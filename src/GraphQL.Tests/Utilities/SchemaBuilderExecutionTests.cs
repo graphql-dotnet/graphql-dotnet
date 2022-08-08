@@ -7,7 +7,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
 {
     public class Query
     {
-        public virtual Test Test() => new Test();
+        public virtual Test Test() => new();
 
         public string Method() => throw new OverflowException("just test");
 
@@ -764,7 +764,7 @@ public class PeopleQueryType
 
 public static class PostData
 {
-    public static readonly List<Post> Posts = new List<Post>
+    public static readonly List<Post> Posts = new()
     {
         new Post {Id = "1", Title = "Post One"}
     };

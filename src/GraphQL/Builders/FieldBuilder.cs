@@ -166,7 +166,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
         public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
-            => new FieldBuilder<TSourceType, TNewReturnType>(FieldType);
+            => new(FieldType);
 
         /// <summary>
         /// Adds an argument to the field.

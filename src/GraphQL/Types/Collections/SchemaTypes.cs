@@ -163,7 +163,8 @@ namespace GraphQL.Types
                    SetGraphType(name, type);
                    ctx.AddType(name, type, null!);
                },
-               graphTypeMappings);
+               graphTypeMappings,
+               schema);
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
@@ -177,8 +178,7 @@ namespace GraphQL.Types
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
             _nameConverter = CamelCaseNameConverter.Instance;
 
-            foreach (var introspectionType in _introspectionTypes.Values)
-                AddType(introspectionType, _context);
+            AddType(_introspectionTypes[typeof(__Schema)], _context);
 
             // set the name converter properly
             _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
@@ -192,12 +192,13 @@ namespace GraphQL.Types
                         AddType(graphType, context);
                     }
                 },
-                graphTypeMappings);
+                graphTypeMappings,
+                schema);
 
             foreach (var type in types)
             {
                 if (type is not ScalarGraphType)
-                    AddType(type, ctx);
+                    AddTypeIfNotRegistered(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
@@ -412,6 +413,7 @@ namespace GraphQL.Types
                 throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
             }
 
+            type.Initialize(context.Schema);
             SetGraphType(type.Name, type);
 
             if (type is IComplexGraphType complexType)

@@ -1,102 +1,101 @@
 using System.Globalization;
 using Newtonsoft.Json;
 
-namespace GraphQL.NewtonsoftJson
+namespace GraphQL.NewtonsoftJson;
+
+// https://github.com/JamesNK/Newtonsoft.Json/issues/1726
+// https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
+/// <summary>
+/// JSON converter for writing floating-point values without loss of precision.
+/// </summary>
+public class FixPrecisionConverter : JsonConverter
 {
-    // https://github.com/JamesNK/Newtonsoft.Json/issues/1726
-    // https://stackoverflow.com/questions/21153381/json-net-serializing-float-double-with-minimal-decimal-places-i-e-no-redundant
+    private readonly bool _decimal;
+    private readonly bool _double;
+    private readonly bool _float;
+
     /// <summary>
-    /// JSON converter for writing floating-point values without loss of precision.
+    /// Initializes the converter and enables it for the specified floating-point types.
     /// </summary>
-    public class FixPrecisionConverter : JsonConverter
+    public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat)
     {
-        private readonly bool _decimal;
-        private readonly bool _double;
-        private readonly bool _float;
+        _decimal = forDecimal;
+        _double = forDouble;
+        _float = forFloat;
+    }
 
-        /// <summary>
-        /// Initializes the converter and enables it for the specified floating-point types.
-        /// </summary>
-        public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat)
+    /// <inheritdoc/>
+    public override bool CanRead => false;
+
+    /// <inheritdoc/>
+    public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+    {
+        throw new NotSupportedException();
+    }
+
+    /// <inheritdoc/>
+    public override bool CanConvert(Type objType) =>
+        objType == typeof(decimal) && _decimal ||
+        objType == typeof(float) && _float ||
+        objType == typeof(double) && _double;
+
+    /// <inheritdoc/>
+    public override void WriteJson(JsonWriter jWriter, object? value, JsonSerializer jSerializer)
+    {
+        if (IsWholeValue(value, out string? result))
         {
-            _decimal = forDecimal;
-            _double = forDouble;
-            _float = forFloat;
+            jWriter.WriteRawValue(result);
         }
-
-        /// <inheritdoc/>
-        public override bool CanRead => false;
-
-        /// <inheritdoc/>
-        public override object ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        else
         {
-            throw new NotSupportedException();
+            jWriter.WriteRawValue(JsonConvert.ToString(value)); // allocations
         }
+    }
 
-        /// <inheritdoc/>
-        public override bool CanConvert(Type objType) =>
-            objType == typeof(decimal) && _decimal ||
-            objType == typeof(float) && _float ||
-            objType == typeof(double) && _double;
-
-        /// <inheritdoc/>
-        public override void WriteJson(JsonWriter jWriter, object? value, JsonSerializer jSerializer)
+    private static bool IsWholeValue(object? value, out string? result)
+    {
+        if (value is decimal dm)
         {
-            if (IsWholeValue(value, out string? result))
+            var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dm);
+            int precision = ((int)decBits.Flags >> 16) & 0x000000FF;
+            if (precision == 0)
             {
-                jWriter.WriteRawValue(result);
+                result = dm.ToString(CultureInfo.InvariantCulture);
+                return true;
+            }
+            {
+                result = null;
+                return false;
+            }
+        }
+        else if (value is float f)
+        {
+            double doubleValue = f;
+            if (doubleValue == Math.Truncate(doubleValue))
+            {
+                result = doubleValue.ToString(CultureInfo.InvariantCulture);
+                return true;
             }
             else
             {
-                jWriter.WriteRawValue(JsonConvert.ToString(value)); // allocations
+                result = null;
+                return false;
             }
         }
-
-        private static bool IsWholeValue(object? value, out string? result)
+        else if (value is double d)
         {
-            if (value is decimal dm)
+            if (d == Math.Truncate(d))
             {
-                var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dm);
-                int precision = ((int)decBits.Flags >> 16) & 0x000000FF;
-                if (precision == 0)
-                {
-                    result = dm.ToString(CultureInfo.InvariantCulture);
-                    return true;
-                }
-                {
-                    result = null;
-                    return false;
-                }
+                result = d.ToString(CultureInfo.InvariantCulture);
+                return true;
             }
-            else if (value is float f)
+            else
             {
-                double doubleValue = f;
-                if (doubleValue == Math.Truncate(doubleValue))
-                {
-                    result = doubleValue.ToString(CultureInfo.InvariantCulture);
-                    return true;
-                }
-                else
-                {
-                    result = null;
-                    return false;
-                }
+                result = null;
+                return false;
             }
-            else if (value is double d)
-            {
-                if (d == Math.Truncate(d))
-                {
-                    result = d.ToString(CultureInfo.InvariantCulture);
-                    return true;
-                }
-                else
-                {
-                    result = null;
-                    return false;
-                }
-            }
-
-            throw new NotSupportedException();
         }
+
+        throw new NotSupportedException();
     }
 }

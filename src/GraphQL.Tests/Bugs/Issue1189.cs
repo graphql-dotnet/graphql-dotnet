@@ -74,7 +74,7 @@ public class Issue1189_Query
 {
     [GraphQLMetadata("hero")]
     public Issue1189_Droid GetHero()
-        => new Issue1189_Droid { Id = "1", Name = "R2-D2" };
+        => new() { Id = "1", Name = "R2-D2" };
 }
 
 [GraphQLMetadata("Droid", IsTypeOf = typeof(Issue1189_Droid))]

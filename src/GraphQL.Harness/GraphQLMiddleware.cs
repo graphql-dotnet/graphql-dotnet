@@ -4,76 +4,78 @@ using GraphQL.Transport;
 using GraphQL.Types;
 using Microsoft.Extensions.Options;
 
-namespace Example
+namespace Example;
+
+// This is just a simple example of ASP.NET Core middleware to setup GraphQL.NET execution engine.
+// It is not intended to be used in production. We recommend to use middleware from server project.
+// See https://github.com/graphql-dotnet/server.
+public class GraphQLMiddleware : IMiddleware
 {
-    public class GraphQLMiddleware : IMiddleware
+    private readonly GraphQLSettings _settings;
+    private readonly IDocumentExecuter _executer;
+    private readonly IGraphQLSerializer _serializer;
+    private readonly ISchema _schema;
+
+    public GraphQLMiddleware(
+        IOptions<GraphQLSettings> options,
+        IDocumentExecuter executer,
+        IGraphQLSerializer serializer,
+        ISchema schema)
     {
-        private readonly GraphQLSettings _settings;
-        private readonly IDocumentExecuter _executer;
-        private readonly IGraphQLSerializer _serializer;
-        private readonly ISchema _schema;
+        _settings = options.Value;
+        _executer = executer;
+        _serializer = serializer;
+        _schema = schema;
+    }
 
-        public GraphQLMiddleware(
-            IOptions<GraphQLSettings> options,
-            IDocumentExecuter executer,
-            IGraphQLSerializer serializer,
-            ISchema schema)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        if (!IsGraphQLRequest(context))
         {
-            _settings = options.Value;
-            _executer = executer;
-            _serializer = serializer;
-            _schema = schema;
+            await next(context).ConfigureAwait(false);
+            return;
         }
 
-        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-        {
-            if (!IsGraphQLRequest(context))
-            {
-                await next(context).ConfigureAwait(false);
-                return;
-            }
+        await ExecuteAsync(context).ConfigureAwait(false);
+    }
 
-            await ExecuteAsync(context).ConfigureAwait(false);
+    private bool IsGraphQLRequest(HttpContext context)
+    {
+        return context.Request.Path.StartsWithSegments(_settings.GraphQLPath)
+            && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task ExecuteAsync(HttpContext context)
+    {
+        var start = DateTime.UtcNow;
+
+        var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false);
+
+        var result = await _executer.ExecuteAsync(options =>
+        {
+            options.Schema = _schema;
+            options.Query = request.Query;
+            options.OperationName = request.OperationName;
+            options.Variables = request.Variables;
+            options.UserContext = _settings.BuildUserContext?.Invoke(context);
+            options.EnableMetrics = _settings.EnableMetrics;
+            options.RequestServices = context.RequestServices;
+            options.CancellationToken = context.RequestAborted;
+        }).ConfigureAwait(false);
+
+        if (_settings.EnableMetrics)
+        {
+            result.EnrichWithApolloTracing(start);
         }
 
-        private bool IsGraphQLRequest(HttpContext context)
-        {
-            return context.Request.Path.StartsWithSegments(_settings.GraphQLPath)
-                && string.Equals(context.Request.Method, "POST", StringComparison.OrdinalIgnoreCase);
-        }
+        await WriteResponseAsync(context, result, context.RequestAborted).ConfigureAwait(false);
+    }
 
-        private async Task ExecuteAsync(HttpContext context)
-        {
-            var start = DateTime.UtcNow;
+    private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
+    {
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = 200; // OK
 
-            var request = await _serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false);
-
-            var result = await _executer.ExecuteAsync(options =>
-            {
-                options.Schema = _schema;
-                options.Query = request.Query;
-                options.OperationName = request.OperationName;
-                options.Variables = request.Variables;
-                options.UserContext = _settings.BuildUserContext?.Invoke(context);
-                options.EnableMetrics = _settings.EnableMetrics;
-                options.RequestServices = context.RequestServices;
-                options.CancellationToken = context.RequestAborted;
-            }).ConfigureAwait(false);
-
-            if (_settings.EnableMetrics)
-            {
-                result.EnrichWithApolloTracing(start);
-            }
-
-            await WriteResponseAsync(context, result, context.RequestAborted).ConfigureAwait(false);
-        }
-
-        private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
-        {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = 200; // OK
-
-            await _serializer.WriteAsync(context.Response.Body, result, cancellationToken).ConfigureAwait(false);
-        }
+        await _serializer.WriteAsync(context.Response.Body, result, cancellationToken).ConfigureAwait(false);
     }
 }

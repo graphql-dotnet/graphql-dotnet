@@ -108,7 +108,7 @@ namespace GraphQL.Execution
             return array;
         }
 
-        private readonly List<Array> _trackedArrays = new List<Array>();
+        private readonly List<Array> _trackedArrays = new();
 
         /// <summary>
         /// Clears all state in this context.

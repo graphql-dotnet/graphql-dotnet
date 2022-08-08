@@ -104,6 +104,38 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
+### 9. Add `Field<TReturnType>` overload to create field builder with an inferred graph type
+
+To define a field with a field builder, previously the graph type was always required, like this:
+
+```csharp
+Field<IntGraphType>("test")
+    .Resolve(_ => 123);
+
+// or
+
+Field<IntGraphType, int>("test")
+    .Resolve(_ => 123);
+```
+
+Now you can simply specify the return type, and the graph type will be inferred:
+
+```csharp
+Field<int>("test")        // by defaut assumes not-null
+    .Resolve(_ => 123);
+
+// or
+
+Field<int>("test", true)  // specify true or false to indicate nullability
+    .Resolve(_ => 123);
+```
+
+This is similar to the expression syntax (`Field(x => x.Name)`) which does not require
+the graph type to be specified in order to define a field.
+
+As with the expression syntax or the `AutoRegisteringObjectGraphType`,
+CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
@@ -255,19 +287,35 @@ This change was done for better discoverability and usability of extension metho
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
 
-### 9. A bunch of FieldXXX APIs were deprecated
+### 9. Errors do not serialize the `Data` property within the response by default.
 
-After upgrade to v7 you will notice with ~100% probability compiler warnings with message
-> Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just
-> use AddField() method directly. This method will be removed in v8.
+This change was made because various .NET services add data to the `Exception` instance
+which may be unintentionally returned to the caller.
+
+To revert to prior behavior, register a custom `ErrorInfoProvider` instance configured
+to return the data to the caller.
+
+```csharp
+//
+services.AddGraphQL(b => b
+    // add schema, serializer, etc
+    .AddErrorInfoProvider(o => o.ExposeData = true));
+```
+
+### 10. A bunch of FieldXXX APIs were deprecated
+
+After upgrading to v7 you will likely notice many compiler warnings with a message similar to the following:
+> Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use
+> AddField() method directly. This method may be removed in a future release. For now you can continue to
+> use this API but we do not encourage this.
 
 The goal of this [change](https://github.com/graphql-dotnet/graphql-dotnet/pull/3237) was to simplify
-APIs and guide developer with well-discovered APIs.
+APIs and guide developers with well-discovered APIs.
 
-You will need to change a way of setting fields on your Graph Types. Instead of many `FieldXXX`
-overloads start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
+You will need to change a way of setting fields on your graph types. Instead of many `FieldXXX`
+overloads, start configuring your field with one of the `Field` methods defined on `ComplexGraphType`.
 All such methods define a new field and return an instance of `FieldBuilder<T,U>`. Then continue to
-configure defined field with rich APIs provided by the returned builder. 
+configure the field with rich APIs provided by the returned builder. 
 
 ```csharp
 // GraphQL 5.x
@@ -282,11 +330,13 @@ Field<NonNullGraphType<StringGraphType>>("name")
   .Resolve(context => context.Source!.Name);
 
 
+
 // GraphQL 5.x
 FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
 
 // GraphQL 7.x
 Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+
 
 
 // GraphQL 5.x
@@ -302,6 +352,60 @@ FieldAsync<HumanType>(
 Field<HumanType>("human")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
   .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
+
+
+
+// GraphQL 5.x
+Func<IResolveFieldContext<object>, Task<string?>> resolver = context => Task.FromResult("abc");
+FieldAsync<StringGraphType, string>("name", resolve: resolver);
+
+// GraphQL 7.x
+Func<IResolveFieldContext<object>, Task<string?>> resolver = context => Task.FromResult("abc");
+Field<StringGraphType, string>("name").ResolveAsync(resolver);
+
+
+
+// GraphQL 5.x
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+
+FieldDelegate<DroidType>(
+  "droid",
+  arguments: new QueryArguments(
+    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+  ),
+  resolve: func
+);
+
+
+
+// GraphQL 7.x
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+
+Field<DroidType, Droid>("droid")
+  .Argument<NonNullGraphType<StringGraphType>>("id", "id of the droid")
+  .ResolveDelegate(func);
+
+
+
+// GraphQL 5.x
+IObservable<object> observable = ...;
+FieldSubscribe<MessageGraphType>("messages", subscribe: context => observable);
+
+// GraphQL 7.x
+IObservable<object> observable = ...;
+Field<MessageGraphType>("messages").ResolveStream(context => observable);
+
+
+
+// GraphQL 5.x
+Task<IObservable<object>> observable = null!;
+FieldSubscribeAsync<MessageGraphType>("messages", subscribeAsync: context => observable);
+
+
+
+// GraphQL 7.x
+Task<IObservable<object>> observable = null!;
+Field<MessageGraphType>("messages").ResolveStreamAsync(context => observable);
 ```
 
 Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.

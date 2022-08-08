@@ -250,5 +250,8 @@ namespace GraphQL.Types
         {
             throw new InvalidOperationException($"Unable to serialize '{value ?? "(null)"}' to the scalar type '{Name}'.");
         }
+
+        /// <inheritdoc/>
+        public override void Initialize(ISchema schema) { }
     }
 }

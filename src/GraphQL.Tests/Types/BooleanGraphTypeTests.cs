@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Types;
 
 public class BooleanGraphTypeTests
 {
-    private readonly BooleanGraphType type = new BooleanGraphType();
+    private readonly BooleanGraphType type = new();
 
     [Theory]
     [InlineData(0)]
