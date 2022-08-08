@@ -28,15 +28,16 @@ namespace GraphQL.Caching
         protected abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
         protected abstract System.Threading.Tasks.Task SetQueryAsync(string hash, string query);
     }
-    public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
+    public class MemoryDocumentCache : GraphQL.DI.IConfigureExecution, System.IDisposable
     {
         public MemoryDocumentCache() { }
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         public virtual void Dispose() { }
-        public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
+        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(GraphQL.ExecutionOptions options) { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
-        public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
+        public virtual System.Threading.Tasks.ValueTask SetAsync(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument value) { }
     }
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {

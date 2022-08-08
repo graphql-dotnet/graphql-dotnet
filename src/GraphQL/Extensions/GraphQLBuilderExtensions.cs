@@ -1,5 +1,4 @@
 using System.Reflection;
-using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -797,41 +796,6 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddDocumentCache -
-        /// <summary>
-        /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
-        /// dependency injection framework.
-        /// </summary>
-        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder)
-            where TDocumentCache : class, IDocumentCache
-        {
-            builder.Services.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <paramref name="documentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
-        /// dependency injection framework.
-        /// </summary>
-        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
-            where TDocumentCache : class, IDocumentCache
-        {
-            builder.Services.Register<IDocumentCache>(documentCache ?? throw new ArgumentNullException(nameof(documentCache)));
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
-        /// dependency injection framework. The supplied factory method is used to create the document cache.
-        /// </summary>
-        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentCache> documentCacheFactory)
-            where TDocumentCache : class, IDocumentCache
-        {
-            builder.Services.Register<IDocumentCache>(documentCacheFactory ?? throw new ArgumentNullException(nameof(documentCacheFactory)), ServiceLifetime.Singleton);
-            return builder;
-        }
-        #endregion
-
         #region - AddSerializer -
         /// <summary>
         /// Registers <typeparamref name="TSerializer"/> as a singleton of type <see cref="IGraphQLSerializer"/> within the
@@ -896,7 +860,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
@@ -911,7 +875,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an asynchronous action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>

@@ -7,20 +7,19 @@ namespace GraphQL;
 public static class MemoryCacheGraphQLBuilderExtensions
 {
     /// <summary>
-    /// Registers <see cref="MemoryDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
-    /// dependency injection framework, and configures it with the specified configuration delegate.
+    /// Registers <see cref="MemoryDocumentCache"/> as a singleton of type <see cref="IConfigureExecution"/> within
+    /// the dependency injection framework, and configures it with the specified configuration delegate.
     /// </summary>
     public static IGraphQLBuilder AddMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions>? action = null)
-    {
-        builder.Services.Configure(action);
-        return builder.AddDocumentCache<MemoryDocumentCache>();
-    }
+     => builder.AddMemoryCache(action == null ? null : (options, _) => action(options));
 
     /// <inheritdoc cref="AddMemoryCache(IGraphQLBuilder, Action{MemoryDocumentCacheOptions})"/>
     public static IGraphQLBuilder AddMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions, IServiceProvider>? action)
     {
-        builder.Services.Configure(action);
-        return builder.AddDocumentCache<MemoryDocumentCache>();
+        builder.Services
+            .Configure(action)
+            .TryRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
     }
 
     /// <summary>

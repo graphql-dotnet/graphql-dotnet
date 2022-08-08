@@ -1,4 +1,3 @@
-using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -20,7 +19,6 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
-        private readonly IDocumentCache _documentCache;
         private readonly ExecutionDelegate _execution;
         private readonly IExecutionStrategySelector _executionStrategySelector;
 
@@ -29,38 +27,28 @@ namespace GraphQL
         /// <see cref="IDocumentValidator"/> instances, and without document caching.
         /// </summary>
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), DefaultDocumentCache.Instance)
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
         {
         }
 
         /// <summary>
         /// Initializes a new instance with specified <see cref="IDocumentBuilder"/> and
-        /// <see cref="IDocumentValidator"/>, and without document caching.
+        /// <see cref="IDocumentValidator"/>.
         /// </summary>
         public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
-            : this(documentBuilder, documentValidator, DefaultDocumentCache.Instance)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/> and <see cref="IDocumentCache"/> instances.
-        /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache)
-            : this(documentBuilder, documentValidator, documentCache, new DefaultExecutionStrategySelector(), Array.Empty<IConfigureExecution>())
+            : this(documentBuilder, documentValidator, new DefaultExecutionStrategySelector(), Array.Empty<IConfigureExecution>())
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/>, <see cref="IDocumentCache"/> and a set of
-        /// <see cref="IConfigureExecution"/> instances.
+        /// <see cref="IDocumentValidator"/>, <see cref="IExecutionStrategySelector"/> and
+        /// a set of <see cref="IConfigureExecution"/> instances.
         /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IDocumentCache documentCache, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
-            _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
             _executionStrategySelector = executionStrategySelector ?? throw new ArgumentNullException(nameof(executionStrategySelector));
             _execution = BuildExecutionDelegate(configurations);
         }
@@ -111,22 +99,10 @@ namespace GraphQL
                 }
 
                 var document = options.Document;
-                bool saveInCache = false;
-                var validationRules = options.ValidationRules;
-                using (metrics.Subject("document", "Building document"))
+                if (document == null)
                 {
-                    if (document == null && (document = await _documentCache.GetAsync(options.Query!).ConfigureAwait(false)) != null)
-                    {
-                        // none of the default validation rules yet are dependent on the inputs, and the
-                        // operation name is not passed to the document validator, so any successfully cached
-                        // document should not need any validation rules run on it
-                        validationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
-                    }
-                    if (document == null)
-                    {
+                    using (metrics.Subject("document", "Building document"))
                         document = _documentBuilder.Build(options.Query!);
-                        saveInCache = true;
-                    }
                 }
 
                 if (document.OperationsCount() == 0)
@@ -149,7 +125,7 @@ namespace GraphQL
                         new ValidationOptions
                         {
                             Document = document,
-                            Rules = validationRules,
+                            Rules = options.ValidationRules,
                             Operation = operation,
                             UserContext = options.UserContext,
                             RequestServices = options.RequestServices,
@@ -160,11 +136,6 @@ namespace GraphQL
                             Variables = options.Variables ?? Inputs.Empty,
                             Extensions = options.Extensions ?? Inputs.Empty,
                         }).ConfigureAwait(false);
-                }
-
-                if (saveInCache && validationResult.IsValid)
-                {
-                    await _documentCache.SetAsync(options.Query!, document).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);

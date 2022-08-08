@@ -25,7 +25,10 @@ namespace GraphQL
         /// <summary>GraphQL query operation name; optional, defaults to first (if any) operation defined in query</summary>
         public string? OperationName { get; set; }
 
-        /// <summary>Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed GraphQL requests (a <see cref="GraphQLDocument"/>). If not set, it will be parsed from <see cref="Query"/></summary>
+        /// <summary>
+        /// Parsed GraphQL request; can be used to increase performance when implementing a cache of parsed
+        /// GraphQL requests (a <see cref="GraphQLDocument"/>). If not set, it will be parsed from <see cref="Query"/>
+        /// </summary>
         public GraphQLDocument? Document { get; set; }
 
         /// <summary>Input variables to GraphQL request</summary>
