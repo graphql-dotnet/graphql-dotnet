@@ -74,7 +74,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// </summary>
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
-    public virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
+    protected virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
         new(_memoryCache.TryGetValue<GraphQLDocument>(options.Query, out var value) ? value : null);
 
     /// <summary>
@@ -82,7 +82,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// </summary>
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <param name="value">The document object to cache.</param>
-    public virtual ValueTask SetAsync(ExecutionOptions options, GraphQLDocument value)
+    protected virtual ValueTask SetAsync(ExecutionOptions options, GraphQLDocument value)
     {
         if (value is null)
         {
