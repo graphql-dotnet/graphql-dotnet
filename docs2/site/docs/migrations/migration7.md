@@ -139,17 +139,17 @@ CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods
 ### 10. Interface graph types can be automatically built from CLR types
 
 Similar to how input and output types can be inferred from their CLR counterparts,
-now interface graph types can also be inferred from CLR types.  This is possible
+now interface graph types can also be inferred from CLR types. This is possible
 with the new class `AutoRegisteringInterfaceGraphType<TSourceType>` which functions
 identically to `AutoRegisteringObjectGraphType<TSourceType>` except creates an
-interface type rather than an object graph type.  When using automatic CLR type
+interface type rather than an object graph type. When using automatic CLR type
 mapping provided by `AddAutoClrMappings()` or `AddAutoSchema()`, any CLR interface
 type is automatically mapped to a interface graph type rather than an object graph
 type.
 
 Note that auto-mapped CLR types do not automatically register or link
 to any GraphQL interfaces; such mapping needs to be specified via the new
-`ImplementsAttribute`.  Similarly, CLR types not referenced directly in the schema
+`ImplementsAttribute`. Similarly, CLR types not referenced directly in the schema
 need to be added to the schema manually or else no graph type will be generated for them.
 
 Below is a typcial example of how the new functionality can be used:
@@ -206,14 +206,14 @@ public class Dog : IAnimal
 
 It is important to ensure that any GraphQL attributes applied to members of the CLR types
 are applied to both the interface and the classes alike, as the GraphQL.NET engine will build
-distinct graph types for the interface and classes which implement those interfaces.  Regardless,
+distinct graph types for the interface and classes which implement those interfaces. Regardless,
 fields will execute against the source object as expected.
 
 When supported by the language in use, default interface methods are fully supported, including static
-methods defined on an interface.  This functionality is available in C# 8.0 and later.
+methods defined on an interface. This functionality is available in C# 8.0 and later.
 
 When building a graph type from an interface, methods are built for all inherited methods
-as well as the specified interface's methods.  This is by design.
+as well as the specified interface's methods. This is by design.
 
 ## Breaking Changes
 
@@ -379,4 +379,18 @@ to return the data to the caller.
 services.AddGraphQL(b => b
     // add schema, serializer, etc
     .AddErrorInfoProvider(o => o.ExposeData = true));
+```
+
+### 10. Interfaces mapped by the `AutoRegisteringGraphTypeMappingProvider` now generate interface graph types rather than object graph types.
+
+If you use interfaces to contain your GraphQL attributes for your data models, or for any other reason
+rely on the generation of object graph types for interface CLR types, you may wish to revert this design
+choice. Simply reconfigure the mapping provider as follows and interfaces will be generated as object graph
+types as before:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(true, true, false))
+    // other calls
+);
 ```
