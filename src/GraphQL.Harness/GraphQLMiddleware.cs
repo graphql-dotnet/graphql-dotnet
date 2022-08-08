@@ -6,6 +6,9 @@ using Microsoft.Extensions.Options;
 
 namespace Example;
 
+// This is just a simple example of ASP.NET Core middleware to setup GraphQL.NET execution engine.
+// It is not intended to be used in production. We recommend to use middleware from server project.
+// See https://github.com/graphql-dotnet/server.
 public class GraphQLMiddleware : IMiddleware
 {
     private readonly GraphQLSettings _settings;
