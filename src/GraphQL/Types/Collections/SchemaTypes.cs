@@ -428,7 +428,11 @@ namespace GraphQL.Types
             {
                 foreach (var objectInterface in obj.Interfaces.List)
                 {
-                    if (AddTypeIfNotRegistered(objectInterface, context) is IInterfaceGraphType interfaceInstance)
+                    object typeOrError = RebuildType(objectInterface, false, context.ClrToGraphTypeMappings);
+                    if (typeOrError is string error)
+                        throw new InvalidOperationException($"The GraphQL implemented type for '{type.Name}' could not be derived implicitly. " + error);
+                    var objectInterface2 = (Type)typeOrError;
+                    if (AddTypeIfNotRegistered(objectInterface2, context) is IInterfaceGraphType interfaceInstance)
                     {
                         obj.AddResolvedInterface(interfaceInstance);
                         interfaceInstance.AddPossibleType(obj);

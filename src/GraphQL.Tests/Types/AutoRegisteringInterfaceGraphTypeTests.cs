@@ -7,57 +7,58 @@ using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace GraphQL.Tests.Types;
 
-public class AutoRegisteringObjectGraphTypeTests
+public class AutoRegisteringInterfaceGraphTypeTests
 {
     [Fact]
     public void Class_RecognizesNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomName>();
         graphType.Name.ShouldBe("TestWithCustomName");
     }
 
     [Fact]
     public void Class_IgnoresInputNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomInputName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomInputName>();
         graphType.Name.ShouldBe("TestClass_WithCustomInputName");
     }
 
     [Fact]
     public void Class_RecognizesOutputNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomOutputName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomOutputName>();
         graphType.Name.ShouldBe("TestWithCustomName");
     }
 
     [Fact]
     public void Class_RecognizesDescriptionAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomDescription>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomDescription>();
         graphType.Description.ShouldBe("Test description");
     }
 
     [Fact]
     public void Class_RecognizesObsoleteAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomDeprecationReason>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomDeprecationReason>();
         graphType.DeprecationReason.ShouldBe("Test deprecation reason");
     }
 
     [Fact]
     public void Class_RecognizesCustomGraphQLAttributes()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithCustomAttributes>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomAttributes>();
         graphType.Description.ShouldBe("Test custom description");
     }
 
     [Fact]
     public void Class_RecognizesMultipleAttributes()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestClass_WithMultipleAttributes>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithMultipleAttributes>();
         graphType.Description.ShouldBe("Test description");
         graphType.GetMetadata<string>("key1").ShouldBe("value1");
         graphType.GetMetadata<string>("key2").ShouldBe("value2");
@@ -66,8 +67,8 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Class_CanOverrideDefaultName()
     {
-        var graphType = new TestOverrideDefaultName<TestClass>();
-        graphType.Name.ShouldBe("TestClassOutput");
+        var graphType = new TestOverrideDefaultName<TestInterface>();
+        graphType.Name.ShouldBe("TestInterfaceInterface");
     }
 
     [Fact]
@@ -80,21 +81,21 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Class_RecognizesInheritedAttributes()
     {
-        var graphType = new AutoRegisteringObjectGraphType<DerivedClass>();
+        var graphType = new AutoRegisteringInterfaceGraphType<DerivedClass>();
         graphType.Fields.Find("Field1CustomName").ShouldNotBeNull();
     }
 
     [Fact]
     public void Field_RecognizesNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         graphType.Fields.Find("Test1").ShouldNotBeNull();
     }
 
     [Fact]
     public void Field_RecognizesDescriptionAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field2").ShouldNotBeNull();
         fieldType.Description.ShouldBe("Test description");
     }
@@ -102,7 +103,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_RecognizesObsoleteAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field3").ShouldNotBeNull();
         fieldType.DeprecationReason.ShouldBe("Test deprecation reason");
     }
@@ -110,7 +111,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_RecognizesCustomGraphQLAttributes()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field4").ShouldNotBeNull();
         fieldType.Description.ShouldBe("Test custom description for field");
     }
@@ -118,7 +119,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_RecognizesMultipleAttributes()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field5").ShouldNotBeNull();
         fieldType.Description.ShouldBe("Test description");
         fieldType.GetMetadata<string>("key1").ShouldBe("value1");
@@ -128,7 +129,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_IgnoresInputTypeAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field6").ShouldNotBeNull();
         fieldType.Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
     }
@@ -136,7 +137,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_RecognizesOutputTypeAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field7").ShouldNotBeNull();
         fieldType.Type.ShouldBe(typeof(IdGraphType));
     }
@@ -144,7 +145,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_IgnoresDefaultValueAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field8").ShouldNotBeNull();
         fieldType.DefaultValue.ShouldBeNull();
     }
@@ -152,21 +153,21 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_IgnoresInputNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         graphType.Fields.Find("Field9").ShouldNotBeNull();
     }
 
     [Fact]
     public void Field_RecognizesOutputNameAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         graphType.Fields.Find("OutputField10").ShouldNotBeNull();
     }
 
     [Fact]
     public void Field_RecognizesIgnoreAttribute()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         graphType.Fields.Find("Field11").ShouldBeNull();
     }
 
@@ -203,7 +204,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
     public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
         fieldType.Type.ShouldBe(expectedGraphType);
     }
@@ -211,7 +212,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void Field_RemovesAsyncSuffix()
     {
-        var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
     }
 
@@ -219,26 +220,26 @@ public class AutoRegisteringObjectGraphTypeTests
     public void DefaultServiceProvider_Should_Create_AutoRegisteringGraphTypes()
     {
         var provider = new DefaultServiceProvider();
-        provider.GetService(typeof(AutoRegisteringObjectGraphType<TestClass>)).ShouldNotBeNull();
+        provider.GetService(typeof(AutoRegisteringInterfaceGraphType<TestInterface>)).ShouldNotBeNull();
     }
 
     [Theory]
-    [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
-    [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
-    [InlineData(nameof(ArgumentTests.WithNullableDefaultString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
-    [InlineData(nameof(ArgumentTests.WithCancellationToken), "cancellationToken", null)]
-    [InlineData(nameof(ArgumentTests.WithResolveFieldContext), "context", null)]
-    [InlineData(nameof(ArgumentTests.WithFromServices), "arg1", null)]
-    [InlineData(nameof(ArgumentTests.NamedArg), "arg1", null)]
-    [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
-    [InlineData(nameof(ArgumentTests.IdArg), "arg1", typeof(NonNullGraphType<IdGraphType>))]
-    [InlineData(nameof(ArgumentTests.TypedArg), "arg1", typeof(StringGraphType))]
-    [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
-    [InlineData(nameof(ArgumentTests.MultipleArgs), "arg2", typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
+    [InlineData(nameof(ArgumentTestsInterface.WithNonNullString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableDefaultString), "arg1", typeof(GraphQLClrInputTypeReference<string>))]
+    [InlineData(nameof(ArgumentTestsInterface.WithCancellationToken), "cancellationToken", null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithResolveFieldContext), "context", null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithFromServices), "arg1", null)]
+    [InlineData(nameof(ArgumentTestsInterface.NamedArg), "arg1", null)]
+    [InlineData(nameof(ArgumentTestsInterface.NamedArg), "arg1rename", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(ArgumentTestsInterface.IdArg), "arg1", typeof(NonNullGraphType<IdGraphType>))]
+    [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", typeof(StringGraphType))]
+    [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>))]
+    [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg2", typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>))]
     public void Argument_VerifyType(string fieldName, string argumentName, Type? argumentGraphType)
     {
-        var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
         var argument = fieldType.Arguments?.Find(argumentName);
         if (argumentGraphType != null)
@@ -253,24 +254,24 @@ public class AutoRegisteringObjectGraphTypeTests
     }
 
     [Theory]
-    [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTests.WithNullableString), null, null, null, null)]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")]
-    [InlineData(nameof(ArgumentTests.WithCancellationToken), null, null, null, true)]
-    [InlineData(nameof(ArgumentTests.WithFromServices), null, null, null, "testService")]
-    [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTests.IdArg), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", "123", null, 123)]
-    [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", 123, null, 123)]
-    [InlineData(nameof(ArgumentTests.TypedArg), "arg1", "123", null, 123)]
-    [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", "hello", 123, "hello123")]
+    [InlineData(nameof(ArgumentTestsInterface.WithNonNullString), "arg1", "hello", null, "hello")]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", "hello", null, "hello")]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), null, null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", "hello", null, "hello")]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), null, null, null, "test")]
+    [InlineData(nameof(ArgumentTestsInterface.WithCancellationToken), null, null, null, true)]
+    [InlineData(nameof(ArgumentTestsInterface.WithFromServices), null, null, null, "testService")]
+    [InlineData(nameof(ArgumentTestsInterface.NamedArg), "arg1rename", "hello", null, "hello")]
+    [InlineData(nameof(ArgumentTestsInterface.IdArg), "arg1", "hello", null, "hello")]
+    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", "123", null, 123)]
+    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null, 123)]
+    [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null, 123)]
+    [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123, "hello123")]
     public async Task Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
     {
-        var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
         using var cts = new CancellationTokenSource();
         cts.Cancel();
@@ -278,7 +279,7 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             CancellationToken = cts.Token,
-            Source = new ArgumentTests(),
+            Source = new ArgumentTestsClass(),
         };
         if (arg1Name != null)
         {
@@ -299,7 +300,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void RegistersReadablePropertiesAndMethodsOnly()
     {
-        var outputType = new AutoRegisteringObjectGraphType<TestClass>();
+        var outputType = new AutoRegisteringInterfaceGraphType<TestInterface>();
         outputType.Fields.Find("Field1").ShouldNotBeNull();
         outputType.Fields.Find("Field2").ShouldNotBeNull();
         outputType.Fields.Find("Field3").ShouldBeNull();
@@ -310,7 +311,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void SkipsSpecifiedProperties()
     {
-        var outputType = new AutoRegisteringObjectGraphType<TestClass>(x => x.Field1);
+        var outputType = new AutoRegisteringInterfaceGraphType<TestInterface>(x => x.Field1);
         outputType.Fields.Find("Field1").ShouldBeNull();
         outputType.Fields.Find("Field2").ShouldNotBeNull();
         outputType.Fields.Find("Field3").ShouldBeNull();
@@ -321,35 +322,27 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void CanOverrideFieldGeneration()
     {
-        var graph = new TestChangingName<TestClass>();
+        var graph = new TestChangingName<TestInterface>();
         graph.Fields.Find("Field1Prop").ShouldNotBeNull();
     }
 
     [Fact]
     public void CanOverrideFieldList()
     {
-        var graph = new TestChangingFieldList<TestClass>();
+        var graph = new TestChangingFieldList<TestInterface>();
         graph.Fields.Count.ShouldBe(1);
         graph.Fields.Find("Field1").ShouldNotBeNull();
-    }
-
-    [Fact]
-    public void CanAddFieldInfos()
-    {
-        var graph = new TestFieldSupport<TestClass>();
-        graph.Fields.Find("Field5").ShouldNotBeNull();
     }
 
     [Theory]
     [InlineData("Field1", 1)]
     [InlineData("Field2", 2)]
     [InlineData("Field4", 4)]
-    [InlineData("Field5", 5)]
     [InlineData("Field6AltName", 6)]
     [InlineData("Field7", 7)]
     public async Task FieldResolversWork(string fieldName, object expected)
     {
-        var graph = new TestFieldSupport<TestClass>();
+        var graph = new AutoRegisteringInterfaceGraphType<TestInterface>();
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
         var resolver = field.Resolver.ShouldNotBeNull();
         var obj = new TestClass();
@@ -364,42 +357,27 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public async Task WorksWithNoDefaultConstructor()
     {
-        var graphType = new TestFieldSupport<NoDefaultConstructorTest>();
+        var graphType = new AutoRegisteringInterfaceGraphType<NoDefaultConstructorTestInterface>();
         var context = new ResolveFieldContext
         {
-            Source = new NoDefaultConstructorTest(true)
+            Source = new NoDefaultConstructorTestClass(true)
         };
         (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(true);
         (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("test");
-        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(1);
     }
 
     [Fact]
     public async Task ThrowsWhenSourceNull()
     {
-        var graphType = new TestFieldSupport<NullSourceFailureTest>();
+        var graphType = new AutoRegisteringInterfaceGraphType<NullSourceFailureTest>();
         var context = new ResolveFieldContext();
         (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
         (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
     }
 
-    [Fact]
-    public async Task ThrowsWhenSourceNull_Struct()
-    {
-        var graphType = new TestFieldSupport<NullSourceStructFailureTest>();
-        var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-    }
-
+#if !NET48 // .NET Framework 4.8 does not support default interface implementation, so would not support static methods on an interface
     [Fact]
     public async Task WorksWithNullSource()
     {
@@ -410,64 +388,40 @@ public class AutoRegisteringObjectGraphTypeTests
         (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(3);
     }
 
+    private class TestFieldSupport<T> : AutoRegisteringInterfaceGraphType<T>
+    {
+        protected override IEnumerable<MemberInfo> GetRegisteredMembers()
+            => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public));
+    }
+
+    private interface NullSourceTest
+    {
+        public static bool Example1 { get; set; } = true;
+        public static string Example2() => "test";
+        public static int Example3 = 3;
+    }
+#endif
+
     [Fact]
     public void TestExceptionBubbling()
     {
-        Should.Throw<Exception>(() => new AutoRegisteringObjectGraphType<TestExceptionBubblingClass>()).Message.ShouldBe("Test");
+        Should.Throw<Exception>(() => new AutoRegisteringInterfaceGraphType<TestExceptionBubblingClass>()).Message.ShouldBe("Test");
     }
 
     [Fact]
     public void TestBasicClassNoExtraFields()
     {
-        var graphType = new AutoRegisteringObjectGraphType<TestBasicClass>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestBasicClass>();
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
-    }
-
-    [Fact]
-    public void TestBasicRecordNoExtraFields()
-    {
-        var graphType = new AutoRegisteringObjectGraphType<TestBasicRecord>();
-        graphType.Fields.Find("Id").ShouldNotBeNull();
-        graphType.Fields.Find("Name").ShouldNotBeNull();
-        graphType.Fields.Count.ShouldBe(2);
-    }
-
-    [Fact]
-    public void TestBasicRecordStructNoExtraFields()
-    {
-        var graphType = new AutoRegisteringObjectGraphType<TestBasicRecordStruct>();
-        graphType.Fields.Find("Id").ShouldNotBeNull();
-        graphType.Fields.Find("Name").ShouldNotBeNull();
-        graphType.Fields.Count.ShouldBe(2);
-    }
-
-    [Fact]
-    public async Task TestStruct()
-    {
-        var graphType = new TestFieldSupport<TestStructModel>();
-        graphType.Name.ShouldBe("Test");
-        graphType.Fields.Count.ShouldBe(3);
-        var context = new ResolveFieldContext
-        {
-            Source = new TestStructModel(),
-            Arguments = new Dictionary<string, ArgumentValue>
-            {
-                { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
-            },
-        };
-        (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(1);
-        graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
-        (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("Example");
-        (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("testExample1");
     }
 
     [Fact]
     public async Task CustomHardcodedArgumentAttributesWork()
     {
-        var graphType = new AutoRegisteringObjectGraphType<CustomHardcodedArgumentAttributeTestClass>();
-        var fieldType = graphType.Fields.Find(nameof(CustomHardcodedArgumentAttributeTestClass.FieldWithHardcodedValue))!;
+        var graphType = new AutoRegisteringInterfaceGraphType<CustomHardcodedArgumentAttributeTestInterface>();
+        var fieldType = graphType.Fields.Find(nameof(CustomHardcodedArgumentAttributeTestInterface.FieldWithHardcodedValue))!;
         var resolver = fieldType.Resolver!;
         (await resolver.ResolveAsync(new ResolveFieldContext
         {
@@ -478,7 +432,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [Fact]
     public void TestInheritedFields()
     {
-        var graphType = new AutoRegisteringObjectGraphType<InheritanceTests>();
+        var graphType = new AutoRegisteringInterfaceGraphType<InheritanceTests>();
         graphType.Fields.Find("Field1").ShouldNotBeNull();
         graphType.Fields.Find("Field2").ShouldNotBeNull();
         graphType.Fields.Find("Field3").ShouldNotBeNull();
@@ -487,9 +441,114 @@ public class AutoRegisteringObjectGraphTypeTests
         graphType.Fields.Count.ShouldBe(5);
     }
 
-    private class CustomHardcodedArgumentAttributeTestClass
+    [Theory]
+    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:DOG){id name}}", @"{""data"":{""find"":{""id"":""20"",""name"":""Shadow""}}}")]
+    [InlineData("{find(type:CAT){id name ... on Cat { lives } ... on Dog { isLarge }}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy"",""lives"":9}}}")]
+    [InlineData("{find(type:DOG){id name ... on Cat { lives } ... on Dog { isLarge }}}", @"{""data"":{""find"":{""id"":""20"",""name"":""Shadow"",""isLarge"":true}}}")]
+    [InlineData("{cat{id name}}", @"{""data"":{""cat"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{dog{id name}}", @"{""data"":{""dog"":{""id"":""20"",""name"":""Shadow""}}}")]
+    [InlineData("{cat{...frag}} fragment frag on IAnimal { id name }", @"{""data"":{""cat"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{dog{...frag}} fragment frag on IAnimal { id name }", @"{""data"":{""dog"":{""id"":""20"",""name"":""Shadow""}}}")]
+    public async Task EndToEndTest(string query, string expected)
     {
-        public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<TestQuery>()
+            .AddSystemTextJson());
+        using var provider = services.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var result = await executer.ExecuteAsync(new()
+        {
+            Query = query,
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var actual = serializer.Serialize(result);
+        actual.ShouldBeCrossPlatJson(expected);
+    }
+
+    [Fact]
+    public async Task ExecutesQueryWithInterfaceOnly()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<TestQuery2>()
+            .AddSystemTextJson());
+        using var provider = services.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var result = await executer.ExecuteAsync(new()
+        {
+            Query = "{find(type:CAT){id name}}",
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var actual = serializer.Serialize(result);
+        actual.ShouldBeCrossPlatJson(@"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}");
+    }
+
+    public class TestQuery
+    {
+        public static IAnimal Find(AnimalType type) => type switch
+        {
+            AnimalType.Cat => Cat(),
+            AnimalType.Dog => Dog(),
+            _ => throw new ArgumentOutOfRangeException(nameof(type)),
+        };
+
+        public static Cat Cat() => new Cat() { Name = "Fluffy", Lives = 9 };
+        public static Dog Dog() => new Dog() { Name = "Shadow", IsLarge = true };
+    }
+
+    public class TestQuery2
+    {
+        public static IAnimal Find(AnimalType type) => type switch
+        {
+            AnimalType.Cat => new Cat() { Name = "Fluffy", Lives = 9 },
+            AnimalType.Dog => new Dog() { Name = "Shadow", IsLarge = true },
+            _ => throw new ArgumentOutOfRangeException(nameof(type)),
+        };
+    }
+
+    public interface IObject
+    {
+        [Id] int Id { get; }
+    }
+
+    public interface IAnimal : IObject
+    {
+        AnimalType Type { get; }
+        string Name { get; }
+    }
+
+    public enum AnimalType { Cat, Dog }
+
+    [Implements(typeof(IAnimal))]
+    public class Cat : IAnimal
+    {
+        [Id] public int Id => 10;
+        public AnimalType Type => AnimalType.Cat;
+        public string Name { get; set; } = null!;
+        public int Lives { get; set; }
+    }
+
+    [Implements(typeof(IAnimal))]
+    public class Dog : IAnimal
+    {
+        [Id] public int Id => 20;
+        public AnimalType Type => AnimalType.Dog;
+        public string Name { get; set; } = null!;
+        public bool IsLarge { get; set; }
+    }
+
+    public class CustomHardcodedArgumentAttributeTestClass : CustomHardcodedArgumentAttributeTestInterface
+    {
+        public string FieldWithHardcodedValue(int value) => value.ToString();
+    }
+
+    public interface CustomHardcodedArgumentAttributeTestInterface
+    {
+        string FieldWithHardcodedValue([HardcodedValue] int value);
     }
 
     private class HardcodedValueAttribute : GraphQLAttribute
@@ -498,101 +557,90 @@ public class AutoRegisteringObjectGraphTypeTests
             => argumentInformation.SetDelegate(context => 85);
     }
 
-    private class NoDefaultConstructorTest
+    private class NoDefaultConstructorTestClass : NoDefaultConstructorTestInterface
     {
-        public NoDefaultConstructorTest(bool value)
+        public NoDefaultConstructorTestClass(bool value)
         {
             Example1 = value;
         }
 
         public bool Example1 { get; set; }
         public string Example2() => "test";
-        public int Example3 = 1;
     }
 
-    private class NullSourceTest
+    private interface NoDefaultConstructorTestInterface
     {
-        public static bool Example1 { get; set; } = true;
-        public static string Example2() => "test";
-        public static int Example3 = 3;
+        bool Example1 { get; set; }
+        string Example2();
     }
 
-    private class NullSourceFailureTest
+    private interface NullSourceFailureTest
     {
-        public bool Example1 { get; set; } = true;
-        public string Example2() => "test";
-        public int Example3 = 3;
+        bool Example1 { get; set; }
+        string Example2();
     }
 
-    private struct NullSourceStructFailureTest
-    {
-        public NullSourceStructFailureTest() { }
-        public bool Example1 { get; set; } = true;
-        public string Example2() => "test";
-        public int Example3 = 3;
-    }
-
-    private class FieldTests
+    private interface FieldTests
     {
         [Name("Test1")]
-        public string? Field1 { get; set; }
+        string? Field1 { get; set; }
         [Description("Test description")]
-        public string? Field2 { get; set; }
+        string? Field2 { get; set; }
         [Obsolete("Test deprecation reason")]
-        public string? Field3 { get; set; }
+        string? Field3 { get; set; }
         [CustomDescription]
-        public string? Field4 { get; set; }
+        string? Field4 { get; set; }
         [Description("Test description")]
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
-        public string? Field5 { get; set; }
+        string? Field5 { get; set; }
         [InputType(typeof(IdGraphType))]
-        public int? Field6 { get; set; }
+        int? Field6 { get; set; }
         [OutputType(typeof(IdGraphType))]
-        public int? Field7 { get; set; }
+        int? Field7 { get; set; }
         [DefaultValue("hello")]
-        public string? Field8 { get; set; }
+        string? Field8 { get; set; }
         [InputName("InputField9")]
-        public string? Field9 { get; set; }
+        string? Field9 { get; set; }
         [OutputName("OutputField10")]
-        public string? Field10 { get; set; }
+        string? Field10 { get; set; }
         [Ignore]
-        public string? Field11 { get; set; }
-        public int NotNullIntField { get; set; }
-        public int? NullableIntField { get; set; }
-        public string NotNullStringField { get; set; } = null!;
-        public string? NullableStringField { get; set; }
-        public string NotNullStringGetOnlyField => null!;
-        public string? NullableStringGetOnlyField => null!;
-        public List<string?> NotNullListNullableStringField { get; set; } = null!;
-        public List<string> NotNullListNotNullStringField { get; set; } = null!;
-        public List<string?>? NullableListNullableStringField { get; set; }
-        public List<string>? NullableListNotNullStringField { get; set; }
-        public IEnumerable<int?> NotNullEnumerableNullableIntField { get; set; } = null!;
-        public IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; } = null!;
-        public IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
-        public IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
-        public Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; } = null!;
-        public Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; } = null!;
-        public Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
-        public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
+        string? Field11 { get; set; }
+        int NotNullIntField { get; set; }
+        int? NullableIntField { get; set; }
+        string NotNullStringField { get; set; }
+        string? NullableStringField { get; set; }
+        string NotNullStringGetOnlyField { get; }
+        string? NullableStringGetOnlyField { get; }
+        List<string?> NotNullListNullableStringField { get; set; }
+        List<string> NotNullListNotNullStringField { get; set; }
+        List<string?>? NullableListNullableStringField { get; set; }
+        List<string>? NullableListNotNullStringField { get; set; }
+        IEnumerable<int?> NotNullEnumerableNullableIntField { get; set; }
+        IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; }
+        IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
+        IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
+        Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; }
+        Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; }
+        Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
+        Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
         [Id]
-        public int IdField { get; set; }
+        int IdField { get; set; }
         [Id]
-        public int? NullableIdField { get; set; }
-        public IEnumerable EnumerableField { get; set; } = null!;
-        public ICollection CollectionField { get; set; } = null!;
-        public IEnumerable? NullableEnumerableField { get; set; }
-        public ICollection? NullableCollectionField { get; set; }
-        public int?[]?[]? ListOfListOfIntsField { get; set; }
-        public Task<string> TaskStringField() => null!;
-        public Task<int> TaskIntFieldAsync() => Task.FromResult(0);
-        public IDataLoaderResult<string?> DataLoaderNullableStringField() => null!;
-        public IDataLoaderResult<string>? NullableDataLoaderStringField() => null!;
-        public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField() => null!;
+        int? NullableIdField { get; set; }
+        IEnumerable EnumerableField { get; set; }
+        ICollection CollectionField { get; set; }
+        IEnumerable? NullableEnumerableField { get; set; }
+        ICollection? NullableCollectionField { get; set; }
+        int?[]?[]? ListOfListOfIntsField { get; set; }
+        Task<string> TaskStringField();
+        Task<int> TaskIntFieldAsync();
+        IDataLoaderResult<string?> DataLoaderNullableStringField();
+        IDataLoaderResult<string>? NullableDataLoaderStringField();
+        Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField();
     }
 
-    private class ArgumentTests
+    private class ArgumentTestsClass : ArgumentTestsInterface
     {
         public string? WithNonNullString(string arg1) => arg1;
         public string? WithNullableString(string? arg1) => arg1;
@@ -608,7 +656,23 @@ public class AutoRegisteringObjectGraphTypeTests
         public string MultipleArgs(string arg1, int arg2) => arg1 + arg2.ToString();
     }
 
-    private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
+    private interface ArgumentTestsInterface
+    {
+        string? WithNonNullString(string arg1);
+        string? WithNullableString(string? arg1);
+        string? WithDefaultString(string arg1 = "test");
+        string? WithNullableDefaultString(string? arg1 = "test");
+        bool WithCancellationToken(CancellationToken cancellationToken);
+        string? WithResolveFieldContext(IResolveFieldContext context);
+        string WithFromServices([FromServices] string arg1);
+        string NamedArg([Name("arg1rename")] string arg1);
+        string IdArg([Id] string arg1);
+        int IdIntArg([Id] int arg1);
+        int TypedArg([InputType(typeof(StringGraphType))] int arg1);
+        string MultipleArgs(string arg1, int arg2);
+    }
+
+    private class TestChangingFieldList<T> : AutoRegisteringInterfaceGraphType<T>
     {
         protected override IEnumerable<FieldType> ProvideFields()
         {
@@ -616,13 +680,7 @@ public class AutoRegisteringObjectGraphTypeTests
         }
     }
 
-    private class TestFieldSupport<T> : AutoRegisteringObjectGraphType<T>
-    {
-        protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-            => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public));
-    }
-
-    private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
+    private class TestChangingName<T> : AutoRegisteringInterfaceGraphType<T>
     {
         protected override FieldType CreateField(MemberInfo memberInfo)
         {
@@ -632,37 +690,47 @@ public class AutoRegisteringObjectGraphTypeTests
         }
     }
 
-    private class TestClass
+    private class TestClass : TestInterface
     {
         public int Field1 { get; set; } = 1;
         public int Field2 => 2;
         public int Field3 { set { } }
         public int Field4() => 4;
-        public int Field5 = 5;
         [Name("Field6AltName")]
         public int Field6 => 6;
         public Task<int> Field7 => Task.FromResult(7);
     }
 
+    private interface TestInterface
+    {
+        int Field1 { get; set; }
+        int Field2 { get; }
+        int Field3 { set; }
+        int Field4();
+        [Name("Field6AltName")]
+        int Field6 { get; }
+        Task<int> Field7 { get; }
+    }
+
     [Name("TestWithCustomName")]
-    private class TestClass_WithCustomName { }
+    private interface TestClass_WithCustomName { }
 
     [InputName("TestWithCustomName")]
-    private class TestClass_WithCustomInputName { }
+    private interface TestClass_WithCustomInputName { }
 
     [OutputName("TestWithCustomName")]
-    private class TestClass_WithCustomOutputName { }
+    private interface TestClass_WithCustomOutputName { }
 
     [Description("Test description")]
-    private class TestClass_WithCustomDescription { }
+    private interface TestClass_WithCustomDescription { }
 
     [Obsolete("Test deprecation reason")]
-    private class TestClass_WithCustomDeprecationReason { }
+    private interface TestClass_WithCustomDeprecationReason { }
 
     [CustomDescription]
-    private class TestClass_WithCustomAttributes { }
+    private interface TestClass_WithCustomAttributes { }
 
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Property)]
     private class CustomDescriptionAttribute : GraphQLAttribute
     {
         public override void Modify(IGraphType graphType)
@@ -679,13 +747,13 @@ public class AutoRegisteringObjectGraphTypeTests
     [Metadata("key1", "value1")]
     [Metadata("key2", "value2")]
     [Description("Test description")]
-    private class TestClass_WithMultipleAttributes { }
+    private interface TestClass_WithMultipleAttributes { }
 
-    private class TestOverrideDefaultName<T> : AutoRegisteringObjectGraphType<T>
+    private class TestOverrideDefaultName<T> : AutoRegisteringInterfaceGraphType<T>
     {
         protected override void ConfigureGraph()
         {
-            Name = typeof(T).Name + "Output";
+            Name = typeof(T).Name + "Interface";
             base.ConfigureGraph();
         }
     }
@@ -700,9 +768,9 @@ public class AutoRegisteringObjectGraphTypeTests
         public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
     }
 
-    private class TestExceptionBubblingClass
+    private interface TestExceptionBubblingClass
     {
-        public string Test([TestExceptionBubbling] string arg) => arg;
+        string Test([TestExceptionBubbling] string arg);
     }
 
     private class TestExceptionBubblingAttribute : GraphQLAttribute
@@ -713,39 +781,26 @@ public class AutoRegisteringObjectGraphTypeTests
         }
     }
 
-    private record TestBasicRecord(int Id, string Name);
-
-    private record struct TestBasicRecordStruct(int Id, string Name);
-
-    private class TestBasicClass
+    private interface TestBasicClass
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = null!;
+        int Id { get; set; }
+        string Name { get; set; }
     }
 
-    [Name("Test")]
-    public struct TestStructModel
+    public interface InheritanceTestsGrandparent
     {
-        public TestStructModel() { }
-        [Id]
-        public int Id { get; set; } = 1;
-        public static string Name = "Example";
-        [Name("IdAndName")]
-        public string IdName(string prefix) => prefix + Name + Id.ToString();
+        int Field1 { get; }
+        int Field2();
     }
 
-    public class InheritanceTestsParent
+    public interface InheritanceTestsParent : InheritanceTestsGrandparent
     {
-        public int Field1 => 1;
-        public int Field2() => 2;
-        public virtual int Field3() => 3;
+        int Field3();
     }
 
-    public class InheritanceTests : InheritanceTestsParent
+    public interface InheritanceTests : InheritanceTestsParent
     {
-        public int Field4 => 4;
-        public int Field5() => 5;
-        public override int Field3() => 3;
-        public override int GetHashCode() => 123;
+        int Field4 { get; }
+        int Field5();
     }
 }

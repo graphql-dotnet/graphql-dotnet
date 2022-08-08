@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
-using GraphQL.Resolvers;
 
 namespace GraphQL.Types
 {
@@ -11,20 +10,20 @@ namespace GraphQL.Types
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// Also it can get descriptions for fields from the XML comments.
     /// </summary>
-    public class AutoRegisteringObjectGraphType<TSourceType> : ObjectGraphType<TSourceType>
+    public class AutoRegisteringInterfaceGraphType<TSourceType> : InterfaceGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
         /// </summary>
-        public AutoRegisteringObjectGraphType() : this(null) { }
+        public AutoRegisteringInterfaceGraphType() : this(null) { }
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
         /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
-        public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+        public AutoRegisteringInterfaceGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         {
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
@@ -35,19 +34,13 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Applies default configuration settings to this graph type along with any <see cref="GraphQLAttribute"/> attributes marked on <typeparamref name="TSourceType"/>.
-        /// Allows the ability to override the default naming convention used by this class without affecting attributes applied directly to <typeparamref name="TSourceType"/>.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ConfigureGraph"/>
         protected virtual void ConfigureGraph()
         {
             AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
         }
 
-        /// <summary>
-        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
-        /// added to the graph type.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ProvideFields"/>
         protected virtual IEnumerable<FieldType> ProvideFields()
         {
             foreach (var memberInfo in GetRegisteredMembers())
@@ -67,10 +60,7 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Processes the specified member and returns a <see cref="FieldType"/>.
-        /// May return <see langword="null"/> to skip a member.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.CreateField(MemberInfo)"/>
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
         {
             var typeInformation = GetTypeInformation(memberInfo);
@@ -82,7 +72,7 @@ namespace GraphQL.Types
             return fieldType;
         }
 
-        /// <inheritdoc cref="AutoRegisteringHelper.BuildFieldTypeForOutput(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument})"/>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
         protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
             Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
@@ -100,14 +90,7 @@ namespace GraphQL.Types
                 ApplyArgumentAttributes);
         }
 
-        /// <summary>
-        /// Returns a lambda expression that will be used by the field resolver to access the member.
-        /// <br/><br/>
-        /// Typically this is a lambda expression of type <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TSourceType"/>&gt;.
-        /// <br/><br/>
-        /// By default this returns the <see cref="IResolveFieldContext.Source"/> property.
-        /// </summary>
-        /// <param name="memberInfo">The member being called or accessed.</param>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildMemberInstanceExpression(MemberInfo)"/>
         protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
             => _sourceExpression;
 
@@ -116,21 +99,16 @@ namespace GraphQL.Types
 
         private static object ThrowSourceNullException()
         {
-            throw new NullReferenceException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
+            throw new NullReferenceException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
         }
 
-        private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringObjectGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
+        private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
         private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
             => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
 
-        /// <summary>
-        /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
-        /// to the specified <see cref="QueryArgument"/>.
-        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
         protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         {
-            // Apply derivatives of GraphQLAttribute
             var attributes = parameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
@@ -138,12 +116,7 @@ namespace GraphQL.Types
             }
         }
 
-        /// <summary>
-        /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>
-        /// containing information necessary to build a <see cref="QueryArgument"/> and <see cref="IFieldResolver"/>.
-        /// Also applies any <see cref="GraphQLAttribute"/> attributes defined on the <see cref="ParameterInfo"/>
-        /// to the returned <see cref="ArgumentInformation"/> instance.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)"/>
         protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
         {
             var typeInformation = GetTypeInformation(parameterInfo);
@@ -152,19 +125,11 @@ namespace GraphQL.Types
             return argumentInfo;
         }
 
-        /// <inheritdoc cref="AutoRegisteringHelper.GetRegisteredMembersForOutput{TSourceType}(Expression{Func{TSourceType, object?}}[])"/>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetRegisteredMembers"/>
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
             => AutoRegisteringHelper.GetRegisteredMembersForOutput(_excludedProperties);
 
-        /// <summary>
-        /// Analyzes a property, method or field and returns an instance of <see cref="TypeInformation"/>
-        /// containing information necessary to select a graph type. Nullable reference annotations
-        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
-        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
-        /// <br/><br/>
-        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
-        /// attributes to change graph type selection behavior.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetTypeInformation(MemberInfo)"/>
         protected virtual TypeInformation GetTypeInformation(MemberInfo memberInfo)
         {
             var typeInformation = memberInfo switch
@@ -178,15 +143,7 @@ namespace GraphQL.Types
             return typeInformation;
         }
 
-        /// <summary>
-        /// Analyzes a method argument and returns an instance of <see cref="TypeInformation"/>
-        /// containing information necessary to select a graph type. Nullable reference annotations
-        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
-        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
-        /// <br/><br/>
-        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
-        /// attributes to change graph type selection behavior.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetTypeInformation(ParameterInfo)"/>
         protected virtual TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
         {
             var typeInformation = new TypeInformation(parameterInfo);
