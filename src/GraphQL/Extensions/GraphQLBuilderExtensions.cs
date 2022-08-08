@@ -915,7 +915,7 @@ namespace GraphQL
             => ConfigureExecutionOptions(builder, action, SORT_ORDER_CONFIGURE_EXECUTION_OPTIONS);
 
         /// <inheritdoc cref="ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})"/>
-        public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action, float sortOrder)
+        internal static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action, float sortOrder)
         {
             builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action)), sortOrder));
             return builder;
