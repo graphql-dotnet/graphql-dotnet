@@ -154,7 +154,7 @@ Complexity analysis is now a validation rule and has been removed from execution
 There is no change when using the `IGraphQLBuilder.AddComplexityAnalyzer` methods as shown below:
 
 ```csharp
-// GraphQL 5.x or 6.x
+// GraphQL 5.x or 7.x
 builder.AddComplexityAnalyzer(complexityConfig => {
     // set configuration here
 });
@@ -167,14 +167,15 @@ However, when manually setting `options.ComplexityConfiguration`, you will need 
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
-// GraphQL 6.x
+// GraphQL 7.x
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
 ```
 
 ### 4. `IComplexityAnalyzer` has been removed from `DocumentExecuter` constructors
 
 When not using the complexity analyzer, or when using the default complexity analyzer, simply
-remove the argument from calls to the constructor and no additional changes are required.
+remove the argument from calls to the constructor. Note that `IDocumentCache` argument was
+removed as well, see the next chapter for details.
 
 ```csharp
 /// GraphQL 5.x
@@ -189,14 +190,13 @@ public MyCustomDocumentExecuter(
 {
 }
 
-/// GraphQL 6.x
+/// GraphQL 7.x
 public MyCustomDocumentExecuter(
     IDocumentBuilder documentBuilder,
     IDocumentValidator documentValidator,
-    IDocumentCache documentCache,
-    IEnumerable<IConfigureExecutionOptions> configureExecutionOptions,
-    IExecutionStrategySelector executionStrategySelector)
-    : base(documentBuilder, documentValidator, documentCache, configureExecutionOptions, executionStrategySelector)
+    IExecutionStrategySelector executionStrategySelector,
+    IEnumerable<IConfigureExecution> configurations)
+    : base(documentBuilder, documentValidator, documentCache, executionStrategySelector, configurations)
 {
 }
 ```
@@ -205,7 +205,7 @@ When using a custom complexity analyzer implementation added through the `IGraph
 methods, no change is required.
 
 ```csharp
-/// GraphQL 5.x or 6.x
+/// GraphQL 5.x or 7.x
 builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(complexityConfig => {
     // set configuration here
 });
@@ -219,7 +219,7 @@ from DI through to `ComplexityValidationRule`.
 // GraphQL 5.x
 options.ComplexityConfiguration = complexityConfig;
 
-// GraphQL 6.x
+// GraphQL 7.x
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
     new ComplexityValidationRule(
         complexityConfig,
@@ -229,7 +229,19 @@ options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
 
 Using the `IGraphQLBuilder` interface to configure the GraphQL.NET execution engine is the recommended approach.
 
-### 5. Obsolete members have been removed
+### 5. Changes in document caching
+
+To make work with document cache more flexible and allow some advanced use-cases this component
+was moved out of the GraphQL.NET execution engine. There is no more `IDocumentCache` interface
+to implement and no more `AddDocumentCache` extension methods defined on `IGraphQLBuilder`.
+The recommended way to setup caching layer is to inherit from `IConfigureExecution` interface
+and register your class as its implementation. No change is required if you used `AddMemoryCache`
+extension methods.
+
+Other changes in `MemoryDocumentCache` that may affect you - `GetMemoryCacheEntryOptions`,
+`GetAsync` and `SetAsync` methods take `ExecutionOptions options` argument instead of `string query`.
+
+### 6. Obsolete members have been removed
 
 | Member | Replaced by |
 |--------|-------------|
@@ -248,7 +260,7 @@ Please consider the operation of the new `AddApolloTracing` method (see 'New Fea
 when replacing `AddMetrics` with `AddApolloTracing`. Remember that `AddApolloTracing` includes
 functionality previously within `ApolloTracingDocumentExecuter` and/or `EnrichWithApolloTracing`.
 
-### 6. `GlobalSwitches.MapAllEnumerableTypes` has been removed; only specific types are detected as lists.
+### 7. `GlobalSwitches.MapAllEnumerableTypes` has been removed; only specific types are detected as lists.
 
 When auto detecting graph types from CLR types (usually within `AutoRegisteringObjectGraphType` or the
 expression syntax of `Field(x => x.Member)`), previously any type except `string` that implemented
@@ -270,7 +282,7 @@ Now only the following types or generic types are considered list types:
 
 There is no change as compared to when `GlobalSwitches.MapAllEnumerableTypes` was set to `false`.
 
-### 7. Unification of namespaces for DI extension methods
+### 8. Unification of namespaces for DI extension methods
 
 All extension methods to configure GraphQL.NET services within a dependency injection framework
 were moved into `GraphQL` namespace. Also class names were changed:
@@ -283,11 +295,11 @@ were moved into `GraphQL` namespace. Also class names were changed:
 
 This change was done for better discoverability and usability of extension methods when configuring DI.
 
-### 8. `IResolveFieldContext.User` property added
+### 9. `IResolveFieldContext.User` property added
 
 Custom implementations of `IResolveFieldContext` must implement the new `User` property.
 
-### 9. Errors do not serialize the `Data` property within the response by default.
+### 10. Errors do not serialize the `Data` property within the response by default.
 
 This change was made because various .NET services add data to the `Exception` instance
 which may be unintentionally returned to the caller.

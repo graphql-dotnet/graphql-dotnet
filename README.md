@@ -78,7 +78,8 @@ We provide several serializers (or you can bring your own).
 
 #### 3. Document Caching
 
-For caching of parsed GraphQL documents you'll need an `IDocumentCache` implementation.
+The recommended way to setup caching layer (for caching of parsed GraphQL documents) is to
+inherit from `IConfigureExecution` interface and register your class as its implementation.
 We provide in-memory implementation on top of `Microsoft.Extensions.Caching.Memory` package.
 
 ```
