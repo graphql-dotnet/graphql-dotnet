@@ -14,74 +14,74 @@ namespace GraphQL.Tests.Types;
 public class AutoRegisteringInterfaceGraphTypeTests
 {
     [Fact]
-    public void Class_RecognizesNameAttribute()
+    public void Interface_RecognizesNameAttribute()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomName>();
         graphType.Name.ShouldBe("TestWithCustomName");
     }
 
     [Fact]
-    public void Class_IgnoresInputNameAttribute()
+    public void Interface_IgnoresInputNameAttribute()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomInputName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomInputName>();
         graphType.Name.ShouldBe("TestClass_WithCustomInputName");
     }
 
     [Fact]
-    public void Class_RecognizesOutputNameAttribute()
+    public void Interface_RecognizesOutputNameAttribute()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomOutputName>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomOutputName>();
         graphType.Name.ShouldBe("TestWithCustomName");
     }
 
     [Fact]
-    public void Class_RecognizesDescriptionAttribute()
+    public void Interface_RecognizesDescriptionAttribute()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomDescription>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomDescription>();
         graphType.Description.ShouldBe("Test description");
     }
 
     [Fact]
-    public void Class_RecognizesObsoleteAttribute()
+    public void Interface_RecognizesObsoleteAttribute()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomDeprecationReason>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomDeprecationReason>();
         graphType.DeprecationReason.ShouldBe("Test deprecation reason");
     }
 
     [Fact]
-    public void Class_RecognizesCustomGraphQLAttributes()
+    public void Interface_RecognizesCustomGraphQLAttributes()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithCustomAttributes>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomAttributes>();
         graphType.Description.ShouldBe("Test custom description");
     }
 
     [Fact]
-    public void Class_RecognizesMultipleAttributes()
+    public void Interface_RecognizesMultipleAttributes()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestClass_WithMultipleAttributes>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithMultipleAttributes>();
         graphType.Description.ShouldBe("Test description");
         graphType.GetMetadata<string>("key1").ShouldBe("value1");
         graphType.GetMetadata<string>("key2").ShouldBe("value2");
     }
 
     [Fact]
-    public void Class_CanOverrideDefaultName()
+    public void Interface_CanOverrideDefaultName()
     {
         var graphType = new TestOverrideDefaultName<TestInterface>();
         graphType.Name.ShouldBe("TestInterfaceInterface");
     }
 
     [Fact]
-    public void Class_AttributesApplyOverOverriddenDefaultName()
+    public void Interface_AttributesApplyOverOverriddenDefaultName()
     {
-        var graphType = new TestOverrideDefaultName<TestClass_WithCustomName>();
+        var graphType = new TestOverrideDefaultName<TestInterface_WithCustomName>();
         graphType.Name.ShouldBe("TestWithCustomName");
     }
 
     [Fact]
-    public void Class_RecognizesInheritedAttributes()
+    public void Interface_RecognizesInheritedAttributes()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<DerivedClass>();
+        var graphType = new AutoRegisteringInterfaceGraphType<DerivedInterface>();
         graphType.Fields.Find("Field1CustomName").ShouldNotBeNull();
     }
 
@@ -405,13 +405,13 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [Fact]
     public void TestExceptionBubbling()
     {
-        Should.Throw<Exception>(() => new AutoRegisteringInterfaceGraphType<TestExceptionBubblingClass>()).Message.ShouldBe("Test");
+        Should.Throw<Exception>(() => new AutoRegisteringInterfaceGraphType<TestExceptionBubblingInterface>()).Message.ShouldBe("Test");
     }
 
     [Fact]
     public void TestBasicClassNoExtraFields()
     {
-        var graphType = new AutoRegisteringInterfaceGraphType<TestBasicClass>();
+        var graphType = new AutoRegisteringInterfaceGraphType<TestBasicInterface>();
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
@@ -713,22 +713,22 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Name("TestWithCustomName")]
-    private interface TestClass_WithCustomName { }
+    private interface TestInterface_WithCustomName { }
 
     [InputName("TestWithCustomName")]
-    private interface TestClass_WithCustomInputName { }
+    private interface TestInterface_WithCustomInputName { }
 
     [OutputName("TestWithCustomName")]
-    private interface TestClass_WithCustomOutputName { }
+    private interface TestInterface_WithCustomOutputName { }
 
     [Description("Test description")]
-    private interface TestClass_WithCustomDescription { }
+    private interface TestInterface_WithCustomDescription { }
 
     [Obsolete("Test deprecation reason")]
-    private interface TestClass_WithCustomDeprecationReason { }
+    private interface TestInterface_WithCustomDeprecationReason { }
 
     [CustomDescription]
-    private interface TestClass_WithCustomAttributes { }
+    private interface TestInterface_WithCustomAttributes { }
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Property)]
     private class CustomDescriptionAttribute : GraphQLAttribute
@@ -747,7 +747,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [Metadata("key1", "value1")]
     [Metadata("key2", "value2")]
     [Description("Test description")]
-    private interface TestClass_WithMultipleAttributes { }
+    private interface TestInterface_WithMultipleAttributes { }
 
     private class TestOverrideDefaultName<T> : AutoRegisteringInterfaceGraphType<T>
     {
@@ -758,17 +758,16 @@ public class AutoRegisteringInterfaceGraphTypeTests
         }
     }
 
-    private class ParentClass
+    private interface ParentInterface
     {
         [Name("Field1CustomName")]
-        public virtual string? Field1 { get; set; }
+        string? Field1 { get; set; }
     }
-    private class DerivedClass : ParentClass
+    private interface DerivedInterface : ParentInterface
     {
-        public override string? Field1 { get => base.Field1; set => base.Field1 = value; }
     }
 
-    private interface TestExceptionBubblingClass
+    private interface TestExceptionBubblingInterface
     {
         string Test([TestExceptionBubbling] string arg);
     }
@@ -781,7 +780,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         }
     }
 
-    private interface TestBasicClass
+    private interface TestBasicInterface
     {
         int Id { get; set; }
         string Name { get; set; }
