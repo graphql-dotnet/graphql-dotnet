@@ -24,7 +24,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     public void Interface_IgnoresInputNameAttribute()
     {
         var graphType = new AutoRegisteringInterfaceGraphType<TestInterface_WithCustomInputName>();
-        graphType.Name.ShouldBe("TestClass_WithCustomInputName");
+        graphType.Name.ShouldBe("TestInterface_WithCustomInputName");
     }
 
     [Fact]
@@ -521,7 +521,11 @@ public class AutoRegisteringInterfaceGraphTypeTests
         string Name { get; }
     }
 
-    public enum AnimalType { Cat, Dog }
+    public enum AnimalType
+    {
+        Cat,
+        Dog,
+    }
 
     [Implements(typeof(IAnimal))]
     public class Cat : IAnimal
