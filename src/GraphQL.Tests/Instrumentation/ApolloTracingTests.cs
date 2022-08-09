@@ -112,14 +112,15 @@ query {
                 if (enableBefore)
                     opts.EnableMetrics = true;
                 return next(opts);
-            }, -1000)
+            })
             .UseApolloTracing(enable)
-            .ConfigureExecutionOptions(opts =>
+            .ConfigureExecution((opts, next) =>
             {
                 opts.EnableMetrics.ShouldBe(enable || enableBefore);
                 if (enableAfter)
                     opts.EnableMetrics = true;
-            }, 1000)
+                return next(opts);
+            })
             .AddSystemTextJson());
         using var provider = serviceCollection.BuildServiceProvider();
         var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();

@@ -344,8 +344,12 @@ namespace GraphQL
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IServiceRegister Configure<TOptions>(this GraphQL.DI.IServiceRegister services, System.Action<TOptions>? action)
             where TOptions :  class, new () { }
-        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action, float sortOrder = 600) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, GraphQL.DI.ExecutionDelegate, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TConfigureExecution> factory)
+            where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this GraphQL.DI.IGraphQLBuilder builder, TConfigureExecution instance)
             where TConfigureExecution :  class, GraphQL.DI.IConfigureExecution { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.ExecutionOptions> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }

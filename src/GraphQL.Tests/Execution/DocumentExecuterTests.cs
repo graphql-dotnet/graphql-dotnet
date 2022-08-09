@@ -79,33 +79,51 @@ public class DocumentExecuterTests
     [Fact]
     public async Task Honors_IConfigureExecution_SortOrder()
     {
-        Func<int, int, Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>>> given =
-            (expected, setValue) =>
-            {
-                return (options, next) =>
-                {
-                    (options.MaxParallelExecutionCount ?? 0).ShouldBe(expected);
-                    options.MaxParallelExecutionCount = setValue;
-                    return next(options);
-                };
-            };
-
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
-            .ConfigureExecution(given(0, 1), 1) //executes 1st
-            .ConfigureExecution(given(4, 5), 5) //executes 3rd
-            .ConfigureExecution(given(1, 4), 2) //executes 2nd
-            .ConfigureExecution((options, _) => //executes 5th
+            .ConfigureExecution(new MyConfigureExecution(0, 1, 1)) //executes 1st
+            .ConfigureExecution(new MyConfigureExecution(4, 5, 5)) //executes 3rd
+            .ConfigureExecution(new MyConfigureExecution(1, 4, 2)) //executes 2nd
+            .ConfigureExecution(new MyConfigureExecution((options, _) => //executes 5th
             {
                 options.MaxParallelExecutionCount.ShouldBe(6);
                 return Task.FromResult<ExecutionResult>(null!); // no need to actually execute a query
-            }, 6)
-            .ConfigureExecution(given(5, 6), 5) //executes 4th
+            }, 6))
+            .ConfigureExecution(new MyConfigureExecution(5, 6, 5)) //executes 4th
         );
         using var provider = services.BuildServiceProvider();
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var ret = await executer.ExecuteAsync(new()).ConfigureAwait(false);
         ret.ShouldBeNull(); // validates that all configured executions have run, as normally this would never be null
+    }
+
+    private class MyConfigureExecution : ConfigureExecution
+    {
+        private readonly float _sortOrder;
+
+        public MyConfigureExecution(int expected, int setValue, int sortOrder)
+            : base(CreateAction(expected, setValue))
+        {
+            _sortOrder = sortOrder;
+        }
+
+        public MyConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action, int sortOrder)
+            : base(action)
+        {
+            _sortOrder = sortOrder;
+        }
+
+        private static Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> CreateAction(int expected, int setValue)
+        {
+            return (options, next) =>
+            {
+                (options.MaxParallelExecutionCount ?? 0).ShouldBe(expected);
+                options.MaxParallelExecutionCount = setValue;
+                return next(options);
+            };
+        }
+
+        public override float SortOrder => _sortOrder;
     }
 
     private class StringExecuter<TSchema> where TSchema : ISchema
