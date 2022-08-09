@@ -81,7 +81,6 @@ namespace GraphQL.DataLoader
         public DataLoaderPair(GraphQL.DataLoader.IDataLoader loader, TKey key) { }
         public bool IsResultSet { get; }
         public TKey Key { get; }
-        public GraphQL.DataLoader.IDataLoader Loader { get; }
         public T Result { get; }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public void SetResult(T value) { }
@@ -91,10 +90,6 @@ namespace GraphQL.DataLoader
         public DataLoaderResult(System.Threading.Tasks.Task<T> result) { }
         public DataLoaderResult(T result) { }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
-    }
-    public static class GraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
     public interface IDataLoader
     {
@@ -118,5 +113,12 @@ namespace GraphQL.DataLoader
         public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync() { }
+    }
+}
+namespace GraphQL
+{
+    public static class DataLoaderGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
 }

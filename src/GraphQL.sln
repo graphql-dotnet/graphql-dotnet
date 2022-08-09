@@ -128,6 +128,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
 		..\docs2\site\docs\migrations\migration5.md = ..\docs2\site\docs\migrations\migration5.md
 		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
+		..\docs2\site\docs\migrations\migration7.md = ..\docs2\site\docs\migrations\migration7.md
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
 EndProject

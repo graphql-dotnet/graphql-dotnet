@@ -421,12 +421,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         public ParentChildrenConnectionType()
         {
-            Field<NonNullGraphType<IntGraphType>>()
-                .Name("highestField2")
+            Field<NonNullGraphType<IntGraphType>>("highestField2")
                 .Description("The highest value of all Child's Field2 values in current page of the connection.");
 
-            Field<NonNullGraphType<IntGraphType>>()
-                .Name("connectionField1")
+            Field<NonNullGraphType<IntGraphType>>("connectionField1")
                 .Description("An example of a manually set field on the connection.");
         }
     }
@@ -440,14 +438,13 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         public ParentChildrenEdgeType()
         {
-            Field<NonNullGraphType<DateTimeGraphType>>()
-                .Name("friendedAd")
+            Field<NonNullGraphType<DateTimeGraphType>>("friendedAd")
                 .Description("When parent became friend with child.");
         }
     }
 
     private const int ConnectionField1Value = 123;
-    private static readonly DateTime FriendedAt = new DateTime(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime FriendedAt = new(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     public class ParentType : ObjectGraphType<Parent>
     {
@@ -474,11 +471,9 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Child";
 
-            Field<StringGraphType>()
-                .Name("field1");
+            Field<StringGraphType>("field1");
 
-            Field<IntGraphType>()
-                .Name("field2");
+            Field<IntGraphType>("field2");
         }
     }
 
@@ -536,8 +531,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Query";
 
-            Field<ParentType>()
-                .Name("parent")
+            Field<ParentType>("parent")
                 .Resolve(_ => new Parent());
         }
     }

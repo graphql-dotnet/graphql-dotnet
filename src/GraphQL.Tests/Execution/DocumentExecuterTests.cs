@@ -1,11 +1,8 @@
 using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Execution;
@@ -26,10 +23,9 @@ public class DocumentExecuterTests
         var executer = new DocumentExecuter(
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
-            new ComplexityAnalyzer(),
             DefaultDocumentCache.Instance,
-            new IConfigureExecutionOptions[] { },
-            selector);
+            selector,
+            new IConfigureExecution[] { });
         var schema = new Schema();
         var graphType = new AutoRegisteringObjectGraphType<SampleGraph>();
         schema.Query = graphType;
@@ -110,7 +106,7 @@ public class DocumentExecuterTests
         public Schema1(IServiceProvider provider) : base(provider)
         {
             var graph = new ObjectGraphType { Name = "Query" };
-            graph.Field<StringGraphType>("hero", resolve: context => "hello");
+            graph.Field<StringGraphType>("hero").Resolve(_ => "hello");
             Query = graph;
         }
     }
@@ -120,7 +116,7 @@ public class DocumentExecuterTests
         public Schema2(IServiceProvider provider) : base(provider)
         {
             var graph = new ObjectGraphType { Name = "Query" };
-            graph.Field<StringGraphType>("hero", resolve: context => "hello2");
+            graph.Field<StringGraphType>("hero").Resolve(_ => "hello2");
             Query = graph;
         }
     }

@@ -57,10 +57,9 @@ public class ArrayOfArrayMutation : ObjectGraphType
 {
     public ArrayOfArrayMutation()
     {
-        Field<ArrayOfArrayType>(
-            "create",
-            arguments: new QueryArguments(new QueryArgument<ArrayOfArrayInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<ArrayOfArrayType>("create")
+            .Argument<ArrayOfArrayInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ArrayOfArrayModel>("input");
                 return arg;

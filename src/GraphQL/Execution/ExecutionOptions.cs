@@ -1,7 +1,7 @@
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -46,9 +46,6 @@ namespace GraphQL
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext { get; set; } = new Dictionary<string, object?>();
 
-        /// <summary>Complexity constraints for <see cref="IComplexityAnalyzer"/> to use to validate maximum query complexity</summary>
-        public ComplexityConfiguration? ComplexityConfiguration { get; set; }
-
         /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
         public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
 
@@ -73,5 +70,10 @@ namespace GraphQL
         /// from your dependency injection framework.
         /// </summary>
         public IServiceProvider? RequestServices { get; set; }
+
+        /// <summary>
+        /// Gets or sets security information for the executing request.
+        /// </summary>
+        public ClaimsPrincipal? User { get; set; }
     }
 }

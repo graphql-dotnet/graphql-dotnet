@@ -31,8 +31,8 @@ public sealed class Type1 : ObjectGraphType
     {
         Name = "MyType";
 
-        Field<StringGraphType>("Field1A", resolve: _ => "Field1A Value");
-        Field<StringGraphType>("Field1B", resolve: _ => "Field1B Value");
+        Field<StringGraphType>("Field1A").Resolve(_ => "Field1A Value");
+        Field<StringGraphType>("Field1B").Resolve(_ => "Field1B Value");
     }
 }
 
@@ -42,8 +42,8 @@ public sealed class Type2 : ObjectGraphType
     {
         Name = "MyType";
 
-        Field<StringGraphType>("Field2A", resolve: _ => "Field2A Value");
-        Field<StringGraphType>("Field2B", resolve: _ => "Field1B Value");
+        Field<StringGraphType>("Field2A").Resolve(_ => "Field2A Value");
+        Field<StringGraphType>("Field2B").Resolve(_ => "Field1B Value");
     }
 }
 
@@ -51,8 +51,8 @@ public sealed class QueryType : ObjectGraphType
 {
     public QueryType()
     {
-        Field<Type1>().Name("type1").Resolve(x => new { });
-        Field<Type2>().Name("type2").Resolve(x => new { });
+        Field<Type1>("type1").Resolve(x => new { });
+        Field<Type2>("type2").Resolve(x => new { });
     }
 }
 

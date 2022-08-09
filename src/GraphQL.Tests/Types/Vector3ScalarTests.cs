@@ -99,28 +99,22 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
     {
         public Vector3ScalarQuery()
         {
-            Field(typeof(StringGraphType), "input",
-                arguments: new QueryArguments
-                {
-                    new QueryArgument<Vector3Type> { Name = "arg", DefaultValue = new Vector3(7, 8, 9) }
-                },
-                resolve: context => context.GetArgument<Vector3?>("arg")?.ToString());
+            Field("input", typeof(StringGraphType))
+                .Argument<Vector3Type>("arg", arg => arg.DefaultValue = new Vector3(7, 8, 9))
+                .Resolve(context => context.GetArgument<Vector3?>("arg")?.ToString());
 
-            Field(typeof(Vector3Type), "output",
-                resolve: context => new Vector3(4, 5, 6));
+            Field("output", typeof(Vector3Type))
+                .Resolve(_ => new Vector3(4, 5, 6));
 
-            Field(typeof(Vector3Type), "loopback",
-                arguments: new QueryArguments
-                {
-                    new QueryArgument<Vector3Type> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<Vector3?>("arg"));
+            Field("loopback", typeof(Vector3Type))
+                .Argument<Vector3Type>("arg")
+                .Resolve(context => context.GetArgument<Vector3?>("arg"));
         }
     }
 
     public class Vector3Type : ScalarGraphType
     {
-        private readonly FloatGraphType _floatScalar = new FloatGraphType();
+        private readonly FloatGraphType _floatScalar = new();
 
         public Vector3Type()
         {

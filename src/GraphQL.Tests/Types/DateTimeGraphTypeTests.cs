@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DateTimeGraphTypeTests
 {
-    private readonly DateTimeGraphType _type = new DateTimeGraphType();
+    private readonly DateTimeGraphType _type = new();
 
     [Fact]
     public void coerces_valid_date()

@@ -1,5 +1,7 @@
 using System.Collections;
+using System.Security.Claims;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -26,6 +28,8 @@ namespace GraphQL.Validation
             Variables = null!;
             Extensions = null!;
             RequestServices = null!;
+            Metrics = null!;
+            User = null;
         }
 
         /// <summary>
@@ -44,6 +48,9 @@ namespace GraphQL.Validation
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext { get; set; } = null!;
+
+        /// <inheritdoc cref="IExecutionContext.Metrics"/>
+        public Metrics Metrics { get; set; } = null!;
 
         /// <summary>
         /// Dictionary of temporary data used by validation rules.
@@ -69,6 +76,9 @@ namespace GraphQL.Validation
 
         /// <inheritdoc cref="ExecutionOptions.RequestServices"/>
         public IServiceProvider? RequestServices { get; set; }
+
+        /// <inheritdoc cref="ExecutionOptions.User"/>
+        public ClaimsPrincipal? User { get; set; }
 
         /// <summary>
         /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;
@@ -119,7 +129,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// </summary>
-        public Variables GetVariableValues(IVariableVisitor? visitor = null)
+        public async ValueTask<Variables> GetVariableValuesAsync(IVariableVisitor? visitor = null)
         {
             var variableDefinitions = Operation?.Variables;
 
@@ -153,7 +163,7 @@ namespace GraphQL.Validation
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = GetVariableValue(graphType, variableDef, variableValue, visitor);
+                            variable.Value = await GetVariableValueAsync(graphType, variableDef, variableValue, visitor).ConfigureAwait(false);
                         }
                         catch (ValidationError error)
                         {
@@ -203,17 +213,18 @@ namespace GraphQL.Validation
         /// <br/><br/>
         /// Since v3.3, returns null for variables set to null rather than the variable's default value.
         /// </summary>
-        private object? GetVariableValue(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
+        private ValueTask<object?> GetVariableValueAsync(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
         {
-            return ParseValue(graphType, variableDef, variableDef.Variable.Name.StringValue, input, visitor); //ISSUE:allocation
+            return ParseValueAsync(graphType, variableDef, variableDef.Variable.Name.StringValue, input, visitor); //ISSUE:allocation
 
             // Coerces a value depending on the graph type.
-            object? ParseValue(IGraphType type, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            async ValueTask<object?> ParseValueAsync(IGraphType type, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    var parsedValue = ParseValueObject(inputObjectGraphType, variableDef, variableName, value, visitor);
-                    visitor?.VisitObject(this, variableDef, variableName, inputObjectGraphType, value, parsedValue);
+                    var parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    if (visitor != null)
+                        await visitor.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
@@ -221,18 +232,20 @@ namespace GraphQL.Validation
                     if (value == null)
                         throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.");
 
-                    return ParseValue(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor);
+                    return await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
-                    var parsedValue = ParseValueList(listGraphType, variableDef, variableName, value, visitor);
-                    visitor?.VisitList(this, variableDef, variableName, listGraphType, value, parsedValue);
+                    var parsedValue = await ParseValueListAsync(listGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    if (visitor != null)
+                        await visitor.VisitListAsync(this, variableDef, variableName, listGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
                     var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
-                    visitor?.VisitScalar(this, variableDef, variableName, scalarGraphType, value, parsedValue);
+                    if (visitor != null)
+                        await visitor.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else
@@ -254,7 +267,7 @@ namespace GraphQL.Validation
                 }
             }
 
-            IList<object?>? ParseValueList(ListGraphType listGraphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            async ValueTask<IList<object?>?> ParseValueListAsync(ListGraphType listGraphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (value == null)
                     return null;
@@ -270,7 +283,7 @@ namespace GraphQL.Validation
                         for (int index = 0; index < list.Count; index++)
                         {
                             // parse/validate values as required by graph type
-                            valueOutputs[index] = ParseValue(listGraphType.ResolvedType!, variableDef, new VariableName(variableName, index), list[index], visitor);
+                            valueOutputs[index] = await ParseValueAsync(listGraphType.ResolvedType!, variableDef, new VariableName(variableName, index), list[index], visitor).ConfigureAwait(false);
                         }
                         return valueOutputs;
                     }
@@ -281,7 +294,7 @@ namespace GraphQL.Validation
                         foreach (object val in values)
                         {
                             // parse/validate values as required by graph type
-                            valueOutputs.Add(ParseValue(listGraphType.ResolvedType!, variableDef, new VariableName(variableName, index++), val, visitor));
+                            valueOutputs.Add(await ParseValueAsync(listGraphType.ResolvedType!, variableDef, new VariableName(variableName, index++), val, visitor).ConfigureAwait(false));
                         }
                         return valueOutputs;
                     }
@@ -292,12 +305,12 @@ namespace GraphQL.Validation
                     // then the result of input coercion is a list of size one, where the single item value is the
                     // result of input coercion for the list’s item type on the provided value (note this may apply
                     // recursively for nested lists).
-                    object? result = ParseValue(listGraphType.ResolvedType!, variableDef, variableName, value, visitor);
+                    object? result = await ParseValueAsync(listGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
                     return new object?[] { result };
                 }
             }
 
-            object? ParseValueObject(IInputObjectGraphType graphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
+            async ValueTask<object?> ParseValueObjectAsync(IInputObjectGraphType graphType, GraphQLVariableDefinition variableDef, VariableName variableName, object? value, IVariableVisitor? visitor)
             {
                 if (value == null)
                     return null;
@@ -326,8 +339,9 @@ namespace GraphQL.Validation
 
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
-                        object? parsedFieldValue = ParseValue(field.ResolvedType!, variableDef, childFieldVariableName, fieldValue, visitor);
-                        visitor?.VisitField(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue);
+                        object? parsedFieldValue = await ParseValueAsync(field.ResolvedType!, variableDef, childFieldVariableName, fieldValue, visitor).ConfigureAwait(false);
+                        if (visitor != null)
+                            await visitor.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue).ConfigureAwait(false);
                         newDictionary[field.Name] = parsedFieldValue;
                     }
                     else if (field.DefaultValue != null)

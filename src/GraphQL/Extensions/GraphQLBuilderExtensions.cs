@@ -9,6 +9,7 @@ using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 
 namespace GraphQL
@@ -361,46 +362,42 @@ namespace GraphQL
         /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
         /// </summary>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-            => builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+        {
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
+            return builder;
+        }
 
         /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
         public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-            => builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+        {
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
+            return builder;
+        }
 
         /// <summary>
         /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
         /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -408,28 +405,24 @@ namespace GraphQL
         /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
         /// dependency injection framework, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
@@ -437,28 +430,24 @@ namespace GraphQL
         /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
         /// using the specified factory delegate, then enables and configures it with the specified configuration delegate.
         /// </summary>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration>? action = null)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
 
         /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
+        [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
         public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
             where TAnalyzer : class, IComplexityAnalyzer
         {
             builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-            builder.ConfigureExecutionOptions(opts =>
-            {
-                opts.ComplexityConfiguration ??= new();
-                action?.Invoke(opts.ComplexityConfiguration, opts.RequestServices);
-            });
+            builder.AddValidationRule<ComplexityValidationRule>();
+            builder.Services.Configure(action);
             return builder;
         }
         #endregion
@@ -649,11 +638,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-            builder.ConfigureExecutionOptions(options =>
-            {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
-            });
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
             return builder;
         }
 
@@ -689,11 +674,7 @@ namespace GraphQL
             where TDocumentListener : class, IDocumentExecutionListener
         {
             builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(documentListenerFactory ?? throw new ArgumentNullException(nameof(documentListenerFactory)), serviceLifetime);
-            builder.ConfigureExecutionOptions(options =>
-            {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                options.Listeners.Add(requestServices.GetRequiredService<TDocumentListener>());
-            });
+            builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
             return builder;
         }
         #endregion
@@ -915,7 +896,7 @@ namespace GraphQL
         /// <summary>
         /// Configures an action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
@@ -923,14 +904,14 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Action<ExecutionOptions> action)
         {
-            builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
             return builder;
         }
 
         /// <summary>
         /// Configures an asynchronous action to run immediately prior to document execution.
         /// Assumes that the document executer is <see cref="DocumentExecuter"/>, or that it derives from <see cref="DocumentExecuter"/> and calls
-        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IComplexityAnalyzer, IDocumentCache, System.Collections.Generic.IEnumerable{IConfigureExecutionOptions})"/>
+        /// <see cref="DocumentExecuter(IDocumentBuilder, IDocumentValidator, IDocumentCache, IExecutionStrategySelector, IEnumerable{IConfigureExecution})"/>
         /// within the constructor.
         /// </summary>
         /// <remarks>
@@ -938,7 +919,7 @@ namespace GraphQL
         /// </remarks>
         public static IGraphQLBuilder ConfigureExecutionOptions(this IGraphQLBuilder builder, Func<ExecutionOptions, Task> action)
         {
-            builder.Services.Register<IConfigureExecutionOptions>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
+            builder.Services.Register<IConfigureExecution>(new ConfigureExecutionOptions(action ?? throw new ArgumentNullException(nameof(action))));
             return builder;
         }
 
@@ -973,8 +954,7 @@ namespace GraphQL
             builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                var rule = requestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -1027,8 +1007,7 @@ namespace GraphQL
             builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
             builder.ConfigureExecutionOptions(options =>
             {
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                var rule = requestServices.GetRequiredService<TValidationRule>();
+                var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
                 options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
                 if (useForCachedDocuments)
                 {
@@ -1039,7 +1018,7 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddApolloTracing / AddMetrics -
+        #region - AddApolloTracing -
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema, and configures responses to include Apollo
@@ -1074,69 +1053,6 @@ namespace GraphQL
                     ret.EnrichWithApolloTracing(start);
                 }
                 return ret;
-            });
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
-        /// configures it to be installed within the schema.
-        /// When <paramref name="enable"/> is <see langword="true"/>, configures execution to set
-        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
-        /// </summary>
-        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
-        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, bool enable = true)
-        {
-            builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            if (enable)
-                builder.ConfigureExecutionOptions(options => options.EnableMetrics = true);
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
-        /// configures it to be installed within the schema.
-        /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
-        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
-        /// </summary>
-        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
-        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate)
-        {
-            if (enablePredicate == null)
-                throw new ArgumentNullException(nameof(enablePredicate));
-
-            builder.AddMiddleware<InstrumentFieldsMiddleware>();
-            builder.ConfigureExecutionOptions(options =>
-            {
-                if (enablePredicate(options))
-                {
-                    options.EnableMetrics = true;
-                }
-            });
-            return builder;
-        }
-
-        /// <summary>
-        /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
-        /// configures it to be installed within the schema when <paramref name="installPredicate"/> returns <see langword="true"/>.
-        /// Configures execution to run <paramref name="enablePredicate"/> and when <see langword="true"/>, sets
-        /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
-        /// </summary>
-        [Obsolete("Use AddApolloTracing instead, which also appends Apollo Tracing data to the execution result. This method will be removed in v6.")]
-        public static IGraphQLBuilder AddMetrics(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enablePredicate, Func<IServiceProvider, ISchema, bool> installPredicate)
-        {
-            if (enablePredicate == null)
-                throw new ArgumentNullException(nameof(enablePredicate));
-            if (installPredicate == null)
-                throw new ArgumentNullException(nameof(installPredicate));
-
-            builder.AddMiddleware<InstrumentFieldsMiddleware>(installPredicate);
-            builder.ConfigureExecutionOptions(options =>
-            {
-                if (enablePredicate(options))
-                {
-                    options.EnableMetrics = true;
-                }
             });
             return builder;
         }

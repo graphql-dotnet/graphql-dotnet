@@ -32,17 +32,16 @@ public class Issue127Query : ObjectGraphType
 {
     public Issue127Query()
     {
-        Field<StringGraphType>(
-            "getsome",
-            arguments: new QueryArguments(
+        Field<StringGraphType>("getsome")
+            .Arguments(
                 new QueryArgument<StringGraphType> { Name = "s1", DefaultValue = "def1" },
                 new QueryArgument<StringGraphType> { Name = "s2", DefaultValue = "def2" },
                 new QueryArgument<StringGraphType> { Name = "s3", DefaultValue = "def3" },
                 new QueryArgument<BaseInputType> { Name = "input1", DefaultValue = 1 },
                 new QueryArgument<BaseInputType> { Name = "input2", DefaultValue = 2 },
                 new QueryArgument<BaseInputType> { Name = "input3", DefaultValue = 3 }
-            ),
-            resolve: ctx =>
+            )
+            .Resolve(ctx =>
             {
                 ctx.Arguments["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
                 ctx.Arguments["s2"].ShouldBe(ArgumentValue.NullLiteral);

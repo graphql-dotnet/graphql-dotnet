@@ -30,8 +30,7 @@ public class AliasedInputFieldMutation : ObjectGraphType
 {
     public AliasedInputFieldMutation()
     {
-        Field<BooleanGraphType>()
-            .Name("mutateMyEntity")
+        Field<BooleanGraphType>("mutateMyEntity")
             .Argument<MyEntityInputType>("singleEntity")
             .Argument<ListGraphType<MyEntityInputType>>("multipleEntities")
             .Resolve(

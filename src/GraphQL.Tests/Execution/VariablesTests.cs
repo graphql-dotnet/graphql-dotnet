@@ -92,64 +92,46 @@ public class TestType : ObjectGraphType
     {
         Name = "TestType";
 
-        Field<StringGraphType>(
-            "fieldWithObjectInput",
-            arguments: new QueryArguments(
-                new QueryArgument<TestInputObject> { Name = "input" }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("fieldWithObjectInput")
+            .Argument<TestInputObject>("input")
+            .Resolve(context =>
             {
                 var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                 return result;
             });
 
-        Field<StringGraphType>(
-            "fieldWithNullableStringInput",
-            arguments: new QueryArguments(
-                new QueryArgument<StringGraphType> { Name = "input" }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("fieldWithNullableStringInput")
+            .Argument<StringGraphType>("input")
+            .Resolve(context =>
             {
                 var val = context.GetArgument<object>("input");
                 var result = JsonSerializer.Serialize(val);
                 return result;
             });
 
-        Field<IntGraphType>(
-            "fieldWithNullableIntInput",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType> { Name = "input" }
-            ),
-            resolve: context => context.GetArgument<int>("input"));
+        Field<IntGraphType>("fieldWithNullableIntInput")
+            .Argument<IntGraphType>("input")
+            .Resolve(context => context.GetArgument<int>("input"));
 
-        Field<StringGraphType>(
-            "fieldWithNonNullableStringInput",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "input" }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("fieldWithNonNullableStringInput")
+            .Argument<NonNullGraphType<StringGraphType>>("input")
+            .Resolve(context =>
             {
                 var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                 return result;
             });
 
-        Field<StringGraphType>(
-            "fieldWithDefaultArgumentValue",
-            arguments: new QueryArguments(
-                new QueryArgument<StringGraphType> { Name = "input", DefaultValue = "Hello World" }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("fieldWithDefaultArgumentValue")
+            .Argument<StringGraphType>("input", arg => arg.DefaultValue = "Hello World")
+            .Resolve(context =>
             {
                 var result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
                 return result;
             });
 
-        Field<StringGraphType>(
-            "fieldWithCustomScalarInput",
-            arguments: new QueryArguments(
-                new QueryArgument<TestJsonScalarReturningObject> { Name = "input" }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("fieldWithCustomScalarInput")
+            .Argument<TestJsonScalarReturningObject>("input")
+            .Resolve(context =>
             {
                 var val = context.GetArgument<TestJsonScalarObject>("input");
                 var stringProperty = val.StringProperty;

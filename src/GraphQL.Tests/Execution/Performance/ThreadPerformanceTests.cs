@@ -20,8 +20,8 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
         {
             Name = "Query";
 
-            FieldAsync<StringGraphType, string>("halfSecond", resolve: c => Get(500, "Half"));
-            FieldAsync<StringGraphType, string>("quarterSecond", resolve: c => Get(500, "Quarter"));
+            Field<StringGraphType, string>("halfSecond").ResolveAsync(_ => Get(500, "Half"));
+            Field<StringGraphType, string>("quarterSecond").ResolveAsync(_ => Get(500, "Quarter"));
         }
 
         private async Task<string> Get(int milliseconds, string result)
@@ -33,14 +33,14 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
 
     public class PerfMutation : ObjectGraphType<object>
     {
-        public static readonly List<string> Calls = new List<string>();
+        public static readonly List<string> Calls = new();
 
         public PerfMutation()
         {
             Name = "Mutation";
 
-            FieldAsync<StringGraphType, string>("setFive", resolve: c => Set("5"));
-            FieldAsync<StringGraphType, string>("setOne", resolve: c => Set("1"));
+            Field<StringGraphType, string>("setFive").ResolveAsync(_ => Set("5"));
+            Field<StringGraphType, string>("setOne").ResolveAsync(_ => Set("1"));
         }
 
         private Task<string> Set(string result)

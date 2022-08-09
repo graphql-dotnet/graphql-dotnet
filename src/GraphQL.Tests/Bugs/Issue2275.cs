@@ -48,12 +48,9 @@ public class Issue2275
     {
         public Issue2275Query()
         {
-            Field<StringGraphType>(
-              "request",
-              arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<Issue2275InputType>> { Name = "data", Description = "some stuff" }
-              ),
-              resolve: context => context.GetArgument<ContainerRequest>("data").ToString()
+            Field<StringGraphType>("request")
+                .Argument<NonNullGraphType<Issue2275InputType>>("data", "some stuff")
+                .Resolve(context => context.GetArgument<ContainerRequest>("data").ToString()
           );
         }
     }

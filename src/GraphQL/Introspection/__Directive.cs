@@ -28,33 +28,32 @@ namespace GraphQL.Introspection
                 "conditionally including or skipping a field. Directives provide this by " +
                 "describing additional information to the executor.";
 
-            Field<NonNullGraphType<StringGraphType>>("name", resolve: context => context.Source!.Name);
+            Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source!.Name);
 
-            Field<StringGraphType>("description", resolve: context => context.Source!.Description);
+            Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
-                resolve: context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>()
-            );
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
+                .Resolve(context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>());
 
             if (allowRepeatable)
-                Field<NonNullGraphType<BooleanGraphType>>("isRepeatable", resolve: context => context.Source!.Repeatable);
+                Field<NonNullGraphType<BooleanGraphType>>("isRepeatable").Resolve(context => context.Source!.Repeatable);
 
-            Field<NonNullGraphType<BooleanGraphType>>("onOperation", deprecationReason: "Use 'locations'.",
-                resolve: context => context.Source!.Locations.Any(l =>
+            Field<NonNullGraphType<BooleanGraphType>>("onOperation").DeprecationReason("Use 'locations'.")
+                .Resolve(context => context.Source!.Locations.Any(l =>
                         l == DirectiveLocation.Query ||
                         l == DirectiveLocation.Mutation ||
                         l == DirectiveLocation.Subscription));
 
-            Field<NonNullGraphType<BooleanGraphType>>("onFragment", deprecationReason: "Use 'locations'.",
-                resolve: context => context.Source!.Locations.Any(l =>
+            Field<NonNullGraphType<BooleanGraphType>>("onFragment").DeprecationReason("Use 'locations'.")
+                .Resolve(context => context.Source!.Locations.Any(l =>
                         l == DirectiveLocation.FragmentSpread ||
                         l == DirectiveLocation.InlineFragment ||
                         l == DirectiveLocation.FragmentDefinition));
 
-            Field<NonNullGraphType<BooleanGraphType>>("onField", deprecationReason: "Use 'locations'.",
-                resolve: context => context.Source!.Locations.Any(l => l == DirectiveLocation.Field));
+            Field<NonNullGraphType<BooleanGraphType>>("onField").DeprecationReason("Use 'locations'.")
+                .Resolve(context => context.Source!.Locations.Any(l => l == DirectiveLocation.Field));
 
             if (allowAppliedDirectives)
                 this.AddAppliedDirectivesField("directive");

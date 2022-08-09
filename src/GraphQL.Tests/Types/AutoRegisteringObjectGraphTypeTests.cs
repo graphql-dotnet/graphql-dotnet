@@ -475,6 +475,18 @@ public class AutoRegisteringObjectGraphTypeTests
         }).ConfigureAwait(false)).ShouldBe("85");
     }
 
+    [Fact]
+    public void TestInheritedFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<InheritanceTests>();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+        graphType.Fields.Find("Field3").ShouldNotBeNull();
+        graphType.Fields.Find("Field4").ShouldNotBeNull();
+        graphType.Fields.Find("Field5").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(5);
+    }
+
     private class CustomHardcodedArgumentAttributeTestClass
     {
         public string FieldWithHardcodedValue([HardcodedValue] int value) => value.ToString();
@@ -720,5 +732,20 @@ public class AutoRegisteringObjectGraphTypeTests
         public static string Name = "Example";
         [Name("IdAndName")]
         public string IdName(string prefix) => prefix + Name + Id.ToString();
+    }
+
+    public class InheritanceTestsParent
+    {
+        public int Field1 => 1;
+        public int Field2() => 2;
+        public virtual int Field3() => 3;
+    }
+
+    public class InheritanceTests : InheritanceTestsParent
+    {
+        public int Field4 => 4;
+        public int Field5() => 5;
+        public override int Field3() => 3;
+        public override int GetHashCode() => 123;
     }
 }

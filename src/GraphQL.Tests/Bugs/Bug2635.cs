@@ -42,13 +42,15 @@ public class Bug2635 : QueryTestBase<Bug2635.MySchema>
     {
         public MyQuery()
         {
-            FieldAsync<IntGraphType>("a", resolve: async context =>
+            Field<IntGraphType>("a")
+                .ResolveAsync(async context =>
             {
                 await Task.Delay(500).ConfigureAwait(false);
                 ((Bug2635)context.RootValue).Num = 1;
                 throw new Exception();
             });
-            Field<IntGraphType>("b", resolve: context =>
+            Field<IntGraphType>("b")
+                .Resolve(context =>
             {
                 ((Bug2635)context.RootValue).CancellationTokenSource.Cancel();
                 context.CancellationToken.ThrowIfCancellationRequested();

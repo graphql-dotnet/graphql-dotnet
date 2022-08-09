@@ -1,6 +1,6 @@
 # Object/Field Metadata
 
-Any `IGraphType`, `IFieldType`, `DirectiveGraphType`, `ISchema` and some other classes implement
+Any `IGraphType`, `IFieldType`, `Directive`, `ISchema` and some other classes implement
 the `IProvideMetadata` interface. This allows you to add arbitrary information to those objects.
 This can be useful in combination with a validation rule or field middleware.
 

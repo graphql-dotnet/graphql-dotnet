@@ -111,31 +111,21 @@ public class Bug2159Query : ObjectGraphType
 {
     public Bug2159Query()
     {
-        Field<StringGraphType>(
-            "testValue",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(StringGraphType)) { Name = "arg", DefaultValue = "defaultValue" }),
-            resolve: ctx => ctx.GetArgument<string>("arg"));
-        Field<StringGraphType>(
-            "testObject",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(Bug2159ObjectGraphType)) { Name = "arg", DefaultValue = new Bug2159Object { Value = "defaultValue" } }),
-            resolve: ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value);
-        Field<BooleanGraphType>(
-            "hasArgumentNoDefault",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(BooleanGraphType)) { Name = "arg" }),
-            resolve: ctx => ctx.HasArgument("arg"));
-        Field<BooleanGraphType>(
-            "hasArgumentWithDefault",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(BooleanGraphType)) { Name = "arg", DefaultValue = true }),
-            resolve: ctx => ctx.HasArgument("arg"));
-        Field<StringGraphType>(
-            "testReqObjField",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(Bug2159ReqObjGraphType)) { Name = "arg" }),
-            resolve: ctx => "OK");
+        Field<StringGraphType>("testValue")
+            .Argument(typeof(StringGraphType), "arg", arg => arg.DefaultValue = "defaultValue")
+            .Resolve(ctx => ctx.GetArgument<string>("arg"));
+        Field<StringGraphType>("testObject")
+            .Argument(typeof(Bug2159ObjectGraphType), "arg", arg => arg.DefaultValue = new Bug2159Object { Value = "defaultValue" })
+            .Resolve(ctx => ctx.GetArgument<Bug2159Object>("arg")?.Value);
+        Field<BooleanGraphType>("hasArgumentNoDefault")
+            .Argument(typeof(BooleanGraphType), "arg")
+            .Resolve(ctx => ctx.HasArgument("arg"));
+        Field<BooleanGraphType>("hasArgumentWithDefault")
+            .Argument(typeof(BooleanGraphType), "arg", arg => arg.DefaultValue = true)
+            .Resolve(ctx => ctx.HasArgument("arg"));
+        Field<StringGraphType>("testReqObjField")
+            .Argument(typeof(Bug2159ReqObjGraphType), "arg")
+            .Resolve(_ => "OK");
     }
 }
 

@@ -3,12 +3,12 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.NewtonsoftJson;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 using Moq;
 
@@ -20,7 +20,7 @@ public class GraphQLBuilderExtensionTests
     {
     }
 
-    private readonly Mock<IGraphQLBuilderAndServiceRegister> _builderMock = new Mock<IGraphQLBuilderAndServiceRegister>(MockBehavior.Strict);
+    private readonly Mock<IGraphQLBuilderAndServiceRegister> _builderMock = new(MockBehavior.Strict);
     private IGraphQLBuilderAndServiceRegister _builder => _builderMock.Object;
 
     public GraphQLBuilderExtensionTests()
@@ -85,14 +85,14 @@ public class GraphQLBuilderExtensionTests
     private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
     {
         Action<ExecutionOptions> actions = _ => { };
-        _builderMock.Setup(b => b.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+        _builderMock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
+            .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
             {
                 var actions2 = actions;
                 actions = opts =>
                 {
                     actions2(opts);
-                    action.ConfigureAsync(opts).Wait();
+                    action.ExecuteAsync(opts, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
                 };
                 return _builder;
             }).Verifiable();
@@ -332,267 +332,97 @@ public class GraphQLBuilderExtensionTests
     #endregion
 
     #region - AddComplexityAnalyzer -
-    private Action<ComplexityConfiguration> MockSetupComplexityConfiguration1()
+    [Theory]
+    [InlineData(false, false, false, false, false)]
+    [InlineData(false, false, false, true, false)]
+    [InlineData(false, false, false, false, true)]
+    [InlineData(true, false, false, false, false)]
+    [InlineData(true, false, false, true, false)]
+    [InlineData(true, false, false, false, true)]
+    [InlineData(true, true, false, false, false)]
+    [InlineData(true, true, false, true, false)]
+    [InlineData(true, true, false, false, true)]
+    [InlineData(true, false, true, false, false)]
+    [InlineData(true, false, true, true, false)]
+    [InlineData(true, false, true, false, true)]
+    public void AddComplexityAnalyzer(bool typed, bool withFactory, bool withInstance, bool withAction, bool withAction2)
     {
-        bool ran = false;
-        ExecutionOptions opts = null;
-        Action<ComplexityConfiguration> configureAction = cc =>
+        var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
+        MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
+        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
+        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
+        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        Func<IServiceProvider, IComplexityAnalyzer> factory = null;
+        MyComplexityAnalyzer instance = null;
+        if (typed)
         {
-            cc.ShouldNotBeNull();
-            cc.ShouldBe(opts.ComplexityConfiguration);
-            ran = true;
-        };
-        _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+            if (withFactory)
             {
-                //test with no complexity configuration
-                ran = false;
-                opts = new ExecutionOptions();
-                action.ConfigureAsync(opts).Wait();
-                ran.ShouldBeTrue();
-
-                //test with existing complexity configuration
-                ran = false;
-                var cc2 = new ComplexityConfiguration();
-                opts = new ExecutionOptions()
-                {
-                    ComplexityConfiguration = cc2,
-                };
-                action.ConfigureAsync(opts).Wait();
-                ran.ShouldBeTrue();
-                opts.ComplexityConfiguration.ShouldBe(cc2);
-
-                return _builder;
-            }).Verifiable();
-
-        return configureAction;
-    }
-
-    private Action<ComplexityConfiguration, IServiceProvider> MockSetupComplexityConfiguration2()
-    {
-        bool ran = false;
-        ExecutionOptions opts = null;
-        Action<ComplexityConfiguration, IServiceProvider> configureAction = (cc, sp) =>
+                factory = MockSetupRegister<IComplexityAnalyzer>();
+            }
+            else if (withInstance)
+            {
+                instance = new MyComplexityAnalyzer();
+                MockSetupRegister<IComplexityAnalyzer>(instance);
+            }
+            else
+            {
+                MockSetupRegister<IComplexityAnalyzer, MyComplexityAnalyzer>();
+            }
+        }
+        if (withAction)
         {
-            sp.ShouldBe(opts.RequestServices);
-            cc.ShouldNotBeNull();
-            cc.ShouldBe(opts.ComplexityConfiguration);
-            ran = true;
-        };
-        _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            if (typed)
             {
-                //test with no complexity configuration
-                ran = false;
-                opts = new ExecutionOptions()
-                {
-                    RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
-                };
-                action.ConfigureAsync(opts).Wait();
-                ran.ShouldBeTrue();
-
-                //test with existing complexity configuration
-                ran = false;
-                var cc2 = new ComplexityConfiguration();
-                opts = new ExecutionOptions()
-                {
-                    RequestServices = new Mock<IServiceProvider>(MockBehavior.Strict).Object,
-                    ComplexityConfiguration = cc2,
-                };
-                action.ConfigureAsync(opts).Wait();
-                ran.ShouldBeTrue();
-                opts.ComplexityConfiguration.ShouldBe(cc2);
-
-                return _builder;
-            }).Verifiable();
-
-        return configureAction;
-    }
-
-    private void MockSetupComplexityConfigurationNull()
-    {
-        ExecutionOptions opts = null;
-        _builderMock.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+                if (withFactory)
+                    _builder.AddComplexityAnalyzer(factory, action);
+                else if (withInstance)
+                    _builder.AddComplexityAnalyzer(instance, action);
+                else
+                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
+            }
+            else
             {
-                //test with no complexity configuration
-                opts = new ExecutionOptions();
-                opts.ComplexityConfiguration.ShouldBeNull();
-                action.ConfigureAsync(opts).Wait();
-                opts.ComplexityConfiguration.ShouldNotBeNull();
-
-                //test with existing complexity configuration
-                var cc2 = new ComplexityConfiguration();
-                opts = new ExecutionOptions()
-                {
-                    ComplexityConfiguration = cc2,
-                };
-                action.ConfigureAsync(opts).Wait();
-                opts.ComplexityConfiguration.ShouldBe(cc2);
-
-                return _builder;
-            }).Verifiable();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer()
-    {
-        var action = MockSetupComplexityConfiguration1();
-        _builder.AddComplexityAnalyzer(action);
+                _builder.AddComplexityAnalyzer(action);
+            }
+        }
+        else
+        {
+            var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
+            if (!withAction2)
+                MockSetupConfigureNull<ComplexityConfiguration>();
+            if (typed)
+            {
+                if (withFactory)
+                    _builder.AddComplexityAnalyzer(factory, action);
+                else if (withInstance)
+                    _builder.AddComplexityAnalyzer(instance, action);
+                else
+                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
+            }
+            else
+            {
+                _builder.AddComplexityAnalyzer(action);
+            }
+        }
+        var opts = getOpts();
+        opts.ValidationRules.ShouldNotBeNull();
+        opts.ValidationRules.ShouldContain(ruleInstance);
+        opts.CachedDocumentValidationRules?.ShouldBeEmpty();
+        mockServiceProvider.Verify();
         Verify();
     }
 
     [Fact]
-    public void AddComplexityAnalyzer2()
-    {
-        var action = MockSetupComplexityConfiguration2();
-        _builder.AddComplexityAnalyzer(action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Null1()
-    {
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer();
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Null2()
-    {
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer((Action<ComplexityConfiguration, IServiceProvider>)null);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Typed1()
-    {
-        MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-        var action = MockSetupComplexityConfiguration1();
-        _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Typed2()
-    {
-        MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-        var action = MockSetupComplexityConfiguration2();
-        _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>(action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Typed1_Null()
-    {
-        MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>();
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Typed2_Null()
-    {
-        MockSetupRegister<IComplexityAnalyzer, TestComplexityAnalyzer>();
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer<TestComplexityAnalyzer>((Action<ComplexityConfiguration, IServiceProvider>)null);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Instance1()
-    {
-        var instance = new TestComplexityAnalyzer();
-        MockSetupRegister<IComplexityAnalyzer>(instance);
-        var action = MockSetupComplexityConfiguration1();
-        _builder.AddComplexityAnalyzer(instance, action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Instance2()
-    {
-        var instance = new TestComplexityAnalyzer();
-        MockSetupRegister<IComplexityAnalyzer>(instance);
-        var action = MockSetupComplexityConfiguration2();
-        _builder.AddComplexityAnalyzer(instance, action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Instance1_Null()
-    {
-        var instance = new TestComplexityAnalyzer();
-        MockSetupRegister<IComplexityAnalyzer>(instance);
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer(instance);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Instance2_Null()
-    {
-        var instance = new TestComplexityAnalyzer();
-        MockSetupRegister<IComplexityAnalyzer>(instance);
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer(instance, (Action<ComplexityConfiguration, IServiceProvider>)null);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_InstanceNull()
+    public void AddComplexityAnalyzer_Null()
     {
         Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null, (_, _) => { }));
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Factory1()
-    {
-        var factory = MockSetupRegister<IComplexityAnalyzer>();
-        var action = MockSetupComplexityConfiguration1();
-        _builder.AddComplexityAnalyzer(factory, action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Factory2()
-    {
-        var factory = MockSetupRegister<IComplexityAnalyzer>();
-        var action = MockSetupComplexityConfiguration2();
-        _builder.AddComplexityAnalyzer(factory, action);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Factory1_Null()
-    {
-        var factory = MockSetupRegister<IComplexityAnalyzer>();
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer(factory);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Factory2_Null()
-    {
-        var factory = MockSetupRegister<IComplexityAnalyzer>();
-        MockSetupComplexityConfigurationNull();
-        _builder.AddComplexityAnalyzer(factory, (Action<ComplexityConfiguration, IServiceProvider>)null);
-        Verify();
-    }
-
-    [Fact]
-    public void AddComplexityAnalyzer_FactoryNull()
-    {
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((TestComplexityAnalyzer)null, (_, _) => { }));
         Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null, (_, _) => { }));
     }
+
+    private class MyComplexityAnalyzer : ComplexityAnalyzer { }
     #endregion
 
     #region - AddErrorInfoProvider -
@@ -1212,75 +1042,6 @@ public class GraphQLBuilderExtensionTests
     {
         Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((MyValidationRule)null));
         Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((Func<IServiceProvider, MyValidationRule>)null));
-    }
-    #endregion
-
-    #region - AddMetrics -
-    [Theory]
-    [InlineData(true, false, true, false)]
-    [InlineData(false, false, true, false)]
-    [InlineData(true, true, true, false)]
-    [InlineData(false, true, true, false)]
-    [InlineData(true, true, true, true)]
-    [InlineData(true, true, false, true)]
-    [InlineData(false, true, true, true)]
-    [InlineData(false, true, false, true)]
-    public void AddMetrics(bool enable, bool useEnablePredicate, bool install, bool useInstallPredicate)
-    {
-        var instance = new InstrumentFieldsMiddleware();
-        MockSetupRegister<IFieldMiddleware, InstrumentFieldsMiddleware>(ServiceLifetime.Transient);
-        MockSetupRegister<InstrumentFieldsMiddleware, InstrumentFieldsMiddleware>(ServiceLifetime.Transient);
-        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        var schema = new TestSchema();
-        //setup middleware
-        Action runSchemaConfigs = null;
-        if (install || useInstallPredicate)
-        {
-            runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
-        }
-        if (install)
-        {
-            mockServiceProvider.Setup(sp => sp.GetService(typeof(InstrumentFieldsMiddleware))).Returns(instance).Verifiable();
-        }
-        //setup execution
-        Func<ExecutionOptions> getOptions = () => new ExecutionOptions();
-        if (enable || useEnablePredicate)
-        {
-            getOptions = MockSetupConfigureExecution(mockServiceProvider.Object);
-        }
-        //test
-        if (enable == true && useEnablePredicate == false && useInstallPredicate == false)
-        {
-            //verify that defaults parameters are configured appropriately
-            _builder.AddMetrics();
-        }
-        else if (useInstallPredicate)
-        {
-            _builder.AddMetrics(opts => enable, (services, schema) => install);
-        }
-        else if (useEnablePredicate)
-        {
-            _builder.AddMetrics(opts => enable);
-        }
-        else
-        {
-            _builder.AddMetrics(enable);
-        }
-        //verify
-        runSchemaConfigs?.Invoke();
-        var options = getOptions();
-        (schema.FieldMiddleware.Build() != null).ShouldBe(install);
-        options.EnableMetrics.ShouldBe(enable);
-        mockServiceProvider.Verify();
-        Verify();
-    }
-
-    [Fact]
-    public void AddMetrics_Null()
-    {
-        Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(enablePredicate: null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(null, (_, _) => true));
-        Should.Throw<ArgumentNullException>(() => _builder.AddMetrics(_ => true, null));
     }
     #endregion
 

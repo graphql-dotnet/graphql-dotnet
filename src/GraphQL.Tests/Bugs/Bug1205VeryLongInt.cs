@@ -135,35 +135,26 @@ public class Bug1205VeryLongIntQuery : ObjectGraphType
 {
     public Bug1205VeryLongIntQuery()
     {
-        Field<IntGraphType>(
-            "int",
-            resolve: ctx => 636474637870330463);
-        Field<IntGraphType>(
-           "int_with_arg",
-           arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "in" }),
-           resolve: ctx =>
-           {
-               Assert.True(false, "Never goes here");
-               return 1;
-           });
+        Field<IntGraphType>("int").Resolve(_ => 636474637870330463);
+        Field<IntGraphType>("int_with_arg")
+            .Argument<IntGraphType>("in")
+            .Resolve(_ =>
+            {
+                Assert.True(false, "Never goes here");
+                return 1;
+            });
 
-        Field<LongGraphType>(
-            "long",
-            resolve: ctx => 636474637870330463);
-        Field<LongGraphType>(
-          "long_return_bigint",
-          resolve: ctx => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
-        Field<LongGraphType>(
-           "long_with_arg",
-           arguments: new QueryArguments(new QueryArgument<LongGraphType> { Name = "in" }),
-           resolve: ctx => ctx.GetArgument<long>("in"));
+        Field<LongGraphType>("long").Resolve(_ => 636474637870330463);
+        Field<LongGraphType>("long_return_bigint")
+            .Resolve(_ => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
+        Field<LongGraphType>("long_with_arg")
+            .Argument<LongGraphType>("in")
+            .Resolve(ctx => ctx.GetArgument<long>("in"));
 
-        Field<BigIntGraphType>(
-            "bigint",
-            resolve: ctx => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
-        Field<BigIntGraphType>(
-           "bigint_with_arg",
-           arguments: new QueryArguments(new QueryArgument<BigIntGraphType> { Name = "in" }),
-           resolve: ctx => ctx.GetArgument<BigInteger>("in"));
+        Field<BigIntGraphType>("bigint")
+            .Resolve(_ => BigInteger.Parse("636474637870330463636474637870330463636474637870330463"));
+        Field<BigIntGraphType>("bigint_with_arg")
+            .Argument<BigIntGraphType>("in")
+            .Resolve(ctx => ctx.GetArgument<BigInteger>("in"));
     }
 }

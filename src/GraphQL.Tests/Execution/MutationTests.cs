@@ -104,7 +104,7 @@ public class GuidHolderType : ObjectGraphType
     public GuidHolderType()
     {
         Name = "GuidHolder";
-        Field<GuidGraphType>("theGuid", null, null, x => x.Source);
+        Field<GuidGraphType>("theGuid").Resolve(x => x.Source);
     }
 }
 
@@ -124,16 +124,9 @@ public class MutationChange : ObjectGraphType
     {
         Name = "Mutation";
 
-        Field<NumberHolderType>(
-            "immediatelyChangeTheNumber",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType>
-                {
-                    Name = "newNumber",
-                    DefaultValue = 0
-                }
-            ),
-            resolve: context =>
+        Field<NumberHolderType>("immediatelyChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .Resolve(context =>
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<int>("newNumber");
@@ -141,16 +134,9 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        FieldAsync<NumberHolderType>(
-            "promiseToChangeTheNumber",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType>
-                {
-                    Name = "newNumber",
-                    DefaultValue = 0
-                }
-            ),
-            resolve: async context =>
+        Field<NumberHolderType>("promiseToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .ResolveAsync(async context =>
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<int>("newNumber");
@@ -158,16 +144,9 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        Field<NumberHolderType>(
-            "failToChangeTheNumber",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType>
-                {
-                    Name = "newNumber",
-                    DefaultValue = 0
-                }
-            ),
-            resolve: context =>
+        Field<NumberHolderType>("failToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .Resolve(context =>
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<int>("newNumber");
@@ -175,31 +154,18 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        FieldAsync<NumberHolderType>(
-            "promiseAndFailToChangeTheNumber",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType>
-                {
-                    Name = "newNumber",
-                    DefaultValue = 0
-                }
-            ),
-            resolve: async context =>
+        Field<NumberHolderType>("promiseAndFailToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .ResolveAsync(async context =>
             {
                 var change = context.GetArgument<int>("newNumber");
                 return await Root.PromiseAndFailToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
 
-        Field<DateTimeHolderType>(
-            "immediatelyChangeTheDateTime",
-            arguments: new QueryArguments(
-                new QueryArgument<DateTimeGraphType>
-                {
-                    Name = "newDateTime"
-                }
-            ),
-            resolve: context =>
+        Field<DateTimeHolderType>("immediatelyChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .Resolve(context =>
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<DateTime>("newDateTime");
@@ -207,15 +173,9 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        FieldAsync<DateTimeHolderType>(
-            "promiseToChangeTheDateTime",
-            arguments: new QueryArguments(
-                new QueryArgument<DateTimeGraphType>
-                {
-                    Name = "newDateTime"
-                }
-            ),
-            resolve: async context =>
+        Field<DateTimeHolderType>("promiseToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .ResolveAsync(async context =>
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<DateTime>("newDateTime");
@@ -223,15 +183,9 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        Field<DateTimeHolderType>(
-            "failToChangeTheDateTime",
-            arguments: new QueryArguments(
-                new QueryArgument<DateTimeGraphType>
-                {
-                    Name = "newDateTime"
-                }
-            ),
-            resolve: context =>
+        Field<DateTimeHolderType>("failToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .Resolve(context =>
             {
                 var root = context.Source as Root;
                 _ = context.GetArgument<DateTime>("newDateTime");
@@ -239,30 +193,18 @@ public class MutationChange : ObjectGraphType
             }
         );
 
-        FieldAsync<DateTimeHolderType>(
-            "promiseAndFailToChangeTheDateTime",
-            arguments: new QueryArguments(
-                new QueryArgument<DateTimeGraphType>
-                {
-                    Name = "newDateTime"
-                }
-            ),
-            resolve: async context =>
+        Field<DateTimeHolderType>("promiseAndFailToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .ResolveAsync(async context =>
             {
                 var change = context.GetArgument<DateTime>("newDateTime");
                 return await Root.PromiseAndFailToChangeTheDateTimeAsync(change).ConfigureAwait(false);
             }
         );
 
-        Field<GuidHolderType>(
-            "passGuidGraphType",
-            arguments: new QueryArguments(
-                new QueryArgument<GuidGraphType>
-                {
-                    Name = "guid"
-                }
-            ),
-            resolve: context =>
+        Field<GuidHolderType>("passGuidGraphType")
+            .Argument<GuidGraphType>("guid")
+            .Resolve(context =>
             {
                 var guid = context.GetArgument<Guid>("guid");
                 return guid;

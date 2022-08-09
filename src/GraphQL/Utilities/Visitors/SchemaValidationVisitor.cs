@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Returns a static instance of the <see cref="SchemaValidationVisitor"/> class.
         /// </summary>
-        public static readonly SchemaValidationVisitor Instance = new SchemaValidationVisitor();
+        public static readonly SchemaValidationVisitor Instance = new();
 
         private SchemaValidationVisitor()
         {

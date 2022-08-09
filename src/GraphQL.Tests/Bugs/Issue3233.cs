@@ -1,3 +1,5 @@
+using GraphQL.Execution;
+
 namespace GraphQL.Tests.Bugs;
 
 public class Issue3233
@@ -5,7 +7,7 @@ public class Issue3233
     [Fact]
     public void Throws_NotSupportedException_On_Object_Key()
     {
-        var serializer = new SystemTextJson.GraphQLSerializer();
+        var serializer = new SystemTextJson.GraphQLSerializer(new ErrorInfoProvider(opt => opt.ExposeData = true));
         var result = new ExecutionResult();
         result.AddError(new ExecutionError("oops1"));
         var serialized = serializer.Serialize(result);
