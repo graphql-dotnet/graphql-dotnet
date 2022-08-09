@@ -150,5 +150,5 @@ public abstract class AutomaticPersistedQueriesExecutionBase : IConfigureExecuti
     }
 
     /// <inheritdoc/>
-    public virtual float SortOrder { get; protected set; } = 200;
+    public virtual float SortOrder => 200;
 }

@@ -17,7 +17,7 @@ namespace GraphQL.Caching
     {
         public const string SUPPORTED_VERSION = "1";
         protected AutomaticPersistedQueriesExecutionBase() { }
-        public virtual float SortOrder { get; set; }
+        public virtual float SortOrder { get; }
         protected virtual bool CheckHash(string hash, string query) { }
         protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
