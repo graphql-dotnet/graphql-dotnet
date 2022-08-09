@@ -43,9 +43,7 @@ public static class MemoryCacheGraphQLBuilderExtensions
     /// <inheritdoc cref="UseAutomaticPersistedQueries(IGraphQLBuilder, Action{AutomaticPersistedQueriesCacheOptions})"/>
     public static IGraphQLBuilder UseAutomaticPersistedQueries(this IGraphQLBuilder builder, Action<AutomaticPersistedQueriesCacheOptions, IServiceProvider>? action)
     {
-        builder.Services
-            .Configure(action)
-            .TryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
-        return builder;
+        builder.Services.Configure(action);
+        return builder.ConfigureExecution<AutomaticPersistedQueriesExecution>();
     }
 }

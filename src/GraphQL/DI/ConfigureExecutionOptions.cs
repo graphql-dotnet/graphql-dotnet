@@ -4,14 +4,16 @@ namespace GraphQL.DI // TODO: think about namespaces!
     {
         private readonly Func<ExecutionOptions, Task> _action;
 
-        public ConfigureExecutionOptions(Func<ExecutionOptions, Task> action)
+        public ConfigureExecutionOptions(Func<ExecutionOptions, Task> action, float sortOrder)
         {
             _action = action;
+            SortOrder = sortOrder;
         }
 
-        public ConfigureExecutionOptions(Action<ExecutionOptions> action)
+        public ConfigureExecutionOptions(Action<ExecutionOptions> action, float sortOrder)
         {
             _action = opt => { action(opt); return Task.CompletedTask; };
+            SortOrder = sortOrder;
         }
 
         public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
@@ -27,5 +29,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
                 return await next(options).ConfigureAwait(false);
             }
         }
+
+        public float SortOrder { get; }
     }
 }
