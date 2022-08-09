@@ -27,8 +27,8 @@ public class Startup
             })
             .AddSchema<StarWarsSchema>()
             .AddGraphTypes(typeof(StarWarsQuery).Assembly)
-            .AddMiddleware<CountFieldMiddleware>(false) // do not auto-install middleware
-            .AddMiddleware<InstrumentFieldsMiddleware>(false) // do not auto-install middleware
+            .UseMiddleware<CountFieldMiddleware>(false) // do not auto-install middleware
+            .UseMiddleware<InstrumentFieldsMiddleware>(false) // do not auto-install middleware
             .ConfigureSchema((schema, serviceProvider) =>
             {
                 // install middleware only when the custom EnableMetrics option is set

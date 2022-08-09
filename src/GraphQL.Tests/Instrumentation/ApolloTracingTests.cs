@@ -113,7 +113,7 @@ query {
                     opts.EnableMetrics = true;
                 return next(opts);
             })
-            .AddApolloTracing(enable)
+            .UseApolloTracing(enable)
             .ConfigureExecutionOptions(opts =>
             {
                 opts.EnableMetrics.ShouldBe(enable || enableBefore);

@@ -679,7 +679,31 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddMiddleware -
+        #region - UseMiddleware -
+        /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, bool, ServiceLifetime)"/>
+        [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+            where TMiddleware : class, IFieldMiddleware
+            => UseMiddleware<TMiddleware>(builder, install, serviceLifetime);
+
+        /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, Func{IServiceProvider, ISchema, bool}, ServiceLifetime)"/>
+        [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+            where TMiddleware : class, IFieldMiddleware
+            => UseMiddleware<TMiddleware>(builder, installPredicate, serviceLifetime);
+
+        /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, bool)"/>
+        [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
+            where TMiddleware : class, IFieldMiddleware
+            => UseMiddleware(builder, middleware, install);
+
+        /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, Func{IServiceProvider, ISchema, bool})"/>
+        [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
+            where TMiddleware : class, IFieldMiddleware
+            => UseMiddleware(builder, middleware, installPredicate);
+
         /// <summary>
         /// Registers <typeparamref name="TMiddleware"/> with the dependency injection framework as both <typeparamref name="TMiddleware"/> and
         /// <see cref="IFieldMiddleware"/>. If <paramref name="install"/> is <see langword="true"/>, installs the middleware by configuring schema
@@ -692,7 +716,7 @@ namespace GraphQL
         /// If <paramref name="install"/> is <see langword="true"/>, do not separately install the middleware within your schema constructor or the
         /// middleware may be registered twice within the schema.
         /// </remarks>
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
             where TMiddleware : class, IFieldMiddleware
         {
             if (serviceLifetime == ServiceLifetime.Scoped)
@@ -720,7 +744,7 @@ namespace GraphQL
         /// <remarks>
         /// Do not separately install the middleware within your schema constructor or the middleware may be registered twice within the schema.
         /// </remarks>
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
             where TMiddleware : class, IFieldMiddleware
         {
             if (installPredicate == null)
@@ -754,7 +778,7 @@ namespace GraphQL
         /// If <paramref name="install"/> is <see langword="true"/>, do not separately install the middleware within your schema constructor or the
         /// middleware may be registered twice within the schema.
         /// </remarks>
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
+        public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
             where TMiddleware : class, IFieldMiddleware
         {
             if (middleware == null)
@@ -778,7 +802,7 @@ namespace GraphQL
         /// <remarks>
         /// Do not separately install the middleware within your schema constructor or the middleware may be registered twice within the schema.
         /// </remarks>
-        public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
+        public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
             where TMiddleware : class, IFieldMiddleware
         {
             if (middleware == null)
@@ -1018,7 +1042,17 @@ namespace GraphQL
         }
         #endregion
 
-        #region - AddApolloTracing -
+        #region - UseApolloTracing -
+        /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, bool)"/>
+        [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => UseApolloTracing(builder, enableMetrics);
+
+        /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, Func{ExecutionOptions, bool})"/>
+        [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
+        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
+            => UseApolloTracing(builder, enableMetricsPredicate);
+
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
         /// configures it to be installed within the schema, and configures responses to include Apollo
@@ -1026,8 +1060,8 @@ namespace GraphQL
         /// When <paramref name="enableMetrics"/> is <see langword="true"/>, configures execution to set
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
-        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
-            => AddApolloTracing(builder, _ => enableMetrics);
+        public static IGraphQLBuilder UseApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
+            => UseApolloTracing(builder, _ => enableMetrics);
 
         /// <summary>
         /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
@@ -1036,12 +1070,12 @@ namespace GraphQL
         /// Configures execution to run <paramref name="enableMetricsPredicate"/> and when <see langword="true"/>, sets
         /// <see cref="ExecutionOptions.EnableMetrics"/> to <see langword="true"/>; otherwise leaves it unchanged.
         /// </summary>
-        public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
+        public static IGraphQLBuilder UseApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
         {
             if (enableMetricsPredicate == null)
                 throw new ArgumentNullException(nameof(enableMetricsPredicate));
 
-            builder.AddMiddleware<InstrumentFieldsMiddleware>();
+            builder.UseMiddleware<InstrumentFieldsMiddleware>();
             builder.ConfigureExecution(async (options, next) =>
             {
                 if (enableMetricsPredicate(options))
