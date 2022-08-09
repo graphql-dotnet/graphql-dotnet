@@ -418,9 +418,5 @@ instances are run, with the lowest value being run first.
 
 The default sort order of configurations are as follows:
 
-- 100: Apollo tracing
-- 200: Validation rules, document executers, and other 'initial' setting configurations
-- 300: User calls to ConfigureExecutionOptions
-- 400: Automatic Persisted Query processing
-- 500: Memory cache
-- 600: User calls to ConfigureExecution (configurable)
+- 100: Options configuration -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
+- 200: Execution configurations -- `Use` calls such as `UseApolloTracing`, and `ConfigureExecution` calls
