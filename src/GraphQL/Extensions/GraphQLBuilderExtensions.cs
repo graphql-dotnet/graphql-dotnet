@@ -19,7 +19,7 @@ namespace GraphQL
     /// </summary>
     public static class GraphQLBuilderExtensions // TODO: split
     {
-        // see matching list in ConfigureExecution xml comments
+        // see matching list in IConfigureExecution.SortOrder xml comments
         internal const float SORT_ORDER_OPTIONS = 100;
         internal const float SORT_ORDER_CONFIGURATION = 200;
 
@@ -951,8 +951,7 @@ namespace GraphQL
             => ConfigureExecution(builder, new ConfigureExecution(action));
 
         /// <summary>
-        /// Configures an action that can modify or replace document execution behavior, which runs after options configuration
-        /// and immediately prior to document execution.
+        /// Configures an action that can modify or replace document execution behavior.
         /// </summary>
         public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
             where TConfigureExecution : class, IConfigureExecution
