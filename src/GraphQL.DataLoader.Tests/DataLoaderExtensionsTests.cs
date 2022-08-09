@@ -68,7 +68,6 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
         User user2 = null;
         User user3 = null;
 
-        // Run within an async context to make sure we won't deadlock
         var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
         // Start async tasks to load by ID
