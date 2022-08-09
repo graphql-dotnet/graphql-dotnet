@@ -124,17 +124,29 @@ public class ErrorInfoProviderTests
     }
 
     [Fact]
-    public void exposeExceptions()
+    public void exposeExceptions_in_message()
     {
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
         var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+        info.Extensions.TryGetValue("stacktrace", out _).ShouldBeFalse();
     }
 
     [Fact]
-    public void exposeExceptions_with_real_stack_trace()
+    public void exposeExceptions_in_extensions()
+    {
+        var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
+        var error = new ExecutionError(innerException.Message, innerException);
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true, ExposeExceptionStackTraceMode = ExposeExceptionStackTraceMode.Extensions }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["stacktrace"].ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_message()
     {
         // generate a real stack trace to serialize
         ExecutionError error;
@@ -156,6 +168,32 @@ public class ErrorInfoProviderTests
 
         var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_extensions()
+    {
+        // generate a real stack trace to serialize
+        ExecutionError error;
+        try
+        {
+            try
+            {
+                throw new ArgumentNullException(null, new ArgumentOutOfRangeException());
+            }
+            catch (Exception innerException)
+            {
+                throw new ExecutionError(innerException.Message, innerException);
+            }
+        }
+        catch (ExecutionError e)
+        {
+            error = e;
+        }
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true, ExposeExceptionStackTraceMode = ExposeExceptionStackTraceMode.Extensions }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["stacktrace"].ShouldNotBeNull();
     }
 
     [Fact]

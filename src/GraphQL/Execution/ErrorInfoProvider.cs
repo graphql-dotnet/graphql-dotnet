@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text;
 using GraphQL.Validation;
 
 namespace GraphQL.Execution
@@ -53,8 +54,11 @@ namespace GraphQL.Execution
                     codes = null;
                 var number = _options.ExposeCode && executionError is ValidationError validationError ? validationError.Number : null;
                 var data = _options.ExposeData && executionError.Data?.Count > 0 ? executionError.Data : null;
+                var stacktrace = _options.ExposeExceptionStackTrace && _options.ExposeExceptionStackTraceMode == ExposeExceptionStackTraceMode.Extensions
+                    ? BuildStackTrace(executionError)
+                    : null;
 
-                if (code != null || codes != null || data != null)
+                if (code != null || codes != null || data != null || stacktrace != null)
                 {
                     extensions = new Dictionary<string, object?>();
                     if (code != null)
@@ -65,14 +69,32 @@ namespace GraphQL.Execution
                         extensions.Add("number", number);
                     if (data != null)
                         extensions.Add("data", data);
+                    if (stacktrace != null)
+                        extensions.Add("stacktrace", stacktrace);
                 }
             }
 
             return new ErrorInfo
             {
-                Message = _options.ExposeExceptionStackTrace ? executionError.ToString() : executionError.Message,
+                Message = _options.ExposeExceptionStackTrace && _options.ExposeExceptionStackTraceMode == ExposeExceptionStackTraceMode.Message ? executionError.ToString() : executionError.Message,
                 Extensions = extensions,
             };
+
+            string BuildStackTrace(Exception ex)
+            {
+                string prefix = "";
+                StringBuilder sb = new();
+                while (ex != null)
+                {
+                    AppendEntry();
+                    ex = ex.InnerException!;
+                    prefix = "[inner] ";
+                }
+
+                return sb.ToString();
+
+                void AppendEntry() => sb.Append(prefix).Append(ex.GetType().FullName).AppendLine(":").AppendLine(ex.StackTrace ?? "   <no stacktrace>");
+            }
         }
 
         /// <summary>

@@ -1067,6 +1067,7 @@ namespace GraphQL.Execution
         public bool ExposeCodes { get; set; }
         public bool ExposeData { get; set; }
         public bool ExposeExceptionStackTrace { get; set; }
+        public GraphQL.Execution.ExposeExceptionStackTraceMode ExposeExceptionStackTraceMode { get; set; }
         public bool ExposeExtensions { get; set; }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
@@ -1154,6 +1155,11 @@ namespace GraphQL.Execution
         protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
+    }
+    public enum ExposeExceptionStackTraceMode
+    {
+        Message = 0,
+        Extensions = 1,
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {
