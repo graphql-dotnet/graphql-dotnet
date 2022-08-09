@@ -16,7 +16,7 @@ namespace GraphQL.Execution
         public ExposeExceptionStackTraceMode ExposeExceptionStackTraceMode { get; set; }
 
         /// <summary>
-        /// Specifies whether the extensions property, including by default the 'code', 'codes' and 'data' properties, should be serialized.
+        /// Specifies whether the extensions property, including by default the 'code', 'codes', 'data' and 'stacktrace' properties, should be serialized.
         /// </summary>
         public bool ExposeExtensions { get; set; } = true;
 
@@ -39,8 +39,7 @@ namespace GraphQL.Execution
     }
 
     /// <summary>
-    /// Mode to control location of stack traces when <see cref="ErrorInfoProviderOptions.ExposeExceptionStackTrace"/>
-    /// and <see cref="ErrorInfoProviderOptions.ExposeExtensions"/> are enabled.
+    /// Mode to control location of stack traces.
     /// </summary>
     public enum ExposeExceptionStackTraceMode
     {
