@@ -418,5 +418,5 @@ instances are run, with the lowest value being run first.
 
 The default sort order of configurations are as follows:
 
-- 100: Options configuration -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
+- 100: Option configurations -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
 - 200: Execution configurations -- `Use` calls such as `UseApolloTracing`, and `ConfigureExecution` calls

@@ -103,7 +103,10 @@ A list of the available extension methods is below:
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
 
-Methods that start with `Configure` and `Use` execute in the order they appear, which may be important. For instance
+Methods that start with `Configure` and `Use` execute in the order they appear, which may be important. For instance,
+calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in the memory cache being unable to
+cache any APQ queries.
+
 Custom `IGraphQLBuilder` extension methods typically rely on the `Services` property of the builder in order to register services
 with the underlying dependency injection framework. The `Services` property returns a `IServiceRegister` interface which has these methods:
 
