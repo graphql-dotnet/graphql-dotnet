@@ -58,7 +58,6 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 ResolvedType = type,
-                Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
@@ -70,7 +69,6 @@ namespace GraphQL.Builders
             {
                 Name = name,
                 Type = type,
-                Arguments = new QueryArguments(),
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
