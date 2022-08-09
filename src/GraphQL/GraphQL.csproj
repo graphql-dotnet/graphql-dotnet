@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Condition="'$(SignAssembly)' == 'true'" Include="$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)"/>
+    <InternalsVisibleTo Condition="'$(SignAssembly)' != 'true'" Include="$(MSBuildProjectName).Tests"/>
+  </ItemGroup>
+
+
+  <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1 Condition="'$(SignAssembly)' == 'true'">$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)</_Parameter1>
       <_Parameter1 Condition="'$(SignAssembly)' != 'true'">$(MSBuildProjectName).Tests</_Parameter1>
