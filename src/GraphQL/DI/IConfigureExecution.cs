@@ -32,15 +32,14 @@ namespace GraphQL.DI
     {
         private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
 
-        public ConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action, float sortOrder)
+        public ConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action)
         {
             _action = action;
-            SortOrder = sortOrder;
         }
 
         public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
             => _action(options, next);
 
-        public float SortOrder { get; }
+        public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
     }
 }
