@@ -19,6 +19,13 @@ namespace GraphQL.DI
         /// the lowest order executes first; instances with the same value execute in the same
         /// order they were registered, assuming the dependency injection provider returns
         /// instances in the order they were registered.
+        /// <para>
+        /// The default sort order of configurations are as follows:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>100: Option configurations -- 'Add' calls such as <see cref="GraphQLBuilderExtensions.AddValidationRule{TValidationRule}(IGraphQLBuilder, bool)">AddValidationRule</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})">ConfigureExecutionOptions</see> calls</item>
+        /// <item>200: Execution configurations -- 'Use' calls such as <see cref="GraphQLBuilderExtensions.UseApolloTracing(IGraphQLBuilder, bool)">UseApolloTracing</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see> calls</item>
+        /// </list>
         /// </summary>
         float SortOrder { get; }
     }
