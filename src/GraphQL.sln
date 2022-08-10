@@ -11,11 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		Directory.Build.targets = Directory.Build.targets
 		graphql.snk = graphql.snk
 		..\LICENSE.md = ..\LICENSE.md
-		nuget.config = nuget.config
-		public.snk = public.snk
 		..\README.md = ..\README.md
 		Tests.props = Tests.props
-		_SignAssembly.targets = _SignAssembly.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
@@ -127,8 +124,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
 		..\docs2\site\docs\migrations\migration5.md = ..\docs2\site\docs\migrations\migration5.md
-		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
 		..\docs2\site\docs\migrations\migration7.md = ..\docs2\site\docs\migrations\migration7.md
+		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
 EndProject
