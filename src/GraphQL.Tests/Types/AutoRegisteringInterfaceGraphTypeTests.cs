@@ -457,6 +457,9 @@ public class AutoRegisteringInterfaceGraphTypeTests
             .AddAutoSchema<TestQuery>()
             .AddSystemTextJson());
         using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
+            .ShouldBe(new[] { "AnimalType", "Boolean", "Cat", "Dog", "IAnimal", "ID", "Int", "String", "TestQuery" });
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var result = await executer.ExecuteAsync(new()
         {
@@ -468,23 +471,55 @@ public class AutoRegisteringInterfaceGraphTypeTests
         actual.ShouldBeCrossPlatJson(expected);
     }
 
-    [Fact]
-    public async Task ExecutesQueryWithInterfaceOnly()
+    [Theory]
+    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal {id name}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    public async Task ExecutesQueryWithInterfaceOnly(string query, string expected)
     {
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
             .AddAutoSchema<TestQuery2>()
             .AddSystemTextJson());
         using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
+            .ShouldBe(new[] { "AnimalType", "Boolean", "IAnimal", "ID", "String", "TestQuery2" });
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var result = await executer.ExecuteAsync(new()
         {
-            Query = "{find(type:CAT){id name}}",
+            Query = query,
             RequestServices = provider,
         }).ConfigureAwait(false);
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         var actual = serializer.Serialize(result);
-        actual.ShouldBeCrossPlatJson(@"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}");
+        actual.ShouldBeCrossPlatJson(expected);
+    }
+
+    [Theory]
+    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal { id name }", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on Dog { isLarge }", @"{""data"":{""find"":{}}}")]
+    [InlineData("{find(type:CAT){ ... on Dog { isLarge } }}", @"{""data"":{""find"":{}}}")]
+    [InlineData("{find(type:CAT){ id name ... on Dog { isLarge } }}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    public async Task ExecutesQueryWithInterfaceOnly2(string query, string expected)
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<TestQuery3>()
+            .AddSystemTextJson());
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
+            .ShouldBe(new[] { "AnimalType", "Boolean", "Dog", "IAnimal", "ID", "String", "TestQuery3" });
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var result = await executer.ExecuteAsync(new()
+        {
+            Query = query,
+            RequestServices = provider,
+        }).ConfigureAwait(false);
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+        var actual = serializer.Serialize(result);
+        actual.ShouldBeCrossPlatJson(expected);
     }
 
     public class TestQuery
@@ -508,6 +543,18 @@ public class AutoRegisteringInterfaceGraphTypeTests
             AnimalType.Dog => new Dog() { Name = "Shadow", IsLarge = true },
             _ => throw new ArgumentOutOfRangeException(nameof(type)),
         };
+    }
+
+    public class TestQuery3
+    {
+        public static IAnimal Find(AnimalType type) => type switch
+        {
+            AnimalType.Cat => new Cat() { Name = "Fluffy", Lives = 9 },
+            AnimalType.Dog => new Dog() { Name = "Shadow", IsLarge = true },
+            _ => throw new ArgumentOutOfRangeException(nameof(type)),
+        };
+
+        public static Dog Dog() => new Dog() { Name = "Shadow", IsLarge = true };
     }
 
     public interface IObject
