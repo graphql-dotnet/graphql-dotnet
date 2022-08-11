@@ -129,9 +129,9 @@ public class ErrorInfoProviderTests
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
-        info.Extensions.TryGetValue("stacktrace", out _).ShouldBeFalse();
+        info.Extensions.TryGetValue("details", out _).ShouldBeFalse();
     }
 
     [Fact]
@@ -140,9 +140,9 @@ public class ErrorInfoProviderTests
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true, ExposeExceptionStackTraceMode = ExposeExceptionStackTraceMode.Extensions }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Extensions }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
-        info.Extensions["stacktrace"].ShouldNotBeNull();
+        info.Extensions["details"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
     }
 
@@ -191,9 +191,9 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true, ExposeExceptionStackTraceMode = ExposeExceptionStackTraceMode.Extensions }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Extensions }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
-        info.Extensions["stacktrace"].ShouldNotBeNull();
+        info.Extensions["details"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class ErrorInfoProviderTests
         };
         error.Code.ShouldBe("");
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");

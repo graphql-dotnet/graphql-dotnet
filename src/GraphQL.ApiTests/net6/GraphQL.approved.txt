@@ -1066,8 +1066,10 @@ namespace GraphQL.Execution
         public bool ExposeCode { get; set; }
         public bool ExposeCodes { get; set; }
         public bool ExposeData { get; set; }
+        public bool ExposeExceptionDetails { get; set; }
+        public GraphQL.Execution.ExposeExceptionDetailsMode ExposeExceptionDetailsMode { get; set; }
+        [System.Obsolete("Use ExposeExceptionDetails property instead")]
         public bool ExposeExceptionStackTrace { get; set; }
-        public GraphQL.Execution.ExposeExceptionStackTraceMode ExposeExceptionStackTraceMode { get; set; }
         public bool ExposeExtensions { get; set; }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
@@ -1152,11 +1154,10 @@ namespace GraphQL.Execution
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
-        protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
     }
-    public enum ExposeExceptionStackTraceMode
+    public enum ExposeExceptionDetailsMode
     {
         Message = 0,
         Extensions = 1,
@@ -2425,6 +2426,11 @@ namespace GraphQL.Types
         public System.Type Type { get; set; }
         public virtual void ApplyAttributes() { }
         public virtual System.Type ConstructGraphType() { }
+        public class f : System.IEquatable<GraphQL.Types.TypeInformation.f>
+        {
+            public f(int i) { }
+            public int i { get; set; }
+        }
     }
     public class UIntGraphType : GraphQL.Types.ScalarGraphType
     {
