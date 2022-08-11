@@ -2412,11 +2412,6 @@ namespace GraphQL.Types
         public System.Type Type { get; set; }
         public virtual void ApplyAttributes() { }
         public virtual System.Type ConstructGraphType() { }
-        public class f : System.IEquatable<GraphQL.Types.TypeInformation.f>
-        {
-            public f(int i) { }
-            public int i { get; set; }
-        }
     }
     public class UIntGraphType : GraphQL.Types.ScalarGraphType
     {
