@@ -208,9 +208,55 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+            where TArgumentGraphType : IGraphType => Argument(typeof(TArgumentGraphType), name, null);
+
+        /// <summary>
+        /// Adds an argument to the field.
+        /// </summary>
+        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType => Argument(typeof(TArgumentGraphType), name, configure);
+
+        /// <summary>
+        /// Adds an argument to the field.
+        /// </summary>
+        /// <typeparam name="TArgumentClrType">The clr type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="nullable">Indicates if the argument is optional or not.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, Action<QueryArgument>? configure = null)
+        {
+            Type type;
+
+            try
+            {
+                type = typeof(TArgumentClrType).GetGraphTypeFromType(nullable, TypeMappingMode.InputType);
+            }
+            catch (ArgumentOutOfRangeException exp)
+            {
+                throw new ArgumentException($"The GraphQL type for argument '{FieldType.Name}.{name}' could not be derived implicitly from type '{typeof(TArgumentClrType).Name}'.", exp);
+            }
+
+            return Argument(type, name, configure);
+        }
+
+        /// <summary>
+        /// Adds an argument to the field.
+        /// </summary>
+        /// <typeparam name="TArgumentClrType">The clr type of the argument.</typeparam>
+        /// <param name="name">The name of the argument.</param>
+        /// <param name="nullable">Indicates if the argument is optional or not.</param>
+        /// <param name="description">The description of the argument.</param>
+        /// <param name="configure">A delegate to further configure the argument.</param>
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, Action<QueryArgument>? configure = null)
+            => Argument<TArgumentClrType>(name, nullable, b =>
+            {
+                b.Description = description;
+                configure?.Invoke(b);
+            });
 
         /// <summary>
         /// Adds an argument to the field.

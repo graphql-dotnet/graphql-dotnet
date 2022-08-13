@@ -104,7 +104,7 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
-### 9. Add `Field<TReturnType>` overload to create field builder with an inferred graph type
+### 9. `Field<TReturnType>` and `Argument<TArgumentClrType> overloads to create field and argument builders with inferred graph types
 
 To define a field with a field builder, previously the graph type was always required, like this:
 
@@ -121,7 +121,7 @@ Field<IntGraphType, int>("test")
 Now you can simply specify the return type, and the graph type will be inferred:
 
 ```csharp
-Field<int>("test")        // by defaut assumes not-null
+Field<int>("test")        // by default assumes not-null
     .Resolve(_ => 123);
 
 // or
@@ -132,6 +132,19 @@ Field<int>("test", true)  // specify true or false to indicate nullability
 
 This is similar to the expression syntax (`Field(x => x.Name)`) which does not require
 the graph type to be specified in order to define a field.
+
+Similarly, you can now define an argument by specifying the CLR type:
+
+```csharp
+Field<int>("test")
+    .Argument<string>("name")              // required
+    .Argument<string>("description", true) // optional
+    .Resolve(ctx => {
+        var name = ctx.GetArgument<string>("name");
+        var desc = ctx.GetArgument<string>("description");
+        return 123;
+    });
+```
 
 As with the expression syntax or the `AutoRegisteringObjectGraphType`,
 CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods.
