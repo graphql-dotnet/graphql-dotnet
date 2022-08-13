@@ -209,7 +209,8 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
-            where TArgumentGraphType : IGraphType => Argument(typeof(TArgumentGraphType), name, null);
+            where TArgumentGraphType : IGraphType
+            => Argument(typeof(TArgumentGraphType), name, null);
 
         /// <summary>
         /// Adds an argument to the field.
