@@ -120,4 +120,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             return await next(options).ConfigureAwait(false);
         }
     }
+
+    /// <inheritdoc/>
+    public virtual float SortOrder => 200;
 }

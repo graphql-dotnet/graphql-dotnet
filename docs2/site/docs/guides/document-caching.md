@@ -19,7 +19,7 @@ IServiceCollection services = ...;
 services.AddGraphQL(builder => builder
     .AddSchema<StarWarsSchema>()
     .AddSystemTextJson()
-    .AddMemoryCache(options =>
+    .UseMemoryCache(options =>
     {
         // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
         // for 10MB maximum memory use by the cache - parsed AST and other stuff)
