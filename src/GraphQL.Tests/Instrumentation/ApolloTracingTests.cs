@@ -113,12 +113,13 @@ query {
                     opts.EnableMetrics = true;
                 return next(opts);
             })
-            .AddApolloTracing(enable)
-            .ConfigureExecutionOptions(opts =>
+            .UseApolloTracing(enable)
+            .ConfigureExecution((opts, next) =>
             {
                 opts.EnableMetrics.ShouldBe(enable || enableBefore);
                 if (enableAfter)
                     opts.EnableMetrics = true;
+                return next(opts);
             })
             .AddSystemTextJson());
         using var provider = serviceCollection.BuildServiceProvider();

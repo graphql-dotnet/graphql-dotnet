@@ -409,3 +409,14 @@ Field<MessageGraphType>("messages").ResolveStreamAsync(context => observable);
 ```
 
 Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
+
+### 11. `SortOrder` property added to `IConfigureExecution`
+
+If you have classes that implement `IConfigureExecution`, you will now need to also implement the
+added `SortOrder` property. The sort order determines the order that the `IConfigureExecution`
+instances are run, with the lowest value being run first.
+
+The default sort order of configurations are as follows:
+
+- 100: Option configurations -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
+- 200: Execution configurations -- `Use` calls such as `UseApolloTracing`, and `ConfigureExecution` calls

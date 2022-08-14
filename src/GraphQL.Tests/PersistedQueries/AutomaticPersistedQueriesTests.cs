@@ -158,7 +158,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
     {
         Provider = new ServiceCollection()
             .AddGraphQL(builder => builder
-                .AddAutomaticPersistedQueries(options => options.SlidingExpiration = TimeSpan.FromMinutes(1))
+                .UseAutomaticPersistedQueries(options => options.SlidingExpiration = TimeSpan.FromMinutes(1))
                 .AddSchema<AutomaticPersistedQueriesTestSchema>()
                 .AddSystemTextJson()
             ).BuildServiceProvider();
