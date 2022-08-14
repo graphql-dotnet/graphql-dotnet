@@ -14,7 +14,12 @@ namespace GraphQL.Execution
         public bool ExposeExceptionStackTrace
         {
             get => ExposeExceptionDetails;
-            set => ExposeExceptionDetails = value;
+            set
+            {
+                ExposeExceptionDetails = value;
+                if (value)
+                    ExposeExceptionDetailsMode = Message;
+            }
         }
 
         /// <summary>
