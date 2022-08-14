@@ -12,7 +12,7 @@ public static class MemoryCacheGraphQLBuilderExtensions
     /// </summary>
     [Obsolete("Please use UseMemoryCache. This method will be removed in v8.")]
     public static IGraphQLBuilder AddMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions>? action = null)
-     => builder.AddMemoryCache(action == null ? null : (options, _) => action(options));
+        => builder.AddMemoryCache(action == null ? null : (options, _) => action(options));
 
     /// <inheritdoc cref="AddMemoryCache(IGraphQLBuilder, Action{MemoryDocumentCacheOptions})"/>
     [Obsolete("Please use UseMemoryCache. This method will be removed in v8.")]
