@@ -76,6 +76,59 @@ public class DocumentExecuterTests
         err.Message.ShouldBe("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
     }
 
+    [Fact]
+    public async Task Honors_IConfigureExecution_SortOrder()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .ConfigureExecution(new MyConfigureExecution(0, 1, 1)) //executes 1st
+            .ConfigureExecution(new MyConfigureExecution(4, 5, 5)) //executes 3rd
+            .ConfigureExecution(new MyConfigureExecution(1, 4, 2)) //executes 2nd
+            .ConfigureExecution(new MyConfigureExecution((options, _) => //executes 5th
+            {
+                options.MaxParallelExecutionCount.ShouldBe(6);
+                return Task.FromResult<ExecutionResult>(null!); // no need to actually execute a query
+            }, 6))
+            .ConfigureExecution(new MyConfigureExecution(5, 6, 5)) //executes 4th
+        );
+        using var provider = services.BuildServiceProvider();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var ret = await executer.ExecuteAsync(new()).ConfigureAwait(false);
+        ret.ShouldBeNull(); // validates that all configured executions have run, as normally this would never be null
+    }
+
+    private class MyConfigureExecution : IConfigureExecution
+    {
+        private readonly int _expected;
+        private readonly int _setValue;
+        private readonly int _sortOrder;
+        private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
+
+        public MyConfigureExecution(int expected, int setValue, int sortOrder)
+        {
+            _expected = expected;
+            _setValue = setValue;
+            _sortOrder = sortOrder;
+        }
+
+        public MyConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action, int sortOrder)
+        {
+            _action = action;
+            _sortOrder = sortOrder;
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+        {
+            if (_action != null)
+                return _action(options, next);
+            (options.MaxParallelExecutionCount ?? 0).ShouldBe(_expected);
+            options.MaxParallelExecutionCount = _setValue;
+            return next(options);
+        }
+
+        public float SortOrder => _sortOrder;
+    }
+
     private class StringExecuter<TSchema> where TSchema : ISchema
     {
         private readonly IDocumentExecuter<TSchema> _executer;

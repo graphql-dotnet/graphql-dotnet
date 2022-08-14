@@ -9,10 +9,16 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(SignAssembly)' == 'true'">
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)graphql.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <InternalsVisibleTo Condition="'$(SignAssembly)' == 'true'" Include="$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)"/>
+    <InternalsVisibleTo Condition="'$(SignAssembly)' != 'true'" Include="$(MSBuildProjectName).Tests"/>
   </ItemGroup>
 
   <!--Workaround for https://github.com/NuGet/Home/issues/5556 and https://github.com/NuGet/Home/issues/5525-->
@@ -30,5 +36,5 @@
       <_ProjectReferencesWithVersions Include="@(_ProjectReferenceWithReassignedVersion)" />
     </ItemGroup>
   </Target>
-  
+
 </Project>
