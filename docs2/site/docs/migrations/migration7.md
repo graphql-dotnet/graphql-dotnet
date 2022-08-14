@@ -152,7 +152,7 @@ to any GraphQL interfaces; such mapping needs to be specified via the new
 `ImplementsAttribute`. Similarly, CLR types not referenced directly in the schema
 need to be added to the schema manually or else no graph type will be generated for them.
 
-Below is a typcial example of how the new functionality can be used:
+Below is a typical example of how the new functionality can be used:
 
 ```csharp
 services.AddGraphQL(b => b
