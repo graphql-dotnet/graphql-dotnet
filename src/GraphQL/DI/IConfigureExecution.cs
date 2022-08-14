@@ -47,6 +47,6 @@ namespace GraphQL.DI
         public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
             => _action(options, next);
 
-        public virtual float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
+        public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
     }
 }
