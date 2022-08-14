@@ -141,7 +141,7 @@ CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods
 Similar to how input and output types can be inferred from their CLR counterparts,
 now interface graph types can also be inferred from CLR types. This is possible
 with the new class `AutoRegisteringInterfaceGraphType<TSourceType>` which functions
-identically to `AutoRegisteringObjectGraphType<TSourceType>` except creates an
+identically to `AutoRegisteringObjectGraphType<TSourceType>` except it creates an
 interface type rather than an object graph type. When using automatic CLR type
 mapping provided by `AddAutoClrMappings()` or `AddAutoSchema()`, any CLR interface
 type is automatically mapped to a interface graph type rather than an object graph
