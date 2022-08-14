@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.Resolvers;
@@ -140,6 +141,20 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
+        internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+        {
+            var typeInformation = getTypeInformation(memberInfo);
+            var graphType = typeInformation.ConstructGraphType();
+            var fieldType = CreateField(memberInfo, graphType, isInputType);
+            buildFieldType?.Invoke(fieldType, memberInfo);
+            // apply field attributes after resolver has been set
+            ApplyFieldAttributes(memberInfo, fieldType, isInputType);
+            return fieldType;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
+        /// </summary>
         internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
@@ -226,141 +241,66 @@ namespace GraphQL.Types
         }
 
         /// <summary>
-        /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
-        /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
-        /// and <see cref="FieldType.StreamResolver"/>.
-        /// <br/><br/>
-        /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
-        /// member from <see cref="IResolveFieldContext.Source"/>.
-        /// <br/><br/>
-        /// For methods, method arguments are iterated and processed by
-        /// <see cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)">GetArgumentInformation</see>, building
-        /// a list of query arguments and expressions as necessary. Then a field resolver is built around the method.
+        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
         /// </summary>
-        internal static void BuildFieldTypeForOutput(
-            MemberInfo memberInfo,
-            FieldType fieldType,
-            Func<MemberInfo, LambdaExpression> BuildMemberInstanceExpression,
-            Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-            Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes)
+        internal static IEnumerable<FieldType> ProvideFields(IEnumerable<MemberInfo> members, Func<MemberInfo, FieldType?> createField, bool isInputType)
         {
-            if (memberInfo is PropertyInfo propertyInfo)
+            foreach (var memberInfo in members)
             {
-                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
-                fieldType.Arguments = null;
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
-            }
-            else if (memberInfo is MethodInfo methodInfo)
-            {
-                List<LambdaExpression> expressions = new();
-                QueryArguments queryArguments = new();
-                foreach (var parameterInfo in methodInfo.GetParameters())
+                bool include = true;
+                foreach (var attr in memberInfo.GetGraphQLAttributes())
                 {
-                    var getArgumentInfoMethod = getTypedArgumentInfoMethod(parameterInfo.ParameterType);
-                    var argumentInfo = getArgumentInfoMethod(fieldType, parameterInfo);
-                    var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
-                    if (queryArgument != null)
-                    {
-                        ApplyArgumentAttributes(parameterInfo, queryArgument);
-                        queryArguments.Add(queryArgument);
-                    }
-                    expression ??= AutoRegisteringHelper.GetParameterExpression(
-                        parameterInfo.ParameterType,
-                        queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
-                    expressions.Add(expression);
+                    include = attr.ShouldInclude(memberInfo, isInputType);
+                    if (!include)
+                        break;
                 }
-                var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
-                if (IsObservable(methodInfo.ReturnType))
-                {
-                    var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
-                    fieldType.Resolver = resolver;
-                    fieldType.StreamResolver = resolver;
-                }
-                else
-                {
-                    var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
-                    fieldType.Resolver = resolver;
-                    fieldType.StreamResolver = null;
-                }
-                fieldType.Arguments = queryArguments;
-            }
-            else if (memberInfo is FieldInfo fieldInfo)
-            {
-                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
-                fieldType.Arguments = null;
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
-            }
-            else if (memberInfo == null)
-            {
-                throw new ArgumentNullException(nameof(memberInfo));
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
+                if (!include)
+                    continue;
+                var fieldType = createField(memberInfo);
+                if (fieldType != null)
+                    yield return fieldType;
             }
         }
 
         /// <summary>
-        /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
+        /// Analyzes a member and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
+        /// <br/><br/>
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
         /// </summary>
-        private static bool IsObservable(Type type)
+        internal static TypeInformation GetTypeInformation(MemberInfo memberInfo, bool isInputType)
         {
-            if (!type.IsGenericType)
-                return false;
-
-            var g = type.GetGenericTypeDefinition();
-            if (g == typeof(IObservable<>))
-                return true;
-            if (g == typeof(Task<>) || g == typeof(ValueTask<>))
-                return IsObservable(type.GetGenericArguments()[0]);
-            return false;
+            var typeInformation = memberInfo switch
+            {
+                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, isInputType),
+                MethodInfo methodInfo when !isInputType => new TypeInformation(methodInfo),
+                FieldInfo fieldInfo => new TypeInformation(fieldInfo, isInputType),
+                _ => isInputType
+                    ? throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties and fields are supported.")
+                    : throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties, methods and fields are supported."),
+            };
+            typeInformation.ApplyAttributes();
+            return typeInformation;
         }
 
         /// <summary>
-        /// Returns a list of properties, methods or fields that should have fields created for them.
+        /// Analyzes a method argument and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
         /// <br/><br/>
-        /// Unless overridden, returns a list of public instance readable properties and public instance methods
-        /// that do not return <see langword="void"/> or <see cref="Task"/>
-        /// including properties and methods declared on inherited classes.
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
         /// </summary>
-        internal static IEnumerable<MemberInfo> GetRegisteredMembersForOutput<TSourceType>(Expression<Func<TSourceType, object?>>[]? excludedProperties)
+        internal static TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
         {
-            if (typeof(TSourceType).IsInterface)
-            {
-                var types = typeof(TSourceType).GetInterfaces().Append(typeof(TSourceType));
-
-                var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-                var properties = ExcludeProperties(
-                    types.SelectMany(type => type.GetProperties(flags)).Where(x => x.CanRead),
-                    excludedProperties);
-                var methods = types.SelectMany(type => type.GetMethods(flags))
-                    .Where(x =>
-                        !x.ContainsGenericParameters &&     // exclude methods with open generics
-                        !x.IsSpecialName &&                 // exclude methods generated for properties
-                        x.ReturnType != typeof(void) &&     // exclude methods which do not return a value
-                        x.ReturnType != typeof(Task));
-                return properties.Concat<MemberInfo>(methods);
-            }
-            else
-            {
-                var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
-                var properties = ExcludeProperties(
-                    typeof(TSourceType).GetProperties(flags).Where(x => x.CanRead),
-                    excludedProperties);
-                var methods = typeof(TSourceType).GetMethods(flags)
-                    .Where(x =>
-                        !x.ContainsGenericParameters &&                          // exclude methods with open generics
-                        !x.IsSpecialName &&                                      // exclude methods generated for properties
-                        x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
-                        x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
-                        x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
-                                                                                 // exclude methods generated for record types: bool Equals(TSourceType)
-                        !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
-                        x.Name != "<Clone>$");                                   // exclude methods generated for record types
-                return properties.Concat<MemberInfo>(methods);
-            }
+            var typeInformation = new TypeInformation(parameterInfo);
+            typeInformation.ApplyAttributes();
+            return typeInformation;
         }
     }
 }

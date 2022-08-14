@@ -42,35 +42,11 @@ namespace GraphQL.Types
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ProvideFields"/>
         protected virtual IEnumerable<FieldType> ProvideFields()
-        {
-            foreach (var memberInfo in GetRegisteredMembers())
-            {
-                bool include = true;
-                foreach (var attr in memberInfo.GetGraphQLAttributes())
-                {
-                    include = attr.ShouldInclude(memberInfo, false);
-                    if (!include)
-                        break;
-                }
-                if (!include)
-                    continue;
-                var fieldType = CreateField(memberInfo);
-                if (fieldType != null)
-                    yield return fieldType;
-            }
-        }
+            => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, false);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.CreateField(MemberInfo)"/>
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        {
-            var typeInformation = GetTypeInformation(memberInfo);
-            var graphType = typeInformation.ConstructGraphType();
-            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, false);
-            BuildFieldType(fieldType, memberInfo);
-            // apply field attributes after resolver has been set
-            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, false);
-            return fieldType;
-        }
+            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
         protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
@@ -82,7 +58,7 @@ namespace GraphQL.Types
                     return (Func<FieldType, ParameterInfo, ArgumentInformation>)getArgumentInfoMethodInfo.CreateDelegate(typeof(Func<FieldType, ParameterInfo, ArgumentInformation>), this);
                 };
 
-            AutoRegisteringHelper.BuildFieldTypeForOutput(
+            AutoRegisteringOutputHelper.BuildFieldType(
                 memberInfo,
                 fieldType,
                 BuildMemberInstanceExpression,
@@ -108,47 +84,22 @@ namespace GraphQL.Types
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ApplyArgumentAttributes(ParameterInfo, QueryArgument)"/>
         protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
-        {
-            var attributes = parameterInfo.GetGraphQLAttributes();
-            foreach (var attr in attributes)
-            {
-                attr.Modify(queryArgument);
-            }
-        }
+            => AutoRegisteringOutputHelper.ApplyArgumentAttributes(parameterInfo, queryArgument);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetArgumentInformation{TParameterType}(FieldType, ParameterInfo)"/>
         protected virtual ArgumentInformation GetArgumentInformation<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
-        {
-            var typeInformation = GetTypeInformation(parameterInfo);
-            var argumentInfo = new ArgumentInformation(parameterInfo, typeof(TSourceType), fieldType, typeInformation);
-            argumentInfo.ApplyAttributes();
-            return argumentInfo;
-        }
+            => AutoRegisteringOutputHelper.GetArgumentInformation<TSourceType>(GetTypeInformation(parameterInfo), fieldType, parameterInfo);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetRegisteredMembers"/>
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
-            => AutoRegisteringHelper.GetRegisteredMembersForOutput(_excludedProperties);
+            => AutoRegisteringOutputHelper.GetRegisteredMembers(_excludedProperties);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetTypeInformation(MemberInfo)"/>
         protected virtual TypeInformation GetTypeInformation(MemberInfo memberInfo)
-        {
-            var typeInformation = memberInfo switch
-            {
-                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, false),
-                MethodInfo methodInfo => new TypeInformation(methodInfo),
-                FieldInfo fieldInfo => new TypeInformation(fieldInfo, false),
-                _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties, methods and fields are supported."),
-            };
-            typeInformation.ApplyAttributes();
-            return typeInformation;
-        }
+            => AutoRegisteringHelper.GetTypeInformation(memberInfo, false);
 
         /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.GetTypeInformation(ParameterInfo)"/>
         protected virtual TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
-        {
-            var typeInformation = new TypeInformation(parameterInfo);
-            typeInformation.ApplyAttributes();
-            return typeInformation;
-        }
+            => AutoRegisteringHelper.GetTypeInformation(parameterInfo);
     }
 }
