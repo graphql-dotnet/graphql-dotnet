@@ -17,6 +17,7 @@ namespace GraphQL.Caching
     {
         public const string SUPPORTED_VERSION = "1";
         protected AutomaticPersistedQueriesExecutionBase() { }
+        public virtual float SortOrder { get; }
         protected virtual bool CheckHash(string hash, string query) { }
         protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
@@ -61,9 +62,13 @@ namespace GraphQL
 {
     public static class MemoryCacheGraphQLBuilderExtensions
     {
+        [System.Obsolete("Please use UseAutomaticPersistedQueries. This method will be removed in v8.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
+        [System.Obsolete("Please use UseAutomaticPersistedQueries. This method will be removed in v8.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UseAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
     }
 }

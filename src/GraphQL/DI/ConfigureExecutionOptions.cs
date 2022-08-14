@@ -27,5 +27,7 @@ namespace GraphQL.DI // TODO: think about namespaces!
                 return await next(options).ConfigureAwait(false);
             }
         }
+
+        public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_OPTIONS;
     }
 }

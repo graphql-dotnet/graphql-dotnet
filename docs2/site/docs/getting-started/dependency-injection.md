@@ -71,7 +71,6 @@ A list of the available extension methods is below:
 
 | Method    | Description / Notes | Library |
 |-----------|---------------------|---------|
-| `AddApolloTracing`      | Registers and enables metrics depending on the supplied arguments, and adds Apollo Tracing data to the execution result | |
 | `AddAutoClrMappings`    | Configures unmapped CLR types to use auto-registering graph types | |
 | `AddAutoSchema`         | Registers a schema based on CLR types | |
 | `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
@@ -86,7 +85,6 @@ A list of the available extension methods is below:
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
 | `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
-| `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
@@ -97,9 +95,17 @@ A list of the available extension methods is below:
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
+| `UseApolloTracing`      | Registers and enables metrics depending on the supplied arguments, and adds Apollo Tracing data to the execution result | |
+| `UseAutomaticPersistedQueries` | Enables Automatic Persisted Queries support | GraphQL.MemoryCache |
+| `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
+
+Calls to `ConfigureExecutionOptions` and methods that start with `Add` will execute first, in the order they
+appear, followed by calls to `ConfigureExecution` and methods that start with `Use`. The order of the calls
+may be important. For instance, calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in
+the memory cache being unable to cache any APQ queries.
 
 Custom `IGraphQLBuilder` extension methods typically rely on the `Services` property of the builder in order to register services
 with the underlying dependency injection framework. The `Services` property returns a `IServiceRegister` interface which has these methods:

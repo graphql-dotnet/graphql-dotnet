@@ -714,15 +714,15 @@ public class GraphQLBuilderExtensionTests
         if (install == true && usePredicate == false && serviceLifetime == ServiceLifetime.Transient)
         {
             //verify that defaults parameters are configured appropriately
-            _builder.AddMiddleware<MyMiddleware>();
+            _builder.UseMiddleware<MyMiddleware>();
         }
         else if (usePredicate)
         {
-            _builder.AddMiddleware<MyMiddleware>((services, schema) => install, serviceLifetime);
+            _builder.UseMiddleware<MyMiddleware>((services, schema) => install, serviceLifetime);
         }
         else
         {
-            _builder.AddMiddleware<MyMiddleware>(install, serviceLifetime);
+            _builder.UseMiddleware<MyMiddleware>(install, serviceLifetime);
         }
         runSchemaConfigs?.Invoke();
         FieldMiddlewareDelegate fieldResolver = _ => default;
@@ -757,15 +757,15 @@ public class GraphQLBuilderExtensionTests
         if (install == true && usePredicate == false)
         {
             //verify that defaults parameters are configured appropriately
-            _builder.AddMiddleware(instance);
+            _builder.UseMiddleware(instance);
         }
         else if (usePredicate)
         {
-            _builder.AddMiddleware(instance, (services, schema) => install);
+            _builder.UseMiddleware(instance, (services, schema) => install);
         }
         else
         {
-            _builder.AddMiddleware(instance, install);
+            _builder.UseMiddleware(instance, install);
         }
         runSchemaConfigs?.Invoke();
         FieldMiddlewareDelegate fieldResolver = _ => default;
@@ -783,17 +783,17 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddMiddleware_Scoped()
     {
-        Should.Throw<ArgumentOutOfRangeException>(() => _builder.AddMiddleware<MyMiddleware>(serviceLifetime: ServiceLifetime.Scoped));
-        Should.Throw<ArgumentOutOfRangeException>(() => _builder.AddMiddleware<MyMiddleware>((_, _) => false, ServiceLifetime.Scoped));
+        Should.Throw<ArgumentOutOfRangeException>(() => _builder.UseMiddleware<MyMiddleware>(serviceLifetime: ServiceLifetime.Scoped));
+        Should.Throw<ArgumentOutOfRangeException>(() => _builder.UseMiddleware<MyMiddleware>((_, _) => false, ServiceLifetime.Scoped));
     }
 
     [Fact]
     public void AddMiddleware_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware<MyMiddleware>(installPredicate: null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware((MyMiddleware)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware(new MyMiddleware(), installPredicate: null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddMiddleware((MyMiddleware)null, (_, _) => true));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware<MyMiddleware>(installPredicate: null));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware(new MyMiddleware(), installPredicate: null));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null, (_, _) => true));
     }
     #endregion
 

@@ -37,7 +37,7 @@ jobs:
           dotnet-version: |
             3.1.x
             5.0.x
-            6.0.x
+            6.0.303
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -59,7 +59,8 @@ jobs:
       - name: Build solution [Debug]
         working-directory: src
         run: dotnet build --no-restore -c Debug
-      - name: Test solution [Debug]
+      - name: Test solution [Debug] with code coverage
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: >
           dotnet test
@@ -69,6 +70,10 @@ jobs:
           --
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
+      - name: Test solution [Debug] without code coverage
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        working-directory: src
+        run: dotnet test --no-build
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3
