@@ -500,7 +500,7 @@ namespace GraphQL
         public IgnoreAttribute() { }
         public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Interface, AllowMultiple=true)]
     public class ImplementsAttribute : GraphQL.GraphQLAttribute
     {
         public ImplementsAttribute(System.Type type) { }
