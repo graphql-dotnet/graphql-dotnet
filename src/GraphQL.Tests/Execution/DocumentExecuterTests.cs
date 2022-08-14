@@ -97,33 +97,36 @@ public class DocumentExecuterTests
         ret.ShouldBeNull(); // validates that all configured executions have run, as normally this would never be null
     }
 
-    private class MyConfigureExecution : ConfigureExecution
+    private class MyConfigureExecution : IConfigureExecution
     {
-        private readonly float _sortOrder;
+        private readonly int _expected;
+        private readonly int _setValue;
+        private readonly int _sortOrder;
+        private readonly Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> _action;
 
         public MyConfigureExecution(int expected, int setValue, int sortOrder)
-            : base(CreateAction(expected, setValue))
         {
+            _expected = expected;
+            _setValue = setValue;
             _sortOrder = sortOrder;
         }
 
         public MyConfigureExecution(Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> action, int sortOrder)
-            : base(action)
         {
+            _action = action;
             _sortOrder = sortOrder;
         }
 
-        private static Func<ExecutionOptions, ExecutionDelegate, Task<ExecutionResult>> CreateAction(int expected, int setValue)
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
         {
-            return (options, next) =>
-            {
-                (options.MaxParallelExecutionCount ?? 0).ShouldBe(expected);
-                options.MaxParallelExecutionCount = setValue;
-                return next(options);
-            };
+            if (_action != null)
+                return _action(options, next);
+            (options.MaxParallelExecutionCount ?? 0).ShouldBe(_expected);
+            options.MaxParallelExecutionCount = _setValue;
+            return next(options);
         }
 
-        public override float SortOrder => _sortOrder;
+        public float SortOrder => _sortOrder;
     }
 
     private class StringExecuter<TSchema> where TSchema : ISchema
