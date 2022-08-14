@@ -495,7 +495,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         [Id] public int Id { get; set; }
     }
 
-    public interface Interface2
+    public interface Interface2 : Interface1
     {
         public string Name { get; set; }
     }

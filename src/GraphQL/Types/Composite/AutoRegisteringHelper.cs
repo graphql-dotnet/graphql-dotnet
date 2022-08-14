@@ -146,6 +146,7 @@ namespace GraphQL.Types
             var typeInformation = getTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
             var fieldType = CreateField(memberInfo, graphType, isInputType);
+            // set resolver, if applicable
             buildFieldType?.Invoke(fieldType, memberInfo);
             // apply field attributes after resolver has been set
             ApplyFieldAttributes(memberInfo, fieldType, isInputType);
