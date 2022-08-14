@@ -103,7 +103,9 @@ A list of the available extension methods is below:
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
 
-Methods that start with `Configure` and `Use` execute in the order they appear, which may be important. For instance,
+Calls to `ConfigureExecutionOptions` and methods that start with `Add` will execute first, in the order they
+appear, followed by calls to `ConfigureExecution` and methods that start with `Use`. The order of the calls
+may be important. For instance,
 calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in the memory cache being unable to
 cache any APQ queries.
 
