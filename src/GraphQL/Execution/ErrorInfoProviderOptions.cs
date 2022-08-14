@@ -18,7 +18,7 @@ namespace GraphQL.Execution
             {
                 ExposeExceptionDetails = value;
                 if (value)
-                    ExposeExceptionDetailsMode = Message;
+                    ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message;
             }
         }
 
