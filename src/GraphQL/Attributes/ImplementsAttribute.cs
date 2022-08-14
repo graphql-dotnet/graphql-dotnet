@@ -5,7 +5,7 @@ namespace GraphQL
     /// <summary>
     /// Marks the type as implementing a specified interface.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = true)]
     public class ImplementsAttribute : GraphQLAttribute
     {
         /// <summary>

@@ -430,6 +430,77 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Fact]
+    public void CannotImplementWithMismatchedInterface_ReturnType()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b.AddAutoSchema<TestMismatchedObject1>());
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        Should.Throw<ArgumentException>(() => schema.Initialize())
+            .Message.ShouldBe("Type AutoRegisteringObjectGraphType<TestMismatchedObject1> with name 'TestMismatchedObject1' does not implement interface AutoRegisteringInterfaceGraphType<Interface1> with name 'Interface1'. Field 'id' must be of type 'ID!' or covariant from it, but in fact it is of type 'Int!'.");
+    }
+
+    [Implements(typeof(Interface1))]
+    public class TestMismatchedObject1 : Interface1
+    {
+        public int Id { get; set; }
+    }
+
+    [Fact(Skip = "Check not implemented yet - see issue #3285")]
+    public void CannotImplementWithMismatchedInterface_Argument()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b.AddAutoSchema<TestMismatchedObject2>());
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        Should.Throw<ArgumentException>(() => schema.Initialize());
+    }
+
+    [Implements(typeof(Interface3))]
+    public class TestMismatchedObject2 : Interface3
+    {
+        public string GetName(int id) => null!;
+    }
+
+    public interface Interface3
+    {
+        string GetName([Id] int id);
+    }
+
+    [Fact]
+    public void GraphTypeCanImplementMultipleInterfaces()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b.AddAutoSchema<TestObjectWithMultipleInterfaces>());
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var testType = schema.AllTypes[nameof(TestObjectWithMultipleInterfaces)].ShouldBeAssignableTo<IObjectGraphType>().ShouldNotBeNull();
+        var if1Type = schema.AllTypes[nameof(Interface1)].ShouldNotBeNull();
+        var if2Type = schema.AllTypes[nameof(Interface2)].ShouldNotBeNull();
+        testType.ResolvedInterfaces.ShouldContain(if1Type);
+        testType.ResolvedInterfaces.ShouldContain(if2Type);
+    }
+
+    [Implements(typeof(Interface1))]
+    [Implements(typeof(Interface2))]
+    public class TestObjectWithMultipleInterfaces : Interface1, Interface2
+    {
+        [Id] public int Id { get; set; }
+        public string Name { get; set; } = null!;
+    }
+
+    public interface Interface1
+    {
+        [Id] public int Id { get; set; }
+    }
+
+    public interface Interface2
+    {
+        public string Name { get; set; }
+    }
+
+    [Fact]
     public void TestInheritedFields()
     {
         var graphType = new AutoRegisteringInterfaceGraphType<InheritanceTests>();
