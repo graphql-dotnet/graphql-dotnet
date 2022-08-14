@@ -1142,7 +1142,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddAutomaticPersistedQueries()
     {
-        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
         MockSetupConfigureNull<AutomaticPersistedQueriesCacheOptions>();
         _builder.AddAutomaticPersistedQueries();
         Verify();
@@ -1151,7 +1151,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddAutomaticPersistedQueries_Options1()
     {
-        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
         var options = MockSetupConfigure1<AutomaticPersistedQueriesCacheOptions>();
         _builder.AddAutomaticPersistedQueries(options);
         Verify();
@@ -1160,7 +1160,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddAutomaticPersistedQueries_Options2()
     {
-        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
         var options = MockSetupConfigure2<AutomaticPersistedQueriesCacheOptions>();
         _builder.AddAutomaticPersistedQueries(options);
         Verify();
