@@ -105,9 +105,8 @@ as transients so that they will match the schema lifetime. So with a singleton s
 
 Calls to `ConfigureExecutionOptions` and methods that start with `Add` will execute first, in the order they
 appear, followed by calls to `ConfigureExecution` and methods that start with `Use`. The order of the calls
-may be important. For instance,
-calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in the memory cache being unable to
-cache any APQ queries.
+may be important. For instance, calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in
+the memory cache being unable to cache any APQ queries.
 
 Custom `IGraphQLBuilder` extension methods typically rely on the `Services` property of the builder in order to register services
 with the underlying dependency injection framework. The `Services` property returns a `IServiceRegister` interface which has these methods:
