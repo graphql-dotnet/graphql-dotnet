@@ -53,6 +53,11 @@ public class GraphQLBuilderExtensionTests
         return factory;
     }
 
+    private void MockSetupTryRegister<TService, TImplementation>(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, RegistrationCompareMode registrationCompareMode = RegistrationCompareMode.ServiceType)
+    {
+        _builderMock.Setup(b => b.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, registrationCompareMode)).Returns(_builder).Verifiable();
+    }
+
     private Action<TOptions> MockSetupConfigure1<TOptions>()
         where TOptions : class, new()
     {
@@ -792,40 +797,6 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
-    #region - AddDocumentCache -
-    [Fact]
-    public void AddDocumentCache()
-    {
-        MockSetupRegister<IDocumentCache, TestDocumentCache>();
-        _builder.AddDocumentCache<TestDocumentCache>();
-        Verify();
-    }
-
-    [Fact]
-    public void AddDocumentCache_Instance()
-    {
-        var instance = new TestDocumentCache();
-        MockSetupRegister<IDocumentCache>(instance);
-        _builder.AddDocumentCache(instance);
-        Verify();
-    }
-
-    [Fact]
-    public void AddDocumentCache_Factory()
-    {
-        var factory = MockSetupRegister<IDocumentCache>();
-        _builder.AddDocumentCache(factory);
-        Verify();
-    }
-
-    [Fact]
-    public void AddDocumentCache_Null()
-    {
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((TestDocumentCache)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentCache((Func<IServiceProvider, TestDocumentCache>)null));
-    }
-    #endregion
-
     #region - AddSerializer -
     [Fact]
     public void AddSerializer()
@@ -1140,31 +1111,58 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
-    #region - GraphQL.MemoryCache: AddMemoryCache -
+    #region - GraphQL.MemoryCache: UseMemoryCache / UseAutomaticPersistedQueries -
     [Fact]
-    public void AddMemoryCache()
+    public void UseMemoryCache()
     {
-        MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
         MockSetupConfigureNull<MemoryDocumentCacheOptions>();
-        _builder.AddMemoryCache();
+        _builder.UseMemoryCache();
         Verify();
     }
 
     [Fact]
-    public void AddMemoryCache_Options1()
+    public void UseMemoryCache_Options1()
     {
-        MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
         var options = MockSetupConfigure1<MemoryDocumentCacheOptions>();
-        _builder.AddMemoryCache(options);
+        _builder.UseMemoryCache(options);
         Verify();
     }
 
     [Fact]
-    public void AddMemoryCache_Options2()
+    public void UseMemoryCache_Options2()
     {
-        MockSetupRegister<IDocumentCache, MemoryDocumentCache>();
+        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
         var options = MockSetupConfigure2<MemoryDocumentCacheOptions>();
-        _builder.AddMemoryCache(options);
+        _builder.UseMemoryCache(options);
+        Verify();
+    }
+
+    [Fact]
+    public void UseAutomaticPersistedQueries()
+    {
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        MockSetupConfigureNull<AutomaticPersistedQueriesCacheOptions>();
+        _builder.UseAutomaticPersistedQueries();
+        Verify();
+    }
+
+    [Fact]
+    public void UseAutomaticPersistedQueries_Options1()
+    {
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        var options = MockSetupConfigure1<AutomaticPersistedQueriesCacheOptions>();
+        _builder.UseAutomaticPersistedQueries(options);
+        Verify();
+    }
+
+    [Fact]
+    public void UseAutomaticPersistedQueries_Options2()
+    {
+        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        var options = MockSetupConfigure2<AutomaticPersistedQueriesCacheOptions>();
+        _builder.UseAutomaticPersistedQueries(options);
         Verify();
     }
     #endregion

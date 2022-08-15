@@ -1,3 +1,4 @@
+using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -61,7 +62,7 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
         _ = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator());
         Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null, new DocumentValidator()));
         Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null));
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null));
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null, new IConfigureExecution[] { }));
     }
 }
 
