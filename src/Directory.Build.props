@@ -20,7 +20,6 @@
     <IsPackable>true</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SignAssembly>true</SignAssembly>
-    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <_FriendAssembliesPublicKey>PublicKey=0024000004800000940000000602000000240000525341310004000001000100352162dbf27be78fc45136884b8f324aa9f1dfc928c96c24704bf1df1a8779b2f26c760ed8321eca5b95ea6bd9bb60cd025b300f73bd1f4ae1ee6e281f85c527fa013ab5cb2c3fc7a1cbef7f9bf0c9014152e6a21f6e0ac6a371f8b45c6d7139c9119df9eeecf1cf59063545bb7c07437b1bc12be2c57d108d72d6c27176fbb8</_FriendAssembliesPublicKey>
   </PropertyGroup>
 

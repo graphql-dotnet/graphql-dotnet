@@ -64,6 +64,7 @@ jobs:
         working-directory: src
         run: >
           dotnet test
+          --no-restore
           --no-build
           --collect "XPlat Code Coverage"
           --results-directory .coverage
@@ -73,7 +74,7 @@ jobs:
       - name: Test solution [Debug] without code coverage
         if: ${{ startsWith(matrix.os, 'windows') }}
         working-directory: src
-        run: dotnet test --no-build
+        run: dotnet test --no-restore --no-build
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3
