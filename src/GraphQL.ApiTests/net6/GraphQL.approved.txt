@@ -265,6 +265,18 @@ namespace GraphQL
             "be removed in v8.")]
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
             where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
+        [System.Obsolete("Please write custom document cache implementations based the IConfigureExecution " +
+            "interface with ConfigureExecution; this method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
+        [System.Obsolete("Please write custom document cache implementations based the IConfigureExecution " +
+            "interface with ConfigureExecution; this method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentCache> documentCacheFactory)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
+        [System.Obsolete("Please write custom document cache implementations based the IConfigureExecution " +
+            "interface with ConfigureExecution; this method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddDocumentCache<TDocumentCache>(this GraphQL.DI.IGraphQLBuilder builder, TDocumentCache documentCache)
+            where TDocumentCache :  class, GraphQL.Caching.IDocumentCache { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
@@ -918,6 +930,24 @@ namespace GraphQL.Builders
         public bool IsUnidirectional { get; }
         public int? Last { get; }
         public int? PageSize { get; }
+    }
+}
+namespace GraphQL.Caching
+{
+    [System.Obsolete("Do not use; will be removed in v8")]
+    public sealed class DefaultDocumentCache : GraphQL.Caching.IDocumentCache
+    {
+        [System.Obsolete("Do not use; will be removed in v8")]
+        public static readonly GraphQL.Caching.DefaultDocumentCache Instance;
+        public System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
+        public System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
+    }
+    [System.Obsolete("Please use the IConfigureExecution interface; this interface will be removed in v" +
+        "8.")]
+    public interface IDocumentCache
+    {
+        System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query);
+        System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value);
     }
 }
 namespace GraphQL.Conversion

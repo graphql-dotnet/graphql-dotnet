@@ -1,4 +1,5 @@
 using System.Reflection;
+using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -822,6 +823,49 @@ namespace GraphQL
             });
             return builder;
         }
+        #endregion
+
+        #region - AddDocumentCache -
+#pragma warning disable CS0618 // Type or member is obsolete
+        /// <summary>
+        /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
+        /// dependency injection framework.
+        /// </summary>
+        [Obsolete($"Please write custom document cache implementations based the {nameof(DI.IConfigureExecution)} interface with {nameof(ConfigureExecution)}; this method will be removed in v8.")]
+        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder)
+            where TDocumentCache : class, IDocumentCache
+        {
+            builder.Services.Register<IDocumentCache, TDocumentCache>(ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IConfigureExecution, DocumentCacheMapper>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <paramref name="documentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
+        /// dependency injection framework.
+        /// </summary>
+        [Obsolete($"Please write custom document cache implementations based the {nameof(DI.IConfigureExecution)} interface with {nameof(ConfigureExecution)}; this method will be removed in v8.")]
+        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, TDocumentCache documentCache)
+            where TDocumentCache : class, IDocumentCache
+        {
+            builder.Services.Register<IDocumentCache>(documentCache ?? throw new ArgumentNullException(nameof(documentCache)));
+            builder.Services.TryRegister<IConfigureExecution, DocumentCacheMapper>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            return builder;
+        }
+
+        /// <summary>
+        /// Registers <typeparamref name="TDocumentCache"/> as a singleton of type <see cref="IDocumentCache"/> within the
+        /// dependency injection framework. The supplied factory method is used to create the document cache.
+        /// </summary>
+        [Obsolete($"Please write custom document cache implementations based the {nameof(DI.IConfigureExecution)} interface with {nameof(ConfigureExecution)}; this method will be removed in v8.")]
+        public static IGraphQLBuilder AddDocumentCache<TDocumentCache>(this IGraphQLBuilder builder, Func<IServiceProvider, TDocumentCache> documentCacheFactory)
+            where TDocumentCache : class, IDocumentCache
+        {
+            builder.Services.Register<IDocumentCache>(documentCacheFactory ?? throw new ArgumentNullException(nameof(documentCacheFactory)), ServiceLifetime.Singleton);
+            builder.Services.TryRegister<IConfigureExecution, DocumentCacheMapper>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            return builder;
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
         #endregion
 
         #region - AddSerializer -
