@@ -7,7 +7,7 @@ namespace GraphQL
     /// Specifies a GraphQL type name for a CLR class when used as an input type.
     /// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
     public class InputNameAttribute : GraphQLAttribute
     {
         private string _name;

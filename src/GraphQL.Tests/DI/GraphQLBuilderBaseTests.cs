@@ -62,6 +62,7 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.TryRegister(typeof(AutoRegisteringInterfaceGraphType<>), typeof(AutoRegisteringInterfaceGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
 
         builder.CallInitialize();
         mock.Verify();

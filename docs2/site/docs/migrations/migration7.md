@@ -104,7 +104,7 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
-### 9. Add `Field<TReturnType>` overload to create field builder with an inferred graph type
+### 9. `Field<TReturnType>` and `Argument<TArgumentClrType> overloads to create field and argument builders with inferred graph types
 
 To define a field with a field builder, previously the graph type was always required, like this:
 
@@ -121,7 +121,7 @@ Field<IntGraphType, int>("test")
 Now you can simply specify the return type, and the graph type will be inferred:
 
 ```csharp
-Field<int>("test")        // by defaut assumes not-null
+Field<int>("test")        // by default assumes not-null
     .Resolve(_ => 123);
 
 // or
@@ -133,10 +133,102 @@ Field<int>("test", true)  // specify true or false to indicate nullability
 This is similar to the expression syntax (`Field(x => x.Name)`) which does not require
 the graph type to be specified in order to define a field.
 
+Similarly, you can now define an argument by specifying the CLR type:
+
+```csharp
+Field<int>("test")
+    .Argument<string>("name")              // required
+    .Argument<string>("description", true) // optional
+    .Resolve(ctx => {
+        var name = ctx.GetArgument<string>("name");
+        var desc = ctx.GetArgument<string>("description");
+        return 123;
+    });
+```
+
 As with the expression syntax or the `AutoRegisteringObjectGraphType`,
 CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods.
 
-### 10. Add `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
+### 10. Interface graph types can be automatically built from CLR types
+
+Similar to how input and output types can be inferred from their CLR counterparts,
+now interface graph types can also be inferred from CLR types. This is possible
+with the new class `AutoRegisteringInterfaceGraphType<TSourceType>` which functions
+identically to `AutoRegisteringObjectGraphType<TSourceType>` except it creates an
+interface type rather than an object graph type. When using automatic CLR type
+mapping provided by `AddAutoClrMappings()` or `AddAutoSchema()`, any CLR interface
+type is automatically mapped to a interface graph type rather than an object graph
+type.
+
+Note that auto-mapped CLR types do not automatically register or link
+to any GraphQL interfaces; such mapping needs to be specified via the new
+`ImplementsAttribute`. Similarly, CLR types not referenced directly in the schema
+need to be added to the schema manually or else no graph type will be generated for them.
+
+Below is a typical example of how the new functionality can be used:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddAutoSchema<SampleQuery>()
+    .AddSystemTextJson());
+
+public class SampleQuery
+{
+    public static IAnimal Find(AnimalType type) => type switch
+    {
+        AnimalType.Cat => Cat(),
+        AnimalType.Dog => Dog(),
+        _ => throw new ArgumentOutOfRangeException(nameof(type)),
+    };
+
+    public static Cat Cat() => new Cat() { Name = "Fluffy", Lives = 9 };
+    public static Dog Dog() => new Dog() { Name = "Shadow", IsLarge = true };
+}
+
+public interface IObject
+{
+    [Id] int Id { get; }
+}
+
+public interface IAnimal : IObject
+{
+    AnimalType Type { get; }
+    string Name { get; }
+}
+
+public enum AnimalType { Cat, Dog }
+
+[Implements(typeof(IAnimal))]
+public class Cat : IAnimal
+{
+    [Id] public int Id => 10;
+    public AnimalType Type => AnimalType.Cat;
+    public string Name { get; set; } = null!;
+    public int Lives { get; set; }
+}
+
+[Implements(typeof(IAnimal))]
+public class Dog : IAnimal
+{
+    [Id] public int Id => 20;
+    public AnimalType Type => AnimalType.Dog;
+    public string Name { get; set; } = null!;
+    public bool IsLarge { get; set; }
+}
+```
+
+It is important to ensure that any GraphQL attributes applied to members of the CLR types
+are applied to both the interface and the classes alike, as the GraphQL.NET engine will build
+distinct graph types for the interface and classes which implement those interfaces. Regardless,
+fields will execute against the source object as expected.
+
+When supported by the language in use, default interface methods are fully supported, including static
+methods defined on an interface. This functionality is available in C# 8.0 and later.
+
+When building a graph type from an interface, methods are built for all inherited methods
+as well as the specified interface's methods. This is by design.
+
+### 11. Add `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
 
 In v7 we introduced new `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
 that allows you to control location of exception details. By default in v7 exception details
@@ -326,7 +418,7 @@ services.AddGraphQL(b => b
     .AddErrorInfoProvider(o => o.ExposeData = true));
 ```
 
-### 10. A bunch of FieldXXX APIs were deprecated
+### 11. A bunch of FieldXXX APIs were deprecated
 
 After upgrading to v7 you will likely notice many compiler warnings with a message similar to the following:
 > Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use
@@ -434,7 +526,7 @@ Field<MessageGraphType>("messages").ResolveStreamAsync(context => observable);
 
 Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
 
-### 11. `SortOrder` property added to `IConfigureExecution`
+### 12. `SortOrder` property added to `IConfigureExecution`
 
 If you have classes that implement `IConfigureExecution`, you will now need to also implement the
 added `SortOrder` property. The sort order determines the order that the `IConfigureExecution`
@@ -444,3 +536,17 @@ The default sort order of configurations are as follows:
 
 - 100: Option configurations -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
 - 200: Execution configurations -- `Use` calls such as `UseApolloTracing`, and `ConfigureExecution` calls
+
+### 13. Interfaces mapped by the `AutoRegisteringGraphTypeMappingProvider` now generate interface graph types rather than object graph types.
+
+If you use interfaces to contain your GraphQL attributes for your data models, or for any other reason
+rely on the generation of object graph types for interface CLR types, you may wish to revert this design
+choice. Simply reconfigure the mapping provider as follows and interfaces will be generated as object graph
+types as before:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(true, true, false))
+    // other calls
+);
+```

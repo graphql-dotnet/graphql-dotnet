@@ -405,7 +405,7 @@ namespace GraphQL
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public sealed class GraphQLMetadataAttribute : GraphQL.GraphQLAttribute
     {
         public GraphQLMetadataAttribute() { }
@@ -493,7 +493,14 @@ namespace GraphQL
         public IgnoreAttribute() { }
         public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Interface, AllowMultiple=true)]
+    public class ImplementsAttribute : GraphQL.GraphQLAttribute
+    {
+        public ImplementsAttribute(System.Type type) { }
+        public System.Type InterfaceGraphType { get; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputNameAttribute : GraphQL.GraphQLAttribute
     {
         public InputNameAttribute(string name) { }
@@ -502,7 +509,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InputTypeAttribute : GraphQL.GraphQLAttribute
     {
         public InputTypeAttribute(System.Type graphType) { }
@@ -549,7 +556,7 @@ namespace GraphQL
     {
         public static System.Collections.Generic.IList<T> Constrained<T>(this T[] array, int count) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public class MetadataAttribute : GraphQL.GraphQLAttribute
     {
         public MetadataAttribute(string key, object? value) { }
@@ -566,7 +573,7 @@ namespace GraphQL
     {
         public MissingRequestServicesException() { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class NameAttribute : GraphQL.GraphQLAttribute
     {
         public NameAttribute(string name) { }
@@ -584,7 +591,7 @@ namespace GraphQL
         public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
             where T :  class { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {
         public OutputNameAttribute(string name) { }
@@ -592,7 +599,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputTypeAttribute : GraphQL.GraphQLAttribute
     {
         public OutputTypeAttribute(System.Type graphType) { }
@@ -856,10 +863,14 @@ namespace GraphQL.Builders
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         [System.Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads" +
             " to set default value for parameter or use Arguments() method. This method will " +
             "be removed in v8.")]
@@ -1703,7 +1714,7 @@ namespace GraphQL.Types
     public class AutoRegisteringGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
         public AutoRegisteringGraphTypeMappingProvider() { }
-        public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes) { }
+        public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
         public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
@@ -1719,6 +1730,21 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+    }
+    public class AutoRegisteringInterfaceGraphType<TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
+    {
+        public AutoRegisteringInterfaceGraphType() { }
+        public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
+        protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
+        protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual void ConfigureGraph() { }
+        protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
+        protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
+        protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
     }
     public class AutoRegisteringObjectGraphType<TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>

@@ -8,9 +8,11 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
 {
     private readonly bool _mapInputTypes;
     private readonly bool _mapOutputTypes;
+    private readonly bool _mapInterfaceTypes;
 
     /// <summary>
     /// Creates an instance that maps both input and output types.
+    /// CLR interface output types will be mapped as GraphQL interfaces.
     /// </summary>
     public AutoRegisteringGraphTypeMappingProvider()
         : this(true, true)
@@ -19,11 +21,14 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
 
     /// <summary>
     /// Creates an instance that maps input and/or output types, as specified.
+    /// When output types are enabled, <paramref name="mapInterfaceTypes"/> indicates whether CLR
+    /// interface output types are mapped as GraphQL interfaces or GraphQL object types.
     /// </summary>
-    public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes)
+    public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true)
     {
         _mapInputTypes = mapInputTypes;
         _mapOutputTypes = mapOutputTypes;
+        _mapInterfaceTypes = mapInterfaceTypes;
     }
 
     /// <inheritdoc/>
@@ -38,7 +43,17 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
             SchemaTypes.BuiltInScalarMappings.ContainsKey(clrType))
             return null;
 
-        return (isInputType ? typeof(AutoRegisteringInputObjectGraphType<>) : typeof(AutoRegisteringObjectGraphType<>))
-            .MakeGenericType(clrType);
+        if (isInputType)
+        {
+            return typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(clrType);
+        }
+        else if (clrType.IsInterface && _mapInterfaceTypes)
+        {
+            return typeof(AutoRegisteringInterfaceGraphType<>).MakeGenericType(clrType);
+        }
+        else
+        {
+            return typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(clrType);
+        }
     }
 }
