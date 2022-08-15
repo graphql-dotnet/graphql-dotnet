@@ -95,7 +95,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     }
 
     /// <inheritdoc />
-    public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+    public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         if (options.Document == null && options.Query != null)
         {
