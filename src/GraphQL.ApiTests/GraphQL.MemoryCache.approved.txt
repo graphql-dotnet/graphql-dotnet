@@ -36,7 +36,7 @@ namespace GraphQL.Caching
         protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         public virtual float SortOrder { get; }
         public virtual void Dispose() { }
-        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
         protected virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(GraphQL.ExecutionOptions options) { }
         protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.ValueTask SetAsync(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument value) { }
