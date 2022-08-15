@@ -1,8 +1,10 @@
 # Migrating from v5.x to v7.x
 
-Note that v6 was skipped to align GraphQL.NET version with versions of packages from [server](https://github.com/graphql-dotnet/server) project. The historically established discrepancy in one major version constantly caused problems among the developers.
+Note that v6 was skipped to align GraphQL.NET version with versions of packages from [server](https://github.com/graphql-dotnet/server)
+project. The historically established discrepancy in one major version constantly caused problems among the developers.
 
-See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A7.0+is%3Aissue+is%3Aclosed) and [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A7.0+is%3Aclosed) done in v7.
+See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A7.0+is%3Aissue+is%3Aclosed) and
+[pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A7.0+is%3Aclosed) done in v7.
 
 ## New Features
 
@@ -15,7 +17,7 @@ memory usage is reduced by freeing unnecessary references after obtaining the re
 
 Particularly useful for authentication checks, now validation rules are asynchronous.
 
-### 3. Add `AddApolloTracing` builder method (added in 5.3.0)
+### 3. Add `UseApolloTracing` builder method (added in 5.3.0 as `AddApolloTracing`)
 
 This method adds the `InstrumentFieldsMiddleware` to the schema, and conditionally enables metrics
 during execution via `ExecutionOptions.EnableMetrics`. It also appends the Apollo Tracing results
@@ -230,7 +232,7 @@ as well as the specified interface's methods. This is by design.
 
 ### 11. Add `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
 
-In v7 we introduced new `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
+In v7 we introduced a new `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
 that allows you to control location of exception details. By default in v7 exception details
 are located within "extensions.details" separately from exception message itself. Before v7
 exception details were located along with exception message. To use old behavior set
@@ -274,10 +276,10 @@ options.ComplexityConfiguration = complexityConfig;
 options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
 ```
 
-### 4. `IComplexityAnalyzer` has been removed from `DocumentExecuter` constructors
+### 4. `IComplexityAnalyzer` and `IDocumentCache` have been removed from `DocumentExecuter` constructors
 
 When not using the complexity analyzer, or when using the default complexity analyzer, simply
-remove the argument from calls to the constructor. Note that `IDocumentCache` argument was
+remove the argument from calls to the constructor. The `IDocumentCache` argument was
 removed as well; see the next section for details.
 
 ```csharp
@@ -332,6 +334,9 @@ options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
 
 Using the `IGraphQLBuilder` interface to configure the GraphQL.NET execution engine is the recommended approach.
 
+Note that the `IComplexityAnalyzer` has been deprecated and will be removed in v8.
+Please convert your custom complexity analyzer to a validation rule.
+
 ### 5. Changes in document caching
 
 To make work with document cache more flexible and allow some advanced use-cases this component
@@ -359,9 +364,9 @@ Other changes in `MemoryDocumentCache` that may affect you - `GetMemoryCacheEntr
 A few of the `DocumentExecuter` constructors have been removed that include `IConfigureExecutionOptions`.
 No changes to `ConfigureExecutionOptions` builder methods are required.
 
-`AddMetrics` contains functionality not present in `AddApolloTracing` and vice versa.
-Please consider the operation of the new `AddApolloTracing` method (see 'New Features' section above)
-when replacing `AddMetrics` with `AddApolloTracing`. Remember that `AddApolloTracing` includes
+`AddMetrics` contains functionality not present in `UseApolloTracing` and vice versa.
+Please consider the operation of the new `UseApolloTracing` method (see 'New Features' section above)
+when replacing `AddMetrics` with `UseApolloTracing`. Remember that `UseApolloTracing` includes
 functionality previously within `ApolloTracingDocumentExecuter` and/or `EnrichWithApolloTracing`.
 
 ### 7. `GlobalSwitches.MapAllEnumerableTypes` has been removed; only specific types are detected as lists.
