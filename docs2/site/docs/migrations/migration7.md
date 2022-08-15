@@ -237,7 +237,7 @@ to implement and no more `AddDocumentCache` extension methods defined on `IGraph
 The recommended way to setup caching layer is to inherit from `IConfigureExecution` interface
 and register your class as its implementation. No change is required if you used `AddMemoryCache`
 extension methods before though `AddMemoryCache` method itself was marked as obsolete and you may
-want to switch to `UseMemoryCache`. 
+want to switch to its replacement `UseMemoryCache`. 
 
 Other changes in `MemoryDocumentCache` that may affect you - `GetMemoryCacheEntryOptions`,
 `GetAsync` and `SetAsync` methods take `ExecutionOptions options` argument instead of `string query`.
