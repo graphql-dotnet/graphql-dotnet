@@ -224,6 +224,28 @@ public class FieldBuilderTests
     }
 
     [Fact]
+    public void argument_with_clr_type_works()
+    {
+        var objectType = new ObjectGraphType();
+        objectType.Field<string>("test")
+            .Argument<int>("intRequired")
+            .Argument<int?>("intOptional", true)
+            .Argument<string>("strRequired")
+            .Argument<string>("strOptional", true);
+        var testField = objectType.Fields.Find("test").ShouldNotBeNull();
+        testField.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+        testField.Arguments.ShouldNotBeNull();
+        var arg1 = testField.Arguments.Find("intRequired").ShouldNotBeNull();
+        arg1.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>));
+        var arg2 = testField.Arguments.Find("intOptional").ShouldNotBeNull();
+        arg2.Type.ShouldBe(typeof(GraphQLClrInputTypeReference<int>));
+        var arg3 = testField.Arguments.Find("strRequired").ShouldNotBeNull();
+        arg3.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>));
+        var arg4 = testField.Arguments.Find("strOptional").ShouldNotBeNull();
+        arg4.Type.ShouldBe(typeof(GraphQLClrInputTypeReference<string>));
+    }
+
+    [Fact]
     public async Task can_get_nullable_argument_with_null_value()
     {
         var objectType = new ObjectGraphType();
