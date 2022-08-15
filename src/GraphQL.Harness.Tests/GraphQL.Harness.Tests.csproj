@@ -9,10 +9,6 @@
     <TargetFrameworks>net6;net5</TargetFrameworks>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Alba" Version="6.0.0" />
   </ItemGroup>
