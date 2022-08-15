@@ -137,8 +137,9 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Upgrade Guides
 
-You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0/lib/netstandard2.0/diff/2.4.0/).
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.3/).
 
+* [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)
 * [3.x to 4.x](https://graphql-dotnet.github.io/docs/migrations/migration4)
 * [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/migrations/migration3)
@@ -336,8 +337,8 @@ This project exists thanks to all the people who contribute.
 PRs are welcome! Looking for something to work on? The list of [open issues](https://github.com/graphql-dotnet/graphql-dotnet/issues)
 is a great place to start. You can help the project simply respond to some of the [asked questions](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aissue+is%3Aopen+label%3Aquestion).
 
-The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 5.x.x.
-If you have a PR with some breaking changes, then please target it to the `develop` branch that tracks changes for v6.0.0.
+The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 7.x.x.
+If you have a PR with some breaking changes, then please target it to the `develop` branch that tracks changes for v8.0.0.
 
 ## Backers
 
