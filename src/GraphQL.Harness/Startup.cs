@@ -23,7 +23,7 @@ public class Startup
             .AddErrorInfoProvider((opts, serviceProvider) =>
             {
                 var settings = serviceProvider.GetRequiredService<IOptions<GraphQLSettings>>();
-                opts.ExposeExceptionStackTrace = settings.Value.ExposeExceptions;
+                opts.ExposeExceptionDetails = settings.Value.ExposeExceptions;
             })
             .AddSchema<StarWarsSchema>()
             .AddGraphTypes(typeof(StarWarsQuery).Assembly)

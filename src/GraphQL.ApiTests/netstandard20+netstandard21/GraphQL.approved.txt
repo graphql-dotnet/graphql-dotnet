@@ -1079,6 +1079,9 @@ namespace GraphQL.Execution
         public bool ExposeCode { get; set; }
         public bool ExposeCodes { get; set; }
         public bool ExposeData { get; set; }
+        public bool ExposeExceptionDetails { get; set; }
+        public GraphQL.Execution.ExposeExceptionDetailsMode ExposeExceptionDetailsMode { get; set; }
+        [System.Obsolete("Use ExposeExceptionDetails property instead")]
         public bool ExposeExceptionStackTrace { get; set; }
         public bool ExposeExtensions { get; set; }
     }
@@ -1168,6 +1171,11 @@ namespace GraphQL.Execution
         protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
+    }
+    public enum ExposeExceptionDetailsMode
+    {
+        Message = 0,
+        Extensions = 1,
     }
     public class GraphQLDocumentBuilder : GraphQL.Execution.IDocumentBuilder
     {

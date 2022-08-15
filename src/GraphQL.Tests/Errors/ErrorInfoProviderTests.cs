@@ -145,17 +145,29 @@ public class ErrorInfoProviderTests
     }
 
     [Fact]
-    public void exposeExceptions()
+    public void exposeExceptions_in_message()
     {
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+        info.Extensions.TryGetValue("details", out _).ShouldBeFalse();
     }
 
     [Fact]
-    public void exposeExceptions_with_real_stack_trace()
+    public void exposeExceptions_in_extensions()
+    {
+        var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
+        var error = new ExecutionError(innerException.Message, innerException);
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["details"].ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_message()
     {
         // generate a real stack trace to serialize
         ExecutionError error;
@@ -175,8 +187,34 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_extensions()
+    {
+        // generate a real stack trace to serialize
+        ExecutionError error;
+        try
+        {
+            try
+            {
+                throw new ArgumentNullException(null, new ArgumentOutOfRangeException());
+            }
+            catch (Exception innerException)
+            {
+                throw new ExecutionError(innerException.Message, innerException);
+            }
+        }
+        catch (ExecutionError e)
+        {
+            error = e;
+        }
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["details"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -188,7 +226,7 @@ public class ErrorInfoProviderTests
         };
         error.Code.ShouldBe("");
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");
