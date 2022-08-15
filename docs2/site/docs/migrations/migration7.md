@@ -136,6 +136,17 @@ the graph type to be specified in order to define a field.
 As with the expression syntax or the `AutoRegisteringObjectGraphType`,
 CLR type mappings can be tailored via the `schema.RegisterTypeMapping()` methods.
 
+### 10. Add `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
+
+In v7 we introduced new `ErrorInfoProviderOptions.ExposeExceptionDetailsMode` property
+that allows you to control location of exception details. By default in v7 exception details
+are located within "extensions.details" separately from exception message itself. Before v7
+exception details were located along with exception message. To use old behavior set
+`ExposeExceptionDetailsMode` to `Message` or just do nothing if you have already set
+`ExposeExceptionStackTrace` property to `true`. To better reflect the meaning of these changes
+we have added a new `ErrorInfoProviderOptions.ExposeExceptionDetails` property and marked
+`ErrorInfoProviderOptions.ExposeExceptionStackTrace` property as obsolete.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
