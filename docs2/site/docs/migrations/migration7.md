@@ -175,7 +175,7 @@ options.ValidationRules = GraphQL.Validation.DocumentValidator.CoreRules.Append(
 
 When not using the complexity analyzer, or when using the default complexity analyzer, simply
 remove the argument from calls to the constructor. Note that `IDocumentCache` argument was
-removed as well, see the next chapter for details.
+removed as well; see the next section for details.
 
 ```csharp
 /// GraphQL 5.x
