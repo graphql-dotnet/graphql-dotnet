@@ -30,30 +30,24 @@ public class ErrorExtensionsTests : QueryTestBase<ErrorExtensionsTests.TestSchem
         public TestQuery()
         {
             Name = "Query";
-            Field<StringGraphType>(
-                "firstSync",
-                resolve: _ => throw new FirstException("Exception from synchronous resolver", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")))
-            );
-            FieldAsync<StringGraphType>(
-                "firstAsync",
-                resolve: _ => throw new FirstException("Exception from asynchronous resolver")
-            );
-            Field<StringGraphType>(
-                "secondSync",
-                resolve: _ => throw new SecondTestException("Exception from synchronous resolver")
-            );
-            FieldAsync<StringGraphType>(
-                "secondAsync",
-                resolve: _ => throw new SecondTestException("Exception from asynchronous resolver")
-            );
-            Field<StringGraphType>(
-                "uncodedSync",
-                resolve: _ => throw new Exception("Exception from synchronous resolver")
-            );
-            FieldAsync<StringGraphType>(
-                "uncodedAsync",
-                resolve: _ => throw new Exception("Exception from asynchronous resolver")
-            );
+
+            Field<StringGraphType>("firstSync")
+                .Resolve(_ => throw new FirstException("Exception from synchronous resolver", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2"))));
+
+            Field<StringGraphType>("firstAsync")
+                .ResolveAsync(_ => throw new FirstException("Exception from asynchronous resolver"));
+
+            Field<StringGraphType>("secondSync")
+                .Resolve(_ => throw new SecondTestException("Exception from synchronous resolver"));
+
+            Field<StringGraphType>("secondAsync")
+                .ResolveAsync(_ => throw new SecondTestException("Exception from asynchronous resolver"));
+
+            Field<StringGraphType>("uncodedSync")
+                .Resolve(_ => throw new Exception("Exception from synchronous resolver"));
+
+            Field<StringGraphType>("uncodedAsync")
+                .ResolveAsync(_ => throw new Exception("Exception from asynchronous resolver"));
         }
     }
 

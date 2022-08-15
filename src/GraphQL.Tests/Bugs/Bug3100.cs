@@ -1,4 +1,3 @@
-using GraphQL.MicrosoftDI;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,10 +51,8 @@ public class Bug3100
     {
         public Query1()
         {
-            Field(
-                type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>),
-                name: "Class2",
-                resolve: context => new Class2[] { new Class2() });
+            Field("Class2", typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>))
+                .Resolve(_ => new Class2[] { new Class2() });
         }
     }
 

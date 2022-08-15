@@ -5,7 +5,7 @@ namespace GraphQL.Tests.Types;
 
 public class IdGraphTypeTests
 {
-    private readonly IdGraphType _type = new IdGraphType();
+    private readonly IdGraphType _type = new();
 
     [Fact]
     public void parse_literal_null_returns_null()

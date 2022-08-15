@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DecimalGraphTypeTests
 {
-    private readonly DecimalGraphType _type = new DecimalGraphType();
+    private readonly DecimalGraphType _type = new();
 
     [Fact]
     public void coerces_null_to_null()

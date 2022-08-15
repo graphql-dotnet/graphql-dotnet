@@ -1,7 +1,5 @@
 using GraphQL.Instrumentation;
-using GraphQL.MicrosoftDI;
 using GraphQL.StarWars;
-using GraphQL.SystemTextJson;
 using GraphQL.Tests.StarWars;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -93,28 +91,6 @@ query {
         result.ShouldBeCrossPlat(expected);
     }
 
-    [Fact]
-    public async Task ApolloTracingDocumentExecuter_Works()
-    {
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton<StarWarsData>();
-        serviceCollection.AddGraphQL(b => b
-            .AddSelfActivatingSchema<StarWarsSchema>()
-            .AddMetrics(true)
-            .AddDocumentExecuter<ApolloTracingDocumentExecuter>()
-            .AddSystemTextJson());
-        using var provider = serviceCollection.BuildServiceProvider();
-        var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
-        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var result = await executer.ExecuteAsync(new ExecutionOptions
-        {
-            Query = "{ hero { name } }",
-            RequestServices = provider,
-        }).ConfigureAwait(false);
-        var resultString = serializer.Serialize(result);
-        resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
-    }
-
     [Theory]
     [InlineData(false, false, false)]
     [InlineData(true, false, false)]
@@ -137,12 +113,13 @@ query {
                     opts.EnableMetrics = true;
                 return next(opts);
             })
-            .AddApolloTracing(enable)
-            .ConfigureExecutionOptions(opts =>
+            .UseApolloTracing(enable)
+            .ConfigureExecution((opts, next) =>
             {
                 opts.EnableMetrics.ShouldBe(enable || enableBefore);
                 if (enableAfter)
                     opts.EnableMetrics = true;
+                return next(opts);
             })
             .AddSystemTextJson());
         using var provider = serviceCollection.BuildServiceProvider();

@@ -9,10 +9,16 @@ public class HumanType : ObjectGraphType<Human>
     {
         Name = "Human";
 
-        Field<NonNullGraphType<StringGraphType>>("id", "The id of the human.", resolve: context => context.Source.Id);
-        Field<StringGraphType>("name", "The name of the human.", resolve: context => context.Source.Name);
+        Field<NonNullGraphType<StringGraphType>>("id")
+            .Description("The id of the human.")
+            .Resolve(context => context.Source.Id);
 
-        Field<ListGraphType<CharacterInterface>>("friends", resolve: context => data.GetFriends(context.Source));
+        Field<StringGraphType>("name")
+            .Description("The name of the human.")
+            .Resolve(context => context.Source.Name);
+
+        Field<ListGraphType<CharacterInterface>>("friends")
+            .Resolve(context => data.GetFriends(context.Source));
 
         Connection<CharacterInterface>()
             .Name("friendsConnection")
@@ -20,9 +26,11 @@ public class HumanType : ObjectGraphType<Human>
             .Bidirectional()
             .Resolve(context => context.GetPagedResults<Human, StarWarsCharacter>(data, context.Source.Friends));
 
-        Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+        Field<ListGraphType<EpisodeEnum>>("appearsIn").Description("Which movie they appear in.");
 
-        Field<StringGraphType>("homePlanet", "The home planet of the human.", resolve: context => context.Source.HomePlanet);
+        Field<StringGraphType>("homePlanet")
+            .Description("The home planet of the human.")
+            .Resolve(context => context.Source.HomePlanet);
 
         Interface<CharacterInterface>();
     }

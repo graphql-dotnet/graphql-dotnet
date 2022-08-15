@@ -211,9 +211,8 @@ query test {
     {
         public RootMutation()
         {
-            Field<StringGraphType>(
-                "test",
-                arguments: new QueryArguments(new QueryArgument(typeof(SomeInputType)) { Name = "some" }));
+            Field<StringGraphType>("test")
+                .Argument(typeof(SomeInputType), "some");
         }
     }
 

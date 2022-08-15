@@ -8,6 +8,7 @@ namespace GraphQL.Types
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
+        private bool _initialized;
 
         /// <summary>
         /// Initializes a new instance of the graph type.
@@ -23,6 +24,14 @@ namespace GraphQL.Types
                 // This name can be always changed later to any valid value.
                 SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
             }
+        }
+
+        /// <inheritdoc/>
+        public virtual void Initialize(ISchema schema)
+        {
+            if (_initialized)
+                throw new InvalidOperationException($"This graph type '{Name}' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            _initialized = true;
         }
 
         private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]

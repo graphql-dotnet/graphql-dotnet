@@ -19,12 +19,10 @@ namespace GraphQL.Types.Relay
             Description =
                 $"An edge in a connection from an object to another object of type `{graphQLTypeName}`.";
 
-            Field<NonNullGraphType<StringGraphType>>()
-                .Name("cursor")
+            Field<NonNullGraphType<StringGraphType>>("cursor")
                 .Description("A cursor for use in pagination");
 
-            Field<TNodeType>()
-                .Name("node")
+            Field<TNodeType>("node")
                 .Description("The item at the end of the edge");
         }
     }

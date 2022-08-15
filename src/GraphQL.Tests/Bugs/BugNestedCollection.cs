@@ -46,9 +46,9 @@ public class NestedMutation : ObjectGraphType
     public NestedMutation()
     {
         Name = "mutation";
-        Field<BooleanGraphType>("createProgram",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<ProgramInputType>> { Name = "program" }),
-            resolve: context =>
+        Field<BooleanGraphType>("createProgram")
+            .Argument<NonNullGraphType<ProgramInputType>>("program")
+            .Resolve(context =>
             {
                 var program = context.GetArgument<Program>("program");
                 program.Steps.Any(step => step.PropertyValues.Count > 0).ShouldBeTrue();

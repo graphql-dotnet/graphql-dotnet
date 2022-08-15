@@ -19,10 +19,9 @@ public sealed class PascalCaseSchema : Schema
     public PascalCaseSchema()
     {
         var query = new ObjectGraphType();
-        query.Field<IntGraphType>(
-            name: "query",
-            arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "argumentValue" }),
-            resolve: context => context.GetArgument<int>("argumentValue")
+        query.Field<IntGraphType>("query")
+            .Argument<IntGraphType>("argumentValue")
+            .Resolve(context => context.GetArgument<int>("argumentValue")
         );
         Query = query;
     }

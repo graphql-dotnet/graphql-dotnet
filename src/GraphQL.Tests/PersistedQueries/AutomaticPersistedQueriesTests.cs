@@ -1,6 +1,4 @@
 using GraphQL.Caching;
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -142,7 +140,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
         {
             public AutomaticPersistedQueriesTestQuery()
             {
-                Field<StringGraphType>("ping", resolve: _ => "pong");
+                Field<StringGraphType>("ping").Resolve(_ => "pong");
             }
         }
 
@@ -160,7 +158,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
     {
         Provider = new ServiceCollection()
             .AddGraphQL(builder => builder
-                .AddAutomaticPersistedQueries(options => options.SlidingExpiration = TimeSpan.FromMinutes(1))
+                .UseAutomaticPersistedQueries(options => options.SlidingExpiration = TimeSpan.FromMinutes(1))
                 .AddSchema<AutomaticPersistedQueriesTestSchema>()
                 .AddSystemTextJson()
             ).BuildServiceProvider();

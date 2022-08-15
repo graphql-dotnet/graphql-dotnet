@@ -4,7 +4,7 @@ namespace GraphQL.StarWars;
 
 public class StarWarsData
 {
-    private readonly List<StarWarsCharacter> _characters = new List<StarWarsCharacter>();
+    private readonly List<StarWarsCharacter> _characters = new();
 
     public StarWarsData()
     {

@@ -54,7 +54,7 @@ namespace GraphQL.Execution
         /// Specifies whether data (typically from inner exceptions) should be returned.
         /// Not applicable when <see cref="ExposeExtensions"/> is <see langword="false"/>.
         /// </summary>
-        public bool ExposeData { get; set; } = true;
+        public bool ExposeData { get; set; }
     }
 
     /// <summary>

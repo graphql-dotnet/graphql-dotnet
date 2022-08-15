@@ -15,21 +15,41 @@
       ],
       "types": [
         {
-          "name": "__DirectiveLocation",
-          "appliedDirectives": [],
-          "fields": null
-        },
-        {
-          "name": "__DirectiveArgument",
+          "name": "__Schema",
           "appliedDirectives": [],
           "fields": [
             {
-              "name": "name",
+              "name": "description",
               "appliedDirectives": [],
               "args": []
             },
             {
-              "name": "value",
+              "name": "types",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "queryType",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "mutationType",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "subscriptionType",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "directives",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "appliedDirectives",
               "appliedDirectives": [],
               "args": []
             }
@@ -39,130 +59,6 @@
           "name": "String",
           "appliedDirectives": [],
           "fields": null
-        },
-        {
-          "name": "__AppliedDirective",
-          "appliedDirectives": [],
-          "fields": [
-            {
-              "name": "name",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "args",
-              "appliedDirectives": [],
-              "args": []
-            }
-          ]
-        },
-        {
-          "name": "__TypeKind",
-          "appliedDirectives": [],
-          "fields": null
-        },
-        {
-          "name": "__EnumValue",
-          "appliedDirectives": [],
-          "fields": [
-            {
-              "name": "name",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "description",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "isDeprecated",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "deprecationReason",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "appliedDirectives",
-              "appliedDirectives": [],
-              "args": []
-            }
-          ]
-        },
-        {
-          "name": "Boolean",
-          "appliedDirectives": [],
-          "fields": null
-        },
-        {
-          "name": "__Directive",
-          "appliedDirectives": [],
-          "fields": [
-            {
-              "name": "name",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "description",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "locations",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "args",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "isRepeatable",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "appliedDirectives",
-              "appliedDirectives": [],
-              "args": []
-            }
-          ]
-        },
-        {
-          "name": "__InputValue",
-          "appliedDirectives": [],
-          "fields": [
-            {
-              "name": "name",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "description",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "type",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "defaultValue",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "appliedDirectives",
-              "appliedDirectives": [],
-              "args": []
-            }
-          ]
         },
         {
           "name": "__Type",
@@ -231,6 +127,11 @@
           ]
         },
         {
+          "name": "__TypeKind",
+          "appliedDirectives": [],
+          "fields": null
+        },
+        {
           "name": "__Field",
           "appliedDirectives": [],
           "fields": [
@@ -272,36 +173,26 @@
           ]
         },
         {
-          "name": "__Schema",
+          "name": "__InputValue",
           "appliedDirectives": [],
           "fields": [
+            {
+              "name": "name",
+              "appliedDirectives": [],
+              "args": []
+            },
             {
               "name": "description",
               "appliedDirectives": [],
               "args": []
             },
             {
-              "name": "types",
+              "name": "type",
               "appliedDirectives": [],
               "args": []
             },
             {
-              "name": "queryType",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "mutationType",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "subscriptionType",
-              "appliedDirectives": [],
-              "args": []
-            },
-            {
-              "name": "directives",
+              "name": "defaultValue",
               "appliedDirectives": [],
               "args": []
             },
@@ -311,6 +202,115 @@
               "args": []
             }
           ]
+        },
+        {
+          "name": "__AppliedDirective",
+          "appliedDirectives": [],
+          "fields": [
+            {
+              "name": "name",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "args",
+              "appliedDirectives": [],
+              "args": []
+            }
+          ]
+        },
+        {
+          "name": "__DirectiveArgument",
+          "appliedDirectives": [],
+          "fields": [
+            {
+              "name": "name",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "value",
+              "appliedDirectives": [],
+              "args": []
+            }
+          ]
+        },
+        {
+          "name": "Boolean",
+          "appliedDirectives": [],
+          "fields": null
+        },
+        {
+          "name": "__EnumValue",
+          "appliedDirectives": [],
+          "fields": [
+            {
+              "name": "name",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "description",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "isDeprecated",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "deprecationReason",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "appliedDirectives",
+              "appliedDirectives": [],
+              "args": []
+            }
+          ]
+        },
+        {
+          "name": "__Directive",
+          "appliedDirectives": [],
+          "fields": [
+            {
+              "name": "name",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "description",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "locations",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "args",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "isRepeatable",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "appliedDirectives",
+              "appliedDirectives": [],
+              "args": []
+            }
+          ]
+        },
+        {
+          "name": "__DirectiveLocation",
+          "appliedDirectives": [],
+          "fields": null
         },
         {
           "name": "Query",

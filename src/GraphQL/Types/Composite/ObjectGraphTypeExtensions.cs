@@ -5,6 +5,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Provides methods to add fields to output graph types.
     /// </summary>
+    [Obsolete("This class will be removed in v8.")]
     public static class ObjectGraphTypeExtensions
     {
         /// <summary>
@@ -16,7 +17,8 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-        public static void Field( //TODO: v5 - change void to T where T : IObjectGraphType
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
+        public static void Field(
             this IObjectGraphType obj,
             string name,
             IGraphType type,
@@ -44,7 +46,8 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-        public static void FieldAsync( //TODO: v5 - change void to T where T : IObjectGraphType
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
+        public static void FieldAsync(
             this IObjectGraphType obj,
             string name,
             IGraphType type,

@@ -60,6 +60,6 @@ public class Bug1772Query : ObjectGraphType
 {
     public Bug1772Query()
     {
-        Field<StringGraphType>("Test", resolve: context => "ok");
+        Field<StringGraphType>("Test").Resolve(_ => "ok");
     }
 }

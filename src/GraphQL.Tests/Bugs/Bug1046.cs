@@ -41,7 +41,7 @@ public class QueryGraphType : ObjectGraphType
 {
     public QueryGraphType()
     {
-        Field<InterfaceGraphType>("inst", resolve: c => new Implementation());
+        Field<InterfaceGraphType>("inst").Resolve(_ => new Implementation());
     }
 }
 

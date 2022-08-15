@@ -64,9 +64,7 @@ The `AddGraphQL()` method will register default implementations of the following
 * `IDocumentExecuter`
 * `IDocumentBuilder`
 * `IDocumentValidator`
-* `IComplexityAnalyzer` - which is not used unless configured within `ExecutionOptions`
 * `IErrorInfoProvider`
-* `IDocumentCache` - an implemenation which does not cache documents
 * `IExecutionStrategySelector` - which does not support subscriptions by default
 
 A list of the available extension methods is below:
@@ -86,21 +84,28 @@ A list of the available extension methods is below:
 | `AddExecutionStrategySelector` | Registers the specified execution strategy selector | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
-| `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
-| `AddMetrics`            | Registers and enables metrics depending on the supplied arguments | |
-| `AddMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
+| `ConfigureExecution`    | Configures execution middleware to monitor or modify both options and the result | |
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
 | `ConfigureSchema`       | Configures schema options when the schema is initialized | |
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
+| `UseApolloTracing`      | Registers and enables metrics depending on the supplied arguments, and adds Apollo Tracing data to the execution result | |
+| `UseAutomaticPersistedQueries` | Enables Automatic Persisted Queries support | GraphQL.MemoryCache |
+| `UseMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
+| `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
+
+Calls to `ConfigureExecutionOptions` and methods that start with `Add` will execute first, in the order they
+appear, followed by calls to `ConfigureExecution` and methods that start with `Use`. The order of the calls
+may be important. For instance, calling `UseMemoryCache` prior to `UseAutomaticPersistedQueries` would result in
+the memory cache being unable to cache any APQ queries.
 
 Custom `IGraphQLBuilder` extension methods typically rely on the `Services` property of the builder in order to register services
 with the underlying dependency injection framework. The `Services` property returns a `IServiceRegister` interface which has these methods:
@@ -275,10 +280,8 @@ public class StarWarsQuery : ObjectGraphType
 {
     public StarWarsQuery()
     {
-        Field<DroidType>(
-            "hero",
-            resolve: context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2")
-        );
+        Field<DroidType>("hero")
+            .Resolve(context => context.RequestServices.GetRequiredService<IDroidRepo>().GetDroid("R2-D2"));
     }
 }
 ```
@@ -298,15 +301,13 @@ public class StarWarsQuery : ObjectGraphType
 {
     public StarWarsQuery()
     {
-        Field<DroidType>(
-            "hero",
-            resolve: context =>
+        Field<DroidType>("hero")
+            .Resolve(context =>
             {
                 using var scope = context.RequestServices.CreateScope();
                 var services = scope.ServiceProvider;
                 return services.GetRequiredService<MyDbContext>().Droids.Find(1);
-            }
-        );
+            });
     }
 }
 ```
@@ -319,7 +320,7 @@ public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {
-        Field("Name", context => context.Source.Name);
+        Field("Name").Resolve(context => context.Source.Name);
         Field<ListGraphType<ProductGraphType>>("Products")
             .ResolveScopedAsync(context => {
                 var db = context.RequestServices.GetRequiredService<MyDbContext>();
@@ -344,8 +345,8 @@ public class MyGraphType : ObjectGraphType<Category>
 {
     public MyGraphType()
     {
-        Field("Name", context => context.Source.Name);
-        Field<ListGraphType<ProductGraphType>>().Name("Products")
+        Field("Name").Resolve(context => context.Source.Name);
+        Field<ListGraphType<ProductGraphType>>("Products")
             .Resolve()
             .WithScope() // creates a service scope as described above; not necessary for serial execution
             .WithService<MyDbContext>()
@@ -385,13 +386,9 @@ public class StarWarsQuery : ObjectGraphType
   // #1 - Add dependencies using Defer<T>
   public StarWarsQuery(Defer<IDroidRepo> repoFactory)
   {
-    Field<DroidType>(
-      "hero",
-
-      // #2 Resolve dependencies using current scope provider
-      resolve: context => repoFactory.Value.GetDroid("R2-D2")
-
-    );
+    Field<DroidType>("hero")
+        // #2 Resolve dependencies using current scope provider
+        .Resolve(context => repoFactory.Value.GetDroid("R2-D2"));
   }
 }
 ```

@@ -149,10 +149,9 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         objectType.HasAppliedDirectives().ShouldBeTrue();
         objectType.GetAppliedDirectives().Count.ShouldBe(1);
 
-        var field = objectType.Field<StringGraphType>("test");
-        field.ApplyDirective("field");
-        field.HasAppliedDirectives().ShouldBeTrue();
-        field.GetAppliedDirectives().Count.ShouldBe(1);
+        var field = objectType.Field<StringGraphType>("test").Directive("field");
+        field.FieldType.HasAppliedDirectives().ShouldBeTrue();
+        field.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
 
         var interfaceType = new InterfaceGraphType();
         interfaceType.ApplyDirective("interface");
@@ -184,10 +183,9 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         inputType.HasAppliedDirectives().ShouldBeTrue();
         inputType.GetAppliedDirectives().Count.ShouldBe(1);
 
-        var input = inputType.Field<StringGraphType>("test");
-        input.ApplyDirective("inputField");
-        input.HasAppliedDirectives().ShouldBeTrue();
-        input.GetAppliedDirectives().Count.ShouldBe(1);
+        var input = inputType.Field<StringGraphType>("test").Directive("inputField");
+        input.FieldType.HasAppliedDirectives().ShouldBeTrue();
+        input.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
 
         var scalarType = new BigIntGraphType();
         scalarType.ApplyDirective("scalar");

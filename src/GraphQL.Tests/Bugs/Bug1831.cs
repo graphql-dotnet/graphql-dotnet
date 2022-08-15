@@ -54,11 +54,9 @@ public class Bug1831Query : ObjectGraphType
 {
     public Bug1831Query()
     {
-        Field<StringGraphType>(
-            "test1",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(Bug1831InputGraphType)) { Name = "arg" }),
-            resolve: context =>
+        Field<StringGraphType>("test1")
+            .Argument(typeof(Bug1831InputGraphType), "arg")
+            .Resolve(context =>
             {
                 var arg = context.GetArgument<Bug1831Class>("arg");
                 arg.Id.ShouldBe("id");

@@ -24,12 +24,11 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description");
 
-            Field<NonNullGraphType<__Type>>("type", resolve: context => ((IProvideResolvedType)context.Source!).ResolvedType);
+            Field<NonNullGraphType<__Type>>("type").Resolve(context => ((IProvideResolvedType)context.Source!).ResolvedType);
 
-            Field<StringGraphType>(
-                "defaultValue",
-                "A GraphQL-formatted string representing the default value for this input value.",
-                resolve: context =>
+            Field<StringGraphType>("defaultValue")
+                .Description("A GraphQL-formatted string representing the default value for this input value.")
+                .Resolve(context =>
                 {
                     return context.Source is IHaveDefaultValue hasDefault && hasDefault.DefaultValue != null
                         ? hasDefault.ResolvedType!.Print(hasDefault.DefaultValue)

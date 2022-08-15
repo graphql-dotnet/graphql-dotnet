@@ -53,7 +53,7 @@ namespace GraphQL.Types
             foreach (var memberInfo in GetRegisteredMembers())
             {
                 bool include = true;
-                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in memberInfo.GetGraphQLAttributes())
                 {
                     include = attr.ShouldInclude(memberInfo, false);
                     if (!include)
@@ -197,11 +197,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes defined on the supplied <see cref="ParameterInfo"/>
         /// to the specified <see cref="QueryArgument"/>.
+        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
         /// </summary>
         protected virtual void ApplyArgumentAttributes(ParameterInfo parameterInfo, QueryArgument queryArgument)
         {
             // Apply derivatives of GraphQLAttribute
-            var attributes = parameterInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = parameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(queryArgument);
@@ -225,26 +226,27 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a list of properties, methods or fields that should have fields created for them.
         /// <br/><br/>
-        /// Unless overridden, returns a list of public instance readable properties (including properties declared on
-        /// inherited classes) and public instance methods (excluding methods declared on inherited classes) that
-        /// do not return <see langword="void"/> or <see cref="Task"/>.
+        /// Unless overridden, returns a list of public instance readable properties and public instance methods
+        /// that do not return <see langword="void"/> or <see cref="Task"/>
+        /// including properties and methods declared on inherited classes.
         /// </summary>
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         {
-            var props = AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static).Where(x => x.CanRead),
+            var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
+            var properties = AutoRegisteringHelper.ExcludeProperties(
+                typeof(TSourceType).GetProperties(flags).Where(x => x.CanRead),
                 _excludedProperties);
-            var methods = typeof(TSourceType).GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            var methods = typeof(TSourceType).GetMethods(flags)
                 .Where(x =>
-                    !x.ContainsGenericParameters &&               // exclude methods with open generics
-                    !x.IsSpecialName &&                           // exclude methods generated for properties
-                    x.ReturnType != typeof(void) &&               // exclude methods which do not return a value
-                    x.ReturnType != typeof(Task) &&               // exclude methods which do not return a value
-                    x.GetBaseDefinition() == x &&                 // exclude methods which override an inherited class' method (e.g. GetHashCode)
-                                                                  // exclude methods generated for record types: bool Equals(TSourceType)
+                    !x.ContainsGenericParameters &&                          // exclude methods with open generics
+                    !x.IsSpecialName &&                                      // exclude methods generated for properties
+                    x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
+                    x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
+                    x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
+                                                                             // exclude methods generated for record types: bool Equals(TSourceType)
                     !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
-                    x.Name != "<Clone>$");                        // exclude methods generated for record types
-            return props.Concat<MemberInfo>(methods);
+                    x.Name != "<Clone>$");                                   // exclude methods generated for record types
+            return properties.Concat<MemberInfo>(methods);
         }
 
         /// <summary>

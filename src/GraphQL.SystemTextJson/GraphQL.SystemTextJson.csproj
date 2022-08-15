@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net5;net6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net5;net6;netcoreapp3.1</TargetFrameworks>
     <RootNamespace>GraphQL.SystemTextJson</RootNamespace>
     <Description>System.Text.Json serializer for GraphQL.NET</Description>
     <PackageTags>GraphQL;json</PackageTags>
@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Json" Version="4.7.2" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
 </Project>

@@ -178,8 +178,7 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(IReadOnlyCollection<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(typeof(List<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(typeof(int[]), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))] //remove for v6
-    //[InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))] //enable for v6
+    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))]
     [InlineData(typeof(IEnumerable<KeyValuePair<int, string>>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
     [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
     //input mapping mode
@@ -262,7 +261,7 @@ public class GetGraphTypeFromTypeTests
     public void OutputTypeIsDereferenced(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(referenceType, "test");
+        query.Field("test", referenceType);
         var schema = new Schema
         {
             Query = query
@@ -291,11 +290,8 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_Argument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(referenceType) { Name = "arg" }
-            });
+        query.Field("test", typeof(IntGraphType))
+            .Argument(referenceType, "arg");
         var schema = new Schema
         {
             Query = query
@@ -325,7 +321,7 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_DirectiveArgument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(StringGraphType), "test");
+        query.Field("test", typeof(StringGraphType));
         var schema = new Schema
         {
             Query = query
@@ -364,13 +360,10 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_InputField(Type referenceType, Type mappedType)
     {
         var inputType = new InputObjectGraphType();
-        inputType.Field(referenceType, "field");
+        inputType.Field("field", referenceType);
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(inputType) { Name = "arg" }
-            });
+        query.Field("test", typeof(IntGraphType))
+            .Arguments(new QueryArgument(inputType) { Name = "arg" });
         var schema = new Schema
         {
             Query = query

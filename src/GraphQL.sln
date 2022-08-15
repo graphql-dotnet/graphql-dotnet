@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		..\.gitignore = ..\.gitignore
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
+		graphql.snk = graphql.snk
 		..\LICENSE.md = ..\LICENSE.md
 		..\README.md = ..\README.md
 		Tests.props = Tests.props
@@ -76,6 +77,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F263-BCEB-4738-9111-C85139BC63A7}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
+		..\docs2\site\docs\guides\document-caching.md = ..\docs2\site\docs\guides\document-caching.md
 		..\docs2\site\docs\guides\known-issues.md = ..\docs2\site\docs\guides\known-issues.md
 		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
@@ -123,6 +125,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\migration3.md = ..\docs2\site\docs\migrations\migration3.md
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
 		..\docs2\site\docs\migrations\migration5.md = ..\docs2\site\docs\migrations\migration5.md
+		..\docs2\site\docs\migrations\migration7.md = ..\docs2\site\docs\migrations\migration7.md
 		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection

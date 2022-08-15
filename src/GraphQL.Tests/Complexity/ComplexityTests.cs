@@ -199,7 +199,7 @@ fragment optionDetail on Option
   }
 }");
 
-        result.Complexity.ShouldBe(1839999841); // WOW! :)
+        result.Complexity.ShouldBe(1839999848); // WOW! :)
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/3207
@@ -276,7 +276,7 @@ fragment pricing on Car
 ";
         var result = AnalyzeComplexity(query);
 
-        result.Complexity.ShouldBe(4);
+        result.Complexity.ShouldBe(6);
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/3221

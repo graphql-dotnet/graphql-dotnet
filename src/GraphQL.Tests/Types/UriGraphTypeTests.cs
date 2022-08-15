@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Types;
 
 public class UriGraphTypeTests
 {
-    private readonly UriGraphType uriGraphType = new UriGraphType();
+    private readonly UriGraphType uriGraphType = new();
 
     [Fact]
     public void ParseValue_uriIsAString_ReturnValidUriGraphType() =>

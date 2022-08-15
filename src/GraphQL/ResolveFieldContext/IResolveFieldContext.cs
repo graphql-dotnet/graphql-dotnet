@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -107,6 +108,9 @@ namespace GraphQL
         /// Can be used to return lists of data from field resolvers.
         /// </summary>
         IExecutionArrayPool ArrayPool { get; }
+
+        /// <inheritdoc cref="IExecutionContext.User"/>
+        ClaimsPrincipal? User { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

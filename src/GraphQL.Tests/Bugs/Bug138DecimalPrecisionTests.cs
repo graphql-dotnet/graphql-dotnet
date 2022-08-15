@@ -35,10 +35,9 @@ public class DecimalMutation : ObjectGraphType
 {
     public DecimalMutation()
     {
-        Field<DecimalGraphType>(
-            "set",
-            arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request" }),
-            resolve: context =>
+        Field<DecimalGraphType>("set")
+            .Argument<DecimalGraphType>("request")
+            .Resolve(context =>
             {
                 var val = context.GetArgument<decimal>("request");
                 val.ShouldBe(24.15m);

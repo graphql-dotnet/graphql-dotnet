@@ -28,12 +28,8 @@ public class Bug2279Query : ObjectGraphType
 {
     public Bug2279Query()
     {
-        Field<Bug2279GraphType<string>>(
-            "string",
-            resolve: ctx => "hello");
-        Field<Bug2279GraphType<int>>(
-            "int",
-            resolve: ctx => 3);
+        Field<Bug2279GraphType<string>>("string").Resolve(_ => "hello");
+        Field<Bug2279GraphType<int>>("int").Resolve(_ => 3);
     }
 }
 

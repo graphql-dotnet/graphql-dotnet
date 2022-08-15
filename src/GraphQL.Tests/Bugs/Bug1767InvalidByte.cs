@@ -54,9 +54,8 @@ public class Bug1767Query : ObjectGraphType
 {
     public Bug1767Query()
     {
-        Field<StringGraphType>(
-            "input",
-            arguments: new QueryArguments(new QueryArgument<ByteGraphType> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<byte>("arg").ToString());
+        Field<StringGraphType>("input")
+            .Argument<ByteGraphType>("arg")
+            .Resolve(ctx => ctx.GetArgument<byte>("arg").ToString());
     }
 }

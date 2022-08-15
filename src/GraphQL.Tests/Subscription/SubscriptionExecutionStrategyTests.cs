@@ -3,7 +3,6 @@
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
 using GraphQL.Execution;
-using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 

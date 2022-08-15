@@ -1,7 +1,6 @@
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using Moq;
-using Nito.AsyncEx;
 
 namespace GraphQL.DataLoader.Tests;
 
@@ -53,7 +52,7 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
     }
 
     [Fact]
-    public void LoadAsync_MultipleKeys_Works()
+    public async Task LoadAsync_MultipleKeys_Works()
     {
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(2);
@@ -69,30 +68,26 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
         User user2 = null;
         User user3 = null;
 
-        // Run within an async context to make sure we won't deadlock
-        AsyncContext.Run(async () =>
-        {
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
-            // Start async tasks to load by ID
-            var result1 = loader.LoadAsync(new int[] { 1, 2 });
-            var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
+        // Start async tasks to load by ID
+        var result1 = loader.LoadAsync(new int[] { 1, 2 });
+        var result2 = loader.LoadAsync(new int[] { 1, 2, 3 });
 
-            // Dispatch loading
-            await loader.DispatchAsync().ConfigureAwait(false);
-            var task1 = result1.GetResultAsync();
-            var task2 = result2.GetResultAsync();
+        // Dispatch loading
+        await loader.DispatchAsync().ConfigureAwait(false);
+        var task1 = result1.GetResultAsync();
+        var task2 = result2.GetResultAsync();
 
-            // Now await tasks
-            users1 = await task1.ConfigureAwait(false);
-            users1.ShouldNotBeNull();
-            user1 = users1[0];
-            user2 = users1[1];
+        // Now await tasks
+        users1 = await task1.ConfigureAwait(false);
+        users1.ShouldNotBeNull();
+        user1 = users1[0];
+        user2 = users1[1];
 
-            users2 = await task2.ConfigureAwait(false);
-            users2.ShouldNotBeNull();
-            user3 = users2[2];
-        });
+        users2 = await task2.ConfigureAwait(false);
+        users2.ShouldNotBeNull();
+        user3 = users2[2];
 
         users1.Length.ShouldBe(2, "First task with two keys should return array of two users");
         users2.Length.ShouldBe(3, "Second task with three keys should return array of three users");

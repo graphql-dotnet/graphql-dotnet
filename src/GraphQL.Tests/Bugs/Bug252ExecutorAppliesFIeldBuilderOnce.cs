@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Bugs;
 public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
 {
     public int AppliedCount;
-    private readonly FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
+    private readonly FieldMiddlewareBuilder overriddenBuilder = new();
 
     public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
     {

@@ -1,4 +1,7 @@
+using System.Security.Claims;
 using GraphQL.Execution;
+using GraphQL.Types;
+using GraphQL.Validation;
 
 namespace GraphQL.Tests.Execution;
 
@@ -178,6 +181,52 @@ public class ResolveFieldContextTests
 
         _context.SetOutputExtension("a.b.c", "override");
         _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task User_Returns_ClaimsPrincipal(bool isAuthenticated)
+    {
+        var schema = new Schema();
+        var queryType = new ObjectGraphType();
+        queryType.Field<BooleanGraphType>("IsAuthenticated")
+            .Resolve(context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
+        schema.Query = queryType;
+        var executer = new DocumentExecuter();
+        var options = new ExecutionOptions
+        {
+            Schema = schema,
+            Query = "{ isAuthenticated }",
+            ValidationRules = DocumentValidator.CoreRules.Append(new VerifyUserValidationRule { ShouldBeAuthenticated = isAuthenticated }),
+            User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
+        };
+        options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
+        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
+        var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
+    }
+
+    private class VerifyUserDocumentListener : DocumentExecutionListenerBase
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public override Task BeforeExecutionAsync(IExecutionContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return Task.CompletedTask;
+        }
+    }
+
+    private class VerifyUserValidationRule : IValidationRule
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return default;
+        }
     }
 
     [Fact]

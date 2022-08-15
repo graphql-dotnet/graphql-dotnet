@@ -13,6 +13,21 @@ namespace GraphQL.DI
         /// <see cref="ExecutionOptions.RequestServices"/> can be used to resolve other services from the dependency injection framework.
         /// </remarks>
         Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next);
+
+        /// <summary>
+        /// Determines the order of the registered <see cref="IConfigureExecution"/> instances;
+        /// the lowest order executes first; instances with the same value execute in the same
+        /// order they were registered, assuming the dependency injection provider returns
+        /// instances in the order they were registered.
+        /// <para>
+        /// The default sort order of configurations are as follows:
+        /// </para>
+        /// <list type="bullet">
+        /// <item>100: Option configurations -- 'Add' calls such as <see cref="GraphQLBuilderExtensions.AddValidationRule{TValidationRule}(IGraphQLBuilder, bool)">AddValidationRule</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})">ConfigureExecutionOptions</see> calls</item>
+        /// <item>200: Execution configurations -- 'Use' calls such as <see cref="GraphQLBuilderExtensions.UseApolloTracing(IGraphQLBuilder, bool)">UseApolloTracing</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see> calls</item>
+        /// </list>
+        /// </summary>
+        float SortOrder { get; }
     }
 
     /// <summary>
@@ -31,5 +46,7 @@ namespace GraphQL.DI
 
         public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
             => _action(options, next);
+
+        public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
     }
 }

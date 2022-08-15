@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -38,6 +40,12 @@ namespace GraphQL.Validation
         public IDictionary<string, object?> UserContext { get; init; } = null!;
 
         /// <summary>
+        /// Gets or sets object for performance metrics, which can be used by
+        /// validation rules during document validation.
+        /// </summary>
+        public Metrics Metrics { get; init; } = null!;
+
+        /// <summary>
         /// Gets or sets the input variables.
         /// </summary>
         public Inputs Variables { get; init; } = null!;
@@ -54,6 +62,9 @@ namespace GraphQL.Validation
 
         /// <inheritdoc cref="ExecutionOptions.RequestServices"/>
         public IServiceProvider? RequestServices { get; init; } = null;
+
+        /// <inheritdoc cref="ExecutionOptions.User"/>
+        public ClaimsPrincipal? User { get; init; } = null;
 
         /// <summary>
         /// <see cref="System.Threading.CancellationToken">CancellationToken</see> to cancel validation of request;

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using GraphQL.Conversion;
-using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL
@@ -67,20 +66,15 @@ namespace GraphQL
         public static bool UseDeclaringTypeNames { get; set; } = false;
 
         /// <summary>
-        /// Specifies whether to map all types that implement <see cref="IEnumerable{T}"/> to list
-        /// graph types within <see cref="TypeExtensions.GetGraphTypeFromType(Type, bool, TypeMappingMode)"/>,
-        /// or only common collection types such as <see cref="IEnumerable{T}"/>, <see cref="IList{T}"/>,
-        /// <see cref="List{T}"/>, <see cref="IReadOnlyCollection{T}"/> and similar. <see cref="HashSet{T}"/>
-        /// and <see cref="ISet{T}"/> are also supported, but not dictionary types.
+        /// A collection of global <see cref="GraphQLAttribute"/> instances which are applied while
+        /// <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>,
+        /// <see cref="Types.AutoRegisteringInputObjectGraphType{TSourceType}">AutoRegisteringInputObjectGraphType</see>,
+        /// <see cref="Types.EnumerationGraphType{TEnum}">EnumerationGraphType</see>,
+        /// <see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveDelegate(Delegate?)">ResolveDelegate</see>
+        /// or the schema builder is building graph types, field definitions, arguments, or similar.
         /// <br/><br/>
-        /// When set to <see langword="true"/>, dictionaries are also detected as lists of
-        /// <see cref="KeyValuePair{TKey, TValue}"/> which may be unintended.
-        /// <br/><br/>
-        /// When set to <see langword="false"/>, custom collection types such as <see cref="TypeFields"/>
-        /// would not be detected and would need to be cast to the correct <see cref="IEnumerable{T}"/> type
-        /// when defining the field so that <see cref="GraphQLClrOutputTypeReference{T}"/> is generated
-        /// for the field type with the proper <see cref="IEnumerable{T}"/> type as its generic type.
+        /// The collection is not thread-safe; instances should be added prior to schema initialization.
         /// </summary>
-        public static bool MapAllEnumerableTypes { get; set; } = true;
+        public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
     }
 }
