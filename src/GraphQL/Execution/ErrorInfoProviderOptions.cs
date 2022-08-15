@@ -29,7 +29,7 @@ namespace GraphQL.Execution
         public bool ExposeExceptionDetails { get; set; }
 
         /// <inheritdoc cref="Execution.ExposeExceptionDetailsMode"/>
-        public ExposeExceptionDetailsMode ExposeExceptionDetailsMode { get; set; }
+        public ExposeExceptionDetailsMode ExposeExceptionDetailsMode { get; set; } = ExposeExceptionDetailsMode.Extensions;
 
         /// <summary>
         /// Specifies whether the extensions property, including by default the 'code',
