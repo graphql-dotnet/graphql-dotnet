@@ -394,7 +394,7 @@ services.AddGraphQL(b => b
     .AddErrorInfoProvider(o => o.ExposeData = true));
 ```
 
-### 10. A bunch of FieldXXX APIs were deprecated
+### 11. A bunch of FieldXXX APIs were deprecated
 
 After upgrading to v7 you will likely notice many compiler warnings with a message similar to the following:
 > Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use
@@ -502,7 +502,7 @@ Field<MessageGraphType>("messages").ResolveStreamAsync(context => observable);
 
 Also `ComplexGraphType.Field<IntGraphType>("name")` now returns `FieldBuilder` instead of `FieldType`.
 
-### 11. `SortOrder` property added to `IConfigureExecution`
+### 12. `SortOrder` property added to `IConfigureExecution`
 
 If you have classes that implement `IConfigureExecution`, you will now need to also implement the
 added `SortOrder` property. The sort order determines the order that the `IConfigureExecution`
@@ -513,7 +513,7 @@ The default sort order of configurations are as follows:
 - 100: Option configurations -- `Add` calls such as `AddValidationRule`, and `ConfigureExecutionOptions` calls
 - 200: Execution configurations -- `Use` calls such as `UseApolloTracing`, and `ConfigureExecution` calls
 
-### 12. Interfaces mapped by the `AutoRegisteringGraphTypeMappingProvider` now generate interface graph types rather than object graph types.
+### 13. Interfaces mapped by the `AutoRegisteringGraphTypeMappingProvider` now generate interface graph types rather than object graph types.
 
 If you use interfaces to contain your GraphQL attributes for your data models, or for any other reason
 rely on the generation of object graph types for interface CLR types, you may wish to revert this design
