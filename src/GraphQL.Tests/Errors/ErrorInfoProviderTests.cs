@@ -129,7 +129,7 @@ public class ErrorInfoProviderTests
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
         info.Extensions.TryGetValue("details", out _).ShouldBeFalse();
     }
@@ -140,7 +140,7 @@ public class ErrorInfoProviderTests
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Extensions }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions["details"].ShouldNotBeNull();
     }
@@ -166,7 +166,7 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
     }
 
@@ -191,7 +191,7 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Extensions }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions["details"].ShouldNotBeNull();
     }
