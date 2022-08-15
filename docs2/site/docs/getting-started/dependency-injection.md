@@ -65,7 +65,6 @@ The `AddGraphQL()` method will register default implementations of the following
 * `IDocumentBuilder`
 * `IDocumentValidator`
 * `IErrorInfoProvider`
-* `IDocumentCache` - an implemenation which does not cache documents
 * `IExecutionStrategySelector` - which does not support subscriptions by default
 
 A list of the available extension methods is below:
@@ -85,7 +84,6 @@ A list of the available extension methods is below:
 | `AddExecutionStrategySelector` | Registers the specified execution strategy selector | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
-| `AddMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
@@ -98,6 +96,7 @@ A list of the available extension methods is below:
 | `Configure<TOptions>`   | Used by extension methods to configures an options class within the DI framework | |
 | `UseApolloTracing`      | Registers and enables metrics depending on the supplied arguments, and adds Apollo Tracing data to the execution result | |
 | `UseAutomaticPersistedQueries` | Enables Automatic Persisted Queries support | GraphQL.MemoryCache |
+| `UseMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered

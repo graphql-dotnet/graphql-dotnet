@@ -1,4 +1,3 @@
-using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -23,7 +22,6 @@ public class DocumentExecuterTests
         var executer = new DocumentExecuter(
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
-            DefaultDocumentCache.Instance,
             selector,
             new IConfigureExecution[] { });
         var schema = new Schema();
