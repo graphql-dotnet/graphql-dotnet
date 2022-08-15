@@ -137,7 +137,7 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Upgrade Guides
 
-You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.2/).
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.3/).
 
 * [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)
