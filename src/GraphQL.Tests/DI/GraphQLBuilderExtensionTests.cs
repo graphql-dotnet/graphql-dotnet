@@ -4,7 +4,6 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
-using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
