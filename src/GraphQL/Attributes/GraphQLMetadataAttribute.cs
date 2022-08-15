@@ -6,7 +6,7 @@ namespace GraphQL
     /// <summary>
     /// Attribute for specifying additional information when matching a CLR type to a corresponding GraphType.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
     public sealed class GraphQLMetadataAttribute : GraphQLAttribute
     {
         private Type? _mappedToInput;

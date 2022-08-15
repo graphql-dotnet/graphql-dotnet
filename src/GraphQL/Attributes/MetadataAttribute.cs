@@ -6,7 +6,7 @@ namespace GraphQL
     /// <summary>
     /// Marks a class (graph type) or property (field) with additional metadata.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = true)]
     public class MetadataAttribute : GraphQLAttribute
     {
         /// <inheritdoc cref="MetadataAttribute"/>

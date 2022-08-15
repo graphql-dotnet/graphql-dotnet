@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.Resolvers;
@@ -140,6 +141,21 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
+        internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+        {
+            var typeInformation = getTypeInformation(memberInfo);
+            var graphType = typeInformation.ConstructGraphType();
+            var fieldType = CreateField(memberInfo, graphType, isInputType);
+            // set resolver, if applicable
+            buildFieldType?.Invoke(fieldType, memberInfo);
+            // apply field attributes after resolver has been set
+            ApplyFieldAttributes(memberInfo, fieldType, isInputType);
+            return fieldType;
+        }
+
+        /// <summary>
+        /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
+        /// </summary>
         internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
         {
             var fieldType = new FieldType()
@@ -223,6 +239,69 @@ namespace GraphQL.Types
             return context.TryGetArgument(typeof(T), queryArgument.Name, out var value)
                 ? (T?)value
                 : (T?)queryArgument.DefaultValue;
+        }
+
+        /// <summary>
+        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
+        /// </summary>
+        internal static IEnumerable<FieldType> ProvideFields(IEnumerable<MemberInfo> members, Func<MemberInfo, FieldType?> createField, bool isInputType)
+        {
+            foreach (var memberInfo in members)
+            {
+                bool include = true;
+                foreach (var attr in memberInfo.GetGraphQLAttributes())
+                {
+                    include = attr.ShouldInclude(memberInfo, isInputType);
+                    if (!include)
+                        break;
+                }
+                if (!include)
+                    continue;
+                var fieldType = createField(memberInfo);
+                if (fieldType != null)
+                    yield return fieldType;
+            }
+        }
+
+        /// <summary>
+        /// Analyzes a member and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
+        /// <br/><br/>
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
+        /// </summary>
+        internal static TypeInformation GetTypeInformation(MemberInfo memberInfo, bool isInputType)
+        {
+            var typeInformation = memberInfo switch
+            {
+                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, isInputType),
+                MethodInfo methodInfo when !isInputType => new TypeInformation(methodInfo),
+                FieldInfo fieldInfo => new TypeInformation(fieldInfo, isInputType),
+                _ => isInputType
+                    ? throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties and fields are supported.")
+                    : throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties, methods and fields are supported."),
+            };
+            typeInformation.ApplyAttributes();
+            return typeInformation;
+        }
+
+        /// <summary>
+        /// Analyzes a method argument and returns an instance of <see cref="TypeInformation"/>
+        /// containing information necessary to select a graph type. Nullable reference annotations
+        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
+        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
+        /// <br/><br/>
+        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
+        /// attributes to change graph type selection behavior.
+        /// </summary>
+        internal static TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
+        {
+            var typeInformation = new TypeInformation(parameterInfo);
+            typeInformation.ApplyAttributes();
+            return typeInformation;
         }
     }
 }

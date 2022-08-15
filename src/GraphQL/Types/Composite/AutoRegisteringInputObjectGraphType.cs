@@ -44,41 +44,16 @@ namespace GraphQL.Types
             AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
         }
 
-        /// <summary>
-        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
-        /// added to the graph type.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringHelper.ProvideFields(IEnumerable{MemberInfo}, Func{MemberInfo, FieldType?}, bool)"/>
         protected virtual IEnumerable<FieldType> ProvideFields()
-        {
-            foreach (var memberInfo in GetRegisteredMembers())
-            {
-                bool include = true;
-                foreach (var attr in memberInfo.GetGraphQLAttributes())
-                {
-                    include = attr.ShouldInclude(memberInfo, true);
-                    if (!include)
-                        break;
-                }
-                if (!include)
-                    continue;
-                var fieldType = CreateField(memberInfo);
-                if (fieldType != null)
-                    yield return fieldType;
-            }
-        }
+            => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, true);
 
         /// <summary>
         /// Processes the specified property or field and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        {
-            var typeInformation = GetTypeInformation(memberInfo);
-            var graphType = typeInformation.ConstructGraphType();
-            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
-            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, true);
-            return fieldType;
-        }
+            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true);
 
         /// <summary>
         /// Returns a list of properties or fields that should have fields created for them.
@@ -90,25 +65,11 @@ namespace GraphQL.Types
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
                 _excludedProperties);
 
-        /// <summary>
-        /// Analyzes a property or field and returns an instance of <see cref="TypeInformation"/>
-        /// containing information necessary to select a graph type. Nullable reference annotations
-        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
-        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
-        /// <br/><br/>
-        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
-        /// attributes to change graph type selection behavior.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringHelper.GetTypeInformation(MemberInfo, bool)"/>
+        /// <remarks>
+        /// Only properties and fields are supported.
+        /// </remarks>
         protected virtual TypeInformation GetTypeInformation(MemberInfo memberInfo)
-        {
-            var typeInformation = memberInfo switch
-            {
-                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, true),
-                FieldInfo fieldInfo => new TypeInformation(fieldInfo, true),
-                _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties and fields are supported."),
-            };
-            typeInformation.ApplyAttributes();
-            return typeInformation;
-        }
+            => AutoRegisteringHelper.GetTypeInformation(memberInfo, true);
     }
 }
