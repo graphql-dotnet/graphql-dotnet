@@ -7,21 +7,21 @@ namespace GraphQL.Caching;
 /// Maps the registered <see cref="IDocumentCache"/> instance as an <see cref="IConfigureExecution"/> instance.
 /// </summary>
 [Obsolete("Remove in v8")]
-internal class DocumentCacheMapper : IConfigureExecution
+internal sealed class DocumentCacheMapper : IConfigureExecution
 {
-    internal IDocumentCache DocumentCache { get; }
+    private readonly IDocumentCache _documentCache;
 
     public DocumentCacheMapper(IDocumentCache documentCache)
     {
-        DocumentCache = documentCache;
+        _documentCache = documentCache;
     }
 
     /// <inheritdoc />
-    public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+    public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         if (options.Document == null && options.Query != null)
         {
-            var document = await DocumentCache.GetAsync(options.Query).ConfigureAwait(false);
+            var document = await _documentCache.GetAsync(options.Query).ConfigureAwait(false);
             if (document != null) // already in cache
                 // none of the default validation rules yet are dependent on the inputs, and the
                 // operation name is not passed to the document validator, so any successfully cached
@@ -33,7 +33,7 @@ internal class DocumentCacheMapper : IConfigureExecution
             if (result.Executed && // that is, validation was successful
                 document == null && // cache miss
                 options.Document != null)
-                await DocumentCache.SetAsync(options.Query, options.Document).ConfigureAwait(false);
+                await _documentCache.SetAsync(options.Query, options.Document).ConfigureAwait(false);
 
             return result;
         }
@@ -44,5 +44,5 @@ internal class DocumentCacheMapper : IConfigureExecution
     }
 
     /// <inheritdoc/>
-    public virtual float SortOrder => 200;
+    public float SortOrder => 200;
 }
