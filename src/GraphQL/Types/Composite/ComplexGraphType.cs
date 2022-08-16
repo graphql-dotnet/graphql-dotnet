@@ -402,7 +402,7 @@ namespace GraphQL.Types
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name = "default")
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name)
             where TGraphType : IGraphType
         {
             var builder = CreateBuilder<TReturnType>(typeof(TGraphType)).Name(name);
@@ -410,13 +410,17 @@ namespace GraphQL.Types
             return builder;
         }
 
-        /// <summary>
-        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
-        /// </summary>
-        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
+        [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
+            where TGraphType : IGraphType
+            => Field<TGraphType, TReturnType>("default");
+
+        /// <inheritdoc cref="Field{TGraphType}(string)"/>
+        [Obsolete("Please call Field<TGraphType>(string name) instead.")]
         public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
             where TGraphType : IGraphType
-            => Field<TGraphType, object>();
+            => Field<TGraphType, object>("default");
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.

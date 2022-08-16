@@ -10,8 +10,7 @@ public class QueryType : ObjectGraphType
     {
         Name = "Query";
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("Users")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("Users")
             .Description("Get all Users")
             .ResolveAsync(ctx =>
             {
@@ -21,8 +20,7 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync();
             });
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("UsersWithDelay")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("UsersWithDelay")
             .Description("Get all Users")
             .ResolveAsync(async ctx =>
             {
