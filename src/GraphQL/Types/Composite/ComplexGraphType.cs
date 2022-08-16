@@ -414,6 +414,14 @@ namespace GraphQL.Types
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
+        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+            where TGraphType : IGraphType
+            => Field<TGraphType, object>();
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field.
+        /// </summary>
+        /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : IGraphType
