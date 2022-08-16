@@ -39,11 +39,11 @@ public class Bug2279GraphType<T> : ObjectGraphType<T>
     {
         if (typeof(T) == typeof(int))
         {
-            Field<IntGraphType, T>().Name("value").Resolve(x => x.Source);
+            Field<IntGraphType, T>("value").Resolve(x => x.Source);
         }
         else
         {
-            Field<StringGraphType, T>().Name("value").Resolve(x => x.Source);
+            Field<StringGraphType, T>("value").Resolve(x => x.Source);
         }
     }
 }
