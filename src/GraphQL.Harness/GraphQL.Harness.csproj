@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="5.2.0" />
-    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="5.2.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="7.0.0" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="7.0.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="7.0.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
