@@ -107,6 +107,7 @@ namespace GraphQL
             Document = context.Document;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
+            User = context.User;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
