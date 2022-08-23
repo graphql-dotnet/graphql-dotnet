@@ -138,7 +138,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
 
         if (serializerSettings.ContractResolver == null)
             serializer.ContractResolver = new GraphQLContractResolver(errorInfoProvider ?? new ErrorInfoProvider());
-        else if (!(serializerSettings.ContractResolver is GraphQLContractResolver))
+        else if (serializerSettings.ContractResolver is not GraphQLContractResolver)
             throw new InvalidOperationException($"{nameof(JsonSerializerSettings.ContractResolver)} must be of type {nameof(GraphQLContractResolver)}");
 
         return serializer;

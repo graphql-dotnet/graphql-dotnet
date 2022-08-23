@@ -246,7 +246,7 @@ namespace GraphQL
                     newCollection = (IList)Activator.CreateInstance(genericListType)!;
                 }
 
-                if (!(propertyValue is IEnumerable valueList))
+                if (propertyValue is not IEnumerable valueList)
                     return newCollection;
 
                 // Array of known size is populated in-place
