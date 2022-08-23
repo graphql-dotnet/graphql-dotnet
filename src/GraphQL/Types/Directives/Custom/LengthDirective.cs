@@ -47,10 +47,10 @@ namespace GraphQL.Types
             if (min == null && max == null)
                 throw new ArgumentException("Either 'min' or 'max' argument must be specified for @length directive.");
 
-            if (min != null && (!(min is int minV) || minV < 0))
+            if (min != null && (min is not int minV || minV < 0))
                 throw new ArgumentOutOfRangeException("min", $"Argument 'min' for @length directive must be of type int and greater or equal 0. Current: {min}, {min.GetType().Name}");
 
-            if (max != null && (!(max is int maxV) || maxV < 0))
+            if (max != null && (max is not int maxV || maxV < 0))
                 throw new ArgumentOutOfRangeException("max", $"Argument 'max' for @length directive must be of type int and greater or equal 0. Current: {max}, {max.GetType().Name}");
 
             if (min != null && max != null && (int)min > (int)max)

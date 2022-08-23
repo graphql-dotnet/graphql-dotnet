@@ -71,7 +71,7 @@ namespace GraphQL
                     while (parent is ArrayExecutionNode)
                         parent = parent.Parent;
 
-                    if (parent != null && !(parent is RootExecutionNode))
+                    if (parent != null && parent is not RootExecutionNode)
                         _parent = new ReadonlyResolveFieldContext(parent, _executionContext);
                 }
 

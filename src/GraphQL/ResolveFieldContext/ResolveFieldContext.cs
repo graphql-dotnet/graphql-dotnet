@@ -137,7 +137,7 @@ namespace GraphQL
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <typeparamref name="TSource"/></exception>
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
-            if (context.Source != null && !(context.Source is TSource))
+            if (context.Source != null && context.Source is not TSource)
                 throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 
