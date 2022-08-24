@@ -343,7 +343,7 @@ public class SchemaWithDirective : Schema
         }
     }
 
-    public class MaxLengthDirectiveVistor : BaseSchemaNodeVisitor
+    public class MaxLengthDirectiveVisitor : BaseSchemaNodeVisitor
     {
         public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
         {
@@ -384,6 +384,7 @@ public class SchemaWithDirective : Schema
         root.Field<StringGraphType>("field").Argument<BookSummaryCreateArgInputType>("arg");
         Query = root;
 
-        this.RegisterVisitor<MaxLengthDirectiveVistor>();
+        Directives.Register(new MaxLength());
+        this.RegisterVisitor<MaxLengthDirectiveVisitor>();
     }
 }
