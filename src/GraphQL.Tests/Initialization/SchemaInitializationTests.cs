@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Initialization;
@@ -78,6 +79,12 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     {
         ShouldThrow<SchemaWithEnumWithoutValues1, InvalidOperationException>("An Enum type 'EnumWithoutValues' must define one or more unique enum values.");
         ShouldThrow<SchemaWithEnumWithoutValues2, InvalidOperationException>("An Enum type 'Enumeration' must define one or more unique enum values.");
+    }
+
+    [Fact]
+    public void SchemaWithDirective_Should_Not_Throw()
+    {
+        ShouldNotThrow<SchemaWithDirective>();
     }
 }
 
@@ -309,5 +316,75 @@ public class SchemaWithEnumWithoutValues2 : Schema
     {
         var type = new EnumerationGraphType();
         RegisterType(type);
+    }
+}
+
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3301
+public class SchemaWithDirective : Schema
+{
+    public class MaxLength : Directive
+    {
+        public MaxLength()
+          : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
+        {
+            Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
+            Arguments = new QueryArguments(
+                new QueryArgument<IntGraphType>
+                {
+                    Name = "min",
+                    Description = "If specified, specifies the minimum length that the input field or argument must have."
+                },
+                new QueryArgument<IntGraphType>
+                {
+                    Name = "max",
+                    Description = "If specified, specifies the maximum length that the input field or argument must have."
+                }
+          );
+        }
+    }
+
+    public class MaxLengthDirectiveVisitor : BaseSchemaNodeVisitor
+    {
+        public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
+        {
+            var applied = field.FindAppliedDirective("maxLength");
+            applied.ShouldBeNull();
+        }
+
+        public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
+        {
+            if (field.Name == "count")
+            {
+                var applied = field.FindAppliedDirective("maxLength");
+                applied.ShouldNotBeNull();
+                applied.ArgumentsCount.ShouldBe(2);
+            }
+        }
+    }
+
+    public class BookSummaryCreateArgInputType : InputObjectGraphType<BookSummaryCreateArg>
+    {
+        public BookSummaryCreateArgInputType()
+        {
+            Name = "BookSummaryCreateArg";
+            Field(_ => _.Count).Directive("maxLength", x =>
+                x.AddArgument(new DirectiveArgument("min") { Name = "min", Value = 1 })
+                .AddArgument(new DirectiveArgument("max") { Name = "max", Value = 10 }));
+        }
+    }
+
+    public class BookSummaryCreateArg
+    {
+        public int Count { get; set; }
+    }
+
+    public SchemaWithDirective()
+    {
+        var root = new ObjectGraphType();
+        root.Field<StringGraphType>("field").Argument<BookSummaryCreateArgInputType>("arg");
+        Query = root;
+
+        Directives.Register(new MaxLength());
+        this.RegisterVisitor<MaxLengthDirectiveVisitor>();
     }
 }
