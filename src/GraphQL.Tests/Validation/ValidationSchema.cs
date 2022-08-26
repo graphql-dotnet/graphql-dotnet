@@ -173,6 +173,19 @@ public class ComplexInput : InputObjectGraphType
     }
 }
 
+public class ComplexInput2 : InputObjectGraphType
+{
+    public ComplexInput2()
+    {
+        Name = "ComplexInput2";
+        Field<NonNullGraphType<BooleanGraphType>>("requiredField");
+        Field<IntGraphType>("intField");
+        Field<NonNullGraphType<StringGraphType>>("stringField").Directive("length", "min", 3, "max", 7);
+        Field<BooleanGraphType>("booleanField");
+        Field<ListGraphType<StringGraphType>>("stringListField");
+    }
+}
+
 public class ComplicatedArgs : ObjectGraphType
 {
     public ComplicatedArgs()
@@ -197,6 +210,8 @@ public class ComplicatedArgs : ObjectGraphType
             .Argument<ListGraphType<StringGraphType>>("stringListArg");
         Field<StringGraphType>("complexArgField")
             .Argument<ComplexInput>("complexArg");
+        Field<StringGraphType>("complexArgField2")
+            .Argument<NonNullGraphType<ComplexInput2>>("complexArg");
         Field<StringGraphType>("multipleReqs")
             .Argument<NonNullGraphType<IntGraphType>>("req1")
             .Argument<NonNullGraphType<IntGraphType>>("req2");
@@ -217,6 +232,8 @@ public class ValidationQueryRoot : ObjectGraphType
     {
         Field<Human>("human")
             .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
+        Field<Human>("human2")
+            .Argument<NonNullGraphType<IdGraphType>>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
         Field<Dog>("dog");
         Field<Cat>("cat");
         Field<CatOrDog>("catOrDog");
