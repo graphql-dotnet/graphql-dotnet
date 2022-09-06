@@ -268,21 +268,26 @@ public class BubbleNullSchema : Schema
         var query = new ObjectGraphType();
 
         query.Field<NonNullGraphType<DataGraphType>>("nonNullableDataGraph")
-            .Resolve(c => new DataGraphType { Data = c.Source as Data }
+            .Resolve(c => new DataModel { Data = c.Source as Data }
         );
 
         query.Field<DataGraphType>("nullableDataGraph")
-            .Resolve(c => new DataGraphType { Data = c.Source as Data }
+            .Resolve(c => new DataModel { Data = c.Source as Data }
         );
 
         query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>("nonNullableListOfNonNullableDataGraph")
-            .Resolve(_ => new[] { new DataGraphType() });
+            .Resolve(_ => new[] { new DataModel() });
 
         Query = query;
     }
 }
 
-public class DataGraphType : ObjectGraphType<DataGraphType>
+public class DataModel
+{
+    public Data Data { get; set; }
+}
+
+public class DataGraphType : ObjectGraphType<DataModel>
 {
     public DataGraphType()
     {
@@ -307,13 +312,11 @@ public class DataGraphType : ObjectGraphType<DataGraphType>
             .Resolve(_ => throw new Exception("test"));
 
         Field<NonNullGraphType<DataGraphType>>("nonNullableNest")
-            .Resolve(c => new DataGraphType { Data = c.Source.Data.NonNullableNest });
+            .Resolve(c => new DataModel { Data = c.Source.Data.NonNullableNest });
 
         Field<DataGraphType>("nullableNest")
-            .Resolve(c => new DataGraphType { Data = c.Source.Data.NullableNest });
+            .Resolve(c => new DataModel { Data = c.Source.Data.NullableNest });
     }
-
-    public Data Data { get; set; }
 }
 
 public class Data

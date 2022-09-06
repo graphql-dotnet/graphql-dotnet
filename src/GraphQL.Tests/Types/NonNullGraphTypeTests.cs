@@ -94,15 +94,20 @@ public class NullableSchema : Schema
         var query = new ObjectGraphType();
 
         query.Field<NullableSchemaType>("nullable")
-            .Resolve(c => new NullableSchemaType { Data = c.Source as ExampleContext });
+            .Resolve(c => new DataModel { Data = c.Source as ExampleContext });
         query.Field<NonNullableSchemaType>("nonNullable")
-            .Resolve(c => new NonNullableSchemaType { Data = c.Source as ExampleContext });
+            .Resolve(c => new DataModel { Data = c.Source as ExampleContext });
 
         Query = query;
     }
 }
 
-public class NullableSchemaType : ObjectGraphType<NullableSchemaType>
+public class DataModel
+{
+    public ExampleContext Data { get; set; }
+}
+
+public class NullableSchemaType : ObjectGraphType<DataModel>
 {
     public NullableSchemaType()
     {
@@ -110,11 +115,9 @@ public class NullableSchemaType : ObjectGraphType<NullableSchemaType>
         Field<BooleanGraphType>("b").Resolve(_ => _.Source.Data.B);
         Field<StringGraphType>("c").Resolve(_ => _.Source.Data.C);
     }
-
-    public ExampleContext Data { get; set; }
 }
 
-public class NonNullableSchemaType : ObjectGraphType<NonNullableSchemaType>
+public class NonNullableSchemaType : ObjectGraphType<DataModel>
 {
     public NonNullableSchemaType()
     {
@@ -122,6 +125,4 @@ public class NonNullableSchemaType : ObjectGraphType<NonNullableSchemaType>
         Field<NonNullGraphType<BooleanGraphType>>("b").Resolve(_ => _.Source.Data.B);
         Field<NonNullGraphType<StringGraphType>>("c").Resolve(_ => _.Source.Data.C);
     }
-
-    public ExampleContext Data { get; set; }
 }
