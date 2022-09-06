@@ -17,9 +17,6 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         protected ComplexGraphType()
         {
-            if (typeof(IGraphType).IsAssignableFrom(typeof(TSourceType)))
-                throw new InvalidOperationException($"Cannot use graph type '{typeof(TSourceType).Name}' as a model for graph type '{GetType().Name}'. Please use a model rather than a graph type for {nameof(TSourceType)}.");
-
             Description ??= typeof(TSourceType).Description();
             DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }

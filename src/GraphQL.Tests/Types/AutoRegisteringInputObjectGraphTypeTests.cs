@@ -309,6 +309,16 @@ public class AutoRegisteringInputObjectGraphTypeTests
         fieldTests.FieldWithInitSetter.ShouldBe("hello");
     }
 
+    [Fact]
+    public void CannotUseGraphTypeAsModel()
+    {
+        Should.Throw<InvalidOperationException>(() => new Graph2())
+            .Message.ShouldBe("Cannot use graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
+    }
+
+    private class Graph1 : InputObjectGraphType { }
+    private class Graph2 : AutoRegisteringInputObjectGraphType<Graph1> { }
+
     private class FieldTests
     {
         [Name("Test1")]

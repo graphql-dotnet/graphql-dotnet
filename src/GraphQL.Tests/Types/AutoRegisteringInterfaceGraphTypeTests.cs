@@ -593,6 +593,16 @@ public class AutoRegisteringInterfaceGraphTypeTests
         actual.ShouldBeCrossPlatJson(expected);
     }
 
+    [Fact]
+    public void CannotUseGraphTypeAsModel()
+    {
+        Should.Throw<InvalidOperationException>(() => new Graph2())
+            .Message.ShouldBe("Cannot use graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
+    }
+
+    private class Graph1 : ObjectGraphType { }
+    private class Graph2 : AutoRegisteringInterfaceGraphType<Graph1> { }
+
     public class TestQuery
     {
         public static IAnimal Find(AnimalType type) => type switch
