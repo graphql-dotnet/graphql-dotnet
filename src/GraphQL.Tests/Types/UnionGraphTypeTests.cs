@@ -72,4 +72,20 @@ public class UnionGraphTypeTests
         var str1 = await schema.ExecuteAsync(o => o.Query = "{ union1 { ...frag } union2 { ...frag } } fragment frag on UnionType { ... on Type1 { field1 } ... on Type2 { field2 } }").ConfigureAwait(false);
         str1.ShouldBeCrossPlatJson(@"{""data"":{""union1"":{""field1"":1},""union2"":{""field2"":2}}}");
     }
+
+    [Fact]
+    public void invalid_type_reference_throws()
+    {
+        var queryType = new ObjectGraphType { Name = "Query" };
+        var unionType = new UnionGraphType
+        {
+            Name = "UnionType",
+            Types = new[] { typeof(GraphQLClrOutputTypeReference<Model1>) }
+        };
+        queryType.Field("union1", unionType, resolve: _ => new Model1());
+
+        var schema = new Schema() { Query = queryType };
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("The GraphQL type 'GraphQLClrOutputTypeReference<Model1>' for union graph type 'UnionType' could not be derived implicitly. Could not find type mapping from CLR type 'GraphQL.Tests.Types.UnionGraphTypeTests+Model1' to GraphType. Did you forget to register the type mapping with the 'ISchema.RegisterTypeMapping'?");
+    }
 }
