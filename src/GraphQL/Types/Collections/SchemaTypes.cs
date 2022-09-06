@@ -474,7 +474,12 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
-                    var objType = AddTypeIfNotRegistered(unionedType, context) as IObjectGraphType;
+                    object typeOrError = RebuildType(unionedType, false, context.ClrToGraphTypeMappings);
+                    if (typeOrError is string error)
+                        throw new InvalidOperationException($"The GraphQL implemented type '{unionedType.Name}' for union graph type '{type.Name}' could not be derived implicitly. " + error);
+                    var unionedType2 = (Type)typeOrError;
+                    if (AddTypeIfNotRegistered(unionedType2, context) is not IObjectGraphType objType)
+                        throw new InvalidOperationException($"The GraphQL implemented type '{unionedType.Name}' for union graph type '{type.Name}' could not be derived implicitly. The resolved type is not an {nameof(IObjectGraphType)}.");
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {

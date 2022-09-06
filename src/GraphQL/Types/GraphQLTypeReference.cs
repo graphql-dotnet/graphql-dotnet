@@ -57,12 +57,19 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Output type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType
+    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType, IObjectGraphType
     {
-        internal GraphQLClrOutputTypeReference()
+        private GraphQLClrOutputTypeReference()
         {
-            throw new InvalidOperationException("Not for creation. Marker only.");
         }
+
+        Func<object, bool>? IObjectGraphType.IsTypeOf { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        Interfaces IImplementInterfaces.Interfaces => throw new NotImplementedException();
+
+        ResolvedInterfaces IImplementInterfaces.ResolvedInterfaces => throw new NotImplementedException();
+
+        void IObjectGraphType.AddResolvedInterface(IInterfaceGraphType graphType) => throw new NotImplementedException();
     }
 
     /// <summary>
@@ -71,9 +78,8 @@ namespace GraphQL.Types
     /// </summary>
     public sealed class GraphQLClrInputTypeReference<T> : InputObjectGraphType
     {
-        internal GraphQLClrInputTypeReference()
+        private GraphQLClrInputTypeReference()
         {
-            throw new InvalidOperationException("Not for creation. Marker only.");
         }
     }
 }
