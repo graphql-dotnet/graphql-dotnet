@@ -557,9 +557,9 @@ public class ComplexGraphTypeTests
     public void cannot_use_graphtype_as_model()
     {
         Should.Throw<InvalidOperationException>(() => new Graph2())
-            .Message.ShouldBe("Cannot use a graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
+            .Message.ShouldBe("Cannot use graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
         Should.Throw<InvalidOperationException>(() => new Graph4())
-            .Message.ShouldBe("Cannot use a graph type 'Graph3' as a model for graph type 'Graph4'. Please use a model rather than a graph type for TSourceType.");
+            .Message.ShouldBe("Cannot use graph type 'Graph3' as a model for graph type 'Graph4'. Please use a model rather than a graph type for TSourceType.");
     }
 
     private class Graph1 : ObjectGraphType { }
