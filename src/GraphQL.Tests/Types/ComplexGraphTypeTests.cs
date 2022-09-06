@@ -552,4 +552,18 @@ public class ComplexGraphTypeTests
         type.Field<IEnumerable<string>>("field13").Resolve(_ => Array.Empty<string>());
         type.Fields.Find("field13").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
     }
+
+    [Fact]
+    public void cannot_use_graphtype_as_model()
+    {
+        Should.Throw<InvalidOperationException>(() => new Graph2())
+            .Message.ShouldBe("Cannot use a graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph4())
+            .Message.ShouldBe("Cannot use a graph type 'Graph3' as a model for graph type 'Graph4'. Please use a model rather than a graph type for TSourceType.");
+    }
+
+    private class Graph1 : ObjectGraphType { }
+    private class Graph2 : ObjectGraphType<Graph1> { }
+    private class Graph3 : InputObjectGraphType { }
+    private class Graph4 : InputObjectGraphType<Graph3> { }
 }
