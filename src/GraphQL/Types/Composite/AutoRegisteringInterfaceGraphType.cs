@@ -25,6 +25,9 @@ public class AutoRegisteringInterfaceGraphType<TSourceType> : InterfaceGraphType
     /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
     public AutoRegisteringInterfaceGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
     {
+        if (typeof(IGraphType).IsAssignableFrom(typeof(TSourceType)))
+            throw new InvalidOperationException($"Cannot use graph type '{typeof(TSourceType).Name}' as a model for graph type '{GetType().Name}'. Please use a model rather than a graph type for {nameof(TSourceType)}.");
+
         _excludedProperties = excludedProperties;
         Name = typeof(TSourceType).GraphQLName();
         ConfigureGraph();
