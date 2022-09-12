@@ -3022,6 +3022,7 @@ namespace GraphQL.Validation
     public readonly struct ValidationOptions
     {
         public ValidationOptions() { }
+        public ValidationOptions(GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules, System.Collections.Generic.IDictionary<string, object?> userContext, GraphQL.Instrumentation.Metrics metrics, GraphQL.Inputs variables, GraphQL.Inputs extensions, GraphQLParser.AST.GraphQLOperationDefinition operation, System.IServiceProvider? requestServices, System.Security.Claims.ClaimsPrincipal? user, System.Threading.CancellationToken cancellationToken) { }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.Inputs Extensions { get; set; }

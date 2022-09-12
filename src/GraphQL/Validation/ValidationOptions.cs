@@ -18,6 +18,36 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
+        /// Creates a default instance of <see cref="ValidationOptions"/> with the specified options.
+        /// </summary>
+        public ValidationOptions(
+            ISchema schema,
+            GraphQLDocument document,
+            IEnumerable<IValidationRule>? rules,
+            IDictionary<string, object?> userContext,
+            Metrics metrics,
+            Inputs variables,
+            Inputs extensions,
+            GraphQLOperationDefinition operation,
+            IServiceProvider? requestServices,
+            ClaimsPrincipal? user,
+            CancellationToken cancellationToken)
+        {
+            // this constructor is required for C# 8.0 and prior consumers, as they cannot write to init-only properties
+            Schema = schema;
+            Document = document;
+            Rules = rules;
+            UserContext = userContext;
+            Metrics = metrics;
+            Variables = variables;
+            Extensions = extensions;
+            Operation = operation;
+            RequestServices = requestServices;
+            User = user;
+            CancellationToken = cancellationToken;
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="ISchema"/> to validate the <see cref="GraphQLDocument"/> against.
         /// </summary>
         public ISchema Schema { get; init; } = null!;
