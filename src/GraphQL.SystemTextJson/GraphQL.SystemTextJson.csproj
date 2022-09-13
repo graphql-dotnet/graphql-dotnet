@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
+    <PackageReference Include="System.Text.Json" Version="6.0.6" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
 </Project>
