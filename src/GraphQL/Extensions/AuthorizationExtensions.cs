@@ -236,6 +236,22 @@ namespace GraphQL
             return builder;
         }
 
+        /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
+        public static FieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder)
+        {
+            builder.FieldType.Authorize();
+            return builder;
+        }
+
+        /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
+        public static FieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
+            this FieldBuilder<TSourceType, TReturnType> builder)
+        {
+            builder.FieldType.AllowAnonymous();
+            return builder;
+        }
+
         /// <summary>
         /// Adds authorization policy to the specified connection builder. If the underlying field already
         /// contains a policy with the same name, then it will not be added twice.
@@ -277,6 +293,62 @@ namespace GraphQL
             this ConnectionBuilder<TSourceType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
+            return builder;
+        }
+
+        /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
+        public static ConnectionBuilder<TSourceType> Authorize<TSourceType>(
+            this ConnectionBuilder<TSourceType> builder)
+        {
+            builder.FieldType.Authorize();
+            return builder;
+        }
+
+        /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
+        public static ConnectionBuilder<TSourceType> AllowAnonymous<TSourceType>(
+            this ConnectionBuilder<TSourceType> builder)
+        {
+            builder.FieldType.AllowAnonymous();
+            return builder;
+        }
+
+        /// <inheritdoc cref="AuthorizeWithPolicy{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
+            this ConnectionBuilder<TSourceType, TReturnType> builder, string policy)
+        {
+            builder.FieldType.AuthorizeWithPolicy(policy);
+            return builder;
+        }
+
+        /// <inheritdoc cref="AuthorizeWithRoles{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+            this ConnectionBuilder<TSourceType, TReturnType> builder, string roles)
+        {
+            builder.FieldType.AuthorizeWithRoles(roles);
+            return builder;
+        }
+
+        /// <inheritdoc cref="AuthorizeWithRoles{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+            this ConnectionBuilder<TSourceType, TReturnType> builder, params string[] roles)
+        {
+            builder.FieldType.AuthorizeWithRoles(roles);
+            return builder;
+        }
+
+        /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
+        public static ConnectionBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
+            this ConnectionBuilder<TSourceType, TReturnType> builder)
+        {
+            builder.FieldType.Authorize();
+            return builder;
+        }
+
+        /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
+        public static ConnectionBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
+            this ConnectionBuilder<TSourceType, TReturnType> builder)
+        {
+            builder.FieldType.AllowAnonymous();
             return builder;
         }
     }
