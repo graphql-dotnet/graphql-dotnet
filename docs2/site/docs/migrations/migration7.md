@@ -555,3 +555,17 @@ services.AddGraphQL(b => b
     // other calls
 );
 ```
+
+### 14. Graph types cannot be used as data models
+
+From version 7.1 on, graph types cannot be used as data models. This is because the graph types are
+designed to be used as schema definitions, and not as a data model. The following classes
+will now throw an exception if a graph type is used as a data model:
+
+- `ObjectGraphType<TSourceType>`
+- `InputObjectGraphType<TSourceType>`
+- `AutoRegisteringObjectGraphType<TSourceType>`
+- `AutoRegisteringInputObjectGraphType<TSourceType>`
+
+If it is necessary to do so, you can derive from the `ObjectGraphType` or `InputObjectGraphType` classes
+instead of the generic version.
