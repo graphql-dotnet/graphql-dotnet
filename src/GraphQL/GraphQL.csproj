@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net7;net6</TargetFrameworks>
     <Description>GraphQL for .NET</Description>
     <Authors>Joe McBride</Authors>
     <Copyright>Copyright (c) 2015-2021 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>

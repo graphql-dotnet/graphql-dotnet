@@ -16,10 +16,11 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v3
 
-    - name: Setup .NET Core SDK
+    - name: Setup .NET 7.0 SDK
       uses: actions/setup-dotnet@v2
       with:
-         dotnet-version: '6.0.102'
+         dotnet-version: '7.0.x'
+         include-prerelease: true
          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
       env:
          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

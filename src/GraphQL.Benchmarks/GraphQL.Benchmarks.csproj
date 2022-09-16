@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7;net6;net5;netcoreapp3.1</TargetFrameworks>
     <OutputType>exe</OutputType>
     <IsPackable>false</IsPackable>
   </PropertyGroup>

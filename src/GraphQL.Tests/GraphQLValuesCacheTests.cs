@@ -13,7 +13,13 @@ public class GraphQLValuesCacheTests
         GraphQLValuesCache.GetInt("-1000000").ShouldBe(-1000000);
         GraphQLValuesCache.GetInt("1000000").ShouldBe(1000000);
 
-        Should.Throw<FormatException>(() => GraphQLValuesCache.GetInt("a")).Message.ShouldBe("Input string was not in a correct format.");
+#if NET7_0_OR_GREATER
+        var expectedMessage = "The input string 'a' was not in a correct format.";
+#else
+        var expectedMessage = "Input string was not in a correct format.";
+#endif
+
+        Should.Throw<FormatException>(() => GraphQLValuesCache.GetInt("a")).Message.ShouldBe(expectedMessage);
     }
 
     [Fact]
@@ -25,6 +31,12 @@ public class GraphQLValuesCacheTests
         GraphQLValuesCache.GetLong("-1000000").ShouldBe(-1000000L);
         GraphQLValuesCache.GetLong("1000000").ShouldBe(1000000L);
 
-        Should.Throw<FormatException>(() => GraphQLValuesCache.GetLong("a")).Message.ShouldBe("Input string was not in a correct format.");
+#if NET7_0_OR_GREATER
+        var expectedMessage = "The input string 'a' was not in a correct format.";
+#else
+        var expectedMessage = "Input string was not in a correct format.";
+#endif
+
+        Should.Throw<FormatException>(() => GraphQLValuesCache.GetLong("a")).Message.ShouldBe(expectedMessage);
     }
 }

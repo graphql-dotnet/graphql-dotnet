@@ -68,23 +68,28 @@ query {
     public void serialization_should_have_correct_case(IGraphQLTextSerializer writer)
     {
         var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
-        var expected = @"{
+#if NET7_0_OR_GREATER
+        var expectedEndTime = "2019-12-05T15:38:00.1025Z";
+#else
+        var expectedEndTime = "2019-12-05T15:38:00.103Z";
+#endif
+        var expected = @$"{{
   ""version"": 1,
   ""startTime"": ""2019-12-05T15:38:00Z"",
-  ""endTime"": ""2019-12-05T15:38:00.103Z"",
+  ""endTime"": ""{expectedEndTime}"",
   ""duration"": 102500000,
-  ""parsing"": {
+  ""parsing"": {{
     ""startOffset"": 0,
     ""duration"": 0
-  },
-  ""validation"": {
+  }},
+  ""validation"": {{
     ""startOffset"": 0,
     ""duration"": 0
-  },
-  ""execution"": {
+  }},
+  ""execution"": {{
     ""resolvers"": []
-  }
-}";
+  }}
+}}";
 
         var result = writer.Serialize(trace);
 

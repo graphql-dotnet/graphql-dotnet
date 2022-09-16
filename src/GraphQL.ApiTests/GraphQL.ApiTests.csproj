@@ -2,7 +2,7 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
