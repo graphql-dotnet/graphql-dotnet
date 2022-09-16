@@ -430,7 +430,7 @@ namespace GraphQL.Types
                 {
                     object typeOrError = RebuildType(objectInterface, false, context.ClrToGraphTypeMappings);
                     if (typeOrError is string error)
-                        throw new InvalidOperationException($"The GraphQL implemented type '{objectInterface.Name}' for object graph type '{type.Name}' could not be derived implicitly. " + error);
+                        throw new InvalidOperationException($"The GraphQL implemented type '{objectInterface.GetFriendlyName()}' for object graph type '{type.Name}' could not be derived implicitly. " + error);
                     var objectInterface2 = (Type)typeOrError;
                     if (AddTypeIfNotRegistered(objectInterface2, context) is IInterfaceGraphType interfaceInstance)
                     {
@@ -474,7 +474,12 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
-                    var objType = AddTypeIfNotRegistered(unionedType, context) as IObjectGraphType;
+                    object typeOrError = RebuildType(unionedType, false, context.ClrToGraphTypeMappings);
+                    if (typeOrError is string error)
+                        throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. " + error);
+                    var unionedType2 = (Type)typeOrError;
+                    if (AddTypeIfNotRegistered(unionedType2, context) is not IObjectGraphType objType)
+                        throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. The resolved type is not an {nameof(IObjectGraphType)}.");
 
                     if (union.ResolveType == null && objType != null && objType.IsTypeOf == null)
                     {
