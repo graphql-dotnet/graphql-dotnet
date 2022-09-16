@@ -29,29 +29,13 @@ public class AuthorizeAttribute : GraphQLAttribute
     /// <summary>
     /// The name of policy to apply.
     /// </summary>
-    public string? Policy
-    {
-        get;
-#if NET5_0_OR_GREATER
-        init;
-#else
-        set;
-#endif
-    }
+    public string? Policy { get; set; }
 
     /// <summary>
     /// A comma-separated list of the roles to apply.
     /// Role names will be trimmed before adding.
     /// </summary>
-    public string? Roles
-    {
-        get;
-#if NET5_0_OR_GREATER
-        init;
-#else
-        set;
-#endif
-    }
+    public string? Roles { get; set; }
 
     /// <inheritdoc />
     public override void Modify(TypeConfig type)
