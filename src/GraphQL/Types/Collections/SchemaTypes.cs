@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
+using System.Text;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -646,10 +647,61 @@ Make sure that your ServiceProvider is configured correctly.");
             var (namedType, namedType2) = type.GetNamedTypes();
             namedType ??= context.ResolveType(namedType2!);
 
-            var foundType = this[namedType.Name];
-            if (foundType == null)
+            var existingType = this[namedType.Name];
+            if (existingType is null)
             {
                 AddType(namedType, context);
+            }
+            else
+            {
+                EnsureTypeEquality(existingType, namedType);
+            }
+        }
+
+        private void EnsureTypeEquality(IGraphType existingType, IGraphType newType)
+        {
+            if (ReferenceEquals(existingType, newType))
+            {
+                return;
+            }
+
+            if (existingType.GetType() != newType.GetType())
+            {
+                throw new InvalidOperationException($"Type '{existingType.GetType().Name}' is already registered but being re-registered using different type '{newType.GetType().Name}'");
+            }
+
+            // Ignore scalars
+            if (existingType is not IObjectGraphType objectKnownType || newType is not IObjectGraphType objectNewType)
+            {
+                return;
+            }
+
+            var knownFields = new HashSet<string>(objectKnownType.Fields.Select(x => x.Name));
+            var newFields = new HashSet<string>(objectNewType.Fields.Select(x => x.Name));
+
+            if (knownFields.Count != newFields.Count)
+            {
+                throw new InvalidOperationException($"Type '{existingType.GetType().Name}' has '{knownFields.Count}' field(s), where new type has '{newFields.Count}' field(s). Make sure to use the same type instances when registering the same type");
+            }
+
+            foreach (var knownTypeField in objectKnownType.Fields)
+            {
+                var newTypeField = objectNewType.Fields.FirstOrDefault(x => string.Equals(knownTypeField.Name, x.Name));
+                if (newTypeField is null)
+                {
+                    var exceptionStringBuilder = new StringBuilder($"Type '{existingType.GetType().Name}' has field '{knownTypeField.Name}', but this cannot be found on the new type. New type has:");
+                    exceptionStringBuilder.AppendLine();
+
+                    foreach (var newField in objectNewType.Fields)
+                    {
+                        exceptionStringBuilder.AppendLine($"- {newField.Name}");
+                    }
+
+                    exceptionStringBuilder.AppendLine();
+                    exceptionStringBuilder.Append("Make sure to use the same type instances when registering the same type");
+
+                    throw new InvalidOperationException(exceptionStringBuilder.ToString());
+                }
             }
         }
 

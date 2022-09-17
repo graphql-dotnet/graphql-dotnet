@@ -7,7 +7,7 @@ using Moq;
 
 namespace GraphQL.Tests.Types.Collections;
 
-public class SchemaTypesTests
+public partial class SchemaTypesTests
 {
     [Fact]
     public void does_not_request_instance_more_than_once()
