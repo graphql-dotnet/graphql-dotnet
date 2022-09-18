@@ -672,7 +672,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
             if (existingType.GetType() != newType.GetType())
             {
-                throw new InvalidOperationException($@"Unable to register GraphType '{newType.GetType().FullName}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().FullName}'. Check your schema configuration.");
+                throw new InvalidOperationException($@"Unable to register GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().GetFriendlyName()}'. Check your schema configuration.");
             }
 
             // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
@@ -885,7 +885,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else
                 {
                     // Fatal schema configuration error.
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'. The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetFriendlyName()}' with the name '{typeName}'. The name '{typeName}' is already registered to '{existingGraphType.GetType().GetFriendlyName()}'. Check your schema configuration.");
                 }
             }
             else
