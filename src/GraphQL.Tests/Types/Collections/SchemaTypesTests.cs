@@ -83,7 +83,8 @@ public class SchemaTypesTests
         queryGraphType.Field("second", graphType2);
 
         // Test
-        Assert.Throws<InvalidOperationException>(() => schema.Initialize());
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("A different instance of the type 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
     }
 
     [Fact]
