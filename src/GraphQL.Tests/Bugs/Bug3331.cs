@@ -2,50 +2,10 @@ using GraphQL.Conversion;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 
-namespace GraphQL.Tests.Types.Collections;
+namespace GraphQL.Tests.Bugs;
 
-public partial class SchemaTypesTests
+public class Bug3331
 {
-    [Fact]
-    public void throws_exception_when_multiple_type_instances_exists_simple()
-    {
-        var schema = new Schema
-        {
-            NameConverter = new CamelCaseNameConverter()
-        };
-
-        var queryGraphType = new ObjectGraphType
-        {
-            Name = "Query"
-        };
-
-        schema.RegisterType(queryGraphType);
-
-        // Object 1
-        var graphType1 = new ObjectGraphType
-        {
-            Name = "MyObject"
-        };
-
-        graphType1.Field<IntGraphType>("int");
-
-        queryGraphType.Field("first", graphType1);
-
-        // Object 2
-        var graphType2 = new ObjectGraphType
-        {
-            Name = "MyObject"
-        };
-
-        graphType2.Field<IntGraphType>("int");
-        graphType2.Field<StringGraphType>("string");
-
-        queryGraphType.Field("second", graphType2);
-
-        // Test
-        Assert.Throws<InvalidOperationException>(() => schema.Initialize());
-    }
-
     [Fact]
     public void throws_exception_when_multiple_type_instances_exists_complex()
     {
