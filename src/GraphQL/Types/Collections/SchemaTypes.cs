@@ -189,7 +189,7 @@ namespace GraphQL.Types
                 {
                     if (this[name] == null)
                     {
-                        AddType(graphType, context);
+                        AddTypeIfNotRegistered(graphType, context);
                     }
                 },
                 graphTypeMappings,
@@ -603,7 +603,7 @@ Make sure that your ServiceProvider is configured correctly.");
             context.InFlightRegisteredTypes.Push(namedType);
             try
             {
-                AddType(resolvedType, context);
+                AddTypeIfNotRegistered(resolvedType, context);
             }
             finally
             {
@@ -664,15 +664,15 @@ Make sure that your ServiceProvider is configured correctly.");
                 return;
             }
 
-            if (existingType.GetType() != newType.GetType())
-            {
-                throw new InvalidOperationException($"Type '{existingType.GetType().Name}' is already registered but being re-registered using different type '{newType.GetType().Name}'");
-            }
-
             // Ignore scalars
             if (existingType is ScalarGraphType && newType is ScalarGraphType)
             {
                 return;
+            }
+
+            if (existingType.GetType() != newType.GetType())
+            {
+                throw new InvalidOperationException($@"Unable to register GraphType '{newType.GetType().FullName}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().FullName}'. Check your schema configuration.");
             }
 
             // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
