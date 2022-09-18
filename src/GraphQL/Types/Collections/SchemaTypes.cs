@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
-using System.Text;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -671,38 +670,13 @@ Make sure that your ServiceProvider is configured correctly.");
             }
 
             // Ignore scalars
-            if (existingType is not IObjectGraphType objectKnownType || newType is not IObjectGraphType objectNewType)
+            if (existingType is ScalarGraphType && newType is ScalarGraphType)
             {
                 return;
             }
 
-            var knownFields = new HashSet<string>(objectKnownType.Fields.Select(x => x.Name));
-            var newFields = new HashSet<string>(objectNewType.Fields.Select(x => x.Name));
-
-            if (knownFields.Count != newFields.Count)
-            {
-                throw new InvalidOperationException($"Type '{existingType.GetType().Name}' has '{knownFields.Count}' field(s), where new type has '{newFields.Count}' field(s). Make sure to use the same type instances when registering the same type");
-            }
-
-            foreach (var knownTypeField in objectKnownType.Fields)
-            {
-                var newTypeField = objectNewType.Fields.FirstOrDefault(x => string.Equals(knownTypeField.Name, x.Name));
-                if (newTypeField is null)
-                {
-                    var exceptionStringBuilder = new StringBuilder($"Type '{existingType.GetType().Name}' has field '{knownTypeField.Name}', but this cannot be found on the new type. New type has:");
-                    exceptionStringBuilder.AppendLine();
-
-                    foreach (var newField in objectNewType.Fields)
-                    {
-                        exceptionStringBuilder.AppendLine($"- {newField.Name}");
-                    }
-
-                    exceptionStringBuilder.AppendLine();
-                    exceptionStringBuilder.Append("Make sure to use the same type instances when registering the same type");
-
-                    throw new InvalidOperationException(exceptionStringBuilder.ToString());
-                }
-            }
+            // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
+            throw new InvalidOperationException($"A different instance of the type '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
         }
 
         private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
