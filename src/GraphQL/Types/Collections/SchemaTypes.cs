@@ -189,7 +189,7 @@ namespace GraphQL.Types
                 {
                     if (this[name] == null)
                     {
-                        AddTypeIfNotRegistered(graphType, context);
+                        AddType(graphType, context);
                     }
                 },
                 graphTypeMappings,
@@ -603,7 +603,7 @@ Make sure that your ServiceProvider is configured correctly.");
             context.InFlightRegisteredTypes.Push(namedType);
             try
             {
-                AddTypeIfNotRegistered(resolvedType, context);
+                AddType(resolvedType, context);
             }
             finally
             {
