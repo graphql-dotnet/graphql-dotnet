@@ -34,7 +34,7 @@ namespace GraphQL.Types
         /// Indicates whether there is meta information with the given key.
         /// </summary>
         /// <param name="key"> String key. </param>
-        /// <returns> <c>true</c> if value for such key exists, otherwise <c>false</c>. </returns>
+        /// <returns> <see langword="true"/> if value for such key exists, otherwise <see langword="false"/>. </returns>
         bool HasMetadata(string key);
     }
 }

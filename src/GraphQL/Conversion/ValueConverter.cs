@@ -165,7 +165,10 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// <para>If a conversion delegate was registered, converts an object to the specified type and returns <c>true</c>; returns <c>false</c> if no conversion delegate is registered.</para>
+        /// <para>
+        /// If a conversion delegate was registered, converts an object to the specified type and
+        /// returns <see langword="true"/>; returns <see langword="false"/> if no conversion delegate is registered.
+        /// </para>
         /// <para>Conversion delegates may throw exceptions if the conversion was unsuccessful</para>
         /// </summary>
         internal static bool TryConvertTo(object? value, Type targetType, out object? result, Type? sourceType = null)
@@ -203,7 +206,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="valueType">Type of original value.</param>
         /// <param name="targetType">Converted value type.</param>
-        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
         public static void Register(Type valueType, Type targetType, Func<object, object>? conversion)
         {
             if (!_valueConversions.TryGetValue(valueType, out var conversions) &&
@@ -223,7 +226,7 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TSource">Type of original value.</typeparam>
         /// <typeparam name="TTarget">Converted value type.</typeparam>
-        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
         public static void Register<TSource, TTarget>(Func<TSource, TTarget>? conversion)
             => Register(typeof(TSource), typeof(TTarget), conversion == null ? null : v => conversion((TSource)v)!);
 
@@ -236,7 +239,7 @@ namespace GraphQL
         /// If the conversion from dictionary to TTarget is already registered, then it will be overwritten.
         /// </summary>
         /// <typeparam name="TTarget">Converted value type.</typeparam>
-        /// <param name="conversion">Conversion delegate; <c>null</c> for unregister already registered conversion.</param>
+        /// <param name="conversion">Conversion delegate; <see langword="null"/> for unregister already registered conversion.</param>
         public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
             where TTarget : class
             => Register<IDictionary<string, object>, TTarget>(conversion);

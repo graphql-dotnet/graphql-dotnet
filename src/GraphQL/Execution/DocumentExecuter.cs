@@ -268,7 +268,7 @@ namespace GraphQL
         /// <summary>
         /// Returns the selected <see cref="GraphQLOperationDefinition"/> given a specified <see cref="GraphQLDocument"/> and operation name.
         /// <br/><br/>
-        /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
+        /// Returns <see langword="null"/> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
         protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)

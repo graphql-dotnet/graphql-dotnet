@@ -112,7 +112,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
-        /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
+        /// <returns>Value, if any exists on the specified path, otherwise <see langword="null"/>.</returns>
         public static object? GetOutputExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)

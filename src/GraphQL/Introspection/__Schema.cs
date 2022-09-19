@@ -3,12 +3,12 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__Schema</c> introspection type allows querying the schema for available types and directives.
+    /// The <see cref="__Schema"/> introspection type allows querying the schema for available types and directives.
     /// </summary>
     public class __Schema : ObjectGraphType<ISchema>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__Schema</c> introspection type.
+        /// Initializes a new instance of the <see cref="__Schema"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Schema(bool allowAppliedDirectives = false)

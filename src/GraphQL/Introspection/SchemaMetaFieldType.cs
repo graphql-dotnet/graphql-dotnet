@@ -4,7 +4,8 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__schema</c> meta-field is available on the root of a query operation and returns a <c>__Schema</c> graph type for the schema.
+    /// The <c>__schema</c> meta-field is available on the root of a query operation and
+    /// returns a <see cref="__Schema"/> graph type for the schema.
     /// </summary>
     public class SchemaMetaFieldType : FieldType
     {

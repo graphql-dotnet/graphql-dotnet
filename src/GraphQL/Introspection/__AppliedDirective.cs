@@ -3,7 +3,8 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__AppliedDirective</c> introspection type represents a directive applied to a schema element - type, field, argument, etc.
+    /// The <see cref="__AppliedDirective"/> introspection type represents
+    /// a directive applied to a schema element - type, field, argument, etc.
     /// </summary>
     public class __AppliedDirective : ObjectGraphType<AppliedDirective>
     {
