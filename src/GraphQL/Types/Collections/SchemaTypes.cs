@@ -144,7 +144,7 @@ namespace GraphQL.Types
                 throw new InvalidOperationException("SchemaTypes has already been initialized.");
             _initialized = true;
 
-            var types = GetSchemaTypes(schema, serviceProvider);
+            var (typeInstances, types) = GetSchemaTypes(schema, serviceProvider);
             if (schema.TypeMappings != null)
             {
                 // this code could be moved into Schema
@@ -168,7 +168,7 @@ namespace GraphQL.Types
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
-            foreach (var type in types)
+            foreach (var type in typeInstances)
             {
                 if (type is ScalarGraphType)
                     AddType(type, _context);
@@ -195,10 +195,15 @@ namespace GraphQL.Types
                 graphTypeMappings,
                 schema);
 
-            foreach (var type in types)
+            foreach (var type in typeInstances)
             {
                 if (type is not ScalarGraphType)
                     AddTypeIfNotRegistered(type, ctx);
+            }
+
+            foreach (var type in types)
+            {
+                AddTypeIfNotRegistered(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
@@ -218,7 +223,13 @@ namespace GraphQL.Types
             _typeDictionary = null!; // not needed once initialization is complete
         }
 
-        private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+        private static (IEnumerable<IGraphType>, IEnumerable<Type>) GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+        {
+            return (GetSchemaTypeInstances(schema, serviceProvider),
+                schema.AdditionalTypes.Select(x => x.GetNamedType()).Where(x => !typeof(ScalarGraphType).IsAssignableFrom(x)));
+        }
+
+        private static IEnumerable<IGraphType> GetSchemaTypeInstances(ISchema schema, IServiceProvider serviceProvider)
         {
             // Manually registered AdditionalTypeInstances and AdditionalTypes should be handled first.
             // This is necessary for the correct processing of overridden built-in scalars.
