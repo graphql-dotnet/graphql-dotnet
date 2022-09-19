@@ -238,7 +238,13 @@ namespace GraphQL.Types
                 yield return instance;
 
             foreach (var type in schema.AdditionalTypes)
-                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
+            {
+                var type2 = type.GetNamedType();
+                if (typeof(ScalarGraphType).IsAssignableFrom(type2))
+                {
+                    yield return (IGraphType)serviceProvider.GetRequiredService(type2);
+                }
+            }
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
