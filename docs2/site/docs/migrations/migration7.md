@@ -572,7 +572,7 @@ instead of the generic version.
 
 ### 15. Different instances of the same graph type cannot be referenced in the same schema
 
-From version 7.1 on, different instances of the same graph type cannot be referenced in the same schema.
+From version 7.2 on, different instances of the same graph type cannot be referenced in the same schema.
 This prevents the situation where some graph types are not initialized and throw errors when used.
 If this is causing a problem (perhaps with graph types that are dynamically generated, for instance),
 create and pull from a dictionary of instantiated types, or use `GraphQLNameReference` to reference
