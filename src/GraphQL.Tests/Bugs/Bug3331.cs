@@ -1,7 +1,6 @@
 using GraphQL.Conversion;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Shouldly;
 
 namespace GraphQL.Tests.Bugs;
 
@@ -30,7 +29,7 @@ public class Bug3331
             .Message.ShouldBe("A different instance of the type 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
 
         // Must have 2 instances
-        Assert.Equal(3, MyObjectGraphType.SharedInstanceCounter);
+        MyObjectGraphType.SharedInstanceCounter.ShouldBe(3);
     }
 
     private static void RegisterGenericQueryGraphTypes(Schema schema, ObjectGraphType queryGraphType,
