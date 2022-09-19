@@ -560,10 +560,19 @@ public class ComplexGraphTypeTests
             .Message.ShouldBe("Cannot use graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
         Should.Throw<InvalidOperationException>(() => new Graph4())
             .Message.ShouldBe("Cannot use graph type 'Graph3' as a model for graph type 'Graph4'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph5())
+          .Message.ShouldBe("Cannot use graph type 'Graph5' as a model for graph type 'Graph5'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph6())
+          .Message.ShouldBe("Cannot use graph type 'Graph6' as a model for graph type 'Graph6'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph7())
+          .Message.ShouldBe("Cannot use graph type 'Graph7' as a model for graph type 'Graph7'. Please use a model rather than a graph type for TSourceType.");
     }
 
     private class Graph1 : ObjectGraphType { }
     private class Graph2 : ObjectGraphType<Graph1> { }
     private class Graph3 : InputObjectGraphType { }
     private class Graph4 : InputObjectGraphType<Graph3> { }
+    private class Graph5 : AutoRegisteringInputObjectGraphType<Graph5> { }
+    private class Graph6 : AutoRegisteringObjectGraphType<Graph6> { }
+    private class Graph7 : AutoRegisteringInterfaceGraphType<Graph7> { }
 }
