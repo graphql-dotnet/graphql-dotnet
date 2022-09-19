@@ -5,7 +5,7 @@ namespace GraphQL.Introspection
 {
     /// <summary>
     /// The <c>__type</c> meta-field is available on the root of a query operation and
-    /// returns a <c>__Type</c> graph type for a specified graph type name.
+    /// returns a <see cref="__Type"/> graph type for a specified graph type name.
     /// </summary>
     public class TypeMetaFieldType : FieldType
     {

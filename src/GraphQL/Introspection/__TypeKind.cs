@@ -8,7 +8,7 @@ namespace GraphQL.Introspection
     public class __TypeKind : EnumerationGraphType<TypeKind>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__TypeKind</c> introspection type.
+        /// Initializes a new instance of the <see cref="__TypeKind"/> introspection type.
         /// </summary>
         public __TypeKind()
         {

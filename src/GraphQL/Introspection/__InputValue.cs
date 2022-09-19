@@ -3,12 +3,12 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__InputValue</c> introspection type represents field and directive arguments as well as the inputFields of an input object.
+    /// The <see cref="__InputValue"/> introspection type represents field and directive arguments as well as the inputFields of an input object.
     /// </summary>
     public class __InputValue : ObjectGraphType<IProvideMetadata> // context.Source either QueryArgument or FieldType
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__InputValue</c> introspection type.
+        /// Initializes a new instance of the <see cref="__InputValue"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __InputValue(bool allowAppliedDirectives = false)

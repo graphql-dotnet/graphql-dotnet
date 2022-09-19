@@ -78,7 +78,7 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <returns> <c>true</c> if any authorization policy is applied, otherwise <c>false</c>. </returns>
+        /// <returns> <see langword="true"/> if any authorization policy is applied, otherwise <see langword="false"/>. </returns>
         public static bool IsAuthorizationRequired(this IProvideMetadata provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
 

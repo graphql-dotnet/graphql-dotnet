@@ -177,7 +177,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="iface">The interface graph type.</param>
         /// <param name="type">The object graph type to verify it against.</param>
-        /// <param name="throwError"> Set to <c>true</c> to generate an error if the type does not match the interface. </param>
+        /// <param name="throwError"> Set to <see langword="true"/> to generate an error if the type does not match the interface. </param>
         public static bool IsValidInterfaceFor(this IInterfaceGraphType iface, IObjectGraphType type, bool throwError = true)
         {
             foreach (var field in iface.Fields)

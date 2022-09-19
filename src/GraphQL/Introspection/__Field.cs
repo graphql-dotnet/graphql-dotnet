@@ -3,12 +3,12 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__Field</c> introspection type represents each field in an Object or Interface type.
+    /// The <see cref="__Field"/> introspection type represents each field in an Object or Interface type.
     /// </summary>
     public class __Field : ObjectGraphType<IFieldType>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__Field</c> introspection type.
+        /// Initializes a new instance of the <see cref="__Field"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Field(bool allowAppliedDirectives = false)
