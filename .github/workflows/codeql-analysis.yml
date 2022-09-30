@@ -17,7 +17,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
          dotnet-version: '6.0.102'
          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
