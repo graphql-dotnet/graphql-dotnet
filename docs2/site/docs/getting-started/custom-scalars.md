@@ -105,17 +105,17 @@ public class Vector3Type : ScalarGraphType
         Name = "Vector3";
     }
 
-    public override object ParseLiteral(GraphQLValue value)
+    public override object? ParseLiteral(GraphQLValue value)
     {
         throw new NotImplementedException();
     }
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
     {
         throw new NotImplementedException();
     }
 
-    public override object Serialize(object value)
+    public override object? Serialize(object? value)
     {
         throw new NotImplementedException();
     }
@@ -160,7 +160,7 @@ when the type does not match.
 ```csharp
 //in Vector3Type
 
-public override object ParseLiteral(GraphQLValue value)
+public override object? ParseLiteral(GraphQLValue value)
 {
     if (value is GraphQLNullValue)
         return null;
@@ -202,7 +202,7 @@ In the sample below, only `null` and `string` types need to be handled.
 ```csharp
 // In Vector3Type
 
-public override object ParseValue(object value)
+public override object? ParseValue(object? value)
 {
     if (value == null)
         return null;
@@ -237,7 +237,7 @@ a string, which matches the expected data type within `ParseValue`.
 ```csharp
 // In Vector3Type
 
-public override object Serialize(object value)
+public override object? Serialize(object? value)
 {
     if (value == null)
         return null;
@@ -338,7 +338,7 @@ And a sample of a response with a vector in a more structured format:
 ```csharp
 // In Vector3Type
 
-public override object ParseLiteral(GraphQLValue value)
+public override object? ParseLiteral(GraphQLValue value)
 {
     if (value is GraphQLNullValue)
         return null;
@@ -366,7 +366,7 @@ public override object ParseLiteral(GraphQLValue value)
 ```csharp
 // In Vector3Type
 
-public override object ParseValue(object value)
+public override object? ParseValue(object? value)
 {
     if (value == null)
         return null;
@@ -413,7 +413,7 @@ public override object ParseValue(object value)
 ```csharp
 // In Vector3Type
 
-public override object Serialize(object value)
+public override object? Serialize(object? value)
 {
     if (value == null)
         return null;
@@ -440,7 +440,7 @@ necessary to override this method.
 ```csharp
 // In Vector3Type
 
-public override GraphQLValue? ToAST(object? value)
+public override GraphQLValue ToAST(object? value)
 {
     if (value == null)
         return new GraphQLNullValue();
@@ -534,21 +534,21 @@ public class DbIdGraphType : ScalarGraphType
         Name = "DbId";
     }
 
-    public override object ParseLiteral(GraphQLValue value) => value switch
+    public override object? ParseLiteral(GraphQLValue value) => value switch
     {
         GraphQLStringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
         GraphQLNullValue _ => 0,
         _ => ThrowLiteralConversionError(value)
     };
 
-    public override object ParseValue(object value) => value switch
+    public override object? ParseValue(object? value) => value switch
     {
         string s => int.TryParse(s, out int i) && i > 0 ? i : throw new FormatException($"'{s}' is not a valid identifier."),
         null => 0,
         _ => ThrowValueConversionError(value)
     };
 
-    public override object Serialize(object value) => value switch
+    public override object? Serialize(object? value) => value switch
     {
         int i => i > 0 ? i.ToString() : i == 0 ? null : ThrowSerializationError(value),
         _ => ThrowSerializationError(value)
@@ -601,7 +601,7 @@ public class MyBooleanGraphType : BooleanGraphType
         Name = "Boolean";
     }
 
-    public override object ParseLiteral(GraphQLValue value) => value switch
+    public override object? ParseLiteral(GraphQLValue value) => value switch
     {
         GraphQLBooleanValue b => b.BoolValue,
         GraphQLIntValue i => ParseValue(ParseDoubleAccordingSpec(i)),
@@ -624,7 +624,7 @@ public class MyBooleanGraphType : BooleanGraphType
         }
     }
 
-    public override object ParseValue(object value) => value switch
+    public override object? ParseValue(object? value) => value switch
     {
         bool _ => value,
         byte b => b != 0,
@@ -644,7 +644,7 @@ public class MyBooleanGraphType : BooleanGraphType
         _ => ThrowValueConversionError(value)
     }
 
-    public override bool CanParseValue(object value)
+    public override bool CanParseValue(object? value)
     {
         try
         {
@@ -657,7 +657,7 @@ public class MyBooleanGraphType : BooleanGraphType
         }
     }
 
-    public override GraphQLValue ToAST(object value) => Serialize(value) switch
+    public override GraphQLValue ToAST(object? value) => Serialize(value) switch
     {
         bool b => new GraphQLBooleanValue(b),
         null => new GraphQLNullValue(),
