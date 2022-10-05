@@ -757,6 +757,7 @@ namespace GraphQL
     {
         public static object? ConvertTo(object? value, System.Type targetType) { }
         public static T? ConvertTo<T>(object? value) { }
+        public static System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
         public static void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget>? conversion)
             where TTarget :  class { }

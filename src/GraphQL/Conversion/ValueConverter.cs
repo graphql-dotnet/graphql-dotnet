@@ -192,7 +192,14 @@ namespace GraphQL
             }
         }
 
-        private static Func<object, object>? GetConversion(Type valueType, Type targetType)
+        /// <summary>
+        /// Returns the conversion delegate registered to convert objects of type <paramref name="valueType"/>
+        /// to type <paramref name="targetType"/>, if any.
+        /// </summary>
+        /// <param name="valueType">Type of original values.</param>
+        /// <param name="targetType">Converted value type.</param>
+        /// <returns>The conversion delegate if it is present, <see langword="null"/> otherwise.</returns>
+        public static Func<object, object>? GetConversion(Type valueType, Type targetType)
         {
             return _valueConversions.TryGetValue(valueType, out var conversions) && conversions.TryGetValue(targetType, out var conversion)
                 ? conversion
