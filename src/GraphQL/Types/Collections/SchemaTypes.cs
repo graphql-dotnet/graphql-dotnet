@@ -88,6 +88,7 @@ namespace GraphQL.Types
             new ULongGraphType(),
             new ByteGraphType(),
             new SByteGraphType(),
+            new VersionGraphType(),
         }
         .ToDictionary(t => t.GetType());
 
