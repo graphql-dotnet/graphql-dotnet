@@ -429,6 +429,24 @@ type Foo {
     }
 
     [Fact]
+    public void prints_string_field_with_list_guid_arg_with_default()
+    {
+        var result = printSingleFieldSchema<StringGraphType>(
+            new QueryArgument[]
+            {
+                new QueryArgument<ListGraphType<GuidGraphType>> { Name = "arg", DefaultValue = new List<Guid>() },
+            });
+
+        const string expected =
+@"scalar Guid
+
+type Query {
+  singleField(arg: [Guid] = []): String
+}";
+        AssertEqual(result, "Query", expected);
+    }
+
+    [Fact]
     public void prints_string_field_with_multiple_args()
     {
         var result = printSingleFieldSchema<StringGraphType>(
