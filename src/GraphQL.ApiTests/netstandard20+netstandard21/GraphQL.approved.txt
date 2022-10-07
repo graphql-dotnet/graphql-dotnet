@@ -1721,6 +1721,11 @@ namespace GraphQL.Types
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
     }
+    public class AsIsCaseAttribute : GraphQL.Types.EnumCaseAttribute
+    {
+        public AsIsCaseAttribute() { }
+        public override string ChangeEnumCase(string val) { }
+    }
     public class AutoRegisteringGraphTypeMappingProvider : GraphQL.Types.IGraphTypeMappingProvider
     {
         public AutoRegisteringGraphTypeMappingProvider() { }

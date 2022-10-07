@@ -206,6 +206,11 @@ public class EnumGraphTypeTests
         e.Values.Count.ShouldBe(2);
         e.Values.FindByValue(PascalCaseEnum.OneOne).Name.ShouldBe("OneOne");
         e.Values.FindByValue(PascalCaseEnum.TwoTwo).Name.ShouldBe("TwoTwo");
+
+        e = new EnumerationGraphType<AsIsCaseEnum>();
+        e.Values.Count.ShouldBe(2);
+        e.Values.FindByValue(AsIsCaseEnum.oneOne).Name.ShouldBe("oneOne");
+        e.Values.FindByValue(AsIsCaseEnum.TwoTwo).Name.ShouldBe("TwoTwo");
     }
 
     [ConstantCase]
@@ -226,6 +231,13 @@ public class EnumGraphTypeTests
     private enum PascalCaseEnum
     {
         OneOne,
+        TwoTwo
+    }
+
+    [AsIsCase]
+    private enum AsIsCaseEnum
+    {
+        oneOne,
         TwoTwo
     }
 
