@@ -218,6 +218,8 @@ namespace GraphQL.Types
 
             ApplyTypeReferences();
 
+            _fieldOwners = BuildFieldOwners(Dictionary);
+
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
 
             _typeDictionary = null!; // not needed once initialization is complete
@@ -290,6 +292,34 @@ namespace GraphQL.Types
                     new __Schema(false)
                 })
             .ToDictionary(t => t.GetType());
+        }
+
+
+        private IReadOnlyDictionary<IFieldType, IComplexGraphType> _fieldOwners;
+
+        /// <summary>
+        /// Looks up the type that owns the specified field.
+        /// </summary>
+        /// <returns>The field's owner type, or null if the owner is not found.</returns>
+        public IComplexGraphType? GetFieldOwner(IFieldType fieldType) =>
+            _fieldOwners.TryGetValue(fieldType, out var fieldOwner) ? fieldOwner : null;
+
+        private static Dictionary<IFieldType, IComplexGraphType> BuildFieldOwners(Dictionary<ROM, IGraphType> allTypes)
+        {
+            var fieldOwners = new Dictionary<IFieldType, IComplexGraphType>();
+
+            foreach (var item in allTypes)
+            {
+                if (item.Value is IComplexGraphType fieldOwner)
+                {
+                    foreach (var field in fieldOwner.Fields)
+                    {
+                        fieldOwners[field] = fieldOwner;
+                    }
+                }
+            }
+
+            return fieldOwners;
         }
 
         /// <summary>

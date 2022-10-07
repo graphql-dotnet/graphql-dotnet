@@ -107,4 +107,49 @@ public class SchemaTypesTests
             Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider, null));
         }
     }
+
+    [Fact]
+    public void can_retrieve_owner_for_field_with_multiple_owners()
+    {
+        var schema = new Schema
+        {
+            NameConverter = new CamelCaseNameConverter()
+        };
+        var field = new FieldType { Name = "field1", Type = typeof(IntGraphType) };
+
+        // Object 1
+        var graphType1 = new ObjectGraphType
+        {
+            Name = "MyObject1"
+        };
+        graphType1.AddField(field);
+        schema.RegisterType(graphType1);
+
+        // Object 2
+        var graphType2 = new ObjectGraphType
+        {
+            Name = "MyObject2"
+        };
+        graphType2.AddField(field);
+        schema.RegisterType(graphType2);
+
+        schema.Initialize();
+
+        var owner = schema.AllTypes.GetFieldOwner(field);
+        owner.ShouldBeOneOf(graphType1, graphType2);
+    }
+
+    [Fact]
+    public void unknown_field_has_no_owner()
+    {
+        var schema = new Schema
+        {
+            NameConverter = new CamelCaseNameConverter()
+        };
+
+        schema.Initialize();
+
+        var owner = schema.AllTypes.GetFieldOwner(new FieldType { Name = "field1", Type = typeof(IntGraphType) });
+        owner.ShouldBeNull();
+    }
 }

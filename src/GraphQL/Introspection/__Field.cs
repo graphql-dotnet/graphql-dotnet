@@ -28,20 +28,14 @@ namespace GraphQL.Introspection
                 // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
                 if (description == null)
                 {
-                    // We have to iterate over all schema types because FieldType has no reference to the GraphType to which it belongs.
-                    foreach (var item in context.Schema.AllTypes.Dictionary)
+                    var fieldOwner = context.Schema.AllTypes.GetFieldOwner(context.Source);
+                    if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
                     {
-                        if (item.Value is IComplexGraphType fieldOwner && fieldOwner.Fields.Contains(context.Source))
+                        foreach (var iface in implementation.ResolvedInterfaces.List)
                         {
-                            if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
-                            {
-                                foreach (var iface in implementation.ResolvedInterfaces.List)
-                                {
-                                    var fieldFromInterface = iface.GetField(context.Source.Name);
-                                    if (fieldFromInterface?.Description != null)
-                                        return fieldFromInterface.Description;
-                                }
-                            }
+                            var fieldFromInterface = iface.GetField(context.Source.Name);
+                            if (fieldFromInterface?.Description != null)
+                                return fieldFromInterface.Description;
                         }
                     }
                 }
