@@ -218,7 +218,8 @@ namespace GraphQL.Types
 
             ApplyTypeReferences();
 
-            _fieldOwners = BuildFieldOwners(Dictionary);
+            // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
+            InheritInterfaceDescriptions();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
 
@@ -292,34 +293,6 @@ namespace GraphQL.Types
                     new __Schema(false)
                 })
             .ToDictionary(t => t.GetType());
-        }
-
-
-        private IReadOnlyDictionary<IFieldType, IComplexGraphType> _fieldOwners;
-
-        /// <summary>
-        /// Looks up the type that owns the specified field.
-        /// </summary>
-        /// <returns>The field's owner type, or null if the owner is not found.</returns>
-        public IComplexGraphType? GetFieldOwner(IFieldType fieldType) =>
-            _fieldOwners.TryGetValue(fieldType, out var fieldOwner) ? fieldOwner : null;
-
-        private static Dictionary<IFieldType, IComplexGraphType> BuildFieldOwners(Dictionary<ROM, IGraphType> allTypes)
-        {
-            var fieldOwners = new Dictionary<IFieldType, IComplexGraphType>();
-
-            foreach (var item in allTypes)
-            {
-                if (item.Value is IComplexGraphType fieldOwner)
-                {
-                    foreach (var field in fieldOwner.Fields)
-                    {
-                        fieldOwners[field] = fieldOwner;
-                    }
-                }
-            }
-
-            return fieldOwners;
         }
 
         /// <summary>
@@ -941,6 +914,28 @@ Make sure that your ServiceProvider is configured correctly.");
                 // if building a schema from code, the .NET types will not be unique, which should be ignored
                 if (!_typeDictionary.ContainsKey(type))
                     _typeDictionary.Add(type, graphType);
+            }
+        }
+
+        private void InheritInterfaceDescriptions()
+        {
+            foreach (var fieldOwner in Dictionary.Values.OfType<IComplexGraphType>())
+            {
+                if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
+                {
+                    foreach (var field in fieldOwner.Fields.Where(field => field.Description == null))
+                    {
+                        foreach (var iface in implementation.ResolvedInterfaces.List)
+                        {
+                            var fieldFromInterface = iface.GetField(field.Name);
+                            if (fieldFromInterface?.Description != null)
+                            {
+                                field.Description = fieldFromInterface.Description;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 

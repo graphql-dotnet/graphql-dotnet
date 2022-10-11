@@ -21,27 +21,7 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source.Name);
 
-            Field<StringGraphType>("description").Resolve(context =>
-            {
-                string description = context.Source.Description;
-
-                // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
-                if (description == null)
-                {
-                    var fieldOwner = context.Schema.AllTypes.GetFieldOwner(context.Source);
-                    if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
-                    {
-                        foreach (var iface in implementation.ResolvedInterfaces.List)
-                        {
-                            var fieldFromInterface = iface.GetField(context.Source.Name);
-                            if (fieldFromInterface?.Description != null)
-                                return fieldFromInterface.Description;
-                        }
-                    }
-                }
-
-                return description;
-            });
+            Field<StringGraphType>("description").Resolve(context => context.Source.Description);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
                 .ResolveAsync(async context =>
