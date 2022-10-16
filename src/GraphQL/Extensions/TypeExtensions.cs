@@ -85,6 +85,9 @@ namespace GraphQL
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
 
+            if (typeName == nameof(GraphType) || typeName == nameof(Type))
+                return typeName;
+
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
             return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
