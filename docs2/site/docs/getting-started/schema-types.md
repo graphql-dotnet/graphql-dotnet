@@ -150,7 +150,7 @@ public class MediaTypeEnum : CamelCaseEnumerationGraphType<MediaTypeViewModel>
 }
 ```
  
-b. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase` or your own).
+b. Mark your .NET enum with one of the `EnumCaseAttribute` descendants (`PascalCase`,  `CamelCase`, `ConstantCase`, `AsIsCase` or your own).
 
 ```csharp
 [CamelCase]
