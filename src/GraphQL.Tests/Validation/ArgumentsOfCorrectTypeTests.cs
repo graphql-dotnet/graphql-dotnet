@@ -809,6 +809,20 @@ public class ArgumentsOfCorrectType_valid_input_object : ValidationTestBase<Argu
     }
 
     [Fact]
+    public void partial_object_required_field_missing()
+    {
+        ShouldFailRule(_ =>
+        {
+            _.Query = @"{
+              complicatedArgs {
+                complexArgField(complexArg: { })
+              }
+            }";
+            Rule.badValue(_, "complexArg", "Boolean", "null", 3, 33, "Missing required field 'requiredField' of type 'Boolean'.");
+        });
+    }
+
+    [Fact]
     public void partial_object_including_required()
     {
         ShouldPassRule(@"{
