@@ -37,7 +37,7 @@ jobs:
           dotnet-version: |
             3.1.x
             5.0.x
-            6.0.402
+            '6.0.402'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
