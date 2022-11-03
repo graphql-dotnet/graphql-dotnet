@@ -16,6 +16,7 @@ public class AllScalarGraphTypeTests
      *    UIntGraphType
      *    LongGraphType
      *    ULongGraphType
+     *    HalfGraphType
      *
      *    BooleanGraphType
      *    FloatGraphType
@@ -45,6 +46,9 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType))]
     [InlineData(typeof(DateGraphType))]
     [InlineData(typeof(DateTimeGraphType))]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType))]
+#endif
 #if NET6_0_OR_GREATER
     [InlineData(typeof(DateOnlyGraphType))]
     [InlineData(typeof(TimeOnlyGraphType))]
@@ -82,6 +86,9 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(ULongGraphType))]
     [InlineData(typeof(BigIntGraphType))]
     [InlineData(typeof(DateGraphType))]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType))]
+#endif
 #if NET6_0_OR_GREATER
     [InlineData(typeof(DateOnlyGraphType))]
     [InlineData(typeof(TimeOnlyGraphType))]
@@ -117,6 +124,9 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType))]
     [InlineData(typeof(FloatGraphType))]
     [InlineData(typeof(DecimalGraphType))]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType))]
+#endif
     public void does_not_coerce_string(Type graphType)
     {
         // if string to coercion were possible, all would pass, as the string is "0"
@@ -155,10 +165,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65504)]
+    [InlineData(typeof(HalfGraphType), 65504)]
+#endif
     public void parseValue_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         var types = new Type[]
@@ -228,10 +247,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65500)]
+    [InlineData(typeof(HalfGraphType), 65500)]
+#endif
     public void parseValue_from_newtonsoft_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
@@ -270,10 +298,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65500)]
+    [InlineData(typeof(HalfGraphType), 65500)]
+#endif
     public void parseValue_from_system_text_json_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         var valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
@@ -311,10 +348,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65504)]
+    [InlineData(typeof(HalfGraphType), 65504)]
+#endif
     public void parseLiteral_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         var valueCasts = new Func<object, GraphQLValue>[]
@@ -370,10 +416,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65504)]
+    [InlineData(typeof(HalfGraphType), 65504)]
+#endif
     public void serialize_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         var types = new Type[]
@@ -440,10 +495,19 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), -1E+25)]
     [InlineData(typeof(BigIntGraphType), 0)]
     [InlineData(typeof(BigIntGraphType), 1E+25)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), -65504)]
+    [InlineData(typeof(HalfGraphType), 65504)]
+#endif
     public void toAST_ok(Type graphType, object value)
     {
         if (graphType == typeof(BigIntGraphType))
             value = new BigInteger(Convert.ToDecimal(value));
+
+#if NET5_0_OR_GREATER
+        if (graphType == typeof(HalfGraphType))
+            value = (Half)Convert.ToDouble(value);
+#endif
 
         var g = Create(graphType);
         var types = new Type[]
@@ -587,6 +651,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(LongGraphType), 1.5)]
     [InlineData(typeof(ULongGraphType), 1.5)]
     [InlineData(typeof(BigIntGraphType), 1.5)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void parseValue_other_fail(Type graphType, object value)
     {
         var g = Create(graphType);
@@ -622,6 +690,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(LongGraphType), 1.5)]
     [InlineData(typeof(ULongGraphType), 1.5)]
     [InlineData(typeof(BigIntGraphType), 1.5)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void parseLiteral_other_fail(Type graphType, object value)
     {
         GraphQLValue astValue = value switch
@@ -667,6 +739,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(LongGraphType), 1.5)]
     [InlineData(typeof(ULongGraphType), 1.5)]
     [InlineData(typeof(BigIntGraphType), 1.5)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void serialize_other_fail(Type graphType, object value)
     {
         var g = Create(graphType);
@@ -689,6 +765,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(UIntGraphType), -1)]
     [InlineData(typeof(UIntGraphType), long.MaxValue)]
     [InlineData(typeof(LongGraphType), ulong.MaxValue)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void parseValue_out_of_range(Type graphType, object value)
     {
         var g = Create(graphType);
@@ -728,6 +808,12 @@ public class AllScalarGraphTypeTests
             {
                 Should.Throw<InvalidOperationException>(() => g.ParseValue(converted));
             }
+#if NET5_0_OR_GREATER
+            else if (graphType == typeof(HalfGraphType))
+            {
+                Should.Throw<InvalidOperationException>(() => g.Serialize(converted));
+            }
+#endif
             else
             {
                 Should.Throw<OverflowException>(() => g.ParseValue(converted));
@@ -752,6 +838,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(UIntGraphType), -1)]
     [InlineData(typeof(UIntGraphType), long.MaxValue)]
     [InlineData(typeof(LongGraphType), ulong.MaxValue)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void parseLiteral_out_of_range(Type graphType, object value)
     {
         var g = Create(graphType);
@@ -778,6 +868,12 @@ public class AllScalarGraphTypeTests
             {
                 Should.Throw<InvalidOperationException>(() => g.ParseLiteral(astValue));
             }
+#if NET5_0_OR_GREATER
+            else if (graphType == typeof(HalfGraphType))
+            {
+                Should.Throw<InvalidOperationException>(() => g.ParseLiteral(astValue));
+            }
+#endif
             else
             {
                 Should.Throw<OverflowException>(() => g.ParseLiteral(astValue));
@@ -802,6 +898,10 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(UIntGraphType), -1)]
     [InlineData(typeof(UIntGraphType), long.MaxValue)]
     [InlineData(typeof(LongGraphType), ulong.MaxValue)]
+#if NET5_0_OR_GREATER
+    [InlineData(typeof(HalfGraphType), 1000000)]
+    [InlineData(typeof(HalfGraphType), -1000000)]
+#endif
     public void serialize_out_of_range(Type graphType, object value)
     {
         var g = Create(graphType);
@@ -841,6 +941,12 @@ public class AllScalarGraphTypeTests
             {
                 Should.Throw<InvalidOperationException>(() => g.Serialize(converted));
             }
+#if NET5_0_OR_GREATER
+            else if (graphType == typeof(HalfGraphType))
+            {
+                Should.Throw<InvalidOperationException>(() => g.Serialize(converted));
+            }
+#endif
             else
             {
                 Should.Throw<OverflowException>(() => g.Serialize(converted));
