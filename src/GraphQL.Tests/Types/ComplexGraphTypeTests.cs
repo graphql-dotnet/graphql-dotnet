@@ -399,7 +399,7 @@ public class ComplexGraphTypeTests
         var schema2 = new Schema() { Query = type };
         Should.Throw<InvalidOperationException>(
             () => schema2.Initialize())
-            .Message.ShouldBe("This graph type 'Query' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            .Message.ShouldBe("This graph type 'ComplexType<String>' with name 'Query' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
     }
 
     [Fact]
