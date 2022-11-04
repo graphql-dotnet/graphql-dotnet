@@ -20,6 +20,7 @@ public class TypeExtensionTests
 
     [Theory]
     [InlineData(typeof(Type), "Type")]
+    [InlineData(typeof(GraphType), "GraphType")]
     [InlineData(typeof(Guid), "Guid")]
     [InlineData(typeof(ScalarGraphType), "Scalar")]
     [InlineData(typeof(NonNullGraphType<ListGraphType<IdGraphType>>), "Id")]
