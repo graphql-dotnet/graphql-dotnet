@@ -33,8 +33,8 @@ public class Issue3370_LiteralObjectsWithNoEntriesDoNotValidate
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>("test")
-                .Arguments(new QueryArgument<NonNullGraphType<TestInputType>> { Name = "input" })
+            Field<TestResponseType, TestResponse>("test")
+                .Argument<NonNullGraphType<TestInputType>, TestInput>("input", null)
                 .Resolve(_ => new TestResponse());
         }
     }
