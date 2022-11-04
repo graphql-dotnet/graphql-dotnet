@@ -456,25 +456,26 @@ namespace GraphQL.Validation
 
                 var fields = inputType.Fields.List;
                 var fieldAsts = objValue.Fields;
-                if (fieldAsts == null)
-                    return null;
 
                 List<string>? errors = null;
 
                 // ensure every provided field is defined
-                foreach (var providedFieldAst in fieldAsts)
+                if (fieldAsts != null)
                 {
-                    var found = fields.Find(x => x.Name == providedFieldAst.Name);
-                    if (found == null)
+                    foreach (var providedFieldAst in fieldAsts)
                     {
-                        (errors ??= new()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
+                        var found = fields.Find(x => x.Name == providedFieldAst.Name);
+                        if (found == null)
+                        {
+                            (errors ??= new()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
+                        }
                     }
                 }
 
                 // ensure every defined field is valid
                 foreach (var field in fields)
                 {
-                    var fieldAst = fieldAsts.Find(x => x.Name == field.Name);
+                    var fieldAst = fieldAsts?.Find(x => x.Name == field.Name);
 
                     if (fieldAst != null)
                     {
