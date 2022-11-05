@@ -34,8 +34,8 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
 
-            FieldAsync<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args",
-                resolve: async context =>
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
+                .ResolveAsync(async context =>
                 {
                     var source = context.Source;
                     if (source.Arguments?.Count > 0)

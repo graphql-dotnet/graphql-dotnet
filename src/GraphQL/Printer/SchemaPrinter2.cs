@@ -45,7 +45,7 @@ namespace GraphQL.Utilities
         public async ValueTask PrintSchemaAsync(ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
             var doc = CreateConverter().Convert(schema);
-            await _astPrinter.PrintAsync(doc, writer, cancellationToken);
+            await _astPrinter.PrintAsync(doc, writer, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace GraphQL.Utilities
         {
             var def = CreateConverter().ConvertSchemaDefinition(schema);
             if (def != null)
-                await _astPrinter.PrintAsync(def, writer, cancellationToken);
+                await _astPrinter.PrintAsync(def, writer, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace GraphQL.Utilities
         public async ValueTask PrintTypeAsync(IGraphType type, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
             var def = CreateConverter().ConvertTypeDefinition(type, schema);
-            await _astPrinter.PrintAsync(def, writer, cancellationToken);
+            await _astPrinter.PrintAsync(def, writer, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace GraphQL.Utilities
         public async ValueTask PrintDirectiveAsync(Directive directive, ISchema schema, TextWriter writer, CancellationToken cancellationToken = default)
         {
             var def = CreateConverter().ConvertDirectiveDefinition(directive, schema);
-            await _astPrinter.PrintAsync(def, writer, cancellationToken);
+            await _astPrinter.PrintAsync(def, writer, cancellationToken).ConfigureAwait(false);
         }
     }
 }

@@ -27,18 +27,18 @@ public class SchemaPrinterTests
         return result;
     }
 
-        private static string print(ISchema schema)
-        {
-            return print(schema, new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeDeprecationReasons = true, Comparer = new AlphabeticalSchemaComparer() });
-        }
+    private static string print(ISchema schema)
+    {
+        return print(schema, new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeDeprecationReasons = true, Comparer = new AlphabeticalSchemaComparer() });
+    }
 
-        private static string print(ISchema schema, SchemaPrinterOptions2 options)
-        {
-            var printer = new SchemaPrinter2(options);
-            var writer = new StringWriter();
-            printer.PrintSchemaAsync(schema, writer).GetAwaiter().GetResult();
-            return Environment.NewLine + writer.ToString();
-        }
+    private static string print(ISchema schema, SchemaPrinterOptions2 options)
+    {
+        var printer = new SchemaPrinter2(options);
+        var writer = new StringWriter();
+        printer.PrintSchemaAsync(schema, writer).GetAwaiter().GetResult();
+        return Environment.NewLine + writer.ToString();
+    }
 
     private void AssertEqual(string result, string expectedName, string expected, bool excludeScalars = false)
     {
@@ -48,22 +48,22 @@ public class SchemaPrinterTests
             excludeScalars);
     }
 
-        private void AssertEqual(string result, Dictionary<string, string> expected, bool excludeScalars = false)
+    private void AssertEqual(string result, Dictionary<string, string> expected, bool excludeScalars = false)
+    {
+        string exp;
+        if (excludeScalars)
         {
-            string exp;
-            if (excludeScalars)
-            {
-                exp = string.Join($"{Environment.NewLine}{Environment.NewLine}", expected
-                    .OrderBy(x => x.Key)
-                    .Select(x => x.Value));
-            }
-            else
-            {
-                var orderedScalars = expected
-                    .OrderBy(x => x.Key, StringComparer.Ordinal)
-                    .Select(x => x.Value);
-                exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars);
-            }
+            exp = string.Join($"{Environment.NewLine}{Environment.NewLine}", expected
+                .OrderBy(x => x.Key)
+                .Select(x => x.Value));
+        }
+        else
+        {
+            var orderedScalars = expected
+                .OrderBy(x => x.Key, StringComparer.Ordinal)
+                .Select(x => x.Value);
+            exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars);
+        }
 
         result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
     }
@@ -72,22 +72,22 @@ public class SchemaPrinterTests
     {
     }
 
-        [Fact]
-        public async Task prints_directive()
-        {
-            var printer = new SchemaPrinter2(new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeBuiltinDirectives = true });
-            var skip = new SkipDirective();
-            var arg = skip.Arguments.First();
-            arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
-            var writer = new StringWriter();
-            await printer.PrintDirectiveAsync(skip, null, writer);
-            const string expected = @"""Directs the executor to skip this field or fragment when the 'if' argument is true.""
+    [Fact]
+    public async Task prints_directive()
+    {
+        var printer = new SchemaPrinter2(new SchemaPrinterOptions2 { IncludeDescriptions = true, IncludeBuiltinDirectives = true });
+        var skip = new SkipDirective();
+        var arg = skip.Arguments.First();
+        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
+        var writer = new StringWriter();
+        await printer.PrintDirectiveAsync(skip, null, writer).ConfigureAwait(false);
+        const string expected = @"""Directs the executor to skip this field or fragment when the 'if' argument is true.""
 directive @skip(
   ""Skipped when true.""
   if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
 
-            AssertEqual(writer.ToString(), "directive", expected, excludeScalars: true);
-        }
+        AssertEqual(writer.ToString(), "directive", expected, excludeScalars: true);
+    }
 
     [Fact]
     public void prints_directive_2()
@@ -201,7 +201,7 @@ directive @skip(
 
         var schema = new Schema { Query = root };
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
             {
                 {
                     "Foo",
@@ -231,15 +231,15 @@ type Foo {
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
                     "Foo",
 @"""This is a Foo object type""
 type Foo {
@@ -267,15 +267,15 @@ type Foo {
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
                     "Foo",
 @"""This is a Foo object type""
 type Foo {
@@ -303,16 +303,16 @@ type Foo {
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                IncludeDeprecationReasons = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            IncludeDeprecationReasons = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
-            var expected = new Dictionary<string, string>
+        var expected = new Dictionary<string, string>
+        {
             {
-                {
                     "Foo",
 @"""This is a Foo object type""
 type Foo {
@@ -341,15 +341,15 @@ type Foo {
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                IncludeDeprecationReasons = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            IncludeDeprecationReasons = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
-            var expected = new Dictionary<string, string>
-            {
+        var expected = new Dictionary<string, string>
+        {
                 {
                     "Foo",
 @"""This is a Foo object type""
@@ -535,7 +535,7 @@ interface IFoo {
 type Root {
   bar: Bar
 }", excludeScalars: true);
-        }
+    }
 
     [Fact]
     public void prints_multiple_interfaces()
@@ -569,21 +569,21 @@ interface IFoo {
 type Query {
   bar: Bar
 }", excludeScalars: true);
-        }
+    }
 
-        [Fact]
-        public void prints_multiple_interfaces_with_field_descriptions()
-        {
-            var root = new ObjectGraphType { Name = "Query" };
-            root.Field<BarMultipleType>("bar");
+    [Fact]
+    public void prints_multiple_interfaces_with_field_descriptions()
+    {
+        var root = new ObjectGraphType { Name = "Query" };
+        root.Field<BarMultipleType>("bar");
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
         var result = print(schema, options);
 
@@ -609,7 +609,7 @@ interface IFoo {
 type Query {
   bar: Bar
 }", excludeScalars: true);
-        }
+    }
 
     [Fact]
     public void prints_multiple_interfaces_with_field_descriptions_2()
@@ -619,11 +619,11 @@ type Query {
 
         var schema = new Schema { Query = root };
 
-            var options = new SchemaPrinterOptions2
-            {
-                IncludeDescriptions = true,
-                Comparer = new AlphabeticalSchemaComparer()
-            };
+        var options = new SchemaPrinterOptions2
+        {
+            IncludeDescriptions = true,
+            Comparer = new AlphabeticalSchemaComparer()
+        };
 
         var result = print(schema, options);
 
@@ -649,7 +649,7 @@ interface IFoo {
 type Query {
   bar: Bar
 }", excludeScalars: true);
-        }
+    }
 
     [Fact]
     public void prints_unions()
@@ -688,7 +688,7 @@ type Query {
 }
 
 union SingleUnion = Foo", excludeScalars: true);
-        }
+    }
 
     [Fact]
     public void prints_input_type()
@@ -948,8 +948,8 @@ scalar Uri
 scalar UShort"
                 },
             };
-            AssertEqual(print(schema), expected);
-        }
+        AssertEqual(print(schema), expected);
+    }
 
     [Fact]
     public void prints_enum()

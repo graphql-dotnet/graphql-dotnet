@@ -1,3 +1,5 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
 
 namespace GraphQL.Utilities.Federation
@@ -16,7 +18,7 @@ namespace GraphQL.Utilities.Federation
         {
             Name = "_Service";
 
-            Field<StringGraphType>("sdl", description: "SDL of the service's schema", resolve: context =>
+            Field<StringGraphType>("sdl").Description("SDL of the service's schema").Resolve(context =>
             {
                 var printer = new FederatedSchemaPrinter(context.Schema);
                 return printer.PrintFederatedSchema();

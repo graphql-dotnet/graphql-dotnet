@@ -712,8 +712,6 @@ namespace GraphQL
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
-        public static TSchema EnableFederation<TSchema>(this TSchema schema)
-            where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
         public static void RegisterType<T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
@@ -1183,7 +1181,6 @@ namespace GraphQL.Execution
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
-        protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
     }

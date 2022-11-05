@@ -56,7 +56,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            var astDirective = new ASTConverter().ConvertDirective(directive, Schema);
+            var astDirective = new ASTConverter().ConvertDirective(directive, Schema!);
             return astDirective.Print();
         }
 

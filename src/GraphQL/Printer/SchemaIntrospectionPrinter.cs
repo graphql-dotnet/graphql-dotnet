@@ -1,10 +1,6 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
-using GraphQLParser;
-using GraphQLParser.AST;
 
 namespace GraphQL.Utilities
 {
@@ -44,7 +40,7 @@ namespace GraphQL.Utilities
                 Comparer = Options.Comparer
             });
 
-            await _astPrinter.PrintAsync(converter.Convert(schema), writer, cancellationToken);
+            await _astPrinter.PrintAsync(converter.Convert(schema), writer, cancellationToken).ConfigureAwait(false);
         }
     }
 }

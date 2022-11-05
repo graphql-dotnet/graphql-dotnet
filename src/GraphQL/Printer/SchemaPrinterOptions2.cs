@@ -4,7 +4,7 @@ using GraphQLParser.Visitors;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Options for schema printing when using <see cref="SchemaPrinter2.PrintAsync"/>.
+    /// Options for schema printing when using <see cref="SchemaPrinter2"/>.
     /// </summary>
     public class SchemaPrinterOptions2 : SDLPrinterOptions
     {
