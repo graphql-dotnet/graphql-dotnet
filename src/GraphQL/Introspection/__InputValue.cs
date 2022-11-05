@@ -3,12 +3,12 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__InputValue</c> introspection type represents field and directive arguments as well as the inputFields of an input object.
+    /// The <see cref="__InputValue"/> introspection type represents field and directive arguments as well as the inputFields of an input object.
     /// </summary>
     public class __InputValue : ObjectGraphType<IProvideMetadata> // context.Source either QueryArgument or FieldType
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__InputValue</c> introspection type.
+        /// Initializes a new instance of the <see cref="__InputValue"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __InputValue(bool allowAppliedDirectives = false)
@@ -24,12 +24,11 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description");
 
-            Field<NonNullGraphType<__Type>>("type", resolve: context => ((IProvideResolvedType)context.Source!).ResolvedType);
+            Field<NonNullGraphType<__Type>>("type").Resolve(context => ((IProvideResolvedType)context.Source!).ResolvedType);
 
-            Field<StringGraphType>(
-                "defaultValue",
-                "A GraphQL-formatted string representing the default value for this input value.",
-                resolve: context =>
+            Field<StringGraphType>("defaultValue")
+                .Description("A GraphQL-formatted string representing the default value for this input value.")
+                .Resolve(context =>
                 {
                     return context.Source is IHaveDefaultValue hasDefault && hasDefault.DefaultValue != null
                         ? hasDefault.ResolvedType!.Print(hasDefault.DefaultValue)

@@ -36,6 +36,5 @@ namespace GraphQL.Types.Relay.DataObjects
     /// <typeparam name="TNode">The data type.</typeparam>
     public class Connection<TNode> : Connection<TNode, Edge<TNode>>
     {
-
     }
 }

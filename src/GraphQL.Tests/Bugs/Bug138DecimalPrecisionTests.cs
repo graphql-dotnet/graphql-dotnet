@@ -1,49 +1,47 @@
 using GraphQL.Types;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 {
-    public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
-    {
 #if NETCOREAPP3_1
-        [Fact]
+    [Fact]
 #else
-        [Fact(Skip = "24.149999999999999 with .NET Core < 3.1")]
+    [Fact(Skip = "24.149999999999999 with .NET Core < 3.1")]
 #endif
-        public void double_to_decimal_does_not_lose_precision()
-        {
-            var query = @"
+    public void double_to_decimal_does_not_lose_precision()
+    {
+        var query = @"
                 mutation SetState{
                     set(request:24.15)
                 }
             ";
 
-            var expected = @"{ ""set"": 24.15 }";
+        var expected = @"{ ""set"": 24.15 }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
     }
+}
 
-    public class DecimalSchema : Schema
+public class DecimalSchema : Schema
+{
+    public DecimalSchema()
     {
-        public DecimalSchema()
-        {
-            Mutation = new DecimalMutation();
-        }
+        Mutation = new DecimalMutation();
     }
+}
 
-    public class DecimalMutation : ObjectGraphType
+public class DecimalMutation : ObjectGraphType
+{
+    public DecimalMutation()
     {
-        public DecimalMutation()
-        {
-            Field<DecimalGraphType>(
-                "set",
-                arguments: new QueryArguments(new QueryArgument<DecimalGraphType> { Name = "request" }),
-                resolve: context =>
-                {
-                    var val = context.GetArgument<decimal>("request");
-                    val.ShouldBe(24.15m);
-                    return val;
-                });
-        }
+        Field<DecimalGraphType>("set")
+            .Argument<DecimalGraphType>("request")
+            .Resolve(context =>
+            {
+                var val = context.GetArgument<decimal>("request");
+                val.ShouldBe(24.15m);
+                return val;
+            });
     }
 }

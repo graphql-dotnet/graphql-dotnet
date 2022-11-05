@@ -31,7 +31,7 @@ namespace GraphQL.Types
             {
                 if (value is NonNullGraphType) //TODO: null check here or in ctor
                 {
-                    // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
+                    // https://spec.graphql.org/October2021/#sec-Non-Null.Type-Validation
                     throw new ArgumentOutOfRangeException("ResolvedType", "Cannot nest NonNull inside NonNull.");
                 }
 

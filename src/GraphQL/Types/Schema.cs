@@ -13,7 +13,7 @@ namespace GraphQL.Types
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
-        private readonly object _allTypesInitializationLock = new object();
+        private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
         private List<IGraphType>? _additionalInstances;
@@ -54,14 +54,11 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (runConfigurations)
+            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
             {
-                if (services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
+                foreach (var configuration in configurations)
                 {
-                    foreach (var configuration in configurations)
-                    {
-                        configuration.Configure(this, services);
-                    }
+                    configuration.Configure(this, services);
                 }
             }
         }
@@ -177,7 +174,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>
-        /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
+        /// A service object of type <paramref name="serviceType"/> or <see langword="null"/> if there is no service
         /// object of type serviceType.
         /// </returns>
         object? IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);

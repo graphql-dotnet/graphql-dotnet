@@ -24,7 +24,10 @@ namespace GraphQL.Builders
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        internal ConnectionBuilder(FieldType fieldType)
+        /// <summary>
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+        /// </summary>
+        protected internal ConnectionBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -259,11 +262,11 @@ namespace GraphQL.Builders
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
                 var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
                 CheckForErrors(connectionContext);
-                return resolver(connectionContext);
+                return new ValueTask<TReturnType?>(resolver(connectionContext));
             });
         }
 

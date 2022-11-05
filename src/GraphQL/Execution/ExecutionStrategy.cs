@@ -15,7 +15,7 @@ namespace GraphQL.Execution
     {
         /// <summary>
         /// Executes a GraphQL request and returns the result. The default implementation builds the root node
-        /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>.
+        /// and passes execution to <see cref="ExecuteNodeTreeAsync(ExecutionContext, ExecutionNode)"/>.
         /// Once complete, the values are collected into an object that is ready to be serialized and returned
         /// within an <see cref="ExecutionResult"/>.
         /// </summary>
@@ -29,22 +29,15 @@ namespace GraphQL.Execution
             // After the entire node tree has been executed, get the values
             object? data = rootNode.PropagateNull() ? null : rootNode;
 
-            return new ExecutionResult
+            return new ExecutionResult(context)
             {
                 Executed = true,
                 Data = data,
-                Query = context.Document.Source,
-                Document = context.Document,
-                Operation = context.Operation,
-                Extensions = context.OutputExtensions
             };
         }
 
-        /// <summary>
-        /// Executes an execution node and all of its child nodes. This is typically only executed upon
-        /// the root execution node.
-        /// </summary>
-        protected abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode);
+        /// <inheritdoc/>
+        public abstract Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
 
         /// <summary>
         /// Returns the root graph type for the execution -- for a specified schema and operation type.
@@ -57,6 +50,11 @@ namespace GraphQL.Execution
             {
                 case OperationType.Query:
                     type = context.Schema.Query;
+                    // note that per the GraphQL specification, a query root type is required; but currently
+                    // the schema validation check is disabled to allow for test schemas
+                    // that only contain a mutation or subscription root type.
+                    if (type == null)
+                        throw new InvalidOperationError("Schema is not configured for queries").AddLocation(context.Operation, context.Document);
                     break;
 
                 case OperationType.Mutation:
@@ -156,8 +154,8 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var parentType = parent.GetObjectGraphType(context.Schema)!;
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
+            var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
+            var fields = Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];
@@ -173,7 +171,7 @@ namespace GraphQL.Execution
             parent.SubFields = subFields;
 
             fields.Clear();
-            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
+            Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
@@ -217,7 +215,7 @@ namespace GraphQL.Execution
         /// otherwise the field name). This ensures all fields with the same response key included via referenced
         /// fragments are executed at the same time.
         /// <br/><br/>
-        /// <see href="http://spec.graphql.org/June2018/#sec-Field-Collection"/> and <see href="http://spec.graphql.org/June2018/#CollectFields()"/>
+        /// <see href="https://spec.graphql.org/October2021/#sec-Field-Collection"/> and <see href="https://spec.graphql.org/October2021/#CollectFields()"/>
         /// </summary>
         /// <param name="context">The execution context.</param>
         /// <param name="specificType">The graph type to compare the selection set against. May be <see langword="null"/> for root execution node.</param>
@@ -229,7 +227,7 @@ namespace GraphQL.Execution
             fields ??= new();
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
-            int countOfSpreads = GetFragmentSpreads(selectionSet);
+            int countOfSpreads = GetFragmentSpreads(context, selectionSet);
             ROM[]? visitedFragmentNames = null;
             if (countOfSpreads > 1)
                 visitedFragmentNames = ArrayPool<ROM>.Shared.Rent(countOfSpreads);
@@ -323,14 +321,26 @@ namespace GraphQL.Execution
                 };
             }
 
-            static int GetFragmentSpreads(GraphQLSelectionSet selectionSet)
+            static int GetFragmentSpreads(ExecutionContext context, GraphQLSelectionSet selectionSet)
             {
                 int count = 0;
 
                 foreach (var selection in selectionSet.Selections)
                 {
-                    if (selection is GraphQLFragmentSpread)
+                    if (selection is GraphQLFragmentSpread spread)
+                    {
                         ++count;
+
+                        var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
+                        if (fragment != null)
+                        {
+                            count += GetFragmentSpreads(context, fragment.SelectionSet);
+                        }
+                    }
+                    else if (selection is GraphQLInlineFragment inline)
+                    {
+                        count += GetFragmentSpreads(context, inline.SelectionSet);
+                    }
                 }
 
                 return count;
@@ -341,7 +351,7 @@ namespace GraphQL.Execution
         /// This method calculates the criterion for matching fragment definition (spread or inline) to a given graph type.
         /// This criterion determines the need to fill the resulting selection set with fields from such a fragment.
         /// <br/><br/>
-        /// <see href="http://spec.graphql.org/June2018/#DoesFragmentTypeApply()"/>
+        /// <see href="https://spec.graphql.org/October2021/#DoesFragmentTypeApply()"/>
         /// </summary>
         protected bool DoesFragmentConditionMatch(ExecutionContext context, ROM fragmentName, IGraphType type /* should be named type*/)
         {
@@ -419,6 +429,15 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Selects resolver for the specified execution node. By default returns resolver from
+        /// <see cref="ExecutionNode.FieldDefinition"/> if specified. Otherwise returns
+        /// <see cref="SourceFieldResolver.Instance"/> for top level nodes of subscriptions or
+        /// <see cref="NameFieldResolver.Instance"/> for all other cases.
+        /// </summary>
+        protected virtual IFieldResolver SelectResolver(ExecutionNode node, ExecutionContext context)
+            => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
+
+        /// <summary>
         /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
         /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
@@ -432,17 +451,11 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext? resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                ReadonlyResolveFieldContext? resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
-                var resolver = node.FieldDefinition!.Resolver ?? NameFieldResolver.Instance;
-                var result = resolver.Resolve(resolveContext);
-
-                if (result is Task task)
-                {
-                    await task.ConfigureAwait(false);
-                    result = task.GetResult();
-                }
+                var resolver = SelectResolver(node, context);
+                var result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
                 node.Result = result;
 
@@ -455,7 +468,7 @@ namespace GraphQL.Execution
                     {
                         // also see FuncFieldResolver.GetResolverFor as it relates to context re-use
                         resolveContext.Reset(null, null);
-                        System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                        Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                     }
                 }
             }

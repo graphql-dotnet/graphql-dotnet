@@ -54,6 +54,9 @@ namespace GraphQL.Types
         /// </summary>
         public EnumValuesBase Values { get; }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="EnumValues"/>.
+        /// </summary>
         protected virtual EnumValuesBase CreateValues() => new EnumValues();
 
         /// <inheritdoc/>
@@ -150,7 +153,7 @@ namespace GraphQL.Types
                     DeprecationReason = deprecation,
                 };
                 bool ignore = false;
-                foreach (var attr in member.GetCustomAttributes<GraphQLAttribute>())
+                foreach (var attr in member.GetGraphQLAttributes())
                 {
                     if (!attr.ShouldInclude(member, null))
                     {
@@ -164,12 +167,15 @@ namespace GraphQL.Types
                 Add(enumValue);
             }
 
-            foreach (var attr in type.GetCustomAttributes<GraphQLAttribute>())
+            foreach (var attr in type.GetGraphQLAttributes())
             {
                 attr.Modify(this);
             }
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="EnumValues{TEnum}"/>.
+        /// </summary>
         protected override EnumValuesBase CreateValues() => new EnumValues<TEnum>();
 
         /// <inheritdoc/>

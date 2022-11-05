@@ -2,28 +2,23 @@ using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
-namespace GraphQL.Tests.StarWars
+namespace GraphQL.Tests.StarWars;
+
+public class StarWarsSubFieldsTests : StarWarsTestBase
 {
-    public class StarWarsSubFieldsTests : StarWarsTestBase
+    public StarWarsQuery RootQuery => (StarWarsQuery)Schema.Query;
+
+    [Fact]
+    public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
     {
-        public StarWarsSubFieldsTests() : base()
+        RootQuery.Field<ListGraphType<HumanType>>("listOfHumans").Resolve(ctx =>
         {
-            RootQuery = (StarWarsQuery)Schema.Query;
-        }
-
-        public StarWarsQuery RootQuery;
-
-        [Fact]
-        public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
-        {
-            RootQuery.Field<ListGraphType<HumanType>>("listOfHumans", resolve: ctx =>
-            {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return new List<Human>();
-            });
-            var query = @"
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return new List<Human>();
+        });
+        var query = @"
                 {
                     listOfHumans {
                         id
@@ -34,26 +29,26 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""listOfHumans"": []
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_is_not_null_for_single_ObjectGraphType()
+    [Fact]
+    public void subfields_is_not_null_for_single_ObjectGraphType()
+    {
+        RootQuery.Field<HumanType>("singleHuman").Resolve(ctx =>
         {
-            RootQuery.Field<HumanType>("singleHuman", resolve: ctx =>
-            {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return null;
-            });
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return null;
+        });
 
-            var query = @"
+        var query = @"
                 {
                     singleHuman {
                         id
@@ -63,25 +58,25 @@ namespace GraphQL.Tests.StarWars
                     }
                 }
             ";
-            var expected = @"
+        var expected = @"
                 {
                     ""singleHuman"": null
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
+    [Fact]
+    public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
+    {
+        RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters").Resolve(ctx =>
         {
-            RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters", resolve: ctx =>
-            {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return new List<Human>();
-            });
-            var query = @"
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return new List<Human>();
+        });
+        var query = @"
                 {
                     listOfCharacters {
                         id
@@ -92,25 +87,25 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""listOfCharacters"": []
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_is_not_null_for_single_InterfaceGraphType()
-        {
-            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: ctx =>
-           {
-               ctx.SubFields.ShouldNotBeNull();
-               ctx.SubFields.Keys.ShouldContain("id");
-               ctx.SubFields.Keys.ShouldContain("friends");
-               return null;
-           });
-            var query = @"
+    [Fact]
+    public void subfields_is_not_null_for_single_InterfaceGraphType()
+    {
+        RootQuery.Field<CharacterInterface>("singleCharacter").ResolveAsync(ctx =>
+       {
+           ctx.SubFields.ShouldNotBeNull();
+           ctx.SubFields.Keys.ShouldContain("id");
+           ctx.SubFields.Keys.ShouldContain("friends");
+           return Task.FromResult<object>(null);
+       });
+        var query = @"
                 {
                     singleCharacter {
                         id
@@ -121,71 +116,70 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""singleCharacter"": null
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-
-        [Fact]
-        public void subfields_does_not_throw_for_primitive()
+    [Fact]
+    public void subfields_does_not_throw_for_primitive()
+    {
+        RootQuery.Field<IntGraphType>("someNumber").Resolve(ctx =>
         {
-            RootQuery.Field<IntGraphType>("someNumber", resolve: ctx =>
-            {
-                ctx.SubFields.ShouldBeNull();
-                return 1;
-            });
+            ctx.SubFields.ShouldBeNull();
+            return 1;
+        });
 
-            var query = @"
+        var query = @"
                 {
                     someNumber
                 }
             ";
-            var expected = @"
+        var expected = @"
                 {
                     ""someNumber"": 1
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_does_not_throw_for_list_of_primitive()
+    [Fact]
+    public void subfields_does_not_throw_for_list_of_primitive()
+    {
+        RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers").Resolve(ctx =>
         {
-            RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: ctx =>
-            {
-                ctx.SubFields.ShouldBeNull();
-                return new[] { 1, 2 };
-            });
+            ctx.SubFields.ShouldBeNull();
+            return new[] { 1, 2 };
+        });
 
-            var query = @"
+        var query = @"
                 {
                     someNumbers
                 }
             ";
-            var expected = @"
+        var expected = @"
                 {
                     ""someNumbers"": [1,2]
                 }
             ";
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_contains_keys_from_fragment_spread_on_non_null_fields()
+    [Fact]
+    public void subfields_contains_keys_from_fragment_spread_on_non_null_fields()
+    {
+        RootQuery.Field<NonNullGraphType<HumanType>>("luke").Resolve(context =>
         {
-            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
-            {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new Human { Id = "1", Name = "Luke" };
-            });
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new Human { Id = "1", Name = "Luke" };
+        });
 
-            var query = @"
+        var query = @"
                 query Luke {
                     luke {
                         ...HumanData
@@ -198,7 +192,7 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""luke"": {
                         ""id"": ""1"",
@@ -207,21 +201,21 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_contains_keys_from_inline_fragment_on_non_null_fields()
+    [Fact]
+    public void subfields_contains_keys_from_inline_fragment_on_non_null_fields()
+    {
+        RootQuery.Field<NonNullGraphType<HumanType>>("luke").Resolve(context =>
         {
-            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
-            {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new Human { Id = "1", Name = "Luke" };
-            });
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new Human { Id = "1", Name = "Luke" };
+        });
 
-            var query = @"
+        var query = @"
                 query Luke {
                     luke {
                         ...on Human
@@ -233,7 +227,7 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""luke"": {
                         ""id"": ""1"",
@@ -242,21 +236,21 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_contains_keys_from_fragment_spread_on_list_fields()
+    [Fact]
+    public void subfields_contains_keys_from_fragment_spread_on_list_fields()
+    {
+        RootQuery.Field<ListGraphType<HumanType>>("lukes").Resolve(context =>
         {
-            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
-            {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
-            });
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+        });
 
-            var query = @"
+        var query = @"
                 query Luke {
                     lukes {
                         ...HumanData
@@ -269,7 +263,7 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""lukes"": [
                     {
@@ -283,21 +277,21 @@ namespace GraphQL.Tests.StarWars
                 ]}
             ";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void subfields_contains_keys_from_inline_fragment_on_list_fields()
+    [Fact]
+    public void subfields_contains_keys_from_inline_fragment_on_list_fields()
+    {
+        RootQuery.Field<ListGraphType<HumanType>>("lukes").Resolve(context =>
         {
-            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
-            {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
-            });
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+        });
 
-            var query = @"
+        var query = @"
                 query Luke {
                     lukes {
                         ... on Human
@@ -309,7 +303,7 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"
+        var expected = @"
                 {
                     ""lukes"": [
                     {
@@ -323,7 +317,6 @@ namespace GraphQL.Tests.StarWars
                 ]}
             ";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
     }
 }

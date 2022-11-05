@@ -42,7 +42,7 @@ namespace GraphQL.Execution
             {
                 OperationType.Query => ParallelExecutionStrategy.Instance,
                 OperationType.Mutation => SerialExecutionStrategy.Instance,
-                OperationType.Subscription => throw new NotSupportedException($"No execution strategy for executing subscriptions has been configured. You can use the GraphQL.SystemReactive package to handle subscriptions."),
+                OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
                 _ => throw new InvalidOperationException($"Unexpected OperationType '{operationType}'.")
             };
         }

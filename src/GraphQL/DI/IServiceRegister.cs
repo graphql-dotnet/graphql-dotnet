@@ -20,16 +20,27 @@ namespace GraphQL.DI
         IServiceRegister Register(Type serviceType, object implementationInstance, bool replace = false);
 
         /// <summary>
-        /// Registers the service of type <paramref name="serviceType"/> with the dependency injection provider if a service
-        /// of the same type has not already been registered.
+        /// Registers the service of type <paramref name="serviceType"/> with the dependency
+        /// injection provider if a service of the same type (and of the same implementation type
+        /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
+        /// has not already been registered.
         /// </summary>
-        IServiceRegister TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime);
+        IServiceRegister TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
-        /// <inheritdoc cref="TryRegister(Type, Type, ServiceLifetime)"/>
-        IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime);
+        /// <summary>
+        /// Registers the service of type <paramref name="serviceType"/> with the dependency
+        /// injection provider if a service of the same type (and of the same implementation type
+        /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
+        /// has not already been registered.
+        /// <br/><br/>
+        /// With <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>, it is required
+        /// that <paramref name="implementationFactory"/> is a strongly typed delegate with a return type
+        /// of a specific implementation type.
+        /// </summary>
+        IServiceRegister TryRegister(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
-        /// <inheritdoc cref="TryRegister(Type, Type, ServiceLifetime)"/>
-        IServiceRegister TryRegister(Type serviceType, object implementationInstance);
+        /// <inheritdoc cref="TryRegister(Type, Type, ServiceLifetime, RegistrationCompareMode)"/>
+        IServiceRegister TryRegister(Type serviceType, object implementationInstance, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
         /// <summary>
         /// Configures an options class of type <typeparamref name="TOptions"/>. Each registration call to this method

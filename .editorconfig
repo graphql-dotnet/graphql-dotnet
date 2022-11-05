@@ -193,6 +193,9 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = false
 
+# C# formatting settings - Namespace options
+csharp_style_namespace_declarations = file_scoped:suggestion
+
 ########## name all private fields using camelCase with underscore prefix ##########
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2019
 # dotnet_naming_rule.<namingRuleTitle>.symbols = <symbolTitle>
@@ -259,3 +262,14 @@ dotnet_diagnostic.IDE0005.severity = error
 
 # Enforce formatting https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#rule-id-ide0055-fix-formatting
 dotnet_diagnostic.IDE0055.severity = error
+
+# ConfigureAwait https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1090.md
+dotnet_diagnostic.RCS1090.severity = warning
+roslynator_configure_await = true
+
+# https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1194.md
+dotnet_diagnostic.RCS1194.severity = suggestion
+
+# https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1102.md
+# TODO: NullabilityInfo issue in Patching.cs in internal class SR
+dotnet_diagnostic.RCS1102.severity = suggestion

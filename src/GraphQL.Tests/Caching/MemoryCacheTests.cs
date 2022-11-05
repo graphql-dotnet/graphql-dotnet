@@ -1,35 +1,43 @@
+#nullable enable
+
 using GraphQL.Caching;
 using GraphQLParser.AST;
 
-namespace GraphQL.Tests.Caching
+namespace GraphQL.Tests.Caching;
+
+public class MemoryCacheTests
 {
-    public class MemoryCacheTests
+    internal class MyMemoryDocumentCache : MemoryDocumentCache
     {
-        [Fact]
-        public async Task Validate_Entry_Is_Cached()
-        {
-            var doc = new GraphQLDocument();
-            var query = "test";
-            var memoryCache = new MemoryDocumentCache();
+        public ValueTask<GraphQLDocument?> GetAsyncPublic(ExecutionOptions options) => GetAsync(options);
 
-            (await memoryCache.GetAsync(query)).ShouldBeNull();
+        public ValueTask SetAsyncPublic(ExecutionOptions options, GraphQLDocument value) => SetAsync(options, value);
+    }
 
-            await memoryCache.SetAsync(query, doc);
-            (await memoryCache.GetAsync(query)).ShouldBe(doc);
-        }
+    [Fact]
+    public async Task Validate_Entry_Is_Cached()
+    {
+        var doc = new GraphQLDocument();
+        var options = new ExecutionOptions { Query = "test" };
+        var memoryCache = new MyMemoryDocumentCache();
 
-        [Fact]
-        public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
-        {
-            var doc = new GraphQLDocument();
-            var query = "test";
-            var memoryCache = new MemoryDocumentCache();
+        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBeNull();
 
-            await memoryCache.SetAsync(query, doc);
+        await memoryCache.SetAsyncPublic(options, doc).ConfigureAwait(false);
+        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBe(doc);
+    }
 
-            await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsync(query, null));
+    [Fact]
+    public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
+    {
+        var doc = new GraphQLDocument();
+        var options = new ExecutionOptions { Query = "test" };
+        var memoryCache = new MyMemoryDocumentCache();
 
-            (await memoryCache.GetAsync(query)).ShouldBe(doc);
-        }
+        await memoryCache.SetAsyncPublic(options, doc).ConfigureAwait(false);
+
+        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsyncPublic(options, null!).ConfigureAwait(false)).ConfigureAwait(false);
+
+        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBe(doc);
     }
 }

@@ -2,6 +2,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQLParser;
 using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -19,8 +20,17 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
+        /// Should be set to <see langword="null"/> for subscription results.
         /// </summary>
         public object? Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets a dictionary of returned subscription fields along with their
+        /// response streams as <see cref="IObservable{T}"/> implementations.
+        /// Should be set to <see langword="null"/> for query or mutation results.
+        /// According to the GraphQL specification this dictionary should have exactly one item.
+        /// </summary>
+        public IDictionary<string, IObservable<ExecutionResult>>? Streams { get; set; }
 
         /// <summary>
         /// Returns a set of errors that occurred during any stage of processing (parsing, validating, executing, etc.). This property is serialized as part of the GraphQL json response.
@@ -74,6 +84,19 @@ namespace GraphQL
             Document = result.Document;
             Perf = result.Perf;
             Extensions = result.Extensions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the <see cref="Query"/>, <see cref="Document"/>,
+        /// <see cref="Operation"/> and <see cref="Extensions"/> properties set from the
+        /// specified <see cref="ExecutionContext"/>.
+        /// </summary>
+        internal ExecutionResult(ExecutionContext context)
+        {
+            Query = context.Document.Source;
+            Document = context.Document;
+            Operation = context.Operation;
+            Extensions = context.OutputExtensions;
         }
 
         /// <summary>

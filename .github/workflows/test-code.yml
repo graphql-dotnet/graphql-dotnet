@@ -30,14 +30,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup .NET Core SDKs
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: |
             3.1.x
             5.0.x
-            6.0.x
+            6.0.303
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -51,10 +51,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: |
-          dotnet tool install -g dotnet-format --version 6.0.243104 --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
-          dotnet format --no-restore --verify-no-changes --severity warn whitespace --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix whitespace issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn analyzers --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix analyzers issues" && exit 1)
-          dotnet format --no-restore --verify-no-changes --severity warn style --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix style issues" && exit 1)
+          dotnet format --no-restore --verify-no-changes --severity warn --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
@@ -62,14 +59,27 @@ jobs:
       - name: Build solution [Debug]
         working-directory: src
         run: dotnet build --no-restore -c Debug
-      - name: Test solution [Debug]
+      - name: Test solution [Debug] with code coverage
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
-        run: dotnet test --no-restore --no-build -p:CollectCoverage=true
+        run: >
+          dotnet test
+          --no-restore
+          --no-build
+          --collect "XPlat Code Coverage"
+          --results-directory .coverage
+          --
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
+      - name: Test solution [Debug] without code coverage
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        working-directory: src
+        run: dotnet test --no-restore --no-build
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        uses: codecov/codecov-action@v2.1.0
+        uses: codecov/codecov-action@v3
         with:
-          files: .coverage/GraphQL.DataLoader.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Harness.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.Tests/coverage.net6.opencover.xml,.coverage/GraphQL.MicrosoftDI.Tests/coverage.net6.opencover.xml
+          files: 'src/.coverage/**/coverage.opencover.xml'
 
   buildcheck:
     needs:

@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -11,6 +12,38 @@ namespace GraphQL.Execution
     public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposable
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public ExecutionContext()
+        {
+        }
+
+        /// <summary>
+        /// Clones reusable state information from an existing instance; not any properties that
+        /// hold result information. Specifically, <see cref="Errors"/>, <see cref="Metrics"/>,
+        /// <see cref="OutputExtensions"/>, array pool reservations and internal reusable references
+        /// are not cloned.
+        /// </summary>
+        public ExecutionContext(ExecutionContext context)
+        {
+            ExecutionStrategy = context.ExecutionStrategy;
+            Document = context.Document;
+            Schema = context.Schema;
+            RootValue = context.RootValue;
+            UserContext = context.UserContext;
+            Operation = context.Operation;
+            Variables = context.Variables;
+            CancellationToken = context.CancellationToken;
+            Listeners = context.Listeners;
+            ThrowOnUnhandledException = context.ThrowOnUnhandledException;
+            UnhandledExceptionDelegate = context.UnhandledExceptionDelegate;
+            MaxParallelExecutionCount = context.MaxParallelExecutionCount;
+            InputExtensions = context.InputExtensions;
+            RequestServices = context.RequestServices;
+            User = context.User;
+        }
+
         /// <inheritdoc/>
         public IExecutionStrategy ExecutionStrategy { get; set; }
 
@@ -64,6 +97,9 @@ namespace GraphQL.Execution
         public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
+        public ClaimsPrincipal? User { get; set; }
+
+        /// <inheritdoc/>
         public TElement[] Rent<TElement>(int minimumLength)
         {
             var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
@@ -72,7 +108,7 @@ namespace GraphQL.Execution
             return array;
         }
 
-        private readonly List<Array> _trackedArrays = new List<Array>();
+        private readonly List<Array> _trackedArrays = new();
 
         /// <summary>
         /// Clears all state in this context.
@@ -114,6 +150,7 @@ namespace GraphQL.Execution
             //MaxParallelExecutionCount = null;
             //Extensions = null;
             //RequestServices = null;
+            //User = null;
 
             // arrays rented after the execution context has been 'disposed' will still rent just fine, but will
             // not be returned to the pool (since Dispose has already been run) and will be garbage collected.

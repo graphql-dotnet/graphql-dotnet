@@ -1,12 +1,13 @@
 # Directives
 
 A directive can be attached to almost every part of the schema - field, query, enum, fragment inclusion etc. and can affect execution
-of the query in any way the server desires. The core GraphQL [specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives)
-includes exactly three directives.
+of the query in any way the server desires. The core GraphQL [specification](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
+includes exactly four directives.
 
 * `@include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Only include this field in the result if the argument is true.
 * `@skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Skip this field if the argument is true.
 * `@deprecated(reason: String = "No longer supported") on FIELD_DEFINITION | ENUM_VALUE` Indicates deprecated portions of a GraphQL service’s schema, such as deprecated fields on a type or deprecated enum values.
+* `@specifiedBy(url: String!) on SCALAR` Provides a scalar specification URL for specifying the behavior of custom scalar types.
 
 ```graphql
 query HeroQuery($id: ID, $withFriends: Boolean!) {
@@ -22,15 +23,16 @@ query HeroQuery($id: ID, $withFriends: Boolean!) {
 # Executable Directives and Type System Directives
 
 There are two types of directives - those that are applied on incoming requests (so called client directives) and applied
-on the schema (so called server directives). This is determined by the specified [locations](http://spec.graphql.org/June2018/#sec-Type-System.Directives)
+on the schema (so called server directives). This is determined by the specified [locations](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
 when defining the directive. Also it is acceptable to define a directive that will be both client-side and server-side.
 
 Server-side examples:
-- [@deprecated](http://spec.graphql.org/June2018/#sec--deprecated)
+- [@deprecated](https://spec.graphql.org/October2021/#sec--deprecated)
+- [@specifiedBy](https://spec.graphql.org/October2021/#sec--specifiedBy)
 
 Client-side examples:
-- [@skip](http://spec.graphql.org/June2018/#sec--skip)
-- [@include](http://spec.graphql.org/June2018/#sec--include)
+- [@skip](https://spec.graphql.org/October2021/#sec--skip)
+- [@include](https://spec.graphql.org/October2021/#sec--include)
 
 # Repeatable Directives
 
@@ -38,7 +40,7 @@ In GraphQL language a directive may be defined as repeatable by including the `r
 Repeatable directives are often useful when the same directive should be used with different arguments
 at a single location, especially in cases where additional information needs to be provided to a type
 or schema extension via a directive. GraphQL.NET v4 supports repeatable directives. To make your directive
-repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`.
+repeatable in GraphQL.NET set `Directive.Repeatable` property to `true`.
 
 # Basic steps when adding a directive
 
@@ -48,10 +50,10 @@ repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`
 
 # Defining your custom directive
 
-To define your custom directive create a directive class inherited from `DirectiveGraphType`.
+To define your custom directive create a directive class inherited from `Directive`.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
@@ -95,7 +97,7 @@ will be checked.
 The following is an example of using the server-side `@length` directive.
 
 ```csharp
-public class LengthDirective : DirectiveGraphType
+public class LengthDirective : Directive
 {
     // The meaning of this property will be explained below in the 'Directives and introspection' paragraph. 
     public override bool? Introspectable => true;
@@ -147,15 +149,8 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
+        Field<Human>("human")
+            .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
     }
 }
 ```
@@ -178,7 +173,7 @@ provided by the applied directive. This class should implement `ISchemaNodeVisit
 Let's imagine an `@upper` directive.
 
 ```csharp
-public class UpperDirective : DirectiveGraphType
+public class UpperDirective : Directive
 {
     public UpperDirective()
         : base("upper", DirectiveLocation.FieldDefinition)
@@ -250,7 +245,7 @@ schema visitors. In this case, the directive is usually set to provide additiona
 means of introspection. For example, consider such server-side `@author` directive:
 
 ```csharp
-public class AuthorDirective : DirectiveGraphType
+public class AuthorDirective : Directive
 {
     public AuthorDirective()
         : base("author", DirectiveLocation.FieldDefinition)
@@ -285,8 +280,9 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>("human", resolve: context => GetHuman(context))
-            .ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
+        Field<Human>("human")
+            .Resolve(context => GetHuman(context))
+            .Directive("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
     }
 }
 ```
@@ -470,7 +466,7 @@ To make your defined directive and all its applications to the schema elements a
 introspection, override the `Introspectable` property of your directive.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
@@ -490,7 +486,7 @@ public class MyDirective : DirectiveGraphType
 If you do not explicitly set this property (either to `true` or `false`) then by default your
 directive definition along with all applications of this directive to the schema elements will
 be present in the introspection response if and only if directive definition has all its locations
-of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
+of type [`ExecutableDirectiveLocation`](https://spec.graphql.org/October2021/#ExecutableDirectiveLocation)
 (so called client-side directive).
 
 # Directive vs Field Middleware 

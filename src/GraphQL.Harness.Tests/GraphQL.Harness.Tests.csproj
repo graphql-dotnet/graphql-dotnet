@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
@@ -9,8 +9,12 @@
     <TargetFrameworks>net6;net5</TargetFrameworks>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Alba" Version="6.0.0" />
+    <PackageReference Include="Alba" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>

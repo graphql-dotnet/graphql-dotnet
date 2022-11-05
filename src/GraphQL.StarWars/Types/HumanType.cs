@@ -1,30 +1,37 @@
 using GraphQL.StarWars.Extensions;
 using GraphQL.Types;
 
-namespace GraphQL.StarWars.Types
+namespace GraphQL.StarWars.Types;
+
+public class HumanType : ObjectGraphType<Human>
 {
-    public class HumanType : ObjectGraphType<Human>
+    public HumanType(StarWarsData data)
     {
-        public HumanType(StarWarsData data)
-        {
-            Name = "Human";
+        Name = "Human";
 
-            Field<NonNullGraphType<StringGraphType>>("id", "The id of the human.", resolve: context => context.Source.Id);
-            Field<StringGraphType>("name", "The name of the human.", resolve: context => context.Source.Name);
+        Field<NonNullGraphType<StringGraphType>>("id")
+            .Description("The id of the human.")
+            .Resolve(context => context.Source.Id);
 
-            Field<ListGraphType<CharacterInterface>>("friends", resolve: context => data.GetFriends(context.Source));
+        Field<StringGraphType>("name")
+            .Description("The name of the human.")
+            .Resolve(context => context.Source.Name);
 
-            Connection<CharacterInterface>()
-                .Name("friendsConnection")
-                .Description("A list of a character's friends.")
-                .Bidirectional()
-                .Resolve(context => context.GetPagedResults<Human, StarWarsCharacter>(data, context.Source.Friends));
+        Field<ListGraphType<CharacterInterface>>("friends")
+            .Resolve(context => data.GetFriends(context.Source));
 
-            Field<ListGraphType<EpisodeEnum>>("appearsIn", "Which movie they appear in.");
+        Connection<CharacterInterface>()
+            .Name("friendsConnection")
+            .Description("A list of a character's friends.")
+            .Bidirectional()
+            .Resolve(context => context.GetPagedResults<Human, StarWarsCharacter>(data, context.Source.Friends));
 
-            Field<StringGraphType>("homePlanet", "The home planet of the human.", resolve: context => context.Source.HomePlanet);
+        Field<ListGraphType<EpisodeEnum>>("appearsIn").Description("Which movie they appear in.");
 
-            Interface<CharacterInterface>();
-        }
+        Field<StringGraphType>("homePlanet")
+            .Description("The home planet of the human.")
+            .Resolve(context => context.Source.HomePlanet);
+
+        Interface<CharacterInterface>();
     }
 }

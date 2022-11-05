@@ -15,7 +15,7 @@ generic class.
 Here is a sample of using an enumeration graph type:
 
 ```csharp
-Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn", "Which movie they appear in.");
+Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn").Description("Which movie they appear in.");
 ```
 
 Here is a sample of an auto registering input graph type:
@@ -27,11 +27,9 @@ class Person
     public int Age { get; set; }
 }
 
-Field<StringGraphType>("addPerson",
-    arguments: new QueryArguments(
-        new QueryArgument<AutoRegisteringInputObjectGraphType<Person>> { Name = "value" }
-    ),
-    resolve: context => {
+Field<StringGraphType>("addPerson")
+    .Arguments<AutoRegisteringInputObjectGraphType<Person>>("value")
+    .Resolve(context => {
         var person = context.GetArgument<Person>("value");
         db.Add(person);
         return "ok";
@@ -57,7 +55,7 @@ class ProductGraphType : AutoRegisteringObjectGraphType<Product>
     }
 }
 
-Field<ListGraphType<ProductGraphType>>("products", resolve: _ => db.Products);
+Field<ListGraphType<ProductGraphType>>("products").Resolve(_ => db.Products);
 ```
 
 Note that you may need to register the classes within your dependency injection framework:
@@ -132,20 +130,16 @@ enum MyFlags
 }
 
 // this returns the list ["GRUMPY", "HAPPY"]
-Field<ListGraphType<EnumerationGraphType<MyFlags>>>(
-    "getFlagEnum",
-    resolve: ctx => {
+Field<ListGraphType<EnumerationGraphType<MyFlags>>>("getFlagEnum")
+    .Resolve(ctx => {
         var myFlags = MyFlags.Grumpy | MyFlags.Happy;
         return myFlags.FromFlags()
     });
 
 // when calling convertEnumListToString(arg: [GRUMPY, HAPPY]), it returns the string "Grumpy, Happy"
-Field<StringGraphType>(
-    "convertEnumListToString",
-    arguments: new QueryArguments(
-        new QueryArgument<ListGraphType<EnumerationGraphType<MyFlags>>> { Name = "arg" }),
-    resolve: ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString()
-    );
+Field<StringGraphType>("convertEnumListToString")
+    .Argument<ListGraphType<EnumerationGraphType<MyFlags>>>("arg")
+    .Resolve(ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString());
 ```
 
 ### Can custom scalars serialize non-null data to a null value and vice versa?
@@ -162,9 +156,9 @@ If this type of functionality is necessary for your data types, you will need to
 field resolvers to perform the conversion, as a custom scalar cannot do this. This is a limitation
 of GraphQL.NET.
 
-### Should I use `GraphQLAuthorizeAttribute` or the `AuthorizeWith` method?
+### Should I use `AuthorizeAttribute` or the `AuthorizeWith` method?
 
-`GraphQLAuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
+`AuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
 with the code-first approach.
 
 See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
@@ -321,7 +315,7 @@ execution strategy. Please read the section on this in the
 > see https://go.microsoft.com/fwlink/?linkid=2097913.
 
 This problem is due to the fact that the default execution strategy for a query operation
-is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/June2018/#sec-Normal-and-Serial-Execution),
+is the `ParallelExecutionStrategy`, per the [spec](https://spec.graphql.org/October2021/#sec-Normal-and-Serial-Execution),
 combined with the fact that you are using a shared instance of the Entity Framework
 `DbContext`.
 
@@ -346,3 +340,9 @@ or your other scoped services. Please see the section on this in the
 [dependency injection documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
 
 Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/issues/1310) with related issues.
+
+### Enumeration members' case sensitivity
+
+Prior to GraphQL.NET version 5, enumeration values were case insensitive matches, which
+did not meet the GraphQL specification. This has been updated to match the spec; to revert to the prior
+behavior, please see [issue #3105](https://github.com/graphql-dotnet/graphql-dotnet/issues/3105#issuecomment-1109991628).

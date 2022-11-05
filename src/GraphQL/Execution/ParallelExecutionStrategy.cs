@@ -2,7 +2,7 @@ using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ExecutionNode)"/>
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
@@ -21,10 +21,7 @@ namespace GraphQL.Execution
         /// Nodes that return a <see cref="IDataLoaderResult"/> will execute once all other pending nodes
         /// have been completed.
         /// </summary>
-        protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode) => ExecuteNodeTreeAsync(context, rootNode);
-
-        /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
-        protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
+        public override async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
             var pendingNodes = System.Threading.Interlocked.Exchange(ref _reusablePendingNodes, null) ?? new Queue<ExecutionNode>();
             pendingNodes.Enqueue(rootNode);
@@ -49,7 +46,7 @@ namespace GraphQL.Execution
                             if (pendingNodeTask.IsCompleted)
                             {
                                 // Throw any caught exceptions
-                                await pendingNodeTask;
+                                await pendingNodeTask.ConfigureAwait(false);
 
                                 // Node completed synchronously, so no need to add it to the list of currently executing nodes
                                 // instead add any child nodes to the pendingNodes queue directly here

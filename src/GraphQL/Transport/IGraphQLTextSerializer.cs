@@ -21,6 +21,6 @@ namespace GraphQL
         /// Typically used to parse <see cref="GraphQLRequest"/> instances from JSON.
         /// A <paramref name="value"/> of <see langword="null"/> returns <see langword="default"/>.
         /// </summary>
-        T Deserialize<T>(string? value);
+        T? Deserialize<T>(string? value);
     }
 }

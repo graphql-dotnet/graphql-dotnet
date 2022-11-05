@@ -1,11 +1,11 @@
-namespace GraphQL.Tests.StarWars
+namespace GraphQL.Tests.StarWars;
+
+public class StarWarsBasicQueryTests : StarWarsTestBase
 {
-    public class StarWarsBasicQueryTests : StarWarsTestBase
+    [Fact]
+    public void identifies_r2_as_the_hero()
     {
-        [Fact]
-        public void identifies_r2_as_the_hero()
-        {
-            var query = @"
+        var query = @"
                 query HeroNameQuery {
                   hero {
                     name
@@ -13,19 +13,19 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""hero"": {
                 ""name"": ""R2-D2""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_without_query_name()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_without_query_name()
+    {
+        var query = @"
                {
                   hero {
                     name
@@ -33,19 +33,19 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""hero"": {
                 ""name"": ""R2-D2""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_the_id_and_friends_of_r2()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_the_id_and_friends_of_r2()
+    {
+        var query = @"
                 query HeroNameAndFriendsQuery {
                   hero {
                     id
@@ -57,7 +57,7 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""hero"": {
                 ""id"": ""3"",
                 ""name"": ""R2-D2"",
@@ -72,13 +72,13 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_humans()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_humans()
+    {
+        var query = @"
                {
                   human(id: ""1"") {
                     name
@@ -87,20 +87,20 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""human"": {
                 ""name"": ""Luke"",
                 ""homePlanet"": ""Tatooine""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_friends_of_humans()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_friends_of_humans()
+    {
+        var query = @"
                {
                   human(id: ""1"") {
                     name
@@ -112,7 +112,7 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""human"": {
                 ""name"": ""Luke"",
                 ""friends"": [
@@ -122,13 +122,13 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_connected_friends_of_humans()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_connected_friends_of_humans()
+    {
+        var query = @"
                {
                   human(id: ""1"") {
                     name
@@ -150,7 +150,7 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
                 ""human"": {
                   ""name"": ""Luke"",
                   ""friendsConnection"": {
@@ -187,13 +187,13 @@ namespace GraphQL.Tests.StarWars
                 }
               }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_droids()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_droids()
+    {
+        var query = @"
                {
                   droid(id: ""4"") {
                     name
@@ -201,19 +201,19 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""droid"": {
                 ""name"": ""C-3PO""
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_query_for_connected_friends_of_droids_second_page()
-        {
-            var query = @"
+    [Fact]
+    public void can_query_for_connected_friends_of_droids_second_page()
+    {
+        var query = @"
                {
                   droid(id: ""3"") {
                     name
@@ -235,7 +235,7 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
                 ""droid"": {
                   ""name"": ""R2-D2"",
                   ""friendsConnection"": {
@@ -261,13 +261,13 @@ namespace GraphQL.Tests.StarWars
                 }
               }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void create_generic_query_that_fetches_luke()
-        {
-            var query = @"
+    [Fact]
+    public void create_generic_query_that_fetches_luke()
+    {
+        var query = @"
                 query humanQuery($id: String!) {
                   human(id: $id) {
                     name
@@ -275,22 +275,22 @@ namespace GraphQL.Tests.StarWars
                 }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""human"": {
                 ""name"": ""Luke""
               }
             }
             ";
 
-            var inputs = new Inputs(new Dictionary<string, object> { { "id", "1" } });
+        var inputs = new Inputs(new Dictionary<string, object> { { "id", "1" } });
 
-            AssertQuerySuccess(query, expected, inputs);
-        }
+        AssertQuerySuccess(query, expected, inputs);
+    }
 
-        [Fact]
-        public void query_same_root_field_using_alias()
-        {
-            var query = @"
+    [Fact]
+    public void query_same_root_field_using_alias()
+    {
+        var query = @"
                query SomeDroids {
                   r2d2: droid(id: ""3"") {
                     name
@@ -302,7 +302,7 @@ namespace GraphQL.Tests.StarWars
                }
             ";
 
-            var expected = @"{
+        var expected = @"{
               ""r2d2"": {
                 ""name"": ""R2-D2""
               },
@@ -311,36 +311,35 @@ namespace GraphQL.Tests.StarWars
               }
             }";
 
-            AssertQuerySuccess(query, expected);
-        }
+        AssertQuerySuccess(query, expected);
+    }
 
-        [Fact]
-        public void can_add_new_human()
-        {
-            var mutation = @"mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
+    [Fact]
+    public void can_add_new_human()
+    {
+        var mutation = @"mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
 
-            var expected = @"{
+        var expected = @"{
               ""createHuman"": {
                 ""name"": ""Boba Fett"",
                 ""homePlanet"": ""Kamino""
               }
             }";
 
-            var data = new Dictionary<string, object>
+        var data = new Dictionary<string, object>
+        {
             {
+                "human",
+                new Dictionary<string, object>
                 {
-                    "human",
-                    new Dictionary<string, object>
-                    {
-                        {"name", "Boba Fett"},
-                        {"homePlanet", "Kamino"}
-                    }
+                    {"name", "Boba Fett"},
+                    {"homePlanet", "Kamino"}
                 }
-            };
+            }
+        };
 
-            var variables = new Inputs(data);
+        var variables = new Inputs(data);
 
-            AssertQuerySuccess(mutation, expected, variables);
-        }
+        AssertQuerySuccess(mutation, expected, variables);
     }
 }

@@ -23,7 +23,7 @@ access these extensions from validation rules via `ValidationContext.Extensions`
 ### 3. Improved GraphQL-Parser
 
 GraphQL.NET v5 uses GraphQL-Parser v8. This release brought numerous changes in the parser object model,
-which began to better fit the [latest version](http://spec.graphql.org/October2021/) of the published
+which began to better fit the [latest version](https://spec.graphql.org/October2021/) of the published
 official GraphQL specification. GraphQL-Parser v8 has a lot of backward incompatible changes, but you are
 unlikely to come across them if you do not use advanced features.
 
@@ -65,6 +65,7 @@ Specific support is provided for serializing and deserializing to the following 
 | Class                   | Notes |
 |-------------------------|-------|
 | `ExecutionResult`       | Only serialization is supported |
+| `ExecutionError`        | Only serialization is supported |
 | `GraphQLRequest`        | |
 | `IList<GraphQLRequest>` | Other common collection variations, such as `IEnumerable<>` or `List<>`, are also supported |
 | `OperationMessage`      | `Payload` is an `object` and can be deserialized to `GraphQLRequest` via `ReadNode` |
@@ -100,7 +101,7 @@ class Person
 
     public string Name { get; set; }
 
-    [GraphQLAuthorize("Administrators")]
+    [Authorize("Administrators")]
     public int Age { get; set; }
 
     [Description("Employee's job position")]
@@ -258,7 +259,7 @@ an input graph, you may also need to override `ParseDictionary` as well.
 If you utilize dependency injection within your schema, you can register your custom graph
 type to be used instead of the built-in type as follows:
 
-```cs
+```csharp
 services.AddSingleton(typeof(AutoRegisteringObjectGraphType<>), typeof(CustomAutoObjectType<>));
 ```
 
@@ -267,7 +268,7 @@ type instead.
 
 #### Graphs, fields and arguments recognize attributes to control initialization behavior
 
-Any attribute that derives from `GraphQLAttribute`, such as `GraphQLAuthorizeAttribute`, can be set on a
+Any attribute that derives from `GraphQLAttribute`, such as `AuthorizeAttribute`, can be set on a
 CLR class or one if its properties, fields, methods or method arguments and is configured for the graph,
 field type or query argument. New attributes have been updated or added for convenience as follows:
 
@@ -282,7 +283,9 @@ field type or query argument. New attributes have been updated or added for conv
 | `[Metadata]`         | Specifies custom metadata to be added to the graph type, field or query argument |
 | `[Scoped]`           | For methods, specifies to create a DI service scope during resolver execution |
 | `[FromServices]`     | For method parameters, specifies that the argument value should be pulled from DI |
-| `[GraphQLAuthorize]` | Specifies an authorization policy for the graph type for field |
+| `[FromSource]`       | For method parameters, specifies that the argument value should be the context 'Source' |
+| `[FromUserContext]`  | For method parameters, specifies that the argument value should be the user context |
+| `[Authorize]`        | Specifies an authorization policy for the graph type for field |
 | `[GraphQLMetadata]`  | Specifies name, description, deprecation reason, or other properties for the graph type or field |
 
 Note: `[Scoped]` is provided through the GraphQL.MicrosoftDI NuGet package.
@@ -400,7 +403,7 @@ public class MyExecutionStrategySelector : IExecutionStrategySelector
         {
             OperationType.Query => ParallelExecutionStrategy.Instance,
             OperationType.Mutation => SerialExecutionStrategy.Instance,
-            OperationType.Subscription => throw new NotSupportedException(),
+            OperationType.Subscription => SubscriptionExecutionStrategy.Instance,
             _ => throw new InvalidOperationException()
         };
     }
@@ -414,6 +417,218 @@ servcies.AddGraphQL(builder => builder
 
 The `DocumentExecuter.SelectExecutionStrategy` method is still available to be overridden for
 backwards compatibility but may be removed in the next major version.
+
+### 13. Schema builder and `FieldDelegate` improvements for reflected methods
+
+When configuring a CLR method for a field, the method arguments now allow the use of all of
+the new attributes available to `AutoRegisteringObjectGraphType`, such as `[FromServices]`.
+Field resolvers are now precompiled, resulting in faster performance.
+
+As always, when the CLR type is not the source type, the CLR type is pulled from DI.
+Now the CLR type will be pulled from `context.RequestServices` to allow for scoped instances.
+If `RequestServices` is `null`, the root DI provider will be used as it was before.
+
+Note that existing methods will require the use of `[FromSource]` and `[FromUserContext]` for
+applicable method arguments.
+
+```csharp
+// v4
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    // DI-injected services are always pulled from the root DI provider, so scoped services are not supported
+    private readonly Repository _repo;
+    public DroidType(Repository repo)
+    {
+        _repo = repo;
+    }
+
+    public int Id(Droid source) => source.Id;
+
+    public IEnumerable<Droid> Friends(Droid source) => _repo.FriendsOf(source.Id);
+}
+
+// v5
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    // scoped services are supported, so long as ExecutionOptions.RequestServices is set
+    private readonly Repository _repo;
+    public DroidType(Repository repo)
+    {
+        _repo = repo;
+    }
+
+    // requires use of [FromSource]
+    public int Id([FromSource] Droid source) => source.Id;
+
+    public IEnumerable<Droid> Friends([FromSource] Droid source) => _repo.FriendsOf(source.Id);
+}
+
+// v5 alternate
+[GraphQLMetadata("Droid")]
+class DroidType
+{
+    public int Id([FromSource] Droid source) => source.Id;
+
+    // only inject Repository where needed
+    public IEnumerable<Droid> Friends([FromSource] Droid source, [FromServices] Repository repo) => repo.FriendsOf(source.Id);
+}
+```
+
+Similar changes may be necessary when using `FieldDelegate` to assign a field resolver.
+
+### 14. ValueTask support
+
+The execution pipeline has been changed to use `ValueTask` throughout. To support this change, the following
+interfaces have been slightly changed to have methods with `ValueTask` signatures:
+
+- `IFieldResolver`
+- `IEventStreamResolver` (renamed to `ISourceStreamResolver`) (`IAsyncEventStreamResolver` has been removed)
+- `IFieldMiddleware`
+- `IValidationRule`
+
+This will result in a substantial speed increase for schemas that use field middleware.
+
+In addition, `ValueTask<T>` return types are supported for fields built on CLR methods via the schema builder,
+fields built on CLR methods via `AutoRegisteringObjectGraphType`, and fields built on CLR methods via `FieldDelegate`.
+
+When manually instantiating a field or subscription resolver, you may use a delegate that return a `ValueTask` by
+using new constructors available on the `FuncFieldResolver` or `SourceStreamResolver` classes.
+
+### 15. `NameFieldResolver` enhanced method support
+
+When adding a field by name only, such as `Field<StringGraphType>("Name");`, and the field matches a method
+rather than a property on the source object, the method parameters are parsed similarly to `FieldDelegate`
+as noted above with support for query arguments, `IResolveFieldContext`, `[FromServices]` and so on.
+
+### 16. Schemas can be entirely constructed from CLR types
+
+A new builder method `AddAutoSchema` has been added to allow building a schema entirely from CLR types
+using the new features within the auto-registering graph types to build the schema. Below is a sample:
+
+```csharp
+// sample configuration of DI
+var services = new ServiceCollection();
+services.AddGraphQL(b => b
+    .AddAutoSchema<Query>(s => s.WithMutation<Mutation>())
+    .AddSystemTextJson());
+var provider = services.BuildServiceProvider();
+
+
+// sample execution from DI
+var result = await provider.GetRequiredService<IDocumentExecuter>().ExecuteAsync(o =>
+{
+    o.RequestServices = provider;
+    o.Schema = provider.GetRequiredService<ISchema>();
+    o.Query = "{hero}";
+});
+var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
+// resultString returns the following JSON: {"data":{"hero":"Luke Skywalker"}}
+
+
+// sample schema
+public class Query
+{
+    public static string Hero => "Luke Skywalker";
+    public static IEnumerable<Droid> Droids => new Droid[] { new Droid("R2D2"), new Droid("C3PO") };
+}
+
+public class Mutation
+{
+    public static string Hero(string name) => name;
+}
+
+public record Droid(string Name);
+```
+
+Subscriptions are supported; interface or union graph types are not currently supported. You may
+mix the documented "graphtype-first" approach with the CLR types to implement anything not supported
+by the auto-registering graph types.
+
+### 17. `IGraphQLSerializer` implementations support serialization of `ExecutionError` instances.
+
+Previously, only when serializing an `ExecutionResult` instance would `ExecutionError` instances
+be properly serialized. Now you may serialize a `ExecutionError` instance directly and it will
+be handled by the specified `IErrorInfoProvider` and serialized correctly. This can be useful
+when implementing the newer `graphql-transport-ws` WebSockets protocol.
+
+### 18. `IDocumentExecuter<>` interface added to better support multiple schema registrations.
+
+To better support user classes based on a specific schema, the `IDocumentExecuter<>` interface
+and default implementation has been added which allows for executing a request without specifying
+the schema in the `ExecutionOptions`. The execution will pull the schema from dependency injection
+at run-time, supporting both singleton and scoped schemas. `RequestServices` is required to be
+provided.
+
+```csharp
+// sample that executes a request against MySchema
+var executer = serviceProvider.GetRequiredService<IDocumentExecuter<MySchema>>();
+var options = new ExecutionOptions
+{
+    Query = "{hero}",
+    RequestServices = serviceProvider,
+};
+var result = await executer.ExecuteAsync(options);
+```
+
+### 19. Subscription support improved
+
+Support for subscriptions has been moved from the `GraphQL.SystemReactive` nuget package directly into
+the main `GraphQL` package. There is no need to use `SubscriptionDocumentExecuter` (removed), and the default
+document executer will support subscriptions without overriding `SelectExecutionStrategy`.
+
+The new implementation of `SubscriptionExecutionStrategy` supports some new features and bug fixes:
+
+1. Serial execution of data events' field resolvers is supported by passing an instance of
+   `SerialExecutionStrategy` to the constructor. As before, parallel execution is default.
+
+2. Errors and output extensions are returned along with data events.
+
+3. Memory leaks have been eliminated in the case of errors, output extensions, metrics being enabled,
+   or the use of the context's array pool.
+
+4. The unhandled exception handler properly handles all error situations that it was designed to.
+
+5. The `System.Reactive` nuget reference is not necessary for GraphQL. You may still choose to use
+   `System.Reactive` nuget package in your library if you wish.
+
+6. Derived implementations allow for a scoped DI provider during execution of data events. It will
+   be necessary to override `ProcessDataAsync` and change the `ExecutionContext.RequestServices` property to a scoped
+   instance before calling `base.ProcessDataAsync`.
+
+There are a number of other minor issues fixed; see these links for more details:
+
+- https://github.com/graphql-dotnet/graphql-dotnet/issues/3002
+- https://github.com/graphql-dotnet/graphql-dotnet/pull/3004
+
+### 20. `Authorize`, `AuthorizeWithRoles` and `AllowAnonymous` extension methods added in GraphQL 5.1.0 and 5.1.1
+
+`AuthorizeWithRoles` allows for specifying roles rather than just policies that can be used to validate a request.
+`Authorize` can be used to specify that only authentication is required, without specifying any specific roles or policies.
+`AllowAnonymous` typically indicates that anonymous access should be allowed to a field of a graph type requiring authorization,
+providing that no other fields were selected. As with `AuthorizeWithPolicy` (renamed from `AuthorizeWith`), these
+new methods require support by a third-party library to perform the validation.
+
+Similar to the ASP.NET Core `AuthorizeAttribute`, the new `AuthorizeWithRoles` method accepts
+a comma-separated list of role names that would allow access to the graph or field.
+
+```csharp
+graph.AuthorizeWithRoles("Administrators,Managers");
+```
+
+You may also supply a list of strings as in the following example:
+
+```csharp
+graph.AuthorizeWithRoles("Administrators", "Managers");
+```
+
+For schema-first and "type-first" graphs, the `[GraphQLAuthorize]` has been updated to support roles and can now
+be used without any policy or role names, and an `[AllowAnonymous]` attribute has been added.
+
+### 21. `RequestServices` added to `ValidationContext` in GraphQL 5.1.0
+
+This allows for validation rules to access scoped services if necessary.
 
 ## Breaking Changes
 
@@ -555,7 +770,7 @@ The `ExecutionOptions.Variables` property does not require `Inputs.Empty`, but i
 tests based on the `.ToInputs()` extension method, you may want a direct replacement.
 Equivalent code to the previous functionality is as follows:
 
-```cs
+```csharp
 using GraphQL;
 using GraphQL.SystemTextJson;
 
@@ -563,16 +778,16 @@ public static class StringExtensions
 {
     private static readonly GraphQLSerializer _serializer = new();
 
-    public static Inputs ToInputs(string json)
+    public static Inputs ToInputs(this string json)
         => json == null ? Inputs.Empty : _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
 
-    public static Inputs ToInputs(System.Text.Json.JsonElement element)
+    public static Inputs ToInputs(this System.Text.Json.JsonElement element)
         => _serializer.ReadNode<Inputs>(element) ?? Inputs.Empty;
 
-    public static T FromJson<T>(string json)
+    public static T? FromJson<T>(this string json)
         => _serializer.Deserialize<T>(json);
 
-    public static System.Threading.Tasks.ValueTask<T> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default)
+    public static System.Threading.Tasks.ValueTask<T?> FromJsonAsync<T>(this System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default)
         => _serializer.ReadAsync<T>(stream, cancellationToken);
 }
 ```
@@ -664,7 +879,7 @@ public class AutoRegisteringObjectGraphTypeWithoutMethods<T> : AutoRegisteringOb
 
 Register this class within your DI engine like this:
 
-```cs
+```csharp
 services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphTypeWithoutMethods<>));
 ```
 
@@ -680,6 +895,9 @@ Consider GraphQL `enum Color { RED GREEN BLUE }` and corresponding `EnumerationG
 In v4 `ParseValue("rED")` yields internal value for `RED` name. In v5 this behavior was changed
 and `ParseValue("rED")` throws error `Unable to convert 'rED' to the scalar type 'Color'`.
 
+See https://github.com/graphql-dotnet/graphql-dotnet/issues/3105 for code to revert to the
+old behavior.
+
 ### 27. `EnumerationGraphType.AddValue` changes
 
 `description` argument from `EnumerationGraphType.AddValue` method was marked as optional
@@ -694,24 +912,238 @@ Previously the settings class used was `Newtonsoft.Json.JsonSerializerSettings`.
 is `GraphQL.NewtonsoftJson.JsonSerializerSettings`. The class inherits from the former class,
 but sets the default date parsing behavior set to 'none'.
 
-### 29. `SubscriptionDocumentExecuter` and `.AddSubscriptionDocumentExecuter()` have been deprecated.
+### 29. Schema builder CLR types' method arguments require `[FromSource]` and `[FromUserContext]` where applicable
 
-While these can continue to be used for the lifetime of v5, it is now suggested to use the
-`.AddSubscriptionExecutionStrategy()` builder method instead:
+See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
+
+### 30. FieldDelegate method arguments require `[FromSource]` and `[FromUserContext]` where applicable
+
+See New Features: 'Schema builder and `FieldDelegate` improvements for reflected methods' above.
+
+### 31. Code removed to support prior implementation of FieldDelegate and schema builder
+
+The following classes and methods have been removed:
+
+- The `EventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter.
+- The `AsyncEventStreamResolver` implementation which accepted an `IAccessor` as a construtor parameter.
+- The `DelegateFieldModelBinderResolver` class.
+- The `ReflectionHelper.BuildArguments` method.
+
+You may use the following classes and methods as replacements:
+
+- The `MemberResolver` class is an `IFieldResolver` implementation for a property, method or field. Expressions are passed
+  to the constructor for the instance (and if applicable, method arguments), which is immediately compiled.
+- The `SourceStreamMethodResolver` class is an `ISourceStreamResolver` (previously `IEventStreamResolver`) implementation
+  for a method that returns an `IObservable<T>` or `Task<IObservable<T>>`. It also provides a basic `IFieldResolver`
+  implementation for subscription fields.
+- The `AutoRegisteringHelper.BuildFieldResolver` method builds a field resolver around a specifed property, method or field.
+- The `AutoRegisteringHelper.BuildEventStreamResolver` method builds an event stream resolver around a specified method.
+
+### 32. ValueTask execution pipeline support changes
+
+The following interfaces have been modified to support a `ValueTask` pipeline:
+
+- `IFieldResolver`
+- `ISourceStreamResolver` (previously `IEventStreamResolver`)
+- `IFieldMiddleware` and `FieldMiddlewareDelegate`
+- `IValidationRule`
+
+The following interfaces have been removed:
+
+- `IAsyncEventStreamResolver`
+
+All classes which implemented the above interfaces have been modified as necessary:
+
+- `ExpressionFieldResolver`
+- `FuncFieldResolver` (`AsyncFieldResolver` was absorbed by it)
+- `InstrumentFieldsMiddleware`
+- `NameFieldResolver`
+- `SourceStreamResolver` (previously `EventStreamResolver` and `AsyncEventStreamResolver`)
+- All built-in validation rules
+
+These properties have been removed:
+
+- `EventStreamFieldType.AsyncSubscriber` (note: the `EventStreamFieldType` class was removed and the `Subscriber`
+   property moved to the `FieldType` class and renamed to `StreamResolver`)
+- `FieldConfig.AsyncSubscriber`
+
+Any direct implementation of these interfaces or classes derived from the above list will need to be modified to fit the new design.
+
+In addition, it is required that any asynchronous fields must use an appropriate asynchronous field builder method or
+asynchronous field resolver, and inferred methods (built by the schema builder, `FieldDelegate`, or `AutoRegisteringObjectGraphType`)
+must be strongly typed.
+
+```csharp
+// works in v4, not in v5 (throws in runtime)
+Field<CharacterInterface>("hero", resolve: context => data.GetDroidByIdAsync("3"));
+
+// works in v4 or v5
+FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
+
+
+// works in v4, not in v5
+AddField(new FieldType
+{
+    Name = "hero",
+    Resolver = new FuncFieldResolver<Task<Droid>>(context => data.GetDroidByIdAsync("3")),
+});
+
+// works in v4 or v5
+AddField(new FieldType
+{
+    Name = "hero",
+    Resolver = new AsyncFieldResolver<Droid>(context => data.GetDroidByIdAsync("3")),
+});
+
+
+// works in v4, not in v5
+Func<IResolveFieldContext, string, object> func = (context, id) => data.GetDroidByIdAsync(id);
+FieldDelegate<DroidType>(
+    "droid",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+    ),
+    resolve: func
+);
+
+// works in v4 or v5
+Func<IResolveFieldContext, string, Task<Droid>> func = (context, id) => data.GetDroidByIdAsync(id);
+FieldDelegate<DroidType>(
+    "droid",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the droid" }
+    ),
+    resolve: func
+);
+```
+
+### 33. `IResolveEventStreamContext` interface and `ResolveEventStreamContext` class removed
+
+Please use the `IResolveFieldContext` interface and the `ResolveFieldContext` class instead. No other changes are required.
+
+### 34. `EventStreamFieldType` class removed
+
+Please use `FieldType` instead. The `Subscriber` property has been moved to the `FieldType` class so no other changes should be required.
+The `AsyncSubscriber` property has been removed as described above.
+
+### 35. `IEventStreamResolver<T>` interface removed
+
+For custom resolver implementations, please implement `ISourceStreamResolver` (previously `IEventStreamResolver`) interface instead.
+
+### 36. Asynchronous field resolver classes have been removed
+
+These classes have been removed:
+
+- `ScopedAsyncFieldResolver`
+- `AsyncFieldResolver`
+- `AsyncEventStreamResolver`
+
+Please use the new `ValueTask`-based constructors on `ScopedFieldResolver`, `FuncFieldResolver` and `SourceStreamResolver`
+(previously `EventStreamResolver`) instead.
 
 ```csharp
 // v4
-services.AddGraphQL()
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionDocumentExecuter();
+var resolver = new AsyncFieldResolver<string>(async context => await GetSomeString());
 
 // v5
-services.AddGraphQL(builder => builder
-   .AddSchema<StarWarsSchema>()
-   .AddSubscriptionExecutionStrategy());
+var resolver = new FuncFieldResolver<string>(async context => await GetSomeString());
+
+
+// v4
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new AsyncFieldResolver(func);
+
+// v5 option 1
+Func<IResolveFieldContext, ValueTask<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(func);
+
+// v5 option 2
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(context => new ValueTask<string>(func(context)));
+
+// v5 option 3
+Func<IResolveFieldContext, Task<string>> func = async context => await GetSomeString();
+var resolver = new FuncFieldResolver(async context => await func(context));
 ```
 
-For more details on the new approach to execution strategy selection, please review the new feature above titled:
+Field builder methods have not changed and still require a `Task<T>` return value for asynchronous field resolver delegates.
 
-> The `ExecutionStrategy` selected for an operation can be configured through `IGraphQLBuilder`
+### 37. `NameFieldResolver` implementation supports methods with arguments; may cause `AmbigiousMatchException`
 
+The `NameFieldResolver`, used when adding a field by name (e.g. `Field<StringGraphType>("Name");`),
+now supports methods with arguments. During resolver execution, it first looks for a matching property
+with the specified name, and if none is found, looks for a method with the matching name. Since it
+now supports methods with arguments as well as methods without arguments, an `AmbigiousMatchException`
+can occur if the name refers to a public method with multiple overloads. Either specify a field
+resolver explicitly, or reduce the number of public methods with the same name to one.
+
+### 38. `SchemaTypes` updated to support DI-injected mapping providers
+
+- `Initialize` method signature changed to include DI-injected mappings.
+
+- `GetGraphTypeFromClrType` method signature changed to include DI-injected mappings.
+  Rather than a list of CLR to graph type tuples provided to the method, now a list of
+  `IGraphTypeMappingProvider` instances is provided.
+
+### 39. `ExecutionResultJsonConverter` does not handle `ExecutionError`.
+
+If you directly create an instance of `ExecutionResultJsonConverter` and adding it to a set of
+serializer options, you will now need to also add `ExecutionErrorJsonConverter` also. The
+`IErrorInfoProvider` instance previously passed to the `ExecutionResultJsonConverter` will
+need to be passed to the `ExecutionErrorJsonConverter` instead. Typically no changes are
+necessary to user code for this API change.
+
+### 40. Subscription document executer removed
+
+Subscription support is provided by the `DocumentExecuter` implementation without the need to
+use `SubscriptionDocumentExecuter` or override `DocumentExecuter.SelectExecutionStrategy`. You may
+also remove references to the `IGraphQLBuilder.AddSubscriptionDocumentExecuter` method.
+
+### 41. Subscription nuget package removed
+
+Subscription support has been moved into the main project. If you have a need to reference
+`SubscriptionExecutionStrategy`, it now exists within the `GraphQL` nuget package. You
+will need to remove references to the `GraphQL.SystemReactive` nuget package.
+
+### 42. `SubscriptionExecutionResult` class removed
+
+The `SubscriptionExecutionResult.Streams` property has been moved to the `ExecutionResult` class.
+Please use the `ExecutionResult` class rather than the `SubscriptionExecutionResult` class.
+
+### 43. `DateTimeOffsetGraphType` does not adjust to UTC
+
+Previously any ISO-8601 date/time values were converted to UTC before being returned in
+a `DateTimeOffset` value from the `DateTimeOffsetGraphType`. This results in a loss of
+information that was provided to the GraphQL request. In v5, the time offset is preserved.
+
+Although typically `DateTimeOffset` values are not assumed to be in any specific time zone,
+if your code does so, you may need to make changes to your code or implement a custom scalar
+to replace the default scalar.
+
+You may be affected by this change if you use certain versions of Npgsql.
+See https://www.npgsql.org/doc/types/datetime.html
+
+### 44. `OverlappingFieldsCanBeMerged` validation rule enabled by default
+
+Previously this rule, part of the GraphQL specification, was not enabled by default; in
+GraphQL.NET v5 it is enabled by default as part of the `DocumentValidator.CoreRules` list.
+
+### 45. Subscription methods, classes and interfaces renamed
+
+- `IEventStreamResolver` is now `ISourceStreamResolver`
+- `EventStreamResolver` is now `SourceStreamResolver`
+- `IAsyncEventStreamResolver` and `AsyncEventStreamResolver` have been removed
+- `IEventStreamResolver.Subscriber` is now `ISourceStreamResolver.ResolveAsync`
+- Field builder `Subscribe` and `SubscribeAsync` methods are now `ResolveStream` and `ResolveStreamAsync`
+
+### 46. `ValidationContext.GetRecursiveVariables` returns null instead of an empty list
+
+This was done for the purposes of the overall strategy for reducing memory consumption.
+
+### 47. `AuthorizeWith` renamed to `AuthorizeWithPolicy` in 5.1.0
+
+This change was made to clarify and differentiate between `AuthorizeWithRoles`.
+
+### 48. `GraphQLAuthorizeAttribute` renamed to `AuthorizeAttribute` in 5.1.1
+
+This change was made to align with the rest of the attributes' names.

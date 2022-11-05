@@ -62,15 +62,9 @@ namespace GraphQL.MicrosoftDI
         public GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
         public GraphQL.DI.IServiceRegister Register(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false) { }
         protected override void RegisterDefaultServices() { }
-        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, object implementationInstance) { }
-        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime) { }
-        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime) { }
-    }
-    public static class GraphQLBuilderExtensions
-    {
-        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
-        public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
-            where TSchema :  class, GraphQL.Types.ISchema { }
+        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, object implementationInstance, GraphQL.DI.RegistrationCompareMode mode = 0) { }
+        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Func<System.IServiceProvider, object> implementationFactory, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0) { }
+        public GraphQL.DI.IServiceRegister TryRegister(System.Type serviceType, System.Type implementationType, GraphQL.DI.ServiceLifetime serviceLifetime, GraphQL.DI.RegistrationCompareMode mode = 0) { }
     }
     public class ResolverBuilder<TSourceType, TReturnType>
     {
@@ -123,14 +117,6 @@ namespace GraphQL.MicrosoftDI
         public GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public GraphQL.MicrosoftDI.ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5> WithScope() { }
     }
-    public class ScopedAsyncFieldResolver<TReturnType> : GraphQL.Resolvers.AsyncFieldResolver<TReturnType>
-    {
-        public ScopedAsyncFieldResolver(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
-    }
-    public class ScopedAsyncFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.AsyncFieldResolver<TReturnType>
-    {
-        public ScopedAsyncFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
-    }
     public static class ScopedConnectionBuilderExtensions
     {
         public static GraphQL.MicrosoftDI.ConnectionResolverBuilder<TSourceType, object> Resolve<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder) { }
@@ -148,11 +134,21 @@ namespace GraphQL.MicrosoftDI
     }
     public class ScopedFieldResolver<TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
     {
-        public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext, TReturnType> resolver) { }
+        public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<TReturnType?>> resolver) { }
+        public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext, TReturnType?> resolver) { }
     }
     public class ScopedFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
     {
+        public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.ValueTask<TReturnType?>> resolver) { }
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolver) { }
+    }
+    public class ScopedSubscriptionExecutionStrategy : GraphQL.Execution.SubscriptionExecutionStrategy
+    {
+        public ScopedSubscriptionExecutionStrategy(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory) { }
+        public ScopedSubscriptionExecutionStrategy(Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory, GraphQL.Execution.IExecutionStrategy executionStrategy) { }
+        protected override GraphQL.Execution.ExecutionContext CloneExecutionContext(GraphQL.Execution.ExecutionContext context, System.Threading.CancellationToken token) { }
+        protected override System.Threading.Tasks.ValueTask<GraphQL.ExecutionResult> ProcessDataAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, object? value) { }
+        protected override System.Threading.Tasks.Task<GraphQL.ExecutionError> ProcessErrorAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception exception) { }
     }
     public class SelfActivatingServiceProvider : System.IServiceProvider
     {
@@ -162,6 +158,13 @@ namespace GraphQL.MicrosoftDI
 }
 namespace GraphQL
 {
+    public static class MicrosoftDIGraphQLBuilderExtensions
+    {
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddGraphQL(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, System.Action<GraphQL.DI.IGraphQLBuilder>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder, bool serialExecution = true) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TSchema :  class, GraphQL.Types.ISchema { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     public class ScopedAttribute : GraphQL.GraphQLAttribute
     {

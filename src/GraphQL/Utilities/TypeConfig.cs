@@ -1,4 +1,3 @@
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -9,7 +8,7 @@ namespace GraphQL.Utilities
     public class TypeConfig : MetadataProvider
     {
         private readonly LightweightCache<string, FieldConfig> _fields =
-            new LightweightCache<string, FieldConfig>(f => new FieldConfig(f));
+            new(f => new FieldConfig(f));
 
         private Type? _type;
 
@@ -22,6 +21,9 @@ namespace GraphQL.Utilities
             Name = name;
         }
 
+        /// <summary>
+        /// Gets or sets the CLR type of the GraphQL type configured by this instance.
+        /// </summary>
         public Type? Type
         {
             get => _type;
@@ -48,10 +50,17 @@ namespace GraphQL.Utilities
         /// </summary>
         public string? DeprecationReason { get; set; }
 
+        /// <inheritdoc cref="IAbstractGraphType.ResolveType"/>
         public Func<object, IObjectGraphType>? ResolveType { get; set; }
 
+        /// <inheritdoc cref="IObjectGraphType.IsTypeOf"/>
         public Func<object, bool>? IsTypeOfFunc { get; set; }
 
+        /// <summary>
+        /// Sets the <see cref="IsTypeOfFunc"/> property to a delegate
+        /// that returns <see langword="true"/> when the object is a type
+        /// that can be cast to <typeparamref name="T"/>.
+        /// </summary>
         public void IsTypeOf<T>()
         {
             IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeof(T)) ?? false;
@@ -65,7 +74,7 @@ namespace GraphQL.Utilities
 
         private void ApplyMetadata(Type? type)
         {
-            var attributes = type?.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = type?.GetGraphQLAttributes();
 
             if (attributes == null)
                 return;

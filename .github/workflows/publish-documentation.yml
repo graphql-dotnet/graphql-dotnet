@@ -8,6 +8,7 @@ on:
       - docs2/**
       - package.json
       - yarn.lock
+      - .github/workflows/publish-documentation.yml
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
@@ -17,30 +18,48 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          path: main
+      - name: Checkout publish target
+        uses: actions/checkout@v3
+        with:
+          repository: graphql-dotnet/graphql-dotnet.github.io
+          token: ${{ secrets.ORG_PAT_TOKEN }}
+          path: published
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
         run: yarn
+        working-directory: main
       - name: yarn docs2
-        working-directory: docs2
+        working-directory: main/docs2
         run: yarn
       - name: yarn gatsby build
-        working-directory: docs2
+        working-directory: main/docs2
         run: yarn gatsby build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Documentation
-          path: docs2/public/**
+          path: main/docs2/public/**
           if-no-files-found: error
-      - name: Deploy documentation
-        uses: seanmiddleditch/gha-publish-to-git@v2
-        with:
-          repository: graphql-dotnet/graphql-dotnet.github.io
-          branch: master
-          github_token: '${{ secrets.GITHUB_TOKEN  }}'
-          github_pat: '${{ secrets.ORG_PAT_TOKEN }}'
-          source_folder: docs2/public
+      - name: Commit docs
+        shell: bash
+        run: |
+          rsync -a --quiet --delete --exclude ".git" "main/docs2/public/" "published/" || exit 1
+          cd published
+          git config user.name github-actions
+          git config user.email github-actions@graphql-dotnet.net
+          git add --all
+
+          err=$(git status 2>&1)
+          str="nothing to commit, working tree clean"
+          if [[ "$err" == *"$str"* ]]; then
+            echo "Documentation files are up to date, nothing to commit/push"
+          else
+            git commit -a -m "Documentation update"
+            git push
+          fi

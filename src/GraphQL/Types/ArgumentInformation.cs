@@ -4,10 +4,10 @@ using System.Reflection;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Contains information pertaining to a method parameter in preparation for buliding an
+    /// Contains information pertaining to a method parameter in preparation for building an
     /// expression or query argument for it.
     /// <br/><br/>
-    /// If <see cref="ArgumentInformation.Expression"/> is set, a query argument will not be added
+    /// If <see cref="Expression"/> is set, a query argument will not be added
     /// and the expression will be used to build the method resolver.
     /// <br/><br/>
     /// If not, a query argument will be generated and added to the field; the field resolver will
@@ -18,11 +18,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
-        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation, LambdaExpression? expression)
+        public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation, LambdaExpression? expression)
         {
             ParameterInfo = parameterInfo ?? throw new ArgumentNullException(nameof(parameterInfo));
-            FieldType = fieldType ?? throw new ArgumentNullException(nameof(fieldType));
-            SourceType = sourceType ?? throw new ArgumentNullException(nameof(sourceType));
+            FieldType = fieldType; // ?? throw new ArgumentNullException(nameof(fieldType));
+            SourceType = sourceType; // ?? throw new ArgumentNullException(nameof(sourceType));
             TypeInformation = typeInformation ?? throw new ArgumentNullException(nameof(typeInformation));
             Expression = expression;
         }
@@ -33,18 +33,16 @@ namespace GraphQL.Types
         /// an expression is generated for the parameter and set within <see cref="Expression"/>; otherwise
         /// <see cref="Expression"/> is set to <see langword="null"/>.
         /// </summary>
-        public ArgumentInformation(ParameterInfo parameterInfo, Type sourceType, FieldType fieldType, TypeInformation typeInformation)
+        public ArgumentInformation(ParameterInfo parameterInfo, Type? sourceType, FieldType? fieldType, TypeInformation typeInformation)
             : this(parameterInfo, sourceType, fieldType, typeInformation, null)
         {
             if (parameterInfo.ParameterType == typeof(IResolveFieldContext))
             {
-                Expression<Func<IResolveFieldContext, IResolveFieldContext>> expr = x => x;
-                Expression = expr;
+                Expression = (IResolveFieldContext x) => x;
             }
             else if (parameterInfo.ParameterType == typeof(CancellationToken))
             {
-                Expression<Func<IResolveFieldContext, CancellationToken>> expr = x => x.CancellationToken;
-                Expression = expr;
+                Expression = (IResolveFieldContext x) => x.CancellationToken;
             }
         }
 
@@ -57,12 +55,12 @@ namespace GraphQL.Types
         /// The expected type of <see cref="IResolveFieldContext.Source"/>.
         /// Should equal <c>TSourceType</c> within <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>.
         /// </summary>
-        public Type SourceType { get; }
+        public Type? SourceType { get; }
 
         /// <summary>
         /// The <see cref="Types.FieldType"/> that the query argument will be added to.
         /// </summary>
-        public FieldType FieldType { get; }
+        public FieldType? FieldType { get; }
 
         /// <summary>
         /// The parsed type information of the method parameter.
@@ -131,18 +129,19 @@ namespace GraphQL.Types
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
                 throw new ArgumentException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.", nameof(argumentDelegate));
 
-            Expression = (Expression<Func<IResolveFieldContext, TParameterType?>>)(context => argumentDelegate(context));
+            Expression = (IResolveFieldContext context) => argumentDelegate(context);
         }
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes pulled from the <see cref="ArgumentInformation.ParameterInfo">ParameterInfo</see> onto this instance.
+        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
         /// </summary>
         public virtual void ApplyAttributes()
         {
-            var attributes = ParameterInfo.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            var attributes = ParameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
-                ((GraphQLAttribute)attr).Modify(this);
+                attr.Modify(this);
             }
         }
 

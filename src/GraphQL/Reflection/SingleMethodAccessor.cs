@@ -5,8 +5,9 @@ namespace GraphQL.Reflection
 {
     internal class SingleMethodAccessor : IAccessor
     {
-        public SingleMethodAccessor(MethodInfo method)
+        public SingleMethodAccessor(Type declaringType, MethodInfo method)
         {
+            DeclaringType = declaringType; // may be a derived type rather than method.DeclaringType
             MethodInfo = method;
         }
 
@@ -14,7 +15,7 @@ namespace GraphQL.Reflection
 
         public Type ReturnType => MethodInfo.ReturnType;
 
-        public Type DeclaringType => MethodInfo.DeclaringType!;
+        public Type DeclaringType { get; }
 
         public ParameterInfo[] Parameters => MethodInfo.GetParameters();
 

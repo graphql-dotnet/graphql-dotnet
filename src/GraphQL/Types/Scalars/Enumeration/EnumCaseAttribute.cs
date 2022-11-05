@@ -39,4 +39,13 @@ namespace GraphQL.Types
         /// <inheritdoc />
         public override string ChangeEnumCase(string val) => val.ToPascalCase();
     }
+
+    /// <summary>
+    /// Returns enum names as is.
+    /// </summary>
+    public class AsIsCaseAttribute : EnumCaseAttribute
+    {
+        /// <inheritdoc />
+        public override string ChangeEnumCase(string val) => val;
+    }
 }

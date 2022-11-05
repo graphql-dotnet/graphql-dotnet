@@ -124,7 +124,7 @@ namespace GraphQL.Execution
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                if (!(input is GraphQLObjectValue objectValue))
+                if (input is not GraphQLObjectValue objectValue)
                 {
                     throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                 }
@@ -133,7 +133,7 @@ namespace GraphQL.Execution
 
                 foreach (var field in inputObjectGraphType.Fields.List)
                 {
-                    // https://spec.graphql.org/June2018/#sec-Input-Objects
+                    // https://spec.graphql.org/October2021/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {

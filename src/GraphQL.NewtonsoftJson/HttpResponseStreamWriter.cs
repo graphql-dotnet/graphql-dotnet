@@ -6,328 +6,327 @@
 using System.Buffers;
 using System.Text;
 
-namespace GraphQL.NewtonsoftJson
+namespace GraphQL.NewtonsoftJson;
+
+/// <summary>
+/// Writes to the <see cref="Stream"/> using the supplied <see cref="Encoding"/>.
+/// It does not write the BOM and also does not close the stream.
+/// </summary>
+internal class HttpResponseStreamWriter : TextWriter
 {
-    /// <summary>
-    /// Writes to the <see cref="Stream"/> using the supplied <see cref="Encoding"/>.
-    /// It does not write the BOM and also does not close the stream.
-    /// </summary>
-    internal class HttpResponseStreamWriter : TextWriter
+    internal const int DEFAULT_BUFFER_SIZE = 16 * 1024;
+
+    private readonly Stream _stream;
+    private readonly Encoder _encoder;
+    private readonly ArrayPool<byte> _bytePool;
+    private readonly ArrayPool<char> _charPool;
+    private readonly int _charBufferSize;
+
+    private readonly byte[] _byteBuffer;
+    private readonly char[] _charBuffer;
+
+    private int _charBufferCount;
+    private bool _disposed;
+
+    public HttpResponseStreamWriter(Stream stream, Encoding encoding)
+        : this(stream, encoding, DEFAULT_BUFFER_SIZE, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
     {
-        internal const int DEFAULT_BUFFER_SIZE = 16 * 1024;
+    }
 
-        private readonly Stream _stream;
-        private readonly Encoder _encoder;
-        private readonly ArrayPool<byte> _bytePool;
-        private readonly ArrayPool<char> _charPool;
-        private readonly int _charBufferSize;
+    public HttpResponseStreamWriter(
+        Stream stream,
+        Encoding encoding,
+        int bufferSize,
+        ArrayPool<byte> bytePool,
+        ArrayPool<char> charPool)
+    {
+        _stream = stream ?? throw new ArgumentNullException(nameof(stream));
+        Encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
+        _bytePool = bytePool ?? throw new ArgumentNullException(nameof(bytePool));
+        _charPool = charPool ?? throw new ArgumentNullException(nameof(charPool));
 
-        private readonly byte[] _byteBuffer;
-        private readonly char[] _charBuffer;
-
-        private int _charBufferCount;
-        private bool _disposed;
-
-        public HttpResponseStreamWriter(Stream stream, Encoding encoding)
-            : this(stream, encoding, DEFAULT_BUFFER_SIZE, ArrayPool<byte>.Shared, ArrayPool<char>.Shared)
+        if (bufferSize <= 0)
         {
+            throw new ArgumentOutOfRangeException(nameof(bufferSize));
+        }
+        if (!_stream.CanWrite)
+        {
+            throw new ArgumentException("Stream is not writable", nameof(stream));
         }
 
-        public HttpResponseStreamWriter(
-            Stream stream,
-            Encoding encoding,
-            int bufferSize,
-            ArrayPool<byte> bytePool,
-            ArrayPool<char> charPool)
+        _charBufferSize = bufferSize;
+
+        _encoder = encoding.GetEncoder();
+        _charBuffer = charPool.Rent(bufferSize);
+
+        try
         {
-            _stream = stream ?? throw new ArgumentNullException(nameof(stream));
-            Encoding = encoding ?? throw new ArgumentNullException(nameof(encoding));
-            _bytePool = bytePool ?? throw new ArgumentNullException(nameof(bytePool));
-            _charPool = charPool ?? throw new ArgumentNullException(nameof(charPool));
+            var requiredLength = encoding.GetMaxByteCount(bufferSize);
+            _byteBuffer = bytePool.Rent(requiredLength);
+        }
+        catch
+        {
+            charPool.Return(_charBuffer);
 
-            if (bufferSize <= 0)
+            if (_byteBuffer != null)
             {
-                throw new ArgumentOutOfRangeException(nameof(bufferSize));
-            }
-            if (!_stream.CanWrite)
-            {
-                throw new ArgumentException("Stream is not writable", nameof(stream));
+                bytePool.Return(_byteBuffer);
             }
 
-            _charBufferSize = bufferSize;
+            throw;
+        }
+    }
 
-            _encoder = encoding.GetEncoder();
-            _charBuffer = charPool.Rent(bufferSize);
+    public override Encoding Encoding { get; }
 
-            try
-            {
-                var requiredLength = encoding.GetMaxByteCount(bufferSize);
-                _byteBuffer = bytePool.Rent(requiredLength);
-            }
-            catch
-            {
-                charPool.Return(_charBuffer);
-
-                if (_byteBuffer != null)
-                {
-                    bytePool.Return(_byteBuffer);
-                }
-
-                throw;
-            }
+    public override void Write(char value)
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        public override Encoding Encoding { get; }
-
-        public override void Write(char value)
+        if (_charBufferCount == _charBufferSize)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
+            FlushInternal(flushEncoder: false);
+        }
 
+        _charBuffer[_charBufferCount] = value;
+        _charBufferCount++;
+    }
+
+    public override void Write(char[] values, int index, int count)
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
+        }
+
+        if (values == null)
+        {
+            return;
+        }
+
+        while (count > 0)
+        {
             if (_charBufferCount == _charBufferSize)
             {
                 FlushInternal(flushEncoder: false);
             }
 
-            _charBuffer[_charBufferCount] = value;
-            _charBufferCount++;
+            CopyToCharBuffer(values, ref index, ref count);
+        }
+    }
+
+    public override void Write(string value)
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        public override void Write(char[] values, int index, int count)
+        if (value == null)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
-
-            if (values == null)
-            {
-                return;
-            }
-
-            while (count > 0)
-            {
-                if (_charBufferCount == _charBufferSize)
-                {
-                    FlushInternal(flushEncoder: false);
-                }
-
-                CopyToCharBuffer(values, ref index, ref count);
-            }
+            return;
         }
 
-        public override void Write(string value)
+        var count = value.Length;
+        var index = 0;
+        while (count > 0)
         {
-            if (_disposed)
+            if (_charBufferCount == _charBufferSize)
             {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
+                FlushInternal(flushEncoder: false);
             }
 
-            if (value == null)
-            {
-                return;
-            }
+            CopyToCharBuffer(value, ref index, ref count);
+        }
+    }
 
-            var count = value.Length;
-            var index = 0;
-            while (count > 0)
-            {
-                if (_charBufferCount == _charBufferSize)
-                {
-                    FlushInternal(flushEncoder: false);
-                }
-
-                CopyToCharBuffer(value, ref index, ref count);
-            }
+    public override async Task WriteAsync(char value)
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        public override async Task WriteAsync(char value)
+        if (_charBufferCount == _charBufferSize)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
+            await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
+        }
 
+        _charBuffer[_charBufferCount] = value;
+        _charBufferCount++;
+    }
+
+    public override async Task WriteAsync(char[] values, int index, int count)
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
+        }
+
+        if (values == null)
+        {
+            return;
+        }
+
+        while (count > 0)
+        {
             if (_charBufferCount == _charBufferSize)
             {
                 await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
             }
 
-            _charBuffer[_charBufferCount] = value;
-            _charBufferCount++;
+            CopyToCharBuffer(values, ref index, ref count);
         }
+    }
 
-        public override async Task WriteAsync(char[] values, int index, int count)
+    public override async Task WriteAsync(string value)
+    {
+        if (_disposed)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
-
-            if (values == null)
-            {
-                return;
-            }
-
-            while (count > 0)
-            {
-                if (_charBufferCount == _charBufferSize)
-                {
-                    await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
-                }
-
-                CopyToCharBuffer(values, ref index, ref count);
-            }
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        public override async Task WriteAsync(string value)
+        if (value == null)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
-
-            if (value == null)
-            {
-                return;
-            }
-
-            var count = value.Length;
-            var index = 0;
-            while (count > 0)
-            {
-                if (_charBufferCount == _charBufferSize)
-                {
-                    await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
-                }
-
-                CopyToCharBuffer(value, ref index, ref count);
-            }
+            return;
         }
 
-        // We want to flush the stream when Flush/FlushAsync is explicitly
-        // called by the user (example: from a Razor view).
-
-        public override void Flush()
+        var count = value.Length;
+        var index = 0;
+        while (count > 0)
         {
-            if (_disposed)
+            if (_charBufferCount == _charBufferSize)
             {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
+                await FlushInternalAsync(flushEncoder: false).ConfigureAwait(false);
             }
 
-            FlushInternal(flushEncoder: true);
+            CopyToCharBuffer(value, ref index, ref count);
         }
+    }
 
-        public override Task FlushAsync()
+    // We want to flush the stream when Flush/FlushAsync is explicitly
+    // called by the user (example: from a Razor view).
+
+    public override void Flush()
+    {
+        if (_disposed)
         {
-            if (_disposed)
-            {
-                throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
-            }
-
-            return FlushInternalAsync(flushEncoder: true);
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        protected override void Dispose(bool disposing)
+        FlushInternal(flushEncoder: true);
+    }
+
+    public override Task FlushAsync()
+    {
+        if (_disposed)
         {
-            if (disposing && !_disposed)
-            {
-                _disposed = true;
-                try
-                {
-                    FlushInternal(flushEncoder: true);
-                }
-                finally
-                {
-                    _bytePool.Return(_byteBuffer);
-                    _charPool.Return(_charBuffer);
-                }
-            }
-
-            base.Dispose(disposing);
+            throw new ObjectDisposedException(nameof(HttpResponseStreamWriter));
         }
 
-        // Note: our FlushInternal method does NOT flush the underlying stream. This would result in
-        // chunking.
-        private void FlushInternal(bool flushEncoder)
+        return FlushInternalAsync(flushEncoder: true);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && !_disposed)
         {
-            if (_charBufferCount == 0)
+            _disposed = true;
+            try
             {
-                return;
+                FlushInternal(flushEncoder: true);
             }
-
-            var count = _encoder.GetBytes(
-                _charBuffer,
-                0,
-                _charBufferCount,
-                _byteBuffer,
-                0,
-                flush: flushEncoder);
-
-            _charBufferCount = 0;
-
-            if (count > 0)
+            finally
             {
-                _stream.Write(_byteBuffer, 0, count);
+                _bytePool.Return(_byteBuffer);
+                _charPool.Return(_charBuffer);
             }
         }
 
-        // Note: our FlushInternalAsync method does NOT flush the underlying stream. This would result in
-        // chunking.
-        private async Task FlushInternalAsync(bool flushEncoder)
+        base.Dispose(disposing);
+    }
+
+    // Note: our FlushInternal method does NOT flush the underlying stream. This would result in
+    // chunking.
+    private void FlushInternal(bool flushEncoder)
+    {
+        if (_charBufferCount == 0)
         {
-            if (_charBufferCount == 0)
-            {
-                return;
-            }
-
-            var count = _encoder.GetBytes(
-                _charBuffer,
-                0,
-                _charBufferCount,
-                _byteBuffer,
-                0,
-                flush: flushEncoder);
-
-            _charBufferCount = 0;
-
-            if (count > 0)
-            {
-                await _stream.WriteAsync(_byteBuffer, 0, count).ConfigureAwait(false);
-            }
+            return;
         }
 
-        private void CopyToCharBuffer(string value, ref int index, ref int count)
+        var count = _encoder.GetBytes(
+            _charBuffer,
+            0,
+            _charBufferCount,
+            _byteBuffer,
+            0,
+            flush: flushEncoder);
+
+        _charBufferCount = 0;
+
+        if (count > 0)
         {
-            var remaining = Math.Min(_charBufferSize - _charBufferCount, count);
-
-            value.CopyTo(
-                sourceIndex: index,
-                destination: _charBuffer,
-                destinationIndex: _charBufferCount,
-                count: remaining);
-
-            _charBufferCount += remaining;
-            index += remaining;
-            count -= remaining;
+            _stream.Write(_byteBuffer, 0, count);
         }
+    }
 
-        private void CopyToCharBuffer(char[] values, ref int index, ref int count)
+    // Note: our FlushInternalAsync method does NOT flush the underlying stream. This would result in
+    // chunking.
+    private async Task FlushInternalAsync(bool flushEncoder)
+    {
+        if (_charBufferCount == 0)
         {
-            var remaining = Math.Min(_charBufferSize - _charBufferCount, count);
-
-            Buffer.BlockCopy(
-                src: values,
-                srcOffset: index * sizeof(char),
-                dst: _charBuffer,
-                dstOffset: _charBufferCount * sizeof(char),
-                count: remaining * sizeof(char));
-
-            _charBufferCount += remaining;
-            index += remaining;
-            count -= remaining;
+            return;
         }
+
+        var count = _encoder.GetBytes(
+            _charBuffer,
+            0,
+            _charBufferCount,
+            _byteBuffer,
+            0,
+            flush: flushEncoder);
+
+        _charBufferCount = 0;
+
+        if (count > 0)
+        {
+            await _stream.WriteAsync(_byteBuffer, 0, count).ConfigureAwait(false);
+        }
+    }
+
+    private void CopyToCharBuffer(string value, ref int index, ref int count)
+    {
+        var remaining = Math.Min(_charBufferSize - _charBufferCount, count);
+
+        value.CopyTo(
+            sourceIndex: index,
+            destination: _charBuffer,
+            destinationIndex: _charBufferCount,
+            count: remaining);
+
+        _charBufferCount += remaining;
+        index += remaining;
+        count -= remaining;
+    }
+
+    private void CopyToCharBuffer(char[] values, ref int index, ref int count)
+    {
+        var remaining = Math.Min(_charBufferSize - _charBufferCount, count);
+
+        Buffer.BlockCopy(
+            src: values,
+            srcOffset: index * sizeof(char),
+            dst: _charBuffer,
+            dstOffset: _charBufferCount * sizeof(char),
+            count: remaining * sizeof(char));
+
+        _charBufferCount += remaining;
+        index += remaining;
+        count -= remaining;
     }
 }

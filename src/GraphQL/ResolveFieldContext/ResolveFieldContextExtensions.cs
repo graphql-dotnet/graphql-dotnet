@@ -1,5 +1,4 @@
 using GraphQL.Execution;
-using GraphQL.Subscription;
 using GraphQL.Types;
 
 namespace GraphQL
@@ -106,16 +105,6 @@ namespace GraphQL
             return new ResolveFieldContextAdapter<TSourceType>(context);
         }
 
-        /// <summary>Returns the <see cref="IResolveEventStreamContext"/> typed as an <see cref="IResolveEventStreamContext{TSource}"/></summary>
-        /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>
-        public static IResolveEventStreamContext<T> As<T>(this IResolveEventStreamContext context)
-        {
-            if (context is IResolveEventStreamContext<T> typedContext)
-                return typedContext;
-
-            return new ResolveEventStreamContext<T>(context);
-        }
-
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
@@ -123,7 +112,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
-        /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
+        /// <returns>Value, if any exists on the specified path, otherwise <see langword="null"/>.</returns>
         public static object? GetOutputExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)

@@ -9,6 +9,7 @@ on:
       - develop
     paths:
       - src/**
+      - .github/workflows/**
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
@@ -19,9 +20,9 @@ jobs:
   pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v3.5.1
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn
@@ -33,13 +34,13 @@ jobs:
         working-directory: docs2
         run: yarn gatsby build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
       - name: Setup .NET Core 6.0 SDK
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
@@ -55,7 +56,7 @@ jobs:
         working-directory: src
         run: dotnet pack --no-restore --no-build -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -o out
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Nuget packages
           path: |

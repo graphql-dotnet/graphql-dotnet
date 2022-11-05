@@ -18,9 +18,8 @@ public class Query : ObjectGraphType
 {
   public Query()
   {
-    Field<DroidType>(
-      "hero",
-      resolve: context =>
+    Field<DroidType>("hero")
+      .Resolve(context =>
       {
         var userContext = context.UserContext as MyGraphQLUserContext;
         ...

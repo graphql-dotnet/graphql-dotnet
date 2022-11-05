@@ -163,7 +163,7 @@ namespace GraphQL.Execution
         {
             var node = this;
             var count = 0;
-            while (!(node is RootExecutionNode))
+            while (node is not RootExecutionNode)
             {
                 node = node.Parent!;
                 ++count;

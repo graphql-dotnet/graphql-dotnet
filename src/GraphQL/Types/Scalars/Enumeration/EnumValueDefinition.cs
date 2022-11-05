@@ -9,6 +9,9 @@ namespace GraphQL.Types
     [DebuggerDisplay("{Name}: {Value}")]
     public class EnumValueDefinition : MetadataProvider, IProvideDescription, IProvideDeprecationReason
     {
+        /// <summary>
+        /// Initializes a new instance with the specified name and value.
+        /// </summary>
         public EnumValueDefinition(string name, object? value)
         {
             Name = name;

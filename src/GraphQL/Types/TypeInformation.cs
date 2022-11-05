@@ -206,7 +206,7 @@ namespace GraphQL.Types
                     if (type.Type.IsGenericType)
                     {
                         var genericType = type.Type.GetGenericTypeDefinition();
-                        if (genericType == typeof(Task<>) || genericType == typeof(IDataLoaderResult<>))
+                        if (genericType == typeof(Task<>) || genericType == typeof(ValueTask<>) || genericType == typeof(IDataLoaderResult<>) || genericType == typeof(IObservable<>))
                         {
                             //unwrap type
                             IsNullable |= type.Nullable != NullabilityState.NotNull;
@@ -250,7 +250,7 @@ namespace GraphQL.Types
                     }
                     else
                     {
-                        list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                        list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                     }
                     foreach (var t in info.GenericTypeArguments)
                     {
@@ -259,18 +259,20 @@ namespace GraphQL.Types
                 }
                 else if (info.ElementType != null)
                 {
-                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                     RecursiveLoop(info.ElementType);
                 }
                 else
                 {
-                    list.Add((info.Type, isInput ? info.ReadState : info.WriteState));
+                    list.Add((info.Type, isInput ? info.WriteState : info.ReadState));
                 }
             }
         }
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
+        /// Also scans the member's owning module and assembly for globally-applied attributes,
+        /// and applies attributes defined within <see cref="GlobalSwitches.GlobalAttributes"/>.
         /// </summary>
         public virtual void ApplyAttributes()
         {
@@ -287,10 +289,12 @@ namespace GraphQL.Types
                 }
             }
 
-            var attributes = memberOrParameter.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            var attributes = ParameterInfo != null
+                ? ParameterInfo.GetGraphQLAttributes()
+                : MemberInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
-                ((GraphQLAttribute)attr).Modify(this);
+                attr.Modify(this);
             }
         }
 
@@ -322,7 +326,7 @@ namespace GraphQL.Types
             return type;
         }
 
-        private static readonly Type[] _listTypes = new Type[] {
+        internal static readonly Type[] EnumerableListTypes = new Type[] {
             typeof(IEnumerable<>),
             typeof(IList<>),
             typeof(List<>),
@@ -339,6 +343,6 @@ namespace GraphQL.Types
         /// types which may also be able to be cast to <see cref="IEnumerable{T}"/>.
         /// </summary>
         private bool IsRecognizedListType(Type type)
-            => Array.IndexOf(_listTypes, type.GetGenericTypeDefinition()) >= 0;
+            => Array.IndexOf(EnumerableListTypes, type.GetGenericTypeDefinition()) >= 0;
     }
 }

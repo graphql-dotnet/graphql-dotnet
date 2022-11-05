@@ -1,44 +1,44 @@
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 
-namespace GraphQL.Tests.Validation
+namespace GraphQL.Tests.Validation;
+
+public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames, ValidationSchema>
 {
-    public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames, ValidationSchema>
+    [Fact]
+    public void no_operations()
     {
-        [Fact]
-        public void no_operations()
-        {
-            ShouldPassRule(@"
+        ShouldPassRule(@"
                 fragment fragA on Type {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void one_anon_operation()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void one_anon_operation()
+    {
+        ShouldPassRule(@"
                 {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void one_named_operation()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void one_named_operation()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void multiple_operations()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void multiple_operations()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   field
                 }
@@ -47,12 +47,12 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void multiple_operations_of_different_types()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void multiple_operations_of_different_types()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   field
                 }
@@ -65,12 +65,12 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void fragment_and_operation_named_the_same()
-        {
-            ShouldPassRule(@"
+    [Fact]
+    public void fragment_and_operation_named_the_same()
+    {
+        ShouldPassRule(@"
                 query Foo {
                   ...Foo
                 }
@@ -79,12 +79,12 @@ namespace GraphQL.Tests.Validation
                   field
                 }
                 ");
-        }
+    }
 
-        [Fact]
-        public void multiple_operations_of_same_name()
-        {
-            var query = @"
+    [Fact]
+    public void multiple_operations_of_same_name()
+    {
+        var query = @"
                 query Foo {
                   fieldA
                 }
@@ -94,17 +94,17 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
-            });
-        }
-
-        [Fact]
-        public void multiple_operations_of_same_name_of_different_types_mutation()
+        ShouldFailRule(_ =>
         {
-            var query = @"
+            _.Query = query;
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+        });
+    }
+
+    [Fact]
+    public void multiple_operations_of_same_name_of_different_types_mutation()
+    {
+        var query = @"
                 query Foo {
                   fieldA
                 }
@@ -114,17 +114,17 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
-            });
-        }
-
-        [Fact]
-        public void multiple_operations_of_same_name_of_different_types_subscription()
+        ShouldFailRule(_ =>
         {
-            var query = @"
+            _.Query = query;
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+        });
+    }
+
+    [Fact]
+    public void multiple_operations_of_same_name_of_different_types_subscription()
+    {
+        var query = @"
                 query Foo {
                   fieldA
                 }
@@ -134,11 +134,10 @@ namespace GraphQL.Tests.Validation
                 }
                 ";
 
-            ShouldFailRule(_ =>
-            {
-                _.Query = query;
-                _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
-            });
-        }
+        ShouldFailRule(_ =>
+        {
+            _.Query = query;
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+        });
     }
 }

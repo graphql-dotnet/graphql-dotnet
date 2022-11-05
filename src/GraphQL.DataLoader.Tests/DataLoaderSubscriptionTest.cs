@@ -2,41 +2,39 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
-using GraphQL.Subscription;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
-namespace GraphQL.DataLoader.Tests
+namespace GraphQL.DataLoader.Tests;
+
+public class DataLoaderSubscriptionTest : QueryTestBase
 {
-    public class DataLoaderSubscriptionTest : QueryTestBase
+    protected async Task<ExecutionResult> ExecuteSubscribeAsync(string query)
     {
-        protected async Task<SubscriptionExecutionResult> ExecuteSubscribeAsync(string query)
-        {
-            var result = await ExecuteQueryAsync<DataLoaderTestSchema>(query);
-            result.ShouldBeOfType<SubscriptionExecutionResult>();
-            return (SubscriptionExecutionResult)result;
-        }
+        var result = await ExecuteQueryAsync<DataLoaderTestSchema>(query).ConfigureAwait(false);
+        result.Data.ShouldBeNull();
+        return result;
+    }
 
-        [Fact]
-        public async Task OneResultOverSubscription_Works()
-        {
-            var order = Fake.Orders.Generate();
-            var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
-            var orderStream = new ReplaySubject<Order>(1);
+    [Fact]
+    public async Task OneResultOverSubscription_Works()
+    {
+        var order = Fake.Orders.Generate();
+        var ordersMock = Services.GetRequiredService<Mock<IOrdersStore>>();
+        var orderStream = new ReplaySubject<Order>(1);
 
-            ordersMock.Setup(x => x.GetOrderObservable()).Returns(orderStream);
-            orderStream.OnNext(order);
+        ordersMock.Setup(x => x.GetOrderObservable()).Returns(orderStream);
+        orderStream.OnNext(order);
 
-            var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }");
+        var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }").ConfigureAwait(false);
 
-            /* Then */
-            var stream = result.Streams.Values.FirstOrDefault();
-            var message = await stream.FirstOrDefaultAsync();
+        /* Then */
+        var stream = result.Streams.Values.FirstOrDefault();
+        var message = await stream.FirstOrDefaultAsync();
 
-            ordersMock.Verify(x => x.GetOrderObservable(), Times.Once);
-            ordersMock.VerifyNoOtherCalls();
+        ordersMock.Verify(x => x.GetOrderObservable(), Times.Once);
+        ordersMock.VerifyNoOtherCalls();
 
-            message.Data.ShouldNotBeNull();
-        }
+        message.Data.ShouldNotBeNull();
     }
 }

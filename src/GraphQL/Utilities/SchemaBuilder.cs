@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using GraphQL.DI;
 using GraphQL.Reflection;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -12,7 +12,9 @@ namespace GraphQL.Utilities
     /// </summary>
     public class SchemaBuilder
     {
-        protected readonly Dictionary<string, IGraphType> _types = new Dictionary<string, IGraphType>();
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        protected readonly Dictionary<string, IGraphType> _types = new();
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         private GraphQLSchemaDefinition? _schemaDef;
 
         private IgnoreOptions CreateIgnoreOptions()
@@ -62,6 +64,12 @@ namespace GraphQL.Utilities
         public TypeSettings Types { get; } = new TypeSettings();
 
         /// <summary>
+        /// If <see langword="true"/>, pulls registered <see cref="IConfigureSchema"/>
+        /// instances from <see cref="ServiceProvider"/> and executes them.
+        /// </summary>
+        public bool RunConfigurations { get; set; } = true;
+
+        /// <summary>
         /// Builds schema from string.
         /// </summary>
         /// <param name="typeDefinitions">A textual description of the schema in SDL (Schema Definition Language) format.</param>
@@ -73,6 +81,9 @@ namespace GraphQL.Utilities
             return BuildSchemaFrom(document);
         }
 
+        /// <summary>
+        /// Validate the specified SDL.
+        /// </summary>
         protected virtual void Validate(GraphQLDocument document)
         {
             var definitionsByName = document.Definitions.OfType<GraphQLTypeDefinition>().ToLookup(def => def.Name!.Value);
@@ -87,9 +98,14 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             // Also see Schema.Validate
         }
 
+        /// <summary>
+        /// Returns a new <see cref="Schema"/> instance.
+        /// </summary>
+        protected virtual Schema CreateSchema() => new(ServiceProvider, runConfigurations: RunConfigurations);
+
         private Schema BuildSchemaFrom(GraphQLDocument document)
         {
-            var schema = new Schema(ServiceProvider);
+            var schema = CreateSchema();
 
             PreConfigure(schema);
 
@@ -195,10 +211,16 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return schema;
         }
 
+        /// <summary>
+        /// Configures the <paramref name="schema"/> prior to adding any types.
+        /// </summary>
         protected virtual void PreConfigure(Schema schema)
         {
         }
 
+        /// <summary>
+        /// Returns the graph type built for the specified graph type name.
+        /// </summary>
         protected virtual IGraphType? GetType(string name)
         {
             return _types.TryGetValue(name, out var type) ? type : null;
@@ -230,6 +252,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 element.DeprecationReason = reason;
         }
 
+        /// <summary>
+        /// Returns an <see cref="IObjectGraphType"/> from the specified <see cref="GraphQLObjectTypeDefinition"/>.
+        /// </summary>
         protected virtual IObjectGraphType ToObjectGraphType(GraphQLObjectTypeDefinition astType, bool isExtensionType = false)
         {
             var name = (string)astType.Name; //TODO:alloc
@@ -288,7 +313,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (config.ResolverAccessor != null)
             {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
+                    config.ResolverAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
+
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {
@@ -301,11 +331,16 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         private void InitializeSubscriptionField(FieldConfig config, Type? parentType)
         {
             config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
-            config.SubscriberAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Subscriber);
+            config.StreamResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.StreamResolver);
 
-            if (config.ResolverAccessor != null && config.SubscriberAccessor != null)
+            if (config.ResolverAccessor != null && config.StreamResolverAccessor != null)
             {
-                config.Resolver = new AccessorFieldResolver(config.ResolverAccessor, ServiceProvider);
+                config.Resolver = AutoRegisteringHelper.BuildFieldResolver(
+                    config.ResolverAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
+
                 var attrs = config.ResolverAccessor.GetAttributes<GraphQLAttribute>();
                 if (attrs != null)
                 {
@@ -313,17 +348,17 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         a.Modify(config);
                 }
 
-                if (config.SubscriberAccessor.MethodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    config.AsyncSubscriber = new AsyncEventStreamResolver(config.SubscriberAccessor, ServiceProvider);
-                }
-                else
-                {
-                    config.Subscriber = new EventStreamResolver(config.SubscriberAccessor, ServiceProvider);
-                }
+                config.StreamResolver = AutoRegisteringHelper.BuildSourceStreamResolver(
+                    config.StreamResolverAccessor.MethodInfo,
+                    null, // unknown source type
+                    null, // unknown FieldType
+                    AutoRegisteringHelper.BuildInstanceExpressionForSchemaBuilder(config.ResolverAccessor.DeclaringType, ServiceProvider));
             }
         }
 
+        /// <summary>
+        /// Returns a <see cref="FieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
+        /// </summary>
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
@@ -353,6 +388,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return field;
         }
 
+        /// <summary>
+        /// Returns a subscription <see cref="FieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
+        /// </summary>
         protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
@@ -364,14 +402,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownField(fieldConfig, typeConfig);
 
-            var field = new EventStreamFieldType
+            var field = new FieldType
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
                 Resolver = fieldConfig.Resolver,
-                Subscriber = fieldConfig.Subscriber,
-                AsyncSubscriber = fieldConfig.AsyncSubscriber,
+                StreamResolver = fieldConfig.StreamResolver,
             };
 
             fieldConfig.CopyMetadataTo(field);
@@ -384,6 +421,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return field;
         }
 
+        /// <summary>
+        /// Returns a <see cref="FieldType"/> from the specified <see cref="GraphQLInputValueDefinition"/>.
+        /// </summary>
         protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
             var typeConfig = Types.For(parentTypeName);
@@ -408,6 +448,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return field;
         }
 
+        /// <summary>
+        /// Returns a <see cref="InterfaceGraphType"/> from the specified <see cref="GraphQLInterfaceTypeDefinition"/>.
+        /// </summary>
         protected virtual InterfaceGraphType ToInterfaceType(GraphQLInterfaceTypeDefinition interfaceDef)
         {
             var name = (string)interfaceDef.Name; //TODO:alloc
@@ -435,6 +478,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        /// <summary>
+        /// Returns a <see cref="UnionGraphType"/> from the specified <see cref="GraphQLUnionTypeDefinition"/>.
+        /// </summary>
         protected virtual UnionGraphType ToUnionType(GraphQLUnionTypeDefinition unionDef)
         {
             var name = (string)unionDef.Name; //TODO:alloc
@@ -465,6 +511,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        /// <summary>
+        /// Returns an <see cref="InputObjectGraphType"/> from the specified <see cref="GraphQLInputObjectTypeDefinition"/>.
+        /// </summary>
         protected virtual InputObjectGraphType ToInputObjectType(GraphQLInputObjectTypeDefinition inputDef)
         {
             var name = (string)inputDef.Name; //TODO:alloc
@@ -491,6 +540,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        /// <summary>
+        /// Returns an <see cref="EnumerationGraphType"/> from the specified <see cref="GraphQLEnumTypeDefinition"/>.
+        /// </summary>
         protected virtual EnumerationGraphType ToEnumerationType(GraphQLEnumTypeDefinition enumDef)
         {
             var name = (string)enumDef.Name; //TODO:alloc
@@ -515,6 +567,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
+        /// <summary>
+        /// Returns a <see cref="Directive"/> from the specified <see cref="GraphQLDirectiveDefinition"/>.
+        /// </summary>
         protected virtual Directive ToDirective(GraphQLDirectiveDefinition directiveDef)
         {
             var result = new Directive(directiveDef.Name.StringValue) //ISSUE:allocation
@@ -546,6 +601,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }.ApplyDirectivesFrom(valDef);
         }
 
+        /// <summary>
+        /// Returns a <see cref="QueryArgument"/> from the specified <see cref="GraphQLInputValueDefinition"/>.
+        /// </summary>
         protected virtual QueryArgument ToArgument(ArgumentConfig argumentConfig, GraphQLInputValueDefinition inputDef)
         {
             var argument = new QueryArgument(ToGraphType(inputDef.Type!))

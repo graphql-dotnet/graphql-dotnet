@@ -1,109 +1,108 @@
 using GraphQL.Types;
 
-namespace GraphQL.Tests.Validation
+namespace GraphQL.Tests.Validation;
+
+public class ResultTypeValidationSchema : Schema
 {
-    public class ResultTypeValidationSchema : Schema
+    public ResultTypeValidationSchema()
     {
-        public ResultTypeValidationSchema()
-        {
-            Query = new ResultTypeValidationQueryRoot();
-            this.RegisterType<IntBox>();
-            this.RegisterType<StringBox>();
-            this.RegisterType<NonNullStringBox1Imp>();
-            this.RegisterType<NonNullStringBox2Imp>();
-        }
+        Query = new ResultTypeValidationQueryRoot();
+        this.RegisterType<IntBox>();
+        this.RegisterType<StringBox>();
+        this.RegisterType<NonNullStringBox1Imp>();
+        this.RegisterType<NonNullStringBox2Imp>();
     }
+}
 
-    public class ResultTypeValidationQueryRoot : ObjectGraphType
+public class ResultTypeValidationQueryRoot : ObjectGraphType
+{
+    public ResultTypeValidationQueryRoot()
     {
-        public ResultTypeValidationQueryRoot()
-        {
-            Field<SomeBox>("someBox");
-        }
+        Field<SomeBox>("someBox");
     }
+}
 
-    public class SomeBox : InterfaceGraphType
+public class SomeBox : InterfaceGraphType
+{
+    public SomeBox()
     {
-        public SomeBox()
-        {
-            Field<SomeBox>("deepBox");
-            Field<StringGraphType>("unrelatedField");
-        }
+        Field<SomeBox>("deepBox");
+        Field<StringGraphType>("unrelatedField");
     }
+}
 
-    public class StringBox : ObjectGraphType
+public class StringBox : ObjectGraphType
+{
+    public StringBox()
     {
-        public StringBox()
-        {
-            Field<StringGraphType>("scalar");
-            Field<SomeBox>("deepBox");
-            Field<StringGraphType>("unrelatedField");
-            Field<ListGraphType<StringBox>>("listStringBox");
-            Field<StringBox>("stringBox");
-            Field<IntBox>("intBox");
+        Field<StringGraphType>("scalar");
+        Field<SomeBox>("deepBox");
+        Field<StringGraphType>("unrelatedField");
+        Field<ListGraphType<StringBox>>("listStringBox");
+        Field<StringBox>("stringBox");
+        Field<IntBox>("intBox");
 
-            Interface<SomeBox>();
-            IsTypeOf = obj => true;
-        }
+        Interface<SomeBox>();
+        IsTypeOf = obj => true;
     }
+}
 
-    public class IntBox : ObjectGraphType
+public class IntBox : ObjectGraphType
+{
+    public IntBox()
     {
-        public IntBox()
-        {
-            Field<IntGraphType>("scalar");
-            Field<SomeBox>("deepBox");
-            Field<StringGraphType>("unrelatedField");
-            Field<ListGraphType<StringBox>>("listStringBox");
-            Field<StringBox>("stringBox");
-            Field<IntBox>("intBox");
+        Field<IntGraphType>("scalar");
+        Field<SomeBox>("deepBox");
+        Field<StringGraphType>("unrelatedField");
+        Field<ListGraphType<StringBox>>("listStringBox");
+        Field<StringBox>("stringBox");
+        Field<IntBox>("intBox");
 
-            Interface<SomeBox>();
-            IsTypeOf = obj => true;
-        }
+        Interface<SomeBox>();
+        IsTypeOf = obj => true;
     }
+}
 
-    public class NonNullStringBox1 : InterfaceGraphType
+public class NonNullStringBox1 : InterfaceGraphType
+{
+    public NonNullStringBox1()
     {
-        public NonNullStringBox1()
-        {
-            Field<NonNullGraphType<StringGraphType>>("scalar");
-        }
+        Field<NonNullGraphType<StringGraphType>>("scalar");
     }
+}
 
-    public class NonNullStringBox1Imp : ObjectGraphType
+public class NonNullStringBox1Imp : ObjectGraphType
+{
+    public NonNullStringBox1Imp()
     {
-        public NonNullStringBox1Imp()
-        {
-            Field<NonNullGraphType<StringGraphType>>("scalar");
-            Field<StringGraphType>("unrelatedField");
-            Field<SomeBox>("deepBox");
+        Field<NonNullGraphType<StringGraphType>>("scalar");
+        Field<StringGraphType>("unrelatedField");
+        Field<SomeBox>("deepBox");
 
-            Interface<SomeBox>();
-            Interface<NonNullStringBox1>();
-            IsTypeOf = obj => true;
-        }
+        Interface<SomeBox>();
+        Interface<NonNullStringBox1>();
+        IsTypeOf = obj => true;
     }
+}
 
-    public class NonNullStringBox2 : InterfaceGraphType
+public class NonNullStringBox2 : InterfaceGraphType
+{
+    public NonNullStringBox2()
     {
-        public NonNullStringBox2()
-        {
-            Field<NonNullGraphType<StringGraphType>>("scalar");
-        }
+        Field<NonNullGraphType<StringGraphType>>("scalar");
     }
+}
 
-    public class NonNullStringBox2Imp : ObjectGraphType
+public class NonNullStringBox2Imp : ObjectGraphType
+{
+    public NonNullStringBox2Imp()
     {
-        public NonNullStringBox2Imp()
-        {
-            Field<NonNullGraphType<StringGraphType>>("scalar");
-            Field<StringGraphType>("unrelatedField");
-            Field<SomeBox>("deepBox");
+        Field<NonNullGraphType<StringGraphType>>("scalar");
+        Field<StringGraphType>("unrelatedField");
+        Field<SomeBox>("deepBox");
 
-            Interface<SomeBox>();
-            Interface<NonNullStringBox2>();
-            IsTypeOf = obj => true;
-        }
+        Interface<SomeBox>();
+        Interface<NonNullStringBox2>();
+        IsTypeOf = obj => true;
     }
 }

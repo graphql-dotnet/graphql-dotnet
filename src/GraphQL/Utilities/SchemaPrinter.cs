@@ -1,3 +1,6 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,11 +21,11 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Enables printing schema as SDL (Schema Definition Language) document.
     /// <br/>
-    /// See <see href="http://spec.graphql.org/June2018/#sec-Type-System"/> for more information.
+    /// See <see href="https://spec.graphql.org/October2021/#sec-Type-System"/> for more information.
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
-        private static readonly List<string> _builtInScalars = new List<string>
+        private static readonly List<string> _builtInScalars = new()
         {
             "String",
             "Boolean",
@@ -31,7 +34,7 @@ namespace GraphQL.Utilities
             "ID"
         };
 
-        private static readonly List<string> _builtInDirectives = new List<string>
+        private static readonly List<string> _builtInDirectives = new()
         {
             "skip",
             "include",
@@ -372,7 +375,7 @@ namespace GraphQL.Utilities
             return graphType switch
             {
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
-                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable)value).Cast<object>().Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => (enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")).Print(),
                 ScalarGraphType scalar => (scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")).Print(),
