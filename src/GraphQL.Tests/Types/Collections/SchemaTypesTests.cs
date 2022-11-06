@@ -1,3 +1,4 @@
+using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
@@ -43,6 +44,47 @@ public class SchemaTypesTests
         mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
         mock.Verify(x => x.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)), Times.Once);
         mock.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public void throws_exception_when_multiple_type_instances_exists()
+    {
+        var schema = new Schema
+        {
+            NameConverter = new CamelCaseNameConverter()
+        };
+
+        var queryGraphType = new ObjectGraphType
+        {
+            Name = "Query"
+        };
+
+        schema.RegisterType(queryGraphType);
+
+        // Object 1
+        var graphType1 = new ObjectGraphType
+        {
+            Name = "MyObject"
+        };
+
+        graphType1.Field<IntGraphType>("int");
+
+        queryGraphType.Field("first", graphType1);
+
+        // Object 2
+        var graphType2 = new ObjectGraphType
+        {
+            Name = "MyObject"
+        };
+
+        graphType2.Field<IntGraphType>("int");
+        graphType2.Field<StringGraphType>("string");
+
+        queryGraphType.Field("second", graphType2);
+
+        // Test
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("A different instance of the type 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
     }
 
     [Fact]

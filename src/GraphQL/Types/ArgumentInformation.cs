@@ -4,10 +4,10 @@ using System.Reflection;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Contains information pertaining to a method parameter in preparation for buliding an
+    /// Contains information pertaining to a method parameter in preparation for building an
     /// expression or query argument for it.
     /// <br/><br/>
-    /// If <see cref="ArgumentInformation.Expression"/> is set, a query argument will not be added
+    /// If <see cref="Expression"/> is set, a query argument will not be added
     /// and the expression will be used to build the method resolver.
     /// <br/><br/>
     /// If not, a query argument will be generated and added to the field; the field resolver will

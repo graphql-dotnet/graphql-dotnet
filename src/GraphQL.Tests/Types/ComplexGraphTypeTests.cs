@@ -399,7 +399,7 @@ public class ComplexGraphTypeTests
         var schema2 = new Schema() { Query = type };
         Should.Throw<InvalidOperationException>(
             () => schema2.Initialize())
-            .Message.ShouldBe("This graph type 'Query' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            .Message.ShouldBe("This graph type 'ComplexType<String>' with name 'Query' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
     }
 
     [Fact]
@@ -560,10 +560,19 @@ public class ComplexGraphTypeTests
             .Message.ShouldBe("Cannot use graph type 'Graph1' as a model for graph type 'Graph2'. Please use a model rather than a graph type for TSourceType.");
         Should.Throw<InvalidOperationException>(() => new Graph4())
             .Message.ShouldBe("Cannot use graph type 'Graph3' as a model for graph type 'Graph4'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph5())
+          .Message.ShouldBe("Cannot use graph type 'Graph5' as a model for graph type 'Graph5'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph6())
+          .Message.ShouldBe("Cannot use graph type 'Graph6' as a model for graph type 'Graph6'. Please use a model rather than a graph type for TSourceType.");
+        Should.Throw<InvalidOperationException>(() => new Graph7())
+          .Message.ShouldBe("Cannot use graph type 'Graph7' as a model for graph type 'Graph7'. Please use a model rather than a graph type for TSourceType.");
     }
 
     private class Graph1 : ObjectGraphType { }
     private class Graph2 : ObjectGraphType<Graph1> { }
     private class Graph3 : InputObjectGraphType { }
     private class Graph4 : InputObjectGraphType<Graph3> { }
+    private class Graph5 : AutoRegisteringInputObjectGraphType<Graph5> { }
+    private class Graph6 : AutoRegisteringObjectGraphType<Graph6> { }
+    private class Graph7 : AutoRegisteringInterfaceGraphType<Graph7> { }
 }

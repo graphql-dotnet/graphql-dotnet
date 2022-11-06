@@ -1,5 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -374,7 +375,7 @@ namespace GraphQL.Utilities
             return graphType switch
             {
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
-                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable)value).Cast<object>().Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => (enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")).Print(),
                 ScalarGraphType scalar => (scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")).Print(),

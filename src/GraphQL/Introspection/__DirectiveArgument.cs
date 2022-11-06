@@ -3,8 +3,8 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__DirectiveArgument</c> introspection type represents an argument of a directive applied to a
-    /// schema element - type, field, argument, etc.
+    /// The <see cref="__DirectiveArgument"/> introspection type represents an argument of
+    /// a directive applied to a schema element - type, field, argument, etc.
     /// <br/><br/>
     /// Note that this class describes only explicitly specified arguments. If the argument in the directive
     /// definition has default value and this argument was not specified when applying the directive to schema

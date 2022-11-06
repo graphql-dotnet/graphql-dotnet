@@ -4,12 +4,12 @@ using GraphQLParser.AST;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__Directive</c> introspection type represents a directive that a server supports.
+    /// The <see cref="__Directive"/> introspection type represents a directive that a server supports.
     /// </summary>
     public class __Directive : ObjectGraphType<Directive>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__Directive</c> introspection type.
+        /// Initializes a new instance of the <see cref="__Directive"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         /// <param name="allowRepeatable">Allows 'isRepeatable' field for this type. This feature is from a working draft of the specification.</param>

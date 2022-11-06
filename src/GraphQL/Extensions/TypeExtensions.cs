@@ -18,7 +18,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <returns>
-        ///   <c>true</c> if the specified type is neither abstract nor an interface; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if the specified type is neither abstract nor an interface; otherwise, <see langword="false"/>.
         /// </returns>
         public static bool IsConcrete(this Type type)
         {
@@ -33,7 +33,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>
-        ///   <c>true</c> if the indicated type implements IGraphType; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if the indicated type implements IGraphType; otherwise, <see langword="false"/>.
         /// </returns>
         public static bool IsGraphType(this Type type)
             => typeof(IGraphType).IsAssignableFrom(type);
@@ -85,6 +85,9 @@ namespace GraphQL
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
 
+            if (typeName == nameof(GraphType) || typeName == nameof(Type))
+                return typeName;
+
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
             return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
@@ -96,7 +99,7 @@ namespace GraphQL
         /// Gets the graph type for the indicated type.
         /// </summary>
         /// <param name="type">The type for which a graph type is desired.</param>
-        /// <param name="isNullable">if set to <c>false</c> if the type explicitly non-nullable.</param>
+        /// <param name="isNullable">if set to <see langword="false"/> if the type explicitly non-nullable.</param>
         /// <param name="mode">Mode to use when mapping CLR type to GraphType.</param>
         /// <returns>A Type object representing a GraphType that matches the indicated type.</returns>
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
@@ -259,7 +262,7 @@ namespace GraphQL
         /// <param name="type">Type to test.</param>
         /// <param name="genericType">Type to test for.</param>
         /// <returns>
-        ///   <c>true</c> if the indicated type implements <paramref name="genericType"/>; otherwise, <c>false</c>.
+        ///   <see langword="true"/> if the indicated type implements <paramref name="genericType"/>; otherwise, <see langword="false"/>.
         /// </returns>
         public static bool ImplementsGenericType(this Type type, Type genericType)
         {

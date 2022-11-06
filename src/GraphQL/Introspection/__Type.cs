@@ -3,13 +3,13 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// <c>__Type</c> is at the core of the type introspection system.
+    /// <see cref="__Type"/> is at the core of the type introspection system.
     /// It represents scalars, interfaces, object types, unions, enums in the system.
     /// </summary>
     public class __Type : ObjectGraphType<IGraphType>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__Type</c> introspection type.
+        /// Initializes a new instance of the <see cref="__Type"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Type(bool allowAppliedDirectives = false)

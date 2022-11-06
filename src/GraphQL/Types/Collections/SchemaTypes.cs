@@ -144,7 +144,7 @@ namespace GraphQL.Types
                 throw new InvalidOperationException("SchemaTypes has already been initialized.");
             _initialized = true;
 
-            var types = GetSchemaTypes(schema, serviceProvider);
+            var (typeInstances, types) = GetSchemaTypes(schema, serviceProvider);
             if (schema.TypeMappings != null)
             {
                 // this code could be moved into Schema
@@ -168,7 +168,7 @@ namespace GraphQL.Types
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
-            foreach (var type in types)
+            foreach (var type in typeInstances)
             {
                 if (type is ScalarGraphType)
                     AddType(type, _context);
@@ -195,10 +195,15 @@ namespace GraphQL.Types
                 graphTypeMappings,
                 schema);
 
-            foreach (var type in types)
+            foreach (var type in typeInstances)
             {
                 if (type is not ScalarGraphType)
                     AddTypeIfNotRegistered(type, ctx);
+            }
+
+            foreach (var type in types)
+            {
+                AddTypeIfNotRegistered(type, ctx);
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
@@ -218,7 +223,13 @@ namespace GraphQL.Types
             _typeDictionary = null!; // not needed once initialization is complete
         }
 
-        private static IEnumerable<IGraphType> GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+        private static (IEnumerable<IGraphType>, IEnumerable<Type>) GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
+        {
+            return (GetSchemaTypeInstances(schema, serviceProvider),
+                schema.AdditionalTypes.Select(x => x.GetNamedType()).Where(x => !typeof(ScalarGraphType).IsAssignableFrom(x)));
+        }
+
+        private static IEnumerable<IGraphType> GetSchemaTypeInstances(ISchema schema, IServiceProvider serviceProvider)
         {
             // Manually registered AdditionalTypeInstances and AdditionalTypes should be handled first.
             // This is necessary for the correct processing of overridden built-in scalars.
@@ -227,7 +238,13 @@ namespace GraphQL.Types
                 yield return instance;
 
             foreach (var type in schema.AdditionalTypes)
-                yield return (IGraphType)serviceProvider.GetRequiredService(type.GetNamedType());
+            {
+                var type2 = type.GetNamedType();
+                if (typeof(ScalarGraphType).IsAssignableFrom(type2))
+                {
+                    yield return (IGraphType)serviceProvider.GetRequiredService(type2);
+                }
+            }
 
             //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
             // if (Query == null)
@@ -646,11 +663,37 @@ Make sure that your ServiceProvider is configured correctly.");
             var (namedType, namedType2) = type.GetNamedTypes();
             namedType ??= context.ResolveType(namedType2!);
 
-            var foundType = this[namedType.Name];
-            if (foundType == null)
+            var existingType = this[namedType.Name];
+            if (existingType is null)
             {
                 AddType(namedType, context);
             }
+            else
+            {
+                EnsureTypeEquality(existingType, namedType);
+            }
+        }
+
+        private void EnsureTypeEquality(IGraphType existingType, IGraphType newType)
+        {
+            if (ReferenceEquals(existingType, newType))
+            {
+                return;
+            }
+
+            // Ignore scalars
+            if (existingType is ScalarGraphType && newType is ScalarGraphType)
+            {
+                return;
+            }
+
+            if (existingType.GetType() != newType.GetType())
+            {
+                throw new InvalidOperationException($@"Unable to register GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().GetFriendlyName()}'. Check your schema configuration.");
+            }
+
+            // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
+            throw new InvalidOperationException($"A different instance of the type '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
         }
 
         private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
@@ -859,7 +902,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else
                 {
                     // Fatal schema configuration error.
-                    throw new InvalidOperationException($@"Unable to register GraphType '{type.FullName}' with the name '{typeName}'. The name '{typeName}' is already registered to '{existingGraphType.GetType().FullName}'. Check your schema configuration.");
+                    throw new InvalidOperationException($@"Unable to register GraphType '{type.GetFriendlyName()}' with the name '{typeName}'. The name '{typeName}' is already registered to '{existingGraphType.GetType().GetFriendlyName()}'. Check your schema configuration.");
                 }
             }
             else
