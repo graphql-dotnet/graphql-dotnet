@@ -39,7 +39,7 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
-      - name: Setup .NET 7.0 SDK
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v3.0.3
         with:
           dotnet-version: '7.0.x'
