@@ -10,9 +10,7 @@ public class Bug2279DuplicateType : QueryTestBase<Bug2279Schema>
     {
         var s = new Bug2279Schema();
         var e = Should.Throw<InvalidOperationException>(() => s.Initialize());
-        var t1 = typeof(Bug2279GraphType<int>).FullName;
-        var t2 = typeof(Bug2279GraphType<string>).FullName;
-        e.Message.ShouldBe(@$"Unable to register GraphType 'Bug2279GraphType<Int32>' with the name 'Bug2279GraphType_1'. The name 'Bug2279GraphType_1' is already registered to 'Bug2279GraphType<String>'. Check your schema configuration.");
+        e.Message.ShouldBe("Unable to register GraphType 'Bug2279GraphType<Int32>' with the name 'Bug2279GraphType_1'. The name 'Bug2279GraphType_1' is already registered to 'Bug2279GraphType<String>'. Check your schema configuration.");
     }
 }
 
