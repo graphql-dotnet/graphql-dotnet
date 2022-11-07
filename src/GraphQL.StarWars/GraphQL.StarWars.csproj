@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
   </ItemGroup>
 
 </Project>
