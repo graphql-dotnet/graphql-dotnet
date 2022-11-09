@@ -43,7 +43,7 @@ work is properly merged into GraphQL.NET once completed.
 7. Submit code as a draft pull request in the appropriate repository so GraphQL.NET community leaders can track progress.
 8. Once code is complete, remove draft status and notify GraphQL.NET maintainers.
 9. Update code with feedback from core GraphQL.NET contributors as needed.
-10. Wait for your code to be merged into the `master` branch.
+10. Wait for your code to be merged into the `master` or `develop` branch.
 11. [Submit an expense through Open Collective](https://opencollective.com/graphql-net/expenses/new) for the amount of the bounty.
 
 
