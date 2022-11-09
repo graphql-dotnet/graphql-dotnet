@@ -85,9 +85,10 @@ In general, issues that are higher in complexity and higher in demand are given 
 The GraphQL.NET team reserves the right to terminate or make changes to this program at any time, including but not limited
 to terminating In Process or Under Review bounty projects, or changing their valuation.
 
-By posting any issue, pull request, or other form of submission to GraphQL.NET (a Submission), you:
+By posting any issue, pull request, or other form of submission to GraphQL.NET (a Submission), whether or not it is accepted
+through this bounty program, you:
 
-* Grant GraphQL.NET to following non-exclusive, irrevocable, perpetual, royalty free, worldwide, sub-licensable license to the
+* Grant GraphQL.NET the following non-exclusive, irrevocable, perpetual, royalty free, worldwide, sub-licensable license to the
    intellectual property in your Submission: (i) to use, review, assess, test, and otherwise analyze your Submission; (ii) to
    reproduce, modify, distribute, display and perform publicly, and commercialize and create derivative works of your Submission
    and all its content, in whole or in part; and (iii) to feature your Submission and all of its content in connection with the
