@@ -2358,6 +2358,7 @@ namespace GraphQL.Types
         protected object ThrowValueConversionError(object? value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
+    [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
         public Schema() { }
