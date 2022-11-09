@@ -59,11 +59,24 @@ namespace GraphQL
         public IEnumerable<object>? Path { get; set; }
 
         /// <summary>
+        /// Gets or sets additional information about error.
+        /// </summary>
+        public Dictionary<string, object?>? Extensions { get; set; }
+
+        /// <summary>
         /// Adds a location to the list of locations that this error applies to.
         /// </summary>
         public void AddLocation(Location location)
         {
             (Locations ??= new()).Add(location);
+        }
+
+        /// <summary>
+        /// Adds an extension to <see cref="Extensions"/>.
+        /// </summary>
+        public void AddExtension(string key, object? value)
+        {
+            (Extensions ??= new())[key] = value;
         }
 
         private void SetCode(Exception? exception)
@@ -105,6 +118,16 @@ namespace GraphQL
                 return error;
 
             error.AddLocation(Location.FromLinearPosition(document.Source, abstractNode.Location.Start));
+            return error;
+        }
+
+        /// <summary>
+        /// Adds an extension to <see cref="ExecutionError.Extensions"/>.
+        /// </summary>
+        public static TError WithExtension<TError>(this TError error, string key, object? value)
+             where TError : ExecutionError
+        {
+            error.AddExtension(key, value);
             return error;
         }
     }
