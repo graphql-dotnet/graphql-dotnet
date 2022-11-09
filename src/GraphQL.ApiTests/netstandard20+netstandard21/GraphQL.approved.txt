@@ -122,13 +122,17 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception? innerException) { }
         public string? Code { get; set; }
+        public System.Collections.Generic.Dictionary<string, object?>? Extensions { get; set; }
         public System.Collections.Generic.List<GraphQLParser.Location>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
+        public void AddExtension(string key, object? value) { }
         public void AddLocation(GraphQLParser.Location location) { }
     }
     public static class ExecutionErrorExtensions
     {
         public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document)
+            where TError : GraphQL.ExecutionError { }
+        public static TError WithExtension<TError>(this TError error, string key, object? value)
             where TError : GraphQL.ExecutionError { }
     }
     public class ExecutionErrors : System.Collections.Generic.IEnumerable<GraphQL.ExecutionError>, System.Collections.IEnumerable
