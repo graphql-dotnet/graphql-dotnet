@@ -2,11 +2,11 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true'">
-    <TargetFrameworks>net6;net5</TargetFrameworks>
+    <TargetFrameworks>net7;net6;net5</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>
