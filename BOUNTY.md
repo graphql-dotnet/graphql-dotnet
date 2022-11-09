@@ -88,13 +88,10 @@ to terminating In Process or Under Review bounty projects, or changing their val
 By posting any issue, pull request, or other form of submission to GraphQL.NET (a Submission), whether or not it is accepted
 through this bounty program, you:
 
-* Grant GraphQL.NET the following non-exclusive, irrevocable, perpetual, royalty free, worldwide, sub-licensable license to the
-   intellectual property in your Submission: (i) to use, review, assess, test, and otherwise analyze your Submission; (ii) to
-   reproduce, modify, distribute, display and perform publicly, and commercialize and create derivative works of your Submission
-   and all its content, in whole or in part; and (iii) to feature your Submission and all of its content in connection with the
-   marketing, sale, or promotion of this program or other programs (including internal and external sales meetings, conference
-   presentations, tradeshows, and screen shots of the Submission in press releases) in all media (now known or later developed);
-   understand and acknowledge that others may have developed or commissioned materials similar or identical to your Submission,
+* License the Submission under the terms of the [MIT License](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md)
+   and do not require attribution for your submission;
+
+* understand and acknowledge that others may have developed or commissioned materials similar or identical to your Submission,
    and you waive any claims you may have resulting from any similarities to your Submission;
 
 * understand that you are not guaranteed any compensation or credit for your Submission; and
