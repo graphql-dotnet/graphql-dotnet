@@ -325,7 +325,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public string? Field5 { get; set; }
         [InputType(typeof(IdGraphType))]
         public int? Field6 { get; set; }
-        [OutputType(typeof(IdGraphType))]
+        [OutputType<IdGraphType>()]
         public int? Field7 { get; set; }
         [DefaultValue("hello")]
         public string? Field8 { get; set; }

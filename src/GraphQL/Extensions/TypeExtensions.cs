@@ -164,9 +164,9 @@ namespace GraphQL
                 }
                 else if (mode == TypeMappingMode.OutputType)
                 {
-                    var outputAttr = type.GetCustomAttribute<OutputTypeAttribute>();
-                    if (outputAttr != null)
-                        graphType = outputAttr.OutputType;
+                    //var outputAttr = type.GetCustomAttribute<OutputTypeAttribute>();
+                    //if (outputAttr != null)
+                    //    graphType = outputAttr.OutputType;
                 }
 
                 if (graphType == null)

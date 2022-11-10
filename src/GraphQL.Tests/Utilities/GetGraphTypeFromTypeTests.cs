@@ -429,12 +429,12 @@ public class GetGraphTypeFromTypeTests
     private class AttributeTest3 { }
 
     [InputType(typeof(CustomInputGraphType))]
-    [OutputType(typeof(CustomOutputGraphType))]
+    [OutputType<CustomOutputGraphType>()]
     private class AttributeTest4 { }
 
     [InputType(typeof(CustomInputGraphType))]
     private class AttributeTest5 { }
 
-    [OutputType(typeof(CustomOutputGraphType))]
+    [OutputType<CustomOutputGraphType>()]
     private class AttributeTest6 { }
 }

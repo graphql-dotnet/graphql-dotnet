@@ -6,30 +6,14 @@ namespace GraphQL
     /// Specifies an output graph type mapping for the CLR class or property marked with this attribute.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
-    public class OutputTypeAttribute : GraphQLAttribute
+    public class OutputTypeAttribute<TGraphType> : GraphQLAttribute
+        where TGraphType : IGraphType
     {
-        private Type _outputType = null!;
-
-        /// <inheritdoc cref="OutputTypeAttribute"/>
-        public OutputTypeAttribute(Type graphType)
+        /// <inheritdoc cref="OutputTypeAttribute{TGraphType}"/>
+        public OutputTypeAttribute()
         {
-            OutputType = graphType;
-        }
-
-        /// <inheritdoc cref="OutputTypeAttribute"/>
-        public Type OutputType
-        {
-            get => _outputType;
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-
-                if (!value.IsOutputType())
-                    throw new ArgumentException(nameof(OutputType), $"'{value}' should be an output type");
-
-                _outputType = value;
-            }
+            if (!typeof(TGraphType).IsOutputType())
+                throw new ArgumentException($"'{typeof(TGraphType)}' should be an output type");
         }
 
         /// <inheritdoc/>
@@ -37,7 +21,7 @@ namespace GraphQL
         {
             if (!isInputType)
             {
-                fieldType.Type = _outputType;
+                fieldType.Type = typeof(TGraphType);
             }
         }
     }
