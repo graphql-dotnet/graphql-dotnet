@@ -546,7 +546,7 @@ public class AutoRegisteringObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
-        [InputType(typeof(IdGraphType))]
+        [InputType<IdGraphType>()]
         public int? Field6 { get; set; }
         [OutputType<IdGraphType>()]
         public int? Field7 { get; set; }
@@ -604,7 +604,7 @@ public class AutoRegisteringObjectGraphTypeTests
         public string NamedArg([Name("arg1rename")] string arg1) => arg1;
         public string IdArg([Id] string arg1) => arg1;
         public int IdIntArg([Id] int arg1) => arg1;
-        public int TypedArg([InputType(typeof(StringGraphType))] int arg1) => arg1;
+        public int TypedArg([InputType<StringGraphType>()] int arg1) => arg1;
         public string MultipleArgs(string arg1, int arg2) => arg1 + arg2.ToString();
     }
 

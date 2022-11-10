@@ -323,7 +323,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
-        [InputType(typeof(IdGraphType))]
+        [InputType<IdGraphType>()]
         public int? Field6 { get; set; }
         [OutputType<IdGraphType>()]
         public int? Field7 { get; set; }

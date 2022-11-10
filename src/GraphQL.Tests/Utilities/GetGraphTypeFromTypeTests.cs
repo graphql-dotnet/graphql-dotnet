@@ -428,11 +428,11 @@ public class GetGraphTypeFromTypeTests
     [GraphQLMetadata(OutputType = typeof(CustomOutputGraphType))]
     private class AttributeTest3 { }
 
-    [InputType(typeof(CustomInputGraphType))]
+    [InputType<CustomInputGraphType>()]
     [OutputType<CustomOutputGraphType>()]
     private class AttributeTest4 { }
 
-    [InputType(typeof(CustomInputGraphType))]
+    [InputType<CustomInputGraphType>()]
     private class AttributeTest5 { }
 
     [OutputType<CustomOutputGraphType>()]
