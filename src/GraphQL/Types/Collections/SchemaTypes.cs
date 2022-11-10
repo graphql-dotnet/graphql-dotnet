@@ -921,7 +921,7 @@ Make sure that your ServiceProvider is configured correctly.");
         {
             foreach (var fieldOwner in Dictionary.Values.OfType<IComplexGraphType>())
             {
-                if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
+                if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0)
                 {
                     foreach (var field in fieldOwner.Fields.Where(field => field.Description == null))
                     {
