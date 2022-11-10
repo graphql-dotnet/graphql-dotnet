@@ -39,12 +39,12 @@ work is properly merged into GraphQL.NET once completed.
 3. Work with the GraphQL.NET team to finalize plans for the best implementation. Proposals will be judged on their
    maintainability, design quality, and adherence to spec. Note that other developers may submit competing proposals
    at this time as well.
-5. If your proposal is accepted, you may begin code implementation that adheres to your proposal.
-7. Submit code as a draft pull request in the appropriate repository so GraphQL.NET community leaders can track progress.
-8. Once code is complete, remove draft status and notify GraphQL.NET maintainers.
-9. Update code with feedback from core GraphQL.NET contributors as needed.
-10. Wait for your code to be merged into the `master` or `develop` branch.
-11. [Submit an expense through Open Collective](https://opencollective.com/graphql-net/expenses/new) for the amount of the bounty.
+4. If your proposal is accepted, you may begin code implementation that adheres to your proposal.
+5. Submit code as a draft pull request in the appropriate repository so GraphQL.NET community leaders can track progress.
+6. Once code is complete, remove draft status and notify GraphQL.NET maintainers.
+7. Update code with feedback from core GraphQL.NET contributors as needed.
+8. Wait for your code to be merged into the `master` or `develop` branch.
+9. [Submit an expense through Open Collective](https://opencollective.com/graphql-net/expenses/new) for the amount of the bounty.
 
 
 ## Collaboration with GraphQL.NET team
