@@ -21,6 +21,29 @@ public class ExecutionErrorTests
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
+    public void Extensions(IGraphQLTextSerializer serializer)
+    {
+        var error = new ExecutionError("some error 1")
+            .AddExtension("severity", "warn")
+            .AddExtension("rank", 42);
+
+        var expected = """
+{
+  "message": "some error 1",
+  "extensions": {
+    "severity": "warn",
+    "rank": 42
+  }
+}
+""";
+
+        var actual = serializer.Serialize(error);
+
+        actual.ShouldBeCrossPlatJson(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersTestData))]
     public void Null(IGraphQLTextSerializer serializer)
     {
         var expected = "null";
