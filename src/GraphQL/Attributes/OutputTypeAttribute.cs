@@ -41,4 +41,15 @@ namespace GraphQL
             }
         }
     }
+
+    /// <inheritdoc cref="OutputTypeAttribute"/>
+    public class OutputTypeAttribute<TGraphType> : OutputTypeAttribute
+        where TGraphType : IGraphType
+    {
+        /// <inheritdoc cref="OutputTypeAttribute"/>
+        public OutputTypeAttribute()
+            : base(typeof(TGraphType))
+        {
+        }
+    }
 }
