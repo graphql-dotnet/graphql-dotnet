@@ -58,7 +58,7 @@ namespace GraphQL.Execution
                     : null;
                 var userExtensions = executionError.Extensions;
 
-                if (code != null || codes != null || data != null || details != null || userExtensions != null)
+                if (code != null || codes != null || data != null || details != null || userExtensions?.Count > 0)
                 {
                     extensions = new Dictionary<string, object?>();
                     if (code != null)
@@ -72,7 +72,7 @@ namespace GraphQL.Execution
                     if (details != null)
                         extensions.Add("details", details);
                     // Extensions from ExecutionError set by user have a precedence over other so they overwrite existing ones if any
-                    if (userExtensions != null)
+                    if (userExtensions?.Count > 0)
                     {
                         foreach (var item in userExtensions)
                             extensions[item.Key] = item.Value;

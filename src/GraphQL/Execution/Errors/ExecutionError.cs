@@ -71,14 +71,6 @@ namespace GraphQL
             (Locations ??= new()).Add(location);
         }
 
-        /// <summary>
-        /// Adds an extension to <see cref="Extensions"/>.
-        /// </summary>
-        public void AddExtension(string key, object? value)
-        {
-            (Extensions ??= new())[key] = value;
-        }
-
         private void SetCode(Exception? exception)
         {
             if (exception != null)
@@ -124,10 +116,10 @@ namespace GraphQL
         /// <summary>
         /// Adds an extension to <see cref="ExecutionError.Extensions"/>.
         /// </summary>
-        public static TError WithExtension<TError>(this TError error, string key, object? value)
+        public static TError AddExtension<TError>(this TError error, string key, object? value)
              where TError : ExecutionError
         {
-            error.AddExtension(key, value);
+            (error.Extensions ??= new())[key] = value;
             return error;
         }
     }

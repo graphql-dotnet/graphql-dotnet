@@ -24,8 +24,8 @@ public class ExecutionErrorTests
     public void Extensions(IGraphQLTextSerializer serializer)
     {
         var error = new ExecutionError("some error 1")
-            .WithExtension("severity", "warn")
-            .WithExtension("rank", 42);
+            .AddExtension("severity", "warn")
+            .AddExtension("rank", 42);
 
         var expected = """
 {
