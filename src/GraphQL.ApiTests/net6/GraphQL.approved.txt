@@ -529,6 +529,11 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    public class InputTypeAttribute<TGraphType> : GraphQL.InputTypeAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public InputTypeAttribute() { }
+    }
     public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
         public static readonly GraphQL.Inputs Empty;
@@ -617,6 +622,11 @@ namespace GraphQL
         public OutputTypeAttribute(System.Type graphType) { }
         public System.Type OutputType { get; set; }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public class OutputTypeAttribute<TGraphType> : GraphQL.OutputTypeAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public OutputTypeAttribute() { }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
