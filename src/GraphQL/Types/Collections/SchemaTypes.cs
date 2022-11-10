@@ -218,6 +218,9 @@ namespace GraphQL.Types
 
             ApplyTypeReferences();
 
+            // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
+            InheritInterfaceDescriptions();
+
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
 
             _typeDictionary = null!; // not needed once initialization is complete
@@ -911,6 +914,28 @@ Make sure that your ServiceProvider is configured correctly.");
                 // if building a schema from code, the .NET types will not be unique, which should be ignored
                 if (!_typeDictionary.ContainsKey(type))
                     _typeDictionary.Add(type, graphType);
+            }
+        }
+
+        private void InheritInterfaceDescriptions()
+        {
+            foreach (var fieldOwner in Dictionary.Values.OfType<IComplexGraphType>())
+            {
+                if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0)
+                {
+                    foreach (var field in fieldOwner.Fields.Where(field => field.Description == null))
+                    {
+                        foreach (var iface in implementation.ResolvedInterfaces.List)
+                        {
+                            var fieldFromInterface = iface.GetField(field.Name);
+                            if (fieldFromInterface?.Description != null)
+                            {
+                                field.Description = fieldFromInterface.Description;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
