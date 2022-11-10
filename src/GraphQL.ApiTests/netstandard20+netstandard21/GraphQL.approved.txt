@@ -129,9 +129,9 @@ namespace GraphQL
     }
     public static class ExecutionErrorExtensions
     {
-        public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document)
-            where TError : GraphQL.ExecutionError { }
         public static TError AddExtension<TError>(this TError error, string key, object? value)
+            where TError : GraphQL.ExecutionError { }
+        public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document)
             where TError : GraphQL.ExecutionError { }
     }
     public class ExecutionErrors : System.Collections.Generic.IEnumerable<GraphQL.ExecutionError>, System.Collections.IEnumerable
