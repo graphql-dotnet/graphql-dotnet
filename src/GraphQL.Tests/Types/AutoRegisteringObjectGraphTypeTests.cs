@@ -546,9 +546,17 @@ public class AutoRegisteringObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
+#if NET48
+        [InputType(typeof(IdGraphType))]
+#else
         [InputType<IdGraphType>()]
+#endif
         public int? Field6 { get; set; }
+#if NET48
+        [OutputType(typeof(IdGraphType))]
+#else
         [OutputType<IdGraphType>()]
+#endif
         public int? Field7 { get; set; }
         [DefaultValue("hello")]
         public string? Field8 { get; set; }
@@ -604,7 +612,13 @@ public class AutoRegisteringObjectGraphTypeTests
         public string NamedArg([Name("arg1rename")] string arg1) => arg1;
         public string IdArg([Id] string arg1) => arg1;
         public int IdIntArg([Id] int arg1) => arg1;
-        public int TypedArg([InputType<StringGraphType>()] int arg1) => arg1;
+        public int TypedArg(
+#if NET48
+        [InputType(typeof(StringGraphType))]
+#else
+        [InputType<StringGraphType>()]
+#endif
+        int arg1) => arg1;
         public string MultipleArgs(string arg1, int arg2) => arg1 + arg2.ToString();
     }
 

@@ -428,13 +428,24 @@ public class GetGraphTypeFromTypeTests
     [GraphQLMetadata(OutputType = typeof(CustomOutputGraphType))]
     private class AttributeTest3 { }
 
+#if NET48
+    [InputType(typeof(CustomInputGraphType))]
+    [OutputType(typeof(CustomOutputGraphType))]
+#else
     [InputType<CustomInputGraphType>()]
     [OutputType<CustomOutputGraphType>()]
+#endif
     private class AttributeTest4 { }
-
+#if NET48
+    [InputType(typeof(CustomInputGraphType))]
+#else
     [InputType<CustomInputGraphType>()]
+#endif
     private class AttributeTest5 { }
-
+#if NET48
+    [OutputType(typeof(CustomOutputGraphType))]
+#else
     [OutputType<CustomOutputGraphType>()]
+#endif
     private class AttributeTest6 { }
 }

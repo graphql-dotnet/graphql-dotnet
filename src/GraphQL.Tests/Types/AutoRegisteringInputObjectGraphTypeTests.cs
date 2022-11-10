@@ -323,9 +323,17 @@ public class AutoRegisteringInputObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
+#if NET48
+        [InputType(typeof(IdGraphType))]
+#else
         [InputType<IdGraphType>()]
+#endif
         public int? Field6 { get; set; }
+#if NET48
+        [OutputType(typeof(IdGraphType))]
+#else
         [OutputType<IdGraphType>()]
+#endif
         public int? Field7 { get; set; }
         [DefaultValue("hello")]
         public string? Field8 { get; set; }
