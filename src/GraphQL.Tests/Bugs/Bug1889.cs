@@ -7,8 +7,8 @@ public class Bug1889WithCovariant : QueryTestBase<CovariantSchema>
     [Fact]
     public void supports_covariant_schemas()
     {
-        string query = @"query { a { r { value } } }";
-        string expected = @"{ ""a"": { ""r"": { ""value"": ""spec"" } } }";
+        string query = "query { a { r { value } } }";
+        string expected = """{ "a": { "r": { "value": "spec" } } }""";
 
         AssertQuerySuccess(query, expected);
     }

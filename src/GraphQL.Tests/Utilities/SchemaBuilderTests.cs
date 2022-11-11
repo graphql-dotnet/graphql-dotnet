@@ -190,14 +190,14 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_type_with_arguments()
     {
-        var definitions = @"
+        var definitions = """"
                 type Query {
-                  """"""
+                  """
                   Post description
-                  """"""
-                  post(""ID description"" id: ID = 1, ""Val description"" val: String): String
+                  """
+                  post("ID description" id: ID = 1, "Val description" val: String): String
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").Description = "Some argument");
         schema.Initialize();
@@ -259,17 +259,17 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_interface()
     {
-        var definitions = @"
-                """"""
+        var definitions = """"
+                """
                 Example description
-                """"""
+                """
                 interface Pet {
-                    """"""
+                    """
                     ID description
-                    """"""
+                    """
                     id: ID
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -288,18 +288,18 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_enum()
     {
-        var definitions = @"
-                """"""
+        var definitions = """"
+                """
                 Example description
-                """"""
+                """
                 enum PetKind {
-                    """"""
+                    """
                     Cat description
-                    """"""
+                    """
                     CAT
                     DOG
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -409,7 +409,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_unions()
     {
-        var definitions = @"
+        var definitions = """"
                 type Human {
                     name: String
                 }
@@ -418,10 +418,11 @@ public class SchemaBuilderTests
                     name: String
                 }
 
-                """"""
+                """
                 Example description
-                """"""
-                union SearchResult = Human | Droid";
+                """
+                union SearchResult = Human | Droid
+                """";
 
         var schema = Schema.For(definitions, _ =>
         {
@@ -439,18 +440,18 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types()
     {
-        var definitions = @"
-                """"""
+        var definitions = """"
+                """
                 Example description
-                """"""
+                """
                 input ReviewInput {
-                  """"""
+                  """
                   Stars description
-                  """"""
+                  """
                   stars: Int!
                   commentary: String
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -561,14 +562,14 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_directives()
     {
-        var definitions = @"
-                """"""
+        var definitions = """"
+                """
                 Example description
-                """"""
+                """
                 directive @myDirective(
                   if: Boolean!
                 ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();

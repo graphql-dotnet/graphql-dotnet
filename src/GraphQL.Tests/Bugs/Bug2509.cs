@@ -8,19 +8,21 @@ public class RecordTest : QueryTestBase<RecordSchema>
     [Fact]
     public void Record_Should_Return_As_Is()
     {
-        var query = @"
+        var query = """
 {
   search(input: {})
   {
     id
   }
 }
-";
-        var expected = @"{
-  ""search"": {
-    ""id"": null
+""";
+        var expected = """
+{
+  "search": {
+    "id": null
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }

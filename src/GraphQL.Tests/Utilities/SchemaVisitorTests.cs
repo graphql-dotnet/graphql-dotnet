@@ -19,7 +19,7 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
             _.ConfigureBuildedSchema = schema => { schema.Directives.Register(new UpperDirective()); schema.RegisterVisitor<UppercaseDirectiveVisitor>(); };
             _.Query = "{ hello }";
             _.Root = new { Hello = "Hello World!" };
-            _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
+            _.ExpectedResult = """{ "hello": "HELLO WORLD!" }""";
         });
     }
 

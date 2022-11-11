@@ -9,37 +9,37 @@ public class Issue2357_TestSamples : QueryTestBase<Issue2357_TestSamples.MySchem
     [Fact]
     public void output_null()
     {
-        AssertQuerySuccess("{ testDbOutputNull }", "{\"testDbOutputNull\": null}");
+        AssertQuerySuccess("{ testDbOutputNull }", """{"testDbOutputNull": null}""");
     }
 
     [Fact]
     public void output_value()
     {
-        AssertQuerySuccess("{ testDbOutputValue }", "{\"testDbOutputValue\": \"123\"}");
+        AssertQuerySuccess("{ testDbOutputValue }", """{"testDbOutputValue": "123"}""");
     }
 
     [Fact]
     public void input_literal_null()
     {
-        AssertQuerySuccess("{ testDbInput(arg:null) }", "{\"testDbInput\": \"0\"}");
+        AssertQuerySuccess("{ testDbInput(arg:null) }", """{"testDbInput": "0"}""");
     }
 
     [Fact]
     public void input_literal_value()
     {
-        AssertQuerySuccess("{ testDbInput(arg:\"123\") }", "{\"testDbInput\": \"123\"}");
+        AssertQuerySuccess("{ testDbInput(arg:\"123\") }", """{"testDbInput": "123"}""");
     }
 
     [Fact]
     public void input_value_null()
     {
-        AssertQuerySuccess("query ($arg: DbId) { testDbInput(arg:$arg) }", "{\"testDbInput\": \"0\"}", "{\"arg\":null}".ToInputs());
+        AssertQuerySuccess("query ($arg: DbId) { testDbInput(arg:$arg) }", """{"testDbInput": "0"}""", """{"arg":null}""".ToInputs());
     }
 
     [Fact]
     public void input_value_value()
     {
-        AssertQuerySuccess("query ($arg: DbId) { testDbInput(arg:$arg) }", "{\"testDbInput\": \"123\"}", "{\"arg\":\"123\"}".ToInputs());
+        AssertQuerySuccess("query ($arg: DbId) { testDbInput(arg:$arg) }", """{"testDbInput": "123"}""", """{"arg":"123"}""".ToInputs());
     }
 
     public class MySchema : Schema

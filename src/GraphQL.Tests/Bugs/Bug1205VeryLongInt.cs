@@ -50,9 +50,11 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     public void Very_Long_Number_Should_Return_As_Is_For_Long()
     {
         var query = "{ long }";
-        var expected = @"{
-  ""long"": 636474637870330463
-}";
+        var expected = """
+{
+  "long": 636474637870330463
+}
+""";
         AssertQuerySuccess(query, expected);
     }
 
@@ -60,9 +62,11 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     public void Very_Long_Number_In_Input_Should_Work_For_Long()
     {
         var query = "{ long_with_arg(in:636474637870330463) }";
-        var expected = @"{
-  ""long_with_arg"": 636474637870330463
-}";
+        var expected = """
+{
+  "long_with_arg": 636474637870330463
+}
+""";
         AssertQuerySuccess(query, expected);
     }
 
@@ -106,9 +110,11 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     public void Very_Very_Long_Number_Should_Return_As_Is_For_BigInteger()
     {
         var query = "{ bigint }";
-        var expected = @"{
-  ""bigint"": 636474637870330463636474637870330463636474637870330463
-}";
+        var expected = """
+{
+  "bigint": 636474637870330463636474637870330463636474637870330463
+}
+""";
         AssertQuerySuccess(query, expected);
     }
 
@@ -116,9 +122,11 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
     public void Very__Very_Long_Number_In_Input_Should_Work_For_BigInteger()
     {
         var query = "{ bigint_with_arg(in:636474637870330463636474637870330463636474637870330463) }";
-        var expected = @"{
-  ""bigint_with_arg"": 636474637870330463636474637870330463636474637870330463
-}";
+        var expected = """
+{
+  "bigint_with_arg": 636474637870330463636474637870330463636474637870330463
+}
+""";
         AssertQuerySuccess(query, expected);
     }
 }
