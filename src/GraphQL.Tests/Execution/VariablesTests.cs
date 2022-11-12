@@ -154,12 +154,12 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
     [Fact]
     public void executes_with_complex_input()
     {
-        var query = @"
+        var query = """
             {
-              fieldWithObjectInput(input: {a: ""foo"", b: [""bar""], c: ""baz""})
+              fieldWithObjectInput(input: {a: "foo", b: ["bar"], c: "baz"})
             }
-            ";
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+            """;
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
         AssertQuerySuccess(query, expected);
     }
@@ -167,12 +167,12 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
     [Fact]
     public void properly_parses_single_value_to_list()
     {
-        var query = @"
+        var query = """
             {
-              fieldWithObjectInput(input: {a: ""foo"", b: ""bar"", c: ""baz""})
+              fieldWithObjectInput(input: {a: "foo", b: "bar", c: "baz"})
             }
-            ";
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+            """;
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
         AssertQuerySuccess(query, expected);
     }
@@ -180,11 +180,11 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
     [Fact]
     public void fail_on_incorrect_value()
     {
-        var query = @"
+        var query = """
             {
-              fieldWithObjectInput(input: [""foo"", ""bar"", ""baz""])
+              fieldWithObjectInput(input: ["foo", "bar", "baz"])
             }
-            ";
+            """;
         var expected = "{ \"fieldWithObjectInput\": null }";
 
         var result = AssertQueryWithErrors(query, expected, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: true);
@@ -204,9 +204,9 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void executes_with_complex_input()
     {
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": [""bar""], ""c"": ""baz"" } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": ["bar"], "c": "baz" } }""".ToInputs();
 
         AssertQuerySuccess(_query, expected, inputs);
     }
@@ -214,9 +214,9 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void properly_parses_single_value_to_list()
     {
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"" } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": "bar", "c": "baz" } }""".ToInputs();
 
         AssertQuerySuccess(_query, expected, inputs);
     }
@@ -224,9 +224,9 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void properly_parses_multiple_values_to_list()
     {
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\",\"qux\"],\"c\":\"baz\"}" }""";
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": [""bar"", ""qux""], ""c"": ""baz"" } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": ["bar", "qux"], "c": "baz" } }""".ToInputs();
 
         AssertQuerySuccess(_query, expected, inputs);
     }
@@ -240,7 +240,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
                 }
             ";
 
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"a\\\":\\\"foo\\\",\\\"b\\\":[\\\"bar\\\"],\\\"c\\\":\\\"baz\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
         AssertQuerySuccess(queryWithDefaults, expected);
     }
@@ -248,9 +248,9 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void executes_with_complex_scalar_input()
     {
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"c\":\"foo\",\"d\":\"DeserializedValue\"}" }""";
 
-        var inputs = @"{ ""input"": { ""c"": ""foo"", ""d"": ""SerializedValue"" } }".ToInputs();
+        var inputs = """{ "input": { "c": "foo", "d": "SerializedValue" } }""".ToInputs();
 
         AssertQuerySuccess(_query, expected, inputs);
     }
@@ -260,7 +260,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
         const string expected = null;
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": null } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": "bar", "c": null } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
@@ -274,7 +274,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
         const string expected = null;
 
-        var inputs = @"{ ""input"": ""foo bar"" }".ToInputs();
+        var inputs = """{ "input": "foo bar" }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
@@ -322,7 +322,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
                 }
             ";
 
-        var expected = "{ \"fieldWithObjectInput\": \"{\\\"b\\\":[\\\"bar\\\",\\\"qux\\\"],\\\"c\\\":\\\"foo\\\",\\\"d\\\":\\\"DeserializedValue\\\"}\" }";
+        var expected = """{ "fieldWithObjectInput": "{\"b\":[\"bar\",\"qux\"],\"c\":\"foo\",\"d\":\"DeserializedValue\"}" }""";
 
         var inputs = @"{ ""argB"": [""bar"", ""qux""], ""argC"": ""foo"", ""argD"": ""SerializedValue"" }".ToInputs();
 
@@ -434,13 +434,13 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
             ";
 
         // value is: "a"
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithNullableStringInput"": ""\""a\""""
+              "fieldWithNullableStringInput": "\"a\""
             }
-            ";
+            """;
 
-        var inputs = @"{""value"": ""a""}".ToInputs();
+        var inputs = """{"value": "a"}""".ToInputs();
 
         AssertQuerySuccess(query, expected, inputs);
     }

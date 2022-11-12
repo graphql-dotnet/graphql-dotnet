@@ -25,13 +25,13 @@ public class Bug1046
         var response = new DocumentExecuter().ExecuteAsync(_ =>
         {
             _.Schema = schema;
-            _.Query = @"
+            _.Query = """
 query {
   inst {
     id
   }
 }
-";
+""";
         }).Result;
         response.Data.ShouldNotBeNull();
     }

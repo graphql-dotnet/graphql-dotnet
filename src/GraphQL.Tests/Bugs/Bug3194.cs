@@ -8,8 +8,7 @@ public class Bug3194
     [Fact]
     public async Task InheritedMethodsWork()
     {
-        var schema = Schema.For(
-            @"
+        var schema = Schema.For("""
 schema {
   query: Query
 }
@@ -18,7 +17,7 @@ type Query {
   hello: String!    # test inherited method
   hello2: String!   # test inherited property
 }
-",
+""",
             c => c.Types.Include(typeof(QueryType)));
         schema.Initialize();
         var queryType = schema.AllTypes["Query"].ShouldBeAssignableTo<IComplexGraphType>();

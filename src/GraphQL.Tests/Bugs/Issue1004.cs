@@ -7,9 +7,9 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
     [Fact]
     public void Should_Return_Field_Description_From_Interface_If_Not_Overridden()
     {
-        var query = @"
+        var query = """
 {
-  __type(name: ""Query"")
+  __type(name: "Query")
   {
     fields
     {
@@ -17,22 +17,24 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
     }
   }
 }
-";
-        var expected = @"{
-  ""__type"": {
-    ""fields"": [
+""";
+        var expected = """
+{
+  "__type": {
+    "fields": [
       {
-        ""description"": ""Very important field1""
+        "description": "Very important field1"
       },
       {
-        ""description"": ""Not so important""
+        "description": "Not so important"
       },
       {
-        ""description"": null
+        "description": null
       }
     ]
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }

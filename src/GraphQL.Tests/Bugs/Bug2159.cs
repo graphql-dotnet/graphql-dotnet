@@ -6,49 +6,49 @@ namespace GraphQL.Tests.Bugs;
 public class Bug2159 : QueryTestBase<Bug2159Schema>
 {
     [Fact]
-    public void Direct_Literal_Default() => AssertQuerySuccess("{ testValue }", @"{ ""testValue"": ""defaultValue"" }");
+    public void Direct_Literal_Default() => AssertQuerySuccess("{ testValue }", """{ "testValue": "defaultValue" }""");
 
     [Fact]
-    public void Direct_Literal_Specified() => AssertQuerySuccess("{ testValue(arg: \"hello\") }", @"{ ""testValue"": ""hello"" }");
+    public void Direct_Literal_Specified() => AssertQuerySuccess("""{ testValue(arg: "hello") }""", """{ "testValue": "hello" }""");
 
     [Fact]
-    public void Direct_Literal_Null() => AssertQuerySuccess("{ testValue(arg: null) }", @"{ ""testValue"": null }");
+    public void Direct_Literal_Null() => AssertQuerySuccess("{ testValue(arg: null) }", """{ "testValue": null }""");
 
     [Fact]
-    public void Direct_Variable_FieldDefault() => AssertQuerySuccess("query($input: String) { testValue(arg: $input) }", @"{ ""testValue"": ""defaultValue"" }");
+    public void Direct_Variable_FieldDefault() => AssertQuerySuccess("query($input: String) { testValue(arg: $input) }", """{ "testValue": "defaultValue" }""");
 
     [Fact]
-    public void Direct_Variable_VarDefault() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", @"{ ""testValue"": ""varDefault"" }");
+    public void Direct_Variable_VarDefault() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", """{ "testValue": "varDefault" }""");
 
     [Fact]
-    public void Direct_Variable_Specified() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", @"{ ""testValue"": ""hello"" }", "{\"input\":\"hello\"}".ToInputs());
+    public void Direct_Variable_Specified() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", """{ "testValue": "hello" }""", """{"input":"hello"}""".ToInputs());
 
     [Fact]
-    public void Direct_Variable_Null() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", @"{ ""testValue"": null }", "{\"input\":null}".ToInputs());
+    public void Direct_Variable_Null() => AssertQuerySuccess("query($input: String = \"varDefault\") { testValue(arg: $input) }", """{ "testValue": null }""", """{"input":null}""".ToInputs());
 
     [Fact]
-    public void Object_Literal_Default() => AssertQuerySuccess("{ testObject }", @"{ ""testObject"": ""defaultValue"" }");
+    public void Object_Literal_Default() => AssertQuerySuccess("{ testObject }", """{ "testObject": "defaultValue" }""");
 
     [Fact]
-    public void Object_Literal_Specified() => AssertQuerySuccess("{ testObject(arg: {value:\"hello\"}) }", @"{ ""testObject"": ""hello"" }");
+    public void Object_Literal_Specified() => AssertQuerySuccess("""{ testObject(arg: {value:"hello"}) }""", """{ "testObject": "hello" }""");
 
     [Fact]
-    public void Object_Literal_Null() => AssertQuerySuccess("{ testObject(arg: {value:null}) }", @"{ ""testObject"": null }");
+    public void Object_Literal_Null() => AssertQuerySuccess("{ testObject(arg: {value:null}) }", """{ "testObject": null }""");
 
     [Fact]
-    public void Object_Variable_Default() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", @"{ ""testObject"": ""defaultFieldValue"" }", "{\"input\":{}}".ToInputs());
+    public void Object_Variable_Default() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", """{ "testObject": "defaultFieldValue" }""", """{"input":{}}""".ToInputs());
 
     [Fact]
-    public void Object_Variable_Specified() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", @"{ ""testObject"": ""hello"" }", "{\"input\":{\"value\":\"hello\"}}".ToInputs());
+    public void Object_Variable_Specified() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", """{ "testObject": "hello" }""", "{\"input\":{\"value\":\"hello\"}}".ToInputs());
 
     [Fact]
-    public void Object_Variable_Null() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", @"{ ""testObject"": null }", "{\"input\":{\"value\":null}}".ToInputs());
+    public void Object_Variable_Null() => AssertQuerySuccess("query($input: Bug2159Object) { testObject(arg: $input) }", """{ "testObject": null }""", """{"input":{"value":null}}""".ToInputs());
 
     [Fact]
-    public void HasArgument_NoDefault_None() => AssertQuerySuccess("{ hasArgumentNoDefault }", @"{ ""hasArgumentNoDefault"": false }");
+    public void HasArgument_NoDefault_None() => AssertQuerySuccess("{ hasArgumentNoDefault }", """{ "hasArgumentNoDefault": false }""");
 
     [Fact]
-    public void HasArgument_NoDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": false }");
+    public void HasArgument_NoDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": false }""");
 
     [Fact]
     public void HasArgument_NoDefault_Set() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: true) }", @"{ ""hasArgumentNoDefault"": true }");

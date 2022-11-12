@@ -30,7 +30,7 @@ public class Bug2839SystemTextJson
         });
 
         var str = writer.Serialize(result);
-        str.ShouldBeCrossPlatJson("{\"data\":{\"TEST\":{\"THISISASTRING\":\"String Value\",\"THISISADATETIME\":\"2022-Jan-04\"}}}");
+        str.ShouldBeCrossPlatJson("""{"data":{"TEST":{"THISISASTRING":"String Value","THISISADATETIME":"2022-Jan-04"}}}""");
     }
 
     public class TestQuery : ObjectGraphType

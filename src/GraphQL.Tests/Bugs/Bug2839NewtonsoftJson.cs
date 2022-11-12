@@ -38,7 +38,7 @@ public class Bug2839NewtonsoftJson
         });
 
         var str = writer.Serialize(result);
-        str.ShouldBeCrossPlatJson("{\"data\":{\"test\":{\"this-is-a-string\":\"String Value\",\"this-is-a-date-time\":\"2022-Jan-04\"}}}");
+        str.ShouldBeCrossPlatJson("""{"data":{"test":{"this-is-a-string":"String Value","this-is-a-date-time":"2022-Jan-04"}}}""");
     }
 
     public class TestQuery : ObjectGraphType

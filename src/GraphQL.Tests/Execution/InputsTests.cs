@@ -73,12 +73,14 @@ public class InputsTests : QueryTestBase<EnumMutationSchema>
         var inputs = @"{ ""userId"": 1000000000000000001 }".ToInputs();
 
         AssertQuerySuccess(
-            @"query aQuery($userId: Long!) { getLongUser(userId: $userId) { idLong }}",
-            @"{
-                  ""getLongUser"": {
-                    ""idLong"": 1000000000000000001
-                  }
-                }", inputs);
+            "query aQuery($userId: Long!) { getLongUser(userId: $userId) { idLong }}",
+            """
+            {
+                "getLongUser": {
+                "idLong": 1000000000000000001
+                }
+            }
+            """, inputs);
     }
 
     [Fact]

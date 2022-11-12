@@ -20,15 +20,17 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
     [ClassData(typeof(Bug2958DecimalPrecisionTestData))]
     public void double_to_decimal_does_not_lose_precision(IGraphQLTextSerializer serializer)
     {
-        string request = @"{
-""operationName"": ""TestMutation"",
-""variables"": {
-  ""input"": {
-    ""discount"": 12345678901234.56
+        string request = """
+{
+  "operationName": "TestMutation",
+  "variables": {
+  "input": {
+    "discount": 12345678901234.56
     }
-},
-""query"": ""mutation TestMutation($input: MutationType!)""
-}";
+  },
+  "query": "mutation TestMutation($input: MutationType!)"
+}
+""";
 
         var inputs = serializer.Deserialize<GraphQLRequest>(request);
         inputs.Variables.ShouldNotBeNull();

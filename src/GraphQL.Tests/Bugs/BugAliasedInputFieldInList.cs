@@ -12,7 +12,7 @@ public class BugAliasedInputFieldInList : QueryTestBase<AliasedInputFieldSchema>
                 multipleEntities: [{ aField: 3 fieldAlias: 4 }]
             ) }";
 
-        string expected = @"{ ""mutateMyEntity"": true }";
+        string expected = """{ "mutateMyEntity": true }""";
 
         AssertQuerySuccess(query, expected, null);
     }

@@ -17,7 +17,7 @@ public class GraphQLRequestTests : DeserializationTestBase
             Query = "hello",
         };
 
-        var expected = @"{ ""query"": ""hello"" }";
+        var expected = """{ "query": "hello" }""";
 
         var actual = serializer.Serialize(request);
 
@@ -44,7 +44,7 @@ public class GraphQLRequestTests : DeserializationTestBase
             }),
         };
 
-        var expected = @"{ ""query"": ""hello"", ""operationName"": ""opname"", ""variables"": { ""arg1"": 1, ""arg2"": ""test"" }, ""extensions"": { ""arg1"": 2, ""arg2"": ""test2"" } }";
+        var expected = """{ "query": "hello", "operationName": "opname", "variables": { "arg1": 1, "arg2": "test" }, "extensions": { "arg1": 2, "arg2": "test2" } }""";
 
         var actual = serializer.Serialize(request);
 
@@ -80,7 +80,7 @@ public class GraphQLRequestTests : DeserializationTestBase
             Query = "hello",
         };
 
-        var expected = @"[{ ""query"": ""hello"" }]";
+        var expected = """[{ "query": "hello" }]""";
 
         var actual = serializer.Serialize(new List<GraphQLRequest> { request });
 
@@ -96,7 +96,7 @@ public class GraphQLRequestTests : DeserializationTestBase
             Query = "hello",
         };
 
-        var expected = @"[{ ""query"": ""hello"" }]";
+        var expected = """[{ "query": "hello" }]""";
 
         var actual = serializer.Serialize(new GraphQLRequest[] { request });
 

@@ -9,8 +9,8 @@ public class Bug956 : QueryTestBase<Bug956Schema>
     [Fact]
     public void base64_should_Convert_to_binary()
     {
-        var query = @"{ get(base64: ""R3JhcGhRTCE="") }";
-        AssertQuerySuccess(query, @"{""get"": ""R3JhcGhRTCE=""}");
+        var query = """{ get(base64: "R3JhcGhRTCE=") }""";
+        AssertQuerySuccess(query, """{"get": "R3JhcGhRTCE="}""");
     }
 }
 
