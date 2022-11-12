@@ -93,9 +93,9 @@ You ARE eligible to participate in the Program if you meet all of the following 
 You ARE NOT eligible to participate in the Program if you meet any of the following criteria:
 
 * You are a resident of any countries under U.S. sanctions (see link for current sanctions list posted by the United States
-  Treasury Department) or any other country that does not allow participation in this type of program;
+  Treasury Department) or any other country that does not allow participation in this type of program; or
 
-* You are under the age of 14;
+* You are under the age of 14.
 
 By posting any issue, pull request, or other form of submission to GraphQL.NET (a Submission), whether or not it is accepted
 through this bounty program, you:
@@ -103,12 +103,12 @@ through this bounty program, you:
 * License the Submission under the terms of the [MIT License](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/LICENSE.md)
   and do not require attribution for your submission;
 
-* understand and acknowledge that others may have developed or commissioned materials similar or identical to your Submission,
+* Understand and acknowledge that others may have developed or commissioned materials similar or identical to your Submission,
   and you waive any claims you may have resulting from any similarities to your Submission;
 
-* understand that you are not guaranteed any compensation or credit for your Submission; and
+* Understand that you are not guaranteed any compensation or credit for your Submission; and
 
-* represent and warrant that your Submission is your own work, that you haven't used information owned by another person or entity,
+* Represent and warrant that your Submission is your own work, that you haven't used information owned by another person or entity,
   and that you have the legal right to provide the Submission to GraphQL.NET.
 
 The GraphQL.NET team reserves the right to terminate or make changes to this program at any time, including but not limited
