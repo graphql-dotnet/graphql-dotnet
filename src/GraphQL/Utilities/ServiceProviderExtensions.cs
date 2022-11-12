@@ -28,7 +28,7 @@ namespace GraphQL.Utilities
             if (service != null)
                 return service;
 
-            throw new InvalidOperationException($"No service for type '{serviceType}' has been registered.");
+            throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered.");
         }
     }
 }
