@@ -8,19 +8,17 @@
 [![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/graphql-dotnet/graphql-dotnet/latest?label=new+commits)](https://github.com/graphql-dotnet/graphql-dotnet/commits/master)
 ![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
 
-[![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
-
 [![GitHub contributors](https://img.shields.io/github/contributors/graphql-dotnet/graphql-dotnet)](https://github.com/graphql-dotnet/graphql-dotnet/graphs/contributors)
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
 
-[![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty)
-[![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
-
-| :heavy_dollar_sign: [Become a sponsor!](https://opencollective.com/graphql-net#sponsor) :heavy_dollar_sign: | :heavy_dollar_sign: [Get paid for contributing!](BOUNTY.md) :heavy_dollar_sign: |
+| :heart: [Become a backer!](https://opencollective.com/graphql-net#backer) :heart: | [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors)  |
 |-|-|
+
+| :heavy_dollar_sign: [Get paid for contributing!](BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
+|-|-|
+
 
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
