@@ -692,11 +692,11 @@ Make sure that your ServiceProvider is configured correctly.");
 
             if (existingType.GetType() != newType.GetType())
             {
-                throw new InvalidOperationException($@"Unable to register GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().GetFriendlyName()}'. Check your schema configuration.");
+                throw new InvalidOperationException($"Unable to register GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}'. The name '{newType.Name}' is already registered to '{existingType.GetType().GetFriendlyName()}'. Check your schema configuration.");
             }
 
             // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
-            throw new InvalidOperationException($"A different instance of the type '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
+            throw new InvalidOperationException($"A different instance of the GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use {nameof(GraphQLTypeReference)} to reference a type instantiated elsewhere.");
         }
 
         private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
