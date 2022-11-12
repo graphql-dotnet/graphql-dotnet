@@ -1,21 +1,26 @@
 # GraphQL for .NET
 
-[![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Test code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml)
-[![Build artifacts](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml)
-[![Publish code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml)
-[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml)
+[![License](https://img.shields.io/github/license/graphql-dotnet/graphql-dotnet)](LICENSE.md)
 [![codecov](https://codecov.io/gh/graphql-dotnet/graphql-dotnet/branch/master/graph/badge.svg?token=iXZo1jZvFo)](https://codecov.io/gh/graphql-dotnet/graphql-dotnet)
+[![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![Nuget](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![GitHub Release Date](https://img.shields.io/github/release-date/graphql-dotnet/graphql-dotnet?label=released)](https://github.com/graphql-dotnet/graphql-dotnet/releases)
+[![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/graphql-dotnet/graphql-dotnet/latest?label=new+commits)](https://github.com/graphql-dotnet/graphql-dotnet/commits/master)
+![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
 
 [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
 [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
 
+[![GitHub contributors](https://img.shields.io/github/contributors/graphql-dotnet/graphql-dotnet)](https://github.com/graphql-dotnet/graphql-dotnet/graphs/contributors)
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
 
-![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
+[![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty)
+[![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
+
+| :heavy_dollar_sign: [Become a sponsor!](https://opencollective.com/graphql-net#sponsor) :heavy_dollar_sign: | :heavy_dollar_sign: [Get paid for contributing!](BOUNTY.md) :heavy_dollar_sign: |
+|-|-|
 
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
@@ -343,6 +348,10 @@ If you have a PR with some breaking changes, then please target it to the `devel
 ## Backers
 
 Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
+
+Contributions are very much appreciated and are used to support the project primarily via [bounties](BOUNTY.md) paid directly to contributors to the project.
+Please help us to express gratitude to those indivduals who devote time and energy to contributing to this project by supporting their efforts in a tangible means.
+A list of the outstanding issues to which we are sponsoring via bounties can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty).
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
 
