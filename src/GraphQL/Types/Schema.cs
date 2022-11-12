@@ -296,7 +296,7 @@ namespace GraphQL.Types
 
             if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+                throw new ArgumentOutOfRangeException(nameof(type), $"Type must be of {nameof(ISchemaNodeVisitor)}.");
             }
 
             if (!(_visitorTypes ??= new()).Contains(type))
