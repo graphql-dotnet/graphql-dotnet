@@ -48,7 +48,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessageGetAll(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -81,7 +81,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -115,7 +115,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -148,7 +148,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -185,7 +185,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -221,7 +221,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -241,7 +241,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddError(new Exception("test"));
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.FirstOrDefault();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync()).ConfigureAwait(false);
         error.InnerException.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });

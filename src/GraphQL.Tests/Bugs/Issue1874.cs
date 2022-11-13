@@ -52,6 +52,7 @@ public class Issue1874Schema : Schema
 {
     public Issue1874Schema()
     {
+        this.RegisterBCLScalars();
         Query = new Issue1874Query();
     }
 }

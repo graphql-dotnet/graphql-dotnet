@@ -23,6 +23,7 @@ public class Issue1082Schema : Schema
 {
     public Issue1082Schema()
     {
+        this.RegisterBCLScalars();
         var query = new ObjectGraphType<Model>();
         query.Field(f => f.DateTimeField).Resolve(_ => new DateTime(1000, 10, 10, 1, 2, 3));
         query.Field(f => f.DateField, type: typeof(DateGraphType)).Resolve(_ => new DateTime(1000, 10, 10, 1, 2, 3).Date);

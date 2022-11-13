@@ -1,4 +1,5 @@
 using System.Numerics;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types
@@ -9,10 +10,23 @@ namespace GraphQL.Types
     /// </summary>
     public class LongGraphType : ScalarGraphType
     {
+        private static readonly object[] _positiveLongs = new object[] { 0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
+        private static readonly object[] _negativeLongs = new object[] { 0L, -1L, -2L, -3L, -4L, -5L, -6L, -7L, -8L, -9L };
+
+        internal static object GetLong(ROM value)
+        {
+            return value.Length switch
+            {
+                1 when '0' <= value.Span[0] && value.Span[0] <= '9' => _positiveLongs[value.Span[0] - '0'],
+                2 when value.Span[0] == '-' && '0' <= value.Span[1] && value.Span[1] <= '9' => _negativeLongs[value.Span[1] - '0'],
+                _ => Long.Parse(value)
+            };
+        }
+
         /// <inheritdoc/>
         public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            GraphQLIntValue x => GraphQLValuesCache.GetLong(x.Value),
+            GraphQLIntValue x => GetLong(x.Value),
             GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };

@@ -14,20 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\GraphQL.Tests\GraphQLSerializersTestData.cs" Link="GraphQLSerializersTestData.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.*" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.*" />
-    <PackageReference Include="System.Reactive" Version="5.*" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GraphQL.BCLScalars\GraphQL.BCLScalars.csproj" />
-    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
-    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
-    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
   </ItemGroup>
 
 </Project>

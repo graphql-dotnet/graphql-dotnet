@@ -24,6 +24,7 @@ public class BugWithCustomScalarsInDirectiveSchema : Schema
     public BugWithCustomScalarsInDirectiveSchema(IServiceProvider provider, BugWithCustomScalarsInDirectiveQuery query)
         : base(provider)
     {
+        this.RegisterBCLScalars();
         Query = query;
         Directives.Register(new LinkDirective(), new SomeDirective());
     }

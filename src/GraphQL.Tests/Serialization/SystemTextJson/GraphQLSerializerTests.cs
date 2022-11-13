@@ -50,7 +50,7 @@ public class GraphQLSerializerTests
     {
         var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
         {
-            Schema = new Schema { Query = new AutoRegisteringObjectGraphType<Query>() },
+            Schema = new Schema { Query = new AutoRegisteringObjectGraphType<Query>() }.RegisterBCLScalars(),
             Query = "{hero}"
         }).ConfigureAwait(false);
 

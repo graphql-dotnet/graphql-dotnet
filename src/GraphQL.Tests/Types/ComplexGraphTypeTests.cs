@@ -82,7 +82,7 @@ public class ComplexGraphTypeTests
         try
         {
             GlobalSwitches.EnableReadDescriptionFromXmlDocumentation = true;
-            var schema = new Schema();
+            var schema = new Schema().RegisterBCLScalars();
             var type = new AutoRegisteringObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
             schema.Query = type;
             schema.Initialize();
@@ -123,7 +123,7 @@ public class ComplexGraphTypeTests
         try
         {
             GlobalSwitches.EnableReadDescriptionFromXmlDocumentation = true;
-            var schema = new Schema();
+            var schema = new Schema().RegisterBCLScalars();
             var type = new AutoRegisteringInputObjectGraphType<TestObject>(o => o.valuePair, o => o.someEnumerable);
             var query = new ObjectGraphType();
             query.Field<StringGraphType>("test").Arguments(new QueryArgument(type) { Name = "input" });

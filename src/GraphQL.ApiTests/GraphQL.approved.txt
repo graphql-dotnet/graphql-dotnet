@@ -1793,13 +1793,6 @@ namespace GraphQL.Types
     {
         public AutoSchema(System.IServiceProvider serviceProvider) { }
     }
-    public class BigIntGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public BigIntGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
     public class BooleanGraphType : GraphQL.Types.ScalarGraphType
     {
         public BooleanGraphType() { }
@@ -1808,13 +1801,6 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
-    }
-    public class ByteGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public ByteGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
     }
     public class CamelCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -1905,41 +1891,6 @@ namespace GraphQL.Types
     {
         public ConstantCaseAttribute() { }
         public override string ChangeEnumCase(string val) { }
-    }
-    public class DateGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public DateGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class DateOnlyGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public DateOnlyGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class DateTimeGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public DateTimeGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class DateTimeOffsetGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public DateTimeOffsetGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class DecimalGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public DecimalGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
     }
     public class DeprecatedDirective : GraphQL.Types.Directive
     {
@@ -2075,15 +2026,6 @@ namespace GraphQL.Types
         public override int GetHashCode() { }
         public virtual void Initialize(GraphQL.Types.ISchema schema) { }
         public override string ToString() { }
-    }
-    public class GuidGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public GuidGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override bool CanParseValue(object? value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
     }
     public interface IAbstractGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2258,13 +2200,6 @@ namespace GraphQL.Types
         public ListGraphType() { }
         public override System.Type Type { get; }
     }
-    public class LongGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public LongGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType? type) { }
@@ -2348,13 +2283,6 @@ namespace GraphQL.Types
         public int Count { get; }
         public bool Contains(GraphQL.Types.IInterfaceGraphType type) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IInterfaceGraphType> GetEnumerator() { }
-    }
-    public class SByteGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public SByteGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
     }
     public abstract class ScalarGraphType : GraphQL.Types.GraphType
     {
@@ -2457,13 +2385,6 @@ namespace GraphQL.Types
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
     }
-    public class ShortGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public ShortGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
     public class SkipDirective : GraphQL.Types.Directive
     {
         public SkipDirective() { }
@@ -2475,27 +2396,6 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
-    }
-    public class TimeOnlyGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public TimeOnlyGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public TimeSpanMillisecondsGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
-    }
-    public class TimeSpanSecondsGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public TimeSpanSecondsGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
     }
     public static class TypeExtensions
     {
@@ -2532,27 +2432,6 @@ namespace GraphQL.Types
         public virtual void ApplyAttributes() { }
         public virtual System.Type ConstructGraphType() { }
     }
-    public class UIntGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public UIntGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
-    public class ULongGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public ULongGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
-    public class UShortGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public UShortGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-    }
     public class UnionGraphType : GraphQL.Types.GraphType, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public UnionGraphType() { }
@@ -2563,13 +2442,6 @@ namespace GraphQL.Types
         public void Type(System.Type type) { }
         public void Type<TType>()
             where TType : GraphQL.Types.IObjectGraphType { }
-    }
-    public class UriGraphType : GraphQL.Types.ScalarGraphType
-    {
-        public UriGraphType() { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override object? Serialize(object? value) { }
     }
 }
 namespace GraphQL.Types.Relay

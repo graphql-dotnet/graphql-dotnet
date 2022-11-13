@@ -26,7 +26,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 #pragma warning disable xUnit1013 // public method should be marked as test
     // WARNING: it is not static only for discoverability
     // WARNING: do not set any instance data inside
-    // WARNING: method works on temporaly created instance
+    // WARNING: method works on temporary created instance
     public virtual void RegisterServices(IServiceRegister register)
     {
         register.TryRegister(typeof(TSchema), typeof(TSchema), ServiceLifetime.Singleton);

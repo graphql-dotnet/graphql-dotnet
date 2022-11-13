@@ -658,6 +658,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Definitions = defs;
             _.ExpectedResult = expected;
             _.Variables = variables;
+            _.ConfigureBuildedSchema = schema => schema.RegisterBCLScalars();
         });
     }
 

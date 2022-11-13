@@ -217,6 +217,7 @@ public class SchemaForScalars : Schema
 {
     public SchemaForScalars()
     {
+        this.RegisterBCLScalars();
         Mutation = new ScalarsMutation();
     }
 }

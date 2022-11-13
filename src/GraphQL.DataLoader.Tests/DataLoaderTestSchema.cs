@@ -8,6 +8,7 @@ public class DataLoaderTestSchema : Schema
     public DataLoaderTestSchema(IServiceProvider services, QueryType query, SubscriptionType subscriptionType)
         : base(services)
     {
+        this.RegisterBCLScalars();
         Query = query; //runs with parallel execution strategy
         Mutation = query; //runs with serial execution strategy
         Subscription = subscriptionType;

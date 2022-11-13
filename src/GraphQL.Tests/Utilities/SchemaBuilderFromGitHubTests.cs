@@ -30,7 +30,7 @@ public class SchemaBuilderFromGitHubTests
             Name = name;
         }
 
-        public override object ParseValue(object value) => throw new System.NotImplementedException();
+        public override object ParseValue(object value) => throw new NotImplementedException();
     }
 
     [Fact]
@@ -38,6 +38,8 @@ public class SchemaBuilderFromGitHubTests
     {
         var schema = new MySchemaBuilder().Build("GitHub".ReadSDL());
 
+        schema.RegisterType(new ScalarStub("DateTime"));
+        schema.RegisterType(new ScalarStub("Date"));
         schema.RegisterType(new ScalarStub("URI"));
         schema.RegisterType(new ScalarStub("HTML"));
         schema.RegisterType(new ScalarStub("GitObjectID"));

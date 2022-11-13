@@ -13,6 +13,7 @@ public class ApiApprovalTests
 {
     [Theory]
     [InlineData(typeof(IGraphType))]
+    [InlineData(typeof(LongGraphType))]
     [InlineData(typeof(SystemTextJson.GraphQLSerializer))]
     [InlineData(typeof(NewtonsoftJson.GraphQLSerializer))]
     [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]

@@ -15,16 +15,4 @@ public class GraphQLValuesCacheTests
 
         Should.Throw<FormatException>(() => GraphQLValuesCache.GetInt("a")).Message.ShouldEndWith(" was not in a correct format.");
     }
-
-    [Fact]
-    public void GetLong()
-    {
-        for (long i = -15L; i <= 15L; ++i)
-            GraphQLValuesCache.GetInt(i.ToString(CultureInfo.InvariantCulture)).ShouldBe(i);
-
-        GraphQLValuesCache.GetLong("-1000000").ShouldBe(-1000000L);
-        GraphQLValuesCache.GetLong("1000000").ShouldBe(1000000L);
-
-        Should.Throw<FormatException>(() => GraphQLValuesCache.GetLong("a")).Message.ShouldEndWith(" was not in a correct format.");
-    }
 }

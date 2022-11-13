@@ -9,6 +9,8 @@ public class SubscriptionSchemaWithAutoGraphType : Schema
 {
     public SubscriptionSchemaWithAutoGraphType()
     {
+        this.RegisterBCLScalars();
+
         Query = new AutoRegisteringObjectGraphType<QueryType>();
         Mutation = new AutoRegisteringObjectGraphType<MutationType>();
         Subscription = new AutoRegisteringObjectGraphType<SubscriptionType>();

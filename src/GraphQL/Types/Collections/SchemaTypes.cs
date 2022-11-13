@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Numerics;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -27,28 +26,11 @@ namespace GraphQL.Types
         public static ReadOnlyDictionary<Type, Type> BuiltInScalarMappings { get; } = new(new Dictionary<Type, Type>
         {
             [typeof(int)] = typeof(IntGraphType),
-            [typeof(long)] = typeof(LongGraphType),
-            [typeof(BigInteger)] = typeof(BigIntGraphType),
             [typeof(double)] = typeof(FloatGraphType),
             [typeof(float)] = typeof(FloatGraphType),
-            [typeof(decimal)] = typeof(DecimalGraphType),
             [typeof(string)] = typeof(StringGraphType),
             [typeof(bool)] = typeof(BooleanGraphType),
-            [typeof(DateTime)] = typeof(DateTimeGraphType),
-#if NET6_0_OR_GREATER
-            [typeof(DateOnly)] = typeof(DateOnlyGraphType),
-            [typeof(TimeOnly)] = typeof(TimeOnlyGraphType),
-#endif
-            [typeof(DateTimeOffset)] = typeof(DateTimeOffsetGraphType),
-            [typeof(TimeSpan)] = typeof(TimeSpanSecondsGraphType),
             [typeof(Guid)] = typeof(IdGraphType),
-            [typeof(short)] = typeof(ShortGraphType),
-            [typeof(ushort)] = typeof(UShortGraphType),
-            [typeof(ulong)] = typeof(ULongGraphType),
-            [typeof(uint)] = typeof(UIntGraphType),
-            [typeof(byte)] = typeof(ByteGraphType),
-            [typeof(sbyte)] = typeof(SByteGraphType),
-            [typeof(Uri)] = typeof(UriGraphType),
         });
 
         // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
@@ -62,32 +44,6 @@ namespace GraphQL.Types
             new FloatGraphType(),
             new IntGraphType(),
             new IdGraphType(),
-        }
-        .ToDictionary(t => t.GetType());
-
-        // .NET custom scalars
-        private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
-        {
-            new DateGraphType(),
-            #if NET6_0_OR_GREATER
-            new DateOnlyGraphType(),
-            new TimeOnlyGraphType(),
-            #endif
-            new DateTimeGraphType(),
-            new DateTimeOffsetGraphType(),
-            new TimeSpanSecondsGraphType(),
-            new TimeSpanMillisecondsGraphType(),
-            new DecimalGraphType(),
-            new UriGraphType(),
-            new GuidGraphType(),
-            new ShortGraphType(),
-            new UShortGraphType(),
-            new UIntGraphType(),
-            new LongGraphType(),
-            new BigIntGraphType(),
-            new ULongGraphType(),
-            new ByteGraphType(),
-            new SByteGraphType(),
         }
         .ToDictionary(t => t.GetType());
 
@@ -647,11 +603,6 @@ Make sure that your ServiceProvider is configured correctly.");
                     foundType = (IGraphType)Activator.CreateInstance(namedType)!;
                     AddType(foundType, context);
                 }
-                else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
-                {
-                    foundType = builtInCustomScalar;
-                    AddType(foundType, _context);
-                }
                 else
                 {
                     foundType = context.ResolveType(namedType);
@@ -863,7 +814,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 var type2 = this[reference.TypeName];
                 if (type2 == null)
                 {
-                    type2 = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
+                    type2 = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                     if (type2 != null)
                         SetGraphType(type2.Name, type2);
                 }
