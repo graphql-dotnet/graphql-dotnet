@@ -124,14 +124,14 @@ public class AuthorizationTests
     [Fact]
     public void SchemaBuilder()
     {
-        var schema = Schema.For(
-            @"
+        var schema = Schema.For("""
 type Class1 {
   id: String!
   name: String!
   value: String!
   public: String!
-}",
+}
+""",
             configure => configure.Types.Include<Class1>());
 
         var graph = (ObjectGraphType)schema.AllTypes["Class1"];

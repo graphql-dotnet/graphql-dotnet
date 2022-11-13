@@ -7,19 +7,21 @@ public class ArrayOfArrayTest : QueryTestBase<ArrayOfArraySchema>
     [Fact]
     public void ArrayOfArray_Should_Return_As_Is()
     {
-        var query = @"
+        var query = """
 mutation {
   create(input: {ints: [[1],[2,2],[3,3,3]] })
   {
     ints
   }
 }
-";
-        var expected = @"{
-  ""create"": {
-    ""ints"": [[1],[2,2],[3,3,3]]
+""";
+        var expected = """
+{
+  "create": {
+    "ints": [[1],[2,2],[3,3,3]]
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }

@@ -31,7 +31,7 @@ public class Bug3100
         var actual = serializer.Serialize(result);
 
         // verify the result
-        actual.ShouldBe(@"{""data"":{""class2"":[{""id"":""test""}]}}");
+        actual.ShouldBe("""{"data":{"class2":[{"id":"test"}]}}""");
     }
 
     private class MyAutoGraphType<T> : AutoRegisteringObjectGraphType<T>

@@ -21,33 +21,7 @@ namespace GraphQL.Introspection
 
             Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source.Name);
 
-            Field<StringGraphType>("description").Resolve(context =>
-            {
-                string description = context.Source.Description;
-
-                // https://github.com/graphql-dotnet/graphql-dotnet/issues/1004
-                if (description == null)
-                {
-                    // We have to iterate over all schema types because FieldType has no reference to the GraphType to which it belongs.
-                    foreach (var item in context.Schema.AllTypes.Dictionary)
-                    {
-                        if (item.Value is IComplexGraphType fieldOwner && fieldOwner.Fields.Contains(context.Source))
-                        {
-                            if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces != null)
-                            {
-                                foreach (var iface in implementation.ResolvedInterfaces.List)
-                                {
-                                    var fieldFromInterface = iface.GetField(context.Source.Name);
-                                    if (fieldFromInterface?.Description != null)
-                                        return fieldFromInterface.Description;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return description;
-            });
+            Field<StringGraphType>("description").Resolve(context => context.Source.Description);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
                 .ResolveAsync(async context =>

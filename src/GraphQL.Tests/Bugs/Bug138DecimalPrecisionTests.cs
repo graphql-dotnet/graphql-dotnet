@@ -11,13 +11,13 @@ public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 #endif
     public void double_to_decimal_does_not_lose_precision()
     {
-        var query = @"
+        var query = """
                 mutation SetState{
                     set(request:24.15)
                 }
-            ";
+            """;
 
-        var expected = @"{ ""set"": 24.15 }";
+        var expected = """{ "set": 24.15 }""";
 
         AssertQuerySuccess(query, expected);
     }

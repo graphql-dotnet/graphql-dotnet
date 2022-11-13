@@ -71,7 +71,7 @@ query {
         var expected = @"{
   ""version"": 1,
   ""startTime"": ""2019-12-05T15:38:00Z"",
-  ""endTime"": ""2019-12-05T15:38:00.103Z"",
+  ""endTime"": ""2019-12-05T15:38:00.1025Z"",
   ""duration"": 102500000,
   ""parsing"": {
     ""startOffset"": 0,

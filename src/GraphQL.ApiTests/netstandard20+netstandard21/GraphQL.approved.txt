@@ -122,12 +122,15 @@ namespace GraphQL
         public ExecutionError(string message, System.Collections.IDictionary data) { }
         public ExecutionError(string message, System.Exception? innerException) { }
         public string? Code { get; set; }
+        public System.Collections.Generic.Dictionary<string, object?>? Extensions { get; set; }
         public System.Collections.Generic.List<GraphQLParser.Location>? Locations { get; }
         public System.Collections.Generic.IEnumerable<object>? Path { get; set; }
         public void AddLocation(GraphQLParser.Location location) { }
     }
     public static class ExecutionErrorExtensions
     {
+        public static TError AddExtension<TError>(this TError error, string key, object? value)
+            where TError : GraphQL.ExecutionError { }
         public static TError AddLocation<TError>(this TError error, GraphQLParser.AST.ASTNode? abstractNode, GraphQLParser.AST.GraphQLDocument? document)
             where TError : GraphQL.ExecutionError { }
     }
@@ -526,6 +529,11 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    public class InputTypeAttribute<TGraphType> : GraphQL.InputTypeAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public InputTypeAttribute() { }
+    }
     public class Inputs : System.Collections.ObjectModel.ReadOnlyDictionary<string, object?>
     {
         public static readonly GraphQL.Inputs Empty;
@@ -614,6 +622,11 @@ namespace GraphQL
         public OutputTypeAttribute(System.Type graphType) { }
         public System.Type OutputType { get; set; }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public class OutputTypeAttribute<TGraphType> : GraphQL.OutputTypeAttribute
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public OutputTypeAttribute() { }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
@@ -1178,7 +1191,6 @@ namespace GraphQL.Execution
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
-        protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
     }
@@ -2359,6 +2371,7 @@ namespace GraphQL.Types
         protected object ThrowValueConversionError(object? value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
+    [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
     public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
         public Schema() { }

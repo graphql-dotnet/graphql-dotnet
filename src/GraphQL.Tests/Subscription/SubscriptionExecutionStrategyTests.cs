@@ -261,8 +261,8 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         SubscriptionObj!.Dispose();
         Source.Next("should not happen");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "testing" } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -286,11 +286,11 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
         {
-            o.UnhandledExceptionDelegate = async context => throw new InvalidOperationException();
+            o.UnhandledExceptionDelegate = async _ => throw new InvalidOperationException();
         }).ConfigureAwait(false);
         result.ShouldBeSuccessful();
         Source.Next("custom");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Unhandled error of type InvalidOperationException""}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Unhandled error of type InvalidOperationException"}]}""");
     }
 
     [Fact]
@@ -337,7 +337,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Test exception","locations":[{"line":1,"column":16}],"path":["test"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}]}""");
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["test"]}]}""");
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Test exception","locations":[{"line":1,"column":16}],"path":["test"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":{"test":"test"}}""");
     }
 
     [Fact]
@@ -405,7 +405,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["test"]}],"data":{"test":"test"}}""");
     }
 
     [Fact]
@@ -427,7 +427,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error"}]}""");
     }
 
     [Fact]
@@ -449,7 +449,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error"}],"data":{"test":"test"}}""");
     }
 
     [Fact]
@@ -468,7 +468,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testObservableNull }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testObservableNull""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027.","locations":[{"line":1,"column":16}],"path":["testObservableNull"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
     }
 
     [Fact]
@@ -476,7 +476,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false).ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}]}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Anonymous Subscription must select only one top level field.","locations":[{"line":1,"column":21}],"extensions":{"code":"SINGLE_ROOT_FIELD_SUBSCRIPTIONS","codes":["SINGLE_ROOT_FIELD_SUBSCRIPTIONS"],"number":"5.2.3.1"}}]}""");
     }
 
     [Fact]

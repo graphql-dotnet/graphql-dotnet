@@ -18,18 +18,18 @@ public class DataLoaderQueryTests : QueryTestBase
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ users { userId firstName } }",
-            expected: @"
-{ ""users"": [
+            expected: $$"""
+{ "users": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
@@ -46,18 +46,18 @@ public class DataLoaderQueryTests : QueryTestBase
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ usersWithDelay { userId firstName } }",
-            expected: @"
-{ ""usersWithDelay"": [
+            expected: $$"""
+{ "usersWithDelay": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
@@ -90,17 +90,17 @@ public class DataLoaderQueryTests : QueryTestBase
         }
     }
 }",
-            expected: @"
+            expected: $$"""
 {
-    ""order"": {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
+    "order": {
+        "orderId": 1,
+        "user": {
+            "userId": 1,
+            "firstName": "{{users[0].FirstName}}"
         }
     }
 }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -135,25 +135,25 @@ public class DataLoaderQueryTests : QueryTestBase
         }
     }
 }",
-            expected: @"
+            expected: $$"""
 {
-    ""orders"": [
+    "orders": [
     {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
+        "orderId": 1,
+        "user": {
+            "userId": 1,
+            "firstName": "{{users[0].FirstName}}"
         }
     },
     {
-        ""orderId"": 2,
-        ""user"": {
-            ""userId"": 2,
-            ""firstName"": """ + users[1].FirstName + @"""
+        "orderId": 2,
+        "user": {
+            "userId": 2,
+            "firstName": "{{users[1].FirstName}}"
         }
     }]
 }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -188,25 +188,25 @@ mutation {
         }
     }
 }",
-            expected: @"
+            expected: $$"""
 {
-    ""orders"": [
+    "orders": [
     {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
+        "orderId": 1,
+        "user": {
+            "userId": 1,
+            "firstName": "{{users[0].FirstName}}"
         }
     },
     {
-        ""orderId"": 2,
-        ""user"": {
-            ""userId"": 2,
-            ""firstName"": """ + users[1].FirstName + @"""
+        "orderId": 2,
+        "user": {
+            "userId": 2,
+            "firstName": "{{users[1].FirstName}}"
         }
     }]
 }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -243,41 +243,41 @@ mutation {
         }
     }
 }",
-            expected: @"
+            expected: $$"""
 {
-    ""users"": [
+    "users": [
     {
-        ""orderedItems"": [
+        "orderedItems": [
         {
-            ""orderItemId"": 1
+            "orderItemId": 1
         },
         {
-            ""orderItemId"": 2
+            "orderItemId": 2
         },
         {
-            ""orderItemId"": 3
+            "orderItemId": 3
         },
         {
-            ""orderItemId"": 4
+            "orderItemId": 4
         }]
     },
     {
-        ""orderedItems"": [
+        "orderedItems": [
         {
-            ""orderItemId"": 5
+            "orderItemId": 5
         },
         {
-            ""orderItemId"": 6
+            "orderItemId": 6
         },
         {
-            ""orderItemId"": 7
+            "orderItemId": 7
         },
         {
-            ""orderItemId"": 8
+            "orderItemId": 8
         }]
     }]
 }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         usersMock.VerifyNoOtherCalls();
 
@@ -352,19 +352,19 @@ mutation {
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ specifiedUsers(ids:[1, 2, 3]) { userId firstName } }",
-            expected: @"
-{ ""specifiedUsers"": [
+            expected: $$"""
+{ "specifiedUsers": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     },
     null
 ] }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
@@ -381,18 +381,18 @@ mutation {
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ specifiedUsersWithThen(ids:[1, 2, 3]) { userId firstName } }",
-            expected: @"
-{ ""specifiedUsersWithThen"": [
+            expected: $$"""
+{ "specifiedUsersWithThen": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-").ConfigureAwait(false);
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
@@ -409,6 +409,6 @@ mutation {
     {
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ exerciseListsOfLists (values:[[1, 2], [3, 4, 5]]) }",
-            expected: @"{ ""exerciseListsOfLists"": [[1, 2], [3, 4, 5]] }").ConfigureAwait(false);
+            expected: """{ "exerciseListsOfLists": [[1, 2], [3, 4, 5]] }""").ConfigureAwait(false);
     }
 }

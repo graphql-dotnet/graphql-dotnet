@@ -47,4 +47,15 @@ namespace GraphQL
             queryArgument.Type = _inputType;
         }
     }
+
+    /// <inheritdoc cref="InputTypeAttribute"/>
+    public class InputTypeAttribute<TGraphType> : InputTypeAttribute
+        where TGraphType : IGraphType
+    {
+        /// <inheritdoc cref="InputTypeAttribute"/>
+        public InputTypeAttribute()
+            : base(typeof(TGraphType))
+        {
+        }
+    }
 }

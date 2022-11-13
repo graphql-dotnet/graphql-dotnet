@@ -26,10 +26,10 @@ public class Bug3331
         schema.Query = queryGraphType;
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("A different instance of the type 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
+            .Message.ShouldBe("A different instance of the GraphType 'MyObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
 
         // Must have 2 instances
-        MyObjectGraphType.SharedInstanceCounter.ShouldBe(3);
+        MyObjectGraphType.SharedInstanceCounter.ShouldBe(2);
     }
 
     private static void RegisterGenericQueryGraphTypes(Schema schema, ObjectGraphType queryGraphType,
@@ -131,14 +131,14 @@ public class Bug3331
 
     public class MyObjectGraphType : ObjectGraphType<MyObject>
     {
-        public static int SharedInstanceCounter = 1;
+        public static int SharedInstanceCounter = 0;
 
         public MyObjectGraphType()
         {
             Field(p => p.Id);
             Field(p => p.Name);
 
-            InstanceCounter = SharedInstanceCounter++;
+            InstanceCounter = Interlocked.Increment(ref SharedInstanceCounter);
         }
 
         public int InstanceCounter { get; }

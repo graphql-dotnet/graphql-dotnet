@@ -84,7 +84,7 @@ public class SchemaTypesTests
 
         // Test
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("A different instance of the type 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
+            .Message.ShouldBe("A different instance of the GraphType 'ObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
     }
 
     [Fact]

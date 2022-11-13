@@ -438,7 +438,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Root = root;
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""hello"": ""Hello World!"" }");
+        var expectedResult = CreateQueryResult("""{ "hello": "Hello World!" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);

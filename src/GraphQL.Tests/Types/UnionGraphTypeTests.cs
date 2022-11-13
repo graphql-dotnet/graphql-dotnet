@@ -22,7 +22,7 @@ public class UnionGraphTypeTests
         var schema2 = new Schema() { Query = queryType2 };
         Should.Throw<InvalidOperationException>(
             () => schema2.Initialize())
-            .Message.ShouldBe("This graph type 'UnionType' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            .Message.ShouldBe("This graph type 'UnionGraphType' with name 'UnionType' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
     }
 
     public class Type1 : ObjectGraphType<Model1>
@@ -70,7 +70,7 @@ public class UnionGraphTypeTests
         schema.Initialize();
 
         var str1 = await schema.ExecuteAsync(o => o.Query = "{ union1 { ...frag } union2 { ...frag } } fragment frag on UnionType { ... on Type1 { field1 } ... on Type2 { field2 } }").ConfigureAwait(false);
-        str1.ShouldBeCrossPlatJson(@"{""data"":{""union1"":{""field1"":1},""union2"":{""field2"":2}}}");
+        str1.ShouldBeCrossPlatJson("""{"data":{"union1":{"field1":1},"union2":{"field2":2}}}""");
     }
 
     [Fact]

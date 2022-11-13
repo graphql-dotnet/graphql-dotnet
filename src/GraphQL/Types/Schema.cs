@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
@@ -8,8 +9,68 @@ using GraphQLParser.AST;
 namespace GraphQL.Types
 {
     /// <inheritdoc cref="ISchema"/>
+    [DebuggerTypeProxy(typeof(SchemaDebugView))]
     public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
+        private sealed class SchemaDebugView
+        {
+            private readonly Schema _schema;
+
+            public SchemaDebugView(Schema schema)
+            {
+                _schema = schema;
+            }
+
+            public Dictionary<string, object?> Metadata => _schema.Metadata;
+
+            public ExperimentalFeatures Features => _schema.Features;
+
+            public INameConverter NameConverter => _schema.NameConverter;
+
+            public IFieldMiddlewareBuilder FieldMiddleware => _schema.FieldMiddleware;
+
+            public bool Initialized => _schema.Initialized;
+
+            public string? Description => _schema.Description;
+
+            public IObjectGraphType Query => _schema.Query;
+
+            public IObjectGraphType? Mutation => _schema.Mutation;
+
+            public IObjectGraphType? Subscription => _schema.Subscription;
+
+            public ISchemaFilter Filter => _schema.Filter;
+
+            /// <inheritdoc/>
+            public ISchemaComparer Comparer => _schema.Comparer;
+
+            /// <inheritdoc/>
+            public SchemaDirectives Directives => _schema.Directives;
+
+            /// <inheritdoc/>
+            public SchemaTypes? AllTypes => _schema._allTypes;
+
+            public string AllTypesMessage => _schema._allTypes == null ? "AllTypes property too early initialization was suppressed to prevent unforeseen consequences. You may click Raw View in debugger window to evaluate all properties." : string.Empty;
+
+            public IEnumerable<Type> AdditionalTypes => _schema.AdditionalTypes;
+
+            public IEnumerable<IGraphType> AdditionalTypeInstances => _schema.AdditionalTypeInstances;
+
+            /// <inheritdoc/>
+            public FieldType? SchemaMetaFieldType => AllTypes?.SchemaMetaFieldType;
+
+            /// <inheritdoc/>
+            public FieldType? TypeMetaFieldType => AllTypes?.TypeMetaFieldType;
+
+            /// <inheritdoc/>
+            public FieldType? TypeNameMetaFieldType => AllTypes?.TypeNameMetaFieldType;
+
+            public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _schema.TypeMappings;
+
+            /// <inheritdoc/>
+            public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings => _schema.BuiltInTypeMappings;
+        }
+
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
@@ -235,7 +296,7 @@ namespace GraphQL.Types
 
             if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+                throw new ArgumentOutOfRangeException(nameof(type), $"Type must be of {nameof(ISchemaNodeVisitor)}.");
             }
 
             if (!(_visitorTypes ??= new()).Contains(type))

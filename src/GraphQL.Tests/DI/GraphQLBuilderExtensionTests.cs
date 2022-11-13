@@ -929,8 +929,7 @@ public class GraphQLBuilderExtensionTests
         }
         else
         {
-            if (opts.CachedDocumentValidationRules != null)
-                opts.CachedDocumentValidationRules.ShouldBeEmpty();
+            opts.CachedDocumentValidationRules?.ShouldBeEmpty();
         }
         mockServiceProvider.Verify();
         Verify();

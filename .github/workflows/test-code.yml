@@ -31,13 +31,14 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Setup .NET Core SDKs
-        uses: actions/setup-dotnet@v2
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             3.1.x
             5.0.x
-            6.0.303
+            6.0.x
+            7.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

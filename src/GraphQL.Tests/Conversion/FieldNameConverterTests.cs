@@ -33,7 +33,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema();
             _.Query = "{ peRsoN { name } }";
         },
-        @"{ ""peRsoN"": { ""name"": ""Quinn"" } }");
+        """{ "peRsoN": { "name": "Quinn" } }""");
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema();
             _.Query = "{ peRsoN { Na: name } }";
         },
-        @"{ ""peRsoN"": { ""Na"": ""Quinn"" } }");
+        """{ "peRsoN": { "Na": "Quinn" } }""");
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema(converter);
             _.Query = "{ PeRsoN { naME: Name } }";
         },
-        @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
+        """{ "PeRsoN": { "naME": "Quinn" } }""");
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema(converter);
             _.Query = "{ PeRsoN { naME: Name } }";
         },
-        @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
+        """{ "PeRsoN": { "naME": "Quinn" } }""");
     }
 
     [Fact]

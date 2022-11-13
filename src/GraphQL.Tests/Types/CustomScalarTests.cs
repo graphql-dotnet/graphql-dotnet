@@ -144,14 +144,14 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     public void List_works()
     {
         // verify that within lists, custom scalars are coerced to their proper values
-        AssertQuerySuccess("{ list }", @"{ ""list"": [""hello"", null, ""externalNull"" ]}");
+        AssertQuerySuccess("{ list }", """{ "list": ["hello", null, "externalNull" ]}""");
     }
 
     [Fact]
     public void List_NonNull_works_valid()
     {
         // here we are using a custom scalar to coerce a null value to a non-null value, which is valid for a non-null type
-        AssertQuerySuccess("{ listNonNullValid }", @"{ ""listNonNullValid"": [""hello"", ""externalNull"" ]}");
+        AssertQuerySuccess("{ listNonNullValid }", """{ "listNonNullValid": ["hello", "externalNull" ]}""");
     }
 
     [Fact]
