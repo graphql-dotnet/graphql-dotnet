@@ -13,7 +13,7 @@ public class Bug2194
         {
             var printer = new SchemaPrinter(new Bug2194Schema(), new SchemaPrinterOptions { IncludeDeprecationReasons = false, IncludeDescriptions = false });
             var printed = printer.Print();
-            printed.ShouldBe("Bug2194".ReadSDL());
+            printed.ShouldBeCrossPlat("Bug2194".ReadSDL());
         });
     }
 

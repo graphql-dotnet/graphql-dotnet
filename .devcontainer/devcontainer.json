@@ -1,0 +1,16 @@
+// For format details, see https://aka.ms/devcontainer.json
+{
+  "name": "graphql-dotnet-dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "omnisharp.useModernNet": true
+  },
+  "extensions": [
+    "ms-dotnettools.csharp",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

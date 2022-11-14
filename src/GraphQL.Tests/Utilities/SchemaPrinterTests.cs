@@ -132,7 +132,7 @@ directive @skip(
             Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
         };
         string result = new SchemaPrinter(null).PrintDirective(d);
-        result.ShouldBe(@"directive @my(
+        result.ShouldBeCrossPlat(@"directive @my(
   max: Int
 ) repeatable on FIELD | QUERY");
     }
