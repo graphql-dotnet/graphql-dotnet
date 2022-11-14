@@ -1,0 +1,71 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [
+            "**/bin/Debug/net6/GraphQL.dll",
+            "**/bin/Debug/net6/GraphQL.MemoryCache.dll",
+            "**/bin/Debug/net6/GraphQL.MicrosoftDI.dll",
+            "**/bin/Debug/net6/GraphQL.NewtonsoftJson.dll",
+            "**/bin/Debug/net6/GraphQL.SystemTextJson.dll",
+            "**/bin/Debug/net6/GraphQL.DataLoader.dll"
+          ],
+          "src": "."
+        }
+      ],
+      "dest": "api",
+      "disableGitFeatures": false,
+      "disableDefaultFilter": false
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [
+          "api/**.yml",
+          "api/index.md"
+        ]
+      },
+      {
+        "files": [
+          "articles/**.md",
+          "articles/**/toc.yml",
+          "toc.yml",
+          "*.md"
+        ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+          "images/**"
+        ]
+      }
+    ],
+    "overwrite": [
+      {
+        "files": [
+          "apidoc/**.md"
+        ],
+        "exclude": [
+          "obj/**",
+          "_site/**"
+        ]
+      }
+    ],
+    "dest": "_site",
+    "globalMetadataFiles": [],
+    "fileMetadataFiles": [],
+    "template": [
+      "default",
+      "templates/discordfx"
+    ],
+    "postProcessors": [],
+    "markdownEngineName": "markdig",
+    "noLangKeyword": false,
+    "keepFileLink": false,
+    "cleanupCacheHistory": false,
+    "disableGitFeatures": false
+  }
+}

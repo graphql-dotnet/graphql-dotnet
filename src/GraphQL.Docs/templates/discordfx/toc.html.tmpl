@@ -1,0 +1,22 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<div id="sidetoggle">
+  <div>
+    {{^_disableSideFilter}}
+    <div class="sidefilter">
+      <form class="toc-filter">
+        <input type="text" id="toc_filter_input" placeholder="{{__global.tocFilter}}" autocomplete="off" onkeypress="if(event.keyCode==13) {return false;}" />
+        <svg class="filter-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+        <svg id="toc_filter_clear" class="clear-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </form>
+    </div>
+    {{/_disableSideFilter}}
+    <div class="sidetoc">
+      <div class="toc" id="toc">
+        {{^leaf}}
+          {{>partials/li}}
+        {{/leaf}}
+      </div>
+    </div>
+  </div>
+</div>

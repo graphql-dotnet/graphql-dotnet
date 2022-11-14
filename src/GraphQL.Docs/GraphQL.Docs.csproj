@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="docfx.console" Version="2.59.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
+    <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
+    <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
+    <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+  </ItemGroup>
+
+</Project>

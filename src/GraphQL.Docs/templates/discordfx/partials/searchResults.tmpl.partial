@@ -1,0 +1,9 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<div id="search-results" class="main-panel-content" style="display: none;">
+  <h1 class="search-list">{{__global.searchResults}} <span></span></h1>
+  <div class="sr-items">
+    <p><svg class="index-loading" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></p>
+  </div>
+  <ul id="pagination" data-first={{__global.pageFirst}} data-prev={{__global.pagePrev}} data-next={{__global.pageNext}} data-last={{__global.pageLast}}></ul>
+</div>

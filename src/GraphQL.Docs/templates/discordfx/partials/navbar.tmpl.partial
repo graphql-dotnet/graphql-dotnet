@@ -1,0 +1,21 @@
+{{!Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE file in the project root for full license information.}}
+
+<div>
+  <div class="mobile-hide">
+    {{>partials/logo}}
+  </div>
+
+  {{#_enableSearch}}
+      <div class="sidesearch">
+          <form id="search" role="search" class="search">
+              <svg width="20" height="20" class="search-icon" viewBox="0 0 20 20"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+              <input type="text" id="search-query" placeholder="{{__global.search}}" autocomplete="off">
+          </form>
+      </div>
+  {{/_enableSearch}}
+
+  <div id="navbar">
+  </div>
+
+</div>
+

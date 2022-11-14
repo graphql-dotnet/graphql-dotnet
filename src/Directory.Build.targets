@@ -37,4 +37,11 @@
     </ItemGroup>
   </Target>
 
+  <ItemGroup>
+    <None Remove="api\**\*.yml" />
+    <None Remove="api\**\*.manifest" />
+    <None Remove="articles\**\*.yml" />
+    <None Remove="_site\**" />
+  </ItemGroup>
+
 </Project>
