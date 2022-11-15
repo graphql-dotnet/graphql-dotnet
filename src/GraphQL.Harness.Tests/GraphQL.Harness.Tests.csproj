@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alba" Version="6.1.0" />
+    <PackageReference Include="Alba" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>
