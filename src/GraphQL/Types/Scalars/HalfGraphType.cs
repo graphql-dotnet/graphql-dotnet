@@ -48,7 +48,7 @@ public class HalfGraphType : ScalarGraphType
     /// <inheritdoc/>
     public override object? ParseValue(object? value) => value switch
     {
-        double _ => NotInfinity(checked((Half)value)),
+        double db => NotInfinity(checked((Half)db)),
         int i => NotInfinity(checked((Half)i)),
         null => null,
         float f => NotInfinity(checked((Half)f)),

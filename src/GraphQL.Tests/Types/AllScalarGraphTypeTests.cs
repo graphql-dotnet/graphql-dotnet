@@ -266,7 +266,12 @@ public class AllScalarGraphTypeTests
         g.CanParseValue(converted).ShouldBeTrue();
         var parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
-        parsed.ShouldBe(value);
+#if NET5_0_OR_GREATER
+        if (parsed is Half h1 && value is Half h2)
+            h1.ShouldBe(h2); // https://github.com/shouldly/shouldly/pull/870
+        else
+#endif
+            parsed.ShouldBe(value);
     }
 
     [Theory]
@@ -318,7 +323,12 @@ public class AllScalarGraphTypeTests
         g.CanParseValue(converted).ShouldBeTrue($"Converted value: {converted}, Type: {converted.GetType()}");
         var parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
-        parsed.ShouldBe(value);
+#if NET5_0_OR_GREATER
+        if (parsed is Half h1 && value is Half h2)
+            h1.ShouldBe(h2); // https://github.com/shouldly/shouldly/pull/870
+        else
+#endif
+            parsed.ShouldBe(value);
     }
 
     [Theory]
