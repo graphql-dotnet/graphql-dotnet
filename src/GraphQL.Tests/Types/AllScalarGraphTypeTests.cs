@@ -270,8 +270,10 @@ public class AllScalarGraphTypeTests
         if (parsed is Half h1 && value is Half h2)
             h1.ShouldBe(h2); // https://github.com/shouldly/shouldly/pull/870
         else
-#endif
             parsed.ShouldBe(value);
+#else
+        parsed.ShouldBe(value);
+#endif
     }
 
     [Theory]
@@ -327,8 +329,10 @@ public class AllScalarGraphTypeTests
         if (parsed is Half h1 && value is Half h2)
             h1.ShouldBe(h2); // https://github.com/shouldly/shouldly/pull/870
         else
-#endif
             parsed.ShouldBe(value);
+#else
+        parsed.ShouldBe(value);
+#endif
     }
 
     [Theory]
