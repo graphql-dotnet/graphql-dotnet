@@ -49,7 +49,7 @@ public class HalfGraphType : ScalarGraphType
     public override object? ParseValue(object? value) => value switch
     {
         double db => NotInfinity(checked((Half)db)),
-        int i => NotInfinity(checked((Half)i)),
+        int i => checked((Half)i),
         null => null,
         float f => NotInfinity(checked((Half)f)),
         decimal d => NotInfinity(checked((Half)(double)d)),
