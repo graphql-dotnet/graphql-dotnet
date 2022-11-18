@@ -309,6 +309,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), 1E+25)]
 #if NET5_0_OR_GREATER
     [InlineData(typeof(HalfGraphType), -65500)]
+    [InlineData(typeof(HalfGraphType), 0)]
     [InlineData(typeof(HalfGraphType), 65500)]
 #endif
     public void parseValue_from_system_text_json_ok(Type graphType, object value)
