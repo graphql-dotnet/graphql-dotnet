@@ -672,8 +672,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(ULongGraphType), 1.5)]
     [InlineData(typeof(BigIntGraphType), 1.5)]
 #if NET5_0_OR_GREATER
-    [InlineData(typeof(HalfGraphType), 1000000)]
-    [InlineData(typeof(HalfGraphType), -1000000)]
+    [InlineData(typeof(HalfGraphType), false)]
 #endif
     public void parseValue_other_fail(Type graphType, object value)
     {
