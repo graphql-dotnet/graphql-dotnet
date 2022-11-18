@@ -6,19 +6,21 @@ namespace GraphQL.Benchmarks;
 //[RPlotExporter, CsvMeasurementsExporter]
 public class DeserializationBenchmark : IBenchmark
 {
-    private const string SHORT_JSON = @"{
-  ""key0"": null,
-  ""key1"": true,
-  ""key2"": 1.2,
-  ""key3"": 10,
-  ""dict"": { },
-  ""key4"": ""value"",
-  ""arr"": [1,2,3],
-  ""key5"": {
-    ""inner1"": null,
-    ""inner2"": 14
+    private const string SHORT_JSON = """
+{
+  "key0": null,
+  "key1": true,
+  "key2": 1.2,
+  "key3": 10,
+  "dict": { },
+  "key4": "value",
+  "arr": [1,2,3],
+  "key5": {
+    "inner1": null,
+    "inner2": 14
   }
-}";
+}
+""";
 
     [GlobalSetup]
     public void GlobalSetup()

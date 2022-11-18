@@ -9,7 +9,7 @@ public sealed class CamelCaseArgumentTest : QueryTestBase<CamelCaseSchema>
     public void get_argument_pascal_to_camel_case()
     {
         var query = "{ query(argumentValue: 42) }";
-        var expectedResult = @"{ ""query"": 42 }";
+        var expectedResult = """{ "query": 42 }""";
         AssertQuery(query, CreateQueryResult(expectedResult), null, null);
     }
 
