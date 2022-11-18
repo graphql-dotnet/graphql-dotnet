@@ -53,7 +53,7 @@ public class HalfGraphType : ScalarGraphType
         null => null,
         float f => NotInfinity(checked((Half)f)),
         decimal d => NotInfinity(checked((Half)(double)d)),
-        Half h => value,
+        Half h when !Half.IsInfinity(h) => value,
         sbyte sb => checked((Half)sb),
         byte b => checked((Half)b),
         short s => NotInfinity(checked((Half)s)),
