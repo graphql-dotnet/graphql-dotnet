@@ -30,6 +30,7 @@ These are additional scalars provided by this project.
 | `DateTimeOffset` | `DateTimeOffsetGraphType`       | `DateTimeOffset`   | ISO-8601 |
 | `Decimal` | `DecimalGraphType` | `decimal` | number |
 | `Guid` | `GuidGraphType` | `Guid` | string |
+| `Half` | `HalfGraphType` | `Half` | number | .NET5 and higher |
 | `Long` | `LongGraphType` | `long` | number |
 | `Milliseconds`   | `TimeSpanMillisecondsGraphType` | `TimeSpan`         | number |
 | `SByte` | `SByteGraphType` | `sbyte` | number |

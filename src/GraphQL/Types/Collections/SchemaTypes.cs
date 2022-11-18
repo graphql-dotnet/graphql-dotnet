@@ -35,6 +35,9 @@ namespace GraphQL.Types
             [typeof(string)] = typeof(StringGraphType),
             [typeof(bool)] = typeof(BooleanGraphType),
             [typeof(DateTime)] = typeof(DateTimeGraphType),
+#if NET5_0_OR_GREATER
+            [typeof(Half)] = typeof(HalfGraphType),
+#endif
 #if NET6_0_OR_GREATER
             [typeof(DateOnly)] = typeof(DateOnlyGraphType),
             [typeof(TimeOnly)] = typeof(TimeOnlyGraphType),
@@ -69,10 +72,13 @@ namespace GraphQL.Types
         private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
         {
             new DateGraphType(),
-            #if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
+            new HalfGraphType(),
+#endif
+#if NET6_0_OR_GREATER
             new DateOnlyGraphType(),
             new TimeOnlyGraphType(),
-            #endif
+#endif
             new DateTimeGraphType(),
             new DateTimeOffsetGraphType(),
             new TimeSpanSecondsGraphType(),
