@@ -8,7 +8,7 @@ public sealed class Issue1354 : QueryTestBase<ValueTypeSchema>
     public void can_resolve_property_on_value_type()
     {
         var query = "query { seconds }";
-        var expected = @"{ ""seconds"": 42 }";
+        var expected = """{ "seconds": 42 }""";
         AssertQuerySuccess(query, expected, root: TimeSpan.FromSeconds(42));
     }
 
