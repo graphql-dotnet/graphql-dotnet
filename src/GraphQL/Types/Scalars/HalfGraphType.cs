@@ -58,10 +58,10 @@ public class HalfGraphType : ScalarGraphType
         byte b => checked((Half)b),
         short s => NotInfinity(checked((Half)s)),
         ushort us => NotInfinity(checked((Half)us)),
-        uint ui => NotInfinity(checked((Half)ui)),
-        long l => NotInfinity(checked((Half)l)),
-        ulong ul => NotInfinity(checked((Half)ul)),
-        BigInteger bi => NotInfinity(checked((Half)(double)bi)),
+        uint ui => checked((Half)ui),
+        long l => checked((Half)l),
+        ulong ul => checked((Half)ul),
+        BigInteger bi => checked((Half)(double)bi),
         _ => ThrowValueConversionError(value)
     };
 }
