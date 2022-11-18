@@ -49,19 +49,19 @@ public class HalfGraphType : ScalarGraphType
     public override object? ParseValue(object? value) => value switch
     {
         double db => NotInfinity(checked((Half)db)),
-        int i => checked((Half)i),
+        int i => NotInfinity(checked((Half)i)),
         null => null,
         float f => NotInfinity(checked((Half)f)),
         decimal d => NotInfinity(checked((Half)(double)d)),
         Half h when !Half.IsInfinity(h) => value,
         sbyte sb => checked((Half)sb),
         byte b => checked((Half)b),
-        short s => checked((Half)s),
-        ushort us => checked((Half)us),
-        uint ui => checked((Half)ui),
-        long l => checked((Half)l),
-        ulong ul => checked((Half)ul),
-        BigInteger bi => checked((Half)(double)bi),
+        short s => NotInfinity(checked((Half)s)),
+        ushort us => NotInfinity(checked((Half)us)),
+        uint ui => NotInfinity(checked((Half)ui)),
+        long l => NotInfinity(checked((Half)l)),
+        ulong ul => NotInfinity(checked((Half)ul)),
+        BigInteger bi => NotInfinity(checked((Half)(double)bi)),
         _ => ThrowValueConversionError(value)
     };
 }
