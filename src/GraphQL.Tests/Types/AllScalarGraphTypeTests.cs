@@ -516,6 +516,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(BigIntGraphType), 1E+25)]
 #if NET5_0_OR_GREATER
     [InlineData(typeof(HalfGraphType), -65504)]
+    [InlineData(typeof(HalfGraphType), 0)]
     [InlineData(typeof(HalfGraphType), 65504)]
 #endif
     public void toAST_ok(Type graphType, object value)
