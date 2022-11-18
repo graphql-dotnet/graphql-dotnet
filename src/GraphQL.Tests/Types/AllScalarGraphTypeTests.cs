@@ -831,7 +831,7 @@ public class AllScalarGraphTypeTests
 #if NET5_0_OR_GREATER
             else if (graphType == typeof(HalfGraphType))
             {
-                Should.Throw<InvalidOperationException>(() => g.Serialize(converted));
+                Should.Throw<InvalidOperationException>(() => g.ParseValue(converted));
             }
 #endif
             else
