@@ -59,58 +59,60 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     [Fact]
     public void can_introspect_on_union_and_intersection_types()
     {
-        var query = @"
+        var query = """
             query AQuery {
-                Named: __type(name: ""Named"") {
-                  kind
-                  name
-                  fields { name }
-                    interfaces { name }
-                    possibleTypes { name }
-                    enumValues { name }
-                    inputFields { name }
-                }
-                Pet: __type(name: ""Pet"") {
-                  kind
-                  name
-                  fields { name }
-                    interfaces { name }
-                    possibleTypes { name }
-                    enumValues { name }
-                    inputFields { name }
-                }
+              Named: __type(name: "Named") {
+                kind
+                name
+                fields { name }
+                interfaces { name }
+                possibleTypes { name }
+                enumValues { name }
+                inputFields { name }
+              }
+              Pet: __type(name: "Pet") {
+                kind
+                name
+                fields { name }
+                interfaces { name }
+                possibleTypes { name }
+                enumValues { name }
+                inputFields { name }
+              }
             }
-            ";
+            """;
 
-        var expected = @"{
-                ""Named"": {
-                  ""kind"": ""INTERFACE"",
-                  ""name"": ""Named"",
-                  ""fields"": [
-                    { ""name"": ""name"" }
-                  ],
-                  ""interfaces"": null,
-                  ""possibleTypes"": [
-                    { ""name"": ""Dog"" },
-                    { ""name"": ""Cat"" },
-                    { ""name"": ""Person"" }
-                  ],
-                  ""enumValues"": null,
-                  ""inputFields"": null
-                },
-                ""Pet"": {
-                  ""kind"": ""UNION"",
-                  ""name"": ""Pet"",
-                  ""fields"": null,
-                  ""interfaces"": null,
-                  ""possibleTypes"": [
-                    { ""name"": ""Dog"" },
-                    { ""name"": ""Cat"" }
-                  ],
-                  ""enumValues"": null,
-                  ""inputFields"": null
-                }
-            }";
+        var expected = """
+            {
+              "Named": {
+                "kind": "INTERFACE",
+                "name": "Named",
+                "fields": [
+                  { "name": "name" }
+                ],
+                "interfaces": null,
+                "possibleTypes": [
+                  { "name": "Dog" },
+                  { "name": "Cat" },
+                  { "name": "Person" }
+                ],
+                "enumValues": null,
+                "inputFields": null
+              },
+              "Pet": {
+                "kind": "UNION",
+                "name": "Pet",
+                "fields": null,
+                "interfaces": null,
+                "possibleTypes": [
+                  { "name": "Dog" },
+                  { "name": "Cat" }
+                ],
+                "enumValues": null,
+                "inputFields": null
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -120,26 +122,26 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-        var query = @"
-                query AQuery {
-                  __typename
-                  name
-                  pets {
-                    __typename
-                    name
-                    barks
-                    meows
-                  }
-                }
-            ";
+        var query = """
+            query AQuery {
+              __typename
+              name
+              pets {
+                __typename
+                name
+                barks
+                meows
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""__typename"": ""Person"",
-                  ""name"": ""John"",
-                  ""pets"": [ null, null ]
-                }
-            ";
+        var expected = """
+            {
+              "__typename": "Person",
+              "name": "John",
+              "pets": [ null, null ]
+            }
+            """;
 
         var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'pets'.");
@@ -153,34 +155,34 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // This is the valid version of the query in the above test.
 
-        var query = @"
-                query AQuery {
-                  __typename
+        var query = """
+            query AQuery {
+              __typename
+              name
+              pets {
+                __typename
+                ... on Dog {
                   name
-                  pets {
-                    __typename
-                    ... on Dog {
-                      name
-                      barks
-                    },
-                    ... on Cat {
-                      name
-                      meows
-                    }
-                  }
+                  barks
+                },
+                ... on Cat {
+                  name
+                  meows
                 }
-            ";
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""__typename"": ""Person"",
-                  ""name"": ""John"",
-                  ""pets"": [
-                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
-                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
-                  ]
-                }
-            ";
+        var expected = """
+            {
+              "__typename": "Person",
+              "name": "John",
+              "pets": [
+                { "__typename":  "Cat", "name": "Garfield", "meows": false },
+                { "__typename":  "Dog", "name": "Odie", "barks": true }
+              ]
+            }
+            """;
 
         AssertQuerySuccess(query, expected, root: _john);
     }
@@ -190,26 +192,26 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-        var query = @"
-                query AQuery {
-                  __typename
-                  name
-                  friends {
-                    __typename
-                    name
-                    barks
-                    meows
-                  }
-                }
-            ";
+        var query = """
+            query AQuery {
+              __typename
+              name
+              friends {
+                __typename
+                name
+                barks
+                meows
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""__typename"": ""Person"",
-                  ""name"": ""John"",
-                  ""friends"": [ null, null ]
-                }
-            ";
+        var expected = """
+            {
+              "__typename": "Person",
+              "name": "John",
+              "friends": [ null, null ]
+            }
+            """;
 
         var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'friends'.");
@@ -221,50 +223,50 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     [Fact]
     public void allows_fragment_conditions_to_be_abstract_types()
     {
-        var query = @"
-                query AQuery {
-                  __typename
-                  name
-                  pets { ...PetFields }
-                  friends { ...FriendFields }
-                }
-                fragment PetFields on Pet {
-                  __typename
-                  ... on Dog {
-                    name
-                    barks
-                  },
-                  ... on Cat {
-                    name
-                    meows
-                  }
-                }
-                fragment FriendFields on Named {
-                  __typename
-                  name
-                  ... on Dog {
-                    barks
-                  },
-                  ... on Cat {
-                    meows
-                  }
-                }
-            ";
+        var query = """
+            query AQuery {
+              __typename
+              name
+              pets { ...PetFields }
+              friends { ...FriendFields }
+            }
+            fragment PetFields on Pet {
+              __typename
+              ... on Dog {
+                name
+                barks
+              },
+              ... on Cat {
+                name
+                meows
+              }
+            }
+            fragment FriendFields on Named {
+              __typename
+              name
+              ... on Dog {
+                barks
+              },
+              ... on Cat {
+                meows
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""__typename"": ""Person"",
-                  ""name"": ""John"",
-                  ""pets"": [
-                    { ""__typename"":  ""Cat"", ""name"": ""Garfield"", ""meows"": false },
-                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
-                  ],
-                  ""friends"": [
-                    { ""__typename"":  ""Person"", ""name"": ""Liz"" },
-                    { ""__typename"":  ""Dog"", ""name"": ""Odie"", ""barks"": true }
-                  ]
-                }
-            ";
+        var expected = """
+            {
+              "__typename": "Person",
+              "name": "John",
+              "pets": [
+                { "__typename":  "Cat", "name": "Garfield", "meows": false },
+                { "__typename":  "Dog", "name": "Odie", "barks": true }
+              ],
+              "friends": [
+                { "__typename":  "Person", "name": "Liz" },
+                { "__typename":  "Dog", "name": "Odie", "barks": true }
+              ]
+            }
+            """;
 
         AssertQuerySuccess(query, expected, root: _john);
     }

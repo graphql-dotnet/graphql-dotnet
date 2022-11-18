@@ -7,14 +7,16 @@ public class Issue1152ExceptionDelegate : QueryTestBase<Issue1152Schema>
     [Fact]
     public void Issue1152_Should_Intercept_Unhandled_Exceptions()
     {
-        var query = @"
-query {
-  somefield
-}
-";
-        var expected = @"{
-  ""somefield"": null
-}";
+        var query = """
+        query {
+          somefield
+        }
+        """;
+        var expected = """
+        {
+          "somefield": null
+        }
+        """;
 
         var list = new List<Exception>();
 
