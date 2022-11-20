@@ -52,7 +52,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ testSub { one two } }";
+            _.Query = "{ testSub { one two } }";
         }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
@@ -66,7 +66,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ testSubList { one two } }";
+            _.Query = "{ testSubList { one two } }";
         }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
@@ -85,9 +85,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
 
         AssertQueryIgnoreErrors(
             "{ testasync }",
-            CreateQueryResult(@"{
-   ""testasync"": null
-}", errors),
+            CreateQueryResult("""{ "testasync": null }""", errors),
             expectedErrorCount: 1,
             renderErrors: true);
     }

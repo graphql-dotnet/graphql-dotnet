@@ -204,7 +204,7 @@ public class ResolveFieldContextTests
         options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
         var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
         var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
-        resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
+        resultText.ShouldBe(isAuthenticated ? """{"data":{"isAuthenticated":true}}""" : """{"data":{"isAuthenticated":false}}""");
     }
 
     private class VerifyUserDocumentListener : DocumentExecutionListenerBase

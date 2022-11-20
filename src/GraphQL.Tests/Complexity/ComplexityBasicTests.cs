@@ -14,10 +14,11 @@ public class ComplexityBasicTests : ComplexityTestBase
     [Fact]
     public void zero_depth_query()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A #1
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A #1
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(0);
         res.Complexity.ShouldBe(1);
     }
@@ -25,12 +26,13 @@ query {
     [Fact]
     public void one_depth_query_A()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A { #2
-    B #2
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A { #2
+                B #2
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(1);
         res.Complexity.ShouldBe(4);
     }
@@ -38,14 +40,15 @@ query {
     [Fact]
     public void one_depth_query_B()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A { #2
-    B #2
-    C #2
-    D #2
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A { #2
+                B #2
+                C #2
+                D #2
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(1);
         res.Complexity.ShouldBe(8);
     }
@@ -53,14 +56,15 @@ query {
     [Fact]
     public void two_depth_query_A()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A {   #2
-    B { #4
-      C #4
-    }
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A {   #2
+                B { #4
+                  C #4
+                }
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(2);
         res.Complexity.ShouldBe(10);
     }
@@ -68,17 +72,18 @@ query {
     [Fact]
     public void two_depth_query_B()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  F     #1
-  A {   #2
-    B   #2
-    D { #4
-      C #4
-      E #4
-    }
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              F     #1
+              A {   #2
+                B   #2
+                D { #4
+                  C #4
+                  E #4
+                }
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(2);
         res.Complexity.ShouldBe(17);
     }
@@ -86,16 +91,17 @@ query {
     [Fact]
     public void three_depth_query()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A {     #2
-    B {   #4
-      C { #8
-        D #8
-      }
-    }
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A {     #2
+                B {   #4
+                  C { #8
+                    D #8
+                  }
+                }
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(3);
         res.Complexity.ShouldBe(22);
     }
@@ -103,18 +109,19 @@ query {
     [Fact]
     public void three_depth_query_wide()
     {
-        var res = AnalyzeComplexity(@"
-query {
-  A { #2
-    B #2
-  }
-  C { #2
-    D #2
-  }
-  E { #2
-    F #2
-  }
-}");
+        var res = AnalyzeComplexity("""
+            query {
+              A { #2
+                B #2
+              }
+              C { #2
+                D #2
+              }
+              E { #2
+                F #2
+              }
+            }
+            """);
         res.TotalQueryDepth.ShouldBe(3);
         res.Complexity.ShouldBe(12);
     }

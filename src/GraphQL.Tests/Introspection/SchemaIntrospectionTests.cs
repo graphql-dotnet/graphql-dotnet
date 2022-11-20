@@ -177,21 +177,22 @@ public class SchemaIntrospectionTests
             ignoreWhiteSpaceDifferences: true);
     }
 
-    public static readonly string InputObjectBugQuery = @"
-query test {
-    __type(name:""SomeInput"") {
-        inputFields {
-            type {
-                name,
-                description
-                ofType {
-                    kind,
-                    name
+    public static readonly string InputObjectBugQuery = """
+        query test {
+            __type(name:"SomeInput") {
+                inputFields {
+                    type {
+                        name,
+                        description
+                        ofType {
+                            kind,
+                            name
+                        }
+                    }
                 }
             }
         }
-    }
-}";
+        """;
 
     public static readonly string InputObjectBugResult = "{\r\n \"data\": {\r\n  \"__type\": {\r\n    \"inputFields\": [\r\n      {\r\n        \"type\": {\r\n          \"name\": \"String\",\r\n          \"description\": null,\r\n          \"ofType\": null\r\n        }\r\n      }\r\n    ]\r\n  }\r\n }\r\n}";
 

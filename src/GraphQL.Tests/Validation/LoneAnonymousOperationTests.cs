@@ -8,37 +8,37 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
     [Fact]
     public void no_operations()
     {
-        ShouldPassRule(@"
-                fragment fragA on Type {
-                  field
-                }
-                ");
+        ShouldPassRule("""
+            fragment fragA on Type {
+              field
+            }
+            """);
     }
 
     [Fact]
     public void one_anon_operation()
     {
-        ShouldPassRule(@"
-                {
-                  field
-                }
-                ");
+        ShouldPassRule("""
+            {
+              field
+            }
+            """);
     }
 
     [Fact]
     public void one_named_operation()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void multiple_operations()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   field
                 }
@@ -46,13 +46,13 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
                 query Bar {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void one_anon_with_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 {
                   ...Foo
                 }
@@ -60,13 +60,13 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
                 fragment Foo on Type {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void multiple_anon_operations()
     {
-        var query = @"
+        var query = """
                 {
                   fieldA
                 }
@@ -74,20 +74,20 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
                 {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
-            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 6, 17);
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 1, 1);
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 5, 1);
         });
     }
 
     [Fact]
     public void anon_operation_with_mutation()
     {
-        var query = @"
+        var query = """
                 {
                   fieldA
                 }
@@ -95,19 +95,19 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
                 mutation Foo {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 1, 1);
         });
     }
 
     [Fact]
     public void anon_operation_with_subscription()
     {
-        var query = @"
+        var query = """
                 {
                   fieldA
                 }
@@ -115,12 +115,12 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
                 subscription Foo {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 2, 17);
+            _.Error(LoneAnonymousOperationError.AnonOperationNotAloneMessage(), 1, 1);
         });
     }
 }

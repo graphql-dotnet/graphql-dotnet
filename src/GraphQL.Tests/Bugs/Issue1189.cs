@@ -5,21 +5,21 @@ namespace GraphQL.Tests.Bugs;
 
 public class Issue1189 : SchemaBuilderTestBase
 {
-    private const string _typeDefinitions = @"
-                  type Droid {
-                    id: String!
-                    name: String!
-                    friend: Character
-                  }
+    private const string _typeDefinitions = """
+        type Droid {
+          id: String!
+          name: String!
+          friend: Character
+        }
 
-                  type Character {
-                    name: String!
-                  }
+        type Character {
+          name: String!
+        }
 
-                  type Query {
-                    hero: Droid
-                  }
-                ";
+        type Query {
+          hero: Droid
+        }
+        """;
 
     private const string _query = "{ hero { id name friend { name } } }";
 

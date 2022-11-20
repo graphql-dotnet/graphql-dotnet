@@ -54,7 +54,7 @@ public class CancellationTests : QueryTestBase<CancellationSchema>
     public void cancellation_token_in_context()
     {
         using var tokenSource = new CancellationTokenSource();
-        AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
+        AssertQuerySuccess("{one}", """{ "one": "one" }""", cancellationToken: tokenSource.Token);
     }
 
     [Fact]

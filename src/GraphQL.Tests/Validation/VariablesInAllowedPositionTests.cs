@@ -8,20 +8,20 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void boolean_to_boolean()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Query($booleanArg: Boolean)
                 {
                   complicatedArgs {
                     booleanArgField(booleanArg: $booleanArg)
                   }
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void boolean_to_boolean_within_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $booleanArg)
               }
@@ -31,9 +31,9 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
                   ...booleanArgFrag
                 }
               }
-            ");
+            """);
 
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($booleanArg: Boolean)
               {
                 complicatedArgs {
@@ -43,27 +43,27 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $booleanArg)
               }
-            ");
+            """);
     }
 
     [Fact]
     public void nonnull_boolean_to_boolean()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($nonNullBooleanArg: Boolean!)
               {
                 complicatedArgs {
                   booleanArgField(booleanArg: $nonNullBooleanArg)
                 }
               }
-            ",
-        "{ \"nonNullBooleanArg\": true }");
+            """,
+            """{ "nonNullBooleanArg": true }""");
     }
 
     [Fact]
     public void nonnull_boolean_to_boolean_within_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment booleanArgFrag on ComplicatedArgs {
                 booleanArgField(booleanArg: $nonNullBooleanArg)
               }
@@ -73,135 +73,135 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
                   ...booleanArgFrag
                 }
               }
-            ",
-        "{ \"nonNullBooleanArg\": true }");
+            """,
+            """{ "nonNullBooleanArg": true }""");
     }
 
     [Fact]
     public void int_to_int_with_default()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($intArg: Int = 1)
               {
                 complicatedArgs {
                   nonNullIntArgField(nonNullIntArg: $intArg)
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void string_list_to_string_list()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($stringListVar: [String])
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: $stringListVar)
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void nonnull_string_list_to_string_list()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($stringListVar: [String!])
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: $stringListVar)
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void string_to_string_list_in_item_position()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($stringVar: String)
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: [$stringVar])
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void nonnull_string_to_string_list_in_item_position()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($stringVar: String!)
               {
                 complicatedArgs {
                   stringListArgField(stringListArg: [$stringVar])
                 }
               }
-            ",
-        "{ \"stringVar\": \"\" }");
+            """,
+            """{ "stringVar": "" }""");
     }
 
     [Fact]
     public void complexinput_to_complexinput()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($complexVar: ComplexInput)
               {
                 complicatedArgs {
                   complexArgField(complexArg: $complexVar)
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void complexinput_to_complexinput_in_field_position()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($boolVar: Boolean = false)
               {
                 complicatedArgs {
                   complexArgField(complexArg: {requiredArg: $boolVar})
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void nullable_boolean_to_nullable_boolean_in_directive()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($boolVar: Boolean!)
               {
                 dog @include(if: $boolVar)
               }
-            ",
-        "{ \"boolVar\": true }");
+            """,
+            """{ "boolVar": true }""");
     }
 
     [Fact]
     public void boolean_to_nullable_boolean_in_directive_with_default()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Query($boolVar: Boolean = false)
               {
                 dog @include(if: $boolVar)
               }
-            ");
+            """);
     }
 
     [Fact]
     public void int_to_nonnull_int()
     {
-        var query = @"
-              query Query($intArg: Int) {
-                complicatedArgs {
-                  nonNullIntArgField(nonNullIntArg: $intArg)
-                }
+        var query = """
+            query Query($intArg: Int) {
+              complicatedArgs {
+                nonNullIntArgField(nonNullIntArg: $intArg)
               }
-            ";
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -209,8 +209,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("intArg", "Int", "Int!");
-                err.Loc(2, 27);
-                err.Loc(4, 53);
+                err.Loc(1, 13);
+                err.Loc(3, 39);
             });
         });
     }
@@ -218,17 +218,17 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void int_to_nonnull_int_within_fragment()
     {
-        var query = @"
-              fragment nonNullIntArgFieldFrag on ComplicatedArgs {
-                nonNullIntArgField(nonNullIntArg: $intArg)
-              }
+        var query = """
+            fragment nonNullIntArgFieldFrag on ComplicatedArgs {
+              nonNullIntArgField(nonNullIntArg: $intArg)
+            }
 
-              query Query($intArg: Int) {
-                complicatedArgs {
-                  ...nonNullIntArgFieldFrag
-                }
+            query Query($intArg: Int) {
+              complicatedArgs {
+                ...nonNullIntArgFieldFrag
               }
-            ";
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -236,8 +236,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("intArg", "Int", "Int!");
-                err.Loc(6, 27);
-                err.Loc(3, 51);
+                err.Loc(5, 13);
+                err.Loc(2, 37);
             });
         });
     }
@@ -245,21 +245,21 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void int_to_nonnull_int_within_nested_fragment()
     {
-        var query = @"
-              fragment outerFrag on ComplicatedArgs {
-                ...nonNullIntArgFieldFrag
-              }
+        var query = """
+            fragment outerFrag on ComplicatedArgs {
+              ...nonNullIntArgFieldFrag
+            }
 
-              fragment nonNullIntArgFieldFrag on ComplicatedArgs {
-                nonNullIntArgField(nonNullIntArg: $intArg)
-              }
+            fragment nonNullIntArgFieldFrag on ComplicatedArgs {
+              nonNullIntArgField(nonNullIntArg: $intArg)
+            }
 
-              query Query($intArg: Int) {
-                complicatedArgs {
-                  ...outerFrag
-                }
+            query Query($intArg: Int) {
+              complicatedArgs {
+                ...outerFrag
               }
-            ";
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -267,8 +267,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("intArg", "Int", "Int!");
-                err.Loc(10, 27);
-                err.Loc(7, 51);
+                err.Loc(9, 13);
+                err.Loc(6, 37);
             });
         });
     }
@@ -276,13 +276,13 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_over_boolean()
     {
-        var query = @"
-              query Query($stringVar: String) {
-                complicatedArgs {
-                  booleanArgField(booleanArg: $stringVar)
-                }
+        var query = """
+            query Query($stringVar: String) {
+              complicatedArgs {
+                booleanArgField(booleanArg: $stringVar)
               }
-            ";
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -290,8 +290,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("stringVar", "String", "Boolean");
-                err.Loc(2, 27);
-                err.Loc(4, 47);
+                err.Loc(1, 13);
+                err.Loc(3, 33);
             });
         });
     }
@@ -299,13 +299,13 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_string_list()
     {
-        var query = @"
-              query Query($stringVar: String) {
-                complicatedArgs {
-                  stringListArgField(stringListArg: $stringVar)
-                }
+        var query = """
+            query Query($stringVar: String) {
+              complicatedArgs {
+                stringListArgField(stringListArg: $stringVar)
               }
-            ";
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -313,8 +313,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("stringVar", "String", "[String]");
-                err.Loc(2, 27);
-                err.Loc(4, 53);
+                err.Loc(1, 13);
+                err.Loc(3, 39);
             });
         });
     }
@@ -322,11 +322,11 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void boolean_to_nonnull_boolean_in_directive()
     {
-        var query = @"
-              query Query($boolVar: Boolean) {
-                dog @include(if: $boolVar)
-              }
-            ";
+        var query = """
+            query Query($boolVar: Boolean) {
+              dog @include(if: $boolVar)
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -334,8 +334,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("boolVar", "Boolean", "Boolean!");
-                err.Loc(2, 27);
-                err.Loc(3, 34);
+                err.Loc(1, 13);
+                err.Loc(2, 20);
             });
         });
     }
@@ -343,11 +343,11 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_nonnull_boolean_in_directive()
     {
-        var query = @"
-              query Query($stringVar: String) {
-                dog @include(if: $stringVar)
-              }
-            ";
+        var query = """
+            query Query($stringVar: String) {
+              dog @include(if: $stringVar)
+            }
+            """;
 
         ShouldFailRule(_ =>
         {
@@ -355,8 +355,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("stringVar", "String", "Boolean!");
-                err.Loc(2, 27);
-                err.Loc(3, 34);
+                err.Loc(1, 13);
+                err.Loc(2, 20);
             });
         });
     }

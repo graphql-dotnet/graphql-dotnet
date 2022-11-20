@@ -9,7 +9,7 @@ public sealed class PascalCaseTests : QueryTestBase<PascalCaseSchema>
     public void get_argument_camel_to_pascal_case()
     {
         var query = "{ Query(ArgumentValue: 42) }";
-        var expectedResult = @"{ ""Query"": 42 }";
+        var expectedResult = """{ "Query": 42 }""";
         AssertQuery(query, CreateQueryResult(expectedResult), null, null, nameConverter: PascalCaseNameConverter.Instance);
     }
 }

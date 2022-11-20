@@ -6,8 +6,8 @@ namespace GraphQL.Tests.Utilities.Federation;
 public class FederatedSchemaPrinterTests
 {
     [Theory]
-    [InlineData(@"type X @key(fields: ""id"") { id: ID! }", "type Query")]
-    [InlineData(@"schema { query: MyQuery } type MyQuery type X @key(fields: ""id"") { id: ID! }", "type MyQuery")]
+    [InlineData("""type X @key(fields: "id") { id: ID! }""", "type Query")]
+    [InlineData("""schema { query: MyQuery } type MyQuery type X @key(fields: "id") { id: ID! }""", "type MyQuery")]
     public void PrintObject_ReturnsEmptyString_GivenQueryTypeHasOnlyFederatedFields(string definitions, string expected)
     {
         // Arrange

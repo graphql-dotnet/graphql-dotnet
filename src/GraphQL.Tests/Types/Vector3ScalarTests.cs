@@ -10,49 +10,49 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
     [Fact]
     public void test_parseliteral_string()
     {
-        AssertQuerySuccess(@"{ input(arg: ""1,2,3"") }", @"{ ""input"": ""=1=2=3="" }");
+        AssertQuerySuccess("""{ input(arg: "1,2,3") }""", """{ "input": "=1=2=3=" }""");
     }
 
     [Fact]
     public void test_parseliteral_structured()
     {
-        AssertQuerySuccess(@"{ input(arg: {x:1,y:2,z:3}) }", @"{ ""input"": ""=1=2=3="" }");
+        AssertQuerySuccess("{ input(arg: {x:1,y:2,z:3}) }", """{ "input": "=1=2=3=" }""");
     }
 
     [Fact]
     public void test_parsevalue_string()
     {
-        AssertQuerySuccess(@"query($arg: Vector3) { input(arg: $arg) }", @"{ ""input"": ""=1=2=3="" }", @"{ ""arg"": ""1,2,3"" }".ToInputs());
+        AssertQuerySuccess("query($arg: Vector3) { input(arg: $arg) }", """{ "input": "=1=2=3=" }""", """{ "arg": "1,2,3" }""".ToInputs());
     }
 
     [Fact]
     public void test_parsevalue_structured()
     {
-        AssertQuerySuccess(@"query($arg: Vector3) { input(arg: $arg) }", @"{ ""input"": ""=1=2=3="" }", @"{ ""arg"": { ""x"": 1, ""y"": 2, ""z"": 3 } }".ToInputs());
+        AssertQuerySuccess("query($arg: Vector3) { input(arg: $arg) }", """{ "input": "=1=2=3=" }""", """{ "arg": { "x": 1, "y": 2, "z": 3 } }""".ToInputs());
     }
 
     [Fact]
     public void test_default()
     {
-        AssertQuerySuccess(@"{ input }", @"{ ""input"": ""=7=8=9="" }");
+        AssertQuerySuccess("{ input }", """{ "input": "=7=8=9=" }""");
     }
 
     [Fact]
     public void test_output()
     {
-        AssertQuerySuccess(@"{ output }", @"{ ""output"": { ""x"": 4, ""y"": 5, ""z"": 6 } }");
+        AssertQuerySuccess("{ output }", """{ "output": { "x": 4, "y": 5, "z": 6 } }""");
     }
 
     [Fact]
     public void test_loopback_with_value()
     {
-        AssertQuerySuccess(@"{ loopback(arg: ""11,12,13"") }", @"{ ""loopback"": { ""x"": 11, ""y"": 12, ""z"": 13 } }");
+        AssertQuerySuccess("""{ loopback(arg: "11,12,13") }""", """{ "loopback": { "x": 11, "y": 12, "z": 13 } }""");
     }
 
     [Fact]
     public void test_loopback_with_null()
     {
-        AssertQuerySuccess(@"{ loopback }", @"{ ""loopback"": null }");
+        AssertQuerySuccess("{ loopback }", """{ "loopback": null }""");
     }
 
     [Fact]

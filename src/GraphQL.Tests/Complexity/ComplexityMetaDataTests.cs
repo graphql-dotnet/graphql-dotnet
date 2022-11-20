@@ -17,24 +17,24 @@ public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
     [Fact]
     public async Task MetaData_ShouldBe_Used()
     {
-        var result = await _fixture.AnalyzeAsync(@"
-query {
-    hero { #2
-        id #0
-        name #2
-        friends { #4
-            id #0
-            name #4
-            f1: friends { #12
-                name #12
+        var result = await _fixture.AnalyzeAsync("""
+            query {
+                hero { #2
+                    id #0
+                    name #2
+                    friends { #4
+                        id #0
+                        name #4
+                        f1: friends { #12
+                            name #12
+                        }
+                        f2: friends { #12
+                            name #12
+                        }
+                    }
+                }
             }
-            f2: friends { #12
-                name #12
-            }
-        }
-    }
-}
-").ConfigureAwait(false);
+            """).ConfigureAwait(false);
 
         result.Complexity.ShouldBe(60);
         result.TotalQueryDepth.ShouldBe(4);
@@ -43,34 +43,34 @@ query {
     [Fact]
     public async Task MetaData_With_Fragments_ShouldBe_Used()
     {
-        var result = await _fixture.AnalyzeAsync(@"
-query {
-    hero { #2
-        id #0
-        name #2
-        ...friendsRoot #132(4/2*66)
-    }
-}
+        var result = await _fixture.AnalyzeAsync("""
+            query {
+                hero { #2
+                    id #0
+                    name #2
+                    ...friendsRoot #132(4/2*66)
+                }
+            }
 
-fragment friendsRoot on Hero {
-    friends { #3
-        ...friendsIdName #27(9/2*6)
-        f1: friends { #9
-            name #9
-        }
-        f2: friends { #9
-            name #9
-        }
-    }
-}
+            fragment friendsRoot on Hero {
+                friends { #3
+                    ...friendsIdName #27(9/2*6)
+                    f1: friends { #9
+                        name #9
+                    }
+                    f2: friends { #9
+                        name #9
+                    }
+                }
+            }
 
-fragment friendsIdName on Hero {
-    friends { #3
-        id #0
-        name #3
-    }
-}
-").ConfigureAwait(false);
+            fragment friendsIdName on Hero {
+                friends { #3
+                    id #0
+                    name #3
+                }
+            }
+            """).ConfigureAwait(false);
 
         result.Complexity.ShouldBe(136);
         result.TotalQueryDepth.ShouldBe(5);

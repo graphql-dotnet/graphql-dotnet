@@ -67,7 +67,7 @@ public class OperationMessageTests : DeserializationTestBase
     {
         var message = new OperationMessage();
         var actual = serializer.Serialize(message);
-        var expected = @"{}";
+        var expected = "{}";
         actual.ShouldBeCrossPlatJson(expected);
     }
 }

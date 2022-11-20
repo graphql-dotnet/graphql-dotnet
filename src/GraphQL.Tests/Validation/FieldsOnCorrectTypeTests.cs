@@ -8,64 +8,64 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     [Fact]
     public void object_field_selection()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment objectFieldSelection on Dog {
                 __typename
                 name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void aliased_object_field_selection()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment aliasedObjectFieldSelection on Dog {
                 tn : __typename
                 otherName : name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_field_selection()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment interfaceFieldSelection on Pet {
                 __typename
                 name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void aliased_interface_field_selection()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment interfaceFieldSelection on Pet {
                 otherName : name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void lying_alias_selection()
     {
-        ShouldPassRule(@"
-              fragment lyingAliasSelection on Dog {
-                name : nickname
-              }
-            ");
+        ShouldPassRule("""
+            fragment lyingAliasSelection on Dog {
+              name : nickname
+            }
+            """);
     }
 
     [Fact]
     public void ignores_fields_on_unknown_type()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment unknownSelection on UnknownType {
                 unknownField
               }
-            ");
+            """);
     }
 
     [Fact]
@@ -73,18 +73,18 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment typeKnownAgain on Pet {
-                    unknown_pet_field {
-                      ... on Cat {
-                        unknown_cat_field
-                      }
+            _.Query = """
+                fragment typeKnownAgain on Pet {
+                  unknown_pet_field {
+                    ... on Cat {
+                      unknown_cat_field
                     }
                   }
-                ";
+                }
+                """;
 
-            undefinedField(_, "unknown_pet_field", "Pet", line: 3, column: 21);
-            undefinedField(_, "unknown_cat_field", "Cat", line: 5, column: 25);
+            undefinedField(_, "unknown_pet_field", "Pet", line: 2, column: 3);
+            undefinedField(_, "unknown_cat_field", "Cat", line: 4, column: 7);
         });
     }
 
@@ -93,13 +93,13 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment fieldNotDefined on Dog {
-                    meowVolume
-                  }
-                ";
+            _.Query = """
+                fragment fieldNotDefined on Dog {
+                  meowVolume
+                }
+                """;
 
-            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
+            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
         });
     }
 
@@ -108,15 +108,15 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment deepFieldNotDefined on Dog {
-                    unknown_field {
-                      deeper_unknown_field
-                    }
+            _.Query = """
+                fragment deepFieldNotDefined on Dog {
+                  unknown_field {
+                    deeper_unknown_field
                   }
-                ";
+                }
+                """;
 
-            undefinedField(_, "unknown_field", "Dog", line: 3, column: 21);
+            undefinedField(_, "unknown_field", "Dog", line: 2, column: 3);
         });
     }
 
@@ -125,15 +125,15 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment subFieldNotDefined on Human {
-                    pets {
-                      unknown_field
-                    }
+            _.Query = """
+                fragment subFieldNotDefined on Human {
+                  pets {
+                    unknown_field
                   }
-                ";
+                }
+                """;
 
-            undefinedField(_, "unknown_field", "Pet", line: 4, column: 23);
+            undefinedField(_, "unknown_field", "Pet", line: 3, column: 5);
         });
     }
 
@@ -142,15 +142,15 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment fieldNotDefined on Pet {
-                    ... on Dog {
-                      meowVolume
-                    }
+            _.Query = """
+                fragment fieldNotDefined on Pet {
+                  ... on Dog {
+                    meowVolume
                   }
-                ";
+                }
+                """;
 
-            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 4, column: 23);
+            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 5);
         });
     }
 
@@ -159,13 +159,13 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment aliasedFieldTargetNotDefined on Dog {
-                    volume : mooVolume
-                  }
-                ";
+            _.Query = """
+                fragment aliasedFieldTargetNotDefined on Dog {
+                  volume : mooVolume
+                }
+                """;
 
-            undefinedField(_, "mooVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
+            undefinedField(_, "mooVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
         });
     }
 
@@ -174,13 +174,13 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment aliasedLyingFieldTargetNotDefined on Dog {
-                    barkVolume : kawVolume
-                  }
-                ";
+            _.Query = """
+                fragment aliasedLyingFieldTargetNotDefined on Dog {
+                  barkVolume : kawVolume
+                }
+                """;
 
-            undefinedField(_, "kawVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 21);
+            undefinedField(_, "kawVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
         });
     }
 
@@ -189,13 +189,13 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment notDefinedOnInterface on Pet {
-                    tailLength
-                  }
-                ";
+            _.Query = """
+                fragment notDefinedOnInterface on Pet {
+                  tailLength
+                }
+                """;
 
-            undefinedField(_, "tailLength", "Pet", line: 3, column: 21);
+            undefinedField(_, "tailLength", "Pet", line: 2, column: 3);
         });
     }
 
@@ -204,24 +204,24 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment definedOnImplementorsButNotInterface on Pet {
-                    nickname
-                  }
-                ";
+            _.Query = """
+                fragment definedOnImplementorsButNotInterface on Pet {
+                  nickname
+                }
+                """;
 
-            undefinedField(_, "nickname", "Pet", suggestedTypes: new[] { "Dog", "Cat" }, line: 3, column: 21);
+            undefinedField(_, "nickname", "Pet", suggestedTypes: new[] { "Dog", "Cat" }, line: 2, column: 3);
         });
     }
 
     [Fact]
     public void meta_field_selection_on_union()
     {
-        ShouldPassRule(@"
-              fragment directFieldSelectionOnUnion on CatOrDog {
-                __typename
-              }
-            ");
+        ShouldPassRule("""
+            fragment directFieldSelectionOnUnion on CatOrDog {
+              __typename
+            }
+            """);
     }
 
     [Fact]
@@ -229,13 +229,13 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment directFieldSelectionOnUnion on CatOrDog {
-                    directField
-                  }
-                ";
+            _.Query = """
+                fragment directFieldSelectionOnUnion on CatOrDog {
+                  directField
+                }
+                """;
 
-            undefinedField(_, "directField", "CatOrDog", line: 3, column: 21);
+            undefinedField(_, "directField", "CatOrDog", line: 2, column: 3);
         });
     }
 
@@ -244,22 +244,22 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment definedOnImplementorsQueriedOnUnion on CatOrDog {
-                    name
-                  }
-                ";
+            _.Query = """
+                fragment definedOnImplementorsQueriedOnUnion on CatOrDog {
+                  name
+                }
+                """;
 
             undefinedField(_, "name", "CatOrDog",
                 suggestedTypes: new[] { "Canine", "Being", "Pet", "Cat", "Dog" },
-                line: 3, column: 21);
+                line: 2, column: 3);
         });
     }
 
     [Fact]
     public void valid_field_in_inline_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment objectFieldSelection on Pet {
                 ... on Dog {
                   name
@@ -268,7 +268,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                   name
                 }
               }
-            ");
+            """);
     }
 
     private void undefinedField(

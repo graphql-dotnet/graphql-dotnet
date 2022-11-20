@@ -8,28 +8,30 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
     [Fact]
     public void byte_array_should_work()
     {
-        var query = @"
-                query BytesRequest($bytesHolder: Issue1874InputBytesType) {
-                    bytes(bytesObject: $bytesHolder) {
-                        bytes
-                    }
-                }";
+        var query = """
+            query BytesRequest($bytesHolder: Issue1874InputBytesType) {
+              bytes(bytesObject: $bytesHolder) {
+                bytes
+              }
+            }
+            """;
 
-        AssertQuerySuccess(query, @"{ ""bytes"": { ""bytes"": [1, 2, 3, 4] } }", @"{ ""bytesHolder"": { ""bytes"": [1, 2, 3, 4] } }".ToInputs());
+        AssertQuerySuccess(query, """{ "bytes": { "bytes": [1, 2, 3, 4] } }""", """{ "bytesHolder": { "bytes": [1, 2, 3, 4] } }""".ToInputs());
     }
 
     [Fact]
     public void string_should_work()
     {
-        var query = @"
-                query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
-                    bytes64(bytesObject: $bytesHolder) {
-                        bytes
-                    }
-                }";
+        var query = """
+            query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
+              bytes64(bytesObject: $bytesHolder) {
+                bytes
+              }
+            }
+            """;
 
         var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
-        AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }", (@"{ ""bytesHolder"": { ""bytes"": """ + str1234 + @""" } }").ToInputs());
+        AssertQuerySuccess(query, $$"""{ "bytes64": { "bytes": "{{str1234}}" } }""", $$"""{ "bytesHolder": { "bytes": "{{str1234}}" } }""".ToInputs());
     }
 
     [Fact]
@@ -37,14 +39,15 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
     {
         var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
 
-        var query = @"
-                query BytesRequest {
-                    bytes64(bytesObject: { bytes: """ + str1234 + @"""}) {
-                        bytes
-                    }
-                }";
+        var query = $$"""
+            query BytesRequest {
+                bytes64(bytesObject: { bytes: "{{str1234}}"}) {
+                    bytes
+                }
+            }
+            """;
 
-        AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }");
+        AssertQuerySuccess(query, $$"""{ "bytes64": { "bytes": "{{str1234}}" } }""");
     }
 }
 

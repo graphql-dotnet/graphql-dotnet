@@ -8,34 +8,39 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
     [Fact]
     public void Should_Provide_Directives_In_Resolver()
     {
-        var query = @"query Q($var1: Boolean!, $var2: Boolean! = true)
-{
-  fieldWith2Literal @skip(if: false) @include(if: true)
-  fieldWithVariable @include(if: $var1)
-  fieldWithVariableDefault @include(if: $var2)
-  fieldWithoutDirectives
-}
-";
-        var expected = @"{
-  ""fieldWith2Literal"": ""1"",
-  ""fieldWithVariable"": ""2"",
-  ""fieldWithVariableDefault"": ""3"",
-  ""fieldWithoutDirectives"": ""4""
-}";
-        AssertQuerySuccess(query, expected, @"{ ""var1"": true }".ToInputs());
+        var query = """
+        query Q($var1: Boolean!, $var2: Boolean! = true)
+        {
+          fieldWith2Literal @skip(if: false) @include(if: true)
+          fieldWithVariable @include(if: $var1)
+          fieldWithVariableDefault @include(if: $var2)
+          fieldWithoutDirectives
+        }
+        """;
+        var expected = """
+        {
+          "fieldWith2Literal": "1",
+          "fieldWithVariable": "2",
+          "fieldWithVariableDefault": "3",
+          "fieldWithoutDirectives": "4"
+        }
+        """;
+        AssertQuerySuccess(query, expected, """{ "var1": true }""".ToInputs());
     }
 
     [Fact]
     public void Should_Ignore_Unknown_Directives()
     {
-        var query = @"
-{
-  fieldWithoutDirectives @unknown
-}
-";
-        var expected = @"{
-  ""fieldWithoutDirectives"": ""4""
-}";
+        var query = """
+        {
+          fieldWithoutDirectives @unknown
+        }
+        """;
+        var expected = """
+        {
+          "fieldWithoutDirectives": "4"
+        }
+        """;
         // empty validation rules to bypass validation error from KnownDirectivesInAllowedLocations
         AssertQuerySuccess(query, expected, rules: Array.Empty<IValidationRule>());
     }

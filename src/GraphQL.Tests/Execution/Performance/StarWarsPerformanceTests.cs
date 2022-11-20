@@ -17,19 +17,19 @@ public class StarWarsPerformanceTests : StarWarsTestBase
     // [Fact]
     public void Executes_StarWarsBasicQuery_Performant()
     {
-        var query = @"
-                query HeroNameAndFriendsQuery {
-                  hero {
-                    id
-                    name
-                    appearsIn
-                    friends {
-                      name
-                      appearsIn
-                    }
-                  }
+        var query = """
+            query HeroNameAndFriendsQuery {
+              hero {
+                id
+                name
+                appearsIn
+                friends {
+                  name
+                  appearsIn
                 }
-            ";
+              }
+            }
+            """;
 
         var smallListTimer = new Stopwatch();
         ExecutionResult runResult2 = null;

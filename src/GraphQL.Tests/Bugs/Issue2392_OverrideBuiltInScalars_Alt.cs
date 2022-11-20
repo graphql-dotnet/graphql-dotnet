@@ -137,13 +137,14 @@ public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_Over
 
     private Schema BuildSchemaFirst()
     {
-        var typeDefs = @"
-type Query {
-  testOutput: Int!
-  testInput(arg: Int!): ID!
-  testOutputString: String!
-  testInputString(arg: String!): ID!
-}";
+        var typeDefs = """
+            type Query {
+              testOutput: Int!
+              testInput(arg: Int!): ID!
+              testOutputString: String!
+              testInputString(arg: String!): ID!
+            }
+            """;
         var schema = GraphQL.Types.Schema.For(typeDefs, config => config.Types.Include<SchemaFirstRoot>());
 
         Replace(schema);

@@ -21,7 +21,7 @@ public class Issue3370_LiteralObjectsWithNoEntriesDoNotValidate
         var result2 = await schema.ExecuteAsync(options =>
         {
             options.Query = "query($input: TestInputType!){test(input: $input) { stringValue }}";
-            options.Variables = @"{ ""input"": {}}".ToInputs();
+            options.Variables = """{ "input": {}}""".ToInputs();
         }).ConfigureAwait(false);
         result2.ShouldBeCrossPlatJson("""{"errors":[{"message":"Variable \u0027$input.prop1\u0027 is invalid. No value provided for a non-null variable.","locations":[{"line":1,"column":7}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE"],"number":"5.8"}}]}""");
     }

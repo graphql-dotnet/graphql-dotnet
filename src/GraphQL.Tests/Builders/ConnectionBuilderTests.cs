@@ -61,57 +61,76 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     [Fact]
     public void should_resolve_in_query()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection1 {
-                    totalCount
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  }
-                }}",
-            @"{ ""parent"": {
-                ""connection1"": {
-                  ""totalCount"": 3,
-                  ""edges"": [
-                    { ""cursor"": ""1"", ""node"": { ""field1"": ""one"", ""field2"": 1 } },
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""two"", ""field2"": 2 } },
-                    { ""cursor"": ""3"", ""node"": { ""field1"": ""three"", ""field2"": 3 } }
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection1 {
+                  totalCount
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection1": {
+                  "totalCount": 3,
+                  "edges": [
+                    { "cursor": "1", "node": { "field1": "one", "field2": 1 } },
+                    { "cursor": "2", "node": { "field1": "two", "field2": 2 } },
+                    { "cursor": "3", "node": { "field1": "three", "field2": 3 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""one"", ""field2"": 1 },
-                    { ""field1"": ""two"", ""field2"": 2 },
-                    { ""field1"": ""three"", ""field2"": 3 }
+                  "items": [
+                    { "field1": "one", "field2": 1 },
+                    { "field1": "two", "field2": 2 },
+                    { "field1": "three", "field2": 3 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]
     public void should_yield_pagination_information()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection2(first: 1, after: ""1"") {
-                    totalCount
-                    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  } }}",
-            @"{ ""parent"": {
-                ""connection2"": {
-                  ""totalCount"": 3,
-                  ""pageInfo"": {
-                    ""hasNextPage"": true,
-                    ""hasPreviousPage"": true,
-                    ""startCursor"": ""2"",
-                    ""endCursor"": ""2""
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection2(first: 1, after: "1") {
+                  totalCount
+                  pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection2": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": true,
+                    "hasPreviousPage": true,
+                    "startCursor": "2",
+                    "endCursor": "2"
                   },
-                  ""edges"": [
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""TWO"", ""field2"": 22 } }
+                  "edges": [
+                    { "cursor": "2", "node": { "field1": "TWO", "field2": 22 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""TWO"", ""field2"": 22 }
+                  "items": [
+                    { "field1": "TWO", "field2": 22 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]

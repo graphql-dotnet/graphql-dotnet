@@ -7,25 +7,27 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
     [Fact]
     public void Supports_partially_nullable_fields_on_arguments()
     {
-        var query = @"
-mutation {
-  run(input: {id:null, foo:null,bar:null})
-}
-";
-        var expected = @"{
-  ""run"": ""idfoobar""
-}";
+        var query = """
+            mutation {
+              run(input: {id:null, foo:null,bar:null})
+            }
+            """;
+        var expected = """
+            {
+              "run": "idfoobar"
+            }
+            """;
         AssertQuerySuccess(query, expected, null);
     }
 
     [Fact]
     public void Supports_non_null_int()
     {
-        var query = @"
-mutation {
-  run(input: {id:105, foo:null,bar:{id: null, foo:""a"", bar:{id:101}}})
-}
-";
+        var query = """
+            mutation {
+              run(input: {id:105, foo:null,bar:{id: null, foo:"a", bar:{id:101}}})
+            }
+            """;
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
@@ -38,11 +40,11 @@ mutation {
     [Fact]
     public void Supports_non_null_string()
     {
-        var query = @"
-mutation {
-  run(input: {id:105, foo:null,bar:{id: 1, foo:null, bar:{id:101}}})
-}
-";
+        var query = """
+            mutation {
+              run(input: {id:105, foo:null,bar:{id: 1, foo:null, bar:{id:101}}})
+            }
+            """;
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
@@ -55,11 +57,11 @@ mutation {
     [Fact]
     public void Supports_non_null_object()
     {
-        var query = @"
-mutation {
-  run(input: {id:105, foo:null,bar:{id: 1, foo:""abc"", bar:null}})
-}
-";
+        var query = """
+            mutation {
+              run(input: {id:105, foo:null,bar:{id: 1, foo:"abc", bar:null}})
+            }
+            """;
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 

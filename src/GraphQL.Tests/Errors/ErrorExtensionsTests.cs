@@ -20,7 +20,7 @@ public class ErrorExtensionsTests : QueryTestBase<ErrorExtensionsTests.TestSchem
         error.Path = new[] { "firstSync" };
         errors.Add(error);
 
-        var expectedResult = @"{ ""firstSync"": null}";
+        var expectedResult = """{ "firstSync": null}""";
 
         AssertQuery(query, CreateQueryResult(expectedResult, errors), null, null);
     }

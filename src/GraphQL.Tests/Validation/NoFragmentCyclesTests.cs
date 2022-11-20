@@ -8,35 +8,35 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     [Fact]
     public void single_reference_is_valid()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment fragA on Dog { ...fragB }
               fragment fragB on Dog { name }
-            ");
+            """);
     }
 
     [Fact]
     public void spread_twice_is_not_circular()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment fragA on Dog { ...fragB, ...fragB }
               fragment fragB on Dog { name }
-            ");
+            """);
     }
 
     [Fact]
     public void spread_twice_indirectly_is_not_circular()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment fragA on Dog { ...fragB, ...fragC }
               fragment fragB on Dog { ...fragC }
               fragment fragC on Dog { name }
-            ");
+            """);
     }
 
     [Fact]
     public void double_spread_within_abstract_types()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment nameFragment on Pet {
                 ... on Dog { name }
                 ... on Cat { name }
@@ -45,17 +45,17 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 ... on Dog { ...nameFragment }
                 ... on Cat { ...nameFragment }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void does_not_false_positive_on_unknown_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment nameFragment on Pet {
                 ...UnknownFragment
               }
-            ");
+            """);
     }
 
     [Fact]
@@ -63,10 +63,10 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Human { relatives { ...fragA } },
-                ";
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 2, 57);
+                """;
+            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 1, 41);
         });
     }
 
@@ -75,10 +75,10 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragA }
-                ";
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 2, 43);
+                """;
+            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 1, 27);
         });
     }
 
@@ -87,14 +87,14 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Pet {
                     ... on Dog {
                       ...fragA
                     }
                   }
-                ";
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 4, 23);
+                """;
+            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 3, 7);
         });
     }
 
@@ -103,15 +103,15 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragB }
                   fragment fragB on Dog { ...fragA }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
-                e.Loc(2, 43);
-                e.Loc(3, 43);
+                e.Loc(1, 27);
+                e.Loc(2, 27);
             });
         });
     }
@@ -121,15 +121,15 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragB on Dog { ...fragA }
                   fragment fragA on Dog { ...fragB }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragB", new[] { "fragA" });
-                e.Loc(2, 43);
-                e.Loc(3, 43);
+                e.Loc(1, 27);
+                e.Loc(2, 27);
             });
         });
     }
@@ -139,7 +139,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Pet {
                     ... on Dog {
                       ...fragB
@@ -150,12 +150,12 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                       ...fragA
                     }
                   }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
-                e.Loc(4, 23);
-                e.Loc(9, 23);
+                e.Loc(3, 7);
+                e.Loc(8, 7);
             });
         });
     }
@@ -165,7 +165,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragB }
                   fragment fragB on Dog { ...fragC }
                   fragment fragC on Dog { ...fragO }
@@ -174,24 +174,24 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                   fragment fragZ on Dog { ...fragO }
                   fragment fragO on Dog { ...fragP }
                   fragment fragP on Dog { ...fragA, ...fragX }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC", "fragO", "fragP" });
-                e.Loc(2, 43);
-                e.Loc(3, 43);
-                e.Loc(4, 43);
-                e.Loc(8, 43);
-                e.Loc(9, 43);
+                e.Loc(1, 27);
+                e.Loc(2, 27);
+                e.Loc(3, 27);
+                e.Loc(7, 27);
+                e.Loc(8, 27);
             });
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragO", new[] { "fragP", "fragX", "fragY", "fragZ" });
-                e.Loc(8, 43);
-                e.Loc(9, 53);
-                e.Loc(5, 43);
-                e.Loc(6, 43);
-                e.Loc(7, 43);
+                e.Loc(7, 27);
+                e.Loc(8, 37);
+                e.Loc(4, 27);
+                e.Loc(5, 27);
+                e.Loc(6, 27);
             });
         });
     }
@@ -201,22 +201,22 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragB, ...fragC }
                   fragment fragB on Dog { ...fragA }
                   fragment fragC on Dog { ...fragA }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
-                e.Loc(2, 43);
-                e.Loc(3, 43);
+                e.Loc(1, 27);
+                e.Loc(2, 27);
             });
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
-                e.Loc(2, 53);
-                e.Loc(4, 43);
+                e.Loc(1, 37);
+                e.Loc(3, 27);
             });
         });
     }
@@ -226,22 +226,22 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragC }
                   fragment fragB on Dog { ...fragC }
                   fragment fragC on Dog { ...fragA, ...fragB }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
-                e.Loc(2, 43);
-                e.Loc(4, 43);
+                e.Loc(1, 27);
+                e.Loc(3, 27);
             });
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragC", new[] { "fragB" });
-                e.Loc(4, 53);
-                e.Loc(3, 43);
+                e.Loc(3, 37);
+                e.Loc(2, 27);
             });
         });
     }
@@ -251,28 +251,28 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment fragA on Dog { ...fragB }
                   fragment fragB on Dog { ...fragB, ...fragC }
                   fragment fragC on Dog { ...fragA, ...fragB }
-                ";
+                """;
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragB", Array.Empty<string>());
-                e.Loc(3, 43);
+                e.Loc(2, 27);
             });
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC" });
-                e.Loc(2, 43);
-                e.Loc(3, 53);
-                e.Loc(4, 43);
+                e.Loc(1, 27);
+                e.Loc(2, 37);
+                e.Loc(3, 27);
             });
             _.Error(e =>
             {
                 e.Message = CycleErrorMessage("fragB", new[] { "fragC" });
-                e.Loc(3, 53);
-                e.Loc(4, 53);
+                e.Loc(2, 37);
+                e.Loc(3, 37);
             });
         });
     }

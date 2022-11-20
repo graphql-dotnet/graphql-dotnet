@@ -8,16 +8,16 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void can_set_metadata_from_custom_attribute()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
+        var defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
 
-                type Query {
-                    post(id: ID!): Post
-                }
-            ";
+            type Query {
+              post(id: ID!): Post
+            }
+            """;
 
         Builder.Types.Include<PostWithExtraAttributesType>();
         Builder.Types.Include<Post>();
@@ -33,23 +33,23 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void impl_type_sets_isTypeOfFunc()
     {
-        var defs = @"
-                interface IUniqueElement
-                {
-                    id: ID!
-                }
+        var defs = """
+            interface IUniqueElement
+            {
+              id: ID!
+            }
 
-                type ABlog implements IUniqueElement
-                {
-                    id: ID!
-                    name: String!
-                }
+            type ABlog implements IUniqueElement
+            {
+              id: ID!
+              name: String!
+            }
 
-                type Query
-                {
-                    blog(id: ID!): ABlog
-                }
-            ";
+            type Query
+            {
+              blog(id: ID!): ABlog
+            }
+            """;
 
         Builder.Types.Include<ResolvingClassForABlog>();
 
@@ -65,23 +65,23 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void impl_type_sets_default_isTypeOfFunc()
     {
-        var defs = @"
-                interface IUniqueElement
-                {
-                    id: ID!
-                }
+        var defs = """
+            interface IUniqueElement
+            {
+              id: ID!
+            }
 
-                type ABlog implements IUniqueElement
-                {
-                    id: ID!
-                    name: String!
-                }
+            type ABlog implements IUniqueElement
+            {
+              id: ID!
+              name: String!
+            }
 
-                type Query
-                {
-                    blog(id: ID!): ABlog
-                }
-            ";
+            type Query
+            {
+              blog(id: ID!): ABlog
+            }
+            """;
 
         Builder.Types.Include<ABlog, ABlog>();
 

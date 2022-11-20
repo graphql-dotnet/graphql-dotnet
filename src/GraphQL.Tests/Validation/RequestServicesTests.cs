@@ -46,7 +46,7 @@ public class RequestServicesTests
         // serialize to json to be sure no issues with a validation error without a number
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         var resultString = serializer.Serialize(result);
-        resultString.ShouldBe(@"{""errors"":[{""message"":""Num is 1"",""extensions"":{""code"":""VALIDATION_ERROR"",""codes"":[""VALIDATION_ERROR""]}}]}");
+        resultString.ShouldBe("""{"errors":[{"message":"Num is 1","extensions":{"code":"VALIDATION_ERROR","codes":["VALIDATION_ERROR"]}}]}""");
     }
 
     private class MyValidationRule : IValidationRule

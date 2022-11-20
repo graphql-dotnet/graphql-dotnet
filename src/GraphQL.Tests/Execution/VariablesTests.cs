@@ -195,11 +195,11 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
 
 public class UsingVariablesTests : QueryTestBase<VariablesSchema>
 {
-    private const string _query = @"
-            query q($input: TestInputObject) {
-              fieldWithObjectInput(input: $input)
-            }
-        ";
+    private const string _query = """
+        query q($input: TestInputObject) {
+          fieldWithObjectInput(input: $input)
+        }
+        """;
 
     [Fact]
     public void executes_with_complex_input()
@@ -234,11 +234,11 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void uses_default_value_when_not_provided()
     {
-        var queryWithDefaults = @"
-                query q($input: TestInputObject = {a: ""foo"", b: [""bar""] c: ""baz""}) {
-                  fieldWithObjectInput(input: $input)
-                }
-            ";
+        var queryWithDefaults = """
+            query q($input: TestInputObject = {a: "foo", b: ["bar"] c: "baz"}) {
+              fieldWithObjectInput(input: $input)
+            }
+            """;
 
         var expected = """{ "fieldWithObjectInput": "{\"a\":\"foo\",\"b\":[\"bar\"],\"c\":\"baz\"}" }""";
 
@@ -290,7 +290,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
         const string expected = null;
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"" } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": "bar" } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
@@ -304,7 +304,7 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     {
         const string expected = null;
 
-        var inputs = @"{ ""input"": { ""a"": ""foo"", ""b"": ""bar"", ""c"": ""baz"", ""e"": ""dog"" } }".ToInputs();
+        var inputs = """{ "input": { "a": "foo", "b": "bar", "c": "baz", "e": "dog" } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
@@ -316,15 +316,15 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void executes_with_injected_input_variables()
     {
-        var query = @"
-                query q($argB: [String!]!, $argC: String!, $argD: ComplexScalar) {
-                  fieldWithObjectInput(input: { b: $argB, c: $argC, d: $argD,  })
-                }
-            ";
+        var query = """
+            query q($argB: [String!]!, $argC: String!, $argD: ComplexScalar) {
+              fieldWithObjectInput(input: { b: $argB, c: $argC, d: $argD,  })
+            }
+            """;
 
         var expected = """{ "fieldWithObjectInput": "{\"b\":[\"bar\",\"qux\"],\"c\":\"foo\",\"d\":\"DeserializedValue\"}" }""";
 
-        var inputs = @"{ ""argB"": [""bar"", ""qux""], ""argC"": ""foo"", ""argD"": ""SerializedValue"" }".ToInputs();
+        var inputs = """{ "argB": ["bar", "qux"], "argC": "foo", "argD": "SerializedValue" }""".ToInputs();
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -335,17 +335,17 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_int_input_to_be_omitted()
     {
-        var query = @"
-{
-  fieldWithNullableIntInput
-}
-";
+        var query = """
+        {
+          fieldWithNullableIntInput
+        }
+        """;
 
-        var expected = @"
-{
-  ""fieldWithNullableIntInput"": 0
-}
-";
+        var expected = """
+        {
+          "fieldWithNullableIntInput": 0
+        }
+        """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -353,17 +353,17 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_omitted()
     {
-        var query = @"
+        var query = """
             {
               fieldWithNullableStringInput
             }
-            ";
+            """;
 
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithNullableStringInput"": ""null""
+              "fieldWithNullableStringInput": "null"
             }
-            ";
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -371,17 +371,17 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_omitted_in_a_variable()
     {
-        var query = @"
-                query SetsNullable($value: String) {
-                  fieldWithNullableStringInput(input: $value)
-                }
-            ";
-
-        var expected = @"
-            {
-              ""fieldWithNullableStringInput"": ""null""
+        var query = """
+            query SetsNullable($value: String) {
+              fieldWithNullableStringInput(input: $value)
             }
-            ";
+            """;
+
+        var expected = """
+            {
+              "fieldWithNullableStringInput": "null"
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -389,17 +389,17 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_omitted_in_an_unlisted_variable()
     {
-        var query = @"
-                query SetsNullable {
-                  fieldWithNullableStringInput(input: $value)
-                }
-            ";
-
-        var expected = @"
-            {
-              ""fieldWithNullableStringInput"": ""null""
+        var query = """
+            query SetsNullable {
+              fieldWithNullableStringInput(input: $value)
             }
-            ";
+            """;
+
+        var expected = """
+            {
+              "fieldWithNullableStringInput": "null"
+            }
+            """;
 
         AssertQuerySuccess(query, expected, rules: Enumerable.Empty<IValidationRule>());
     }
@@ -407,19 +407,19 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_set_to_null_in_a_variable()
     {
-        var query = @"
-                query SetsNullable($value: String) {
-                  fieldWithNullableStringInput(input: $value)
-                }
-            ";
-
-        var expected = @"
-            {
-              ""fieldWithNullableStringInput"": ""null""
+        var query = """
+            query SetsNullable($value: String) {
+              fieldWithNullableStringInput(input: $value)
             }
-            ";
+            """;
 
-        var inputs = @"{""value"": null}".ToInputs();
+        var expected = """
+            {
+              "fieldWithNullableStringInput": "null"
+            }
+            """;
+
+        var inputs = """{"value": null}""".ToInputs();
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -427,11 +427,11 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_set_to_a_value_in_a_variable()
     {
-        var query = @"
-                query SetsNullable($value: String) {
-                  fieldWithNullableStringInput(input: $value)
-                }
-            ";
+        var query = """
+            query SetsNullable($value: String) {
+              fieldWithNullableStringInput(input: $value)
+            }
+            """;
 
         // value is: "a"
         var expected = """
@@ -448,18 +448,18 @@ public class HandlesNullableScalarsTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_nullable_inputs_to_be_set_to_a_value_directly()
     {
-        var query = @"
+        var query = """
             {
-              fieldWithNullableStringInput(input: ""a"")
+              fieldWithNullableStringInput(input: "a")
             }
-            ";
+            """;
 
         // value is: "a"
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithNullableStringInput"": ""\""a\""""
+              "fieldWithNullableStringInput": "\"a\""
             }
-            ";
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -470,11 +470,11 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void does_not_allow_non_nullable_inputs_to_be_omitted_in_a_variable()
     {
-        var query = @"
+        var query = """
             query SetsNonNullable($value: String!) {
               fieldWithNonNullableStringInput(input: $value)
             }
-            ";
+            """;
 
         string expected = null;
 
@@ -488,15 +488,15 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void does_not_allow_non_nullable_inputs_to_be_set_to_null_in_a_variable()
     {
-        var query = @"
+        var query = """
             query SetsNonNullable($value: String!) {
               fieldWithNonNullableStringInput(input: $value)
             }
-            ";
+            """;
 
         string expected = null;
 
-        var inputs = @"{""value"": null}".ToInputs();
+        var inputs = """{"value": null}""".ToInputs();
 
         var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1, executed: false);
 
@@ -508,19 +508,19 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_non_nullable_inputs_to_be_set_to_a_value_in_a_variable()
     {
-        var query = @"
-                query SetsNullable($value: String) {
-                  fieldWithNullableStringInput(input: $value)
-                }
-            ";
-
-        var expected = @"
-            {
-              ""fieldWithNullableStringInput"": ""\""a\""""
+        var query = """
+            query SetsNullable($value: String) {
+              fieldWithNullableStringInput(input: $value)
             }
-            ";
+            """;
 
-        var inputs = @"{""value"": ""a""}".ToInputs();
+        var expected = """
+            {
+              "fieldWithNullableStringInput": "\"a\""
+            }
+            """;
+
+        var inputs = """{"value": "a"}""".ToInputs();
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -528,17 +528,17 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_non_nullable_inputs_to_be_set_to_a_value_directly()
     {
-        var query = @"
+        var query = """
             {
-              fieldWithNullableStringInput(input: ""a"")
+              fieldWithNullableStringInput(input: "a")
             }
-            ";
+            """;
 
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithNullableStringInput"": ""\""a\""""
+              "fieldWithNullableStringInput": "\"a\""
             }
-            ";
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -546,22 +546,22 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void allows_custom_scalar_that_resolves_to_an_object()
     {
-        var query = @"
+        var query = """
             query SetsCustomScalarInput($input: JsonScalarReturningObject) {
               fieldWithCustomScalarInput(input: $input)
             }
-            ";
+            """;
 
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithCustomScalarInput"": ""bear-cat, dog, bird""
+              "fieldWithCustomScalarInput": "bear-cat, dog, bird"
             }
-            ";
+            """;
 
-        var jsonInput = @"{ ""stringProperty"": ""bear"", ""arrayProperty"": [""cat"", ""dog"", ""bird""] }";
+        var jsonInput = """{ "stringProperty": "bear", "arrayProperty": ["cat", "dog", "bird"] }""";
         var jsonInputEncoded = JsonEncodedText.Encode(jsonInput);
 
-        var inputs = $@"{{ ""input"": ""{jsonInputEncoded}"" }}".ToInputs();
+        var inputs = $$"""{ "input": "{{jsonInputEncoded}}" }""".ToInputs();
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -572,17 +572,17 @@ public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void when_no_argument_provided()
     {
-        var query = @"
+        var query = """
             {
               fieldWithDefaultArgumentValue
             }
-            ";
+            """;
 
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
+              "fieldWithDefaultArgumentValue": "\"Hello World\""
             }
-            ";
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -590,17 +590,17 @@ public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void when_nullable_variable_provided()
     {
-        var query = @"
+        var query = """
             query optionalVariable($optional:String) {
               fieldWithDefaultArgumentValue(input: $optional)
             }
-            ";
+            """;
 
-        var expected = @"
+        var expected = """
             {
-              ""fieldWithDefaultArgumentValue"": ""\""Hello World\""""
+              "fieldWithDefaultArgumentValue": "\"Hello World\""
             }
-            ";
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -608,17 +608,17 @@ public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void when_argument_provided_cannot_be_parsed()
     {
-        var query = @"
-            {
-              fieldWithDefaultArgumentValue(input: WRONG_TYPE)
-            }
-            ";
+        var query = """
+{
+  fieldWithDefaultArgumentValue(input: WRONG_TYPE)
+}
+""";
 
         var error = new ValidationError(default, ArgumentsOfCorrectTypeError.NUMBER, "Argument \u0027input\u0027 has invalid value. Expected type \u0027String\u0027, found WRONG_TYPE.")
         {
             Code = "ARGUMENTS_OF_CORRECT_TYPE",
         };
-        error.AddLocation(new Location(3, 45));
+        error.AddLocation(new Location(2, 33));
 
         var expected = new ExecutionResult
         {

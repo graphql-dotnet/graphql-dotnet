@@ -59,7 +59,7 @@ public class SchemaPrinterTests
             var orderedScalars = expected
                 .OrderBy(x => x.Key, StringComparer.Ordinal)
                 .Select(x => x.Value);
-            exp = Environment.NewLine + string.Join($"{Environment.NewLine}{Environment.NewLine}", orderedScalars) + Environment.NewLine;
+            exp = Environment.NewLine + string.Join($"{Environment.NewLine}", orderedScalars) + Environment.NewLine;
         }
 
         result.Replace("\r", "").ShouldBe(exp.Replace("\r", ""));
@@ -78,10 +78,12 @@ public class SchemaPrinterTests
         arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
         var result = printer.PrintDirective(skip);
-        const string expected = @"# Directs the executor to skip this field or fragment when the 'if' argument is true.
-directive @skip(
-  if: Boolean!
-) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT";
+        const string expected = """
+            # Directs the executor to skip this field or fragment when the 'if' argument is true.
+            directive @skip(
+              if: Boolean!
+            ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+            """;
 
         AssertEqual(result, "directive", expected, excludeScalars: true);
     }
@@ -96,13 +98,13 @@ directive @skip(
 
         var result = printer.PrintDirective(skip);
         const string expected = """"
-"""
-Directs the executor to skip this field or fragment when the 'if' argument is true.
-"""
-directive @skip(
-  if: Boolean!
-) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-"""";
+            """
+            Directs the executor to skip this field or fragment when the 'if' argument is true.
+            """
+            directive @skip(
+              if: Boolean!
+            ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+            """";
 
         AssertEqual(result, "directive", expected, excludeScalars: true);
     }
@@ -132,19 +134,22 @@ directive @skip(
             Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
         };
         string result = new SchemaPrinter(null).PrintDirective(d);
-        result.ShouldBe(@"directive @my(
-  max: Int
-) repeatable on FIELD | QUERY");
+        result.ShouldBe("""
+            directive @my(
+              max: Int
+            ) repeatable on FIELD | QUERY
+            """);
     }
 
     [Fact]
     public void prints_string_field()
     {
         var result = printSingleFieldSchema<StringGraphType>();
-        const string expected =
-@"type Query {
-  singleField: String
-}";
+        const string expected = """
+            type Query {
+              singleField: String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -152,10 +157,11 @@ directive @skip(
     public void prints_string_list_field()
     {
         var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
-        const string expected =
-@"type Query {
-  singleField: [String]
-}";
+        const string expected = """
+            type Query {
+              singleField: [String]
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -163,10 +169,11 @@ directive @skip(
     public void prints_non_null_string_field()
     {
         var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
-        const string expected =
-@"type Query {
-  singleField: String!
-}";
+        const string expected = """
+            type Query {
+              singleField: String!
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -174,10 +181,11 @@ directive @skip(
     public void prints_non_null_list_of_string_field()
     {
         var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
-        const string expected =
-@"type Query {
-  singleField: [String]!
-}";
+        const string expected = """
+            type Query {
+              singleField: [String]!
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -185,10 +193,11 @@ directive @skip(
     public void prints_non_null_list_of_non_null_string_field()
     {
         var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
-        const string expected =
-@"type Query {
-  singleField: [String!]!
-}";
+        const string expected = """
+            type Query {
+              singleField: [String!]!
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -204,19 +213,24 @@ directive @skip(
         {
             {
                 "Foo",
-@"# This is a Foo object type
-type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int @deprecated(reason: ""This field is now deprecated"")
-}"
+                """
+                # This is a Foo object type
+                type Foo {
+                  # This is of type String
+                  str: String
+                  # This is of type Integer
+                  int: Int @deprecated(reason: "This field is now deprecated")
+                }
+                """
             },
             {
                 "Query",
-@"type Query {
-  foo: Foo
-}"
+                """
+
+                type Query {
+                  foo: Foo
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -240,19 +254,24 @@ type Foo {
         {
             {
                 "Foo",
-@"# This is a Foo object type
-type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}"
+                """
+                # This is a Foo object type
+                type Foo {
+                  # This is of type String
+                  str: String
+                  # This is of type Integer
+                  int: Int
+                }
+                """
             },
             {
                 "Query",
-@"type Query {
-  foo: Foo
-}"
+                """
+
+                type Query {
+                  foo: Foo
+                }
+                """
             },
         };
         AssertEqual(print(schema, options), expected);
@@ -276,27 +295,30 @@ type Foo {
         {
             {
                 "Foo",
-""""
-"""
-This is a Foo object type
-"""
-type Foo {
-  """
-  This is of type String
-  """
-  str: String
-  """
-  This is of type Integer
-  """
-  int: Int
-}
-""""
+                """"
+                """
+                This is a Foo object type
+                """
+                type Foo {
+                  """
+                  This is of type String
+                  """
+                  str: String
+                  """
+                  This is of type Integer
+                  """
+                  int: Int
+                }
+                """"
             },
             {
                 "Query",
-@"type Query {
-  foo: Foo
-}"
+                """
+
+                type Query {
+                  foo: Foo
+                }
+                """
             },
         };
         AssertEqual(print(schema, options), expected);
@@ -321,19 +343,24 @@ type Foo {
         {
             {
                 "Foo",
-@"# This is a Foo object type
-type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
+                """
+                # This is a Foo object type
+                type Foo {
+                  # This is of type String
+                  str: String
+                  # This is of type Integer
+                  int: Int
+                }
+                """.Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
             },
             {
                 "Query",
-@"type Query {
-  foo: Foo
-}"
+                """
+
+                type Query {
+                  foo: Foo
+                }
+                """
             },
         };
         var result = print(schema, options);
@@ -359,27 +386,30 @@ type Foo {
         {
             {
                 "Foo",
-""""
-"""
-This is a Foo object type
-"""
-type Foo {
-  """
-  This is of type String
-  """
-  str: String
-  """
-  This is of type Integer
-  """
-  int: Int
-}
-"""".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
+                """"
+                """
+                This is a Foo object type
+                """
+                type Foo {
+                  """
+                  This is of type String
+                  """
+                  str: String
+                  """
+                  This is of type Integer
+                  """
+                  int: Int
+                }
+
+                """".Replace("int: Int", "int: Int @deprecated(reason: \"This field is now deprecated\")")
             },
             {
                 "Query",
-@"type Query {
-  foo: Foo
-}"
+                """
+                type Query {
+                  foo: Foo
+                }
+                """
             },
         };
         var result = print(schema, options);
@@ -395,10 +425,11 @@ type Foo {
                 new QueryArgument<IntGraphType> { Name = "argOne" }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -411,10 +442,11 @@ type Foo {
                 new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int = 2): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int = 2): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -427,10 +459,11 @@ type Foo {
                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int!): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int!): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -443,12 +476,13 @@ type Foo {
                 new QueryArgument<ListGraphType<GuidGraphType>> { Name = "arg", DefaultValue = new List<Guid>() },
             });
 
-        const string expected =
-@"scalar Guid
+        const string expected = """
+            scalar Guid
 
-type Query {
-  singleField(arg: [Guid] = []): String
-}";
+            type Query {
+              singleField(arg: [Guid] = []): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -462,10 +496,11 @@ type Query {
                 new QueryArgument<StringGraphType> { Name = "argTwo" }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int, argTwo: String): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int, argTwo: String): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -480,10 +515,11 @@ type Query {
                 new QueryArgument<BooleanGraphType> { Name = "argThree" }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int = 1, argTwo: String, argThree: Boolean): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -498,10 +534,11 @@ type Query {
                 new QueryArgument<BooleanGraphType> { Name = "argThree" }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int, argTwo: String = ""foo"", argThree: Boolean): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int, argTwo: String = "foo", argThree: Boolean): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -516,10 +553,11 @@ type Query {
                 new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
             });
 
-        const string expected =
-@"type Query {
-  singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
-}";
+        const string expected = """
+            type Query {
+              singleField(argOne: Int, argTwo: String, argThree: Boolean = false): String
+            }
+            """;
         AssertEqual(result, "Query", expected);
     }
 
@@ -531,26 +569,28 @@ type Query {
 
         var schema = new Schema { Query = root };
 
-        AssertEqual(print(schema), "", @"
-schema {
-  query: Root
-}
+        AssertEqual(print(schema), "", """
 
-type Bar implements IFoo {
-  # This is of type String
-  str: String
-}
+            schema {
+              query: Root
+            }
 
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
+            type Bar implements IFoo {
+              # This is of type String
+              str: String
+            }
 
-type Root {
-  bar: Bar
-}
-", excludeScalars: true);
+            # This is a Foo interface type
+            interface IFoo {
+              # This is of type String
+              str: String
+            }
+
+            type Root {
+              bar: Bar
+            }
+
+            """, excludeScalars: true);
     }
 
     [Fact]
@@ -563,29 +603,31 @@ type Root {
 
         var result = print(schema);
 
-        AssertEqual(result, "", @"
-interface Baaz {
-  # This is of type Integer
-  int: Int
-}
+        AssertEqual(result, "", """
 
-type Bar implements IFoo & Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}
+            interface Baaz {
+              # This is of type Integer
+              int: Int
+            }
 
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
+            type Bar implements IFoo & Baaz {
+              # This is of type String
+              str: String
+              # This is of type Integer
+              int: Int
+            }
 
-type Query {
-  bar: Bar
-}
-", excludeScalars: true);
+            # This is a Foo interface type
+            interface IFoo {
+              # This is of type String
+              str: String
+            }
+
+            type Query {
+              bar: Bar
+            }
+
+            """, excludeScalars: true);
     }
 
     [Fact]
@@ -603,29 +645,31 @@ type Query {
             PrintDescriptionsAsComments = true,
         };
 
-        AssertEqual(print(schema, options), "", @"
-interface Baaz {
-  # This is of type Integer
-  int: Int
-}
+        AssertEqual(print(schema, options), "", """
 
-type Bar implements IFoo, Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}
+            interface Baaz {
+              # This is of type Integer
+              int: Int
+            }
 
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
+            type Bar implements IFoo, Baaz {
+              # This is of type String
+              str: String
+              # This is of type Integer
+              int: Int
+            }
 
-type Query {
-  bar: Bar
-}
-", excludeScalars: true);
+            # This is a Foo interface type
+            interface IFoo {
+              # This is of type String
+              str: String
+            }
+
+            type Query {
+              bar: Bar
+            }
+
+            """, excludeScalars: true);
     }
 
     [Fact]
@@ -645,39 +689,39 @@ type Query {
 
         AssertEqual(print(schema, options), "", """"
 
-interface Baaz {
-  """
-  This is of type Integer
-  """
-  int: Int
-}
+            interface Baaz {
+              """
+              This is of type Integer
+              """
+              int: Int
+            }
 
-type Bar implements IFoo, Baaz {
-  """
-  This is of type String
-  """
-  str: String
-  """
-  This is of type Integer
-  """
-  int: Int
-}
+            type Bar implements IFoo, Baaz {
+              """
+              This is of type String
+              """
+              str: String
+              """
+              This is of type Integer
+              """
+              int: Int
+            }
 
-"""
-This is a Foo interface type
-"""
-interface IFoo {
-  """
-  This is of type String
-  """
-  str: String
-}
+            """
+            This is a Foo interface type
+            """
+            interface IFoo {
+              """
+              This is of type String
+              """
+              str: String
+            }
 
-type Query {
-  bar: Bar
-}
+            type Query {
+              bar: Bar
+            }
 
-"""", excludeScalars: true);
+            """", excludeScalars: true);
     }
 
     [Fact]
@@ -696,29 +740,31 @@ type Query {
 
         var result = print(schema, options);
 
-        AssertEqual(result, "", @"
-interface Baaz {
-  # This is of type Integer
-  int: Int
-}
+        AssertEqual(result, "", """
 
-type Bar implements IFoo & Baaz {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int
-}
+            interface Baaz {
+              # This is of type Integer
+              int: Int
+            }
 
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
+            type Bar implements IFoo & Baaz {
+              # This is of type String
+              str: String
+              # This is of type Integer
+              int: Int
+            }
 
-type Query {
-  bar: Bar
-}
-", excludeScalars: true);
+            # This is a Foo interface type
+            interface IFoo {
+              # This is of type String
+              str: String
+            }
+
+            type Query {
+              bar: Bar
+            }
+
+            """, excludeScalars: true);
     }
 
     [Fact]
@@ -739,39 +785,39 @@ type Query {
 
         AssertEqual(result, "", """"
 
-interface Baaz {
-  """
-  This is of type Integer
-  """
-  int: Int
-}
+            interface Baaz {
+              """
+              This is of type Integer
+              """
+              int: Int
+            }
 
-type Bar implements IFoo & Baaz {
-  """
-  This is of type String
-  """
-  str: String
-  """
-  This is of type Integer
-  """
-  int: Int
-}
+            type Bar implements IFoo & Baaz {
+              """
+              This is of type String
+              """
+              str: String
+              """
+              This is of type Integer
+              """
+              int: Int
+            }
 
-"""
-This is a Foo interface type
-"""
-interface IFoo {
-  """
-  This is of type String
-  """
-  str: String
-}
+            """
+            This is a Foo interface type
+            """
+            interface IFoo {
+              """
+              This is of type String
+              """
+              str: String
+            }
 
-type Query {
-  bar: Bar
-}
+            type Query {
+              bar: Bar
+            }
 
-"""", excludeScalars: true);
+            """", excludeScalars: true);
     }
 
     [Fact]
@@ -783,35 +829,37 @@ type Query {
 
         var schema = new Schema { Query = root };
 
-        AssertEqual(print(schema), "", @"
-type Bar implements IFoo {
-  # This is of type String
-  str: String
-}
+        AssertEqual(print(schema), "", """
 
-# This is a Foo object type
-type Foo {
-  # This is of type String
-  str: String
-  # This is of type Integer
-  int: Int @deprecated(reason: ""This field is now deprecated"")
-}
+            type Bar implements IFoo {
+              # This is of type String
+              str: String
+            }
 
-# This is a Foo interface type
-interface IFoo {
-  # This is of type String
-  str: String
-}
+            # This is a Foo object type
+            type Foo {
+              # This is of type String
+              str: String
+              # This is of type Integer
+              int: Int @deprecated(reason: "This field is now deprecated")
+            }
 
-union MultipleUnion = Foo | Bar
+            # This is a Foo interface type
+            interface IFoo {
+              # This is of type String
+              str: String
+            }
 
-type Query {
-  single: SingleUnion
-  multiple: MultipleUnion
-}
+            union MultipleUnion = Foo | Bar
 
-union SingleUnion = Foo
-", excludeScalars: true);
+            type Query {
+              single: SingleUnion
+              multiple: MultipleUnion
+            }
+
+            union SingleUnion = Foo
+
+            """, excludeScalars: true);
     }
 
     [Fact]
@@ -827,15 +875,20 @@ union SingleUnion = Foo
         {
             {
                 "InputType",
-@"input InputType {
-  int: Int
-}"
+                """
+                input InputType {
+                  int: Int
+                }
+                """
             },
-                            {
+            {
                 "Query",
-@"type Query {
-  str(argOne: InputType): String!
-}"
+                """
+
+                type Query {
+                  str(argOne: InputType): String!
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -855,17 +908,22 @@ union SingleUnion = Foo
         {
             {
                 "SomeInput",
-@"input SomeInput {
-  age: Int!
-  name: String!
-  isDeveloper: Boolean!
-}"
+                """
+
+                input SomeInput {
+                  age: Int!
+                  name: String!
+                  isDeveloper: Boolean!
+                }
+                """
             },
-                            {
+            {
                 "Query",
-@"type Query {
-  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
-}"
+                """
+                type Query {
+                  str(argOne: SomeInput! = { age: 42, name: "Tom", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: "Tom1", isDeveloper: false }, { age: 22, name: "Tom2", isDeveloper: true }]): String!
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -884,15 +942,20 @@ union SingleUnion = Foo
         {
             {
                 "SomeInput2",
-@"input SomeInput2 {
-  names: [String]
-}"
+                """
+
+                input SomeInput2 {
+                  names: [String]
+                }
+                """
             },
-                            {
+            {
                 "Query",
-@"type Query {
-  str(argOne: SomeInput2! = { names: null }): String!
-}"
+                """
+                type Query {
+                  str(argOne: SomeInput2! = { names: null }): String!
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -901,36 +964,42 @@ union SingleUnion = Foo
     [Fact]
     public void prints_input_type_with_default_as_dictionary()
     {
-        var schema = Schema.For(@"
-input SomeInput {
-  age: Int!
-  name: String!
-  isDeveloper: Boolean!
-  unused: Boolean
-}
+        var schema = Schema.For("""
 
-type Query {
-  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true },
-      argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
-}
-");
+            input SomeInput {
+              age: Int!
+              name: String!
+              isDeveloper: Boolean!
+              unused: Boolean
+            }
+
+            type Query {
+              str(argOne: SomeInput! = { age: 42, name: "Tom", isDeveloper: true },
+                  argTwo: [SomeInput] = [{ age: 12, name: "Tom1", isDeveloper: false }, { age: 22, name: "Tom2", isDeveloper: true }]): String!
+            }
+            """);
 
         var expected = new Dictionary<string, string>
         {
             {
                 "SomeInput",
-@"input SomeInput {
-  age: Int!
-  name: String!
-  isDeveloper: Boolean!
-  unused: Boolean
-}"
+                """
+
+                input SomeInput {
+                  age: Int!
+                  name: String!
+                  isDeveloper: Boolean!
+                  unused: Boolean
+                }
+                """
             },
-                            {
+             {
                 "Query",
-@"type Query {
-  str(argOne: SomeInput! = { age: 42, name: ""Tom"", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: ""Tom1"", isDeveloper: false }, { age: 22, name: ""Tom2"", isDeveloper: true }]): String!
-}"
+                """
+                type Query {
+                  str(argOne: SomeInput! = { age: 42, name: "Tom", isDeveloper: true }, argTwo: [SomeInput] = [{ age: 12, name: "Tom1", isDeveloper: false }, { age: 22, name: "Tom2", isDeveloper: true }]): String!
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -939,29 +1008,35 @@ type Query {
     [Fact]
     public void prints_input_type_with_default_as_dictionary_null_values()
     {
-        var schema = Schema.For(@"
-input SomeInput {
-  age: Int = 2
-}
+        var schema = Schema.For("""
 
-type Query {
-  str(arg: SomeInput = { age: null }): String!
-}
-");
+            input SomeInput {
+              age: Int = 2
+            }
+
+            type Query {
+              str(arg: SomeInput = { age: null }): String!
+            }
+            """);
 
         var expected = new Dictionary<string, string>
         {
             {
                 "SomeInput",
-@"input SomeInput {
-  age: Int = 2
-}"
+                """
+
+                input SomeInput {
+                  age: Int = 2
+                }
+                """
             },
-                            {
+            {
                 "Query",
-@"type Query {
-  str(arg: SomeInput = { age: null }): String!
-}"
+                """
+                type Query {
+                  str(arg: SomeInput = { age: null }): String!
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -977,12 +1052,15 @@ type Query {
 
         var expected = new Dictionary<string, string>
         {
-            { "Odd", @"scalar Odd" },
+            { "Odd", "scalar Odd" },
             {
                 "Query",
-@"type Query {
-  odd: Odd
-}"
+                """
+
+                type Query {
+                  odd: Odd
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -1015,68 +1093,70 @@ type Query {
         {
             {
                 "Query",
-@"scalar BigInt
+                """
+                scalar BigInt
 
-scalar Byte
+                scalar Byte
 
-# The `Date` scalar type represents a year, month and day in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar Date
+                # The `Date` scalar type represents a year, month and day in accordance with the
+                # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+                scalar Date
 
-# The `DateTime` scalar type represents a date and time. `DateTime` expects
-# timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTime
+                # The `DateTime` scalar type represents a date and time. `DateTime` expects
+                # timestamps to be formatted in accordance with the
+                # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+                scalar DateTime
 
-# The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
-# `DateTimeOffset` expects timestamps to be formatted in accordance with the
-# [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
-scalar DateTimeOffset
+                # The `DateTimeOffset` scalar type represents a date, time and offset from UTC.
+                # `DateTimeOffset` expects timestamps to be formatted in accordance with the
+                # [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard.
+                scalar DateTimeOffset
 
-scalar Decimal
+                scalar Decimal
 
-scalar Guid
+                scalar Guid
 
-scalar Long
+                scalar Long
 
-# The `Milliseconds` scalar type represents a period of time represented as the
-# total number of milliseconds in range [-922337203685477, 922337203685477].
-scalar Milliseconds
+                # The `Milliseconds` scalar type represents a period of time represented as the
+                # total number of milliseconds in range [-922337203685477, 922337203685477].
+                scalar Milliseconds
 
-type Query {
-  bigint: BigInt
-  byte: Byte
-  date: Date
-  datetime: DateTime
-  datetimeoffset: DateTimeOffset
-  decimal: Decimal
-  guid: Guid
-  long: Long
-  milliseconds: Milliseconds
-  sbyte: SByte
-  seconds: Seconds
-  short: Short
-  uint: UInt
-  ulong: ULong
-  ushort: UShort
-  uri: Uri
-}
+                type Query {
+                  bigint: BigInt
+                  byte: Byte
+                  date: Date
+                  datetime: DateTime
+                  datetimeoffset: DateTimeOffset
+                  decimal: Decimal
+                  guid: Guid
+                  long: Long
+                  milliseconds: Milliseconds
+                  sbyte: SByte
+                  seconds: Seconds
+                  short: Short
+                  uint: UInt
+                  ulong: ULong
+                  ushort: UShort
+                  uri: Uri
+                }
 
-scalar SByte
+                scalar SByte
 
-# The `Seconds` scalar type represents a period of time represented as the total
-# number of seconds in range [-922337203685, 922337203685].
-scalar Seconds
+                # The `Seconds` scalar type represents a period of time represented as the total
+                # number of seconds in range [-922337203685, 922337203685].
+                scalar Seconds
 
-scalar Short
+                scalar Short
 
-scalar UInt
+                scalar UInt
 
-scalar ULong
+                scalar ULong
 
-scalar UShort
+                scalar UShort
 
-scalar Uri"
+                scalar Uri
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -1094,20 +1174,25 @@ scalar Uri"
         {
             {
                 "Query",
-@"type Query {
-  rgb: RGB
-}"
+                """
+                type Query {
+                  rgb: RGB
+                }
+                """
             },
             {
                 "RGB",
-@"enum RGB {
-  # Red!
-  RED @deprecated(reason: ""Use green!"")
-  # Green!
-  GREEN
-  # Blue!
-  BLUE
-}"
+                """
+
+                enum RGB {
+                  # Red!
+                  RED @deprecated(reason: "Use green!")
+                  # Green!
+                  GREEN
+                  # Blue!
+                  BLUE
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);
@@ -1135,20 +1220,25 @@ scalar Uri"
         {
             {
                 "Query",
-@"type Query {
-  bestColor(color: RGB = RED): RGB
-}"
+                """
+                type Query {
+                  bestColor(color: RGB = RED): RGB
+                }
+                """
             },
             {
                 "RGB",
-@"enum RGB {
-  # Red!
-  RED @deprecated(reason: ""Use green!"")
-  # Green!
-  GREEN
-  # Blue!
-  BLUE
-}"
+                """
+
+                enum RGB {
+                  # Red!
+                  RED @deprecated(reason: "Use green!")
+                  # Green!
+                  GREEN
+                  # Blue!
+                  BLUE
+                }
+                """
             },
         };
         AssertEqual(print(schema), expected);

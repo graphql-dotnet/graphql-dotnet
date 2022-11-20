@@ -206,7 +206,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_GraphQLRequest_List_NotCaseSensitive(IGraphQLTextSerializer serializer)
     {
-        var test = @"{""VARIABLES"":{""date"":""2015-12-22T10:10:10+03:00""},""query"":""test""}";
+        var test = """{"VARIABLES":{"date":"2015-12-22T10:10:10+03:00"},"query":"test"}""";
         var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
         actual.Count.ShouldBe(1);
         actual[0].Query.ShouldBe("test");
