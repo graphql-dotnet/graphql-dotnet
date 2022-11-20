@@ -8,137 +8,116 @@ public class NoUndefinedVariablesTests : ValidationTestBase<NoUndefinedVariables
     [Fact]
     public void all_variables_defined()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String, $b: String, $c: String) {
-                    field(a: $a, b: $b, c: $c)
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String, $b: String, $c: String) {
+              field(a: $a, b: $b, c: $c)
+            }
+            """);
     }
 
     [Fact]
     public void all_variables_deeply_defined()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String, $b: String, $c: String) {
-                    field(a: $a) {
-                      field(b: $b) {
-                        field(c: $c)
-                      }
-                    }
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String, $b: String, $c: String) {
+              field(a: $a) {
+                field(b: $b) {
+                  field(c: $c)
+                }
+              }
+            }
+            """);
     }
 
     [Fact]
     public void all_variables_deeply_in_inline_fragments_defined()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String, $b: String, $c: String) {
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String, $b: String, $c: String) {
+              ... on Type {
+                field(a: $a) {
+                  field(b: $b) {
                     ... on Type {
-                      field(a: $a) {
-                        field(b: $b) {
-                          ... on Type {
-                            field(c: $c)
-                          }
-                        }
-                      }
+                      field(c: $c)
                     }
                   }
-                """;
-        });
+                }
+              }
+            }
+            """);
     }
 
     [Fact]
     public void all_variables_in_fragments_deeply_defined()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String, $b: String, $c: String) {
-                    ...FragA
-                  }
-                  fragment FragA on Type {
-                    field(a: $a) {
-                      ...FragB
-                    }
-                  }
-                  fragment FragB on Type {
-                    field(b: $b) {
-                      ...FragC
-                    }
-                  }
-                  fragment FragC on Type {
-                    field(c: $c)
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String, $b: String, $c: String) {
+              ...FragA
+            }
+            fragment FragA on Type {
+              field(a: $a) {
+                ...FragB
+              }
+            }
+            fragment FragB on Type {
+              field(b: $b) {
+                ...FragC
+              }
+            }
+            fragment FragC on Type {
+              field(c: $c)
+            }
+            """);
     }
 
     [Fact]
     public void variable_within_single_fragment_defined_in_multiple_operations()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String) {
-                    ...FragA
-                  }
-                  query Bar($a: String) {
-                    ...FragA
-                  }
-                  fragment FragA on Type {
-                    field(a: $a)
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String) {
+              ...FragA
+            }
+            query Bar($a: String) {
+              ...FragA
+            }
+            fragment FragA on Type {
+              field(a: $a)
+            }
+            """);
     }
 
     [Fact]
     public void variable_within_fragments_defined_in_operations()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String) {
-                    ...FragA
-                  }
-                  query Bar($b: String) {
-                    ...FragB
-                  }
-                  fragment FragA on Type {
-                    field(a: $a)
-                  }
-                  fragment FragB on Type {
-                    field(b: $b)
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String) {
+              ...FragA
+            }
+            query Bar($b: String) {
+              ...FragB
+            }
+            fragment FragA on Type {
+              field(a: $a)
+            }
+            fragment FragB on Type {
+              field(b: $b)
+            }
+            """);
     }
 
     [Fact]
     public void variable_within_recursive_fragment_defined()
     {
-        ShouldPassRule(_ =>
-        {
-            _.Query = """
-                  query Foo($a: String) {
-                    ...FragA
-                  }
-                  fragment FragA on Type {
-                    field(a: $a) {
-                      ...FragA
-                    }
-                  }
-                """;
-        });
+        ShouldPassRule(_ => _.Query = """
+            query Foo($a: String) {
+              ...FragA
+            }
+            fragment FragA on Type {
+              field(a: $a) {
+                ...FragA
+              }
+            }
+            """);
     }
 
     [Fact]
