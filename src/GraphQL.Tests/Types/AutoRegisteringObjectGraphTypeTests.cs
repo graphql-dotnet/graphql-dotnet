@@ -268,7 +268,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", 123, null, 123)]
     [InlineData(nameof(ArgumentTests.TypedArg), "arg1", "123", null, 123)]
     [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", "hello", 123, "hello123")]
-    public async Task Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
+    public async Task Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
     {
         var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();

@@ -13,6 +13,16 @@ public class AbstractTypeErrorTests : QueryTestBase<AbstractSchema>
         error.InnerException.ShouldNotBeNull();
         error.InnerException.Message.ShouldBe("Abstract type Pet must resolve to an Object type at runtime for field Query.pets with value '{ name = Eli }', received 'null'.");
     }
+
+    [Fact]
+    public void throws_when_unable_to_determine_object_type_nullable()
+    {
+        var result = AssertQueryWithErrors("{ pets2 { name } }", """{ "pets2": null }""", expectedErrorCount: 1);
+        var error = result.Errors.First();
+        error.Message.ShouldBe("Error trying to resolve field 'pets2'.");
+        error.InnerException.ShouldNotBeNull();
+        error.InnerException.Message.ShouldBe("Abstract type Pet must resolve to an Object type at runtime for field Query.pets2 with value '{ name = Eli }', received 'null'.");
+    }
 }
 
 public class PetInterfaceType : InterfaceGraphType
@@ -30,6 +40,7 @@ public class AbstractQueryType : ObjectGraphType
     {
         Name = "Query";
         Field<PetInterfaceType>("pets").Resolve(_ => new { name = "Eli" });
+        Field<NonNullGraphType<PetInterfaceType>>("pets2").Resolve(_ => new { name = "Eli" });
     }
 }
 

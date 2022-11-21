@@ -54,7 +54,7 @@ namespace GraphQL.Types
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
             => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false);
 
-        /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument})"/>
+        /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument}, bool)"/>
         protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
         {
             Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod =
@@ -69,7 +69,8 @@ namespace GraphQL.Types
                 fieldType,
                 BuildMemberInstanceExpression,
                 getTypedArgumentInfoMethod,
-                ApplyArgumentAttributes);
+                ApplyArgumentAttributes,
+                false);
         }
 
         /// <summary>

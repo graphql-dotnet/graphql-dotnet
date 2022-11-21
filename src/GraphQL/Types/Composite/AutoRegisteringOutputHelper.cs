@@ -9,6 +9,9 @@ namespace GraphQL.Types;
 /// </summary>
 internal static class AutoRegisteringOutputHelper
 {
+    private static readonly IFieldResolver _invalidFieldResolver = new FuncFieldResolver<object?>(_ => throw new InvalidOperationException("This field resolver should never be called. It is only used to prevent the default field resolver from being used."));
+    private static readonly ISourceStreamResolver _invalidStreamResolver = new SourceStreamResolver<object?>((Func<IResolveFieldContext, IObservable<object?>>)(_ => throw new InvalidOperationException("This source stream resolver should never be called. It is only used to prevent the default field resolver from being used.")));
+
     /// <summary>
     /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
     /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
@@ -26,14 +29,18 @@ internal static class AutoRegisteringOutputHelper
         FieldType fieldType,
         Func<MemberInfo, LambdaExpression> BuildMemberInstanceExpression,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes)
+        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes,
+        bool isInterface)
     {
         if (memberInfo is PropertyInfo propertyInfo)
         {
-            var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
             fieldType.Arguments = null;
-            fieldType.Resolver = resolver;
-            fieldType.StreamResolver = null;
+            if (!isInterface)
+            {
+                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
+                fieldType.Resolver = resolver;
+                fieldType.StreamResolver = null;
+            }
         }
         else if (memberInfo is MethodInfo methodInfo)
         {
@@ -55,26 +62,32 @@ internal static class AutoRegisteringOutputHelper
                 expressions.Add(expression);
             }
             var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
-            if (IsObservable(methodInfo.ReturnType))
+            if (!isInterface)
             {
-                var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = resolver;
-            }
-            else
-            {
-                var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
+                if (IsObservable(methodInfo.ReturnType))
+                {
+                    var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
+                    fieldType.Resolver = resolver;
+                    fieldType.StreamResolver = resolver;
+                }
+                else
+                {
+                    var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
+                    fieldType.Resolver = resolver;
+                    fieldType.StreamResolver = null;
+                }
             }
             fieldType.Arguments = queryArguments;
         }
         else if (memberInfo is FieldInfo fieldInfo)
         {
-            var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
             fieldType.Arguments = null;
-            fieldType.Resolver = resolver;
-            fieldType.StreamResolver = null;
+            if (!isInterface)
+            {
+                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
+                fieldType.Resolver = resolver;
+                fieldType.StreamResolver = null;
+            }
         }
         else if (memberInfo == null)
         {
@@ -83,6 +96,11 @@ internal static class AutoRegisteringOutputHelper
         else
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
+        }
+        if (isInterface)
+        {
+            fieldType.Resolver = _invalidFieldResolver;
+            fieldType.StreamResolver = _invalidStreamResolver;
         }
     }
 
