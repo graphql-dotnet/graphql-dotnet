@@ -17,7 +17,7 @@ public class AbstractTypeErrorTests : QueryTestBase<AbstractSchema>
     [Fact]
     public void throws_when_unable_to_determine_object_type_nullable()
     {
-        var result = AssertQueryWithErrors("{ pets2 { name } }", """{ "pets2": null }""", expectedErrorCount: 1);
+        var result = AssertQueryWithErrors("{ pets2 { name } }", null, expectedErrorCount: 1);
         var error = result.Errors.First();
         error.Message.ShouldBe("Error trying to resolve field 'pets2'.");
         error.InnerException.ShouldNotBeNull();
