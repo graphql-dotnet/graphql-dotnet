@@ -613,7 +613,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         public string Name { get; set; } = null!;
         public bool IsLarge { get; set; }
     }
-    
+
     private class NoDefaultConstructorTestClass : NoDefaultConstructorTestInterface
     {
         public NoDefaultConstructorTestClass(bool value)
