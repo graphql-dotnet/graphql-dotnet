@@ -20,7 +20,7 @@ public class InterfaceTests : QueryTestBase<InterfaceTests.MySchema>
             """
             {
                 "noObjectTest": {
-                    "id": "123"
+                    "id": "123_interface"
                 }
             }
             """);
