@@ -8,10 +8,10 @@ public class UniqueVariableNamesTests : ValidationTestBase<UniqueVariableNames, 
     [Fact]
     public void unique_variable_names()
     {
-        ShouldPassRule(@"
-        query A($x: Int, $y: String) { __typename }
-        query B($x: String, $y: Int) { __typename }
-      ");
+        ShouldPassRule("""
+            query A($x: Int, $y: String) { __typename }
+            query B($x: String, $y: Int) { __typename }
+            """);
     }
 
     [Fact]
@@ -19,15 +19,15 @@ public class UniqueVariableNamesTests : ValidationTestBase<UniqueVariableNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query A($x: Int, $x: Int, $x: String) { __typename }
-          query B($x: String, $x: Int) { __typename }
-          query C($x: Int, $x: Int) { __typename }
-        ";
-            duplicateVariable(_, "x", 2, 19, 2, 28);
-            duplicateVariable(_, "x", 2, 19, 2, 37);
-            duplicateVariable(_, "x", 3, 19, 3, 31);
-            duplicateVariable(_, "x", 4, 19, 4, 28);
+            _.Query = """
+                query A($x: Int, $x: Int, $x: String) { __typename }
+                query B($x: String, $x: Int) { __typename }
+                query C($x: Int, $x: Int) { __typename }
+                """;
+            duplicateVariable(_, "x", 1, 9, 1, 18);
+            duplicateVariable(_, "x", 1, 9, 1, 27);
+            duplicateVariable(_, "x", 2, 9, 2, 21);
+            duplicateVariable(_, "x", 3, 9, 3, 18);
         });
     }
 

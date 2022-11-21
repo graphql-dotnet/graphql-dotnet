@@ -159,7 +159,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     {
         // verify that within lists of non-null values, errors are returned properly
         var query = "{ listNonNullInvalid }";
-        var response = @"{ ""listNonNullInvalid"": null}";
+        var response = """{ "listNonNullInvalid": null}""";
         var result = AssertQueryWithErrors(query, response, expectedErrorCount: 1);
         var errorIndex = 1;
         // index should be 1 here because custom scalar will convert ["hello", "internalNull"] to ["hello", null]

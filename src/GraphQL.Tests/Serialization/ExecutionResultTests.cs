@@ -16,7 +16,7 @@ public class ExecutionResultTests
         var executionResult = new ExecutionResult
         {
             Executed = true,
-            Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary().ToExecutionTree(),
+            Data = """{ "someType": { "someProperty": "someValue" } }""".ToDictionary().ToExecutionTree(),
             Errors = new ExecutionErrors
             {
                 new ExecutionError("some error 1"),
@@ -24,31 +24,33 @@ public class ExecutionResultTests
             },
             Extensions = new Dictionary<string, object>
             {
-                { "someExtension", new { someProperty = "someValue", someOtherPropery = 1 } }
+                { "someExtension", new { someProperty = "someValue", someOtherProperty = 1 } }
             }
         };
 
-        var expected = @"{
-              ""errors"": [
-                {
-                  ""message"": ""some error 1""
-                },
-                {
-                  ""message"": ""some error 2""
-                }
+        var expected = """
+            {
+              "errors": [
+              {
+                "message": "some error 1"
+              },
+              {
+                "message": "some error 2"
+              }
               ],
-              ""data"": {
-                ""someType"": {
-                    ""someProperty"": ""someValue""
+              "data": {
+                "someType": {
+                  "someProperty": "someValue"
                 }
               },
-              ""extensions"": {
-                ""someExtension"": {
-                  ""someProperty"": ""someValue"",
-                  ""someOtherPropery"": 1
+              "extensions": {
+                "someExtension": {
+                  "someProperty": "someValue",
+                  "someOtherProperty": 1
                 }
               }
-            }";
+            }
+            """;
 
         var actual = serializer.Serialize(executionResult);
 
@@ -61,9 +63,7 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult { Executed = true };
 
-        var expected = @"{
-              ""data"": null
-            }";
+        var expected = """{"data": null}""";
 
         var actual = serializer.Serialize(executionResult);
 
@@ -86,9 +86,11 @@ public class ExecutionResultTests
             }
         };
 
-        var expected = @"{
-              ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
-            }";
+        var expected = """
+            {
+              "errors": [{"message":"some error 1"},{"message":"some error 2"}]
+            }
+            """;
 
         var actual = serializer.Serialize(executionResult);
 
@@ -107,7 +109,7 @@ public class ExecutionResultTests
             Executed = true
         };
 
-        var expected = @"{ ""data"": {} }";
+        var expected = """{ "data": {} }""";
 
         var actual = serializer.Serialize(executionResult);
 
@@ -126,7 +128,7 @@ public class ExecutionResultTests
             Executed = false
         };
 
-        var expected = @"{ }";
+        var expected = "{ }";
 
         var actual = writer.Serialize(executionResult);
 
@@ -145,7 +147,7 @@ public class ExecutionResultTests
             Executed = true
         };
 
-        var expected = @"{ ""data"": null }";
+        var expected = """{ "data": null }""";
 
         var actual = serializer.Serialize(executionResult);
 

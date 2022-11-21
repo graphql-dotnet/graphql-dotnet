@@ -12,7 +12,7 @@ public class ExecutionErrorTests
     {
         var error = new ExecutionError("some error 1");
 
-        var expected = @"{""message"": ""some error 1""}";
+        var expected = """{"message": "some error 1"}""";
 
         var actual = serializer.Serialize(error);
 
@@ -59,7 +59,7 @@ public class ExecutionErrorTests
     {
         var errors = new ExecutionError[] { new ExecutionError("some error 1"), new ExecutionError("some error 2") };
 
-        var expected = @"[{""message"": ""some error 1""}, {""message"": ""some error 2""}]";
+        var expected = """[{"message": "some error 1"}, {"message": "some error 2"}]""";
 
         var actual = serializer.Serialize(errors);
 
@@ -82,7 +82,7 @@ public class ExecutionErrorTests
         };
         executionResult.Errors.Add(executionError);
 
-        var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
+        var expected = """{ "errors": [{ "message": "Error testing index", "path": [ "parent", 23, "child" ] }] }""";
 
         var actual = serializer.Serialize(executionResult);
 

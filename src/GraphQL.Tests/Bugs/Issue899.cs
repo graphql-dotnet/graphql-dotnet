@@ -7,26 +7,28 @@ public class Issue899 : QueryTestBase<Issue899Schema>
     [Fact]
     public void Issue899_Should_Work()
     {
-        var query = @"
-query {
-  level1(arg1: ""1"") {
-    level2(arg2: ""2"") {
-      level3(arg3: ""3"") {
-        level4(arg4: ""4"")
-      }
-    }
-  }
-}
-";
-        var expected = @"{
-  ""level1"": {
-    ""level2"": [[{
-      ""level3"": [{
-        ""level4"": ""X""
-      }]
-    }]]
-  }
-}";
+        var query = """
+        query {
+          level1(arg1: "1") {
+            level2(arg2: "2") {
+              level3(arg3: "3") {
+                level4(arg4: "4")
+              }
+            }
+          }
+        }
+        """;
+        var expected = """
+        {
+          "level1": {
+            "level2": [[{
+              "level3": [{
+                "level4": "X"
+              }]
+            }]]
+          }
+        }
+        """;
         AssertQuerySuccess(query, expected, null);
     }
 }

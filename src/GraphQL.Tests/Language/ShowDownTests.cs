@@ -5,20 +5,20 @@ namespace GraphQL.Tests.Language;
 
 public class ShowDownTests
 {
-    private const string _query = @"
-       query SomeDroids {
-          r2d2: droid(id: ""3"") {
+    private const string _query = """
+        query SomeDroids {
+          r2d2: droid(id: "3") {
             ...DroidFragment
           }
 
-          c3po: droid(id: ""4"") {
+          c3po: droid(id: "4") {
             ...DroidFragment
           }
-       }
-       fragment DroidFragment on Droid {
-         name
-       }
-";
+        }
+        fragment DroidFragment on Droid {
+          name
+        }
+        """;
     //        [Fact]
     public void core_builder()
     {

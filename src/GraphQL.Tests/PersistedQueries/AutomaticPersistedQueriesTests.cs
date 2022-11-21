@@ -26,7 +26,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         var result = await _fixture.ExecuteAsync(opt => opt.Query = "query { ping }").ConfigureAwait(false);
 
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
     }
 
     private void AssertError(ExecutionResult result, string code, string message)
@@ -124,11 +124,11 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
             opt.Extensions = extentions;
         }).ConfigureAwait(false);
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
 
         result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
     }
 }
 

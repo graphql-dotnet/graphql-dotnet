@@ -32,12 +32,12 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task schema_first_generate_exception_with_normal_stack_trace_for_method()
     {
-        var schema = Schema.For(@"
+        var schema = Schema.For("""
                 type Query {
-                    method: String!
-                    property: Int!
+                  method: String!
+                  property: Int!
                 }
-                ", builder => builder.Types.Include<Query>());
+                """, builder => builder.Types.Include<Query>());
 
         var executor = new DocumentExecuter();
         var result = await executor.ExecuteAsync(options =>
@@ -64,12 +64,12 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task schema_first_generate_exception_with_normal_stack_trace_for_property()
     {
-        var schema = Schema.For(@"
+        var schema = Schema.For("""
                 type Query {
-                    method: String!
-                    property: Int!
+                  method: String!
+                  property: Int!
                 }
-                ", builder => builder.Types.Include<Query>());
+                """, builder => builder.Types.Include<Query>());
 
         var executor = new DocumentExecuter();
         var result = await executor.ExecuteAsync(options =>
@@ -96,16 +96,16 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task issue_1155_throws()
     {
-        var schema = Schema.For(@"
+        var schema = Schema.For("""
                 type Test {
-                    id: ID!
-                    name: String!
+                  id: ID!
+                  name: String!
                 }
 
                 type Query {
-                    test: Test!
+                  test: Test!
                 }
-                ", builder => builder.Types.Include<Query>());
+                """, builder => builder.Types.Include<Query>());
 
         var executor = new DocumentExecuter();
         var result = await executor.ExecuteAsync(options =>
@@ -123,16 +123,16 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task issue_1155_with_custom_root_does_not_throw()
     {
-        var schema = Schema.For(@"
+        var schema = Schema.For("""
                 type Test {
-                    id: ID!
-                    name: String!
+                  id: ID!
+                  name: String!
                 }
 
                 type Query {
-                    test: Test!
+                  test: Test!
                 }
-                ", builder => builder.Types.Include<Query>());
+                """, builder => builder.Types.Include<Query>());
 
         var executor = new DocumentExecuter();
         var result = await executor.ExecuteAsync(options =>
@@ -152,59 +152,59 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void issue_1155_throws_on_build_if_AllowUnknownTypes_disabled()
     {
-        Should.Throw<InvalidOperationException>(() => Schema.For(@"
-                type Test {
-                    id: ID!
-                    name: String!
-                }
+        Should.Throw<InvalidOperationException>(() => Schema.For("""
+            type Test {
+              id: ID!
+              name: String!
+            }
 
-                type Query {
-                    test: Test!
-                }
-                ", builder =>
-        {
-            builder.AllowUnknownTypes = false;
-            builder.Types.Include<Query>();
-        })).Message.ShouldBe("Unknown type 'Test'. Verify that you have configured SchemaBuilder correctly.");
+            type Query {
+              test: Test!
+            }
+            """, builder =>
+            {
+                builder.AllowUnknownTypes = false;
+                builder.Types.Include<Query>();
+            })).Message.ShouldBe("Unknown type 'Test'. Verify that you have configured SchemaBuilder correctly.");
     }
 
     [Fact]
     public void issue_1155_throws_on_build_if_AllowUnknownFields_disabled_1()
     {
-        Should.Throw<InvalidOperationException>(() => Schema.For(@"
-                type Test {
-                    id: ID!
-                    name: String!
-                }
+        Should.Throw<InvalidOperationException>(() => Schema.For("""
+            type Test {
+              id: ID!
+              name: String!
+            }
 
-                type Query {
-                    test: Test!
-                }
-                ", builder =>
-               {
-                   builder.AllowUnknownFields = false;
-                   builder.Types.Include<Query>();
-               })).Message.ShouldBe("Unknown field 'Test.id' has no resolver. Verify that you have configured SchemaBuilder correctly.");
+            type Query {
+              test: Test!
+            }
+            """, builder =>
+            {
+                builder.AllowUnknownFields = false;
+                builder.Types.Include<Query>();
+            })).Message.ShouldBe("Unknown field 'Test.id' has no resolver. Verify that you have configured SchemaBuilder correctly.");
     }
 
     [Fact]
     public void issue_1155_throws_on_build_if_AllowUnknownFields_disabled_2()
     {
-        Should.Throw<InvalidOperationException>(() => Schema.For(@"
-                type Test {
-                    id: ID!
-                    name: String!
-                }
+        Should.Throw<InvalidOperationException>(() => Schema.For("""
+            type Test {
+              id: ID!
+              name: String!
+            }
 
-                type Query {
-                    test: Test!
-                }
-                ", builder =>
-        {
-            builder.AllowUnknownFields = false;
-            builder.Types.Include<Query>();
-            builder.Types.Include<Test>();
-        })).Message.ShouldBe("Unknown field 'Test.name' has no resolver. Verify that you have configured SchemaBuilder correctly.");
+            type Query {
+              test: Test!
+            }
+            """, builder =>
+            {
+                builder.AllowUnknownFields = false;
+                builder.Types.Include<Query>();
+                builder.Types.Include<Test>();
+            })).Message.ShouldBe("Unknown field 'Test.name' has no resolver. Verify that you have configured SchemaBuilder correctly.");
     }
 
     [Fact]
@@ -267,22 +267,22 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_resolver()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
+        var defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
 
-                type Query {
-                    post(id: ID!): Post
-                }
-            ";
+            type Query {
+              post(id: ID!): Post
+            }
+            """;
 
         Builder.Types.Include<PostQueryType>();
 
-        var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-        var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
-        var variables = @"{ ""id"": ""1"" }";
+        var query = "query Posts($id: ID!) { post(id: $id) { id title } }";
+        var expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
+        var variables = """{ "id": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -296,16 +296,16 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_provide_field_description()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
+        var defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
 
-                type Query {
-                    post(id: ID!): Post
-                }
-            ";
+            type Query {
+              post(id: ID!): Post
+            }
+            """;
 
         Builder.Types.Include<PostQueryRenamedType>();
         var schema = Builder.Build(defs);
@@ -317,22 +317,22 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_renamed_field()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
+        var defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
 
-                type Query {
-                    post(id: ID!): Post
-                }
-            ";
+            type Query {
+              post(id: ID!): Post
+            }
+            """;
 
         Builder.Types.Include<PostQueryRenamedType>();
 
-        var query = @"query Posts($id: ID!) { post(id: $id) { id title } }";
-        var expected = @"{ ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } }";
-        var variables = @"{ ""id"": ""1"" }";
+        var query = "query Posts($id: ID!) { post(id: $id) { id title } }";
+        var expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
+        var variables = """{ "id": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -346,37 +346,37 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_interfaces()
     {
-        var defs = @"
-                enum PetKind {
-                    CAT
-                    DOG
-                }
+        var defs = """
+            enum PetKind {
+              CAT
+              DOG
+            }
 
-                interface Pet {
-                    name: String!
-                }
+            interface Pet {
+              name: String!
+            }
 
-                type Dog implements Pet {
-                    name: String!
-                    barks: Boolean!
-                }
+            type Dog implements Pet {
+              name: String!
+              barks: Boolean!
+            }
 
-                type Cat implements Pet {
-                    name: String!
-                    meows: Boolean!
-                }
+            type Cat implements Pet {
+              name: String!
+              meows: Boolean!
+            }
 
-                type Query {
-                    pet(type: PetKind = DOG): Pet
-                }
-            ";
+            type Query {
+              pet(type: PetKind = DOG): Pet
+            }
+            """;
 
         Builder.Types.For("Dog").IsTypeOf<Dog>();
         Builder.Types.For("Cat").IsTypeOf<Cat>();
         Builder.Types.Include<PetQueryType>();
 
-        var query = @"{ pet { name } }";
-        var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
+        var query = "{ pet { name } }";
+        var expected = """{ "pet": { "name" : "Eli" } }""";
 
         AssertQuery(_ =>
         {
@@ -390,30 +390,30 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void schemabuilder_should_throw_on_invalid_default_value()
     {
-        var defs = @"
-                enum PetKind {
-                    CAT
-                    DOG
-                }
+        var defs = """
+            enum PetKind {
+              CAT
+              DOG
+            }
 
-                interface Pet {
-                    name: String!
-                }
+            interface Pet {
+              name: String!
+            }
 
-                type Dog implements Pet {
-                    name: String!
-                    barks: Boolean!
-                }
+            type Dog implements Pet {
+              name: String!
+              barks: Boolean!
+            }
 
-                type Cat implements Pet {
-                    name: String!
-                    meows: Boolean!
-                }
+            type Cat implements Pet {
+              name: String!
+              meows: Boolean!
+            }
 
-                type Query {
-                    pet(type: PetKind = DOGGY): Pet
-                }
-            ";
+            type Query {
+              pet(type: PetKind = DOGGY): Pet
+            }
+            """;
 
         Builder.Types.For("Dog").IsTypeOf<Dog>();
         Builder.Types.For("Cat").IsTypeOf<Cat>();
@@ -425,11 +425,11 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task minimal_schema()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  hello: String
-                }
-            ");
+        var schema = Schema.For("""
+            type Query {
+              hello: String
+            }
+            """);
 
         var root = new { Hello = "Hello World!" };
         var result = await ExecuteAsync(schema, _ =>
@@ -447,11 +447,11 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_source_without_params()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  source: Boolean
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              source: Boolean
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
@@ -459,7 +459,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Root = new { Hello = "World" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""source"": true }");
+        var expectedResult = CreateQueryResult("""{ "source": true }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -468,15 +468,15 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_resolvefieldcontext_without_params()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  resolve: String
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              resolve: String
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }").ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""resolve"": ""Resolved"" }");
+        var expectedResult = CreateQueryResult("""{ "resolve": "Resolved" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -485,15 +485,15 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_resolvefieldcontext_with_params()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  resolveWithParam(id: String): String
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              resolveWithParam(id: String): String
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ => _.Query = @"{ resolveWithParam(id: ""abcd"") }").ConfigureAwait(false);
+        var result = await ExecuteAsync(schema, _ => _.Query = """{ resolveWithParam(id: "abcd") }""").ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""resolveWithParam"": ""Resolved abcd"" }");
+        var expectedResult = CreateQueryResult("""{ "resolveWithParam": "Resolved abcd" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -502,19 +502,19 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_usercontext()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  userContext: String
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              userContext: String
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
-            _.Query = @"{ userContext }";
+            _.Query = "{ userContext }";
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
+        var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -523,19 +523,19 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_inherited_usercontext()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  userContext: String
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              userContext: String
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
-            _.Query = @"{ userContext }";
+            _.Query = "{ userContext }";
             _.UserContext = new ChildMyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""userContext"": ""Quinn"" }");
+        var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -544,20 +544,20 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_use_null_as_default_value()
     {
-        var schema = Schema.For(@"
-                input HumanInput {
-                  name: String!
-                  homePlanet: String = null
-                }
+        var schema = Schema.For("""
+            input HumanInput {
+              name: String!
+              homePlanet: String = null
+            }
 
-                type Human {
-                  id: String!
-                }
+            type Human {
+              id: String!
+            }
 
-                type Mutation {
-                  createHuman(human: HumanInput!): Human
-                }
-            ");
+            type Mutation {
+              createHuman(human: HumanInput!): Human
+            }
+            """);
 
         var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
         type.GetField("homePlanet").DefaultValue.ShouldBeNull();
@@ -566,19 +566,19 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_usercontext_with_params()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  userContextWithParam(id: String): String
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              userContextWithParam(id: String): String
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
-            _.Query = @"{ userContextWithParam(id: ""abcd"") }";
+            _.Query = """{ userContextWithParam(id: "abcd") }""";
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""userContextWithParam"": ""Quinn abcd"" }");
+        var expectedResult = CreateQueryResult("""{ "userContextWithParam": "Quinn abcd" }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -587,20 +587,20 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_context_source_usercontext()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  three: Boolean
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              three: Boolean
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
-            _.Query = @"{ three }";
+            _.Query = "{ three }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""three"": true }");
+        var expectedResult = CreateQueryResult("""{ "three": true }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -609,20 +609,20 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task can_use_context_source_usercontext_with_params()
     {
-        var schema = Schema.For(@"
-                type Query {
-                  four(id: Int): Boolean
-                }
-            ", _ => _.Types.Include<ParametersType>());
+        var schema = Schema.For("""
+            type Query {
+              four(id: Int): Boolean
+            }
+            """, _ => _.Types.Include<ParametersType>());
 
         var result = await ExecuteAsync(schema, _ =>
         {
-            _.Query = @"{ four(id: 123) }";
+            _.Query = "{ four(id: 123) }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
-        var expectedResult = CreateQueryResult(@"{ ""four"": true }");
+        var expectedResult = CreateQueryResult("""{ "four": true }""");
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
@@ -631,26 +631,26 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_complex_schema()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
-                type Blog {
-                    title: String!
-                    post(id: ID!, unused: Long!): Post
-                }
-                type Query {
-                    blog(id: ID!): Blog
-                }
-            ";
+        var defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
+            type Blog {
+              title: String!
+              post(id: ID!, unused: Long!): Post
+            }
+            type Query {
+              blog(id: ID!): Blog
+            }
+            """;
 
         Builder.Types.Include<BlogQueryType>();
         Builder.Types.Include<Blog>();
 
-        var query = @"query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
-        var expected = @"{ ""blog"": { ""title"": ""New blog"", ""post"": { ""id"" : ""1"", ""title"": ""Post One"" } } }";
-        var variables = @"{ ""blogId"": ""1"", ""postId"": ""1"" }";
+        var query = "query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
+        var expected = """{ "blog": { "title": "New blog", "post": { "id" : "1", "title": "Post One" } } }""";
+        var variables = """{ "blogId": "1", "postId": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -664,21 +664,21 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void does_not_require_scalar_fields_to_be_defined()
     {
-        var defs = @"
-                type Person {
-                    name: String!
-                    age: Int!
-                }
-                type Query {
-                    me: Person
-                }
-            ";
+        var defs = """
+            type Person {
+              name: String!
+              age: Int!
+            }
+            type Query {
+              me: Person
+            }
+            """;
 
         Builder.Types.Include<PeopleQueryType>();
         Builder.Types.Include<PersonQueryType>();
 
-        var query = @"{ me { name age } }";
-        var expected = @"{ ""me"": { ""name"": ""Quinn"", ""age"": 100 } }";
+        var query = "{ me { name age } }";
+        var expected = """{ "me": { "name": "Quinn", "age": 100 } }""";
 
         AssertQuery(_ =>
         {
@@ -691,35 +691,35 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public async Task resolves_union_references_when_union_defined_first()
     {
-        var schema = Schema.For(@"
-                union Pet = Dog | Cat
+        var schema = Schema.For("""
+            union Pet = Dog | Cat
 
-                enum PetKind {
-                    CAT
-                    DOG
-                }
+            enum PetKind {
+              CAT
+              DOG
+            }
 
-                type Query {
-                    pet(type: PetKind = DOG): Pet
-                }
+            type Query {
+              pet(type: PetKind = DOG): Pet
+            }
 
-                type Dog {
-                    name: String!
-                }
+            type Dog {
+              name: String!
+            }
 
-                type Cat {
-                    name: String!
-                }
-            ", _ =>
-        {
-            _.Types.For("Dog").IsTypeOf<Dog>();
-            _.Types.For("Cat").IsTypeOf<Cat>();
-            _.Types.Include<PetQueryType>();
-        });
+            type Cat {
+              name: String!
+            }
+            """, _ =>
+            {
+                _.Types.For("Dog").IsTypeOf<Dog>();
+                _.Types.For("Cat").IsTypeOf<Cat>();
+                _.Types.Include<PetQueryType>();
+            });
 
-        var result = await ExecuteAsync(schema, _ => _.Query = @"{ pet { ... on Dog { name } } }").ConfigureAwait(false);
+        var result = await ExecuteAsync(schema, _ => _.Query = "{ pet { ... on Dog { name } } }").ConfigureAwait(false);
 
-        var expected = @"{ ""pet"": { ""name"" : ""Eli"" } }";
+        var expected = """{ "pet": { "name" : "Eli" } }""";
         var expectedResult = CreateQueryResult(expected);
         var serializedExpectedResult = Serializer.Serialize(expectedResult);
 

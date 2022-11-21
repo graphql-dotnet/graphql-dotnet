@@ -10,12 +10,13 @@ public class CommentTests
     [Fact]
     public void operation_comment_should_be_null()
     {
-        const string query = @"
-query _ {
-    person {
-        name
-    }
-}";
+        const string query = """
+            query _ {
+                person {
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation().Comments.ShouldBeNull();
@@ -24,12 +25,14 @@ query _ {
     [Fact]
     public void operation_comment_should_not_be_null()
     {
-        const string query = @"#comment
-query _ {
-    person {
-        name
-    }
-}";
+        const string query = """
+            #comment
+            query _ {
+                person {
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation().Comments[0].Value.ShouldBe("comment");
@@ -38,12 +41,13 @@ query _ {
     [Fact]
     public void field_comment_should_be_null()
     {
-        const string query = @"
-query _ {
-    person {
-        name
-    }
-}";
+        const string query = """
+            query _ {
+                person {
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()
@@ -56,14 +60,15 @@ query _ {
     [Fact]
     public void field_comment_should_not_be_null()
     {
-        const string query = @"
-query _ {
-    #comment1
-    person {
-        #comment2
-        name
-    }
-}";
+        const string query = """
+            query _ {
+                #comment1
+                person {
+                    #comment2
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()
@@ -76,17 +81,18 @@ query _ {
     [Fact]
     public void fragmentdefinition_comment_should_not_be_null()
     {
-        const string query = @"
-query _ {
-    person {
-        ...human
-    }
-}
+        const string query = """
+            query _ {
+                person {
+                    ...human
+                }
+            }
 
-#comment
-fragment human on person {
-        name
-}";
+            #comment
+            fragment human on person {
+                    name
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comments[0].Value.ShouldBe("comment");
@@ -95,17 +101,18 @@ fragment human on person {
     [Fact]
     public void fragmentspread_comment_should_not_be_null()
     {
-        const string query = @"
-query _ {
-    person {
-        #comment
-        ...human
-    }
-}
+        const string query = """
+            query _ {
+                person {
+                    #comment
+                    ...human
+                }
+            }
 
-fragment human on person {
-        name
-}";
+            fragment human on person {
+                    name
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()
@@ -116,15 +123,16 @@ fragment human on person {
     [Fact]
     public void inlinefragment_comment_should_not_be_null()
     {
-        const string query = @"
-query _ {
-    person {
-        #comment
-        ... on human {
-            name
-        }
-    }
-}";
+        const string query = """
+            query _ {
+                person {
+                    #comment
+                    ... on human {
+                        name
+                    }
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()
@@ -135,14 +143,15 @@ query _ {
     [Fact]
     public void argument_comment_should_not_be_null()
     {
-        const string query = @"
-query _ {
-    person(
-        #comment
-        _where: ""foo"") {
-        name
-    }
-}";
+        const string query = """
+            query _ {
+                person(
+                    #comment
+                    _where: "foo") {
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()
@@ -153,14 +162,15 @@ query _ {
     [Fact]
     public void variable_comment_should_not_be_null()
     {
-        const string query = @"
-query _(
-    #comment
-    $id: ID) {
-    person {
-        name
-    }
-}";
+        const string query = """
+            query _(
+                #comment
+                $id: ID) {
+                person {
+                    name
+                }
+            }
+            """;
 
         var document = _builder.Build(query);
         document.Operation()

@@ -11,15 +11,16 @@ public class ApolloTracingTests : StarWarsTestBase
     [Fact]
     public void extension_has_expected_format()
     {
-        var query = @"
-query {
-  hero {
-    name
-    friends {
-      name
-    }
-  }
-}";
+        var query = """
+            query {
+              hero {
+                name
+                friends {
+                  name
+                }
+              }
+            }
+            """;
 
         var start = DateTime.UtcNow;
         Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
@@ -68,23 +69,25 @@ query {
     public void serialization_should_have_correct_case(IGraphQLTextSerializer writer)
     {
         var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
-        var expected = @"{
-  ""version"": 1,
-  ""startTime"": ""2019-12-05T15:38:00Z"",
-  ""endTime"": ""2019-12-05T15:38:00.1025Z"",
-  ""duration"": 102500000,
-  ""parsing"": {
-    ""startOffset"": 0,
-    ""duration"": 0
-  },
-  ""validation"": {
-    ""startOffset"": 0,
-    ""duration"": 0
-  },
-  ""execution"": {
-    ""resolvers"": []
-  }
-}";
+        var expected = """
+        {
+          "version": 1,
+          "startTime": "2019-12-05T15:38:00Z",
+          "endTime": "2019-12-05T15:38:00.1025Z",
+          "duration": 102500000,
+          "parsing": {
+            "startOffset": 0,
+            "duration": 0
+          },
+          "validation": {
+            "startOffset": 0,
+            "duration": 0
+          },
+          "execution": {
+            "resolvers": []
+          }
+        }
+        """;
 
         var result = writer.Serialize(trace);
 
@@ -133,11 +136,11 @@ query {
         var resultString = serializer.Serialize(result);
         if (enable || enableAfter || enableBefore)
         {
-            resultString.ShouldStartWith(@"{""data"":{""hero"":{""name"":""R2-D2""}},""extensions"":{""tracing"":{""version"":1,""startTime"":""");
+            resultString.ShouldStartWith("""{"data":{"hero":{"name":"R2-D2"}},"extensions":{"tracing":{"version":1,"startTime":"2""");
         }
         else
         {
-            resultString.ShouldBe(@"{""data"":{""hero"":{""name"":""R2-D2""}}}");
+            resultString.ShouldBe("""{"data":{"hero":{"name":"R2-D2"}}}""");
         }
     }
 }

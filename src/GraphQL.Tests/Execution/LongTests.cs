@@ -18,11 +18,13 @@ public class LongTests
         var json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
-        json.ShouldBe(@"{
-  ""data"": {
-    ""testField"": 9223372036854775807
-  }
-}");
+        json.ShouldBe("""
+            {
+              "data": {
+                "testField": 9223372036854775807
+              }
+            }
+            """);
     }
 
     private class LongSchema : Schema

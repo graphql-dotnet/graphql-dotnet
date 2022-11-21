@@ -513,14 +513,14 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{find(type:DOG){id name}}", @"{""data"":{""find"":{""id"":""20"",""name"":""Shadow""}}}")]
-    [InlineData("{find(type:CAT){id name ... on Cat { lives } ... on Dog { isLarge }}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy"",""lives"":9}}}")]
-    [InlineData("{find(type:DOG){id name ... on Cat { lives } ... on Dog { isLarge }}}", @"{""data"":{""find"":{""id"":""20"",""name"":""Shadow"",""isLarge"":true}}}")]
-    [InlineData("{cat{id name}}", @"{""data"":{""cat"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{dog{id name}}", @"{""data"":{""dog"":{""id"":""20"",""name"":""Shadow""}}}")]
-    [InlineData("{cat{...frag}} fragment frag on IAnimal { id name }", @"{""data"":{""cat"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{dog{...frag}} fragment frag on IAnimal { id name }", @"{""data"":{""dog"":{""id"":""20"",""name"":""Shadow""}}}")]
+    [InlineData("{find(type:CAT){id name}}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{find(type:DOG){id name}}", """{"data":{"find":{"id":"20","name":"Shadow"}}}""")]
+    [InlineData("{find(type:CAT){id name ... on Cat { lives } ... on Dog { isLarge }}}", """{"data":{"find":{"id":"10","name":"Fluffy","lives":9}}}""")]
+    [InlineData("{find(type:DOG){id name ... on Cat { lives } ... on Dog { isLarge }}}", """{"data":{"find":{"id":"20","name":"Shadow","isLarge":true}}}""")]
+    [InlineData("{cat{id name}}", """{"data":{"cat":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{dog{id name}}", """{"data":{"dog":{"id":"20","name":"Shadow"}}}""")]
+    [InlineData("{cat{...frag}} fragment frag on IAnimal { id name }", """{"data":{"cat":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{dog{...frag}} fragment frag on IAnimal { id name }", """{"data":{"dog":{"id":"20","name":"Shadow"}}}""")]
     public async Task EndToEndTest(string query, string expected)
     {
         var services = new ServiceCollection();
@@ -543,8 +543,8 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal {id name}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:CAT){id name}}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal {id name}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
     public async Task ExecutesQueryWithInterfaceOnly(string query, string expected)
     {
         var services = new ServiceCollection();
@@ -567,11 +567,11 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData("{find(type:CAT){id name}}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal { id name }", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on Dog { isLarge }", @"{""data"":{""find"":{}}}")]
-    [InlineData("{find(type:CAT){ ... on Dog { isLarge } }}", @"{""data"":{""find"":{}}}")]
-    [InlineData("{find(type:CAT){ id name ... on Dog { isLarge } }}", @"{""data"":{""find"":{""id"":""10"",""name"":""Fluffy""}}}")]
+    [InlineData("{find(type:CAT){id name}}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal { id name }", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on Dog { isLarge }", """{"data":{"find":{}}}""")]
+    [InlineData("{find(type:CAT){ ... on Dog { isLarge } }}", """{"data":{"find":{}}}""")]
+    [InlineData("{find(type:CAT){ id name ... on Dog { isLarge } }}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
     public async Task ExecutesQueryWithInterfaceOnly2(string query, string expected)
     {
         var services = new ServiceCollection();

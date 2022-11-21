@@ -80,27 +80,28 @@ public class DataLoaderQueryTests : QueryTestBase
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
-            query: @"
-{
-    order(orderId: 1) {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
+            query: """
+            {
+                order(orderId: 1) {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
             expected: $$"""
-{
-    "order": {
-        "orderId": 1,
-        "user": {
-            "userId": 1,
-            "firstName": "{{users[0].FirstName}}"
-        }
-    }
-}
-""").ConfigureAwait(false);
+            {
+                "order": {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                }
+            }
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -125,35 +126,36 @@ public class DataLoaderQueryTests : QueryTestBase
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
-            query: @"
-{
-    orders {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
+            query: """
+            {
+                orders {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
             expected: $$"""
-{
-    "orders": [
-    {
-        "orderId": 1,
-        "user": {
-            "userId": 1,
-            "firstName": "{{users[0].FirstName}}"
-        }
-    },
-    {
-        "orderId": 2,
-        "user": {
-            "userId": 2,
-            "firstName": "{{users[1].FirstName}}"
-        }
-    }]
-}
-""").ConfigureAwait(false);
+            {
+                "orders": [
+                {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                },
+                {
+                    "orderId": 2,
+                    "user": {
+                        "userId": 2,
+                        "firstName": "{{users[1].FirstName}}"
+                    }
+                }]
+            }
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -178,35 +180,36 @@ public class DataLoaderQueryTests : QueryTestBase
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
-            query: @"
-mutation {
-    orders {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
+            query: """
+            mutation {
+                orders {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
             expected: $$"""
-{
-    "orders": [
-    {
-        "orderId": 1,
-        "user": {
-            "userId": 1,
-            "firstName": "{{users[0].FirstName}}"
-        }
-    },
-    {
-        "orderId": 2,
-        "user": {
-            "userId": 2,
-            "firstName": "{{users[1].FirstName}}"
-        }
-    }]
-}
-""").ConfigureAwait(false);
+            {
+                "orders": [
+                {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                },
+                {
+                    "orderId": 2,
+                    "user": {
+                        "userId": 2,
+                        "firstName": "{{users[1].FirstName}}"
+                    }
+                }]
+            }
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -235,49 +238,50 @@ mutation {
             .ReturnsAsync(orderItems.ToLookup(x => x.OrderId));
 
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
-            query: @"
-{
-    users {
-        orderedItems {
-            orderItemId
-        }
-    }
-}",
+            query: """
+            {
+                users {
+                    orderedItems {
+                        orderItemId
+                    }
+                }
+            }
+            """,
             expected: $$"""
-{
-    "users": [
-    {
-        "orderedItems": [
-        {
-            "orderItemId": 1
-        },
-        {
-            "orderItemId": 2
-        },
-        {
-            "orderItemId": 3
-        },
-        {
-            "orderItemId": 4
-        }]
-    },
-    {
-        "orderedItems": [
-        {
-            "orderItemId": 5
-        },
-        {
-            "orderItemId": 6
-        },
-        {
-            "orderItemId": 7
-        },
-        {
-            "orderItemId": 8
-        }]
-    }]
-}
-""").ConfigureAwait(false);
+            {
+                "users": [
+                {
+                    "orderedItems": [
+                    {
+                        "orderItemId": 1
+                    },
+                    {
+                        "orderItemId": 2
+                    },
+                    {
+                        "orderItemId": 3
+                    },
+                    {
+                        "orderItemId": 4
+                    }]
+                },
+                {
+                    "orderedItems": [
+                    {
+                        "orderItemId": 5
+                    },
+                    {
+                        "orderItemId": 6
+                    },
+                    {
+                        "orderItemId": 7
+                    },
+                    {
+                        "orderItemId": 8
+                    }]
+                }]
+            }
+            """).ConfigureAwait(false);
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         usersMock.VerifyNoOtherCalls();
 
@@ -312,30 +316,31 @@ mutation {
             .ReturnsAsync(products.ToDictionary(x => x.ProductId));
 
         var result = await ExecuteQueryAsync<DataLoaderTestSchema>(
-            query: @"
-{
-    orders {
-        orderId
-        orderedOn
-        user {
-            userId
-            firstName
-            lastName
-            email
-        }
-        items {
-            orderItemId
-            quantity
-            unitPrice
-            product {
-                productId
-                name
-                price
-                description
+            query: """
+            {
+                orders {
+                    orderId
+                    orderedOn
+                    user {
+                        userId
+                        firstName
+                        lastName
+                        email
+                    }
+                    items {
+                        orderItemId
+                        quantity
+                        unitPrice
+                        product {
+                            productId
+                            name
+                            price
+                            description
+                        }
+                    }
+                }
             }
-        }
-    }
-}").ConfigureAwait(false);
+            """).ConfigureAwait(false);
 
         result.Errors.ShouldBeNull();
     }

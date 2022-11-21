@@ -44,7 +44,7 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ secondSync }";
+            _.Query = "{ secondSync }";
         }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);

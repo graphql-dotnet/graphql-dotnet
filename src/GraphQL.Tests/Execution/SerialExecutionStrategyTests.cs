@@ -53,28 +53,30 @@ public class SerialExecutionStrategyTests
             Query = "mutation { families { leader_dataLoader { lastName name } leader { lastName name } } }",
         };
         await documentExecuter.ExecuteAsync(executionOptions).ConfigureAwait(false);
-        sb.ToString().ShouldBeCrossPlat(@"families
-families.0.leader_dataLoader
-families.0.leader
-families.0.leader.lastName
-families.0.leader.name
-families.1.leader_dataLoader
-families.1.leader
-families.1.leader.lastName
-families.1.leader.name
-families.2.leader_dataLoader
-families.2.leader
-families.2.leader.lastName
-families.2.leader.name
-families.0.leader_dataLoader-completed
-families.1.leader_dataLoader-completed
-families.2.leader_dataLoader-completed
-families.0.leader_dataLoader.lastName
-families.0.leader_dataLoader.name
-families.1.leader_dataLoader.lastName
-families.1.leader_dataLoader.name
-families.2.leader_dataLoader.lastName
-families.2.leader_dataLoader.name
-");
+        sb.ToString().ShouldBeCrossPlat("""
+            families
+            families.0.leader_dataLoader
+            families.0.leader
+            families.0.leader.lastName
+            families.0.leader.name
+            families.1.leader_dataLoader
+            families.1.leader
+            families.1.leader.lastName
+            families.1.leader.name
+            families.2.leader_dataLoader
+            families.2.leader
+            families.2.leader.lastName
+            families.2.leader.name
+            families.0.leader_dataLoader-completed
+            families.1.leader_dataLoader-completed
+            families.2.leader_dataLoader-completed
+            families.0.leader_dataLoader.lastName
+            families.0.leader_dataLoader.name
+            families.1.leader_dataLoader.lastName
+            families.1.leader_dataLoader.name
+            families.2.leader_dataLoader.lastName
+            families.2.leader_dataLoader.name
+
+            """);
     }
 }

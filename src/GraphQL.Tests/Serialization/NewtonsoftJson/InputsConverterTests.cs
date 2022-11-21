@@ -56,14 +56,14 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_SimpleValues()
     {
-        string json = @"
-                {
-                    ""int"": 123,
-                    ""double"": 123.456,
-                    ""string"": ""string"",
-                    ""bool"": true
-                }
-            ";
+        string json = """
+            {
+              "int": 123,
+              "double": 123.456,
+              "string": "string",
+              "bool": true
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -76,11 +76,11 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Simple_Null()
     {
-        string json = @"
-                {
-                    ""string"": null
-                }
-            ";
+        string json = """
+            {
+              "string": null
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -90,11 +90,11 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array()
     {
-        string json = @"
-                {
-                    ""values"": [1, 2, 3]
-                }
-            ";
+        string json = """
+            {
+              "values": [1, 2, 3]
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -104,11 +104,11 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array_in_Array()
     {
-        string json = @"
-                {
-                    ""values"": [[1,2,3]]
-                }
-            ";
+        string json = """
+            {
+              "values": [[1,2,3]]
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -120,16 +120,16 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_ComplexValue()
     {
-        string json = @"
-                {
-                    ""complex"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    }
-                }
-            ";
+        string json = """
+            {
+              "complex": {
+                "int": 123,
+                "double": 123.456,
+                "string": "string",
+                "bool": true
+              }
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -143,18 +143,18 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_MixedValue()
     {
-        string json = @"
-                {
-                    ""int"": 123,
-                    ""complex"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    },
-                    ""bool"": true
-                }
-            ";
+        string json = """
+            {
+              "int": 123,
+              "complex": {
+                 "int": 123,
+                 "double": 123.456,
+                 "string": "string",
+                 "bool": true
+              },
+              "bool": true
+            }
+            """;
 
         var actual = Deserialize<Inputs>(json);
 
@@ -171,18 +171,18 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Nested_SimpleValues()
     {
-        string json = @"
-                {
-                    ""value1"": ""string"",
-                    ""dictionary"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    },
-                    ""value2"": 123
-                }
-            ";
+        string json = """
+            {
+              "value1": "string",
+              "dictionary": {
+                "int": 123,
+                "double": 123.456,
+                "string": "string",
+                "bool": true
+              },
+              "value2": 123
+            }
+            """;
 
         var actual = Deserialize<Nested>(json);
 
@@ -201,12 +201,13 @@ public class InputsConverterTests
 
         string json = Serialize(source);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""Value1"": null,
-  ""Dictionary"": null,
-  ""Value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "Value1": null,
+              "Dictionary": null,
+              "Value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -225,15 +226,16 @@ public class InputsConverterTests
 
         string json = Serialize(source);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""Value1"": ""string"",
-  ""Dictionary"": {
-    ""int"": 123,
-    ""string"": ""string""
-  },
-  ""Value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "Value1": "string",
+              "Dictionary": {
+                "int": 123,
+                "string": "string"
+              },
+              "Value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -251,14 +253,15 @@ public class InputsConverterTests
 
         string json = Serialize(source);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""Value1"": ""string"",
-  ""Dictionary"": {
-    ""string"": null
-  },
-  ""Value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "Value1": "string",
+              "Dictionary": {
+                "string": null
+              },
+              "Value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -281,18 +284,19 @@ public class InputsConverterTests
 
         string json = Serialize(source);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""Value1"": ""string"",
-  ""Dictionary"": {
-    ""int"": 123,
-    ""string"": ""string"",
-    ""complex"": {
-      ""double"": 1.123
-    }
-  },
-  ""Value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "Value1": "string",
+              "Dictionary": {
+                "int": 123,
+                "string": "string",
+                "complex": {
+                  "double": 1.123
+                }
+              },
+              "Value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]

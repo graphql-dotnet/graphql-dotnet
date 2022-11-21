@@ -8,92 +8,92 @@ public class UniqueArgumentNamesTests : ValidationTestBase<UniqueArgumentNames, 
     [Fact]
     public void no_arguments_on_field()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           field
         }
-      ");
+        """);
     }
 
     [Fact]
     public void no_arguments_on_directive()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           field @directive
         }
-      ");
+        """);
     }
 
     [Fact]
     public void argument_on_field()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field(arg: ""value"")
+          field(arg: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void argument_on_directive()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field @directive(arg: ""value"")
+          field @directive(arg: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void same_argument_on_two_fields()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          one: field(arg: ""value"")
-          two: field(arg: ""value"")
+          one: field(arg: "value")
+          two: field(arg: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void same_argument_on_field_and_directive()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field(arg: ""value"") @directive(arg: ""value"")
+          field(arg: "value") @directive(arg: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void same_argument_on_two_directives()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field @directive1(arg: ""value"") @directive2(arg: ""value"")
+          field @directive1(arg: "value") @directive2(arg: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void multiple_field_arguments()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field(arg1: ""value"", arg2: ""value"", arg3: ""value"")
+          field(arg1: "value", arg2: "value", arg3: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
     public void multiple_directive_arguments()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
-          field @directive(arg1: ""value"", arg2: ""value"", arg3: ""value"")
+          field @directive(arg1: "value", arg2: "value", arg3: "value")
         }
-      ");
+        """);
     }
 
     [Fact]
@@ -101,12 +101,12 @@ public class UniqueArgumentNamesTests : ValidationTestBase<UniqueArgumentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            field(arg1: ""value"", arg1: ""value"")
-          }
-        ";
-            duplicateArg(_, "arg1", 3, 19, 3, 34);
+            _.Query = """
+            {
+              field(arg1: "value", arg1: "value")
+            }
+            """;
+            duplicateArg(_, "arg1", 2, 9, 2, 24);
         });
     }
 
@@ -115,13 +115,13 @@ public class UniqueArgumentNamesTests : ValidationTestBase<UniqueArgumentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            field(arg1: ""value"", arg1: ""value"", arg1: ""value"")
-          }
-        ";
-            duplicateArg(_, "arg1", 3, 19, 3, 34);
-            duplicateArg(_, "arg1", 3, 19, 3, 49);
+            _.Query = """
+            {
+              field(arg1: "value", arg1: "value", arg1: "value")
+            }
+            """;
+            duplicateArg(_, "arg1", 2, 9, 2, 24);
+            duplicateArg(_, "arg1", 2, 9, 2, 39);
         });
     }
 
@@ -130,12 +130,12 @@ public class UniqueArgumentNamesTests : ValidationTestBase<UniqueArgumentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            field @directive(arg1: ""value"", arg1: ""value"")
-          }
-        ";
-            duplicateArg(_, "arg1", 3, 30, 3, 45);
+            _.Query = """
+            {
+              field @directive(arg1: "value", arg1: "value")
+            }
+            """;
+            duplicateArg(_, "arg1", 2, 20, 2, 35);
         });
     }
 
@@ -144,13 +144,13 @@ public class UniqueArgumentNamesTests : ValidationTestBase<UniqueArgumentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            field @directive(arg1: ""value"", arg1: ""value"", arg1: ""value"")
-          }
-        ";
-            duplicateArg(_, "arg1", 3, 30, 3, 45);
-            duplicateArg(_, "arg1", 3, 30, 3, 60);
+            _.Query = """
+            {
+              field @directive(arg1: "value", arg1: "value", arg1: "value")
+            }
+            """;
+            duplicateArg(_, "arg1", 2, 20, 2, 35);
+            duplicateArg(_, "arg1", 2, 20, 2, 50);
         });
     }
 

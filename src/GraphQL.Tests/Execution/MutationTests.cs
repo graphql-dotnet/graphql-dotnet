@@ -218,44 +218,45 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void evaluates_mutations_serially()
     {
-        var query = @"
-                mutation M {
-                  first: immediatelyChangeTheNumber(newNumber: 1) {
-                    theNumber
-                  }
-                  second: immediatelyChangeTheNumber(newNumber: 2) {
-                    theNumber
-                  }
-                  third: immediatelyChangeTheNumber(newNumber: 3) {
-                    theNumber
-                  }
-                  fourth: immediatelyChangeTheNumber(newNumber: 4) {
-                    theNumber
-                  }
-                  fifth: immediatelyChangeTheNumber(newNumber: 5) {
-                    theNumber
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheNumber(newNumber: 1) {
+                theNumber
+              }
+              second: immediatelyChangeTheNumber(newNumber: 2) {
+                theNumber
+              }
+              third: immediatelyChangeTheNumber(newNumber: 3) {
+                theNumber
+              }
+              fourth: immediatelyChangeTheNumber(newNumber: 4) {
+                theNumber
+              }
+              fifth: immediatelyChangeTheNumber(newNumber: 5) {
+                theNumber
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""first"": {
-                    ""theNumber"": 1
-                  },
-                  ""second"": {
-                    ""theNumber"": 2
-                  },
-                  ""third"": {
-                    ""theNumber"": 3
-                  },
-                  ""fourth"": {
-                    ""theNumber"": 4
-                  },
-                  ""fifth"": {
-                    ""theNumber"": 5
-                  }
-                }";
+        var expected = """
+            {
+              "first": {
+                "theNumber": 1
+              },
+              "second": {
+                "theNumber": 2
+              },
+              "third": {
+                "theNumber": 3
+              },
+              "fourth": {
+                "theNumber": 4
+              },
+              "fifth": {
+                "theNumber": 5
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
     }
@@ -263,46 +264,47 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public async Task evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
     {
-        var query = @"
-                mutation M {
-                  first: immediatelyChangeTheNumber(newNumber: 1) {
-                    theNumber
-                  }
-                  second: promiseToChangeTheNumber(newNumber: 2) {
-                    theNumber
-                  }
-                  third: failToChangeTheNumber(newNumber: 3) {
-                    theNumber
-                  }
-                  fourth: promiseToChangeTheNumber(newNumber: 4) {
-                    theNumber
-                  }
-                  fifth: immediatelyChangeTheNumber(newNumber: 5) {
-                    theNumber
-                  }
-                  sixth: promiseAndFailToChangeTheNumber(newNumber: 6) {
-                    theNumber
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheNumber(newNumber: 1) {
+                theNumber
+              }
+              second: promiseToChangeTheNumber(newNumber: 2) {
+                theNumber
+              }
+              third: failToChangeTheNumber(newNumber: 3) {
+                theNumber
+              }
+              fourth: promiseToChangeTheNumber(newNumber: 4) {
+                theNumber
+              }
+              fifth: immediatelyChangeTheNumber(newNumber: 5) {
+                theNumber
+              }
+              sixth: promiseAndFailToChangeTheNumber(newNumber: 6) {
+                theNumber
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""first"": {
-                    ""theNumber"": 1
-                  },
-                  ""second"": {
-                    ""theNumber"": 2
-                  },
-                  ""third"": null,
-                  ""fourth"": {
-                    ""theNumber"": 4
-                  },
-                  ""fifth"": {
-                    ""theNumber"": 5
-                  },
-                  ""sixth"": null
-                }";
+        var expected = """
+            {
+              "first": {
+                "theNumber": 1
+              },
+              "second": {
+                "theNumber": 2
+              },
+              "third": null,
+              "fourth": {
+                "theNumber": 4
+              },
+              "fifth": {
+                "theNumber": 5
+              },
+              "sixth": null
+            }
+            """;
 
         var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
@@ -313,44 +315,45 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void evaluates_datetime_mutations_serially()
     {
-        var query = @"
-                mutation M {
-                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  second: immediatelyChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  third: immediatelyChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  fourth: immediatelyChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
-                    theDateTime
-                  }
-                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
-                    theDateTime
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
+                theDateTime
+              }
+              second: immediatelyChangeTheDateTime(newDateTime: "2017-02-27T15:19:53.123Z") {
+                theDateTime
+              }
+              third: immediatelyChangeTheDateTime(newDateTime: "2017-03-27T15:19:53.123Z") {
+                theDateTime
+              }
+              fourth: immediatelyChangeTheDateTime(newDateTime: "2017-04-27T15:19:53.123-5:00") {
+                theDateTime
+              }
+              fifth: immediatelyChangeTheDateTime(newDateTime: "2017-05-27T15:19:53.123+2:00") {
+                theDateTime
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""first"": {
-                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
-                  },
-                  ""second"": {
-                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
-                  },
-                  ""third"": {
-                    ""theDateTime"": ""2017-03-27T15:19:53.123Z""
-                  },
-                  ""fourth"": {
-                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
-                  },
-                  ""fifth"": {
-                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
-                  }
-                }";
+        var expected = """
+            {
+              "first": {
+                "theDateTime": "2017-01-27T15:19:53.123Z"
+              },
+              "second": {
+                "theDateTime": "2017-02-27T15:19:53.123Z"
+              },
+              "third": {
+                "theDateTime": "2017-03-27T15:19:53.123Z"
+              },
+              "fourth": {
+                "theDateTime": "2017-04-27T20:19:53.123Z"
+              },
+              "fifth": {
+                "theDateTime": "2017-05-27T13:19:53.123Z"
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
     }
@@ -358,46 +361,47 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public async Task evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
     {
-        var query = @"
-                mutation M {
-                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  second: promiseToChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  third: failToChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  fourth: promiseToChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
-                    theDateTime
-                  }
-                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
-                    theDateTime
-                  }
-                  sixth: promiseAndFailToChangeTheDateTime(newDateTime: ""2017-06-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
+                theDateTime
+              }
+              second: promiseToChangeTheDateTime(newDateTime: "2017-02-27T15:19:53.123Z") {
+                theDateTime
+              }
+              third: failToChangeTheDateTime(newDateTime: "2017-03-27T15:19:53.123Z") {
+                theDateTime
+              }
+              fourth: promiseToChangeTheDateTime(newDateTime: "2017-04-27T15:19:53.123-5:00") {
+                theDateTime
+              }
+              fifth: immediatelyChangeTheDateTime(newDateTime: "2017-05-27T15:19:53.123+2:00") {
+                theDateTime
+              }
+              sixth: promiseAndFailToChangeTheDateTime(newDateTime: "2017-06-27T15:19:53.123Z") {
+                theDateTime
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                  ""first"": {
-                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
-                  },
-                  ""second"": {
-                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
-                  },
-                  ""third"": null,
-                  ""fourth"": {
-                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
-                  },
-                  ""fifth"": {
-                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
-                  },
-                  ""sixth"": null
-                }";
+        var expected = """
+            {
+              "first": {
+                "theDateTime": "2017-01-27T15:19:53.123Z"
+              },
+              "second": {
+                "theDateTime": "2017-02-27T15:19:53.123Z"
+              },
+              "third": null,
+              "fourth": {
+                "theDateTime": "2017-04-27T20:19:53.123Z"
+              },
+              "fifth": {
+                "theDateTime": "2017-05-27T13:19:53.123Z"
+              },
+              "sixth": null
+            }
+            """;
 
         var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
@@ -408,19 +412,21 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void successfully_handles_guidgraphtype()
     {
-        var query = @"
-                mutation M {
-                  passGuidGraphType(guid: ""085A38AD-907B-4625-AFEE-67EFC71217DE"") {
-                    theGuid
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              passGuidGraphType(guid: "085A38AD-907B-4625-AFEE-67EFC71217DE") {
+                theGuid
+              }
+            }
+            """;
 
-        var expected = @"{
-                    ""passGuidGraphType"": {
-                        ""theGuid"": ""085a38ad-907b-4625-afee-67efc71217de""
-                    }
-                }";
+        var expected = """
+            {
+              "passGuidGraphType": {
+                "theGuid": "085a38ad-907b-4625-afee-67efc71217de"
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
     }

@@ -141,7 +141,7 @@ public class EnumType<T> : EnumerationGraphType
     private static string DeriveEnumValueName(string name)
     {
         return Regex
-          .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
+          .Replace(name, "([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
           .ToUpperInvariant();
     }
 }

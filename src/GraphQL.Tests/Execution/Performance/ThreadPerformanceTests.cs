@@ -65,12 +65,12 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
     // [Fact]
     public void Executes_IsQuickerThanTotalTaskTime()
     {
-        var query = @"
-                query HeroNameAndFriendsQuery {
-                  halfSecond,
-                  quarterSecond
-                }
-            ";
+        var query = """
+            query HeroNameAndFriendsQuery {
+              halfSecond,
+              quarterSecond
+            }
+            """;
 
         var smallListTimer = new Stopwatch();
         smallListTimer.Start();
@@ -91,27 +91,27 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
     [Fact]
     public async Task Mutations_RunSynchronously()
     {
-        var query = @"
-                mutation Multiple {
-                  m1:setFive
-                  m2:setFive
-                  m3:setOne
-                  m4:setOne
-                  m5:setOne
-                  m6:setFive
-                  m7:setFive
-                  m8:setFive
-                  m9:setFive
-                  m10:setOne
-                  m11:setFive
-                  m12:setOne
-                  m13:setFive
-                  m14:setOne
-                  m15:setFive
-                  m16:setOne
-                  m17:setFive
-                }
-            ";
+        var query = """
+            mutation Multiple {
+              m1:setFive
+              m2:setFive
+              m3:setOne
+              m4:setOne
+              m5:setOne
+              m6:setFive
+              m7:setFive
+              m8:setFive
+              m9:setFive
+              m10:setOne
+              m11:setFive
+              m12:setOne
+              m13:setFive
+              m14:setOne
+              m15:setFive
+              m16:setOne
+              m17:setFive
+            }
+            """;
 
         var result = await Executer.ExecuteAsync(_ =>
         {
