@@ -204,8 +204,13 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public virtual Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
+            //IGraphType specificType = node is ObjectExecutionNode parent
+            //    ? parent.GetObjectGraphType(context.Schema) ?? parent.GraphType
+            //    : node.FieldDefinition!.ResolvedType!;
+
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
+                //? CollectFieldsFrom(context, specificType, node.Field.SelectionSet, null)
                 : null;
         }
 
@@ -224,7 +229,20 @@ namespace GraphQL.Execution
         /// <returns>A list of collected fields</returns>
         protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
+            //Debug.Assert(specificType is not IAbstractGraphType); //TODO: think about it
+
             fields ??= new();
+
+            // TODO: DESIGN REVIEW NEEDED
+            // https://github.com/graphql-dotnet/graphql-dotnet/pull/3416
+            // SetSubFieldNodes calls CollectFieldsFrom always with IComplexGraphType resolved type even for unions and interfaces since
+            // GetObjectGraphType works well when ExecutionNode.Result is already set. In case of GetSubFields that is called usually
+            // from IResolveFieldContext.SubFields we have a problem - there is no ExecutionNode.Result yet (resolver did not return yet)
+            // so GetObjectGraphType returns null in case of abstract graph type (interface or union) and we try to solve it by choosing
+            // an "approximate" type - interface/union type itself. For interface it works better than for union - at least we can return
+            // fields of interface, it makes sense. What should we return in case of union? First/last/random union member? Probably the
+            // best answer here - nothing. See 'GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)' call inside
+            // CollectFields that effectively filters out all unions allowing only __typename field.
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
             int countOfSpreads = GetFragmentSpreads(context, selectionSet);
@@ -259,7 +277,7 @@ namespace GraphQL.Execution
                         {
                             if (ShouldIncludeNode(context, field))
                             {
-                                var fieldType = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
+                                var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field);
                                 if (fieldType == null)
                                     throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
