@@ -27,17 +27,20 @@ internal static class AutoRegisteringOutputHelper
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,
-        Func<MemberInfo, LambdaExpression> BuildMemberInstanceExpression,
+        Func<MemberInfo, LambdaExpression>? BuildMemberInstanceExpression,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
         Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes,
         bool isInterface)
     {
+        if (!isInterface && BuildMemberInstanceExpression == null)
+            throw new ArgumentNullException(nameof(BuildMemberInstanceExpression));
+
         if (memberInfo is PropertyInfo propertyInfo)
         {
             fieldType.Arguments = null;
             if (!isInterface)
             {
-                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
+                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression!(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -61,9 +64,9 @@ internal static class AutoRegisteringOutputHelper
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }
-            var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
             if (!isInterface)
             {
+                var memberInstanceExpression = BuildMemberInstanceExpression!(methodInfo);
                 if (IsObservable(methodInfo.ReturnType))
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
@@ -84,7 +87,7 @@ internal static class AutoRegisteringOutputHelper
             fieldType.Arguments = null;
             if (!isInterface)
             {
-                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
+                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression!(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }

@@ -61,15 +61,16 @@ public class AutoRegisteringInterfaceGraphType<TSourceType> : InterfaceGraphType
         AutoRegisteringOutputHelper.BuildFieldType(
             memberInfo,
             fieldType,
-            BuildMemberInstanceExpression,
+            null,
             getTypedArgumentInfoMethod,
             ApplyArgumentAttributes,
             true);
     }
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildMemberInstanceExpression(MemberInfo)"/>
+    [Obsolete("Interface graph types do not support field resolvers; use of this method is unnecessary.")]
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
-        => _sourceExpression;
+        => throw new NotSupportedException();
 
     private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
         = context => (TSourceType)(context.Source ?? ThrowSourceNullException());
