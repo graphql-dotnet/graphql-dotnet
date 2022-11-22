@@ -72,14 +72,6 @@ public class AutoRegisteringInterfaceGraphType<TSourceType> : InterfaceGraphType
     protected virtual LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo)
         => throw new NotSupportedException();
 
-    private static readonly Expression<Func<IResolveFieldContext, TSourceType>> _sourceExpression
-        = context => (TSourceType)(context.Source ?? ThrowSourceNullException());
-
-    private static object ThrowSourceNullException()
-    {
-        throw new InvalidOperationException("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
-    }
-
     private static readonly MethodInfo _getArgumentInformationInternalMethodInfo = typeof(AutoRegisteringInterfaceGraphType<TSourceType>).GetMethod(nameof(GetArgumentInformationInternal), BindingFlags.NonPublic | BindingFlags.Instance)!;
     private ArgumentInformation GetArgumentInformationInternal<TParameterType>(FieldType fieldType, ParameterInfo parameterInfo)
         => GetArgumentInformation<TParameterType>(fieldType, parameterInfo);
