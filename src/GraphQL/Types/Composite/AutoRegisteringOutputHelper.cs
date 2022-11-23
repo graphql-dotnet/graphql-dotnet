@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.Resolvers;
@@ -32,8 +33,10 @@ internal static class AutoRegisteringOutputHelper
         Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes,
         bool isInterface)
     {
-        if (!isInterface && BuildMemberInstanceExpression == null)
-            throw new ArgumentNullException(nameof(BuildMemberInstanceExpression));
+        Debug.Assert(isInterface || BuildMemberInstanceExpression != null);
+
+        if (fieldType == null)
+            throw new ArgumentNullException(nameof(fieldType));
 
         if (memberInfo is PropertyInfo propertyInfo)
         {

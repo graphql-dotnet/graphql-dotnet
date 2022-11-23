@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -485,6 +486,18 @@ public class AutoRegisteringObjectGraphTypeTests
         graphType.Fields.Find("Field4").ShouldNotBeNull();
         graphType.Fields.Find("Field5").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(5);
+    }
+
+    [Fact]
+    public void CannotBuildWithoutMemberInstanceExpression()
+    {
+        Should.Throw<ArgumentNullException>(() => new NoMemberInstanceExpression<TestBasicClass>())
+            .ParamName.ShouldBe("instanceExpression");
+    }
+
+    public class NoMemberInstanceExpression<T> : AutoRegisteringObjectGraphType<T>
+    {
+        protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;
     }
 
     private class CustomHardcodedArgumentAttributeTestClass
