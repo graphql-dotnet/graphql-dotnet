@@ -63,8 +63,7 @@ public class AutoRegisteringInterfaceGraphType<TSourceType> : InterfaceGraphType
             fieldType,
             null,
             getTypedArgumentInfoMethod,
-            ApplyArgumentAttributes,
-            true);
+            ApplyArgumentAttributes);
     }
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildMemberInstanceExpression(MemberInfo)"/>

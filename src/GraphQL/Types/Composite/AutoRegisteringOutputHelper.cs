@@ -30,10 +30,10 @@ internal static class AutoRegisteringOutputHelper
         FieldType fieldType,
         Func<MemberInfo, LambdaExpression>? BuildMemberInstanceExpression,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes,
-        bool isInterface)
+        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes)
     {
-        Debug.Assert(isInterface || BuildMemberInstanceExpression != null);
+        // Note: If BuildMemberInstanceExpression is null, then it is assumed this is for
+        // an interface graph type and the field resolver will be set to always throw an exception.
 
         if (fieldType == null)
             throw new ArgumentNullException(nameof(fieldType));
@@ -41,9 +41,9 @@ internal static class AutoRegisteringOutputHelper
         if (memberInfo is PropertyInfo propertyInfo)
         {
             fieldType.Arguments = null;
-            if (!isInterface)
+            if (BuildMemberInstanceExpression != null)
             {
-                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression!(memberInfo));
+                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -67,9 +67,9 @@ internal static class AutoRegisteringOutputHelper
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }
-            if (!isInterface)
+            if (BuildMemberInstanceExpression != null)
             {
-                var memberInstanceExpression = BuildMemberInstanceExpression!(methodInfo);
+                var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
                 if (IsObservable(methodInfo.ReturnType))
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
@@ -88,9 +88,9 @@ internal static class AutoRegisteringOutputHelper
         else if (memberInfo is FieldInfo fieldInfo)
         {
             fieldType.Arguments = null;
-            if (!isInterface)
+            if (BuildMemberInstanceExpression != null)
             {
-                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression!(memberInfo));
+                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -103,7 +103,7 @@ internal static class AutoRegisteringOutputHelper
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
         }
-        if (isInterface)
+        if (BuildMemberInstanceExpression == null)
         {
             fieldType.Resolver = _invalidFieldResolver;
             fieldType.StreamResolver = _invalidStreamResolver;
