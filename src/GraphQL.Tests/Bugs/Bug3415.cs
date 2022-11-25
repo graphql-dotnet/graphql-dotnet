@@ -2,33 +2,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3415
 public class Bug3415 : QueryTestBase<Bug3415.MySchema>
 {
-    [Fact]
-    public void Union_SubFields_WithTypename()
-    {
-        string query = """
-            query {
-                test {
-                    __typename
-                    ... on TypeA {
-                        id
-                    }
-                }
-            }
-            """;
-
-        string expected = """
-            {
-                "test": {
-                    "__typename": "TypeA",
-                    "id": "123"
-                }
-            }
-            """;
-        AssertQuerySuccess(query, expected);
-    }
-
     [Fact]
     public void Union_SubFields_WithoutTypename()
     {
@@ -52,6 +28,33 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
         AssertQuerySuccess(query, expected);
     }
 
+    [Fact]
+    public void Union_SubFields_WithTypename()
+    {
+        string query = """
+            query {
+                test_with_typename {
+                    __typename
+                    ... on TypeA {
+                        id
+                    }
+                }
+            }
+            """;
+
+        string expected = """
+            {
+                "test_with_typename": {
+                    "__typename": "TypeA",
+                    "id": "123"
+                }
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
+
+
+
     public class MySchema : Schema
     {
         public MySchema()
@@ -67,14 +70,14 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
             Field<MyUnionGraphType>("test")
                 .Resolve(context =>
                 {
-                    _ = context.SubFields;
+                    context.SubFields.Count.ShouldBe(0); // we don't know concrete union member until we return it from this resolver on the next line
                     return new MyObject();
                 });
-
-            Field<MyUnionGraphType>("test2")
+            Field<MyUnionGraphType>("test_with_typename")
                 .Resolve(context =>
                 {
-                    _ = context.SubFields;
+                    context.SubFields.Count.ShouldBe(1); // we don't know concrete union member until we return it from this resolver on the next line
+                    context.SubFields.First().Key.ShouldBe("__typename");
                     return new MyObject();
                 });
         }
