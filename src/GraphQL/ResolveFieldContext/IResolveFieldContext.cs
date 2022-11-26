@@ -81,7 +81,13 @@ namespace GraphQL
         /// <summary>The path to the current executing field from the request root as it would appear in the response.</summary>
         IEnumerable<object> ResponsePath { get; }
 
-        /// <summary>Returns a list of child fields requested for the current field.</summary>
+        /// <summary>
+        /// Returns a set of child fields requested for the current field. Note that this set will be completely defined
+        /// (when called from field resolver) only for fields of a concrete type (i.e. not interface or union field). For
+        /// interface field this method returns requested fields in terms of this interface. For union field this method
+        /// returns empty set since we don't know the concrete union member until we get a concrete runtime value from
+        /// the resolver.
+        /// </summary>
         Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; }
 
         /// <summary>

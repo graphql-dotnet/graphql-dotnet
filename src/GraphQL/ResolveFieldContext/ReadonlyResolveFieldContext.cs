@@ -116,7 +116,8 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields
+            => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext => _executionContext.UserContext;
