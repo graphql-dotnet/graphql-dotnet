@@ -26,7 +26,7 @@ namespace GraphQL.Execution
         /// fields of a concrete type (i.e. not interface or union field) or when <paramref name="executionNode"/>
         /// result was set. For interface field this method returns requested fields in terms of this interface. For
         /// union field this method returns empty set since we don't know the concrete union member if <see cref="ExecutionNode.Result"/>
-        /// was not yet set.
+        /// was not set yet.
         /// </summary>
         Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
