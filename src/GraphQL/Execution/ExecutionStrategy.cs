@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections;
+using System.Diagnostics;
 using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -150,10 +151,13 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
-        /// the object execution node result is not <see langword="null"/>.
+        /// the object execution node result is not <see langword="null"/> or object execution
+        /// node is <see cref="RootExecutionNode"/>.
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
+            Debug.Assert(parent.Result != null || parent is RootExecutionNode);
+
             var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
             var fields = Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
@@ -204,13 +208,8 @@ namespace GraphQL.Execution
         /// <inheritdoc/>
         public virtual Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
-            //IGraphType specificType = node is ObjectExecutionNode parent
-            //    ? parent.GetObjectGraphType(context.Schema) ?? parent.GraphType
-            //    : node.FieldDefinition!.ResolvedType!;
-
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
-                //? CollectFieldsFrom(context, specificType, node.Field.SelectionSet, null)
                 : null;
         }
 
@@ -236,8 +235,8 @@ namespace GraphQL.Execution
             // TODO: DESIGN REVIEW NEEDED
             // https://github.com/graphql-dotnet/graphql-dotnet/pull/3416
             // SetSubFieldNodes calls CollectFieldsFrom always with IComplexGraphType resolved type even for unions and interfaces since
-            // GetObjectGraphType works well when ExecutionNode.Result is already set. In case of GetSubFields that is called usually
-            // from IResolveFieldContext.SubFields we have a problem - there is no ExecutionNode.Result yet (resolver did not return yet)
+            // GetObjectGraphType works well when ExecutionNode.Result is already set. In case of GetSubFields (that is called usually
+            // from IResolveFieldContext.SubFields) we have a problem - there is no ExecutionNode.Result yet (resolver did not return yet)
             // so GetObjectGraphType returns null in case of abstract graph type (interface or union) and we try to solve it by choosing
             // an "approximate" type - interface/union type itself. For interface it works better than for union - at least we can return
             // fields of interface, it makes sense. What should we return in case of union? First/last/random union member? Probably the
@@ -277,6 +276,8 @@ namespace GraphQL.Execution
                         {
                             if (ShouldIncludeNode(context, field))
                             {
+                                // parentType argument for GetFieldDefinition may be null in case of union field, in that case
+                                // GetFieldDefinition will not throw only if field is __typename
                                 var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field);
                                 if (fieldType == null)
                                     throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");

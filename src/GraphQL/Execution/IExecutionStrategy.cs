@@ -22,7 +22,11 @@ namespace GraphQL.Execution
         Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
 
         /// <summary>
-        /// Returns the children fields for a specified node.
+        /// Returns the children fields for a specified node. Note that this set will be completely defined only for
+        /// fields of a concrete type (i.e. not interface or union field) or when <paramref name="executionNode"/>
+        /// result was set. For interface field this method returns requested fields in terms of this interface. For
+        /// union field this method returns empty set since we don't know the concrete union member if <see cref="ExecutionNode.Result"/>
+        /// was not yet set.
         /// </summary>
         Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
