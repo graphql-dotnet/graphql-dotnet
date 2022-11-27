@@ -140,7 +140,7 @@ namespace GraphQL
                         }).ConfigureAwait(false);
                 }
 
-                context = BuildExecutionContext(options, document, operation, validationResult.Variables ?? Variables.None, metrics, validationResult.ArgumentValues, validationResult.DirectiveValues);
+                context = BuildExecutionContext(options, document, operation, validationResult, metrics);
 
                 foreach (var listener in options.Listeners)
                 {
@@ -234,7 +234,7 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics, IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues, IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, IValidationResult validationResult, Metrics metrics)
         {
             var context = new ExecutionContext
             {
@@ -244,9 +244,9 @@ namespace GraphQL
                 UserContext = options.UserContext,
 
                 Operation = operation,
-                Variables = variables,
-                ArgumentValues = argumentValues,
-                DirectiveValues = directiveValues,
+                Variables = validationResult.Variables ?? Variables.None,
+                ArgumentValues = validationResult.ArgumentValues,
+                DirectiveValues = validationResult.DirectiveValues,
                 Errors = new ExecutionErrors(),
                 InputExtensions = options.Extensions ?? Inputs.Empty,
                 OutputExtensions = new Dictionary<string, object?>(),
