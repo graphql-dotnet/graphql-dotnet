@@ -134,77 +134,15 @@ namespace GraphQL.Validation
         [Obsolete("This method can repeatedly add the same error into ValidationContext.Errors collection when called multiple times. Use GetVariablesValuesAsync method instead.")]
         public async ValueTask<Variables> GetVariableValuesAsync(IVariableVisitor? visitor = null)
         {
-            var variableDefinitions = Operation?.Variables;
+            (var variables, var errors) = await GetVariablesValuesAsync(visitor).ConfigureAwait(false);
 
-            if ((variableDefinitions?.Count ?? 0) == 0)
+            if (errors != null)
             {
-                return Validation.Variables.None;
+                foreach (var error in errors)
+                    ReportError(error);
             }
 
-            var variablesObj = new Variables(variableDefinitions!.Count);
-
-            if (variableDefinitions != null)
-            {
-                foreach (var variableDef in variableDefinitions.Items)
-                {
-                    var variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
-                    // find the IGraphType instance for the variable type
-                    var graphType = variableDef.Type.GraphTypeFromType(Schema);
-
-                    if (graphType == null)
-                    {
-                        ReportError(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
-                        continue;
-                    }
-
-                    // create a new variable object
-                    var variable = new Variable(variableDefName);
-
-                    // attempt to retrieve the variable value from the inputs
-                    if (Variables.TryGetValue(variableDefName, out var variableValue))
-                    {
-                        // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
-                        try
-                        {
-                            variable.Value = await GetVariableValueAsync(graphType, variableDef, variableValue, visitor).ConfigureAwait(false);
-                        }
-                        catch (ValidationError error)
-                        {
-                            ReportError(error);
-                            continue;
-                        }
-                    }
-                    else if (variableDef.DefaultValue != null)
-                    {
-                        // if the variable was not specified in the inputs, and a default literal value was specified, use the specified default variable value
-
-                        // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
-                        try
-                        {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
-                        }
-                        catch (Exception ex)
-                        {
-                            ReportError(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
-                            continue;
-                        }
-                        variable.IsDefault = true;
-                    }
-                    else if (graphType is NonNullGraphType)
-                    {
-                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
-                        continue;
-                    }
-
-                    // if the variable was not specified and no default was specified, do not set variable.Value
-
-                    // add the variable to the list of parsed variables defined for the operation
-                    variablesObj.Add(variable);
-                }
-            }
-
-            // return the list of parsed variables defined for the operation
-            return variablesObj;
+            return variables;
         }
 
         /// <summary>
