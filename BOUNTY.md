@@ -4,12 +4,14 @@ The GraphQL.NET team has worked to create a program where community developers c
 of GraphQL.NET for compensation. These features are determined by GraphQL.NET maintainers to have the
 potential for high-impact improvement to the product. Design proposals that would fulfill a bounty may
 be made either by individuals or teams of developers, but the final payout will be made to only one stakeholder.
+Routine bug fixes and similar pull requests do not fall into this program at this time.
 
 
 ## Bounty Process Flowchart
 
 1. The GraphQL.NET team publishes a Request For Proposals (RFP) describing a feature that the team has decided
-   should be prioritized, or a bug that is in need of being researched and fixed. These publications take place in the form of GitHub issues.
+   should be prioritized, or a bug that is in need of being researched and fixed. These publications take place
+   in the form of GitHub issues.
     * Initial Bounty Status set to **Accepting Proposals**
 2. Developers write proposals for how they would implement the feature or fix the bug described in the RFP.
 3. The GraphQL.NET team works with developers to clarify and refine their proposals.
