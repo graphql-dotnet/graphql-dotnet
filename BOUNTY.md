@@ -15,7 +15,7 @@ be made either by individuals or teams of developers, but the final payout will 
 3. The GraphQL.NET team works with developers to clarify and refine their proposals.
 4. A proposal is accepted. The developer(s) responsible for the proposal work to implement the feature or
    bug fix according to their proposal.
-    * Bounty status changed to **In Progress**
+    * Bounty status of issue changed to **In Progress**
 5. Pull requests are submitted to implement the proposal by the developers.
     * Bounty status changed to **Under Review**
 6. Pull requests are reviewed by project maintainers, and the pull request developers make any changes to the
