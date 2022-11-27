@@ -16,8 +16,6 @@ namespace GraphQL
         // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
-        private IDictionary<string, ArgumentValue>? _arguments;
-        private IDictionary<string, DirectiveInfo>? _directives;
         private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
@@ -34,19 +32,11 @@ namespace GraphQL
         {
             _executionNode = node!;
             _executionContext = context!;
-            _arguments = null;
-            _directives = null;
             _subFields = null;
             _parent = null;
 
             return this;
         }
-
-        private IDictionary<string, ArgumentValue>? GetArguments()
-            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArguments;
-
-        private IDictionary<string, DirectiveInfo>? GetDirectives()
-            => _executionContext.DirectiveValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : null;
 
         /// <inheritdoc/>
         public object? Source => _executionNode.Source;
@@ -80,10 +70,12 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= GetArguments();
+        public IDictionary<string, ArgumentValue>? Arguments
+            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArguments;
 
         /// <inheritdoc/>
-        public IDictionary<string, DirectiveInfo>? Directives => _directives ??= GetDirectives();
+        public IDictionary<string, DirectiveInfo>? Directives
+            => _executionContext.DirectiveValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : null;
 
         /// <inheritdoc/>
         public object? RootValue => _executionContext.RootValue;
