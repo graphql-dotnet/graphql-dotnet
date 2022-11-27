@@ -185,9 +185,8 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
               fieldWithObjectInput(input: ["foo", "bar", "baz"])
             }
             """;
-        var expected = "{ \"fieldWithObjectInput\": null }";
 
-        var result = AssertQueryWithErrors(query, expected, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: true);
+        var result = AssertQueryWithErrors(query, null, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: false);
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'fieldWithObjectInput'.");
         result.Errors[0].InnerException.Message.ShouldStartWith("Expected object value for 'TestInputObject', found not an object '[\"foo\", \"bar\", \"baz\"]'.");
     }

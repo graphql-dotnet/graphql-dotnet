@@ -122,9 +122,11 @@ namespace GraphQL
 
                 IValidationResult validationResult;
                 Variables variables;
+                IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues;
+                IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    (validationResult, variables) = await _documentValidator.ValidateAsync(
+                    (validationResult, variables, argumentValues, directiveValues) = await _documentValidator.ValidateAsync(
                         new ValidationOptions
                         {
                             Document = document,
@@ -141,7 +143,7 @@ namespace GraphQL
                         }).ConfigureAwait(false);
                 }
 
-                context = BuildExecutionContext(options, document, operation, variables, metrics);
+                context = BuildExecutionContext(options, document, operation, variables, metrics, argumentValues, directiveValues);
 
                 foreach (var listener in options.Listeners)
                 {
@@ -235,7 +237,7 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics, IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues, IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues)
         {
             var context = new ExecutionContext
             {
@@ -246,6 +248,8 @@ namespace GraphQL
 
                 Operation = operation,
                 Variables = variables,
+                ArgumentValues = argumentValues,
+                DirectiveValues = directiveValues,
                 Errors = new ExecutionErrors(),
                 InputExtensions = options.Extensions ?? Inputs.Empty,
                 OutputExtensions = new Dictionary<string, object?>(),

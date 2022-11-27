@@ -68,9 +68,6 @@ public class DefaultValuesOfCorrectTypeTests : ValidationTestBase<DefaultValuesO
             _.Error(BadValueForDefaultArgMessage("a", "Int", "\"one\"", "Expected type 'Int', found \"one\"."), 2, 13);
             _.Error(BadValueForDefaultArgMessage("b", "String", "4", "Expected type 'String', found 4."), 3, 16);
             _.Error(BadValueForDefaultArgMessage("c", "ComplexInput", "\"notverycomplex\"", "Expected 'ComplexInput', found not an object."), 4, 22);
-            _.Error("Variable '$a' is invalid. Error coercing default value.", 2, 3);
-            _.Error("Variable '$b' is invalid. Error coercing default value.", 3, 3);
-            _.Error("Variable '$c' is invalid. Error coercing default value.", 4, 3);
         });
     }
 
@@ -100,7 +97,6 @@ public class DefaultValuesOfCorrectTypeTests : ValidationTestBase<DefaultValuesO
                 }
                 """;
             _.Error(BadValueForDefaultArgMessage("a", "[String]", "[\"one\", 2]", "In element #2: [Expected type 'String', found 2.]"), 1, 34);
-            _.Error("Variable '$a' is invalid. Error coercing default value.", 1, 19);
         });
     }
 

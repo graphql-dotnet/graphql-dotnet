@@ -34,6 +34,8 @@ namespace GraphQL.Execution
             UserContext = context.UserContext;
             Operation = context.Operation;
             Variables = context.Variables;
+            ArgumentValues = context.ArgumentValues;
+            DirectiveValues = context.DirectiveValues;
             CancellationToken = context.CancellationToken;
             Listeners = context.Listeners;
             ThrowOnUnhandledException = context.ThrowOnUnhandledException;
@@ -64,6 +66,12 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 
         /// <inheritdoc/>
         public ExecutionErrors Errors { get; set; }

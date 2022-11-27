@@ -43,10 +43,10 @@ namespace GraphQL
         }
 
         private IDictionary<string, ArgumentValue>? GetArguments()
-            => ExecutionHelper.GetArguments(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
+            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArguments;
 
         private IDictionary<string, DirectiveInfo>? GetDirectives()
-            => ExecutionHelper.GetDirectives(_executionNode.Field, _executionContext.Variables, _executionContext.Schema);
+            => _executionContext.DirectiveValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : null;
 
         /// <inheritdoc/>
         public object? Source => _executionNode.Source;

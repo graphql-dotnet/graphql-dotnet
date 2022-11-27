@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Utilities;
 
@@ -70,6 +71,13 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public QueryArguments? Arguments { get; set; }
+
+        /// <summary>
+        /// This property contains the argument values supplied to the field resolver if no arguments
+        /// to the field were supplied within the request.
+        /// Note that this value is automatically initialized during schema initialization.
+        /// </summary>
+        public IDictionary<string, ArgumentValue>? DefaultArguments { get; set; }
 
         /// <summary>
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.

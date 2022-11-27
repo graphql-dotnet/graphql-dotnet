@@ -469,6 +469,7 @@ namespace GraphQL.Types
             // Do not change the order of these validations.
             CoerceInputTypeDefaultValues();
             SchemaValidationVisitor.Instance.Run(this);
+            FieldTypeDefaultArgumentsVisitor.Instance.Run(this);
             AppliedDirectivesValidationVisitor.Instance.Run(this);
         }
 

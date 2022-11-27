@@ -79,6 +79,16 @@ namespace GraphQL.Execution
         Variables Variables { get; }
 
         /// <summary>
+        /// A dictionary of field argument values.
+        /// </summary>
+        IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+
+        /// <summary>
+        /// A dictionary of directive argument values.
+        /// </summary>
+        IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+
+        /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.
         /// This is reserved for implementors to extend the protocol however they see fit, and
         /// hence there are no additional restrictions on its contents.
