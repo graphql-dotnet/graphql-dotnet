@@ -20,11 +20,11 @@ be made either by individuals or teams of developers, but the final payout will 
     * Bounty status changed to **Under Review**
 6. Pull requests are reviewed by project maintainers, and the pull request developers make any changes to the
    pull requests accordingly.
-8. Pull requests are merged into the master or develop branch.
-9. Developer(s) submit invoice to the [GraphQL.NET Open Collective](https://opencollective.com/graphql-net)
+7. Pull requests are merged into the master or develop branch.
+8. Developer(s) submit invoice to the [GraphQL.NET Open Collective](https://opencollective.com/graphql-net)
    for bounty amount, confirmed by GraphQL.NET team members.
     * Bounty status changed to **Claimed**
-10. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds.
+9. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds.
 
 
 ## How to Claim a Bounty
