@@ -3028,8 +3028,8 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
             where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
-                "variables",
-                "errors"})]
+                "Variables",
+                "Errors"})]
         public System.Threading.Tasks.ValueTask<System.ValueTuple<GraphQL.Validation.Variables, System.Collections.Generic.List<GraphQL.Validation.ValidationError>?>> GetVariablesValuesAsync(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }

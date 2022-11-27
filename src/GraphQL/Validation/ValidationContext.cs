@@ -150,7 +150,7 @@ namespace GraphQL.Validation
         /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
         /// <see cref="ValidationError"/> is returned within the list of errors.
         /// </summary>
-        public async ValueTask<(Variables variables, List<ValidationError>? errors)> GetVariablesValuesAsync(IVariableVisitor? visitor = null)
+        public async ValueTask<(Variables Variables, List<ValidationError>? Errors)> GetVariablesValuesAsync(IVariableVisitor? visitor = null)
         {
             var variableDefinitions = Operation?.Variables;
 
