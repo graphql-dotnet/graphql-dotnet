@@ -1,7 +1,7 @@
 # GraphQL.NET Bounty Program
 
 The GraphQL.NET team has worked to create a program where community developers can work on specific new features
-of GraphQL.NET for compensation. These features are determined by GraphQL.NET maintainers to have the
+of GraphQL.NET for compensation ("projects"). These projects are determined by GraphQL.NET maintainers to have the
 potential for high-impact improvement to the product. Design proposals that would fulfill a bounty may
 be made either by individuals or teams of developers, but the final payout will be made to only one stakeholder.
 Routine bug fixes and similar pull requests do not fall into this program at this time.
@@ -10,23 +10,23 @@ Routine bug fixes and similar pull requests do not fall into this program at thi
 ## Bounty Process Flowchart
 
 1. The GraphQL.NET team publishes a Request For Proposals (RFP) describing a feature that the team has decided
-   should be prioritized, or a bug that is in need of being researched and fixed. These publications take place
-   in the form of GitHub issues.
-    * Initial Bounty Status set to **Accepting Proposals**
+   should be prioritized, or a bug that is in need of being researched and fixed (a "project"). This project
+   will be posted as a GitHub issue and will indicate the amount of the bounty in US dollars (USD).
+     * The GitHub issue is labeled with **`bounty`**.
 2. Developers write proposals for how they would implement the feature or fix the bug described in the RFP.
 3. The GraphQL.NET team works with developers to clarify and refine their proposals.
 4. A proposal is accepted. The developer(s) responsible for the proposal work to implement the feature or
    bug fix according to their proposal.
-    * Bounty status of issue changed to **In Progress**
-5. Pull requests are submitted to implement the proposal by the developers.
-    * Bounty status changed to **Under Review**
+    * The GitHub issue is also labeled with **`in progress`**.
+5. Pull requests are submitted to implement the proposal by the developer(s).
+    * The GitHub pull request is linked to the issue.
 6. Pull requests are reviewed by project maintainers, and the pull request developers make any changes to the
    pull requests accordingly.
 7. Pull requests are merged into the `master` or `develop` branch.
 8. Developer(s) submit invoice to the [GraphQL.NET Open Collective](https://opencollective.com/graphql-net)
    for bounty amount, confirmed by GraphQL.NET team members.
-    * Bounty status changed to **Claimed**
 9. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds.
+    * The GitHub issue is labeled with **`bounty-paid`** and the aforementioned labels are removed.
 
 
 ## How to Claim a Bounty
@@ -34,9 +34,9 @@ Routine bug fixes and similar pull requests do not fall into this program at thi
 We've created a process to ensure multiple contributors aren’t competing on the same project, and to make sure
 work is properly merged into GraphQL.NET once completed.
 
-1. Read the Request For Proposal document completely.
+1. Read the GitHub issue containing the project's Request For Proposals completely.
 2. If you want to move forward, submit an proposal to the GraphQL.NET team on your suggested implementation by
-   replying to the RFP posting. Be sure to include as many details as requested by the spec, and be sure to address
+   replying to the issue. Be sure to include as many details as requested by the spec, and be sure to address
    each of the completion criteria. For proposals that include UI changes, mockups are strongly encouraged.
 3. Work with the GraphQL.NET team to finalize plans for the best implementation. Proposals will be judged on their
    maintainability, design quality, and adherence to spec. Note that other developers may submit competing proposals
@@ -58,12 +58,11 @@ feature.
 
 ## Deadlines
 
-If your team does not show code commits or interaction for two weeks at a time as part of an accepted feature bounty, then
-the bounty will be released for another team to work on. If the task remains in the **Accepting Proposals** state, and the
-team can demonstrate work on the feature, they can reclaim the task.
+If your team does not show code commits or interaction for two weeks at a time as part of an **`in progress`** bounty, then
+the bounty will be released for another team to work on. If the team can demonstrate work on the project, they can reclaim
+the bounty.
 
-If you no longer wish to work on a project that has been granted to you, please notify the GraphQL.NET team to reset the
-bounty as **Accepting Proposals**.
+If you no longer wish to work on a bounty that has been granted to you, please notify the GraphQL.NET team.
 
 
 ## Bounty Valuation
@@ -114,4 +113,4 @@ through this bounty program, you:
   and that you have the legal right to provide the Submission to GraphQL.NET.
 
 The GraphQL.NET team reserves the right to terminate or make changes to this program at any time, including but not limited
-to terminating In Process or Under Review bounty projects, or changing their valuation.
+to terminating **`in progress`** bounty projects, or changing their valuation.
