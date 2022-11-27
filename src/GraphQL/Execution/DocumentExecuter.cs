@@ -121,12 +121,9 @@ namespace GraphQL
                 metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;
-                Variables variables;
-                IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues;
-                IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    (validationResult, variables, argumentValues, directiveValues) = await _documentValidator.ValidateAsync(
+                    validationResult = await _documentValidator.ValidateAsync(
                         new ValidationOptions
                         {
                             Document = document,
@@ -143,7 +140,7 @@ namespace GraphQL
                         }).ConfigureAwait(false);
                 }
 
-                context = BuildExecutionContext(options, document, operation, variables, metrics, argumentValues, directiveValues);
+                context = BuildExecutionContext(options, document, operation, validationResult.Variables ?? Variables.None, metrics, validationResult.ArgumentValues, validationResult.DirectiveValues);
 
                 foreach (var listener in options.Listeners)
                 {

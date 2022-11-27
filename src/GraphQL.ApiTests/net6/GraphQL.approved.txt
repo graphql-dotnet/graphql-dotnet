@@ -2952,21 +2952,11 @@ namespace GraphQL.Validation
     {
         public static readonly System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> CoreRules;
         public DocumentValidator() { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "validationResult",
-                "variables",
-                "argumentValues",
-                "directiveValues"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables, System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>?, System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>?>> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
     }
     public interface IDocumentValidator
     {
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "validationResult",
-                "variables",
-                "argumentValues",
-                "directiveValues"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables, System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>?, System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>?>> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
+        System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
     }
     public interface INodeVisitor
     {
@@ -2975,8 +2965,11 @@ namespace GraphQL.Validation
     }
     public interface IValidationResult
     {
+        System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; }
+        System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         GraphQL.ExecutionErrors Errors { get; }
         bool IsValid { get; }
+        GraphQL.Validation.Variables? Variables { get; }
     }
     public interface IValidationRule
     {
@@ -3016,8 +3009,11 @@ namespace GraphQL.Validation
     public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
     {
         public static readonly GraphQL.Validation.IValidationResult Instance;
+        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; }
+        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         public GraphQL.ExecutionErrors Errors { get; }
         public bool IsValid { get; }
+        public GraphQL.Validation.Variables? Variables { get; }
     }
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
@@ -3090,8 +3086,11 @@ namespace GraphQL.Validation
     {
         public ValidationResult(params GraphQL.Validation.ValidationError[] errors) { }
         public ValidationResult(System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> errors) { }
+        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; set; }
+        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQL.ExecutionErrors Errors { get; }
         public bool IsValid { get; }
+        public GraphQL.Validation.Variables? Variables { get; set; }
     }
     public class Variable
     {

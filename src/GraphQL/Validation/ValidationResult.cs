@@ -1,3 +1,6 @@
+using GraphQL.Execution;
+using GraphQLParser.AST;
+
 namespace GraphQL.Validation
 {
     /// <inheritdoc cref="IValidationResult"/>
@@ -9,7 +12,15 @@ namespace GraphQL.Validation
         /// <param name="errors">Set of validation errors.</param>
         public ValidationResult(IEnumerable<ValidationError> errors)
         {
-            Errors.AddRange(errors);
+            if (errors.Any())
+            {
+                Errors = new ExecutionErrors();
+                Errors.AddRange(errors);
+            }
+            else
+            {
+                Errors = EmptyExecutionErrors.Instance;
+            }
         }
 
         /// <summary>
@@ -17,8 +28,8 @@ namespace GraphQL.Validation
         /// </summary>
         /// <param name="errors">Set of validation errors.</param>
         public ValidationResult(params ValidationError[] errors)
+            : this((IEnumerable<ValidationError>)errors)
         {
-            Errors.AddRange(errors);
         }
 
         /// <inheritdoc/>
@@ -26,6 +37,15 @@ namespace GraphQL.Validation
 
         /// <inheritdoc/>
         public ExecutionErrors Errors { get; } = new ExecutionErrors();
+
+        /// <inheritdoc/>
+        public Variables? Variables { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
     }
 
     // Optimization for validation "green path" - does not allocate memory in managed heap.
@@ -50,5 +70,14 @@ namespace GraphQL.Validation
         /// Returns an empty list of execution errors.
         /// </summary>
         public ExecutionErrors Errors => EmptyExecutionErrors.Instance;
+
+        /// <inheritdoc/>
+        public Variables? Variables => null;
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
+
+        /// <inheritdoc/>
+        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
     }
 }

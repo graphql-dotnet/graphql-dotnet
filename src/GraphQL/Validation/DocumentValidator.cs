@@ -1,8 +1,4 @@
-using GraphQL.Execution;
-using GraphQL.Types;
 using GraphQL.Validation.Rules;
-using GraphQLParser.AST;
-using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation
 {
@@ -12,7 +8,7 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables, IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues, IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues)> ValidateAsync(in ValidationOptions options);
+        Task<IValidationResult> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
@@ -55,7 +51,7 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public Task<(IValidationResult validationResult, Variables variables, IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues, IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues)> ValidateAsync(in ValidationOptions options)
+        public Task<IValidationResult> ValidateAsync(in ValidationOptions options)
         {
             options.Schema.Initialize();
 
@@ -75,7 +71,7 @@ namespace GraphQL.Validation
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
         }
 
-        private async Task<(IValidationResult validationResult, Variables variables, IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? argumentValues, IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? directiveValues)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        private async Task<IValidationResult> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
         {
             try
             {
@@ -124,7 +120,7 @@ namespace GraphQL.Validation
 
                 if (context.HasErrors)
                 {
-                    return (new ValidationResult(context.Errors), Variables.None, null, null);
+                    return new ValidationResult(context.Errors);
                 }
 
                 // can report errors even without rules enabled
@@ -132,7 +128,7 @@ namespace GraphQL.Validation
 
                 if (context.HasErrors)
                 {
-                    return (new ValidationResult(context.Errors), variables, null, null);
+                    return new ValidationResult(context.Errors) { Variables = variables };
                 }
 
                 // parse all field arguments
@@ -143,9 +139,15 @@ namespace GraphQL.Validation
 
                 // todo: execute validation rules that need to be able to read field arguments/directives
 
-                return context.HasErrors
-                    ? (new ValidationResult(context.Errors), variables, argumentValues, directiveValues)
-                    : (SuccessfullyValidatedResult.Instance, variables, argumentValues, directiveValues);
+                if (!context.HasErrors && variables == null && argumentValues == null && directiveValues == null)
+                    return SuccessfullyValidatedResult.Instance;
+
+                return new ValidationResult(context.Errors)
+                {
+                    Variables = variables,
+                    ArgumentValues = argumentValues,
+                    DirectiveValues = directiveValues,
+                };
             }
             finally
             {
