@@ -25,5 +25,14 @@ namespace GraphQL.Utilities
                 field.DefaultArguments = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
             }
         }
+
+        /// <inheritdoc/>
+        public override void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema)
+        {
+            if (field.Arguments?.Count > 0)
+            {
+                field.DefaultArguments = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
+            }
+        }
     }
 }
