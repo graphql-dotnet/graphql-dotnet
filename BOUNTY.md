@@ -9,7 +9,7 @@ be made either by individuals or teams of developers, but the final payout will 
 ## Bounty Process Flowchart
 
 1. The GraphQL.NET team publishes a Request For Proposals (RFP) describing a feature that the team has decided
-   should be prioritized, or a bug that is in need of being researched and fixed.
+   should be prioritized, or a bug that is in need of being researched and fixed. These publications take place in the form of GitHub issues.
     * Initial Bounty Status set to **Accepting Proposals**
 2. Developers write proposals for how they would implement the feature or fix the bug described in the RFP.
 3. The GraphQL.NET team works with developers to clarify and refine their proposals.
