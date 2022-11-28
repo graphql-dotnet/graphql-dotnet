@@ -1,65 +1,61 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/2635
+public class Bug2635 : QueryTestBase<Bug2635.MySchema>
 {
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2635
-    public class Bug2635 : QueryTestBase<Bug2635.MySchema>
+    public int Num;
+    public CancellationTokenSource CancellationTokenSource;
+
+    [Fact]
+    public async Task test_parallel()
     {
-        public int Num;
-        public CancellationTokenSource CancellationTokenSource;
-
-        [Fact]
-        public async Task test_parallel()
+        Num = 0;
+        CancellationTokenSource = new CancellationTokenSource();
+        var de = new DocumentExecuter();
+        try
         {
-            Num = 0;
-            CancellationTokenSource = new CancellationTokenSource();
-            var de = new DocumentExecuter();
-            try
+            _ = await de.ExecuteAsync(new ExecutionOptions
             {
-                _ = await de.ExecuteAsync(new ExecutionOptions
-                {
-                    Query = "{a b}",
-                    Schema = new MySchema(),
-                    Root = this,
-                    CancellationToken = CancellationTokenSource.Token,
-                });
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            Num.ShouldBe(1);
+                Query = "{a b}",
+                Schema = new MySchema(),
+                Root = this,
+                CancellationToken = CancellationTokenSource.Token,
+            }).ConfigureAwait(false);
         }
-
-        public class MySchema : Schema
+        catch (OperationCanceledException)
         {
-            public MySchema()
-            {
-                Query = new MyQuery();
-            }
         }
+        Num.ShouldBe(1);
+    }
 
-        public class MyQuery : ObjectGraphType
+    public class MySchema : Schema
+    {
+        public MySchema()
         {
-            public MyQuery()
+            Query = new MyQuery();
+        }
+    }
+
+    public class MyQuery : ObjectGraphType
+    {
+        public MyQuery()
+        {
+            Field<IntGraphType>("a")
+                .ResolveAsync(async context =>
             {
-                FieldAsync<IntGraphType>("a", resolve: async context =>
-                {
-                    await Task.Delay(500);
-                    ((Bug2635)context.RootValue).Num = 1;
-                    throw new Exception();
-                });
-                Field<IntGraphType>("b", resolve: context =>
-                {
-                    ((Bug2635)context.RootValue).CancellationTokenSource.Cancel();
-                    context.CancellationToken.ThrowIfCancellationRequested();
-                    return 2;
-                });
-            }
+                await Task.Delay(500).ConfigureAwait(false);
+                ((Bug2635)context.RootValue).Num = 1;
+                throw new Exception();
+            });
+            Field<IntGraphType>("b")
+                .Resolve(context =>
+            {
+                ((Bug2635)context.RootValue).CancellationTokenSource.Cancel();
+                context.CancellationToken.ThrowIfCancellationRequested();
+                return 2;
+            });
         }
     }
 }

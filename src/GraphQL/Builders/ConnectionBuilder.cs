@@ -1,8 +1,6 @@
-using System;
 #if NETSTANDARD2_1
 using System.Diagnostics.CodeAnalysis;
 #endif
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
@@ -72,7 +70,10 @@ namespace GraphQL.Builders
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        private ConnectionBuilder(FieldType fieldType)
+        /// <summary>
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+        /// </summary>
+        protected ConnectionBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -125,18 +126,6 @@ namespace GraphQL.Builders
                 Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
             });
             return new ConnectionBuilder<TSourceType>(fieldType);
-        }
-
-        /// <summary>
-        /// Configure the connection to be forward-only.
-        /// </summary>
-        [Obsolete("Calling Unidirectional is unnecessary and will be removed in future versions.")]
-        public virtual ConnectionBuilder<TSourceType> Unidirectional()
-        {
-            if (IsBidirectional)
-                throw new InvalidOperationException("Cannot call Unidirectional after a call to Bidirectional.");
-
-            return this;
         }
 
         /// <summary>
@@ -344,7 +333,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object> resolver)
+        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -363,15 +352,15 @@ namespace GraphQL.Builders
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<object>(context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
             {
                 var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
                 CheckForErrors(connectionContext);
-                return resolver(connectionContext);
+                return new ValueTask<object?>(resolver(connectionContext));
             });
         }
 
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+        private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
         {
             if (context.First.HasValue && context.Last.HasValue)
             {

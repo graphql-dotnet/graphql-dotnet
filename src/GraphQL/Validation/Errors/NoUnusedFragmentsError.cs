@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +11,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public NoUnusedFragmentsError(ValidationContext context, FragmentDefinition node)
-            : base(context.Document.OriginalQuery!, NUMBER, UnusedFragMessage(node.Name), node)
+        public NoUnusedFragmentsError(ValidationContext context, GraphQLFragmentDefinition node)
+            : base(context.Document.Source, NUMBER, UnusedFragMessage(node.FragmentName.Name.StringValue), node)
         {
         }
 

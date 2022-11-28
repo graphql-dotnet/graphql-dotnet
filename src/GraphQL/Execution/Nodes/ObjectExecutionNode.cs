@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -19,7 +16,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="ObjectExecutionNode"/> with the specified values.
         /// </summary>
-        public ObjectExecutionNode(ExecutionNode? parent, IGraphType? graphType, Field? field, FieldType? fieldDefinition, int? indexInParentNode)
+        public ObjectExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
@@ -71,13 +68,10 @@ namespace GraphQL.Execution
                 var child = SubFields[i];
                 bool valueIsNull = child.PropagateNull();
 
-                if (valueIsNull)
+                if (valueIsNull && child.FieldDefinition!.ResolvedType is NonNullGraphType)
                 {
-                    if (child.FieldDefinition!.ResolvedType is NonNullGraphType)
-                    {
-                        SubFields = null;
-                        return true;
-                    }
+                    SubFields = null;
+                    return true;
                 }
             }
 
@@ -87,9 +81,9 @@ namespace GraphQL.Execution
         IEnumerable<ExecutionNode> IParentExecutionNode.GetChildNodes() => SubFields ?? Enumerable.Empty<ExecutionNode>();
 
         /// <summary>
-        /// Returns the selection set from <see cref="Field"/>.
+        /// Returns the selection set from <see cref="ExecutionNode.Field"/>.
         /// </summary>
-        public virtual SelectionSet? SelectionSet => Field?.SelectionSet;
+        public virtual GraphQLSelectionSet? SelectionSet => Field?.SelectionSet;
 
         /// <inheritdoc/>
         public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false)

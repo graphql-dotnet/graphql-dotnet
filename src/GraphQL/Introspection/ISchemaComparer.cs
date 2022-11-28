@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GraphQL.Types;
 
 namespace GraphQL.Introspection
@@ -39,7 +38,7 @@ namespace GraphQL.Introspection
         /// Returns a comparer for GraphQL directives.
         /// If this returns <see langword="null"/> then the original directive ordering is preserved.
         /// </summary>
-        IComparer<DirectiveGraphType>? DirectiveComparer { get; }
+        IComparer<Directive>? DirectiveComparer { get; }
     }
 
     /// <summary>
@@ -51,7 +50,7 @@ namespace GraphQL.Introspection
         public virtual IComparer<IGraphType>? TypeComparer => null;
 
         /// <inheritdoc/>
-        public virtual IComparer<DirectiveGraphType>? DirectiveComparer => null;
+        public virtual IComparer<Directive>? DirectiveComparer => null;
 
         /// <inheritdoc/>
         public virtual IComparer<QueryArgument>? ArgumentComparer(IFieldType field) => null;
@@ -68,20 +67,20 @@ namespace GraphQL.Introspection
     /// </summary>
     public class AlphabeticalSchemaComparer : ISchemaComparer
     {
-        private static readonly TypeByNameComparer _instance1 = new TypeByNameComparer();
-        private static readonly DirectiveByNameComparer _instance2 = new DirectiveByNameComparer();
-        private static readonly ArgumentByNameComparer _instance3 = new ArgumentByNameComparer();
-        private static readonly EnumValueByNameComparer _instance4 = new EnumValueByNameComparer();
-        private static readonly FieldByNameComparer _instance5 = new FieldByNameComparer();
+        private static readonly TypeByNameComparer _instance1 = new();
+        private static readonly DirectiveByNameComparer _instance2 = new();
+        private static readonly ArgumentByNameComparer _instance3 = new();
+        private static readonly EnumValueByNameComparer _instance4 = new();
+        private static readonly FieldByNameComparer _instance5 = new();
 
         private sealed class TypeByNameComparer : IComparer<IGraphType>
         {
             public int Compare(IGraphType? x, IGraphType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
-        private sealed class DirectiveByNameComparer : IComparer<DirectiveGraphType>
+        private sealed class DirectiveByNameComparer : IComparer<Directive>
         {
-            public int Compare(DirectiveGraphType? x, DirectiveGraphType? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
+            public int Compare(Directive? x, Directive? y) => (x?.Name ?? "").CompareTo(y?.Name ?? "");
         }
 
         private sealed class ArgumentByNameComparer : IComparer<QueryArgument>
@@ -103,7 +102,7 @@ namespace GraphQL.Introspection
         public virtual IComparer<IGraphType> TypeComparer => _instance1;
 
         /// <inheritdoc/>
-        public virtual IComparer<DirectiveGraphType> DirectiveComparer => _instance2;
+        public virtual IComparer<Directive> DirectiveComparer => _instance2;
 
         /// <inheritdoc/>
         public virtual IComparer<QueryArgument> ArgumentComparer(IFieldType field) => _instance3;

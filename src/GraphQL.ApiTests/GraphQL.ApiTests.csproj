@@ -2,7 +2,7 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -13,7 +13,6 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
-    <ProjectReference Include="..\GraphQL.SystemReactive\GraphQL.SystemReactive.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
     <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />

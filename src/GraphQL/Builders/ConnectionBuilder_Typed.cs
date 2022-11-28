@@ -1,8 +1,6 @@
-using System;
 #if NETSTANDARD2_1
 using System.Diagnostics.CodeAnalysis;
 #endif
-using System.Threading.Tasks;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -26,7 +24,10 @@ namespace GraphQL.Builders
         /// </summary>
         public FieldType FieldType { get; protected set; }
 
-        internal ConnectionBuilder(FieldType fieldType)
+        /// <summary>
+        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+        /// </summary>
+        protected internal ConnectionBuilder(FieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -241,7 +242,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType> resolver)
+        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -261,15 +262,15 @@ namespace GraphQL.Builders
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.AsyncFieldResolver<TReturnType>(context =>
+            FieldType.Resolver = new Resolvers.FuncFieldResolver<TReturnType>(context =>
             {
                 var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
                 CheckForErrors(connectionContext);
-                return resolver(connectionContext);
+                return new ValueTask<TReturnType?>(resolver(connectionContext));
             });
         }
 
-        private void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+        private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
         {
             if (context.First.HasValue && context.Last.HasValue)
             {

@@ -1,5 +1,3 @@
-using System;
-using System.Reflection;
 using GraphQL.Utilities;
 
 namespace GraphQL.Types
@@ -10,6 +8,7 @@ namespace GraphQL.Types
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
+        private bool _initialized;
 
         /// <summary>
         /// Initializes a new instance of the graph type.
@@ -27,18 +26,19 @@ namespace GraphQL.Types
             }
         }
 
+        /// <inheritdoc/>
+        public virtual void Initialize(ISchema schema)
+        {
+            if (_initialized)
+                throw new InvalidOperationException($"This graph type '{GetType().GetFriendlyName()}' with name '{Name}' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            _initialized = true;
+        }
+
         private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
         private string GetDefaultName()
         {
             var type = GetType();
-
-            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-
-            if (!string.IsNullOrEmpty(attr?.Name))
-            {
-                return attr!.Name!;
-            }
 
             string name = type.Name;
             if (GlobalSwitches.UseDeclaringTypeNames)

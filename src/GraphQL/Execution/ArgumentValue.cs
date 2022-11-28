@@ -8,12 +8,12 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a literal.
         /// </summary>
-        public static ArgumentValue NullLiteral => new ArgumentValue(null, ArgumentSource.Literal);
+        public static ArgumentValue NullLiteral => new(null, ArgumentSource.Literal);
 
         /// <summary>
         /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a variable.
         /// </summary>
-        public static ArgumentValue NullVariable => new ArgumentValue(null, ArgumentSource.Variable);
+        public static ArgumentValue NullVariable => new(null, ArgumentSource.Variable);
 
         /// <summary>
         /// Initializes a new instance with the specified values.

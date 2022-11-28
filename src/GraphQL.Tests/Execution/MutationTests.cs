@@ -1,491 +1,433 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.Execution
+namespace GraphQL.Tests.Execution;
+
+public class NumberHolder
 {
-    public class NumberHolder
+    public int TheNumber { get; set; }
+}
+
+public class DateTimeHolder
+{
+    public DateTime TheDateTime { get; set; }
+}
+
+public class Root
+{
+    public Root(int number, DateTime dateTime)
     {
-        public int TheNumber { get; set; }
+        NumberHolder = new NumberHolder { TheNumber = number };
+        DateTimeHolder = new DateTimeHolder { TheDateTime = dateTime };
     }
 
-    public class DateTimeHolder
+    public NumberHolder NumberHolder { get; private set; }
+
+    public DateTimeHolder DateTimeHolder { get; private set; }
+
+    public NumberHolder ImmediatelyChangeTheNumber(int number)
     {
-        public DateTime TheDateTime { get; set; }
+        NumberHolder.TheNumber = number;
+        return NumberHolder;
     }
 
-    public class Root
+    public Task<NumberHolder> PromiseToChangeTheNumberAsync(int number)
     {
-        public Root(int number, DateTime dateTime)
-        {
-            NumberHolder = new NumberHolder { TheNumber = number };
-            DateTimeHolder = new DateTimeHolder { TheDateTime = dateTime };
-        }
-
-        public NumberHolder NumberHolder { get; private set; }
-
-        public DateTimeHolder DateTimeHolder { get; private set; }
-
-        public NumberHolder ImmediatelyChangeTheNumber(int number)
-        {
-            NumberHolder.TheNumber = number;
-            return NumberHolder;
-        }
-
-        public Task<NumberHolder> PromiseToChangeTheNumberAsync(int number)
-        {
-            NumberHolder.TheNumber = number;
-            return Task.FromResult(NumberHolder);
-        }
-
-        public NumberHolder FailToChangeTheNumber(int number)
-        {
-            throw new InvalidOperationException($"Cannot change the number {number}");
-        }
-
-        public static async Task<NumberHolder> PromiseAndFailToChangeTheNumberAsync(int number)
-        {
-            await Task.Delay(100).ConfigureAwait(false);
-            throw new InvalidOperationException($"Cannot change the number {number}");
-        }
-
-        public DateTimeHolder ImmediatelyChangeTheDateTime(DateTime dateTime)
-        {
-            DateTimeHolder.TheDateTime = dateTime;
-            return DateTimeHolder;
-        }
-
-        public Task<DateTimeHolder> PromiseToChangeTheDateTimeAsync(DateTime dateTime)
-        {
-            DateTimeHolder.TheDateTime = dateTime;
-            return Task.FromResult(DateTimeHolder);
-        }
-
-        public DateTimeHolder FailToChangeTheDateTime()
-        {
-            throw new InvalidOperationException("Cannot change the datetime");
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
-        public static async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
-        {
-            await Task.Delay(100).ConfigureAwait(false);
-            throw new InvalidOperationException("Cannot change the datetime");
-        }
+        NumberHolder.TheNumber = number;
+        return Task.FromResult(NumberHolder);
     }
 
-    public class MutationSchema : Schema
+    public NumberHolder FailToChangeTheNumber(int number)
     {
-        public MutationSchema()
-        {
-            Query = new MutationQuery();
-            Mutation = new MutationChange();
-        }
+        throw new InvalidOperationException($"Cannot change the number {number}");
     }
 
-    public class NumberHolderType : ObjectGraphType
+    public static async Task<NumberHolder> PromiseAndFailToChangeTheNumberAsync(int number)
     {
-        public NumberHolderType()
-        {
-            Name = "NumberHolder";
-            Field<IntGraphType>("theNumber");
-        }
+        await Task.Delay(100).ConfigureAwait(false);
+        throw new InvalidOperationException($"Cannot change the number {number}");
     }
 
-    public class DateTimeHolderType : ObjectGraphType
+    public DateTimeHolder ImmediatelyChangeTheDateTime(DateTime dateTime)
     {
-        public DateTimeHolderType()
-        {
-            Name = "DateTimeHolder";
-            Field<DateTimeGraphType>("theDateTime");
-        }
+        DateTimeHolder.TheDateTime = dateTime;
+        return DateTimeHolder;
     }
 
-    public class GuidHolderType : ObjectGraphType
+    public Task<DateTimeHolder> PromiseToChangeTheDateTimeAsync(DateTime dateTime)
     {
-        public GuidHolderType()
-        {
-            Name = "GuidHolder";
-            Field<GuidGraphType>("theGuid", null, null, x => x.Source);
-        }
+        DateTimeHolder.TheDateTime = dateTime;
+        return Task.FromResult(DateTimeHolder);
     }
 
-    public class MutationQuery : ObjectGraphType
+    public DateTimeHolder FailToChangeTheDateTime()
     {
-        public MutationQuery()
-        {
-            Name = "Query";
-            Field<NumberHolderType>("numberHolder");
-            Field<DateTimeHolderType>("dateTimeHolder");
-        }
+        throw new InvalidOperationException("Cannot change the datetime");
     }
 
-    public class MutationChange : ObjectGraphType
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
+    public static async Task<DateTimeHolder> PromiseAndFailToChangeTheDateTimeAsync(DateTime dateTime)
     {
-        public MutationChange()
-        {
-            Name = "Mutation";
+        await Task.Delay(100).ConfigureAwait(false);
+        throw new InvalidOperationException("Cannot change the datetime");
+    }
+}
 
-            Field<NumberHolderType>(
-                "immediatelyChangeTheNumber",
-                arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType>
-                    {
-                        Name = "newNumber",
-                        DefaultValue = 0
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    var change = context.GetArgument<int>("newNumber");
-                    return root.ImmediatelyChangeTheNumber(change);
-                }
-            );
+public class MutationSchema : Schema
+{
+    public MutationSchema()
+    {
+        Query = new MutationQuery();
+        Mutation = new MutationChange();
+    }
+}
 
-            Field<NumberHolderType>(
-                "promiseToChangeTheNumber",
-                arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType>
-                    {
-                        Name = "newNumber",
-                        DefaultValue = 0
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    var change = context.GetArgument<int>("newNumber");
-                    return root.PromiseToChangeTheNumberAsync(change);
-                }
-            );
+public class NumberHolderType : ObjectGraphType
+{
+    public NumberHolderType()
+    {
+        Name = "NumberHolder";
+        Field<IntGraphType>("theNumber");
+    }
+}
 
-            Field<NumberHolderType>(
-                "failToChangeTheNumber",
-                arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType>
-                    {
-                        Name = "newNumber",
-                        DefaultValue = 0
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    var change = context.GetArgument<int>("newNumber");
-                    return root.FailToChangeTheNumber(change);
-                }
-            );
+public class DateTimeHolderType : ObjectGraphType
+{
+    public DateTimeHolderType()
+    {
+        Name = "DateTimeHolder";
+        Field<DateTimeGraphType>("theDateTime");
+    }
+}
 
-            Field<NumberHolderType>(
-                "promiseAndFailToChangeTheNumber",
-                arguments: new QueryArguments(
-                    new QueryArgument<IntGraphType>
-                    {
-                        Name = "newNumber",
-                        DefaultValue = 0
-                    }
-                ),
-                resolve: context =>
-                {
-                    var change = context.GetArgument<int>("newNumber");
-                    return Root.PromiseAndFailToChangeTheNumberAsync(change);
-                }
-            );
+public class GuidHolderType : ObjectGraphType
+{
+    public GuidHolderType()
+    {
+        Name = "GuidHolder";
+        Field<GuidGraphType>("theGuid").Resolve(x => x.Source);
+    }
+}
 
-            Field<DateTimeHolderType>(
-                "immediatelyChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    var change = context.GetArgument<DateTime>("newDateTime");
-                    return root.ImmediatelyChangeTheDateTime(change);
-                }
-            );
+public class MutationQuery : ObjectGraphType
+{
+    public MutationQuery()
+    {
+        Name = "Query";
+        Field<NumberHolderType>("numberHolder");
+        Field<DateTimeHolderType>("dateTimeHolder");
+    }
+}
 
-            Field<DateTimeHolderType>(
-                "promiseToChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    var change = context.GetArgument<DateTime>("newDateTime");
-                    return root.PromiseToChangeTheDateTimeAsync(change);
-                }
-            );
+public class MutationChange : ObjectGraphType
+{
+    public MutationChange()
+    {
+        Name = "Mutation";
 
-            Field<DateTimeHolderType>(
-                "failToChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var root = context.Source as Root;
-                    _ = context.GetArgument<DateTime>("newDateTime");
-                    return root.FailToChangeTheDateTime();
-                }
-            );
+        Field<NumberHolderType>("immediatelyChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .Resolve(context =>
+            {
+                var root = context.Source as Root;
+                var change = context.GetArgument<int>("newNumber");
+                return root.ImmediatelyChangeTheNumber(change);
+            }
+        );
 
-            Field<DateTimeHolderType>(
-                "promiseAndFailToChangeTheDateTime",
-                arguments: new QueryArguments(
-                    new QueryArgument<DateTimeGraphType>
-                    {
-                        Name = "newDateTime"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var change = context.GetArgument<DateTime>("newDateTime");
-                    return Root.PromiseAndFailToChangeTheDateTimeAsync(change);
-                }
-            );
+        Field<NumberHolderType>("promiseToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .ResolveAsync(async context =>
+            {
+                var root = context.Source as Root;
+                var change = context.GetArgument<int>("newNumber");
+                return await root.PromiseToChangeTheNumberAsync(change).ConfigureAwait(false);
+            }
+        );
 
-            Field<GuidHolderType>(
-                "passGuidGraphType",
-                arguments: new QueryArguments(
-                    new QueryArgument<GuidGraphType>
-                    {
-                        Name = "guid"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var guid = context.GetArgument<Guid>("guid");
-                    return guid;
-                }
-            );
-        }
+        Field<NumberHolderType>("failToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .Resolve(context =>
+            {
+                var root = context.Source as Root;
+                var change = context.GetArgument<int>("newNumber");
+                return root.FailToChangeTheNumber(change);
+            }
+        );
+
+        Field<NumberHolderType>("promiseAndFailToChangeTheNumber")
+            .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
+            .ResolveAsync(async context =>
+            {
+                var change = context.GetArgument<int>("newNumber");
+                return await Root.PromiseAndFailToChangeTheNumberAsync(change).ConfigureAwait(false);
+            }
+        );
+
+        Field<DateTimeHolderType>("immediatelyChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .Resolve(context =>
+            {
+                var root = context.Source as Root;
+                var change = context.GetArgument<DateTime>("newDateTime");
+                return root.ImmediatelyChangeTheDateTime(change);
+            }
+        );
+
+        Field<DateTimeHolderType>("promiseToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .ResolveAsync(async context =>
+            {
+                var root = context.Source as Root;
+                var change = context.GetArgument<DateTime>("newDateTime");
+                return await root.PromiseToChangeTheDateTimeAsync(change).ConfigureAwait(false);
+            }
+        );
+
+        Field<DateTimeHolderType>("failToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .Resolve(context =>
+            {
+                var root = context.Source as Root;
+                _ = context.GetArgument<DateTime>("newDateTime");
+                return root.FailToChangeTheDateTime();
+            }
+        );
+
+        Field<DateTimeHolderType>("promiseAndFailToChangeTheDateTime")
+            .Argument<DateTimeGraphType>("newDateTime")
+            .ResolveAsync(async context =>
+            {
+                var change = context.GetArgument<DateTime>("newDateTime");
+                return await Root.PromiseAndFailToChangeTheDateTimeAsync(change).ConfigureAwait(false);
+            }
+        );
+
+        Field<GuidHolderType>("passGuidGraphType")
+            .Argument<GuidGraphType>("guid")
+            .Resolve(context =>
+            {
+                var guid = context.GetArgument<Guid>("guid");
+                return guid;
+            }
+        );
+    }
+}
+
+public class MutationTests : QueryTestBase<MutationSchema>
+{
+    [Fact]
+    public void evaluates_mutations_serially()
+    {
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheNumber(newNumber: 1) {
+                theNumber
+              }
+              second: immediatelyChangeTheNumber(newNumber: 2) {
+                theNumber
+              }
+              third: immediatelyChangeTheNumber(newNumber: 3) {
+                theNumber
+              }
+              fourth: immediatelyChangeTheNumber(newNumber: 4) {
+                theNumber
+              }
+              fifth: immediatelyChangeTheNumber(newNumber: 5) {
+                theNumber
+              }
+            }
+            """;
+
+        var expected = """
+            {
+              "first": {
+                "theNumber": 1
+              },
+              "second": {
+                "theNumber": 2
+              },
+              "third": {
+                "theNumber": 3
+              },
+              "fourth": {
+                "theNumber": 4
+              },
+              "fifth": {
+                "theNumber": 5
+              }
+            }
+            """;
+
+        AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
     }
 
-    public class MutationTests : QueryTestBase<MutationSchema>
+    [Fact]
+    public async Task evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
     {
-        [Fact]
-        public void evaluates_mutations_serially()
-        {
-            var query = @"
-                mutation M {
-                  first: immediatelyChangeTheNumber(newNumber: 1) {
-                    theNumber
-                  }
-                  second: immediatelyChangeTheNumber(newNumber: 2) {
-                    theNumber
-                  }
-                  third: immediatelyChangeTheNumber(newNumber: 3) {
-                    theNumber
-                  }
-                  fourth: immediatelyChangeTheNumber(newNumber: 4) {
-                    theNumber
-                  }
-                  fifth: immediatelyChangeTheNumber(newNumber: 5) {
-                    theNumber
-                  }
-                }
-            ";
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheNumber(newNumber: 1) {
+                theNumber
+              }
+              second: promiseToChangeTheNumber(newNumber: 2) {
+                theNumber
+              }
+              third: failToChangeTheNumber(newNumber: 3) {
+                theNumber
+              }
+              fourth: promiseToChangeTheNumber(newNumber: 4) {
+                theNumber
+              }
+              fifth: immediatelyChangeTheNumber(newNumber: 5) {
+                theNumber
+              }
+              sixth: promiseAndFailToChangeTheNumber(newNumber: 6) {
+                theNumber
+              }
+            }
+            """;
 
-            var expected = @"
-                {
-                  ""first"": {
-                    ""theNumber"": 1
-                  },
-                  ""second"": {
-                    ""theNumber"": 2
-                  },
-                  ""third"": {
-                    ""theNumber"": 3
-                  },
-                  ""fourth"": {
-                    ""theNumber"": 4
-                  },
-                  ""fifth"": {
-                    ""theNumber"": 5
-                  }
-                }";
+        var expected = """
+            {
+              "first": {
+                "theNumber": 1
+              },
+              "second": {
+                "theNumber": 2
+              },
+              "third": null,
+              "fourth": {
+                "theNumber": 4
+              },
+              "fifth": {
+                "theNumber": 5
+              },
+              "sixth": null
+            }
+            """;
 
-            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
-        }
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
+        result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
+        var last = result.Errors.Last();
+        last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
+    }
 
-        [Fact]
-        public void evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
-        {
-            var query = @"
-                mutation M {
-                  first: immediatelyChangeTheNumber(newNumber: 1) {
-                    theNumber
-                  }
-                  second: promiseToChangeTheNumber(newNumber: 2) {
-                    theNumber
-                  }
-                  third: failToChangeTheNumber(newNumber: 3) {
-                    theNumber
-                  }
-                  fourth: promiseToChangeTheNumber(newNumber: 4) {
-                    theNumber
-                  }
-                  fifth: immediatelyChangeTheNumber(newNumber: 5) {
-                    theNumber
-                  }
-                  sixth: promiseAndFailToChangeTheNumber(newNumber: 6) {
-                    theNumber
-                  }
-                }
-            ";
+    [Fact]
+    public void evaluates_datetime_mutations_serially()
+    {
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
+                theDateTime
+              }
+              second: immediatelyChangeTheDateTime(newDateTime: "2017-02-27T15:19:53.123Z") {
+                theDateTime
+              }
+              third: immediatelyChangeTheDateTime(newDateTime: "2017-03-27T15:19:53.123Z") {
+                theDateTime
+              }
+              fourth: immediatelyChangeTheDateTime(newDateTime: "2017-04-27T15:19:53.123-5:00") {
+                theDateTime
+              }
+              fifth: immediatelyChangeTheDateTime(newDateTime: "2017-05-27T15:19:53.123+2:00") {
+                theDateTime
+              }
+            }
+            """;
 
-            var expected = @"
-                {
-                  ""first"": {
-                    ""theNumber"": 1
-                  },
-                  ""second"": {
-                    ""theNumber"": 2
-                  },
-                  ""third"": null,
-                  ""fourth"": {
-                    ""theNumber"": 4
-                  },
-                  ""fifth"": {
-                    ""theNumber"": 5
-                  },
-                  ""sixth"": null
-                }";
+        var expected = """
+            {
+              "first": {
+                "theDateTime": "2017-01-27T15:19:53.123Z"
+              },
+              "second": {
+                "theDateTime": "2017-02-27T15:19:53.123Z"
+              },
+              "third": {
+                "theDateTime": "2017-03-27T15:19:53.123Z"
+              },
+              "fourth": {
+                "theDateTime": "2017-04-27T20:19:53.123Z"
+              },
+              "fifth": {
+                "theDateTime": "2017-05-27T13:19:53.123Z"
+              }
+            }
+            """;
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
-            result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
-            var last = result.Errors.Last();
-            last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
-        }
+        AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
+    }
 
-        [Fact]
-        public void evaluates_datetime_mutations_serially()
-        {
-            var query = @"
-                mutation M {
-                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  second: immediatelyChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  third: immediatelyChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  fourth: immediatelyChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
-                    theDateTime
-                  }
-                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
-                    theDateTime
-                  }
-                }
-            ";
+    [Fact]
+    public async Task evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
+    {
+        var query = """
+            mutation M {
+              first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
+                theDateTime
+              }
+              second: promiseToChangeTheDateTime(newDateTime: "2017-02-27T15:19:53.123Z") {
+                theDateTime
+              }
+              third: failToChangeTheDateTime(newDateTime: "2017-03-27T15:19:53.123Z") {
+                theDateTime
+              }
+              fourth: promiseToChangeTheDateTime(newDateTime: "2017-04-27T15:19:53.123-5:00") {
+                theDateTime
+              }
+              fifth: immediatelyChangeTheDateTime(newDateTime: "2017-05-27T15:19:53.123+2:00") {
+                theDateTime
+              }
+              sixth: promiseAndFailToChangeTheDateTime(newDateTime: "2017-06-27T15:19:53.123Z") {
+                theDateTime
+              }
+            }
+            """;
 
-            var expected = @"
-                {
-                  ""first"": {
-                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
-                  },
-                  ""second"": {
-                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
-                  },
-                  ""third"": {
-                    ""theDateTime"": ""2017-03-27T15:19:53.123Z""
-                  },
-                  ""fourth"": {
-                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
-                  },
-                  ""fifth"": {
-                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
-                  }
-                }";
+        var expected = """
+            {
+              "first": {
+                "theDateTime": "2017-01-27T15:19:53.123Z"
+              },
+              "second": {
+                "theDateTime": "2017-02-27T15:19:53.123Z"
+              },
+              "third": null,
+              "fourth": {
+                "theDateTime": "2017-04-27T20:19:53.123Z"
+              },
+              "fifth": {
+                "theDateTime": "2017-05-27T13:19:53.123Z"
+              },
+              "sixth": null
+            }
+            """;
 
-            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
-        }
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
+        result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
+        var last = result.Errors.Last();
+        last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
+    }
 
-        [Fact]
-        public void evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
-        {
-            var query = @"
-                mutation M {
-                  first: immediatelyChangeTheDateTime(newDateTime: ""2017-01-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  second: promiseToChangeTheDateTime(newDateTime: ""2017-02-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  third: failToChangeTheDateTime(newDateTime: ""2017-03-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                  fourth: promiseToChangeTheDateTime(newDateTime: ""2017-04-27T15:19:53.123-5:00"") {
-                    theDateTime
-                  }
-                  fifth: immediatelyChangeTheDateTime(newDateTime: ""2017-05-27T15:19:53.123+2:00"") {
-                    theDateTime
-                  }
-                  sixth: promiseAndFailToChangeTheDateTime(newDateTime: ""2017-06-27T15:19:53.123Z"") {
-                    theDateTime
-                  }
-                }
-            ";
+    [Fact]
+    public void successfully_handles_guidgraphtype()
+    {
+        var query = """
+            mutation M {
+              passGuidGraphType(guid: "085A38AD-907B-4625-AFEE-67EFC71217DE") {
+                theGuid
+              }
+            }
+            """;
 
-            var expected = @"
-                {
-                  ""first"": {
-                    ""theDateTime"": ""2017-01-27T15:19:53.123Z""
-                  },
-                  ""second"": {
-                    ""theDateTime"": ""2017-02-27T15:19:53.123Z""
-                  },
-                  ""third"": null,
-                  ""fourth"": {
-                    ""theDateTime"": ""2017-04-27T20:19:53.123Z""
-                  },
-                  ""fifth"": {
-                    ""theDateTime"": ""2017-05-27T13:19:53.123Z""
-                  },
-                  ""sixth"": null
-                }";
+        var expected = """
+            {
+              "passGuidGraphType": {
+                "theGuid": "085a38ad-907b-4625-afee-67efc71217de"
+              }
+            }
+            """;
 
-            var result = AssertQueryWithErrors(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
-            result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
-            var last = result.Errors.Last();
-            last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
-        }
-
-        [Fact]
-        public void successfully_handles_guidgraphtype()
-        {
-            var query = @"
-                mutation M {
-                  passGuidGraphType(guid: ""085A38AD-907B-4625-AFEE-67EFC71217DE"") {
-                    theGuid
-                  }
-                }
-            ";
-
-            var expected = @"{
-                    ""passGuidGraphType"": {
-                        ""theGuid"": ""085a38ad-907b-4625-afee-67efc71217de""
-                    }
-                }";
-
-            AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
-        }
+        AssertQuerySuccess(query, expected, root: new Root(6, DateTime.Now));
     }
 }

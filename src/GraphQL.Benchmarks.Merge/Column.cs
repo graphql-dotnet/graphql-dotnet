@@ -1,9 +1,8 @@
-namespace GraphQL.Benchmarks.Merge
-{
-    internal sealed class Column
-    {
-        public string Name { get; set; }
+namespace GraphQL.Benchmarks.Merge;
 
-        public Alignment Alignment { get; set; }
-    }
+internal sealed class Column
+{
+    public string Name { get; set; }
+
+    public Alignment Alignment { get; set; }
 }

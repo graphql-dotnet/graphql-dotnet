@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 using GraphQL.Utilities;
 
@@ -111,7 +110,7 @@ namespace GraphQL.Types
             return type;
         }
 
-        private ArgumentOutOfRangeException Create(string paramName, Type value) => new ArgumentOutOfRangeException(paramName,
+        private ArgumentOutOfRangeException Create(string paramName, Type value) => new(paramName,
             $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
     }
 }

@@ -1,24 +1,20 @@
-using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Xml.Linq;
 using GraphQL.Types;
 using PublicApiGenerator;
-using Shouldly;
-using Xunit;
 
 namespace GraphQL.ApiTests;
 
-/// <see href="https://github.com/JakeGinnivan/ApiApprover"/>
+/// <summary>
+/// See more info about API approval tests here <see href="https://github.com/JakeGinnivan/ApiApprover"/>.
+/// </summary>
 public class ApiApprovalTests
 {
     [Theory]
     [InlineData(typeof(IGraphType))]
-    [InlineData(typeof(SubscriptionDocumentExecuter))]
-    [InlineData(typeof(SystemTextJson.DocumentWriter))]
-    [InlineData(typeof(NewtonsoftJson.DocumentWriter))]
+    [InlineData(typeof(SystemTextJson.GraphQLSerializer))]
+    [InlineData(typeof(NewtonsoftJson.GraphQLSerializer))]
     [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]
     [InlineData(typeof(Caching.MemoryDocumentCache))]
     [InlineData(typeof(DataLoader.DataLoaderContext))]

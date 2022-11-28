@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Reflection;
 
 namespace GraphQL.Reflection
@@ -20,7 +18,7 @@ namespace GraphQL.Reflection
             var methodInfo = type.MethodForField(field, resolverType);
             if (methodInfo != null)
             {
-                return new SingleMethodAccessor(methodInfo);
+                return new SingleMethodAccessor(type, methodInfo);
             }
 
             if (resolverType != ResolverType.Resolver)
@@ -31,7 +29,7 @@ namespace GraphQL.Reflection
             var propertyInfo = type.PropertyForField(field);
             if (propertyInfo != null)
             {
-                return new SinglePropertyAccessor(propertyInfo);
+                return new SinglePropertyAccessor(type, propertyInfo);
             }
 
             return null;
@@ -42,8 +40,8 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        /// <param name="resolverType">Indicates if a resolver or subscriber method is requested.</param>
-        public static MethodInfo MethodForField(this Type type, string field, ResolverType resolverType)
+        /// <param name="resolverType">Indicates if a resolver or stream resolver method is requested.</param>
+        public static MethodInfo? MethodForField(this Type type, string field, ResolverType resolverType)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
 
@@ -62,7 +60,7 @@ namespace GraphQL.Reflection
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <param name="field">The desired field.</param>
-        public static PropertyInfo PropertyForField(this Type type, string field)
+        public static PropertyInfo? PropertyForField(this Type type, string field)
         {
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
@@ -74,46 +72,6 @@ namespace GraphQL.Reflection
             });
 
             return property;
-        }
-
-        public static object?[]? BuildArguments(ParameterInfo[]? parameters, IResolveFieldContext context)
-        {
-            if (parameters == null || parameters.Length == 0)
-                return null;
-
-            object?[] arguments = new object?[parameters.Length];
-
-            var index = 0;
-            if (parameters[index].ParameterType.IsAssignableFrom(context.GetType()))
-            {
-                arguments[index] = context;
-                index++;
-            }
-
-            if (parameters.Length > index
-                && context.Source != null
-                && (context.Source?.GetType() == parameters[index].ParameterType
-                    || string.Equals(parameters[index].Name, "source", StringComparison.OrdinalIgnoreCase)))
-            {
-                arguments[index] = context.Source;
-                index++;
-            }
-
-            if (parameters.Length > index
-                && context.UserContext != null
-                && parameters[index].ParameterType.IsInstanceOfType(context.UserContext))
-            {
-                arguments[index] = context.UserContext;
-                index++;
-            }
-
-            foreach (var parameter in parameters.Skip(index))
-            {
-                arguments[index] = context.GetArgument(parameter.ParameterType, parameter.Name);
-                index++;
-            }
-
-            return arguments;
         }
     }
 }

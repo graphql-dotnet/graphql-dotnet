@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language.AST;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
@@ -59,14 +59,22 @@ namespace GraphQL.Utilities.Federation
                 schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
-            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new { });
+            var service = new FieldType
+            {
+                Name = "_service",
+                ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
+                Resolver = new FuncFieldResolver<object>(_ => new { })
+            };
+            query.AddField(service);
 
             var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
-            query.FieldAsync(
-                "_entities",
-                new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
-                resolve: async context =>
+
+            var entities = new FieldType
+            {
+                Name = "_entities",
+                Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+                ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);
 
@@ -77,7 +85,7 @@ namespace GraphQL.Utilities.Federation
                     foreach (var rep in reps!)
                     {
                         var typeName = rep!["__typename"].ToString();
-                        var type = context.Schema.AllTypes[typeName];
+                        var type = context.Schema.AllTypes[typeName!];
                         if (type != null)
                         {
                             // execute resolver
@@ -105,35 +113,37 @@ namespace GraphQL.Utilities.Federation
                     }
 
                     return results;
-                });
+                })
+            };
+            query.AddField(entities);
         }
 
-        private void AddTypeNameToSelection(Field field, Document document)
+        private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
         {
             if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
             {
-                setToAlter!.Prepend(new Field(default, new NameNode("__typename")));
+                setToAlter!.Selections.Insert(0, new GraphQLField { Name = new GraphQLName("__typename") });
             }
         }
 
-        private bool FindSelectionToAmend(SelectionSet selectionSet, Document document, out SelectionSet? setToAlter)
+        private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
         {
-            foreach (var selection in selectionSet.SelectionsList)
+            foreach (var selection in selectionSet.Selections)
             {
-                if (selection is Field childField && childField.Name == "__typename")
+                if (selection is GraphQLField childField && childField.Name == "__typename")
                 {
                     setToAlter = null;
                     return false;
                 }
 
-                if (selection is InlineFragment frag)
+                if (selection is GraphQLInlineFragment frag)
                 {
                     return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
                 }
 
-                if (selection is FragmentSpread spread)
+                if (selection is GraphQLFragmentSpread spread)
                 {
-                    var def = document.Fragments.FindDefinition(spread.Name)!;
+                    var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
                     return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
                 }
             }
@@ -157,9 +167,9 @@ namespace GraphQL.Utilities.Federation
 
             union.ResolveType = x =>
             {
-                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object typeName))
+                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
                 {
-                    return new GraphQLTypeReference(typeName.ToString());
+                    return new GraphQLTypeReference(typeName!.ToString()!);
                 }
 
                 // TODO: Provide another way to give graph type name, such as an attribute
@@ -190,7 +200,7 @@ namespace GraphQL.Utilities.Federation
 
         private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
         {
-            return directives?.FirstOrDefault(x => x.Name!.Value == name);
+            return directives?.FirstOrDefault(x => x.Name == name);
         }
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Utilities
 {
     internal static class ServiceProviderExtensions
@@ -26,11 +24,11 @@ namespace GraphQL.Utilities
             if (serviceType == null)
                 throw new ArgumentNullException(nameof(serviceType));
 
-            object service = provider.GetService(serviceType);
+            object? service = provider.GetService(serviceType);
             if (service != null)
                 return service;
 
-            throw new InvalidOperationException($"Required service for type {serviceType} not found");
+            throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered.");
         }
     }
 }

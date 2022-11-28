@@ -1,6 +1,6 @@
-using System;
 using System.Globalization;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -21,10 +21,10 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            StringValue stringValue => ParseDate(stringValue.Value),
-            NullValue _ => null,
+            GraphQLStringValue stringValue => ParseDate(stringValue.Value),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
@@ -38,12 +38,17 @@ namespace GraphQL.Types
             _ => ThrowValueConversionError(value)
         };
 
-        private static DateTimeOffset ParseDate(string stringValue)
+        private static DateTimeOffset ParseDate(ROM stringValue)
         {
             // ISO-8601 format
             // Note that the "O" format is similar but always prints the fractional parts
             // of the second, which is not required by ISO-8601.
-            if (DateTimeOffset.TryParseExact(stringValue, "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var date))
+            if (DateTimeOffset.TryParseExact(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                stringValue,
+                "yyyy'-'MM'-'dd'T'HH':'mm':'ss.FFFFFFFK", DateTimeFormatInfo.InvariantInfo, DateTimeStyles.AssumeUniversal, out var date))
             {
                 return date;
             }

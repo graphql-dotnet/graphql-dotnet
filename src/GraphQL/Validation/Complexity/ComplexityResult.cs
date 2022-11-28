@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity
 {
@@ -11,7 +10,7 @@ namespace GraphQL.Validation.Complexity
         /// <summary>
         /// Returns a dictionary of nodes and their complexity factors.
         /// </summary>
-        public Dictionary<INode, double> ComplexityMap { get; } = new Dictionary<INode, double>();
+        public Dictionary<ASTNode, double> ComplexityMap { get; } = new Dictionary<ASTNode, double>();
 
         /// <summary>
         /// Returns the total calculated document complexity factor over all executed nodes.

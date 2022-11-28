@@ -1,6 +1,5 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,23 +15,23 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly FragmentsOnCompositeTypes Instance = new FragmentsOnCompositeTypes();
+        public static readonly FragmentsOnCompositeTypes Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="FragmentsOnCompositeTypesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<InlineFragment>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
-                if (node.Type != null && type != null && !type.IsCompositeType())
+                if (node.TypeCondition?.Type != null && type != null && !type.IsCompositeType())
                 {
                     context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                 }
             }),
 
-            new MatchingNodeVisitor<FragmentDefinition>((node, context) =>
+            new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
             {
                 var type = context.TypeInfo.GetLastType();
                 if (type != null && !type.IsCompositeType())
@@ -40,6 +39,6 @@ namespace GraphQL.Validation.Rules
                     context.ReportError(new FragmentsOnCompositeTypesError(context, node));
                 }
             })
-        ).ToTask();
+        );
     }
 }

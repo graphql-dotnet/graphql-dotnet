@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
@@ -9,8 +7,9 @@ namespace GraphQL.Reflection
     {
         private readonly PropertyInfo _property;
 
-        public SinglePropertyAccessor(PropertyInfo property)
+        public SinglePropertyAccessor(Type declaringType, PropertyInfo property)
         {
+            DeclaringType = declaringType; // may be a derived type rather than property.DeclaringType
             _property = property;
         }
 
@@ -18,11 +17,11 @@ namespace GraphQL.Reflection
 
         public Type ReturnType => _property.PropertyType;
 
-        public Type DeclaringType => _property.DeclaringType;
+        public Type DeclaringType { get; }
 
         public ParameterInfo[]? Parameters => null;
 
-        public MethodInfo MethodInfo => _property.GetMethod;
+        public MethodInfo MethodInfo => _property.GetMethod!;
 
         public IEnumerable<T> GetAttributes<T>() where T : Attribute => _property.GetCustomAttributes<T>();
 
@@ -34,7 +33,7 @@ namespace GraphQL.Reflection
             }
             catch (TargetInvocationException ex)
             {
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                ExceptionDispatchInfo.Capture(ex.InnerException!).Throw();
                 return null; // never executed, necessary only for intellisense
             }
         }

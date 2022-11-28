@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Security.Claims;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -18,77 +17,90 @@ namespace GraphQL.Execution
         IExecutionStrategy ExecutionStrategy { get; }
 
         /// <summary>
-        /// Propagates notification that the GraphQL request should be canceled
+        /// Propagates notification that the GraphQL request should be canceled.
         /// </summary>
         CancellationToken CancellationToken { get; }
 
         /// <summary>
-        /// The parsed GraphQL request
+        /// The parsed GraphQL request.
         /// </summary>
-        Document Document { get; }
+        GraphQLDocument Document { get; }
 
         /// <summary>
-        /// A list of errors generated during GraphQL request processing
+        /// A list of errors generated during GraphQL request processing.
         /// </summary>
         ExecutionErrors Errors { get; }
 
         /// <summary>
-        /// A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query
+        /// A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query.
         /// </summary>
         List<IDocumentExecutionListener> Listeners { get; }
 
         /// <summary>
-        /// If set, limits the maximum number of nodes (in other words GraphQL fields) executed in parallel
+        /// If set, limits the maximum number of nodes (in other words GraphQL fields) executed in parallel.
         /// </summary>
         int? MaxParallelExecutionCount { get; }
 
         /// <summary>
-        /// Provides performance metrics logging capabilities
+        /// Provides performance metrics logging capabilities.
         /// </summary>
         Metrics Metrics { get; }
 
         /// <summary>
-        /// The GraphQL operation that is being executed
+        /// The GraphQL operation that is being executed.
         /// </summary>
-        Operation Operation { get; }
+        GraphQLOperationDefinition Operation { get; }
 
         /// <summary>
-        /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers
+        /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers.
         /// </summary>
         object? RootValue { get; }
 
         /// <summary>
-        /// Schema of the graph to use
+        /// Schema of the graph to use.
         /// </summary>
         ISchema Schema { get; }
 
         /// <summary>
-        /// When <c>false</c>, <see cref="DocumentExecuter"/> and <see cref="ExecutionStrategy"/> capture unhandled
-        /// exceptions and store them within <see cref="Errors">Errors</see>
+        /// When <see langword="false"/>, <see cref="DocumentExecuter"/> and <see cref="ExecutionStrategy"/> capture unhandled
+        /// exceptions and store them within <see cref="Errors">Errors</see>.
         /// </summary>
         bool ThrowOnUnhandledException { get; }
 
         /// <summary>
-        /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored
+        /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored.
         /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
         /// </summary>
-        Action<UnhandledExceptionContext> UnhandledExceptionDelegate { get; }
+        Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
 
         /// <summary>
-        /// Input variables to the GraphQL request
+        /// Input variables to the GraphQL request.
         /// </summary>
         Variables Variables { get; }
 
         /// <summary>
-        /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
-        /// protocol however they see fit, and hence there are no additional restrictions on its contents.
+        /// A dictionary of extra information supplied with the GraphQL request.
+        /// This is reserved for implementors to extend the protocol however they see fit, and
+        /// hence there are no additional restrictions on its contents.
         /// </summary>
-        Dictionary<string, object?> Extensions { get; }
+        IReadOnlyDictionary<string, object?> InputExtensions { get; }
+
+        /// <summary>
+        /// The response map may also contain an entry with key extensions. This entry is
+        /// reserved for implementors to extend the protocol however they see fit, and
+        /// hence there are no additional restrictions on its contents.
+        /// </summary>
+        Dictionary<string, object?> OutputExtensions { get; }
 
         /// <summary>
         /// The service provider for the executing request. Typically this is a scoped service provider
         /// from your dependency injection framework.
         /// </summary>
         IServiceProvider? RequestServices { get; }
+
+        /// <summary>
+        /// Gets security information for the executing request.
+        /// </summary>
+        ClaimsPrincipal? User { get; }
     }
 }

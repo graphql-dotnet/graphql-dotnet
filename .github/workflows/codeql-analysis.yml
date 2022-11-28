@@ -14,15 +14,18 @@ jobs:
 
     steps:
     - name: Checkout source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
       with:
-         dotnet-version: '6.0.x'
+         dotnet-version: '7.0.x'
+         source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+      env:
+         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v1
+      uses: github/codeql-action/init@v2
       with:
         queries: security-and-quality
         languages: csharp
@@ -31,9 +34,10 @@ jobs:
       working-directory: src
       run: dotnet restore
 
-    - name: Build solution
-      working-directory: src
+    - name: Build CodeQL solution
+      # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/troubleshooting-the-codeql-workflow#reduce-the-amount-of-code-being-analyzed-in-a-single-workflow
+      working-directory: codeql
       run: dotnet build --no-restore
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v1
+      uses: github/codeql-action/analyze@v2

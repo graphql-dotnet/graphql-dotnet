@@ -48,10 +48,7 @@ public class DroidType : ObjectGraphType<Droid>
     Field(d => d.Id).Description("The id of the droid.");
     Field(d => d.Name).Description("The name of the droid.");
 
-    Field<ListGraphType<CharacterInterface>>(
-      "friends",
-      resolve: context => data.GetFriends(context.Source)
-    );
+    Field<ListGraphType<CharacterInterface>>("friends").Resolve(context => data.GetFriends(context.Source));
     Field(d => d.PrimaryFunction, nullable: true).Description("The primary function of the droid.");
 
     Interface<CharacterInterface>();
@@ -120,13 +117,17 @@ that implements an Interface you are required to alter the Interface for that ne
 ```csharp
 public class CharacterInterface : InterfaceGraphType<StarWarsCharacter>
 {
-  public CharacterInterface(
-    DroidType droidType,
-    HumanType humanType)
+  public CharacterInterface()
   {
     Name = "Character";
 
     ...
+
+    // Note: be sure not to pull in these references from DI when the graph types
+    // are registered as transients (the default lifetime for graph types)
+
+    var droidType = new GraphQLTypeReference("Droid");
+    var humanType = new GraphQLTypeReference("Human");
 
     ResolveType = obj =>
     {

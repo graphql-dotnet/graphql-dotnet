@@ -17,9 +17,9 @@ namespace GraphQL.Utilities
         void VisitSchema(ISchema schema);
 
         /// <summary>
-        /// Visits registered within the schema <see cref="DirectiveGraphType"/>.
+        /// Visits registered within the schema <see cref="Directive"/>.
         /// </summary>
-        void VisitDirective(DirectiveGraphType type, ISchema schema);
+        void VisitDirective(Directive directive, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="ScalarGraphType"/>.
@@ -64,7 +64,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Visits directive argument.
         /// </summary>
-        void VisitDirectiveArgumentDefinition(QueryArgument argument, DirectiveGraphType type, ISchema schema);
+        void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema);
 
         /// <summary>
         /// Visits registered within the schema <see cref="IInterfaceGraphType"/>.

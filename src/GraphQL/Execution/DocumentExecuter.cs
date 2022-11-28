@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using GraphQL.Caching;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
+using GraphQLParser;
+using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -20,67 +19,71 @@ namespace GraphQL
     {
         private readonly IDocumentBuilder _documentBuilder;
         private readonly IDocumentValidator _documentValidator;
-        private readonly IComplexityAnalyzer _complexityAnalyzer;
-        private readonly IDocumentCache _documentCache;
-        private readonly IEnumerable<IConfigureExecution>? _configurations;
+        private readonly ExecutionDelegate _execution;
+        private readonly IExecutionStrategySelector _executionStrategySelector;
 
         /// <summary>
-        /// Initializes a new instance with default <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances,
-        /// and without document caching.
+        /// Initializes a new instance with default <see cref="IDocumentBuilder"/> and
+        /// <see cref="IDocumentValidator"/> instances, and without document caching.
         /// </summary>
         public DocumentExecuter()
-            : this(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), DefaultDocumentCache.Instance)
+            : this(new GraphQLDocumentBuilder(), new DocumentValidator())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/> and <see cref="IComplexityAnalyzer"/> instances,
-        /// and without document caching.
+        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/> and
+        /// <see cref="IDocumentValidator"/>.
         /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, DefaultDocumentCache.Instance)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
+            : this(documentBuilder, documentValidator, new DefaultExecutionStrategySelector(), Array.Empty<IConfigureExecution>())
         {
         }
 
         /// <summary>
-        /// Initializes a new instance with specified <see cref="IDocumentBuilder"/>,
-        /// <see cref="IDocumentValidator"/>, <see cref="IComplexityAnalyzer"/>,
-        /// and <see cref="IDocumentCache"/> instances.
+        /// Initializes a new instance with the specified <see cref="IDocumentBuilder"/>,
+        /// <see cref="IDocumentValidator"/>, <see cref="IExecutionStrategySelector"/> and
+        /// a set of <see cref="IConfigureExecution"/> instances.
         /// </summary>
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache)
+        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IExecutionStrategySelector executionStrategySelector, IEnumerable<IConfigureExecution> configurations)
         {
             _documentBuilder = documentBuilder ?? throw new ArgumentNullException(nameof(documentBuilder));
             _documentValidator = documentValidator ?? throw new ArgumentNullException(nameof(documentValidator));
-            _complexityAnalyzer = complexityAnalyzer ?? throw new ArgumentNullException(nameof(complexityAnalyzer));
-            _documentCache = documentCache ?? throw new ArgumentNullException(nameof(documentCache));
+            _executionStrategySelector = executionStrategySelector ?? throw new ArgumentNullException(nameof(executionStrategySelector));
+            _execution = BuildExecutionDelegate(configurations);
         }
 
-        public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator, IComplexityAnalyzer complexityAnalyzer, IDocumentCache documentCache, IEnumerable<IConfigureExecution>? configurations)
-            : this(documentBuilder, documentValidator, complexityAnalyzer, documentCache)
+        private ExecutionDelegate BuildExecutionDelegate(IEnumerable<IConfigureExecution> configurations)
         {
-            _configurations = configurations;
+            ExecutionDelegate execution = CoreExecuteAsync;
+
+            // OrderBy here performs a stable sort; that is, if the sort order of two elements are equal,
+            // the order of the elements are preserved. The order is reversed since each execution wraps
+            // the prior configured executions. OrderByDescending is not used because that would result
+            // in a different sort order when there are two executions with equal sort orders.
+            foreach (var action in configurations.OrderBy(x => x.SortOrder).Reverse())
+            {
+                var nextExecution = execution;
+                execution = async options => await action.ExecuteAsync(options, nextExecution).ConfigureAwait(false);
+            }
+            return execution;
         }
 
         /// <inheritdoc/>
-        public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        public virtual Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
         {
             if (options == null)
                 throw new ArgumentNullException(nameof(options));
+
+            return _execution(options);
+        }
+
+        private async Task<ExecutionResult> CoreExecuteAsync(ExecutionOptions options)
+        {
             if (options.Schema == null)
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
             if (options.Query == null && options.Document == null)
-                throw new InvalidOperationException("Cannot execute request if no query is specified");
-
-            if (_configurations != null)
-            {
-                foreach (var configuration in _configurations)
-                {
-                    // allocation free when the configuration delegate is not asynchronous
-                    await configuration.ConfigureAsync(options).ConfigureAwait(false);
-                }
-            }
+                return new ExecutionResult { Errors = new ExecutionErrors { new QueryMissingError() } };
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
@@ -99,61 +102,43 @@ namespace GraphQL
                 }
 
                 var document = options.Document;
-                bool saveInCache = false;
-                bool analyzeComplexity = true;
-                var validationRules = options.ValidationRules;
-                using (metrics.Subject("document", "Building document"))
+                if (document == null)
                 {
-                    if (document == null && (document = _documentCache[options.Query]) != null)
-                    {
-                        // none of the default validation rules yet are dependent on the inputs, and the
-                        // operation name is not passed to the document validator, so any successfully cached
-                        // document should not need any validation rules run on it
-                        validationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
-                        analyzeComplexity = false;
-                    }
-                    if (document == null)
-                    {
-                        document = _documentBuilder.Build(options.Query);
-                        saveInCache = true;
-                    }
+                    using (metrics.Subject("document", "Building document"))
+                        document = _documentBuilder.Build(options.Query!);
                 }
 
-                if (document.Operations.Count == 0)
+                if (document.OperationsCount() == 0)
                 {
                     throw new NoOperationError();
                 }
 
                 var operation = GetOperation(options.OperationName, document);
-                metrics.SetOperationName(operation?.Name);
-
                 if (operation == null)
                 {
-                    throw new InvalidOperationException($"Query does not contain operation '{options.OperationName}'.");
+                    throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
                 }
+                metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;
                 Variables variables;
                 using (metrics.Subject("document", "Validating document"))
                 {
                     (validationResult, variables) = await _documentValidator.ValidateAsync(
-                        options.Schema,
-                        document,
-                        operation.Variables,
-                        validationRules,
-                        options.UserContext,
-                        options.Inputs).ConfigureAwait(false);
-                }
-
-                if (options.ComplexityConfiguration != null && validationResult.IsValid && analyzeComplexity)
-                {
-                    using (metrics.Subject("document", "Analyzing complexity"))
-                        _complexityAnalyzer.Validate(document, options.ComplexityConfiguration);
-                }
-
-                if (saveInCache && validationResult.IsValid)
-                {
-                    _documentCache[options.Query] = document;
+                        new ValidationOptions
+                        {
+                            Document = document,
+                            Rules = options.ValidationRules,
+                            Operation = operation,
+                            UserContext = options.UserContext,
+                            RequestServices = options.RequestServices,
+                            User = options.User,
+                            CancellationToken = options.CancellationToken,
+                            Schema = options.Schema,
+                            Metrics = metrics,
+                            Variables = options.Variables ?? Inputs.Empty,
+                            Extensions = options.Extensions ?? Inputs.Empty,
+                        }).ConfigureAwait(false);
                 }
 
                 context = BuildExecutionContext(options, document, operation, variables, metrics);
@@ -198,17 +183,6 @@ namespace GraphQL
                     var task = (context.ExecutionStrategy ?? throw new InvalidOperationException("Execution strategy not specified")).ExecuteAsync(context)
                         .ConfigureAwait(false);
 
-                    if (context.Listeners != null)
-                    {
-                        foreach (var listener in context.Listeners)
-                        {
-#pragma warning disable CS0612 // Type or member is obsolete
-                            await listener.BeforeExecutionAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                                .ConfigureAwait(false);
-                        }
-                    }
-
                     result = await task;
 
                     if (context.Listeners != null)
@@ -229,7 +203,7 @@ namespace GraphQL
             }
             catch (ExecutionError ex)
             {
-                (result ??= new ExecutionResult()).AddError(ex);
+                (result ??= new()).AddError(ex);
             }
             catch (Exception ex)
             {
@@ -240,15 +214,15 @@ namespace GraphQL
                 if (options.UnhandledExceptionDelegate != null)
                 {
                     exceptionContext = new UnhandledExceptionContext(context, null, ex);
-                    options.UnhandledExceptionDelegate(exceptionContext);
+                    await options.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                     ex = exceptionContext.Exception;
                 }
 
-                (result ??= new ExecutionResult()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
+                (result ??= new()).AddError(ex is ExecutionError executionError ? executionError : new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex));
             }
             finally
             {
-                result ??= new ExecutionResult();
+                result ??= new();
                 result.Perf = metrics.Finish();
                 if (executionOccurred)
                     result.Executed = true;
@@ -261,7 +235,7 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, Document document, Operation operation, Variables variables, Metrics metrics)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics)
         {
             var context = new ExecutionContext
             {
@@ -273,7 +247,8 @@ namespace GraphQL
                 Operation = operation,
                 Variables = variables,
                 Errors = new ExecutionErrors(),
-                Extensions = new Dictionary<string, object?>(),
+                InputExtensions = options.Extensions ?? Inputs.Empty,
+                OutputExtensions = new Dictionary<string, object?>(),
                 CancellationToken = options.CancellationToken,
 
                 Metrics = metrics,
@@ -282,6 +257,7 @@ namespace GraphQL
                 UnhandledExceptionDelegate = options.UnhandledExceptionDelegate,
                 MaxParallelExecutionCount = options.MaxParallelExecutionCount,
                 RequestServices = options.RequestServices,
+                User = options.User,
             };
 
             context.ExecutionStrategy = SelectExecutionStrategy(context);
@@ -290,37 +266,47 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Returns the selected <see cref="Operation"/> given a specified <see cref="Document"/> and operation name.
+        /// Returns the selected <see cref="GraphQLOperationDefinition"/> given a specified <see cref="GraphQLDocument"/> and operation name.
         /// <br/><br/>
-        /// Returns <c>null</c> if an operation cannot be found that matches the given criteria.
+        /// Returns <see langword="null"/> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual Operation? GetOperation(string? operationName, Document document)
-        {
-            return string.IsNullOrWhiteSpace(operationName)
-                ? document.Operations.FirstOrDefault()
-                : document.Operations.WithName(operationName!);
-        }
+        protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
+            => document.OperationWithName(operationName);
 
         /// <summary>
         /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
         /// <br/><br/>
         /// Typically the strategy is selected based on the type of operation.
         /// <br/><br/>
-        /// By default, query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
-        /// <see cref="SerialExecutionStrategy"/>. Subscription operations return a special strategy defined in some separate project,
-        /// for example it can be SubscriptionExecutionStrategy from GraphQL.SystemReactive.
+        /// By default, the selection is handled by the <see cref="IExecutionStrategySelector"/> implementation passed to the
+        /// constructor, which will select an execution strategy based on a set of <see cref="ExecutionStrategyRegistration"/>
+        /// instances passed to it.
+        /// <br/><br/>
+        /// For the <see cref="DefaultExecutionStrategySelector"/> without any registrations,
+        /// query operations will return a <see cref="ParallelExecutionStrategy"/> while mutation operations return a
+        /// <see cref="SerialExecutionStrategy"/>. Subscription operations return a <see cref="SubscriptionExecutionStrategy"/>.
         /// </summary>
         protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
+            => _executionStrategySelector.Select(context);
+    }
+
+    internal class DocumentExecuter<TSchema> : IDocumentExecuter<TSchema>
+        where TSchema : ISchema
+    {
+        private readonly IDocumentExecuter _documentExecuter;
+        public DocumentExecuter(IDocumentExecuter documentExecuter)
         {
-            // TODO: Should we use cached instances of the default execution strategies?
-            return context.Operation.OperationType switch
-            {
-                OperationType.Query => ParallelExecutionStrategy.Instance,
-                OperationType.Mutation => SerialExecutionStrategy.Instance,
-                OperationType.Subscription => throw new NotSupportedException($"DocumentExecuter does not support executing subscriptions. You can use SubscriptionDocumentExecuter from GraphQL.SystemReactive package to handle subscriptions."),
-                _ => throw new InvalidOperationException($"Unexpected OperationType {context.Operation.OperationType}")
-            };
+            _documentExecuter = documentExecuter ?? throw new ArgumentNullException(nameof(documentExecuter));
+        }
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options)
+        {
+            if (options.Schema != null)
+                throw new InvalidOperationException("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
+
+            options.Schema = options.RequestServicesOrThrow().GetRequiredService<TSchema>();
+            return _documentExecuter.ExecuteAsync(options);
         }
     }
 }

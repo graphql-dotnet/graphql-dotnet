@@ -63,12 +63,9 @@ public class StarWarsMutation : ObjectGraphType
 {
   public StarWarsMutation(StarWarsData data)
   {
-    Field<HumanType>(
-      "createHuman",
-      arguments: new QueryArguments(
-        new QueryArgument<NonNullGraphType<HumanInputType>> {Name = "human"}
-      ),
-      resolve: context =>
+    Field<HumanType>("createHuman")
+      .Argument<NonNullGraphType<HumanInputType>>("human")
+      .Resolve(context =>
       {
         var human = context.GetArgument<Human>("human");
         return data.AddHuman(human);

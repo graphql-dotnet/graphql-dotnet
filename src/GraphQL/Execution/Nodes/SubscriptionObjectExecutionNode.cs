@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -9,7 +9,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="SubscriptionObjectExecutionNode"/> with the specified values.
         /// </summary>
-        public SubscriptionObjectExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode, object source)
+        public SubscriptionObjectExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode, object source)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
             Source = source;

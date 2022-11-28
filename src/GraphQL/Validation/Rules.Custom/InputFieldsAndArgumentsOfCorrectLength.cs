@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -18,13 +17,13 @@ namespace GraphQL.Validation.Rules
     {
         private sealed class FieldVisitor : BaseVariableVisitor
         {
-            public static readonly FieldVisitor Instance = new FieldVisitor();
+            public static readonly FieldVisitor Instance = new();
 
-            public override void VisitField(ValidationContext context, VariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
+            public override ValueTask VisitFieldAsync(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
             {
                 var lengthDirective = field.FindAppliedDirective("length");
                 if (lengthDirective == null)
-                    return;
+                    return default;
 
                 var min = lengthDirective.FindArgument("min")?.Value;
                 var max = lengthDirective.FindArgument("max")?.Value;
@@ -39,6 +38,8 @@ namespace GraphQL.Validation.Rules
                     if (min != null && str.Length < (int)min || max != null && str.Length > (int)max)
                         context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, variable, variableName, str.Length, (int?)min, (int?)max));
                 }
+
+                return default;
             }
         }
 
@@ -48,22 +49,22 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new InputFieldsAndArgumentsOfCorrectLength();
+        public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="InputFieldsAndArgumentsOfCorrectLengthError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<Argument>((arg, context) => CheckLength(arg, context.TypeInfo.GetArgument(), context)),
-            new MatchingNodeVisitor<ObjectField>((field, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<GraphQLArgument>((arg, context) => CheckLength(arg, arg.Value, context.TypeInfo.GetArgument(), context)),
+            new MatchingNodeVisitor<GraphQLObjectField>((field, context) =>
             {
-                if (context.TypeInfo.GetInputType(1) is IInputObjectGraphType input)
-                    CheckLength(field, input.GetField(field.Name), context);
+                if (context.TypeInfo.GetInputType(1)?.GetNamedType() is IInputObjectGraphType input)
+                    CheckLength(field, field.Value, input.GetField(field.Name), context);
             })
-        ).ToTask();
+        );
 
-        private static void CheckLength(IHaveValue node, IProvideMetadata? provider, ValidationContext context)
+        private static void CheckLength(ASTNode node, GraphQLValue value, IProvideMetadata? provider, ValidationContext context)
         {
             var lengthDirective = provider?.FindAppliedDirective("length");
             if (lengthDirective == null)
@@ -72,27 +73,27 @@ namespace GraphQL.Validation.Rules
             var min = lengthDirective.FindArgument("min")?.Value;
             var max = lengthDirective.FindArgument("max")?.Value;
 
-            if (node.Value is NullValue)
+            if (value is GraphQLNullValue)
             {
                 if (min != null)
                     context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
             }
-            else if (node.Value is StringValue strLiteral)
+            else if (value is GraphQLStringValue strLiteral)
             {
-                CheckStringLength(strLiteral.Value);
+                CheckStringLength(strLiteral.Value.Length);
             }
-            else if (node.Value is VariableReference vRef && context.Inputs != null && context.Inputs.TryGetValue(vRef.Name, out var value))
+            else if (value is GraphQLVariable vRef && context.Variables != null && context.Variables.TryGetValue(vRef.Name.StringValue, out object? val)) //ISSUE:allocation
             {
-                if (value is string strVariable)
-                    CheckStringLength(strVariable);
-                else if (value is null && min != null)
+                if (val is string strVariable)
+                    CheckStringLength(strVariable.Length);
+                else if (val is null && min != null)
                     context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, null, (int?)min, (int?)max));
             }
 
-            void CheckStringLength(string str)
+            void CheckStringLength(int length)
             {
-                if (min != null && str.Length < (int)min || max != null && str.Length > (int)max)
-                    context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, str.Length, (int?)min, (int?)max));
+                if (min != null && length < (int)min || max != null && length > (int)max)
+                    context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, node, length, (int?)min, (int?)max));
             }
         }
     }

@@ -1,87 +1,81 @@
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class NullableInputListTests : QueryTestBase<TestSchema>
 {
-    public class NullableInputListTests : QueryTestBase<TestSchema>
+    [Fact]
+    public void Can_Accept_Null_List_From_Literal()
     {
-        [Fact]
-        public void Can_Accept_Null_List_From_Literal()
-        {
-            var query = @"
-                query _ {
-                  example(testInputs:null)
-                }";
-            var expected = @"
-                {
-                    ""example"": ""null""
-                }";
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void Can_Accept_Null_List_From_Input()
-        {
-            var query = @"
-                query _($inputs:[TestInput]) {
-                  example(testInputs: $inputs)
-                }";
-            var expected = @"
-                {
-                    ""example"": ""null""
-                }";
-            AssertQuerySuccess(query, expected, inputs: new Inputs(new Dictionary<string, object>
+        var query = """
+            query _ {
+              example(testInputs:null)
+            }
+            """;
+        var expected = """
             {
-                { "inputs", null }
-            }));
-        }
+              "example": "null"
+            }
+            """;
+        AssertQuerySuccess(query, expected);
     }
 
-    public class TestSchema : Schema
+    [Fact]
+    public void Can_Accept_Null_List_From_Input()
     {
-        public TestSchema()
+        var query = """
+            query _($inputs:[TestInput]) {
+              example(testInputs: $inputs)
+            }
+            """;
+        var expected = """
+            {
+              "example": "null"
+            }
+            """;
+        AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object>
         {
-            Query = new TestQuery();
-        }
+            { "inputs", null }
+        }));
     }
+}
 
-    public class TestQuery : ObjectGraphType
+public class TestSchema : Schema
+{
+    public TestSchema()
     {
-        public TestQuery()
-        {
-            Name = "Query";
-            Field<StringGraphType>(
-                "example",
-                arguments: new QueryArguments(
-                    new QueryArgument<ListGraphType<TestInputType>>
-                    {
-                        Name = "testInputs"
-                    }
-                ),
-                resolve: context =>
-                {
-                    var testInputs = context.GetArgument<List<TestInput>>("testInputs");
-                    return testInputs == null
-                        ? "null"
-                        : "[" + string.Join(",", testInputs.Select(x => x == null ? "null" : x.Text)) + "]";
-                }
-            );
-        }
+        Query = new TestQuery();
     }
+}
 
-    public class TestInputType : InputObjectGraphType
+public class TestQuery : ObjectGraphType
+{
+    public TestQuery()
     {
-        public TestInputType()
-        {
-            Name = "TestInput";
-            Field<StringGraphType>("text");
-        }
+        Name = "Query";
+        Field<StringGraphType>("example")
+            .Argument<ListGraphType<TestInputType>>("testInputs")
+            .Resolve(context =>
+            {
+                var testInputs = context.GetArgument<List<TestInput>>("testInputs");
+                return testInputs == null
+                    ? "null"
+                    : "[" + string.Join(",", testInputs.Select(x => x == null ? "null" : x.Text)) + "]";
+            }
+        );
     }
+}
 
-    public class TestInput
+public class TestInputType : InputObjectGraphType
+{
+    public TestInputType()
     {
-        public string Text { get; set; }
+        Name = "TestInput";
+        Field<StringGraphType>("text");
     }
+}
+
+public class TestInput
+{
+    public string Text { get; set; }
 }

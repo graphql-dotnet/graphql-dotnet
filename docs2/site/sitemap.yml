@@ -88,6 +88,10 @@
       - title: Migration Guides
         dir: migrations
         items:
+          - title: Migration Guide [v5 -> v7]
+            file: migration7.md
+          - title: Migration Guide [v4 -> v5]
+            file: migration5.md
           - title: Migration Guide [v3 -> v4]
             file: migration4.md
           - title: Migration Guide [v2 -> v3]

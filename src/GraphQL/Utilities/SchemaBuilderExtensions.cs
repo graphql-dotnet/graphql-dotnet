@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -41,12 +39,12 @@ namespace GraphQL.Utilities
             {
                 foreach (var directive in ast.Directives!)
                 {
-                    provider.ApplyDirective((string)directive!.Name!.Value, d =>
+                    provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
                     {
                         if (directive.Arguments?.Count > 0)
                         {
                             foreach (var arg in directive.Arguments)
-                                d.AddArgument(new DirectiveArgument((string)arg.Name!.Value) { Value = arg.Value!.ToValue() });
+                                d.AddArgument(new DirectiveArgument(arg.Name.StringValue) { Value = arg.Value.ParseAnyLiteral() }); //ISSUE:allocation
                         }
                     });
                 }
@@ -75,7 +73,7 @@ namespace GraphQL.Utilities
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
         {
             var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
-            return types.SelectMany(x => x.Directives);
+            return types.SelectMany(x => x.Directives!);
         }
     }
 }

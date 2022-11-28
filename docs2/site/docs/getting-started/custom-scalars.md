@@ -96,7 +96,7 @@ public struct Vector3
 ```csharp
 using GraphQL;
 using GraphQL.Types;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 public class Vector3Type : ScalarGraphType
 {
@@ -105,17 +105,17 @@ public class Vector3Type : ScalarGraphType
         Name = "Vector3";
     }
 
-    public override object ParseLiteral(IValue value)
+    public override object? ParseLiteral(GraphQLValue value)
     {
         throw new NotImplementedException();
     }
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
     {
         throw new NotImplementedException();
     }
 
-    public override object Serialize(object value)
+    public override object? Serialize(object? value)
     {
         throw new NotImplementedException();
     }
@@ -138,20 +138,20 @@ public void ConfigureServices(IServiceCollection services)
 ### 4. Prepare to accept `Vector3` inputs from query arguments. Implement `ScalarGraphType.ParseLiteral`.
 
 Keep in mind that AST parsing may present values as any of the following types:
-- `IntValue` - integers that can be represented within an `int`
-- `LongValue` - integers that can be represented within a `long`
-- `BigIntValue` - integers that can be represented within a `BigInteger`
-- `FloatValue` - floating-point values that can be represented within a `double`
-- `DecimalValue` - floating-point values that can be represented within a `decimal`
-- `StringValue` - string values
-- `EnumValue` - enumeration values
-- `NullValue` - representing `null` - must be handled by all scalars
+- `GraphQLIntValue` - integer values
+- `GraphQLFloatValue` - floating-point values that can be represented within a `double`
+- `GraphQLStringValue` - string values
+- `GraphQLEnumValue` - enumeration values
+- `GraphQLBooleanValue` - boolean values - `true` and `false`
+- `GraphQLNullValue` - representing `null` - must be handled by all scalars
+- `GraphQLObjectValue` - complex values with nested levels
+- `GraphQLListValue` - lists of values
 
-If your custom scalar accepts floating-point values, you must be sure to handle all 5 of the
-numeric types, since queries like `{ field(arg: 3) }` is parsed as an `IntValue` even though
+If your custom scalar accepts floating-point values, you must be sure to handle `GraphQLIntValue`
+as well, since queries like `{ field(arg: 3) }` is parsed as an `GraphQLIntValue` even though
 it is also a valid floating-point number.
 
-In the sample below, only `NullValue` and `StringValue` need to be handled.
+In the sample below, only `GraphQLNullValue` and `GraphQLStringValue` need to be handled.
 
 For any type that is not handled, or when the value cannot be parsed, you must throw an exception.
 `ThrowLiteralConversionError` is provided as a convenient method to facilitate throwing an exception
@@ -160,13 +160,13 @@ when the type does not match.
 ```csharp
 //in Vector3Type
 
-public override object ParseLiteral(IValue value)
+public override object? ParseLiteral(GraphQLValue value)
 {
-    if (value is NullValue)
+    if (value is GraphQLNullValue)
         return null;
 
-    if (value is StringValue stringValue)
-        return ParseValue(stringValue.Value);
+    if (value is GraphQLStringValue stringValue)
+        return ParseValue((string)stringValue.Value);
 
     return ThrowLiteralConversionError(value);
 }
@@ -202,7 +202,7 @@ In the sample below, only `null` and `string` types need to be handled.
 ```csharp
 // In Vector3Type
 
-public override object ParseValue(object value)
+public override object? ParseValue(object? value)
 {
     if (value == null)
         return null;
@@ -237,7 +237,7 @@ a string, which matches the expected data type within `ParseValue`.
 ```csharp
 // In Vector3Type
 
-public override object Serialize(object value)
+public override object? Serialize(object? value)
 {
     if (value == null)
         return null;
@@ -338,17 +338,17 @@ And a sample of a response with a vector in a more structured format:
 ```csharp
 // In Vector3Type
 
-public override object ParseLiteral(IValue value)
+public override object? ParseLiteral(GraphQLValue value)
 {
-    if (value is NullValue)
+    if (value is GraphQLNullValue)
         return null;
 
-    if (value is StringValue stringValue)
-        return ParseValue(stringValue.Value);
+    if (value is GraphQLStringValue stringValue)
+        return ParseValue((string)stringValue.Value);
 
-    if (value is ObjectValue objectValue)
+    if (value is GraphQLObjectValue objectValue)
     {
-        var entries = objectValue.ObjectFields.ToDictionary(x => x.Name, x => _floatScalar.ParseLiteral(x.Value));
+        var entries = objectValue.Fields.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
         if (entries.Count != 3)
             return ThrowLiteralConversionError(value);
         var x = (double)entries["x"];
@@ -366,7 +366,7 @@ public override object ParseLiteral(IValue value)
 ```csharp
 // In Vector3Type
 
-public override object ParseValue(object value)
+public override object? ParseValue(object? value)
 {
     if (value == null)
         return null;
@@ -413,7 +413,7 @@ public override object ParseValue(object value)
 ```csharp
 // In Vector3Type
 
-public override object Serialize(object value)
+public override object? Serialize(object? value)
 {
     if (value == null)
         return null;
@@ -440,19 +440,34 @@ necessary to override this method.
 ```csharp
 // In Vector3Type
 
-public override IValue ToAST(object value)
+public override GraphQLValue ToAST(object? value)
 {
     if (value == null)
-        return new NullValue();
+        return new GraphQLNullValue();
 
     if (value is Vector3 vector3)
     {
-        return new ObjectValue(new[]
+        return new GraphQLObjectValue
         {
-            new ObjectField("x", new FloatValue(vector3.X)),
-            new ObjectField("y", new FloatValue(vector3.Y)),
-            new ObjectField("z", new FloatValue(vector3.Z)),
-        });
+            Fields = new List<GraphQLObjectField>
+            {
+                new GraphQLObjectField
+                {
+                    Name = new GraphQLName("x"),
+                    Value = new GraphQLFloatValue(vector3.X))
+                },
+                new GraphQLObjectField
+                {
+                    Name = new GraphQLName("y"),
+                    Value = new GraphQLFloatValue(vector3.Y))
+                },
+                new GraphQLObjectField
+                {
+                    Name = new GraphQLName("z"),
+                    Value = new GraphQLFloatValue(vector3.Z))
+                }
+            }
+        };
     }
 
     return ThrowASTConversionError(value);
@@ -519,21 +534,21 @@ public class DbIdGraphType : ScalarGraphType
         Name = "DbId";
     }
 
-    public override object ParseLiteral(IValue value) => value switch
+    public override object? ParseLiteral(GraphQLValue value) => value switch
     {
-        StringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
-        NullValue _ => 0,
+        GraphQLStringValue s => int.TryParse(s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."),
+        GraphQLNullValue _ => 0,
         _ => ThrowLiteralConversionError(value)
     };
 
-    public override object ParseValue(object value) => value switch
+    public override object? ParseValue(object? value) => value switch
     {
         string s => int.TryParse(s, out int i) && i > 0 ? i : throw new FormatException($"'{s}' is not a valid identifier."),
         null => 0,
         _ => ThrowValueConversionError(value)
     };
 
-    public override object Serialize(object value) => value switch
+    public override object? Serialize(object? value) => value switch
     {
         int i => i > 0 ? i.ToString() : i == 0 ? null : ThrowSerializationError(value),
         _ => ThrowSerializationError(value)
@@ -560,8 +575,9 @@ further reference.
 Below is a sample of how to replace the built-in `BooleanGraphType` so it will accept 0 and non-zero
 values to represent `false` and `true`.
 
-### 1. Create a new scalar graph type `MyBooleanGraphType`. Inherit from `BooleanGraphType` and set
-the name to be `Boolean`.
+### 1. Create a new scalar graph type `MyBooleanGraphType`
+
+Inherit from `BooleanGraphType` and set the name to be `Boolean`.
 
 ```csharp
 public class MyBooleanGraphType : BooleanGraphType
@@ -573,7 +589,9 @@ public class MyBooleanGraphType : BooleanGraphType
 }
 ```
 
-### 2. Override the methods as necessary; in this case we must override all of them except `Serialize` and `IsValidDefault`.
+### 2. Override the methods as necessary
+
+In this case we must override all of them except `Serialize` and `IsValidDefault`.
 
 ```csharp
 public class MyBooleanGraphType : BooleanGraphType
@@ -583,20 +601,17 @@ public class MyBooleanGraphType : BooleanGraphType
         Name = "Boolean";
     }
 
-    public override object ParseLiteral(IValue value) => value switch
+    public override object? ParseLiteral(GraphQLValue value) => value switch
     {
-        BooleanValue b => b.Value,
-        IntValue i => ParseValue(i.Value),
-        LongValue l => ParseValue(l.Value),
-        BigIntValue bi => ParseValue(bi.Value),
-        StringValue s => ParseValue(s.Value),
-        FloatValue f => ParseValue(f.Value),
-        DecimalValue d => ParseValue(d.Value),
-        NullValue _ => null,
+        GraphQLBooleanValue b => b.BoolValue,
+        GraphQLIntValue i => ParseValue(ParseDoubleAccordingSpec(i)),
+        GraphQLFloatValue f => ParseValue(ParseDoubleAccordingSpec(f)),
+        GraphQLStringValue s => ParseValue((string)s.Value),
+        GraphQLNullValue _ => null,
         _ => ThrowLiteralConversionError(value)
     }
 
-    public override bool CanParseLiteral(IValue value)
+    public override bool CanParseLiteral(GraphQLValue value)
     {
         try
         {
@@ -609,7 +624,7 @@ public class MyBooleanGraphType : BooleanGraphType
         }
     }
 
-    public override object ParseValue(object value) => value switch
+    public override object? ParseValue(object? value) => value switch
     {
         bool _ => value,
         byte b => b != 0,
@@ -629,7 +644,7 @@ public class MyBooleanGraphType : BooleanGraphType
         _ => ThrowValueConversionError(value)
     }
 
-    public override bool CanParseValue(object value)
+    public override bool CanParseValue(object? value)
     {
         try
         {
@@ -642,10 +657,10 @@ public class MyBooleanGraphType : BooleanGraphType
         }
     }
 
-    public override IValue ToAST(object value) => Serialize(value) switch
+    public override GraphQLValue ToAST(object? value) => Serialize(value) switch
     {
-        bool b => new BooleanValue(b),
-        null => new NullValue(),
+        bool b => new GraphQLBooleanValue(b),
+        null => new GraphQLNullValue(),
         _ => ThrowASTConversionError(value)
     };
 }
@@ -685,15 +700,10 @@ type, or provide an instance of a built-in type to an applicable constructor, it
 with your registered replacement built-in type. For example, consider this code:
 
 ```csharp
-Field<StringGraphType>("sample",
-    arguments: new QueryArguments {
-        // will be replaced with MyBooleanGraphType
-        new QueryArgument<BooleanGraphType> { Name = "argNewBehavior" }
-
-        // will retain default behavior
-        new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }
-    },
-    resolve: ...);
+Field<StringGraphType>("sample")
+  .Argument<BooleanGraphType>("argNewBehavior") // will be replaced with MyBooleanGraphType
+  .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }) // will retain default behavior
+  .Resolve(...);
 ```
 
 This is by design. However, you can call the `ReplaceScalar` extension method after the schema is

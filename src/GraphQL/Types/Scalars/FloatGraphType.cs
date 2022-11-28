@@ -1,5 +1,5 @@
 using System.Numerics;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,40 +10,26 @@ namespace GraphQL.Types
     public class FloatGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            FloatValue floatVal => floatVal.Value,
-            IntValue intVal => (double)intVal.Value,
-            LongValue longVal => (double)longVal.Value,
-            DecimalValue decVal => checked((double)decVal.Value),
-            BigIntValue bigIntVal => checked((double)bigIntVal.Value),
-            NullValue _ => null,
+            GraphQLIntValue x => ParseDoubleAccordingSpec(x),
+            GraphQLFloatValue x => ParseDoubleAccordingSpec(x),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value)
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            try
-            {
-                return value switch
-                {
-                    FloatValue _ => true,
-                    IntValue _ => true,
-                    LongValue _ => true,
-                    DecimalValue decVal => Ret(checked((double)decVal.Value)),
-                    BigIntValue bigIntVal => Ret(checked((double)bigIntVal.Value)),
-                    NullValue _ => true,
-                    _ => false
-                };
-            }
-            catch
-            {
-                return false;
-            }
+            GraphQLIntValue x => TryParse(x.Value),
+            GraphQLFloatValue x => TryParse(x.Value),
+            GraphQLNullValue _ => true,
+            _ => false
+        };
 
-            static bool Ret(double _) => true;
-        }
+        // IsNaN checks not really necessary because text from parser cannot represent NaN
+        private bool TryParse(ReadOnlySpan<char> chars)
+            => Double.TryParse(chars, out var number) /* && !double.IsNaN(number) */ && !double.IsInfinity(number);
 
         /// <inheritdoc/>
         public override object? ParseValue(object? value) => value switch

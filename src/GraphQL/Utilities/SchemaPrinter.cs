@@ -1,12 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using GraphQL.Introspection;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
+
+//TODO:should be completely rewritten
 
 namespace GraphQL.Utilities
 {
@@ -19,11 +21,11 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Enables printing schema as SDL (Schema Definition Language) document.
     /// <br/>
-    /// See <see href="http://spec.graphql.org/June2018/#sec-Type-System"/> for more information.
+    /// See <see href="https://spec.graphql.org/October2021/#sec-Type-System"/> for more information.
     /// </summary>
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
-        private static readonly List<string> _builtInScalars = new List<string>
+        private static readonly List<string> _builtInScalars = new()
         {
             "String",
             "Boolean",
@@ -32,7 +34,7 @@ namespace GraphQL.Utilities
             "ID"
         };
 
-        private static readonly List<string> _builtInDirectives = new List<string>
+        private static readonly List<string> _builtInDirectives = new()
         {
             "skip",
             "include",
@@ -192,7 +194,7 @@ namespace GraphQL.Utilities
                 IObjectGraphType objectGraphType => PrintObject(objectGraphType),
                 IInterfaceGraphType interfaceGraphType => PrintInterface(interfaceGraphType),
                 UnionGraphType unionGraphType => PrintUnion(unionGraphType),
-                DirectiveGraphType directiveGraphType => PrintDirective(directiveGraphType),  //TODO: DirectiveGraphType does not inherit IGraphType
+                Directive directiveGraphType => PrintDirective(directiveGraphType),  //TODO: DirectiveGraphType does not inherit IGraphType
                 IInputObjectGraphType input => PrintInputObject(input),
                 _ => throw new InvalidOperationException($"Unknown GraphType '{type.GetType().Name}' with name '{type.Name}'")
             };
@@ -268,8 +270,10 @@ namespace GraphQL.Utilities
                     Deprecation = Options.IncludeDeprecationReasons ? PrintDeprecation(x.DeprecationReason) : "",
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
-                f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
+            return fields == null
+                ? ""
+                : string.Join(Environment.NewLine, fields.Select(
+                    f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
         public string PrintArgs(FieldType field)
@@ -314,7 +318,7 @@ namespace GraphQL.Utilities
             return desc;
         }
 
-        public string PrintDirective(DirectiveGraphType directive)
+        public string PrintDirective(Directive directive)
         {
             Schema?.Initialize();
 
@@ -371,10 +375,10 @@ namespace GraphQL.Utilities
             return graphType switch
             {
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
-                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable)value).Cast<object>().Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
-                EnumerationGraphType enumeration => AstPrinter.Print(enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")),
-                ScalarGraphType scalar => AstPrinter.Print(scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")),
+                EnumerationGraphType enumeration => (enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")).Print(),
+                ScalarGraphType scalar => (scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")).Print(),
                 _ => throw new NotSupportedException($"Unsupported graph type '{graphType}'")
             };
         }
@@ -504,7 +508,7 @@ namespace GraphQL.Utilities
             {
                 return string.Empty;
             }
-            return $" @deprecated(reason: {AstPrinter.Print(new StringValue(reason!))})";
+            return $" @deprecated(reason: {new GraphQLStringValue(reason!).Print()})";
         }
 
         public string[] BreakLine(string line, int len)

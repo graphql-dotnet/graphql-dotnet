@@ -1,6 +1,5 @@
-using System;
 using System.Globalization;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types
 {
@@ -10,18 +9,26 @@ namespace GraphQL.Types
     public class GuidGraphType : ScalarGraphType
     {
         /// <inheritdoc/>
-        public override object? ParseLiteral(IValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
-            StringValue s => Guid.Parse(s.Value),
-            NullValue _ => null,
+            GraphQLStringValue s => Guid.Parse(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                s.Value),
+            GraphQLNullValue _ => null,
             _ => ThrowLiteralConversionError(value)
         };
 
         /// <inheritdoc/>
-        public override bool CanParseLiteral(IValue value) => value switch
+        public override bool CanParseLiteral(GraphQLValue value) => value switch
         {
-            StringValue s => Guid.TryParse(s.Value, out _),
-            NullValue _ => true,
+            GraphQLStringValue s => Guid.TryParse(
+#if NETSTANDARD2_0
+                (string)
+#endif
+                s.Value, out _),
+            GraphQLNullValue _ => true,
             _ => false
         };
 

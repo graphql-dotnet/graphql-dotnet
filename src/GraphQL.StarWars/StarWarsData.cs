@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using GraphQL.StarWars.Types;
 
 namespace GraphQL.StarWars;
 
 public class StarWarsData
 {
-    private readonly List<StarWarsCharacter> _characters = new List<StarWarsCharacter>();
+    private readonly List<StarWarsCharacter> _characters = new();
 
     public StarWarsData()
     {

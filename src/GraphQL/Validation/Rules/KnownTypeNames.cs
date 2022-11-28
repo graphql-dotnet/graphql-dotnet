@@ -1,8 +1,6 @@
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Utilities;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -17,21 +15,21 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly KnownTypeNames Instance = new KnownTypeNames();
+        public static readonly KnownTypeNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="KnownTypeNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<NamedType>(leave: (node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLNamedType>(leave: (node, context) =>
         {
             var type = context.Schema.AllTypes[node.Name];
             if (type == null)
             {
                 var typeNames = context.Schema.AllTypes.Dictionary.Values.Select(x => x.Name).ToArray();
-                var suggestionList = StringUtils.SuggestionList(node.Name, typeNames);
+                var suggestionList = StringUtils.SuggestionList(node.Name.StringValue, typeNames); //ISSUE:allocation
                 context.ReportError(new KnownTypeNamesError(context, node, suggestionList));
             }
-        }).ToTask();
+        });
     }
 }

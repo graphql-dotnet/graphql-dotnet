@@ -2,25 +2,26 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>net7;net6;net5;netcoreapp3.1;net48</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7;net6;net5;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.20" />
-    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
+    <PackageReference Include="Bogus" Version="34.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.*" />
+    <PackageReference Include="System.Reactive" Version="5.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
+    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using GraphQL.Language.AST;
+using GraphQL.Validation;
 
 namespace GraphQL
 {
@@ -14,7 +13,7 @@ namespace GraphQL
         /// <summary>
         /// Returns an empty set of inputs.
         /// </summary>
-        public static readonly Inputs Empty = new Inputs(new Dictionary<string, object?>());
+        public static readonly Inputs Empty = new(new Dictionary<string, object?>());
 
         /// <summary>
         /// Initializes a new instance that is a wrapper for the specified dictionary of elements.
