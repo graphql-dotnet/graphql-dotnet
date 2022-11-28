@@ -1151,7 +1151,6 @@ namespace GraphQL.Execution
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
-        protected virtual System.Type EqualityContract { get; }
         public GraphQLParser.AST.OperationType Operation { get; set; }
         public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
     }
@@ -2901,9 +2900,15 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(System.Collections.Generic.List<GraphQLParser.AST.GraphQLOperationDefinition> operations) { }
+        [System.Obsolete("This method can repeatedly add the same error into ValidationContext.Errors colle" +
+            "ction when called multiple times. Use GetVariablesValues method instead.")]
         public GraphQL.Validation.Variables GetVariableValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
             where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
+                "Variables",
+                "Errors"})]
+        public System.ValueTuple<GraphQL.Validation.Variables, System.Collections.Generic.List<GraphQL.Validation.ValidationError>?> GetVariablesValues(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }

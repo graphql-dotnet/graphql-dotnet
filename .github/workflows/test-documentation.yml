@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - develop
+      - v5
     paths:
       - docs2/**
       - package.json
