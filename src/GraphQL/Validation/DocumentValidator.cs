@@ -117,7 +117,13 @@ namespace GraphQL.Validation
                 }
 
                 // can report errors even without rules enabled
-                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                (variables, var errors) = context.GetVariablesValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
+                }
 
                 return context.HasErrors
                     ? (new ValidationResult(context.Errors), variables)

@@ -118,16 +118,39 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
+        /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
+        /// <see cref="ValidationError"/> is added to the <see cref="Errors"/>.
         /// </summary>
+        [Obsolete("This method can repeatedly add the same error into ValidationContext.Errors collection when called multiple times. Use GetVariablesValues method instead.")]
         public Variables GetVariableValues(IVariableVisitor? visitor = null)
+        {
+            (var variables, var errors) = GetVariablesValues(visitor);
+
+            if (errors != null)
+            {
+                foreach (var error in errors)
+                    ReportError(error);
+            }
+
+            return variables;
+        }
+
+
+        /// <summary>
+        /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
+        /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
+        /// <see cref="ValidationError"/> is returned within the list of errors.
+        /// </summary>
+        public (Variables Variables, List<ValidationError>? Errors) GetVariablesValues(IVariableVisitor? visitor = null)
         {
             var variableDefinitions = Operation?.Variables;
 
             if ((variableDefinitions?.Count ?? 0) == 0)
             {
-                return Validation.Variables.None;
+                return (Validation.Variables.None, null);
             }
 
+            List<ValidationError>? errors = null;
             var variablesObj = new Variables(variableDefinitions!.Count);
 
             if (variableDefinitions != null)
@@ -140,7 +163,7 @@ namespace GraphQL.Validation
 
                     if (graphType == null)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
+                        (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
                         continue;
                     }
 
@@ -157,7 +180,7 @@ namespace GraphQL.Validation
                         }
                         catch (ValidationError error)
                         {
-                            ReportError(error);
+                            (errors ??= new()).Add(error);
                             continue;
                         }
                     }
@@ -172,14 +195,14 @@ namespace GraphQL.Validation
                         }
                         catch (Exception ex)
                         {
-                            ReportError(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
+                            (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
                             continue;
                         }
                         variable.IsDefault = true;
                     }
                     else if (graphType is NonNullGraphType)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
+                        (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
                         continue;
                     }
 
@@ -191,7 +214,7 @@ namespace GraphQL.Validation
             }
 
             // return the list of parsed variables defined for the operation
-            return variablesObj;
+            return (variablesObj, errors);
         }
 
         /// <summary>
