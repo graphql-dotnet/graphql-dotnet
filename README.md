@@ -348,7 +348,7 @@ If you have a PR with some breaking changes, then please target it to the `devel
 Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
 
 Contributions are very much appreciated and are used to support the project primarily via [bounties](BOUNTY.md) paid directly to contributors to the project.
-Please help us to express gratitude to those indivduals who devote time and energy to contributing to this project by supporting their efforts in a tangible means.
+Please help us to express gratitude to those individuals who devote time and energy to contributing to this project by supporting their efforts in a tangible means.
 A list of the outstanding issues to which we are sponsoring via bounties can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty).
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
