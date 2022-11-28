@@ -27,7 +27,7 @@ Routine bug fixes and similar pull requests do not fall into this program at thi
    for bounty amount, confirmed by GraphQL.NET team members.
 9. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds;
    i.e. Open Collective is responsible for the actual payment.
-    * The GitHub issue is labeled with **`bounty-paid`** and the aforementioned labels are removed.
+    * The GitHub issue is labeled with **`bounty-paid`** and the aforementioned **`bounty`** and **`in progress`** labels are removed.
 
 
 ## How to Claim a Bounty
