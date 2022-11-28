@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-#if !NET5_0_OR_GREATER
+#if !NETCOREAPP3_0_OR_GREATER
 
 namespace System.Runtime.CompilerServices
 {
