@@ -4,7 +4,8 @@ The GraphQL.NET team has worked to create a program where community developers c
 of GraphQL.NET for compensation ("projects"). These projects are determined by GraphQL.NET maintainers to have the
 potential for high-impact improvement to the product. Design proposals that would fulfill a bounty may
 be made either by individuals or teams of developers, but the final payout will be made to only one stakeholder.
-Routine bug fixes and similar pull requests do not fall into this program at this time.
+Routine bug fixes and similar pull requests like fixing typos or outdated pieces of documentation do not
+fall into this program at this time.
 
 
 ## Bounty Process Flowchart
