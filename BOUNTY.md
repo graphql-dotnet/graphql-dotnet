@@ -25,7 +25,8 @@ Routine bug fixes and similar pull requests do not fall into this program at thi
 7. Pull requests are merged into the `master` or `develop` branch.
 8. Developer(s) submit invoice to the [GraphQL.NET Open Collective](https://opencollective.com/graphql-net)
    for bounty amount, confirmed by GraphQL.NET team members.
-9. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds.
+9. Payment disbursed to developer(s) by the Open Source Collective from GraphQL.NET funds;
+   i.e. Open Collective is responsible for the actual payment.
     * The GitHub issue is labeled with **`bounty-paid`** and the aforementioned labels are removed.
 
 
