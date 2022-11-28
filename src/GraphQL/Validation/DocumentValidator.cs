@@ -55,7 +55,7 @@ namespace GraphQL.Validation
         {
             options.Schema.Initialize();
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            var context = Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
             context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
@@ -119,7 +119,17 @@ namespace GraphQL.Validation
                 }
 
                 // can report errors even without rules enabled
-                variables = await context.GetVariableValuesAsync(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+                (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
+                    ? null
+                    : variableVisitors.Count == 1
+                        ? variableVisitors[0]
+                        : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
+                }
 
                 return context.HasErrors
                     ? (new ValidationResult(context.Errors), variables)
@@ -130,7 +140,7 @@ namespace GraphQL.Validation
                 if (!context.HasErrors)
                 {
                     context.Reset();
-                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

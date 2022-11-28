@@ -567,7 +567,7 @@ will now throw an exception if a graph type is used as a data model:
 - `AutoRegisteringObjectGraphType<TSourceType>`
 - `AutoRegisteringInputObjectGraphType<TSourceType>`
 - `AutoRegisteringInterfaceGraphType<TSourceType>`
-- 
+
 If it is necessary to do so, you can derive from the `ObjectGraphType` or `InputObjectGraphType` classes
 instead of the generic version.
 
