@@ -47,8 +47,8 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(ExecutionOptions)"/>; optional.</param>
     protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
     {
-        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-        _options = (options ?? throw new ArgumentNullException(nameof(options))).Value;
+        _memoryCache = Guard.ThrowIfNull(memoryCache);
+        _options = Guard.ThrowIfNull(options).Value;
         _memoryCacheIsOwned = disposeMemoryCache;
     }
 
