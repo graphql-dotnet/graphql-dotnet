@@ -27,11 +27,11 @@ internal static class AutoRegisteringOutputHelper
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,
-        Func<MemberInfo, LambdaExpression>? BuildMemberInstanceExpression,
+        Func<MemberInfo, LambdaExpression>? buildMemberInstanceExpressionFunc,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes)
+        Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc)
     {
-        // Note: If BuildMemberInstanceExpression is null, then it is assumed this is for
+        // Note: If buildMemberInstanceExpressionFunc is null, then it is assumed this is for
         // an interface graph type and the field resolver will be set to always throw an exception.
 
         if (fieldType == null)
@@ -40,9 +40,9 @@ internal static class AutoRegisteringOutputHelper
         if (memberInfo is PropertyInfo propertyInfo)
         {
             fieldType.Arguments = null;
-            if (BuildMemberInstanceExpression != null)
+            if (buildMemberInstanceExpressionFunc != null)
             {
-                var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
+                var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -58,7 +58,7 @@ internal static class AutoRegisteringOutputHelper
                 var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
                 if (queryArgument != null)
                 {
-                    ApplyArgumentAttributes(parameterInfo, queryArgument);
+                    applyArgumentAttributesFunc(parameterInfo, queryArgument);
                     queryArguments.Add(queryArgument);
                 }
                 expression ??= AutoRegisteringHelper.GetParameterExpression(
@@ -66,9 +66,9 @@ internal static class AutoRegisteringOutputHelper
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }
-            if (BuildMemberInstanceExpression != null)
+            if (buildMemberInstanceExpressionFunc != null)
             {
-                var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
+                var memberInstanceExpression = buildMemberInstanceExpressionFunc(methodInfo);
                 if (IsObservable(methodInfo.ReturnType))
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
@@ -87,9 +87,9 @@ internal static class AutoRegisteringOutputHelper
         else if (memberInfo is FieldInfo fieldInfo)
         {
             fieldType.Arguments = null;
-            if (BuildMemberInstanceExpression != null)
+            if (buildMemberInstanceExpressionFunc != null)
             {
-                var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
+                var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
