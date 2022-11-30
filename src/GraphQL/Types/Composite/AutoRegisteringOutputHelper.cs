@@ -10,7 +10,7 @@ namespace GraphQL.Types;
 internal static class AutoRegisteringOutputHelper
 {
     private static readonly IFieldResolver _invalidFieldResolver = new FuncFieldResolver<object?>(_ => throw new InvalidOperationException("This field resolver should never be called. It is only used to prevent the default field resolver from being used."));
-    private static readonly ISourceStreamResolver _invalidStreamResolver = new SourceStreamResolver<object?>((Func<IResolveFieldContext, IObservable<object?>>)(_ => throw new InvalidOperationException("This source stream resolver should never be called. It is only used to prevent the default field resolver from being used.")));
+    private static readonly ISourceStreamResolver _invalidStreamResolver = new SourceStreamResolver<object?>((Func<IResolveFieldContext, IObservable<object?>>)(_ => throw new InvalidOperationException("This source stream resolver should never be called. It is only used to prevent the default source stream resolver from being used.")));
 
     /// <summary>
     /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
