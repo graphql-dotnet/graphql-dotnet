@@ -102,7 +102,7 @@ internal static class AutoRegisteringOutputHelper
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
         }
-        if (BuildMemberInstanceExpression == null)
+        if (buildMemberInstanceExpressionFunc == null)
         {
             fieldType.Resolver = _invalidFieldResolver;
             fieldType.StreamResolver = _invalidStreamResolver;
