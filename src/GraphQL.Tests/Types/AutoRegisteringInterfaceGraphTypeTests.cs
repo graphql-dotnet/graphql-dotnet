@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -254,22 +255,22 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData(nameof(ArgumentTestsInterface.WithNonNullString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), null, null, null, null)]
-    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), null, null, null, "test")]
-    [InlineData(nameof(ArgumentTestsInterface.WithCancellationToken), null, null, null, true)]
-    [InlineData(nameof(ArgumentTestsInterface.WithFromServices), null, null, null, "testService")]
-    [InlineData(nameof(ArgumentTestsInterface.NamedArg), "arg1rename", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTestsInterface.IdArg), "arg1", "hello", null, "hello")]
-    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", "123", null, 123)]
-    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null, 123)]
-    [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null, 123)]
-    [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123, "hello123")]
-    public async Task Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
+    [InlineData(nameof(ArgumentTestsInterface.WithNonNullString), "arg1", "hello", null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", "hello", null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), "arg1", null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithNullableString), null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", "hello", null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), "arg1", null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithDefaultString), null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithCancellationToken), null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.WithFromServices), null, null, null)]
+    [InlineData(nameof(ArgumentTestsInterface.NamedArg), "arg1rename", "hello", null)]
+    [InlineData(nameof(ArgumentTestsInterface.IdArg), "arg1", "hello", null)]
+    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", "123", null)]
+    [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null)]
+    [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null)]
+    [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123)]
+    public async Task Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value)
     {
         var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -294,7 +295,8 @@ public class AutoRegisteringInterfaceGraphTypeTests
         using var provider = serviceCollection.BuildServiceProvider();
         context.RequestServices = provider;
         fieldType.Resolver.ShouldNotBeNull();
-        (await fieldType.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(expected);
+        var ex = await Should.ThrowAsync<InvalidOperationException>(async () => await fieldType.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false);
+        ex.Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
     }
 
     [Fact]
@@ -335,35 +337,23 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData("Field1", 1)]
-    [InlineData("Field2", 2)]
-    [InlineData("Field4", 4)]
-    [InlineData("Field6AltName", 6)]
-    [InlineData("Field7", 7)]
-    public async Task FieldResolversWork(string fieldName, object expected)
+    [InlineData("Field1")]
+    [InlineData("Field2")]
+    [InlineData("Field4")]
+    [InlineData("Field6AltName")]
+    [InlineData("Field7")]
+    public async Task FieldResolvers_Invalid(string fieldName)
     {
         var graph = new AutoRegisteringInterfaceGraphType<TestInterface>();
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
         var resolver = field.Resolver.ShouldNotBeNull();
         var obj = new TestClass();
-        var actual = await resolver.ResolveAsync(new ResolveFieldContext
+        var ex = await Should.ThrowAsync<InvalidOperationException>(async () => await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = obj,
             FieldDefinition = new FieldType { Name = fieldName },
-        }).ConfigureAwait(false);
-        actual.ShouldBe(expected);
-    }
-
-    [Fact]
-    public async Task WorksWithNoDefaultConstructor()
-    {
-        var graphType = new AutoRegisteringInterfaceGraphType<NoDefaultConstructorTestInterface>();
-        var context = new ResolveFieldContext
-        {
-            Source = new NoDefaultConstructorTestClass(true)
-        };
-        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(true);
-        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("test");
+        }).ConfigureAwait(false)).ConfigureAwait(false);
+        ex.Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
     }
 
     [Fact]
@@ -372,35 +362,10 @@ public class AutoRegisteringInterfaceGraphTypeTests
         var graphType = new AutoRegisteringInterfaceGraphType<NullSourceFailureTest>();
         var context = new ResolveFieldContext();
         (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
+            .Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
         (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringInterfaceGraphType as a root graph type or provide a root value.");
+            .Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
     }
-
-#if !NET48 // .NET Framework 4.8 does not support default interface implementation, so would not support static methods on an interface
-    [Fact]
-    public async Task WorksWithNullSource()
-    {
-        var graphType = new TestFieldSupport<NullSourceTest>();
-        var context = new ResolveFieldContext();
-        (await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(true);
-        (await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe("test");
-        (await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ShouldBe(3);
-    }
-
-    private class TestFieldSupport<T> : AutoRegisteringInterfaceGraphType<T>
-    {
-        protected override IEnumerable<MemberInfo> GetRegisteredMembers()
-            => base.GetRegisteredMembers().Concat(typeof(T).GetFields(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public));
-    }
-
-    private interface NullSourceTest
-    {
-        public static bool Example1 { get; set; } = true;
-        public static string Example2() => "test";
-        public static int Example3 = 3;
-    }
-#endif
 
     [Fact]
     public void TestExceptionBubbling()
@@ -415,18 +380,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
-    }
-
-    [Fact]
-    public async Task CustomHardcodedArgumentAttributesWork()
-    {
-        var graphType = new AutoRegisteringInterfaceGraphType<CustomHardcodedArgumentAttributeTestInterface>();
-        var fieldType = graphType.Fields.Find(nameof(CustomHardcodedArgumentAttributeTestInterface.FieldWithHardcodedValue))!;
-        var resolver = fieldType.Resolver!;
-        (await resolver.ResolveAsync(new ResolveFieldContext
-        {
-            Source = new CustomHardcodedArgumentAttributeTestClass(),
-        }).ConfigureAwait(false)).ShouldBe("85");
     }
 
     [Fact]
@@ -543,9 +496,9 @@ public class AutoRegisteringInterfaceGraphTypeTests
     }
 
     [Theory]
-    [InlineData("{find(type:CAT){id name}}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal {id name}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
-    public async Task ExecutesQueryWithInterfaceOnly(string query, string expected)
+    [InlineData("{find(type:CAT){id name}}")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal {id name}")]
+    public async Task RejectQueryWithInterfaceOnly(string query)
     {
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
@@ -556,23 +509,23 @@ public class AutoRegisteringInterfaceGraphTypeTests
         schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
             .ShouldBe(new[] { "AnimalType", "Boolean", "IAnimal", "ID", "String", "TestQuery2" });
         var executer = provider.GetRequiredService<IDocumentExecuter>();
-        var result = await executer.ExecuteAsync(new()
+        var ex = await Should.ThrowAsync<InvalidOperationException>(() => executer.ExecuteAsync(new()
         {
             Query = query,
             RequestServices = provider,
-        }).ConfigureAwait(false);
-        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var actual = serializer.Serialize(result);
-        actual.ShouldBeCrossPlatJson(expected);
+            ThrowOnUnhandledException = true,
+        })).ConfigureAwait(false);
+        ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery2.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
     }
 
     [Theory]
-    [InlineData("{find(type:CAT){id name}}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal { id name }", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
-    [InlineData("{find(type:CAT){ ...frag }} fragment frag on Dog { isLarge }", """{"data":{"find":{}}}""")]
-    [InlineData("{find(type:CAT){ ... on Dog { isLarge } }}", """{"data":{"find":{}}}""")]
-    [InlineData("{find(type:CAT){ id name ... on Dog { isLarge } }}", """{"data":{"find":{"id":"10","name":"Fluffy"}}}""")]
-    public async Task ExecutesQueryWithInterfaceOnly2(string query, string expected)
+    [InlineData("{find(type:CAT){__typename}}")]
+    [InlineData("{find(type:CAT){id name}}")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on IAnimal { id name }")]
+    [InlineData("{find(type:CAT){ ...frag }} fragment frag on Dog { isLarge }")]
+    [InlineData("{find(type:CAT){ ... on Dog { isLarge } }}")]
+    [InlineData("{find(type:CAT){ id name ... on Dog { isLarge } }}")]
+    public async Task RejectsQueryWithInterfaceOnly2(string query)
     {
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
@@ -583,14 +536,45 @@ public class AutoRegisteringInterfaceGraphTypeTests
         schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
             .ShouldBe(new[] { "AnimalType", "Boolean", "Dog", "IAnimal", "ID", "String", "TestQuery3" });
         var executer = provider.GetRequiredService<IDocumentExecuter>();
-        var result = await executer.ExecuteAsync(new()
+        var ex = await Should.ThrowAsync<InvalidOperationException>(() => executer.ExecuteAsync(new()
         {
             Query = query,
             RequestServices = provider,
-        }).ConfigureAwait(false);
-        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var actual = serializer.Serialize(result);
-        actual.ShouldBeCrossPlatJson(expected);
+            ThrowOnUnhandledException = true,
+        })).ConfigureAwait(false);
+        ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery3.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
+    }
+
+    [Fact]
+    public void BuildsWithoutMemberInstanceExpression()
+    {
+        var type = new NoMemberInstanceExpression<IAnimal>();
+        type.Fields.Find("Id").ShouldNotBeNull();
+    }
+
+    public class NoMemberInstanceExpression<T> : AutoRegisteringInterfaceGraphType<T>
+    {
+        [Obsolete]
+        protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;
+    }
+
+    [Fact]
+    public void BuildFieldTypeChecks()
+    {
+        new TestProtectedMethods().Test();
+    }
+
+    public class TestProtectedMethods : AutoRegisteringInterfaceGraphType<IAnimal>
+    {
+        public void Test()
+        {
+            Should.Throw<ArgumentNullException>(() => BuildFieldType(null!, typeof(TestProtectedMethods).GetMethod(nameof(Test))!))
+                .ParamName.ShouldBe("fieldType");
+            Should.Throw<ArgumentNullException>(() => BuildFieldType(new FieldType(), null!))
+                .ParamName.ShouldBe("memberInfo");
+            Should.Throw<ArgumentOutOfRangeException>(() => BuildFieldType(new FieldType(), typeof(TestProtectedMethods)))
+                .ParamName.ShouldBe("memberInfo");
+        }
     }
 
     public class TestQuery
@@ -661,22 +645,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
         public AnimalType Type => AnimalType.Dog;
         public string Name { get; set; } = null!;
         public bool IsLarge { get; set; }
-    }
-
-    public class CustomHardcodedArgumentAttributeTestClass : CustomHardcodedArgumentAttributeTestInterface
-    {
-        public string FieldWithHardcodedValue(int value) => value.ToString();
-    }
-
-    public interface CustomHardcodedArgumentAttributeTestInterface
-    {
-        string FieldWithHardcodedValue([HardcodedValue] int value);
-    }
-
-    private class HardcodedValueAttribute : GraphQLAttribute
-    {
-        public override void Modify(ArgumentInformation argumentInformation)
-            => argumentInformation.SetDelegate(context => 85);
     }
 
     private class NoDefaultConstructorTestClass : NoDefaultConstructorTestInterface
