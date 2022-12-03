@@ -659,7 +659,7 @@ namespace GraphQL.Execution
                 {
                     throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
-                        $"runtime for field {node.Parent?.GraphType?.Name}.{node.Name} " +
+                        $"runtime for field {(node.IndexInParentNode.HasValue ? node.Parent?.Parent : node.Parent)?.GraphType?.Name}.{node.FieldDefinition.Name} " +
                         $"with value '{result}', received 'null'.");
                 }
 
