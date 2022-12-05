@@ -273,3 +273,5 @@ dotnet_diagnostic.RCS1194.severity = suggestion
 # https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1102.md
 # TODO: NullabilityInfo issue in Patching.cs in internal class SR
 dotnet_diagnostic.RCS1102.severity = suggestion
+
+dotnet_diagnostic.RCS1255.severity = warning
