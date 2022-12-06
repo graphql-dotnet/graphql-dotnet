@@ -14,12 +14,7 @@ namespace GraphQL.Validation
         {
             if (errors.Any())
             {
-                Errors = new ExecutionErrors();
                 Errors.AddRange(errors);
-            }
-            else
-            {
-                Errors = EmptyExecutionErrors.Instance;
             }
         }
 
@@ -33,10 +28,12 @@ namespace GraphQL.Validation
         }
 
         /// <inheritdoc/>
-        public bool IsValid => Errors.Count == 0;
+        public bool IsValid => (_errors?.Count ?? 0) == 0;
+
+        private ExecutionErrors? _errors;
 
         /// <inheritdoc/>
-        public ExecutionErrors Errors { get; } = new ExecutionErrors();
+        public ExecutionErrors Errors => _errors ??= new ExecutionErrors();
 
         /// <inheritdoc/>
         public Variables? Variables { get; set; }
