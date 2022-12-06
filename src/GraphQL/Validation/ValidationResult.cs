@@ -49,7 +49,7 @@ namespace GraphQL.Validation
     /// <summary>
     /// A validation result that indicates no errors were found during validation of the document.
     /// </summary>
-    public sealed class SuccessfullyValidatedResult : IValidationResult
+    internal sealed class SuccessfullyValidatedResult : IValidationResult
     {
         private SuccessfullyValidatedResult() { }
 

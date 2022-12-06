@@ -2985,15 +2985,6 @@ namespace GraphQL.Validation
     {
         public NodeVisitors(params GraphQL.Validation.INodeVisitor[] nodeVisitors) { }
     }
-    public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
-    {
-        public static readonly GraphQL.Validation.IValidationResult Instance;
-        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; }
-        public System.Collections.Generic.IDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
-        public GraphQL.ExecutionErrors Errors { get; }
-        public bool IsValid { get; }
-        public GraphQL.Validation.Variables? Variables { get; }
-    }
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
