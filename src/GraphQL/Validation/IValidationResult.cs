@@ -24,7 +24,7 @@ namespace GraphQL.Validation
         Variables? Variables { get; }
 
         /// <summary>
-        /// Returns a dictionary of fields with suppied arguments.
+        /// Returns a dictionary of fields with supplied arguments.
         /// </summary>
         IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
