@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
@@ -74,6 +75,7 @@ namespace GraphQL.Types
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
+        private ExceptionDispatchInfo? _initializationException;
         private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
@@ -201,9 +203,19 @@ namespace GraphQL.Types
                 if (Initialized)
                     return;
 
-                CreateAndInitializeSchemaTypes();
+                _initializationException?.Throw();
 
-                Initialized = true;
+                try
+                {
+                    CreateAndInitializeSchemaTypes();
+
+                    Initialized = true;
+                }
+                catch (Exception ex)
+                {
+                    _initializationException = ExceptionDispatchInfo.Capture(ex);
+                    throw;
+                }
             }
         }
 
