@@ -5,7 +5,7 @@ namespace GraphQL.Tests.Bugs;
 public class Bug3444
 {
     [Fact]
-    public void Test_Rethrow_Schema_Initialization_Failure()
+    public void Rethrow_Schema_Initialization_Failure()
     {
         var queryType = new ObjectGraphType { Name = "Query" };
         queryType.Field<TestOneType>("test1");
