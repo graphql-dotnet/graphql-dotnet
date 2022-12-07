@@ -11,8 +11,8 @@ public class Bug3444
         queryType.Field<TestOneType>("test1");
         queryType.Field<TestTwoType>("test2");
         var schema = new Schema() { Query = queryType };
-        var msg1 = Should.Throw<InvalidOperationException>(() => schema.Initialize()).ToString();
-        var msg2 = Should.Throw<InvalidOperationException>(() => schema.Initialize()).ToString();
+        var msg1 = Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message;
+        var msg2 = Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message;
         msg1.ShouldBe(msg2);
     }
 
