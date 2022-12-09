@@ -85,20 +85,13 @@ In general, issues that are higher in complexity and higher in demand are given 
 
 ## Legal
 
-You ARE eligible to participate in the Program if you meet all of the following criteria:
+You are eligible to participate in the Program ONLY if you meet ALL of the following criteria:
 
 * You are 14 years of age or older. If you are at least 14 years old but are considered a minor in your place of residence,
   you must obtain your parent's or legal guardian's permission prior to participating in this Program; and
 
 * You are either an individual researcher participating in your own individual capacity, or you work for an organization
   that permits you to participate. You are responsible for reviewing your employer's rules for participating in this Program.
-
-You ARE NOT eligible to participate in the Program if you meet any of the following criteria:
-
-* You are a resident of any countries under U.S. sanctions (see link for current sanctions list posted by the United States
-  Treasury Department) or any other country that does not allow participation in this type of program; or
-
-* You are under the age of 14.
 
 By posting any issue, pull request, or other form of submission to GraphQL.NET (a Submission), whether or not it is accepted
 through this bounty program, you:
