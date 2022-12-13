@@ -68,10 +68,10 @@ namespace GraphQL.Execution
         public Variables Variables { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 
         /// <inheritdoc/>
         public ExecutionErrors Errors { get; set; }

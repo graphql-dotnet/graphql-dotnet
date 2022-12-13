@@ -81,12 +81,12 @@ namespace GraphQL.Execution
         /// <summary>
         /// A dictionary of field argument values.
         /// </summary>
-        IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+        IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
         /// <summary>
         /// A dictionary of directive argument values.
         /// </summary>
-        IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+        IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.

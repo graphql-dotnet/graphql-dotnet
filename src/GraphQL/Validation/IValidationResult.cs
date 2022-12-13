@@ -26,11 +26,11 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns a dictionary of fields with supplied arguments.
         /// </summary>
-        IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+        IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
         /// <summary>
         /// Returns a dictionary of directives with supplied arguments.
         /// </summary>
-        IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+        IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
     }
 }

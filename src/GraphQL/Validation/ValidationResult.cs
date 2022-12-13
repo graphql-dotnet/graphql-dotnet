@@ -39,10 +39,10 @@ namespace GraphQL.Validation
         public Variables? Variables { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
     }
 
     // Optimization for validation "green path" - does not allocate memory in managed heap.
@@ -72,9 +72,9 @@ namespace GraphQL.Validation
         public Variables? Variables => null;
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
 
         /// <inheritdoc/>
-        public IDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
     }
 }
