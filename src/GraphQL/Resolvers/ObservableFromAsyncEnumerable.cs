@@ -1,6 +1,7 @@
 #if !NETSTANDARD2_0
 // for .NET Standard 2.0, this requires the Microsoft.Bcl.AsyncInterfaces NuGet package
 
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -10,6 +11,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Resolvers;
 
+/// <inheritdoc cref="ObservableFromAsyncEnumerable{T}.Create(Func{IResolveFieldContext, IAsyncEnumerable{T}})"/>
 internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
@@ -22,8 +24,9 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
     }
 
     /// <summary>
-    /// Returns a delegate that can be used to create an <see cref="IObservable{T}"/> from an <see cref="IAsyncEnumerable{T}"/>.
-    /// Each execution will create a new <see cref="ObservableFromAsyncEnumerable{T}"/> instance which can only be used once.
+    /// Returns a source stream resolver delegate (which returns an <see cref="IObservable{T}"/>) from a delegate
+    /// which returns <see cref="IAsyncEnumerable{T}"/>. Each execution will create a new
+    /// <see cref="ObservableFromAsyncEnumerable{T}"/> instance which can only be used once.
     /// </summary>
     public static Func<IResolveFieldContext, ValueTask<IObservable<object?>>> Create(Func<IResolveFieldContext, ValueTask<IAsyncEnumerable<T>>> func)
     {
@@ -46,12 +49,15 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
     /// <inheritdoc/>
     public IDisposable Subscribe(IObserver<object?> observer)
     {
+        // note: this error should not occur, as GraphQL.NET does not call IObservable<T>.Subscribe
+        // more than once after executing the source stream resolver
         var enumerable = Interlocked.Exchange(ref _enumerable, null)
             ?? throw new InvalidOperationException("This method can only be called once.");
 
+        // this would only occur if IResolveFieldContext.CancellationToken has been signaled
         _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
-        // Fire and forget
+        // iterate the async enumerable until the cancellation token is signaled via IDisposable.Dispose
         SubscribeInternalAsync(observer, enumerable);
 
         return this;
@@ -61,7 +67,7 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
     {
         try
         {
-            // Enumerate the source and pass the items to the observer
+            // enumerate the source and pass the items to the observer
             await foreach (var z in enumerable.WithCancellation(_cancellationTokenSource.Token).ConfigureAwait(false))
             {
                 observer.OnNext(z);
@@ -74,7 +80,7 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         }
         catch (Exception ex)
         {
-            // may occur within func, the source enumerable, or within the observer
+            // may occur within the source enumerable, or within the observer
             if (!_cancellationTokenSource.Token.IsCancellationRequested)
             {
                 observer.OnError(ex);
@@ -82,12 +88,23 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         }
     }
 
+    /// <summary>
+    /// Signals the iteration task to cancel execution.
+    /// </summary>
     void IDisposable.Dispose()
     {
         if (!_cancellationTokenSource.IsCancellationRequested)
             _cancellationTokenSource.Cancel();
     }
 
+    /// <summary>
+    /// Overrides <see cref="IResolveFieldContext.CancellationToken"/> with the specified token.
+    /// This allows the <see cref="SourceStreamMethodResolver"/> to utilize existing functionality
+    /// to pass the token along to <see cref="CancellationToken"/> method arguments even if
+    /// <see cref="EnumeratorCancellationAttribute"/> was accidentally not set on the method argument.
+    /// It also allows <see cref="IResolveFieldContext.CancellationToken"/> to hold the proper token
+    /// indicating when/if the iterator should be canceled.
+    /// </summary>
     private sealed class OverrideCancellationContext : IResolveFieldContext
     {
         private readonly IResolveFieldContext _context;
