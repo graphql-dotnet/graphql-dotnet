@@ -52,7 +52,7 @@ namespace GraphQL.Resolvers
                     constructor,
                     bodyExpression);
             }
-            // Task<?>
+            // Task<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
             {
                 var type = bodyExpression.Type.GetGenericArguments()[0];
@@ -76,7 +76,7 @@ namespace GraphQL.Resolvers
                 }
 #endif
             }
-            // ValueTask<?>
+            // ValueTask<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(ValueTask<>))
             {
                 var type = bodyExpression.Type.GetGenericArguments()[0];

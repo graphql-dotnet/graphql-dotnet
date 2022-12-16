@@ -10,7 +10,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Resolvers;
 
-internal class ObservableFromAsyncEnumerable<T> : IObservable<object?>, IDisposable
+internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource;
     private IAsyncEnumerable<T>? _enumerable;
@@ -99,51 +99,28 @@ internal class ObservableFromAsyncEnumerable<T> : IObservable<object?>, IDisposa
         }
 
         public GraphQLField FieldAst => _context.FieldAst;
-
         public FieldType FieldDefinition => _context.FieldDefinition;
-
         public IObjectGraphType ParentType => _context.ParentType;
-
         public IResolveFieldContext? Parent => _context.Parent;
-
         public IDictionary<string, ArgumentValue>? Arguments => _context.Arguments;
-
         public IDictionary<string, DirectiveInfo>? Directives => _context.Directives;
-
         public object? RootValue => _context.RootValue;
-
         public object? Source => _context.Source;
-
         public ISchema Schema => _context.Schema;
-
         public GraphQLDocument Document => _context.Document;
-
         public GraphQLOperationDefinition Operation => _context.Operation;
-
         public Variables Variables => _context.Variables;
-
         public CancellationToken CancellationToken { get; }
-
         public Metrics Metrics => _context.Metrics;
-
         public ExecutionErrors Errors => _context.Errors;
-
         public IEnumerable<object> Path => _context.Path;
-
         public IEnumerable<object> ResponsePath => _context.ResponsePath;
-
         public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _context.SubFields;
-
         public IReadOnlyDictionary<string, object?> InputExtensions => _context.InputExtensions;
-
         public IDictionary<string, object?> OutputExtensions => _context.OutputExtensions;
-
         public IServiceProvider? RequestServices => _context.RequestServices;
-
         public IExecutionArrayPool ArrayPool => _context.ArrayPool;
-
         public ClaimsPrincipal? User => _context.User;
-
         public IDictionary<string, object?> UserContext => _context.UserContext;
     }
 }
