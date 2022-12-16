@@ -53,6 +53,7 @@ public class AutoRegisteringObservableTests
         e.Message.ShouldBe("initial error");
     }
 
+#if NET5_0_OR_GREATER
     [Theory]
     [InlineData(nameof(TestClass.AsyncStrings1))]
     [InlineData(nameof(TestClass.AsyncStrings2))]
@@ -181,6 +182,7 @@ public class AutoRegisteringObservableTests
             var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
             service.Disposed.ShouldBeTrue();
         }
+#endif
     }
 
     public class TestClass
