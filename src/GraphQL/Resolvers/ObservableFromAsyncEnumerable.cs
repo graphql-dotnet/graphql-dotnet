@@ -1,6 +1,3 @@
-#if !NETSTANDARD2_0
-// for .NET Standard 2.0, this requires the Microsoft.Bcl.AsyncInterfaces NuGet package
-
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using GraphQL.Execution;
@@ -141,5 +138,3 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         public IDictionary<string, object?> UserContext => _context.UserContext;
     }
 }
-
-#endif

@@ -1,6 +1,5 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable CS8425 // Async-iterator member has one or more parameters of type 'CancellationToken' but none of them is decorated with the 'EnumeratorCancellation' attribute, so the cancellation token parameter from the generated 'IAsyncEnumerable<>.GetAsyncEnumerator' will be unconsumed
-#pragma warning disable IDE0005 // Using directive is unnecessary.
 
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
@@ -57,7 +56,6 @@ public class AutoRegisteringObservableTests
         e.Message.ShouldBe("initial error");
     }
 
-#if NET5_0_OR_GREATER
     [Theory]
     [InlineData(nameof(TestClass.AsyncStrings1))]
     [InlineData(nameof(TestClass.AsyncStrings2))]
@@ -214,7 +212,6 @@ public class AutoRegisteringObservableTests
         var returnedData = stream.Value.ToEnumerable().Select(result => new SystemTextJson.GraphQLSerializer().Serialize(result)).ToList();
         returnedData.ShouldHaveSingleItem().ShouldBeCrossPlatJson("""{"data":{"resolveFieldContextPassThrough":"1"}}""");
     }
-#endif
 
     public class TestClass
     {

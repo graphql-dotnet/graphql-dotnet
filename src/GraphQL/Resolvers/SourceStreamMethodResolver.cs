@@ -65,7 +65,6 @@ namespace GraphQL.Resolvers
                         taskBodyExpression = Expression.Call(_castFromTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression);
                     }
                 }
-#if !NETSTANDARD2_0
                 // Task<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
@@ -74,7 +73,6 @@ namespace GraphQL.Resolvers
                     var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
-#endif
             }
             // ValueTask<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(ValueTask<>))
@@ -89,7 +87,6 @@ namespace GraphQL.Resolvers
                         taskBodyExpression = Expression.Call(_castFromValueTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression);
                     }
                 }
-#if !NETSTANDARD2_0
                 // ValueTask<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
@@ -98,7 +95,6 @@ namespace GraphQL.Resolvers
                     var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
-#endif
             }
             // IObservable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
@@ -113,7 +109,6 @@ namespace GraphQL.Resolvers
                         bodyExpression);
                 }
             }
-#if !NETSTANDARD2_0
             // IAsyncEnumerable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
             {
@@ -122,22 +117,16 @@ namespace GraphQL.Resolvers
                 var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
                 return func(bodyExpression, resolveFieldContextParameter);
             }
-#endif
 
             if (taskBodyExpression == null)
             {
-                throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type" +
-#if !NETSTANDARD2_0
-                    ", or a IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>>" +
-#endif
-                    ".");
+                throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type, or a IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>>.");
             }
 
             var lambda = Expression.Lambda<Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>(taskBodyExpression, resolveFieldContextParameter);
             return lambda.Compile();
         }
 
-#if !NETSTANDARD2_0
         private static readonly MethodInfo _convertFromAsyncEnumerableMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(ConvertFromAsyncEnumerable), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static Func<IResolveFieldContext, ValueTask<IObservable<object?>>> ConvertFromAsyncEnumerable<T>(Expression body, ParameterExpression resolveFieldContextParameter)
         {
@@ -161,7 +150,6 @@ namespace GraphQL.Resolvers
             var func = lambda.Compile();
             return ObservableFromAsyncEnumerable<T>.Create(func);
         }
-#endif
 
         private static readonly MethodInfo _castFromValueTaskAsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromValueTaskAsync<T>(ValueTask<IObservable<T>> task) where T : class

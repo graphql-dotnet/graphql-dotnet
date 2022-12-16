@@ -109,28 +109,18 @@ internal static class AutoRegisteringOutputHelper
         }
     }
 
-#if !NETSTANDARD2_0
     /// <summary>
     /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
     /// Also checks for <see cref="IAsyncEnumerable{T}"/> and task that returns an <see cref="IAsyncEnumerable{T}"/>.
     /// </summary>
-#else
-    /// <summary>
-    /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
-    /// </summary>
-#endif
     private static bool IsObservableOrAsyncEnumerable(Type type)
     {
         if (!type.IsGenericType)
             return false;
 
         var g = type.GetGenericTypeDefinition();
-        if (g == typeof(IObservable<>))
+        if (g == typeof(IObservable<>) || g == typeof(IAsyncEnumerable<>))
             return true;
-#if !NETSTANDARD2_0
-        if (g == typeof(IAsyncEnumerable<>))
-            return true;
-#endif
         if (g == typeof(Task<>) || g == typeof(ValueTask<>))
             return IsObservableOrAsyncEnumerable(type.GetGenericArguments()[0]);
         return false;
