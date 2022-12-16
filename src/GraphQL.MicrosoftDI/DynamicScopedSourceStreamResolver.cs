@@ -22,7 +22,9 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
         {
             var scope = context.RequestServicesOrThrow().CreateScope();
             var scopedContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
-            var observable = await resolver.ResolveAsync(scopedContext).ConfigureAwait(false);
+            var observable = await resolver.ResolveAsync(scopedContext).ConfigureAwait(false)
+                ?? throw new InvalidOperationException("The source stream resolver returned null.");
+            // keep the service scope alive until the subscription has been disposed
             return new ObservableMapper(observable, scope);
         };
     }
@@ -30,6 +32,9 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
     /// <inheritdoc/>
     public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context) => _resolverFunc(context);
 
+    /// <summary>
+    /// Disposes of a service scope when the source stream is disposed.
+    /// </summary>
     private class ObservableMapper : IObservable<object?>, IDisposable
     {
         private IObservable<object?>? _observable;
@@ -44,6 +49,8 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
 
         public IDisposable Subscribe(IObserver<object?> observer)
         {
+            // note: this error should not occur, as GraphQL.NET does not call IObservable<T>.Subscribe
+            // more than once after executing the source stream resolver
             var observable = Interlocked.Exchange(ref _observable, null)
                 ?? throw new InvalidOperationException("This method can only be called once.");
             _disposable = observable.Subscribe(observer);
@@ -52,10 +59,8 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
 
         void IDisposable.Dispose()
         {
-            var disposable = Interlocked.Exchange(ref _disposable, null);
-            disposable?.Dispose();
-            var scope = Interlocked.Exchange(ref _serviceScope, null);
-            scope?.Dispose();
+            Interlocked.Exchange(ref _disposable, null)?.Dispose();
+            Interlocked.Exchange(ref _serviceScope, null)?.Dispose();
         }
     }
 }
