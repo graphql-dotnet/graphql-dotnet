@@ -1,11 +1,10 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable CS8425 // Async-iterator member has one or more parameters of type 'CancellationToken' but none of them is decorated with the 'EnumeratorCancellation' attribute, so the cancellation token parameter from the generated 'IAsyncEnumerable<>.GetAsyncEnumerator' will be unconsumed
+#pragma warning disable IDE0005 // Using directive is unnecessary.
 
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-#pragma warning disable IDE0005 // Using directive is unnecessary.
 using System.Security.Claims;
-#pragma warning restore IDE0005 // Using directive is unnecessary.
 using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
