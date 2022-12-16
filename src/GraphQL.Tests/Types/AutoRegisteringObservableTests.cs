@@ -3,16 +3,14 @@
 
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
-#if NET5_0_OR_GREATER
+#pragma warning disable IDE0005 // Using directive is unnecessary.
 using System.Security.Claims;
-#endif
+#pragma warning restore IDE0005 // Using directive is unnecessary.
 using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-#if NET5_0_OR_GREATER
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-#endif
 
 namespace GraphQL.Tests.Types;
 
