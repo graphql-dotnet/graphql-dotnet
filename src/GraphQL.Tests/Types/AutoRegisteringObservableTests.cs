@@ -182,8 +182,8 @@ public class AutoRegisteringObservableTests
             var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
             service.Disposed.ShouldBeTrue();
         }
-#endif
     }
+#endif
 
     public class TestClass
     {
