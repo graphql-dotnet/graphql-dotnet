@@ -69,7 +69,7 @@ internal static class AutoRegisteringOutputHelper
             if (buildMemberInstanceExpressionFunc != null)
             {
                 var memberInstanceExpression = buildMemberInstanceExpressionFunc(methodInfo);
-                if (IsObservable(methodInfo.ReturnType))
+                if (IsObservableOrAsyncEnumerable(methodInfo.ReturnType))
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
@@ -109,10 +109,17 @@ internal static class AutoRegisteringOutputHelper
         }
     }
 
+#if !NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
+    /// Also checks for <see cref="IAsyncEnumerable{T}"/> and task that returns an <see cref="IAsyncEnumerable{T}"/>.
+    /// </summary>
+#else
     /// <summary>
     /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
     /// </summary>
-    private static bool IsObservable(Type type)
+#endif
+    private static bool IsObservableOrAsyncEnumerable(Type type)
     {
         if (!type.IsGenericType)
             return false;
@@ -120,8 +127,12 @@ internal static class AutoRegisteringOutputHelper
         var g = type.GetGenericTypeDefinition();
         if (g == typeof(IObservable<>))
             return true;
+#if !NETSTANDARD2_0
+        if (g == typeof(IAsyncEnumerable<>))
+            return true;
+#endif
         if (g == typeof(Task<>) || g == typeof(ValueTask<>))
-            return IsObservable(type.GetGenericArguments()[0]);
+            return IsObservableOrAsyncEnumerable(type.GetGenericArguments()[0]);
         return false;
     }
 

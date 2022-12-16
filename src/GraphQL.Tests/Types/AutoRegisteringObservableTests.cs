@@ -1,0 +1,248 @@
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+#pragma warning disable CS8425 // Async-iterator member has one or more parameters of type 'CancellationToken' but none of them is decorated with the 'EnumeratorCancellation' attribute, so the cancellation token parameter from the generated 'IAsyncEnumerable<>.GetAsyncEnumerator' will be unconsumed
+
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
+using GraphQL.Resolvers;
+using GraphQL.Types;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
+
+namespace GraphQL.Tests.Types;
+
+public class AutoRegisteringObservableTests
+{
+    private ISourceStreamResolver GetResolver(string fieldName)
+    {
+        var graph = new AutoRegisteringObjectGraphType<TestClass>();
+        var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
+        var streamResolver = field.StreamResolver.ShouldNotBeNull();
+        return streamResolver;
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.ListOfStrings1))]
+    [InlineData(nameof(TestClass.ListOfStrings2))]
+    [InlineData(nameof(TestClass.ListOfStrings3))]
+    public async Task Observable_Basic(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new string[] { "a", "b", "c" });
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.ReturnError1))]
+    [InlineData(nameof(TestClass.ReturnError2))]
+    [InlineData(nameof(TestClass.ReturnError3))]
+    public async Task Observable_WithError(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("sample error");
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.InitialError1))]
+    [InlineData(nameof(TestClass.InitialError2))]
+    [InlineData(nameof(TestClass.InitialError3))]
+    public async Task Observable_InitialError(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ConfigureAwait(false);
+        e.Message.ShouldBe("initial error");
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.AsyncStrings1))]
+    [InlineData(nameof(TestClass.AsyncStrings2))]
+    [InlineData(nameof(TestClass.AsyncStrings3))]
+    public async Task AsyncEnumerable_Basic(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new string[] { "d", "e", "f" });
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.AsyncWithError1))]
+    [InlineData(nameof(TestClass.AsyncWithError2))]
+    [InlineData(nameof(TestClass.AsyncWithError3))]
+    public async Task AsyncEnumerable_WithError(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("sample error 2");
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.AsyncInitialError1))]
+    [InlineData(nameof(TestClass.AsyncInitialError2))]
+    [InlineData(nameof(TestClass.AsyncInitialError3))]
+    public async Task AsyncEnumerable_InitialError(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ConfigureAwait(false);
+        e.Message.ShouldBe("initial error 2");
+    }
+
+    [Fact]
+    public async Task AsyncEnumerable_Token1()
+    {
+        var streamResolver = GetResolver(nameof(TestClass.AsyncWithToken1));
+        var context = new ResolveFieldContext();
+        context.CancellationToken.CanBeCanceled.ShouldBeFalse();
+        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new string[] { "ok1" });
+    }
+
+    [Fact]
+    public async Task AsyncEnumerable_Token2()
+    {
+        var streamResolver = GetResolver(nameof(TestClass.AsyncWithToken2));
+        var context = new ResolveFieldContext();
+        context.CancellationToken.CanBeCanceled.ShouldBeFalse();
+        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new string[] { "ok2" });
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.AsyncCancelToken1), true)]
+    [InlineData(nameof(TestClass.AsyncCancelToken1), false)]
+    [InlineData(nameof(TestClass.AsyncCancelToken2), true)]
+    [InlineData(nameof(TestClass.AsyncCancelToken2), false)]
+    public async Task AsyncEnumerable_Cancel1(string fieldName, bool cancelViaDispose)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var cts = new CancellationTokenSource();
+        var context = new ResolveFieldContext() { CancellationToken = cts.Token };
+        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        var mockObserver = new Mock<IObserver<object>>(MockBehavior.Strict);
+        var tcs = new TaskCompletionSource<bool>();
+        mockObserver.Setup(x => x.OnNext("canceled")).Callback(() => tcs.SetResult(true)).Verifiable();
+        var disposer = observable.Subscribe(mockObserver.Object);
+        await Task.Delay(500).ConfigureAwait(false);
+        if (cancelViaDispose)
+            disposer.Dispose();
+        else
+            cts.Cancel();
+        await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30))).ConfigureAwait(false);
+        mockObserver.Verify();
+        mockObserver.VerifyNoOtherCalls();
+    }
+
+    [Fact]
+    public async Task ScopedTests()
+    {
+        var streamResolver = GetResolver(nameof(TestClass.Scoped));
+        var services = new ServiceCollection();
+        services.AddScoped<ServiceTestClass>();
+        var context = new ResolveFieldContext()
+        {
+            RequestServices = services.BuildServiceProvider(),
+            OutputExtensions = new Dictionary<string, object>(),
+        };
+        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new string[] { "1", "2" });
+        var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
+        service.Disposed.ShouldBeTrue();
+    }
+
+    public class TestClass
+    {
+        public static IObservable<string> ListOfStrings1() => new string[] { "a", "b", "c" }.ToObservable();
+        public static async Task<IObservable<string>> ListOfStrings2() => new string[] { "a", "b", "c" }.ToObservable();
+        public static async ValueTask<IObservable<string>> ListOfStrings3() => new string[] { "a", "b", "c" }.ToObservable();
+
+        public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
+        public static async Task<IObservable<string>> ReturnError2() => Observable.Throw<string>(new Exception("sample error"));
+        public static async ValueTask<IObservable<string>> ReturnError3() => Observable.Throw<string>(new Exception("sample error"));
+
+        public static IObservable<string> InitialError1() => throw new Exception("initial error");
+        public static async Task<IObservable<string>> InitialError2() => throw new Exception("initial error");
+        public static async ValueTask<IObservable<string>> InitialError3() => throw new Exception("initial error");
+
+        public static async IAsyncEnumerable<string> AsyncStrings1()
+        {
+            yield return "d";
+            yield return "e";
+            yield return "f";
+        }
+        public static async Task<IAsyncEnumerable<string>> AsyncStrings2() => AsyncStrings1();
+        public static async ValueTask<IAsyncEnumerable<string>> AsyncStrings3() => AsyncStrings1();
+
+        public static async IAsyncEnumerable<string> AsyncWithError1()
+        {
+            yield return "g";
+            throw new Exception("sample error 2");
+        }
+        public static async Task<IAsyncEnumerable<string>> AsyncWithError2() => AsyncWithError1();
+        public static async ValueTask<IAsyncEnumerable<string>> AsyncWithError3() => AsyncWithError1();
+
+        public static IAsyncEnumerable<string> AsyncInitialError1() => throw new Exception("initial error 2");
+        public static async Task<IAsyncEnumerable<string>> AsyncInitialError2() => throw new Exception("initial error 2");
+        public static async ValueTask<IAsyncEnumerable<string>> AsyncInitialError3() => throw new Exception("initial error 2");
+
+        public static async IAsyncEnumerable<string> AsyncWithToken1(IResolveFieldContext context, CancellationToken token)
+        {
+            token.CanBeCanceled.ShouldBeTrue();
+            token.ShouldBe(context.CancellationToken);
+            yield return "ok1";
+        }
+
+        public static async IAsyncEnumerable<string> AsyncWithToken2(IResolveFieldContext context, [EnumeratorCancellation] CancellationToken token)
+        {
+            token.CanBeCanceled.ShouldBeTrue();
+            token.ShouldBe(context.CancellationToken);
+            yield return "ok2";
+        }
+
+        public static async IAsyncEnumerable<string> AsyncCancelToken1(IResolveFieldContext context, CancellationToken token)
+        {
+            context.CancellationToken.ShouldBe(token);
+            string response = "ok";
+            try
+            {
+                await Task.Delay(30000, token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                response = "canceled";
+            }
+            yield return response;
+        }
+
+        public static async IAsyncEnumerable<string> AsyncCancelToken2(IResolveFieldContext context, [EnumeratorCancellation] CancellationToken token)
+        {
+            context.CancellationToken.ShouldBe(token);
+            string response = "ok";
+            try
+            {
+                await Task.Delay(30000, token).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                response = "canceled";
+            }
+            yield return response;
+        }
+
+        [Scoped]
+        public static async IAsyncEnumerable<string> Scoped(IResolveFieldContext context, [FromServices] ServiceTestClass serviceTestClass)
+        {
+            serviceTestClass.Disposed.ShouldBeFalse();
+            yield return "1";
+            await Task.Delay(500).ConfigureAwait(false);
+            serviceTestClass.Disposed.ShouldBeFalse();
+            yield return "2";
+            context.OutputExtensions["service"] = serviceTestClass;
+        }
+    }
+
+    public class ServiceTestClass : IDisposable
+    {
+        public bool Disposed { get; private set; }
+
+        public void Dispose() => Disposed = true;
+    }
+}

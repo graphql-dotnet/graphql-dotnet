@@ -206,7 +206,11 @@ namespace GraphQL.Types
                     if (type.Type.IsGenericType)
                     {
                         var genericType = type.Type.GetGenericTypeDefinition();
-                        if (genericType == typeof(Task<>) || genericType == typeof(ValueTask<>) || genericType == typeof(IDataLoaderResult<>) || genericType == typeof(IObservable<>))
+                        if (genericType == typeof(Task<>) || genericType == typeof(ValueTask<>)
+#if !NETSTANDARD2_0
+                            || genericType == typeof(IAsyncEnumerable<>)
+#endif
+                            || genericType == typeof(IDataLoaderResult<>) || genericType == typeof(IObservable<>))
                         {
                             //unwrap type
                             IsNullable |= type.Nullable != NullabilityState.NotNull;

@@ -20,11 +20,42 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
     {
         _resolverFunc = async context =>
         {
-            using var scope = context.RequestServicesOrThrow().CreateScope();
-            return await resolver.ResolveAsync(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
+            var scope = context.RequestServicesOrThrow().CreateScope();
+            var scopedContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
+            var observable = await resolver.ResolveAsync(scopedContext).ConfigureAwait(false);
+            return new ObservableMapper(observable, scope);
         };
     }
 
     /// <inheritdoc/>
     public ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context) => _resolverFunc(context);
+
+    private class ObservableMapper : IObservable<object?>, IDisposable
+    {
+        private IObservable<object?>? _observable;
+        private IServiceScope? _serviceScope;
+        private IDisposable? _disposable;
+
+        public ObservableMapper(IObservable<object?> observable, IServiceScope serviceScope)
+        {
+            _observable = observable;
+            _serviceScope = serviceScope;
+        }
+
+        public IDisposable Subscribe(IObserver<object?> observer)
+        {
+            var observable = Interlocked.Exchange(ref _observable, null)
+                ?? throw new InvalidOperationException("This method can only be called once.");
+            _disposable = observable.Subscribe(observer);
+            return this;
+        }
+
+        void IDisposable.Dispose()
+        {
+            var disposable = Interlocked.Exchange(ref _disposable, null);
+            disposable?.Dispose();
+            var scope = Interlocked.Exchange(ref _serviceScope, null);
+            scope?.Dispose();
+        }
+    }
 }
