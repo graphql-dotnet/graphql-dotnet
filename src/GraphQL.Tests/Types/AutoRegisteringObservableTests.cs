@@ -27,6 +27,8 @@ public class AutoRegisteringObservableTests
     [InlineData(nameof(TestClass.ListOfStrings1))]
     [InlineData(nameof(TestClass.ListOfStrings2))]
     [InlineData(nameof(TestClass.ListOfStrings3))]
+    [InlineData(nameof(TestClass.ListOfStrings4))]
+    [InlineData(nameof(TestClass.ListOfStrings5))]
     public async Task Observable_Basic(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
@@ -220,6 +222,8 @@ public class AutoRegisteringObservableTests
         public static IObservable<string> ListOfStrings1() => new string[] { "a", "b", "c" }.ToObservable();
         public static async Task<IObservable<string>> ListOfStrings2() => new string[] { "a", "b", "c" }.ToObservable();
         public static async ValueTask<IObservable<string>> ListOfStrings3() => new string[] { "a", "b", "c" }.ToObservable();
+        public static IObservable<object> ListOfStrings4() => new string[] { "a", "b", "c" }.ToObservable();
+        public static async ValueTask<IObservable<string>> ListOfStrings5() => new string[] { "a", "b", "c" }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
         public static async Task<IObservable<string>> ReturnError2() => Observable.Throw<string>(new Exception("sample error"));
