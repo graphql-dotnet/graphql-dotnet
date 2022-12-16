@@ -221,7 +221,9 @@ public class AutoRegisteringObservableTests
         public static IObservable<string> ListOfStrings1() => new string[] { "a", "b", "c" }.ToObservable();
         public static async Task<IObservable<string>> ListOfStrings2() => new string[] { "a", "b", "c" }.ToObservable();
         public static async ValueTask<IObservable<string>> ListOfStrings3() => new string[] { "a", "b", "c" }.ToObservable();
+        [OutputType(typeof(StringGraphType))]
         public static IObservable<object> ListOfStrings4() => new string[] { "a", "b", "c" }.ToObservable();
+        [OutputType(typeof(StringGraphType))]
         public static async ValueTask<IObservable<string>> ListOfStrings5() => new string[] { "a", "b", "c" }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
