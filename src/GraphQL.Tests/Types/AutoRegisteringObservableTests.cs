@@ -132,20 +132,55 @@ public class AutoRegisteringObservableTests
     }
 
     [Fact]
-    public async Task ScopedTests()
+    public async Task Scoped_Basic()
     {
         var streamResolver = GetResolver(nameof(TestClass.Scoped));
-        var services = new ServiceCollection();
-        services.AddScoped<ServiceTestClass>();
-        var context = new ResolveFieldContext()
+        // verify that the stream resolver can be run multiple times
+        for (int i = 0; i < 2; i++)
         {
-            RequestServices = services.BuildServiceProvider(),
-            OutputExtensions = new Dictionary<string, object>(),
-        };
-        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
-        observable.ToEnumerable().ShouldBe(new string[] { "1", "2" });
-        var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
-        service.Disposed.ShouldBeTrue();
+            var services = new ServiceCollection();
+            services.AddScoped<ServiceTestClass>();
+            var context = new ResolveFieldContext()
+            {
+                RequestServices = services.BuildServiceProvider(),
+                OutputExtensions = new Dictionary<string, object>(),
+            };
+            // the ServiceTestClass will be created during the call to ResolveAsync
+            var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+            // verify that the ServiceTestClass is not disposed while it is being iterated
+            observable.ToEnumerable().ShouldBe(new string[] { "1", "2" });
+            // verify that the ServiceTestClass is disposed after the iteration is complete
+            var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
+            service.Disposed.ShouldBeTrue();
+        }
+    }
+
+    [Fact]
+    public async Task Scoped_DisposeAfterException()
+    {
+        var streamResolver = GetResolver(nameof(TestClass.ScopedError));
+        // verify that the stream resolver can be run multiple times
+        for (int i = 0; i < 2; i++)
+        {
+            var services = new ServiceCollection();
+            services.AddScoped<ServiceTestClass>();
+            var inService = new ServiceTestClass();
+            var context = new ResolveFieldContext()
+            {
+                RequestServices = services.BuildServiceProvider(),
+                InputExtensions = new Dictionary<string, object>() { { "in", inService } },
+                OutputExtensions = new Dictionary<string, object>(),
+            };
+            // the ServiceTestClass will be created during the call to ResolveAsync
+            var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+            // verify that the ServiceTestClass is not disposed while it is being iterated
+            Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("something");
+            // verify that the finalizer has run within the async iterator
+            inService.Disposed.ShouldBeTrue();
+            // verify that the ServiceTestClass is disposed after the iteration is complete
+            var service = context.OutputExtensions["service"].ShouldBeOfType<ServiceTestClass>();
+            service.Disposed.ShouldBeTrue();
+        }
     }
 
     public class TestClass
@@ -236,6 +271,24 @@ public class AutoRegisteringObservableTests
             serviceTestClass.Disposed.ShouldBeFalse();
             yield return "2";
             context.OutputExtensions["service"] = serviceTestClass;
+        }
+
+        [Scoped]
+        public static async IAsyncEnumerable<string> ScopedError(IResolveFieldContext context, [FromServices] ServiceTestClass serviceTestClass)
+        {
+            var inService = context.InputExtensions["in"].ShouldBeOfType<ServiceTestClass>();
+            context.OutputExtensions["service"] = serviceTestClass;
+            inService.Disposed.ShouldBeFalse();
+            serviceTestClass.Disposed.ShouldBeFalse();
+            yield return "3";
+            try
+            {
+                throw new Exception("something");
+            }
+            finally
+            {
+                inService.Dispose();
+            }
         }
     }
 
