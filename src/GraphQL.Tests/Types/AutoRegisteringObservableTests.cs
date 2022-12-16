@@ -3,6 +3,8 @@
 
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Claims;
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 #if NET5_0_OR_GREATER
@@ -184,6 +186,33 @@ public class AutoRegisteringObservableTests
             service.Disposed.ShouldBeTrue();
         }
     }
+
+    [Fact]
+    public async Task ResolveFieldContext_Passthrough()
+    {
+        var options = new ExecutionOptions
+        {
+            Query = "subscription($n:Int!) { resolveFieldContextPassThrough(num:$n) @skip(if:false) }",
+            RequestServices = new ServiceCollection().BuildServiceProvider(),
+            Schema = new Schema
+            {
+                Subscription = new AutoRegisteringObjectGraphType<TestClass>(),
+            },
+            Variables = new Dictionary<string, object>() { { "n", 2 } }.ToInputs(),
+            Extensions = new Dictionary<string, object>() { { "ext", 20 } }.ToInputs(),
+            EnableMetrics = true,
+            Root = "root",
+            User = new ClaimsPrincipal(new ClaimsIdentity("test")),
+            ThrowOnUnhandledException = true,
+        };
+        options.UserContext["key1"] = "value1";
+        var ret = await new DocumentExecuter().ExecuteAsync(options).ConfigureAwait(false);
+        ret.Executed.ShouldBeTrue();
+        var stream = ret.Streams.ShouldHaveSingleItem();
+        stream.Key.ShouldBe("resolveFieldContextPassThrough");
+        var returnedData = stream.Value.ToEnumerable().Select(result => new SystemTextJson.GraphQLSerializer().Serialize(result)).ToList();
+        returnedData.ShouldHaveSingleItem().ShouldBeCrossPlatJson("""{"data":{"resolveFieldContextPassThrough":"1"}}""");
+    }
 #endif
 
     public class TestClass
@@ -292,6 +321,36 @@ public class AutoRegisteringObservableTests
             {
                 inService.Dispose();
             }
+        }
+
+        [Scoped]
+        public static async IAsyncEnumerable<string> ResolveFieldContextPassThrough(int num, IResolveFieldContext context)
+        {
+            num.ShouldBe(2);
+            context.Document.Source.ShouldBe("subscription($n:Int!) { resolveFieldContextPassThrough(num:$n) @skip(if:false) }");
+            context.GetArgument<int>("num").ShouldBe(2);
+            context.Arguments["num"].Source.ShouldBe(ArgumentSource.Variable);
+            context.Variables.ValueFor("n", out var argValue).ShouldBeTrue();
+            argValue.Value.ShouldBe(2);
+            context.InputExtensions["ext"].ShouldBe(20);
+            context.ArrayPool.ShouldNotBeNull();
+            context.Directives["skip"].ShouldNotBeNull().Arguments["if"].Value.ShouldBe(false);
+            context.Errors.ShouldNotBeNull();
+            context.FieldAst.Name.Value.ShouldBe("resolveFieldContextPassThrough");
+            context.FieldDefinition.Name.ShouldBe("resolveFieldContextPassThrough");
+            context.Metrics.Enabled.ShouldBeTrue();
+            context.Operation.Operation.ShouldBe(GraphQLParser.AST.OperationType.Subscription);
+            context.Parent.ShouldBeNull();
+            context.ParentType.Name.ShouldBe("TestClass");
+            context.Path.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
+            context.ResponsePath.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
+            context.RootValue.ShouldBe("root");
+            context.Schema.Subscription.Name.ShouldBe("TestClass");
+            context.Source.ShouldBe("root");
+            context.SubFields.ShouldBeNull();
+            context.User.Identity.AuthenticationType.ShouldBe("test");
+            context.UserContext["key1"].ShouldBe("value1");
+            yield return "1";
         }
     }
 
