@@ -18,8 +18,7 @@ public class AutoRegisteringObservableTests
     {
         var graph = new AutoRegisteringObjectGraphType<TestClass>();
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
-        var streamResolver = field.StreamResolver.ShouldNotBeNull();
-        return streamResolver;
+        return field.StreamResolver.ShouldNotBeNull();
     }
 
     [Theory]
