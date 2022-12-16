@@ -5,8 +5,10 @@ using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+#if NET5_0_OR_GREATER
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+#endif
 
 namespace GraphQL.Tests.Types;
 
