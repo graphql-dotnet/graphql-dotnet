@@ -40,10 +40,11 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
         _services = serviceDescriptors.ToLookup(x => x.ServiceType);
     }
 
-    public static AotServiceProvider Create(IServiceCollection services, Action<IAotServiceProviderConfiguration> configuration)
+    public static AotServiceProvider Create(IServiceCollection services, Action<IAotServiceProviderConfiguration>? configuration = null)
     {
         var ret = new AotServiceProvider(services);
-        configuration(ret);
+        if (configuration != null)
+            configuration(ret);
         return ret;
     }
 

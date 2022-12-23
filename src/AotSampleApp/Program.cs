@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using AotSampleApp;
 using GraphQL;
-using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.Types;
@@ -44,12 +43,7 @@ Preserve<GraphQLClrInputTypeReference<string>>();
 // note: does not support open generics, such as AutoRegisteringObjectGraphType<>
 // note: does not exhaustively search constructors, but rather uses the first one defined
 
-var services = AotServiceProvider.Create(serviceCollection, c => { }
-// must add each IEnumerable<T> type that is used by GraphQL.NET
-//.AddListType<IConfigureSchema>()
-//.AddListType<IGraphTypeMappingProvider>()
-//.AddListType<IConfigureExecution>()
-);
+var services = AotServiceProvider.Create(serviceCollection);
 
 //#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 //var services = serviceCollection.BuildServiceProvider();

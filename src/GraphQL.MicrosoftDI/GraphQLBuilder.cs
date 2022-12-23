@@ -73,9 +73,6 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         return this;
     }
 
-    private void Preserve<
-        T>() { }
-
     /// <inheritdoc/>
     public IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
     {
