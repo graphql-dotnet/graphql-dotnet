@@ -1,4 +1,7 @@
 using System.Collections;
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -53,7 +56,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         };
 
     /// <inheritdoc/>
-    public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
+    public IServiceRegister Configure<
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+    TOptions>(Action<TOptions, IServiceProvider>? action = null)
         where TOptions : class, new()
     {
         this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
@@ -65,6 +72,9 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
 
         return this;
     }
+
+    private void Preserve<
+        T>() { }
 
     /// <inheritdoc/>
     public IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false)
@@ -86,7 +96,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     }
 
     /// <inheritdoc/>
-    public IServiceRegister Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
+    public IServiceRegister Register(Type serviceType,
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
     {
         if (serviceType == null)
             throw new ArgumentNullException(nameof(serviceType));
@@ -143,7 +157,11 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     }
 
     /// <inheritdoc/>
-    public IServiceRegister TryRegister(Type serviceType, Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+    public IServiceRegister TryRegister(Type serviceType,
+#if NET5_0_OR_GREATER
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
     {
         if (serviceType == null)
             throw new ArgumentNullException(nameof(serviceType));

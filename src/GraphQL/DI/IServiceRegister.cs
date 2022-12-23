@@ -61,7 +61,11 @@ namespace GraphQL.DI
         /// If <paramref name="action"/> is <see langword="null"/> then <typeparamref name="TOptions"/> is still configured and
         /// will return a default instance (unless otherwise configured with a subsequent call to <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider}?)">Configure</see>).
         /// </summary>
-        IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
+        IServiceRegister Configure<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+        TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
     }
 }

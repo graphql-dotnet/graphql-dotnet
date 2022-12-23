@@ -1,11 +1,13 @@
 // See https://aka.ms/new-console-template for more information
-using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
+using AotSampleApp;
 using GraphQL;
+using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.Types;
-using AotSampleApp;
-using GraphQL.DI;
-using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 Console.WriteLine("Hello, World!");
 Console.WriteLine();
@@ -40,11 +42,20 @@ Preserve<GraphQLClrInputTypeReference<string>>();
 
 // must use AOT-friendly service provider
 // note: does not support open generics, such as AutoRegisteringObjectGraphType<>
-var services = AotServiceProvider.Create(serviceCollection, c => c
-    // must add each IEnumerable<T> type that is used by GraphQL.NET
-    .AddListType<IConfigureSchema>()
-    .AddListType<IGraphTypeMappingProvider>()
-    .AddListType<IConfigureExecution>());
+// note: does not exhaustively search constructors, but rather uses the first one defined
+
+var services = AotServiceProvider.Create(serviceCollection, c => { }
+// must add each IEnumerable<T> type that is used by GraphQL.NET
+//.AddListType<IConfigureSchema>()
+//.AddListType<IGraphTypeMappingProvider>()
+//.AddListType<IConfigureExecution>()
+);
+
+//#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+//var services = serviceCollection.BuildServiceProvider();
+//#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+
+var opts = services.GetRequiredService<IOptions<ErrorInfoProviderOptions>>();
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 

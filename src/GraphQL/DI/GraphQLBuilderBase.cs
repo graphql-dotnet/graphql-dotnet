@@ -1,3 +1,6 @@
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
@@ -71,7 +74,23 @@ namespace GraphQL.DI
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Services.Configure<ErrorInfoProviderOptions>();
+
+            // for AOT-compiled scenarios, preserve a few types necessary for DI injection to work properly
+            Preserve<IConfigureExecution[]>();
+            Preserve<IConfigureSchema[]>();
+            Preserve<IGraphTypeMappingProvider[]>();
+            Preserve(typeof(ErrorInfoProviderOptions));
         }
+
+        /// <summary>
+        /// Preserves the specified type in AOT-compiled scenarios.
+        /// </summary>
+        private static void Preserve<T>() { }
+        private static void Preserve(
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type t) => GC.KeepAlive(t);
 
         /// <inheritdoc />
         public abstract IServiceRegister Services { get; }
