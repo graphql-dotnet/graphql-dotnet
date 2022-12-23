@@ -1,3 +1,6 @@
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -33,7 +36,11 @@ namespace GraphQL
         /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IServiceRegister Register<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<TService,
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
             => services.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
@@ -55,7 +62,11 @@ namespace GraphQL
             => services.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
 
         /// <inheritdoc cref="TryRegister{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime)"/>
-        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
@@ -66,7 +77,11 @@ namespace GraphQL
         /// has not already been registered. An instance of <typeparamref name="TImplementation"/>
         /// will be created when an instance is needed.
         /// </summary>
-        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+        public static IServiceRegister TryRegister<TService,
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
             => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, mode);
@@ -830,7 +845,11 @@ namespace GraphQL
         /// dependency injection framework.
         /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddSerializer<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TSerializer>(this IGraphQLBuilder builder)
             where TSerializer : class, IGraphQLSerializer
         {
             builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);

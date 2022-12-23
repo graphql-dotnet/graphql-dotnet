@@ -1,3 +1,6 @@
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -81,7 +84,11 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
-        public static void RegisterTypeMapping<TClrType, TGraphType>(this ISchema schema)
+        public static void RegisterTypeMapping<TClrType,
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {
             schema.RegisterTypeMapping(typeof(TClrType), typeof(TGraphType));
@@ -121,7 +128,10 @@ namespace GraphQL
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
-            schema.AutoRegister(typeof(TClrType), mode);
+            if (mode.HasFlag(AutoRegisteringMode.Output))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringObjectGraphType<TClrType>>();
+            if (mode.HasFlag(AutoRegisteringMode.Input))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringInputObjectGraphType<TClrType>>();
         }
 
         /// <summary>
@@ -138,7 +148,7 @@ namespace GraphQL
         /// the mappings prior to execution.
         /// </remarks>
         public static void RegisterTypeMappings(this ISchema schema)
-        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+            => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,

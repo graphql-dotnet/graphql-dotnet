@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -63,8 +64,15 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Create(IGraphType, string)"/>
-        public static FieldBuilder<TSourceType, TReturnType> Create(Type? type = null, string name = "default")
+        public static FieldBuilder<TSourceType, TReturnType> Create(
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type? type = null, string name = "default")
         {
+            // force AOT compilation to include type references
+            //Reference<GraphQLClrInputTypeReference<TReturnType>>();
+            //Reference<GraphQLClrOutputTypeReference<TReturnType>>();
             var fieldType = new FieldType
             {
                 Name = name,
@@ -72,6 +80,10 @@ namespace GraphQL.Builders
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
+
+        //private static void Reference<T>()
+        //{
+        //}
 
         /// <summary>
         /// Sets the graph type of the field.
@@ -210,7 +222,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
             where TArgumentGraphType : IGraphType
-            => Argument(typeof(TArgumentGraphType), name, null);
+            => Argument<TArgumentGraphType>(name, null);
 
         /// <summary>
         /// Adds an argument to the field.
@@ -218,8 +230,13 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
-            where TArgumentGraphType : IGraphType => Argument(typeof(TArgumentGraphType), name, configure);
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+        TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+            where TArgumentGraphType : IGraphType
+            => Argument(typeof(TArgumentGraphType), name, configure);
 
         /// <summary>
         /// Adds an argument to the field.
@@ -265,7 +282,11 @@ namespace GraphQL.Builders
         /// <param name="type">The graph type of the argument.</param>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument(Type type, string name, Action<QueryArgument>? configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument(
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type type, string name, Action<QueryArgument>? configure = null)
         {
             var arg = new QueryArgument(type)
             {

@@ -1,3 +1,7 @@
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
+
 namespace GraphQL.DI
 {
     /// <summary>
@@ -11,7 +15,11 @@ namespace GraphQL.DI
         /// When not replacing existing registrations, requesting the service type should return the most recent registration,
         /// and requesting an <see cref="IEnumerable{T}"/> of the service type should return all of the registrations.
         /// </summary>
-        IServiceRegister Register(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
+        IServiceRegister Register(Type serviceType,
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 
         /// <inheritdoc cref="Register(Type, Type, ServiceLifetime, bool)"/>
         IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false);
@@ -25,7 +33,11 @@ namespace GraphQL.DI
         /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
         /// has not already been registered.
         /// </summary>
-        IServiceRegister TryRegister(Type serviceType, Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
+        IServiceRegister TryRegister(Type serviceType,
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency

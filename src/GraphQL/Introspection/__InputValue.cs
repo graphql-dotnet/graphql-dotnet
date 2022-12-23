@@ -20,9 +20,11 @@ namespace GraphQL.Introspection
                 "InputObject are represented as Input Values which describe their type " +
                 "and optionally a default value.";
 
-            Field<NonNullGraphType<StringGraphType>>("name");
+            Field<NonNullGraphType<StringGraphType>>("name")
+                .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name);
 
-            Field<StringGraphType>("description");
+            Field<StringGraphType>("description")
+                .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Description);
 
             Field<NonNullGraphType<__Type>>("type").Resolve(context => ((IProvideResolvedType)context.Source!).ResolvedType);
 

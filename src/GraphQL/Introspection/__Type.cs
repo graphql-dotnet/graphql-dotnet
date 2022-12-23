@@ -38,7 +38,7 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("name").Resolve(context => context.Source!.Name);
 
-            Field<StringGraphType>("description");
+            Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
 
             Field<ListGraphType<NonNullGraphType<__Field>>>("fields")
                 .Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False)
