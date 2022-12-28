@@ -81,13 +81,13 @@ jobs:
         working-directory: src/AotSampleApp
         run: |
           dotnet publish -c Release -r linux-x64 --self-contained true
-          bin/Debug/net7.0/linux-x64/native/AotSampleApp
+          bin/Release/net7.0/linux-x64/publish/AotSampleApp
       - name: Test AOT compilation on Windows
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: src/AotSampleApp
         run: |
           dotnet publish -c Release -r win-x64 --self-contained true
-          bin/Debug/net7.0/win-x64/native/AotSampleApp
+          bin/Release/net7.0/win-x64/publish/AotSampleApp
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3
