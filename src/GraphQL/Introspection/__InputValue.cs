@@ -24,7 +24,7 @@ namespace GraphQL.Introspection
                 .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name);
 
             Field<StringGraphType>("description")
-                .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Description);
+                .Resolve(context => context.Source is QueryArgument arg ? arg.Description : ((FieldType)context.Source).Description);
 
             Field<NonNullGraphType<__Type>>("type").Resolve(context => ((IProvideResolvedType)context.Source!).ResolvedType);
 
