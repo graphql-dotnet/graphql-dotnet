@@ -171,3 +171,6 @@ Console.WriteLine(response);
 // forces AOT to preserve the specified type's definition and public constructors
 static void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>()
     => GC.KeepAlive(typeof(T)); // GC.KeepAlive forces the type to be preserved
+
+// return an application exit code if there were any errors
+return ret.Errors?.Count ?? 0;
