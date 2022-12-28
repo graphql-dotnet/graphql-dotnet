@@ -172,5 +172,8 @@ Console.WriteLine(response);
 static void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>()
     => GC.KeepAlive(typeof(T)); // GC.KeepAlive forces the type to be preserved
 
+if (ret.Errors == null)
+    throw new ApplicationException("test");
+
 // return an application exit code if there were any errors
 return ret.Errors?.Count ?? 0;
