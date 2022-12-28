@@ -43,8 +43,7 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
     public static AotServiceProvider Create(IServiceCollection services, Action<IAotServiceProviderConfiguration>? configuration = null)
     {
         var ret = new AotServiceProvider(services);
-        if (configuration != null)
-            configuration(ret);
+        configuration?.Invoke(ret);
         return ret;
     }
 
@@ -56,6 +55,7 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
 
     private static void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>()
     {
+        GC.KeepAlive(typeof(T));
     }
 
     public IServiceProvider ServiceProvider => this;

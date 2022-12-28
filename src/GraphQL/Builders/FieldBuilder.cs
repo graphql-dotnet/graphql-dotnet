@@ -72,9 +72,6 @@ namespace GraphQL.Builders
 #endif
             Type? type = null, string name = "default")
         {
-            // force AOT compilation to include type references
-            //Reference<GraphQLClrInputTypeReference<TReturnType>>();
-            //Reference<GraphQLClrOutputTypeReference<TReturnType>>();
             var fieldType = new FieldType
             {
                 Name = name,
@@ -82,10 +79,6 @@ namespace GraphQL.Builders
             };
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
-
-        //private static void Reference<T>()
-        //{
-        //}
 
         /// <summary>
         /// Sets the graph type of the field.
