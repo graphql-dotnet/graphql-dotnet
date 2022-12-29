@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AotSampleApp;
+namespace GraphQL.AotCompilationSample;
 
 internal interface IAotServiceProviderConfiguration
 {
@@ -130,11 +130,10 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
                     return CreateInstance(genericDescriptor.ImplementationType);
                 var genericArgs = serviceType.GetGenericArguments();
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-#pragma warning disable IL2055
+#pragma warning disable IL2055 // Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.
                 var implementationType = genericDescriptor.ImplementationType!.MakeGenericType(genericArgs);
-#pragma warning restore IL2055
+#pragma warning restore IL2055 // Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.
 #pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-                //throw new ApplicationException("huh");
                 return CreateInstance(implementationType);
             }
         }

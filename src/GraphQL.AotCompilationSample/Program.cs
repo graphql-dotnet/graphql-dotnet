@@ -1,7 +1,7 @@
 // See https://aka.ms/new-console-template for more information
 using System.Diagnostics.CodeAnalysis;
-using AotSampleApp;
 using GraphQL;
+using GraphQL.AotCompilationSample;
 using GraphQL.StarWars;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;

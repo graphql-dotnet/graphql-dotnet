@@ -77,10 +77,10 @@ jobs:
         working-directory: src
         run: dotnet test --no-restore --no-build
       - name: Test AOT compilation
-        working-directory: src/AotSampleApp
+        working-directory: src/GraphQL.AotCompilationSample
         run: |
           dotnet publish -c Release -o publish
-          publish/AotSampleApp
+          publish/GraphQL.AotCompilationSample
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3

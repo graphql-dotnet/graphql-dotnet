@@ -112,7 +112,11 @@ namespace GraphQL
             => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), mode);
 
         /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
-        public static IServiceRegister Configure<TOptions>(this IServiceRegister services, Action<TOptions>? action)
+        public static IServiceRegister Configure<
+#if NET5_0_OR_GREATER
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
             => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
