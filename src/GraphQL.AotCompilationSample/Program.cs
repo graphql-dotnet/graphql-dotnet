@@ -1,7 +1,6 @@
 // See https://aka.ms/new-console-template for more information
 using System.Diagnostics.CodeAnalysis;
 using GraphQL;
-using GraphQL.AotCompilationSample;
 using GraphQL.StarWars;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,14 +36,9 @@ Preserve<GraphQLClrInputTypeReference<string>>();
 // - field builders that do not include a resolver such as Field<StringGraphType>("Name") is not supported
 // - strongly recommend each field has the type specified and a resolver specified
 
-// must use AOT-friendly service provider
-// note: does not support open generics, such as AutoRegisteringObjectGraphType<>
-// note: does not exhaustively search constructors, but rather uses the first one defined
-
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 var services = serviceCollection.BuildServiceProvider();
 #pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-//var services = AotServiceProvider.Create(serviceCollection);
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 
