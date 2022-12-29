@@ -41,7 +41,10 @@ Preserve<GraphQLClrInputTypeReference<string>>();
 // note: does not support open generics, such as AutoRegisteringObjectGraphType<>
 // note: does not exhaustively search constructors, but rather uses the first one defined
 
-var services = AotServiceProvider.Create(serviceCollection);
+#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+var services = serviceCollection.BuildServiceProvider();
+#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+//var services = AotServiceProvider.Create(serviceCollection);
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 
