@@ -116,7 +116,7 @@ namespace GraphQL
 #if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
-            TOptions>(this IServiceRegister services, Action<TOptions>? action)
+        TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
             => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
