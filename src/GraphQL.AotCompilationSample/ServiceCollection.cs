@@ -106,23 +106,23 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
         if (serviceDescriptor != null)
             return Construct(serviceType, serviceDescriptor);
 
-        // for IEnumerable<T>, create a list of instances
+        // for IEnumerable<T> or T[], create a list of instances
+        if (serviceType.IsArray)
+        {
+            var elementType = serviceType.GetElementType()!;
+            return GetListType(elementType);
+        }
+
         if (serviceType.IsGenericType)
         {
             var genericType = serviceType.GetGenericTypeDefinition();
             if (genericType == typeof(IEnumerable<>))
             {
                 var nestedServiceType = serviceType.GetGenericArguments()[0];
-                var serviceDescriptors = _services[nestedServiceType];
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-                IList list = Array.CreateInstance(nestedServiceType, serviceDescriptors.Count());
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-                int i = 0;
-                foreach (var row in serviceDescriptors)
-                    list[i] = Construct(nestedServiceType, row);
-                return list;
+                return GetListType(nestedServiceType);
             }
 
+            // for generic types, attempt to match on the last registration of the generic type
             var genericDescriptor = _services[genericType].LastOrDefault();
             if (genericDescriptor != null)
             {
@@ -136,6 +136,18 @@ internal class AotServiceProvider : IServiceProvider, IDisposable, IServiceScope
 #pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
                 return CreateInstance(implementationType);
             }
+        }
+
+        object GetListType(Type type)
+        {
+            var serviceDescriptors = _services[type];
+#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+            IList list = Array.CreateInstance(type, serviceDescriptors.Count());
+#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+            int i = 0;
+            foreach (var descriptor in serviceDescriptors)
+                list[i] = Construct(type, descriptor);
+            return list;
         }
 
         // no match found
