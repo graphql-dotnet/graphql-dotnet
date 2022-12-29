@@ -79,7 +79,7 @@ namespace GraphQL.DI
             Preserve<IConfigureExecution[]>();
             Preserve<IConfigureSchema[]>();
             Preserve<IGraphTypeMappingProvider[]>();
-            Preserve(typeof(ErrorInfoProviderOptions));
+            Preserve(typeof(ErrorInfoProviderOptions)); // this should be preserved by the above call to Configure<ErrorInfoProviderOptions>(), but it is not
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace GraphQL.DI
         private static void Preserve<T>() { }
         private static void Preserve(
 #if NET5_0_OR_GREATER
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | DynamicallyAccessedMemberTypes.PublicConstructors)]
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 #endif
             Type t) => GC.KeepAlive(t);
 
