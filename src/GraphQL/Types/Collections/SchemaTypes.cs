@@ -57,7 +57,7 @@ namespace GraphQL.Types
         static SchemaTypes()
         {
             if (BuiltInScalarMappings != null) // always true
-                return; // no need to actually execute this code
+                return; // no need to actually execute the below code, but it must be present in the compiled IL
 
             // prevent trimming of these input and output type reference types
             Preserve<int>();
