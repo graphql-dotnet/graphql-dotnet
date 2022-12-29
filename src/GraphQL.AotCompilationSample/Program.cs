@@ -5,7 +5,7 @@ using GraphQL.StarWars;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Sample of AOT compilation of a GraphQL query");
 Console.WriteLine();
 
 IServiceCollection serviceCollection = new ServiceCollection();
@@ -51,8 +51,9 @@ var ret = await executer.ExecuteAsync(new ExecutionOptions
 var serializer = services.GetRequiredService<IGraphQLTextSerializer>();
 var response = serializer.Serialize(ret);
 
+Console.WriteLine("Executing request: { hero { id name } }");
+Console.WriteLine();
 Console.WriteLine(response);
-
 Console.WriteLine();
 
 var introspectionQuery = """
@@ -161,6 +162,8 @@ ret = await executer.ExecuteAsync(new ExecutionOptions
 
 response = serializer.Serialize(ret);
 
+Console.WriteLine("Executing introspection query:");
+Console.WriteLine();
 Console.WriteLine(response);
 
 // forces AOT to preserve the specified type's definition and public constructors
