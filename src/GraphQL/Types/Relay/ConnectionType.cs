@@ -19,7 +19,7 @@ namespace GraphQL.Types.Relay
 #endif
     TNodeType,
 #if NET5_0_OR_GREATER
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
 #endif
     TEdgeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
