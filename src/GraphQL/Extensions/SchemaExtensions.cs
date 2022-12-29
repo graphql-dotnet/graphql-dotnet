@@ -91,8 +91,15 @@ namespace GraphQL
         TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {
+            Preserve<GraphQLClrInputTypeReference<TClrType>>();
+            Preserve<GraphQLClrOutputTypeReference<TClrType>>();
             schema.RegisterTypeMapping(typeof(TClrType), typeof(TGraphType));
         }
+
+        /// <summary>
+        /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
+        /// </summary>
+        private static void Preserve<T>() => GC.KeepAlive(typeof(T));
 
         /// <summary>
         /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.

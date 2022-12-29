@@ -54,6 +54,46 @@ namespace GraphQL.Types
             [typeof(Uri)] = typeof(UriGraphType),
         });
 
+        static SchemaTypes()
+        {
+            if (BuiltInScalarMappings != null) // always true
+                return; // no need to actually execute this code
+
+            // prevent trimming of these input and output type reference types
+            Preserve<int>();
+            Preserve<long>();
+            Preserve<BigInteger>();
+            Preserve<double>();
+            Preserve<float>();
+            Preserve<decimal>();
+            Preserve<string>();
+            Preserve<bool>();
+            Preserve<DateTime>();
+#if NET5_0_OR_GREATER
+            Preserve<Half>();
+#endif
+#if NET6_0_OR_GREATER
+            Preserve<DateOnly>();
+            Preserve<TimeOnly>();
+#endif
+            Preserve<DateTimeOffset>();
+            Preserve<TimeSpan>();
+            Preserve<Guid>();
+            Preserve<short>();
+            Preserve<ushort>();
+            Preserve<ulong>();
+            Preserve<uint>();
+            Preserve<byte>();
+            Preserve<sbyte>();
+            Preserve<Uri>();
+
+            static void Preserve<T>()
+            {
+                GC.KeepAlive(typeof(GraphQLClrInputTypeReference<T>));
+                GC.KeepAlive(typeof(GraphQLClrOutputTypeReference<T>));
+            }
+        }
+
         // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
 

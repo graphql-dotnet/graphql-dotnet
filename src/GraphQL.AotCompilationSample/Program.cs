@@ -26,15 +26,13 @@ serviceCollection.AddSingleton<StarWarsData>();
 // all other graph types' constructors are preserved via calls to Field<T>
 Preserve<StarWarsQuery>();
 Preserve<StarWarsMutation>();
-// must manually preserve any GraphQL type references
-Preserve<GraphQLClrInputTypeReference<string>>();
 
 // other notes:
-// - clr type mappings are generally not supported
+// - auto clr type mappings are generally not supported
 // - auto registering graph types are generally not supported
 // - field builders that use Expressions as resolvers such as Field(x => x.Name) are discouraged
-// - field builders that do not include a resolver such as Field<StringGraphType>("Name") is not supported
-// - strongly recommend each field has the type specified and a resolver specified
+// - field builders that do not include a resolver such as Field<StringGraphType>("Name") are not supported
+// - strongly recommend each field has the explicit graph type specified and a resolver specified
 
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 var services = serviceCollection.BuildServiceProvider();
