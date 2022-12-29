@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net5;net6</TargetFrameworks>
@@ -14,7 +14,7 @@
     <PackageReference Include="Nullability.Source" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
