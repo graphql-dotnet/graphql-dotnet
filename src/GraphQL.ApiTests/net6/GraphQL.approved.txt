@@ -391,6 +391,8 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Diagnostics.ActivitySource activitySource, System.Action<GraphQL.Instrumentation.TelemetryOptions>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, System.Diagnostics.ActivitySource> activitySourceFactory, System.Action<GraphQL.Instrumentation.TelemetryOptions, System.IServiceProvider>? configure = null) { }
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
@@ -1462,6 +1464,11 @@ namespace GraphQL.Instrumentation
         public string? Subject { get; set; }
         public void MarkEnd(double end) { }
         public T? MetaField<T>(string key) { }
+    }
+    public class TelemetryOptions
+    {
+        public TelemetryOptions() { }
+        public bool RecordDocument { get; set; }
     }
     public readonly struct ValueStopwatch
     {
