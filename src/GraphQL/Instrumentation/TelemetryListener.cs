@@ -2,6 +2,7 @@
 
 using System.Diagnostics;
 using GraphQL.Execution;
+using GraphQL.Validation;
 
 namespace GraphQL.Instrumentation;
 
@@ -14,7 +15,7 @@ internal class TelemetryListener : DocumentExecutionListenerBase
         _activity = activity;
     }
 
-    public override Task BeforeExecutionAsync(IExecutionContext context)
+    public override Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
     {
         var operationType = context.Operation.Operation.ToString().ToLowerInvariant();
         _activity.SetTag("graphql.operation.type", operationType);
