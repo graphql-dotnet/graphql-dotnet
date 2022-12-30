@@ -38,8 +38,11 @@ public class TelemetryProvider : IConfigureExecution
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
+        // start the Activity
         using var activity = await StartActivity(options).ConfigureAwait(false);
-        if (activity == null) // if no event listeners
+
+        // if no event listeners, do not record any telemetry
+        if (activity == null)
             return await next(options).ConfigureAwait(false);
 
         // record the requested operation name and optionally the GraphQL document
@@ -55,6 +58,7 @@ public class TelemetryProvider : IConfigureExecution
         // record the status
         await SetResultTags(activity, options, result).ConfigureAwait(false);
 
+        // return the result
         return result;
     }
 
