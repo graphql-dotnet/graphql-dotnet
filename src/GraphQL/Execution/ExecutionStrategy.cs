@@ -470,11 +470,11 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext? resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                var resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = SelectResolver(node, context);
-                var result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
+                object? result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
                 node.Result = result;
 
@@ -629,7 +629,7 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
         {
-            var result = node.Result;
+            object? result = node.Result;
 
             IGraphType? fieldType = node.ResolvedType;
 
