@@ -1,4 +1,5 @@
 using System.Reflection;
+using GraphQL.DI;
 using GraphQL.Types;
 using Moq;
 
@@ -53,6 +54,12 @@ public class AssemblyExtensionTests
         var actual = mockAssembly.Object.GetClrTypeMappings();
         actual.ShouldBe(expected);
         mockAssembly.Verify();
+    }
+
+    [Fact]
+    public void CanGetNuGetVersion()
+    {
+        typeof(IGraphQLBuilder).Assembly.GetNuGetVersion().ShouldNotBeNull();
     }
 
     public class MockableAssembly : Assembly

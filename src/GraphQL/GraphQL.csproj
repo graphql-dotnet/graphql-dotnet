@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard2.0;net5;net6</TargetFrameworks>
@@ -18,4 +18,9 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="GraphQL.NuGetVersion">
+      <_Parameter1>$(Version)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

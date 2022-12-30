@@ -1182,26 +1182,25 @@ namespace GraphQL
         /// <remarks>
         /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
         /// </remarks>
-        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, ActivitySource activitySource, Action<TelemetryOptions>? configure = null)
-            => UseTelemetry(builder, _ => activitySource, configure != null ? (opts, _) => configure(opts) : null);
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions>? configure = null)
+            => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
 
-        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, ActivitySource, Action{TelemetryOptions}?)"/>
-        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Func<IServiceProvider, ActivitySource> activitySourceFactory, Action<TelemetryOptions, IServiceProvider>? configure = null)
+        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{TelemetryOptions}?)"/>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions, IServiceProvider>? configure = null)
         {
-            if (activitySourceFactory == null)
-                throw new ArgumentNullException(nameof(activitySourceFactory));
-
+            var version = typeof(IGraphQLBuilder).Assembly.GetNuGetVersion();
+            var activitySource = new ActivitySource("GraphQL.NET", version);
             builder.Services.Configure(configure);
             builder.ConfigureExecution(async (options, next) =>
             {
-                var activitySource = activitySourceFactory(options.RequestServices ?? throw new MissingRequestServicesException());
                 using var activity = activitySource.StartActivity("graphql");
                 if (activity == null) // if no event listeners
                     return await next(options).ConfigureAwait(false);
                 // record the requested operation name and optionally the GraphQL document
-                var telemetryOptions = options.RequestServices.GetRequiredService<TelemetryOptions>();
+                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
+                var telemetryOptions = requestServices.GetRequiredService<TelemetryOptions>();
                 activity.SetTag("graphql.operation.name", options.OperationName);
-                if (telemetryOptions.RecordDocument)
+                if (telemetryOptions.RecordDocument && activity.IsAllDataRequested)
                     activity.SetTag("graphql.document", options.Query);
                 // record the operation type and the operation name (which may be specified within the
                 // document even if not specified in the request)
