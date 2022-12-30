@@ -1170,15 +1170,15 @@ namespace GraphQL
         }
         #endregion
 
-        #region - UseOpenTelemetry -
+        #region - UseTelemetry -
 #if NET5_0_OR_GREATER
         /// <summary>
-        /// Configures the GraphQL server to collect traces via <see cref="ActivitySource"/> and records events that match the
+        /// Configures the GraphQL server to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
         /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
-        /// Trace data contains the GraphQL operation name, the operation type, and the document.
+        /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
         /// </summary>
         /// <remarks>
-        /// Place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
+        /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
         /// </remarks>
         public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, ActivitySource activitySource, Action<TelemetryOptions>? configure = null)
             => UseTelemetry(builder, _ => activitySource, configure != null ? (opts, _) => configure(opts) : null);
@@ -1194,13 +1194,17 @@ namespace GraphQL
             {
                 var activitySource = activitySourceFactory(options.RequestServices ?? throw new MissingRequestServicesException());
                 using var activity = activitySource.StartActivity("graphql");
-                if (activity == null)
+                if (activity == null) // if no event listeners
                     return await next(options).ConfigureAwait(false);
-                var openTelemetryOptions = options.RequestServices.GetRequiredService<TelemetryOptions>();
+                // record the requested operation name and optionally the GraphQL document
+                var telemetryOptions = options.RequestServices.GetRequiredService<TelemetryOptions>();
                 activity.SetTag("graphql.operation.name", options.OperationName);
-                if (openTelemetryOptions.RecordDocument)
+                if (telemetryOptions.RecordDocument)
                     activity.SetTag("graphql.document", options.Query);
+                // record the operation type and the operation name (which may be specified within the
+                // document even if not specified in the request)
                 options.Listeners.Add(new TelemetryListener(activity));
+                // execute the request and set the status
                 var ret = await next(options).ConfigureAwait(false);
 #if NET6_0_OR_GREATER
                 var successful = !(ret.Errors?.Count > 0);
