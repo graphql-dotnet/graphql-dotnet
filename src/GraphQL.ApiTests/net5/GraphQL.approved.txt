@@ -1470,6 +1470,16 @@ namespace GraphQL.Instrumentation
         public TelemetryOptions() { }
         public bool RecordDocument { get; set; }
     }
+    public class TelemetryProvider : GraphQL.DI.IConfigureExecution
+    {
+        public TelemetryProvider(GraphQL.Instrumentation.TelemetryOptions options) { }
+        public virtual float SortOrder { get; }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.Task SetInitialTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.Task SetOperationTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        protected virtual System.Threading.Tasks.Task SetResultTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivity(GraphQL.ExecutionOptions options) { }
+    }
     public readonly struct ValueStopwatch
     {
         public System.TimeSpan Elapsed { get; }

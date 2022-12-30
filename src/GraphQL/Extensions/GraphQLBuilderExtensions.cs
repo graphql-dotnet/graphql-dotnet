@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics;
-#endif
 using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -1188,31 +1185,8 @@ namespace GraphQL
         /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{TelemetryOptions}?)"/>
         public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions, IServiceProvider>? configure = null)
         {
-            var version = typeof(IGraphQLBuilder).Assembly.GetNuGetVersion();
-            var activitySource = new ActivitySource("GraphQL.NET", version);
             builder.Services.Configure(configure);
-            builder.ConfigureExecution(async (options, next) =>
-            {
-                using var activity = activitySource.StartActivity("graphql");
-                if (activity == null) // if no event listeners
-                    return await next(options).ConfigureAwait(false);
-                // record the requested operation name and optionally the GraphQL document
-                var requestServices = options.RequestServices ?? throw new MissingRequestServicesException();
-                var telemetryOptions = requestServices.GetRequiredService<TelemetryOptions>();
-                activity.SetTag("graphql.operation.name", options.OperationName);
-                if (telemetryOptions.RecordDocument && activity.IsAllDataRequested)
-                    activity.SetTag("graphql.document", options.Query);
-                // record the operation type and the operation name (which may be specified within the
-                // document even if not specified in the request)
-                options.Listeners.Add(new TelemetryListener(activity));
-                // execute the request and set the status
-                var ret = await next(options).ConfigureAwait(false);
-#if NET6_0_OR_GREATER
-                var successful = !(ret.Errors?.Count > 0);
-                activity.SetStatus(successful ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
-#endif
-                return ret;
-            });
+            builder.ConfigureExecution<TelemetryProvider>();
             return builder;
         }
 #endif
