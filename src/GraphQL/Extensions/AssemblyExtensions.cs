@@ -74,6 +74,12 @@ namespace GraphQL
         }
 
         internal static string? GetNuGetVersion(this Assembly assembly)
-            => assembly.GetCustomAttribute<NuGetVersionAttribute>()?.Version;
+        {
+            var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            if (version == null)
+                return null;
+            var i = version.LastIndexOf('+');
+            return i != -1 ? version.Substring(0, i) : version;
+        }
     }
 }
