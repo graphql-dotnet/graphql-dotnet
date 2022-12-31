@@ -392,7 +392,7 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.TelemetryOptions>? configure = null) { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.TelemetryOptions, System.IServiceProvider>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.TelemetryOptions, System.IServiceProvider>? configure) { }
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
@@ -1474,6 +1474,7 @@ namespace GraphQL.Instrumentation
     {
         public TelemetryProvider(GraphQL.Instrumentation.TelemetryOptions options) { }
         public virtual float SortOrder { get; }
+        public static string SourceName { get; }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
         protected virtual System.Threading.Tasks.Task SetInitialTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.Task SetOperationTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }

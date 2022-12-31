@@ -1183,7 +1183,7 @@ namespace GraphQL
             => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
 
         /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{TelemetryOptions}?)"/>
-        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions, IServiceProvider>? configure = null)
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions, IServiceProvider>? configure)
         {
             builder.Services.Configure(configure);
             builder.ConfigureExecution<TelemetryProvider>();

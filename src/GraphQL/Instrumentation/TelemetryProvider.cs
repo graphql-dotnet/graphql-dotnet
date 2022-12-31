@@ -20,15 +20,19 @@ public class TelemetryProvider : IConfigureExecution
 {
     private readonly ActivitySource _activitySource;
     private readonly TelemetryOptions _telemetryOptions;
-    private const string ACTIVITY_SOURCE_NAME = "GraphQL.NET";
     private const string ACTIVITY_OPERATION_NAME = "graphql";
+
+    /// <summary>
+    /// Gets the default source name used for telemetry.
+    /// </summary>
+    public static string SourceName => "GraphQL.NET";
 
     /// <summary>
     /// Initializes a new instance with the specified options.
     /// </summary>
     public TelemetryProvider(TelemetryOptions options)
     {
-        _activitySource = new ActivitySource(ACTIVITY_SOURCE_NAME, typeof(TelemetryProvider).Assembly.GetNuGetVersion());
+        _activitySource = new ActivitySource(SourceName, typeof(TelemetryProvider).Assembly.GetNuGetVersion());
         _telemetryOptions = options;
     }
 
