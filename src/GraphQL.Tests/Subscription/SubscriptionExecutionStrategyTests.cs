@@ -615,7 +615,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         if (ServiceProviderDisposable != null)
             throw new InvalidOperationException("Cannot run ExecuteAsync twice within one test");
         ServiceProviderDisposable = provider; // only disposed after execution is complete
-        var executer = provider.GetService<IDocumentExecuter>();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
             Schema = provider.GetRequiredService<ISchema>(),
