@@ -23,7 +23,7 @@ public class TelemetryProvider : IConfigureExecution
     private const string ACTIVITY_OPERATION_NAME = "graphql";
 
     /// <summary>
-    /// Gets the default source name used for telemetry.
+    /// Gets the source name used for telemetry.
     /// </summary>
     public static string SourceName => "GraphQL.NET";
 
