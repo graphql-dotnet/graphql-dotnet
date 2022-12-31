@@ -2,7 +2,6 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
-using System;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -155,12 +154,17 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         // in this case the graphql execution has not started, so executed should be false
         // and "data" should not exist in the map of error events
         var result = await ExecuteAsync("subscription { testComplex { id name } }").ConfigureAwait(false);
+        ServiceProviderDisposable = null;
+        GC.Collect();
+        GC.Collect();
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Error(new ApplicationException("SourceError"));
         Source.Next("testing");
         Source.Error(new InvalidOperationException("SourceError"));
         Source.Next("success");
+        GC.Collect();
+        GC.Collect();
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "hello" } } }""");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Response stream error for field \u0027testComplex\u0027.","locations":[{"line":1,"column":16}],"path":["testComplex"],"extensions":{"code":"APPLICATION","codes":["APPLICATION"]}}]}""");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "testing" } } }""");
