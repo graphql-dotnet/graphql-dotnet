@@ -4,12 +4,8 @@ namespace GraphQL.Tests.Bugs;
 
 public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 {
-#if NETCOREAPP3_1
     [Fact]
-#else
-    [Fact(Skip = "24.149999999999999 with .NET Core < 3.1")]
-#endif
-    public void double_to_decimal_does_not_lose_precision()
+    public async Task double_to_decimal_does_not_lose_precision()
     {
         var query = """
                 mutation SetState{
@@ -17,9 +13,16 @@ public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
                 }
             """;
 
-        var expected = """{ "set": 24.15 }""";
-
-        AssertQuerySuccess(query, expected);
+        var result = await new DocumentExecuter().ExecuteAsync(new()
+        {
+            Schema = Schema,
+            Query = query,
+        }).ConfigureAwait(false);
+        var expected = """{"data":{"set":24.15}}""";
+        var stjJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        var nsjJson = new NewtonsoftJson.GraphQLSerializer().Serialize(result);
+        stjJson.ShouldBe(expected);
+        nsjJson.ShouldBe(expected);
     }
 }
 
