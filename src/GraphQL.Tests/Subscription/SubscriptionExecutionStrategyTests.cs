@@ -2,17 +2,21 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
+using System;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription;
 
-public class SubscriptionExecutionStrategyTests
+public class SubscriptionExecutionStrategyTests : IDisposable
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
     private IDisposable? SubscriptionObj { get; set; }
+    private IDisposable? ServiceProviderDisposable { get; set; }
+
+    public void Dispose() => ServiceProviderDisposable?.Dispose();
 
     [Fact]
     public async Task Basic()
@@ -151,12 +155,17 @@ public class SubscriptionExecutionStrategyTests
         // in this case the graphql execution has not started, so executed should be false
         // and "data" should not exist in the map of error events
         var result = await ExecuteAsync("subscription { testComplex { id name } }").ConfigureAwait(false);
+        ServiceProviderDisposable = null;
+        GC.Collect();
+        GC.Collect();
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Error(new ApplicationException("SourceError"));
         Source.Next("testing");
         Source.Error(new InvalidOperationException("SourceError"));
         Source.Next("success");
+        GC.Collect();
+        GC.Collect();
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "hello" } } }""");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Response stream error for field \u0027testComplex\u0027.","locations":[{"line":1,"column":16}],"path":["testComplex"],"extensions":{"code":"APPLICATION","codes":["APPLICATION"]}}]}""");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "testing" } } }""");
@@ -608,7 +617,10 @@ public class SubscriptionExecutionStrategyTests
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
-        var provider = services.BuildServiceProvider(); // not disposed intentionally
+        var provider = services.BuildServiceProvider();
+        if (ServiceProviderDisposable != null)
+            throw new InvalidOperationException("Cannot run ExecuteAsync twice within one test");
+        ServiceProviderDisposable = provider; // only disposed after execution is complete
         var executer = provider.GetService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
