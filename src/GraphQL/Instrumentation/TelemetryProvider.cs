@@ -106,8 +106,8 @@ public class TelemetryProvider : IConfigureExecution
     protected virtual Task SetResultTags(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
     {
 #if NET6_0_OR_GREATER
-        var successful = !(result.Errors?.Count > 0);
-        activity.SetStatus(successful ? ActivityStatusCode.Ok : ActivityStatusCode.Error);
+        var failed = result.Errors?.Count > 0;
+        activity.SetStatus(failed ? ActivityStatusCode.Error : ActivityStatusCode.Ok);
 #endif
         return Task.CompletedTask;
     }
