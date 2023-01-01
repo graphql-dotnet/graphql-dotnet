@@ -55,9 +55,10 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
         IDictionary<string, object> userContext = null,
         CancellationToken cancellationToken = default,
         IEnumerable<IValidationRule> rules = null,
-        INameConverter nameConverter = null)
+        INameConverter nameConverter = null,
+        bool suppressSerializeExpected = false)
     {
-        var queryResult = CreateQueryResult(expected);
+        object queryResult = suppressSerializeExpected ? expected : CreateQueryResult(expected);
         return AssertQuery(query, queryResult, variables, root, userContext, cancellationToken, rules, null, nameConverter);
     }
 

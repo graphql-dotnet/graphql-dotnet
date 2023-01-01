@@ -4,11 +4,7 @@ namespace GraphQL.Tests.Bugs;
 
 public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 {
-#if NETCOREAPP3_1
     [Fact]
-#else
-    [Fact(Skip = "24.149999999999999 with .NET Core < 3.1")]
-#endif
     public void double_to_decimal_does_not_lose_precision()
     {
         var query = """
@@ -17,9 +13,15 @@ public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
                 }
             """;
 
-        var expected = """{ "set": 24.15 }""";
+        var expected = """
+            {
+              "data": {
+                "set": 24.15
+              }
+            }
+            """;
 
-        AssertQuerySuccess(query, expected);
+        AssertQuerySuccess(query, expected, suppressSerializeExpected: true);
     }
 }
 
