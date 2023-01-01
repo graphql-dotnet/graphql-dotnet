@@ -129,7 +129,7 @@ public class MutationChange : ObjectGraphType
             .Resolve(context =>
             {
                 var root = context.Source as Root;
-                var change = context.GetArgument<int>("newNumber");
+                int change = context.GetArgument<int>("newNumber");
                 return root.ImmediatelyChangeTheNumber(change);
             }
         );
@@ -139,7 +139,7 @@ public class MutationChange : ObjectGraphType
             .ResolveAsync(async context =>
             {
                 var root = context.Source as Root;
-                var change = context.GetArgument<int>("newNumber");
+                int change = context.GetArgument<int>("newNumber");
                 return await root.PromiseToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
@@ -149,7 +149,7 @@ public class MutationChange : ObjectGraphType
             .Resolve(context =>
             {
                 var root = context.Source as Root;
-                var change = context.GetArgument<int>("newNumber");
+                int change = context.GetArgument<int>("newNumber");
                 return root.FailToChangeTheNumber(change);
             }
         );
@@ -158,7 +158,7 @@ public class MutationChange : ObjectGraphType
             .Argument<IntGraphType>("newNumber", arg => arg.DefaultValue = 0)
             .ResolveAsync(async context =>
             {
-                var change = context.GetArgument<int>("newNumber");
+                int change = context.GetArgument<int>("newNumber");
                 return await Root.PromiseAndFailToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
@@ -218,7 +218,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void evaluates_mutations_serially()
     {
-        var query = """
+        const string query = """
             mutation M {
               first: immediatelyChangeTheNumber(newNumber: 1) {
                 theNumber
@@ -238,7 +238,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "first": {
                 "theNumber": 1
@@ -264,7 +264,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public async Task evaluates_mutations_correctly_in_the_presence_of_a_failed_mutation()
     {
-        var query = """
+        const string query = """
             mutation M {
               first: immediatelyChangeTheNumber(newNumber: 1) {
                 theNumber
@@ -287,7 +287,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "first": {
                 "theNumber": 1
@@ -315,7 +315,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void evaluates_datetime_mutations_serially()
     {
-        var query = """
+        const string query = """
             mutation M {
               first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
                 theDateTime
@@ -335,7 +335,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "first": {
                 "theDateTime": "2017-01-27T15:19:53.123Z"
@@ -361,7 +361,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public async Task evaluates_datetime_mutations_correctly_in_the_presence_of_a_failed_mutation()
     {
-        var query = """
+        const string query = """
             mutation M {
               first: immediatelyChangeTheDateTime(newDateTime: "2017-01-27T15:19:53.123Z") {
                 theDateTime
@@ -384,7 +384,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "first": {
                 "theDateTime": "2017-01-27T15:19:53.123Z"
@@ -412,7 +412,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
     [Fact]
     public void successfully_handles_guidgraphtype()
     {
-        var query = """
+        const string query = """
             mutation M {
               passGuidGraphType(guid: "085A38AD-907B-4625-AFEE-67EFC71217DE") {
                 theGuid
@@ -420,7 +420,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "passGuidGraphType": {
                 "theGuid": "085a38ad-907b-4625-afee-67efc71217de"

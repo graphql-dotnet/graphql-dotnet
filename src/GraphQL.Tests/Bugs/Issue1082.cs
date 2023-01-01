@@ -7,14 +7,14 @@ public class Issue1082 : QueryTestBase<Issue1082Schema>
     [Fact]
     public void Should_Return_DateTime_With_Time_Component()
     {
-        var query = "{ dateTimeField }";
+        const string query = "{ dateTimeField }";
         AssertQuerySuccess(query, """{"dateTimeField": "1000-10-10T01:02:03"}""");
     }
 
     [Fact]
     public void Should_Return_Date_Without_Time_Component()
     {
-        var query = "{ dateField }";
+        const string query = "{ dateField }";
         AssertQuerySuccess(query, """{"dateField": "1000-10-10"}""");
     }
 }

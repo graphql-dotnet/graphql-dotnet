@@ -40,7 +40,7 @@ public class DateGraphTypeTests
         CultureTestHelper.UseCultures(() =>
         {
             var expected = DateTime.UtcNow;
-            var input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
+            string input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
             Should.Throw<FormatException>(() => _type.ParseValue(input));
         });
     }

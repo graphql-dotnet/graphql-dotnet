@@ -33,7 +33,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             Friends = new List<INamed>()
         };
 
-        for (var x = 0; x < PerformanceIterations; x++)
+        for (int x = 0; x < PerformanceIterations; x++)
         {
             var person = new Person
             {
@@ -73,7 +73,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_MultipleProperties_Are_Performant()
     {
-        var query = """
+        const string query = """
             query AQuery {
               people {
                 name
@@ -127,7 +127,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_SimpleLists_Are_Performant()
     {
-        var query = """
+        const string query = """
             query AQuery {
               people {
                 name
@@ -162,7 +162,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_UnionLists_Are_Performant()
     {
-        var query = """
+        const string query = """
             query AQuery {
               people {
                 __typename

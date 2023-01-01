@@ -9,7 +9,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void rethrows_unhandled_exception()
     {
-        var def = """
+        const string def = """
             type Query {
               hello: Int
             }
@@ -31,7 +31,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_exception()
     {
-        var def = """
+        const string def = """
             type Query {
               hello2: Int
             }
@@ -62,7 +62,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_message_from_field_resolver()
     {
-        var def = """
+        const string def = """
             type Query {
               hello2: Int
             }
@@ -93,7 +93,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_message_from_document_listener()
     {
-        var def = """
+        const string def = """
             type Query {
               hello2: Int
             }

@@ -59,7 +59,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     [Fact]
     public void can_introspect_on_union_and_intersection_types()
     {
-        var query = """
+        const string query = """
             query AQuery {
               Named: __type(name: "Named") {
                 kind
@@ -82,7 +82,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "Named": {
                 "kind": "INTERFACE",
@@ -122,7 +122,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-        var query = """
+        const string query = """
             query AQuery {
               __typename
               name
@@ -135,7 +135,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__typename": "Person",
               "name": "John",
@@ -155,7 +155,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // This is the valid version of the query in the above test.
 
-        var query = """
+        const string query = """
             query AQuery {
               __typename
               name
@@ -173,7 +173,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__typename": "Person",
               "name": "John",
@@ -192,7 +192,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     {
         // NOTE: This is an *invalid* query, but it should be an *executable* query.    <--- ???
 
-        var query = """
+        const string query = """
             query AQuery {
               __typename
               name
@@ -205,7 +205,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__typename": "Person",
               "name": "John",
@@ -223,7 +223,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
     [Fact]
     public void allows_fragment_conditions_to_be_abstract_types()
     {
-        var query = """
+        const string query = """
             query AQuery {
               __typename
               name
@@ -253,7 +253,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__typename": "Person",
               "name": "John",

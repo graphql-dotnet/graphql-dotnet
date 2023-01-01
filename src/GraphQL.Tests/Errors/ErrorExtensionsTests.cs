@@ -8,8 +8,8 @@ public class ErrorExtensionsTests : QueryTestBase<ErrorExtensionsTests.TestSchem
     [Fact]
     public void should_add_extension_object_when_exception_is_thrown_with_error_code()
     {
-        string query = "{ firstSync }";
-        string code = "FIRST";
+        const string query = "{ firstSync }";
+        const string code = "FIRST";
 
         var errors = new ExecutionErrors();
         var error = new ExecutionError("Error trying to resolve field 'firstSync'.", new SystemException("Just inner exception 1", new DllNotFoundException("just inner exception 2")))
@@ -20,7 +20,7 @@ public class ErrorExtensionsTests : QueryTestBase<ErrorExtensionsTests.TestSchem
         error.Path = new[] { "firstSync" };
         errors.Add(error);
 
-        var expectedResult = """{ "firstSync": null}""";
+        const string expectedResult = """{ "firstSync": null}""";
 
         AssertQuery(query, CreateQueryResult(expectedResult, errors), null, null);
     }

@@ -15,7 +15,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     [Fact]
     public void returns_sdl()
     {
-        var definitions = """
+        const string definitions = """
             extend type Query {
               me: User
             }
@@ -26,9 +26,9 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
             """;
 
-        var query = "{ _service { sdl } }";
+        const string query = "{ _service { sdl } }";
 
-        var sdl = """
+        const string sdl = """
             extend type Query {
               me: User
             }
@@ -39,7 +39,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
 
             """;
-        var expected = $$"""{ "_service": { "sdl" : "{{JsonEncodedText.Encode(sdl)}}" } }""";
+        string expected = $$"""{ "_service": { "sdl" : "{{JsonEncodedText.Encode(sdl)}}" } }""";
 
         AssertQuery(_ =>
         {
@@ -52,7 +52,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     [Fact]
     public void entity_query()
     {
-        var definitions = """
+        const string definitions = """
             extend type Query {
               me: User
             }
@@ -65,7 +65,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
 
-        var query = """
+        const string query = """
                 query ($_representations: [_Any!]!) {
                     _entities(representations: $_representations) {
                         ... on User {
@@ -76,8 +76,8 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
                 }
                 """;
 
-        var variables = """{ "_representations": [{ "__typename": "User", "id": "123" }] }""";
-        var expected = """{ "_entities": [{ "__typename": "User", "id" : "123", "username": "Quinn" }] }""";
+        const string variables = """{ "_representations": [{ "__typename": "User", "id": "123" }] }""";
+        const string expected = """{ "_entities": [{ "__typename": "User", "id" : "123", "username": "Quinn" }] }""";
 
         AssertQuery(_ =>
         {
@@ -95,7 +95,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     [InlineData("...on User { ...TypeAndId }", true)]
     public void result_includes_typename(string selectionSet, bool includeFragment)
     {
-        var definitions = """
+        const string definitions = """
             extend type Query {
               me: User
             }
@@ -108,7 +108,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
 
-        var query = $$"""
+        string query = $$"""
                 query ($_representations: [_Any!]!) {
                   _entities(representations: $_representations) {
                     {{selectionSet}}
@@ -127,8 +127,8 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
                 """;
         }
 
-        var variables = """{ "_representations": [{ "__typename": "User", "id": "123" }] }""";
-        var expected = """{ "_entities": [{ "__typename": "User", "id" : "123"}] }""";
+        const string variables = """{ "_representations": [{ "__typename": "User", "id": "123" }] }""";
+        const string expected = """{ "_entities": [{ "__typename": "User", "id" : "123"}] }""";
 
         AssertQuery(_ =>
         {
@@ -142,7 +142,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     [Fact]
     public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
     {
-        var definitions = """
+        const string definitions = """
             input UserInput {
               limit: Int!
               offset: Int
@@ -157,7 +157,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
             """;
 
-        var query = "{ __schema { types { name kind possibleTypes { name } } } }";
+        const string query = "{ __schema { types { name kind possibleTypes { name } } } }";
 
         var executionResult = Executer.ExecuteAsync(_ =>
         {
@@ -171,7 +171,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
         var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
         var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
         var possibleType = possibleTypes.First().ToDict();
-        var name = (string)possibleType["name"];
+        string name = (string)possibleType["name"];
 
         Assert.Equal("User", name);
     }
@@ -179,7 +179,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     [Fact]
     public void resolve_reference_is_not_trying_to_await_for_each_field_individialy_and_plays_well_with_dataloader_issue_1565()
     {
-        var definitions = """
+        const string definitions = """
             extend type Query {
               user(id: ID!): User
             }
@@ -202,7 +202,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         Builder.Types.For("User").ResolveReferenceAsync(ctx =>
         {
-            var id = ctx.Arguments["id"].ToString();
+            string id = ctx.Arguments["id"].ToString();
             // return Task.FromResult(users.FirstOrDefault(user => user.Id == id));
             var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids =>
             {
@@ -212,7 +212,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             return Task.FromResult(loader.LoadAsync(id));
         });
 
-        string query = """
+        const string query = """
             {
                 _entities(representations: [{__typename: "User", id: "1" }, {__typename: "User", id: "2" }]) {
                     ... on User {
@@ -223,7 +223,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
             """;
 
-        var expected = """{ "_entities": [{ "__typename": "User", "id" : "1", "username": "One" }, { "__typename": "User", "id" : "2", "username": "Two" }] }""";
+        const string expected = """{ "_entities": [{ "__typename": "User", "id" : "1", "username": "One" }, { "__typename": "User", "id" : "2", "username": "Two" }] }""";
 
         AssertQuery(_ =>
         {

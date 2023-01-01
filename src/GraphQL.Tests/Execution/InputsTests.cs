@@ -146,7 +146,7 @@ public class UserQuery : ObjectGraphType
             .Argument<NonNullGraphType<IntGraphType>>("userId", "user id")
             .Resolve(context =>
             {
-                var id = context.GetArgument<int>("userId");
+                int id = context.GetArgument<int>("userId");
                 return new User
                 {
                     Id = id
@@ -159,7 +159,7 @@ public class UserQuery : ObjectGraphType
             .Argument<NonNullGraphType<LongGraphType>>("userId", "user id")
             .Resolve(context =>
             {
-                var id = context.GetArgument<long>("userId");
+                long id = context.GetArgument<long>("userId");
                 return new User
                 {
                     IdLong = id

@@ -97,13 +97,13 @@ public class EnumType<T> : EnumerationGraphType
         var type = typeof(T);
         Name = DeriveGraphQlName(type.Name);
 
-        foreach (var enumName in type.GetEnumNames())
+        foreach (string enumName in type.GetEnumNames())
         {
             var enumMember = type
               .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
               .First();
 
-            var name = DeriveEnumValueName(enumMember.Name);
+            string name = DeriveEnumValueName(enumMember.Name);
 
             Add(name, Enum.Parse(type, enumName));
         }

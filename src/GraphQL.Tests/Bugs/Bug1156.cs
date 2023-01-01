@@ -7,7 +7,7 @@ public class Bug1156 : QueryTestBase<Bug1156Schema>
     [Fact]
     public void duplicated_type_names_should_throw_error()
     {
-        var query = """
+        const string query = """
 {
     type1 {
         field1A

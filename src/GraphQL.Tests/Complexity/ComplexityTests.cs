@@ -219,19 +219,19 @@ public class ComplexityTests : ComplexityTestBase
     [InlineData(false)]
     public void nested_fragments_3(bool reverse)
     {
-        var frag1 = """
+        const string frag1 = """
             fragment frag1 on QueryType
             {
               ...frag4
             }
             """;
-        var frag2 = """
+        const string frag2 = """
             fragment frag2 on QueryType
             {
               ...frag3
             }
             """;
-        var otherFrags = """
+        const string otherFrags = """
             fragment frag3 on QueryType
             {
               ...frag5
@@ -263,7 +263,7 @@ public class ComplexityTests : ComplexityTestBase
     [Fact]
     public void duplicate_fragment_ok()
     {
-        var query = """
+        const string query = """
             query carFragmentTest
             {
               car(id: 1)
@@ -294,7 +294,7 @@ public class ComplexityTests : ComplexityTestBase
     [Fact]
     public void no_fragment_cycle()
     {
-        var query = """
+        const string query = """
             query carFragmentTest
             {
               car(id: 1)

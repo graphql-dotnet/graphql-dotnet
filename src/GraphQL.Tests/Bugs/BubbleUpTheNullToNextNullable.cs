@@ -238,7 +238,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
         {
             actualErrors.Count.ShouldBe(errors.Count);
 
-            for (var i = 0; i < errors.Count; i++)
+            for (int i = 0; i < errors.Count; i++)
             {
                 ExecutionError actualError = actualErrors[i];
                 ExecutionError expectedError = errors[i];

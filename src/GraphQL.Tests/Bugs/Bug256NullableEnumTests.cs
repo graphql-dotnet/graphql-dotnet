@@ -46,7 +46,7 @@ public class Bug256NullableEnumTests
         result.ShouldBe(EnumType.A);
 
         // just place it here to also check for default value
-        var result2 = ctx.GetArgument<int>("value");
+        int result2 = ctx.GetArgument<int>("value");
         result2.ShouldBe(0);
     }
 

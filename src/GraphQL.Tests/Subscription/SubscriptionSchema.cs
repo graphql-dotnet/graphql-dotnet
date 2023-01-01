@@ -74,7 +74,7 @@ public class ChatSubscriptions : ObjectGraphType
 
     private IObservable<Message> SubscribeById(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = _chat.Messages();
 
@@ -83,7 +83,7 @@ public class ChatSubscriptions : ObjectGraphType
 
     private async ValueTask<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = await _chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
@@ -218,7 +218,7 @@ public class Chat : IChat
 
     public Message AddMessage(ReceivedMessage message)
     {
-        if (!Users.TryGetValue(message.FromId, out var displayName))
+        if (!Users.TryGetValue(message.FromId, out string displayName))
         {
             displayName = "(unknown)";
         }

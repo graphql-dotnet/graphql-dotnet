@@ -150,8 +150,8 @@ public class GraphQLExtensionsTests
     [ClassData(typeof(ToASTTestData))]
     public void ToAST_Test(IGraphType type, object value, GraphQLValue expected)
     {
-        var actual = type.ToAST(value).Print();
-        var result = expected.Print();
+        string actual = type.ToAST(value).Print();
+        string result = expected.Print();
         actual.ShouldBe(result);
     }
 

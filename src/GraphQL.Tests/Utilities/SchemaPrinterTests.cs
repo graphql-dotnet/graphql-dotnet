@@ -18,7 +18,7 @@ public class SchemaPrinterTests
             Query = root
         };
 
-        var result = print(schema);
+        string result = print(schema);
 
         // ensure schema isn't disposed before test finishes
         schema.Query.Name.ShouldNotBeNull();
@@ -77,7 +77,7 @@ public class SchemaPrinterTests
         var arg = skip.Arguments.First();
         arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
-        var result = printer.PrintDirective(skip);
+        string result = printer.PrintDirective(skip);
         const string expected = """
             # Directs the executor to skip this field or fragment when the 'if' argument is true.
             directive @skip(
@@ -96,7 +96,7 @@ public class SchemaPrinterTests
         var arg = skip.Arguments.First();
         arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
 
-        var result = printer.PrintDirective(skip);
+        string result = printer.PrintDirective(skip);
         const string expected = """"
             """
             Directs the executor to skip this field or fragment when the 'if' argument is true.
@@ -144,7 +144,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field()
     {
-        var result = printSingleFieldSchema<StringGraphType>();
+        string result = printSingleFieldSchema<StringGraphType>();
         const string expected = """
             type Query {
               singleField: String
@@ -156,7 +156,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_list_field()
     {
-        var result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
+        string result = printSingleFieldSchema<ListGraphType<StringGraphType>>();
         const string expected = """
             type Query {
               singleField: [String]
@@ -168,7 +168,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_non_null_string_field()
     {
-        var result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
+        string result = printSingleFieldSchema<NonNullGraphType<StringGraphType>>();
         const string expected = """
             type Query {
               singleField: String!
@@ -180,7 +180,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_non_null_list_of_string_field()
     {
-        var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
+        string result = printSingleFieldSchema<NonNullGraphType<ListGraphType<StringGraphType>>>();
         const string expected = """
             type Query {
               singleField: [String]!
@@ -192,7 +192,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_non_null_list_of_non_null_string_field()
     {
-        var result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
+        string result = printSingleFieldSchema<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>();
         const string expected = """
             type Query {
               singleField: [String!]!
@@ -363,7 +363,7 @@ public class SchemaPrinterTests
                 """
             },
         };
-        var result = print(schema, options);
+        string result = print(schema, options);
         AssertEqual(result, expected);
     }
 
@@ -412,14 +412,14 @@ public class SchemaPrinterTests
                 """
             },
         };
-        var result = print(schema, options);
+        string result = print(schema, options);
         AssertEqual(result, expected);
     }
 
     [Fact]
     public void prints_string_field_with_int_arg()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne" }
@@ -436,7 +436,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_int_arg_with_default()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
@@ -453,7 +453,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_non_null_int_arg()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new[]
             {
                 new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
@@ -470,7 +470,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_list_guid_arg_with_default()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new QueryArgument[]
             {
                 new QueryArgument<ListGraphType<GuidGraphType>> { Name = "arg", DefaultValue = new List<Guid>() },
@@ -489,7 +489,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_multiple_args()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new QueryArgument[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne" },
@@ -507,7 +507,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_multiple_args_first_has_default()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new QueryArgument[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
@@ -526,7 +526,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_multiple_args_second_has_default()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new QueryArgument[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne" },
@@ -545,7 +545,7 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_string_field_with_multiple_args_third_has_default()
     {
-        var result = printSingleFieldSchema<StringGraphType>(
+        string result = printSingleFieldSchema<StringGraphType>(
             new QueryArgument[]
             {
                 new QueryArgument<IntGraphType> { Name = "argOne" },
@@ -601,7 +601,7 @@ public class SchemaPrinterTests
 
         var schema = new Schema { Query = root };
 
-        var result = print(schema);
+        string result = print(schema);
 
         AssertEqual(result, "", """
 
@@ -738,7 +738,7 @@ public class SchemaPrinterTests
             PrintDescriptionsAsComments = true,
         };
 
-        var result = print(schema, options);
+        string result = print(schema, options);
 
         AssertEqual(result, "", """
 
@@ -781,7 +781,7 @@ public class SchemaPrinterTests
             PrintDescriptionsAsComments = false,
         };
 
-        var result = print(schema, options);
+        string result = print(schema, options);
 
         AssertEqual(result, "", """"
 
@@ -1256,7 +1256,7 @@ public class SchemaPrinterTests
         };
         schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
-        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+        string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
         const string expected = """
 
@@ -1443,7 +1443,7 @@ enum __TypeKind {
         };
         schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
-        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+        string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
         const string expected = """"
 
@@ -1704,7 +1704,7 @@ enum __TypeKind {
         .EnableExperimentalIntrospectionFeatures();
         schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
-        var result = Environment.NewLine + printer.PrintIntrospectionSchema();
+        string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
         const string expected = """
 
@@ -1968,8 +1968,8 @@ enum Beta {
 
 """);
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer() });
-        var actual = printer.Print();
-        var expected = """
+        string actual = printer.Print();
+        const string expected = """
 directive @test1(
   arg2: Boolean!
   arg1: Boolean!

@@ -5,7 +5,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void identifies_r2_as_the_hero()
     {
-        var query = """
+        const string query = """
             query HeroNameQuery {
               hero {
                 name
@@ -13,7 +13,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "hero": {
                 "name": "R2-D2"
@@ -27,7 +27,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_without_query_name()
     {
-        var query = """
+        const string query = """
             {
               hero {
                 name
@@ -35,7 +35,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "hero": {
                 "name": "R2-D2"
@@ -49,7 +49,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_the_id_and_friends_of_r2()
     {
-        var query = """
+        const string query = """
             query HeroNameAndFriendsQuery {
               hero {
                 id
@@ -61,7 +61,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "hero": {
                 "id": "3",
@@ -84,7 +84,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_humans()
     {
-        var query = """
+        const string query = """
             {
               human(id: "1") {
                 name
@@ -93,7 +93,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "human": {
                 "name": "Luke",
@@ -108,7 +108,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_friends_of_humans()
     {
-        var query = """
+        const string query = """
             {
               human(id: "1") {
                 name
@@ -120,7 +120,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "human": {
                 "name": "Luke",
@@ -138,7 +138,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_connected_friends_of_humans()
     {
-        var query = """
+        const string query = """
             {
               human(id: "1") {
                 name
@@ -160,7 +160,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "human": {
                 "name": "Luke",
@@ -204,7 +204,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_droids()
     {
-        var query = """
+        const string query = """
             {
               droid(id: "4") {
                 name
@@ -212,7 +212,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "droid": {
                 "name": "C-3PO"
@@ -226,7 +226,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_query_for_connected_friends_of_droids_second_page()
     {
-        var query = """
+        const string query = """
                {
                   droid(id: "3") {
                     name
@@ -248,7 +248,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
                }
             """;
 
-        var expected = """
+        const string expected = """
             {
                 "droid": {
                   "name": "R2-D2",
@@ -282,7 +282,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void create_generic_query_that_fetches_luke()
     {
-        var query = """
+        const string query = """
             query humanQuery($id: String!) {
               human(id: $id) {
                 name
@@ -290,7 +290,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "human": {
                 "name": "Luke"
@@ -306,7 +306,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void query_same_root_field_using_alias()
     {
-        var query = """
+        const string query = """
                query SomeDroids {
                   r2d2: droid(id: "3") {
                     name
@@ -318,7 +318,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
                }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "r2d2": {
                 "name": "R2-D2"
@@ -335,9 +335,9 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
     [Fact]
     public void can_add_new_human()
     {
-        var mutation = "mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
+        const string mutation = "mutation ($human:HumanInput!){ createHuman(human: $human) { name homePlanet } }";
 
-        var expected = """
+        const string expected = """
             {
               "createHuman": {
                 "name": "Boba Fett",

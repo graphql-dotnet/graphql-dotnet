@@ -63,7 +63,7 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the GraphQLMetadata Attribute.
+        /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the <see cref="GraphQLMetadataAttribute"/>.
         /// </summary>
         /// <param name="type">The indicated type.</param>
         /// <returns>A string containing a GraphQL compatible type name.</returns>

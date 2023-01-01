@@ -48,7 +48,7 @@ internal static class TestExtensions
         else if (value?.GetType() != typeof(string) && value is IEnumerable list)
         {
             var newList = new List<ExecutionNode>();
-            foreach (var item in list)
+            foreach (object item in list)
             {
                 newList.Add(CreateExecutionNode(null, item));
             }
