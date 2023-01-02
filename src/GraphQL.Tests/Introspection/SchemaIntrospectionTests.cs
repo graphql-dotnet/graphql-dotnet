@@ -21,7 +21,7 @@ public class SchemaIntrospectionTests
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
 
         ShouldBe(json, "IntrospectionResult".ReadJsonResult());
     }
@@ -41,7 +41,7 @@ public class SchemaIntrospectionTests
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
 
         ShouldBe(json, "IntrospectionResult".ReadJsonResult().Replace("\"test\"", "\"Test\""));
     }
@@ -68,7 +68,7 @@ public class SchemaIntrospectionTests
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
         }).ConfigureAwait(false);
-        var scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
@@ -105,7 +105,7 @@ public class SchemaIntrospectionTests
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
         }).ConfigureAwait(false);
-        var scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString();
 
@@ -162,7 +162,7 @@ public class SchemaIntrospectionTests
             _.Query = InputObjectBugQuery;
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         ShouldBe(json, InputObjectBugResult);

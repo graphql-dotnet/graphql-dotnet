@@ -17,7 +17,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
     // [Fact]
     public void Executes_StarWarsBasicQuery_Performant()
     {
-        var query = """
+        const string query = """
             query HeroNameAndFriendsQuery {
               hero {
                 id
@@ -36,7 +36,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
         smallListTimer.Start();
 
         //Note: Implementing a custom IDocumentValidator would increase speeds 600%
-        for (var x = 0; x < 10000; x++)
+        for (int x = 0; x < 10000; x++)
         {
             runResult2 = Executer.ExecuteAsync(_ =>
             {

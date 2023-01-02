@@ -84,7 +84,7 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
     [Fact]
     public void multiple_operations_of_same_name()
     {
-        var query = """
+        const string query = """
                 query Foo {
                   fieldA
                 }
@@ -104,7 +104,7 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
     [Fact]
     public void multiple_operations_of_same_name_of_different_types_mutation()
     {
-        var query = """
+        const string query = """
                 query Foo {
                   fieldA
                 }
@@ -124,7 +124,7 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
     [Fact]
     public void multiple_operations_of_same_name_of_different_types_subscription()
     {
-        var query = """
+        const string query = """
                 query Foo {
                   fieldA
                 }

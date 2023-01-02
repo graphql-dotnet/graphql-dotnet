@@ -354,7 +354,7 @@ public class AutoRegisteringObjectGraphTypeTests
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
         var resolver = field.Resolver.ShouldNotBeNull();
         var obj = new TestClass();
-        var actual = await resolver.ResolveAsync(new ResolveFieldContext
+        object? actual = await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = obj,
             FieldDefinition = new FieldType { Name = fieldName },

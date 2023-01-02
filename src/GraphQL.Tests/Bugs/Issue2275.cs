@@ -30,7 +30,7 @@ public class Issue2275
                 """);
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         json.ShouldBe("""

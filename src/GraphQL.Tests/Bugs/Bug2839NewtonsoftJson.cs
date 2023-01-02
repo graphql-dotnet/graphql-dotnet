@@ -37,7 +37,7 @@ public class Bug2839NewtonsoftJson
             };
         });
 
-        var str = writer.Serialize(result);
+        string str = writer.Serialize(result);
         str.ShouldBeCrossPlatJson("""{"data":{"test":{"this-is-a-string":"String Value","this-is-a-date-time":"2022-Jan-04"}}}""");
     }
 

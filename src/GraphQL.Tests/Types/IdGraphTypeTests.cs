@@ -38,7 +38,7 @@ public class IdGraphTypeTests
             string s => new GraphQLStringValue(s),
             _ => null
         };
-        var ret = _type.ParseLiteral(ast);
+        object ret = _type.ParseLiteral(ast);
         ret.ShouldBeOfType(value.GetType());
         ret.ShouldBe(value);
     }
@@ -55,7 +55,7 @@ public class IdGraphTypeTests
     [InlineData("hello")]
     public void parse_value_to_identifier(object value)
     {
-        var ret = _type.ParseValue(value);
+        object ret = _type.ParseValue(value);
         ret.ShouldBeOfType(value.GetType());
         ret.ShouldBe(value);
     }
@@ -72,7 +72,7 @@ public class IdGraphTypeTests
     [InlineData("hello")]
     public void serialize_value(object value)
     {
-        var ret = _type.Serialize(value);
+        object ret = _type.Serialize(value);
         ret.ShouldBeOfType(typeof(string));
         ret.ShouldBe(value.ToString());
     }
@@ -99,7 +99,7 @@ public class IdGraphTypeTests
     public void parse_guid_value()
     {
         var g = new Guid("12345678901234567890123456789012");
-        var ret = _type.ParseValue(g);
+        object ret = _type.ParseValue(g);
         ret.ShouldBeOfType(typeof(Guid));
         ret.ShouldBe(g);
     }
@@ -108,7 +108,7 @@ public class IdGraphTypeTests
     public void serialize_guid()
     {
         var g = new Guid("12345678901234567890123456789012");
-        var ret = _type.Serialize(g);
+        object ret = _type.Serialize(g);
         ret.ShouldBeOfType(typeof(string));
         ret.ShouldBe(g.ToString("D", System.Globalization.CultureInfo.InvariantCulture));
     }

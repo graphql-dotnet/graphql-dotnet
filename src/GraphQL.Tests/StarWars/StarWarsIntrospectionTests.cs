@@ -5,9 +5,9 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void provides_typename()
     {
-        var query = "{ hero { __typename name } }";
+        const string query = "{ hero { __typename name } }";
 
-        var expected = """{ "hero": { "__typename": "Droid", "name": "R2-D2" } }""";
+        const string expected = """{ "hero": { "__typename": "Droid", "name": "R2-D2" } }""";
 
         AssertQuerySuccess(query, expected);
     }
@@ -15,7 +15,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_an_object_kind()
     {
-        var query = """
+        const string query = """
             query IntrospectionDroidKindQuery {
               __type(name: "Droid") {
                 name,
@@ -24,7 +24,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__type": {
                 "name": "Droid",
@@ -39,7 +39,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_an_interface_kind()
     {
-        var query = """
+        const string query = """
             query IntrospectionCharacterKindQuery {
               __type(name: "Character") {
                 name
@@ -48,7 +48,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__type": {
                 "name": "Character",
@@ -63,7 +63,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_possibleTypes_of_an_interface()
     {
-        var query = """
+        const string query = """
             query IntrospectionCharacterKindQuery {
               __type(name: "Character") {
                 name
@@ -76,7 +76,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "__type": {
                 "name": "Character",
@@ -95,7 +95,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema_for_object_fields()
     {
-        var query = """
+        const string query = """
             query IntrospectionDroidFieldsQuery {
               __type(name: "Droid") {
                 name
@@ -110,7 +110,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
                 "__type": {
                   "name": "Droid",
@@ -168,7 +168,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema_for_documentation()
     {
-        var query = """
+        const string query = """
             query IntrospectionDroidDescriptionQuery {
               __type(name: "Droid") {
                 name
@@ -176,7 +176,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
               }
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "__type": {
                 "name": "Droid",
@@ -191,7 +191,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema()
     {
-        var query = """
+        const string query = """
             query SchemaIntrospectionQuery {
               __schema {
                 types { name, kind }
@@ -207,7 +207,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
               }
             }
             """;
-        var expected = """
+        const string expected = """
             {
                 "__schema": {
                     "types": [
@@ -337,7 +337,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allow_querying_input_object_type_fields()
     {
-        var query = """
+        const string query = """
             {
               __type(name: "HumanInput") {
                 fields { name }
@@ -352,7 +352,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_field_args()
     {
-        var query = """
+        const string query = """
             query SchemaIntrospectionQuery {
               __schema {
                 queryType {
@@ -376,7 +376,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
               }
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "__schema": {
                 "queryType": {

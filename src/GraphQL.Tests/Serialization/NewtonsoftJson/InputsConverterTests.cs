@@ -37,7 +37,7 @@ public class InputsConverterTests
     [Fact]
     public void Throws_For_Deep_Objects()
     {
-        var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+        string value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
         Should.Throw<JsonReaderException>(() => Deserialize<Inputs>(value));
     }
 
@@ -56,7 +56,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_SimpleValues()
     {
-        string json = """
+        const string json = """
             {
               "int": 123,
               "double": 123.456,
@@ -76,7 +76,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Simple_Null()
     {
-        string json = """
+        const string json = """
             {
               "string": null
             }
@@ -90,7 +90,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array()
     {
-        string json = """
+        const string json = """
             {
               "values": [1, 2, 3]
             }
@@ -104,7 +104,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array_in_Array()
     {
-        string json = """
+        const string json = """
             {
               "values": [[1,2,3]]
             }
@@ -120,7 +120,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_ComplexValue()
     {
-        string json = """
+        const string json = """
             {
               "complex": {
                 "int": 123,
@@ -143,7 +143,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_MixedValue()
     {
-        string json = """
+        const string json = """
             {
               "int": 123,
               "complex": {
@@ -171,7 +171,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Nested_SimpleValues()
     {
-        string json = """
+        const string json = """
             {
               "value1": "string",
               "dictionary": {
@@ -303,7 +303,7 @@ public class InputsConverterTests
     public void Deserializes_Dates()
     {
         var d = new DateTimeOffset(2022, 1, 3, 15, 47, 22, System.TimeSpan.Zero);
-        var json = $"{{ \"date\": \"{d:o}\"}}";
+        string json = $"{{ \"date\": \"{d:o}\"}}";
 
         var jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings
         {

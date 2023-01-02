@@ -142,7 +142,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void int_into_string()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringArgField(stringArg: 1)
@@ -166,7 +166,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void float_into_string()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringArgField(stringArg: 1.0)
@@ -184,7 +184,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void boolean_into_string()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringArgField(stringArg: true)
@@ -202,7 +202,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unquotedstring_into_string()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringArgField(stringArg: BAR)
@@ -220,7 +220,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void string_into_int()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 intArgField(intArg: "3")
@@ -238,7 +238,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void big_int_into_int()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 intArgField(intArg: 829384293849283498239482938)
@@ -256,7 +256,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unquoted_string_into_int()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 intArgField(intArg: FOO)
@@ -274,7 +274,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void simple_float_into_int()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 intArgField(intArg: 3.0)
@@ -292,7 +292,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void float_into_int()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 intArgField(intArg: 3.333)
@@ -310,7 +310,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void string_into_float()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 floatArgField(floatArg: "3.333")
@@ -328,7 +328,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void boolean_into_float()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 floatArgField(floatArg: true)
@@ -346,7 +346,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unquoted_string_into_float()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 floatArgField(floatArg: FOO)
@@ -364,7 +364,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void int_into_boolean()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 booleanArgField(booleanArg: 2)
@@ -382,7 +382,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void float_into_boolean()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 booleanArgField(booleanArg: 1.0)
@@ -400,7 +400,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void string_into_boolean()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 booleanArgField(booleanArg: "true")
@@ -418,7 +418,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unquotedstring_into_boolean()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 booleanArgField(booleanArg: TRUE)
@@ -436,7 +436,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void float_into_id()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 idArgField(idArg: 1.0)
@@ -454,7 +454,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void boolean_into_id()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 idArgField(idArg: true)
@@ -472,7 +472,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unquoted_into_id()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 idArgField(idArg: SOMETHING)
@@ -490,7 +490,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void int_into_enum()
     {
-        var query = """
+        const string query = """
             {
               dog {
                 doesKnowCommand(dogCommand: 2)
@@ -514,7 +514,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void float_into_enum()
     {
-        var query = """
+        const string query = """
             {
               dog {
                 doesKnowCommand(dogCommand: 1.0)
@@ -532,7 +532,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void string_into_enum()
     {
-        var query = """
+        const string query = """
             {
               dog {
                 doesKnowCommand(dogCommand: "SIT")
@@ -550,7 +550,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void boolean_into_enum()
     {
-        var query = """
+        const string query = """
             {
               dog {
                 doesKnowCommand(dogCommand: true)
@@ -568,7 +568,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void unknown_enum_value_into_enum()
     {
-        var query = """
+        const string query = """
             {
               dog {
                 doesKnowCommand(dogCommand: JUGGLE)
@@ -605,7 +605,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void list_value_incorrect_item_type()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringListArgField(stringListArg: ["one", 2])
@@ -623,7 +623,7 @@ public class ArgumentsOfCorrectTypeTests : ValidationTestBase<ArgumentsOfCorrect
     [Fact]
     public void list_value_single_value_of_incorrect_type()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 stringListArgField(stringListArg: 1)
@@ -793,7 +793,7 @@ public class ArgumentsOfCorrectType_Invalid_Non_Nullable : ValidationTestBase<Ar
     [Fact]
     public void incorrect_value_type()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 multipleReqs(req2: "two", req1: "one")
@@ -812,7 +812,7 @@ public class ArgumentsOfCorrectType_Invalid_Non_Nullable : ValidationTestBase<Ar
     [Fact]
     public void incorrect_value_and_missing_argument()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 multipleReqs(req1: "one")
@@ -831,7 +831,7 @@ public class ArgumentsOfCorrectType_Invalid_Non_Nullable : ValidationTestBase<Ar
     [Fact]
     public void multiple_args_with_one_null()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 multipleReqs(req1: null)
@@ -850,7 +850,7 @@ public class ArgumentsOfCorrectType_Invalid_Non_Nullable : ValidationTestBase<Ar
     [Fact]
     public void multiple_args_with_second_null()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 multipleReqs(req2: null)
@@ -869,7 +869,7 @@ public class ArgumentsOfCorrectType_Invalid_Non_Nullable : ValidationTestBase<Ar
     [Fact]
     public void multiple_args_with_both_null()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 multipleReqs(req2: null, req1: null)
@@ -994,7 +994,7 @@ public class ArgumentsOfCorrectType_invalid_input_object_value : ValidationTestB
     [Fact]
     public void partial_object_missing_required()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 complexArgField(complexArg: { intField: 4 })
@@ -1012,7 +1012,7 @@ public class ArgumentsOfCorrectType_invalid_input_object_value : ValidationTestB
     [Fact]
     public void partial_object_invalid_field_type()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 complexArgField(complexArg: {
@@ -1033,7 +1033,7 @@ public class ArgumentsOfCorrectType_invalid_input_object_value : ValidationTestB
     [Fact]
     public void partial_object_unknown_field_arg()
     {
-        var query = """
+        const string query = """
             {
               complicatedArgs {
                 complexArgField(complexArg: {
@@ -1072,7 +1072,7 @@ public class ArgumentsOfCorrectType_directive_arguments : ValidationTestBase<Arg
     [Fact]
     public void with_directives_with_incorrect_types()
     {
-        var query = """
+        const string query = """
             {
               dog @include(if: "yes") {
                 name @skip(if: ENUM)

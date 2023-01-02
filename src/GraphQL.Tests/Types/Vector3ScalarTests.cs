@@ -61,7 +61,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
         var scalar = new Vector3Type();
         var input = new Vector3(1, 2, 3);
         var ast = scalar.ToAST(input);
-        var value = scalar.ParseLiteral(ast);
+        object value = scalar.ParseLiteral(ast);
         var output = value.ShouldBeOfType<Vector3>();
         output.X.ShouldBe(input.X);
         output.Y.ShouldBe(input.Y);
@@ -130,10 +130,10 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             {
                 try
                 {
-                    var vector3Parts = vector3InputString.Split(','); // strings allocations
-                    var x = float.Parse(vector3Parts[0]);
-                    var y = float.Parse(vector3Parts[1]);
-                    var z = float.Parse(vector3Parts[2]);
+                    string[] vector3Parts = vector3InputString.Split(','); // strings allocations
+                    float x = float.Parse(vector3Parts[0]);
+                    float y = float.Parse(vector3Parts[1]);
+                    float z = float.Parse(vector3Parts[2]);
                     return new Vector3(x, y, z);
                 }
                 catch
@@ -149,17 +149,17 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
                     // no strings allocations
                     var span = vector3InputROM.Span;
 
-                    var i = span.IndexOf(',');
-                    var x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    int i = span.IndexOf(',');
+                    float x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                     span = span.Slice(i + 1);
 
                     i = span.IndexOf(',');
-                    var y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    float y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                     span = span.Slice(i + 1);
 
-                    var z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    float z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
                     return new Vector3(x, y, z);
                 }
                 catch
@@ -172,9 +172,9 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             {
                 try
                 {
-                    var x = Convert.ToSingle(dictionary["x"]);
-                    var y = Convert.ToSingle(dictionary["y"]);
-                    var z = Convert.ToSingle(dictionary["z"]);
+                    float x = Convert.ToSingle(dictionary["x"]);
+                    float y = Convert.ToSingle(dictionary["y"]);
+                    float z = Convert.ToSingle(dictionary["z"]);
                     if (dictionary.Count > 3)
                         return ThrowValueConversionError(value);
                     return new Vector3(x, y, z);
@@ -201,9 +201,9 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
                 var entries = objectValue.Fields.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
                 if (entries.Count != 3)
                     return ThrowLiteralConversionError(value);
-                var x = (double)entries["x"];
-                var y = (double)entries["y"];
-                var z = (double)entries["z"];
+                double x = (double)entries["x"];
+                double y = (double)entries["y"];
+                double z = (double)entries["z"];
                 return new Vector3((float)x, (float)y, (float)z);
             }
 

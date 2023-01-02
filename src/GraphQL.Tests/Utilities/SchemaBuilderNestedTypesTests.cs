@@ -7,7 +7,7 @@ public class SchemaBuilderNestedTypesTests : SchemaBuilderTestBase
     [Fact]
     public void supports_nested_graph_types()
     {
-        var defs = """
+        const string defs = """
             type Droid {
               id: String
               name: String
@@ -26,8 +26,8 @@ public class SchemaBuilderNestedTypesTests : SchemaBuilderTestBase
         Builder.Types.Include<DroidType, Droid>("Droid");
         Builder.Types.Include<Query>();
 
-        var query = "{ hero { id name friend { name } } }";
-        var expected = """{ "hero": { "id" : "1", "name": "R2-D2", "friend": { "name": "C3-PO" } } }""";
+        const string query = "{ hero { id name friend { name } } }";
+        const string expected = """{ "hero": { "id" : "1", "name": "R2-D2", "friend": { "name": "C3-PO" } } }""";
 
         AssertQuery(_ =>
         {
@@ -40,7 +40,7 @@ public class SchemaBuilderNestedTypesTests : SchemaBuilderTestBase
     [Fact]
     public void supports_type_references_in_resolve_type()
     {
-        var defs = """
+        const string defs = """
             type Droid {
               id: String
               name: String
@@ -60,8 +60,8 @@ public class SchemaBuilderNestedTypesTests : SchemaBuilderTestBase
         Builder.Types.For("Droid").ResolveType = obj => new GraphQLTypeReference("Droid");
         Builder.Types.Include<Query>();
 
-        var query = "{ hero { id name friend { name } } }";
-        var expected = """{ "hero": { "id" : "1", "name": "R2-D2", "friend": { "name": "C3-PO" } } }""";
+        const string query = "{ hero { id name friend { name } } }";
+        const string expected = """{ "hero": { "id" : "1", "name": "R2-D2", "friend": { "name": "C3-PO" } } }""";
 
         AssertQuery(_ =>
         {

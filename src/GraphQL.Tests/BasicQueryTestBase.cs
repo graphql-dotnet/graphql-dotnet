@@ -34,8 +34,8 @@ public class BasicQueryTestBase
     {
         var runResult = Executer.ExecuteAsync(options).Result;
 
-        var writtenResult = Writer.Serialize(runResult);
-        var expectedResult = Writer.Serialize(expectedExecutionResult);
+        string writtenResult = Writer.Serialize(runResult);
+        string expectedResult = Writer.Serialize(expectedExecutionResult);
 
         //#if DEBUG
         //            Console.WriteLine(writtenResult);
@@ -76,8 +76,8 @@ public class BasicQueryTestBase
             _.ValidationRules = rules;
         }).GetAwaiter().GetResult();
 
-        var writtenResult = Writer.Serialize(runResult);
-        var expectedResult = Writer.Serialize(expectedExecutionResult);
+        string writtenResult = Writer.Serialize(runResult);
+        string expectedResult = Writer.Serialize(expectedExecutionResult);
 
         //#if DEBUG
         //            Console.WriteLine(writtenResult);

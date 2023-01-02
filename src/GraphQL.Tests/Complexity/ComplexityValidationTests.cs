@@ -7,7 +7,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void should_work_when_complexity_within_params()
     {
-        var query = """
+        const string query = """
             query HeroNameQuery {
               hero {
               name
@@ -24,7 +24,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void error_when_too_nested()
     {
-        var query = """
+        const string query = """
             query FriendsOfFriends {
               hero {
               friends {
@@ -48,7 +48,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void fail_when_too_complex()
     {
-        var query = """
+        const string query = """
             query BasicQuery {
               hero {
               id
@@ -69,7 +69,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void fail_when_too_complex_and_nested()
     {
-        var query = """
+        const string query = """
             query FriendsOfFriends {
               hero {
                 friends {
