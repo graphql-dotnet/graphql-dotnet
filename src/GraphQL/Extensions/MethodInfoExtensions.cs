@@ -6,9 +6,9 @@ namespace GraphQL;
 
 internal static class MethodInfoExtensions
 {
-    public static T CreateDelegate<T>(this MethodInfo methodInfo, object? target)
+    public static T CreateDelegate<T>(this MethodInfo methodInfo)
         where T : Delegate
-        => (T)methodInfo.CreateDelegate(typeof(T), target);
+        => (T)methodInfo.CreateDelegate(typeof(T));
 }
 
 #endif

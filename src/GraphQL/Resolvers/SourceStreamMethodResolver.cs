@@ -70,7 +70,7 @@ namespace GraphQL.Resolvers
                 {
                     var innerType = type.GetGenericArguments()[0];
                     var method = _convertFromTaskAsyncEnumerableMethodInfo.MakeGenericMethod(innerType);
-                    var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
+                    var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>();
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
             }
@@ -92,7 +92,7 @@ namespace GraphQL.Resolvers
                 {
                     var innerType = type.GetGenericArguments()[0];
                     var method = _convertFromValueTaskAsyncEnumerableMethodInfo.MakeGenericMethod(innerType);
-                    var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
+                    var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>();
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
             }
@@ -114,7 +114,7 @@ namespace GraphQL.Resolvers
             {
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
                 var method = _convertFromAsyncEnumerableMethodInfo.MakeGenericMethod(innerType);
-                var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>(null);
+                var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>();
                 return func(bodyExpression, resolveFieldContextParameter);
             }
 
