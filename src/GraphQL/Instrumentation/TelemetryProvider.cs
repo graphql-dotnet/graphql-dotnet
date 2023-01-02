@@ -25,7 +25,7 @@ public class TelemetryProvider : IConfigureExecution
     /// <summary>
     /// Gets the source name used for telemetry.
     /// </summary>
-    public static string SourceName => "GraphQL.NET";
+    public static string SourceName => "GraphQL";
 
     /// <summary>
     /// Initializes a new instance with the specified options.
