@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
 namespace GraphQL.ApiTests;
 
 public class BomTests
@@ -6,13 +9,15 @@ public class BomTests
     [Fact]
     public void Files_Should_Not_Use_BOM()
     {
-        var baseDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent!.Parent!.Parent!.Parent!.Parent!;
+        string GetPath([CallerFilePath] string path = "") => path; // <GIT_ROOT>\src\GraphQL.ApiTests\BomTests.cs
+
+        var gitRoot = new DirectoryInfo(GetPath()).Parent!.Parent!.Parent!;
 
         byte[] buffer = new byte[3];
         int counter = 0;
         List<string> files = new();
 
-        foreach (string file in Directory.EnumerateFiles(baseDir.FullName, "*.*", SearchOption.AllDirectories))
+        foreach (string file in Directory.EnumerateFiles(gitRoot.FullName, "*.*", SearchOption.AllDirectories))
         {
             ++counter;
 
