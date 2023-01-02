@@ -6,13 +6,13 @@ public class BomTests
     [Fact]
     public void Files_Should_Not_Use_BOM()
     {
-        var baseDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../../..");
+        var baseDir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory).Parent!.Parent!.Parent!.Parent!.Parent!;
 
-        var buffer = new byte[3];
+        byte[] buffer = new byte[3];
         int counter = 0;
         List<string> files = new();
 
-        foreach (var file in Directory.EnumerateFiles(baseDir, "*.*", SearchOption.AllDirectories))
+        foreach (string file in Directory.EnumerateFiles(baseDir.FullName, "*.*", SearchOption.AllDirectories))
         {
             ++counter;
 
@@ -31,6 +31,6 @@ public class BomTests
         Console.WriteLine("Files checked: " + counter);
 
         if (files.Count > 0)
-            throw new InvalidOperationException("Files with BOM found:" + Environment.NewLine + string.Join(Environment.NewLine, files));
+            throw new InvalidOperationException("Remove BOM from files. Files with BOM found:" + Environment.NewLine + string.Join(Environment.NewLine, files));
     }
 }
