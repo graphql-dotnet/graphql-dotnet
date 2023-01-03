@@ -14,7 +14,12 @@ public partial class DocumentValidator
         private ParseArgumentVisitor() { }
 
         protected override ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
-            => context.ValidationContext.Operation != null ? VisitOperationDefinitionAsync(context.ValidationContext.Operation, context) : default;
+        {
+            var selectedOperation = context.ValidationContext.Operation;
+            if (selectedOperation != null)
+                return VisitOperationDefinitionAsync(selectedOperation, context);
+            return default;
+        }
 
         protected override async ValueTask VisitOperationDefinitionAsync(GraphQLOperationDefinition operationDefinition, Context context)
         {
@@ -83,7 +88,7 @@ public partial class DocumentValidator
             var schema = context.Schema;
             var fieldType =
                 field.Name.Value == schema.TypeMetaFieldType.Name ? schema.TypeMetaFieldType :
-                field.Name.Value == schema.TypeNameMetaFieldType.Name ? schema.TypeNameMetaFieldType:
+                field.Name.Value == schema.TypeNameMetaFieldType.Name ? schema.TypeNameMetaFieldType :
                 field.Name.Value == schema.SchemaMetaFieldType.Name ? schema.SchemaMetaFieldType :
                 context.Type?.Fields.Find(field.Name.Value);
             if (fieldType == null)
