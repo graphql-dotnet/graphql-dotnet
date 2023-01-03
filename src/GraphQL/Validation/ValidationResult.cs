@@ -69,7 +69,7 @@ namespace GraphQL.Validation
         public ExecutionErrors Errors => EmptyExecutionErrors.Instance;
 
         /// <inheritdoc/>
-        public Variables? Variables => null;
+        public Variables? Variables => Variables.None;
 
         /// <inheritdoc/>
         public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;

@@ -4,6 +4,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Validates a document against a set of validation rules and returns a list of the errors found.
+    /// If the document passes validation, also returns the set of parsed variabes and argument values.
     /// </summary>
     public interface IDocumentValidator
     {
@@ -55,7 +56,7 @@ namespace GraphQL.Validation
         {
             options.Schema.Initialize();
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            var context = Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
             context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
@@ -139,7 +140,7 @@ namespace GraphQL.Validation
 
                 // todo: execute validation rules that need to be able to read field arguments/directives
 
-                if (!context.HasErrors && variables == null && argumentValues == null && directiveValues == null)
+                if (!context.HasErrors && variables == Variables.None && argumentValues == null && directiveValues == null)
                     return SuccessfullyValidatedResult.Instance;
 
                 return new ValidationResult(context.Errors)
