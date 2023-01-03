@@ -4,7 +4,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Validates a document against a set of validation rules and returns a list of the errors found.
-    /// If the document passes validation, also returns the set of parsed variabes and argument values.
+    /// If the document passes validation, also returns the set of parsed variables and argument values.
     /// </summary>
     public interface IDocumentValidator
     {
