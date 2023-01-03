@@ -27,14 +27,16 @@ namespace GraphQL.Validation
         Variables? Variables { get; }
 
         /// <summary>
-        /// Returns a dictionary of fields with supplied arguments.
-        /// If the document did not pass validation, or if no fields having arguments were found, this value will be <see langword="null"/>.
+        /// Returns a dictionary of fields, and for each field, a dictionary of arguments defined for the field with their values.
+        /// If the document did not pass validation, or if no field arguments were found, this value will be <see langword="null"/>.
+        /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
         /// </summary>
         IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
         /// <summary>
-        /// Returns a dictionary of directives with supplied arguments.
-        /// If the document did not pass validation, or if no directives having arguments were found, this value will be <see langword="null"/>.
+        /// Returns a dictionary of fields, and for each field, a dictionary of directives defined for the field with argument
+        /// values for each directive.
+        /// If the document did not pass validation, or if no directives were found, this value will be <see langword="null"/>.
         /// </summary>
         IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
     }

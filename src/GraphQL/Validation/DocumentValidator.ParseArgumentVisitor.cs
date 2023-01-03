@@ -7,6 +7,9 @@ namespace GraphQL.Validation;
 
 public partial class DocumentValidator
 {
+    /// <summary>
+    /// Visits an AST tree to parse the field and directive argument values.
+    /// </summary>
     private class ParseArgumentVisitor : ASTVisitor<ParseArgumentVisitor.Context>
     {
         public static readonly ParseArgumentVisitor Instance = new();
@@ -15,14 +18,17 @@ public partial class DocumentValidator
 
         protected override ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
         {
+            // parses the selected operation only
             var selectedOperation = context.ValidationContext.Operation;
             if (selectedOperation != null)
                 return VisitOperationDefinitionAsync(selectedOperation, context);
+            // if no operation is selected, nothing is parsed
             return default;
         }
 
         protected override async ValueTask VisitOperationDefinitionAsync(GraphQLOperationDefinition operationDefinition, Context context)
         {
+            // pull the matching graph type for the operation
             var type = operationDefinition.Operation switch
             {
                 OperationType.Query => context.Schema.Query,
@@ -30,6 +36,7 @@ public partial class DocumentValidator
                 OperationType.Subscription => context.Schema.Subscription,
                 _ => null
             };
+            // assuming the schema passed validation, the type should not be null
             if (type == null)
                 return;
             context.Types.Push(type);
@@ -46,6 +53,7 @@ public partial class DocumentValidator
             }
             else
             {
+                // assuming the schema passed validation, we should be find the matching graph type for this inline fragment
                 if (context.Schema.AllTypes[typeCondition.Type.Name.Value]?.GetNamedType() is IComplexGraphType type)
                 {
                     context.Types.Push(type);
@@ -57,13 +65,19 @@ public partial class DocumentValidator
 
         protected override ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, Context context)
         {
-            // visit the fragment that this fragment spread references
+            // visit the fragment that this fragment spread references,
+            // unless we already visited this fragment spread
             var fragmentName = fragmentSpread.FragmentName.Name.Value;
-            foreach (var definition in context.ValidationContext.Document.Definitions)
+            if ((context.VisitedFragments ??= new()).Add(fragmentName))
             {
-                if (definition is GraphQLFragmentDefinition fragment && fragment.FragmentName.Name.Value == fragmentName)
+                foreach (var definition in context.ValidationContext.Document.Definitions)
                 {
-                    return VisitFragmentDefinitionAsync(fragment, context);
+                    // the fragment name should be one of the definitions in the document, or the
+                    // document would not have passed validation
+                    if (definition is GraphQLFragmentDefinition fragment && fragment.FragmentName.Name.Value == fragmentName)
+                    {
+                        return VisitFragmentDefinitionAsync(fragment, context);
+                    }
                 }
             }
             return default;
@@ -71,10 +85,7 @@ public partial class DocumentValidator
 
         protected override async ValueTask VisitFragmentDefinitionAsync(GraphQLFragmentDefinition fragmentDefinition, Context context)
         {
-            // skip if this fragment has already been visited
-            if (context.VisitedFragments?.Contains(fragmentDefinition) == true)
-                return;
-            (context.VisitedFragments ??= new()).Add(fragmentDefinition);
+            // the fragment type name should be listed in the document, or the document would have failed validation
             if (context.Schema.AllTypes[fragmentDefinition.TypeCondition.Type.Name.Value]?.GetNamedType() is IComplexGraphType type)
             {
                 context.Types.Push(type);
@@ -85,14 +96,18 @@ public partial class DocumentValidator
 
         protected override async ValueTask VisitFieldAsync(GraphQLField field, Context context)
         {
+            // find the field definition for this field
             var schema = context.Schema;
             var fieldType =
                 field.Name.Value == schema.TypeMetaFieldType.Name ? schema.TypeMetaFieldType :
                 field.Name.Value == schema.TypeNameMetaFieldType.Name ? schema.TypeNameMetaFieldType :
                 field.Name.Value == schema.SchemaMetaFieldType.Name ? schema.SchemaMetaFieldType :
                 context.Type?.Fields.Find(field.Name.Value);
+            // should not be null, or the document would have failed validation
             if (fieldType == null)
                 return;
+            // if any arguments were supplied in the document for the field, load all defined arguments
+            // for the field
             if (field.Arguments?.Count > 0)
             {
                 try
@@ -109,6 +124,8 @@ public partial class DocumentValidator
                     context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve field '{field.Name.Value}'.", ex));
                 }
             }
+            // if any directives were supplied in the document for the field, load all defined arguments
+            // for directvies on the field
             if (field.Directives?.Count > 0)
             {
                 try
@@ -125,6 +142,7 @@ public partial class DocumentValidator
                     context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve field '{field.Name.Value}'.", ex));
                 }
             }
+            // if the field's type is an object, process child fields
             if (fieldType.ResolvedType?.GetNamedType() is IComplexGraphType type)
             {
                 context.Types.Push(type);
@@ -143,7 +161,7 @@ public partial class DocumentValidator
             public CancellationToken CancellationToken => ValidationContext.CancellationToken;
             public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
             public Dictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
-            public HashSet<GraphQLFragmentDefinition>? VisitedFragments { get; set; }
+            public HashSet<GraphQLParser.ROM>? VisitedFragments { get; set; }
 
             private static Stack<IComplexGraphType>? _reusableTypes;
 

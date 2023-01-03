@@ -78,14 +78,10 @@ namespace GraphQL.Execution
         /// </summary>
         Variables Variables { get; }
 
-        /// <summary>
-        /// A dictionary of field argument values.
-        /// </summary>
+        /// <inheritdoc cref="IValidationResult.ArgumentValues"/>
         IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
-        /// <summary>
-        /// A dictionary of directive argument values.
-        /// </summary>
+        /// <inheritdoc cref="IValidationResult.DirectiveValues"/>
         IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 
         /// <summary>
