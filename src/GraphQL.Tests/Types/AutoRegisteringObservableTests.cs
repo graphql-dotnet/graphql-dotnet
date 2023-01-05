@@ -114,7 +114,7 @@ public class AutoRegisteringObservableTests
     [InlineData(nameof(TestClass.AsyncCancelToken1), false)]
     [InlineData(nameof(TestClass.AsyncCancelToken2), true)]
     [InlineData(nameof(TestClass.AsyncCancelToken2), false)]
-    public async Task AsyncEnumerable_Cancel1(string fieldName, bool cancelViaDispose)
+    public async Task AsyncEnumerable_Cancel(string fieldName, bool cancelViaDispose)
     {
         var streamResolver = GetResolver(fieldName);
         var cts = new CancellationTokenSource();
