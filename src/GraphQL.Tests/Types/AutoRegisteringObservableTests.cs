@@ -35,6 +35,19 @@ public class AutoRegisteringObservableTests
     }
 
     [Theory]
+    [InlineData(nameof(TestClass.ListOfNumbers1))]
+    [InlineData(nameof(TestClass.ListOfNumbers2))]
+    [InlineData(nameof(TestClass.ListOfNumbers3))]
+    [InlineData(nameof(TestClass.ListOfNumbers4))]
+    [InlineData(nameof(TestClass.ListOfNumbers5))]
+    public async Task Observable_Value(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new object[] { 1, 2, 3 });
+    }
+
+    [Theory]
     [InlineData(nameof(TestClass.ReturnError1))]
     [InlineData(nameof(TestClass.ReturnError2))]
     [InlineData(nameof(TestClass.ReturnError3))]
@@ -65,6 +78,17 @@ public class AutoRegisteringObservableTests
         var streamResolver = GetResolver(fieldName);
         var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         observable.ToEnumerable().ShouldBe(new string[] { "d", "e", "f" });
+    }
+
+    [Theory]
+    [InlineData(nameof(TestClass.AsyncNumbers1))]
+    [InlineData(nameof(TestClass.AsyncNumbers2))]
+    [InlineData(nameof(TestClass.AsyncNumbers3))]
+    public async Task AsyncEnumerable_Value(string fieldName)
+    {
+        var streamResolver = GetResolver(fieldName);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        observable.ToEnumerable().ShouldBe(new object[] { 4, 5, 6 });
     }
 
     [Theory]
@@ -219,9 +243,17 @@ public class AutoRegisteringObservableTests
         public static async Task<IObservable<string>> ListOfStrings2() => new string[] { "a", "b", "c" }.ToObservable();
         public static async ValueTask<IObservable<string>> ListOfStrings3() => new string[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static IObservable<object> ListOfStrings4() => new string[] { "a", "b", "c" }.ToObservable();
+        public static IObservable<object> ListOfStrings4() => new object[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static async ValueTask<IObservable<string>> ListOfStrings5() => new string[] { "a", "b", "c" }.ToObservable();
+        public static async ValueTask<IObservable<object>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
+
+        public static IObservable<int> ListOfNumbers1() => new int[] { 1, 2, 3 }.ToObservable();
+        public static async Task<IObservable<int>> ListOfNumbers2() => new int[] { 1, 2, 3 }.ToObservable();
+        public static async ValueTask<IObservable<int>> ListOfNumbers3() => new int[] { 1, 2, 3 }.ToObservable();
+        [OutputType(typeof(IntGraphType))]
+        public static IObservable<object> ListOfNumbers4() => new object[] { 1, 2, 3 }.ToObservable();
+        [OutputType(typeof(IntGraphType))]
+        public static async ValueTask<IObservable<object>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
         public static async Task<IObservable<string>> ReturnError2() => Observable.Throw<string>(new Exception("sample error"));
@@ -239,6 +271,15 @@ public class AutoRegisteringObservableTests
         }
         public static async Task<IAsyncEnumerable<string>> AsyncStrings2() => AsyncStrings1();
         public static async ValueTask<IAsyncEnumerable<string>> AsyncStrings3() => AsyncStrings1();
+
+        public static async IAsyncEnumerable<int> AsyncNumbers1()
+        {
+            yield return 4;
+            yield return 5;
+            yield return 6;
+        }
+        public static async Task<IAsyncEnumerable<int>> AsyncNumbers2() => AsyncNumbers1();
+        public static async ValueTask<IAsyncEnumerable<int>> AsyncNumbers3() => AsyncNumbers1();
 
         public static async IAsyncEnumerable<string> AsyncWithError1()
         {
