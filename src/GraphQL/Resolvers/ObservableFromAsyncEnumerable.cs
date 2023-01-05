@@ -67,7 +67,7 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
             // enumerate the source and pass the items to the observer
             await foreach (var z in enumerable.WithCancellation(_cancellationTokenSource.Token).ConfigureAwait(false))
             {
-                observer.OnNext(z);
+                observer.OnNext(z); // note - boxing here in case of value types
 
                 if (_cancellationTokenSource.IsCancellationRequested)
                     return;
