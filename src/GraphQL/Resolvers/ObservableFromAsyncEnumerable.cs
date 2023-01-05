@@ -30,6 +30,12 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         return async context =>
         {
             var cts = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken);
+
+            // The underlying cancellation token is signaled if the HTTP connection is aborted. However, the
+            // cts here may be signalled if the specific subscription is stopped within a websocket
+            // connection. Hence a linked token is created and passed into the IResolveFieldContext
+            // which is used to populate the arguments of the delegate.
+
             var enumerable = await func(new OverrideCancellationContext(context, cts.Token)).ConfigureAwait(false);
             return new ObservableFromAsyncEnumerable<T>(cts, enumerable);
         };
