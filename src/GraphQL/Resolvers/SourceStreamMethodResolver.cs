@@ -112,7 +112,7 @@ namespace GraphQL.Resolvers
                 return func(bodyExpression, resolveFieldContextParameter);
             }
 
-            throw new InvalidOperationException("Method must return a IObservable<T> or Task<IObservable<T>> where T is a reference type, or a IAsyncEnumerable<T> or Task<IAsyncEnumerable<T>>.");
+            throw new InvalidOperationException("Method must return a IObservable<T>, Task<IObservable<T>> or ValueTask<IObservable<T>> where T is a reference type, or a IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or ValueTask<IAsyncEnumerable<T>>.");
 
             Func<IResolveFieldContext, ValueTask<IObservable<object?>>> Compile(Expression taskBodyExpression)
             {
