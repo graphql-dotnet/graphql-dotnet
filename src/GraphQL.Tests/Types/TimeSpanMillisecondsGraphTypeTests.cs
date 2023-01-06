@@ -40,7 +40,7 @@ public class TimeSpanMillisecondsGraphTypeTests
         CultureTestHelper.UseCultures(() => Should.Throw<InvalidOperationException>(() => _type.Serialize("foo")));
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(TimeSpanMillisecondsGraphTypeTestsData))]
     public void serialize_numerics(object value)
     {
@@ -96,7 +96,7 @@ public class TimeSpanMillisecondsGraphTypeTests
         });
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(TimeSpanMillisecondsGraphTypeTestsData))]
     public void parsevalue_to_timespan(object value)
     {
