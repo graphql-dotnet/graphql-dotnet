@@ -21,6 +21,8 @@ namespace GraphQL.Types
     /// </summary>
     public class SchemaTypes : IEnumerable<IGraphType>
     {
+        private const string INITIALIZATIION_TRACE_KEY = "__INITIALIZATIION_TRACE_KEY__";
+
         /// <summary>
         /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
         /// </summary>
@@ -174,17 +176,21 @@ namespace GraphQL.Types
 
             // Add manually-added scalar types. To allow overriding of built-in scalars, these must be added
             // prior to adding any other types (including introspection types).
-            foreach (var type in typeInstances)
+            using (_context.Trace("Loop over manually-added scalar types from AdditionalTypeInstances"))
             {
-                if (type is ScalarGraphType)
-                    AddType(type, _context);
+                foreach (var type in typeInstances)
+                {
+                    if (type is ScalarGraphType)
+                        AddType(type, _context);
+                }
             }
 
             // Add introspection types. Note that introspection types rely on the
             // CamelCaseNameConverter, as some fields are defined in pascal case - e.g. Field(x => x.Name)
             _nameConverter = CamelCaseNameConverter.Instance;
 
-            AddType(_introspectionTypes[typeof(__Schema)], _context);
+            using (_context.Trace("__Schema root type"))
+                AddType(_introspectionTypes[typeof(__Schema)], _context);
 
             // set the name converter properly
             _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
@@ -195,31 +201,45 @@ namespace GraphQL.Types
                 {
                     if (this[name] == null)
                     {
+                        using var _ = context.Trace("TypeCollectionContext.AddType delegate");
                         AddType(graphType, context);
                     }
                 },
                 graphTypeMappings,
                 schema);
 
-            foreach (var type in typeInstances)
+            using (ctx.Trace("Loop over manually-added non-scalar types from AdditionalTypeInstances"))
             {
-                if (type is not ScalarGraphType)
-                    AddTypeIfNotRegistered(type, ctx);
+                foreach (var type in typeInstances)
+                {
+                    if (type is not ScalarGraphType)
+                        AddTypeIfNotRegistered(type, ctx);
+                }
             }
 
-            foreach (var type in types)
+            using (ctx.Trace("Loop over manually-added types from AdditionalTypes"))
             {
-                AddTypeIfNotRegistered(type, ctx);
+                foreach (var type in types)
+                {
+                    AddTypeIfNotRegistered(type, ctx);
+                }
             }
 
             // these fields must not have their field names translated by INameConverter; see HandleField
-            HandleField(null, SchemaMetaFieldType, ctx, false);
-            HandleField(null, TypeMetaFieldType, ctx, false);
-            HandleField(null, TypeNameMetaFieldType, ctx, false);
+            using (ctx.Trace("__schema root field"))
+                HandleField(null, SchemaMetaFieldType, ctx, false);
+            using (ctx.Trace("__type root field"))
+                HandleField(null, TypeMetaFieldType, ctx, false);
+            using (ctx.Trace("__typename root field"))
+                HandleField(null, TypeNameMetaFieldType, ctx, false);
 
-            foreach (var directive in directives)
+            using (ctx.Trace("Loop for directives"))
             {
-                HandleDirective(directive, ctx);
+                foreach (var directive in directives)
+                {
+                    using var _ = ctx.Trace($"Directive '{directive.Name}'");
+                    HandleDirective(directive, ctx);
+                }
             }
 
             ApplyTypeReferences();
@@ -228,6 +248,8 @@ namespace GraphQL.Types
             InheritInterfaceDescriptions();
 
             Debug.Assert(ctx.InFlightRegisteredTypes.Count == 0);
+            Debug.Assert((ctx.InitializationTrace?.Count ?? 0) == 0);
+            Debug.Assert((_context.InitializationTrace?.Count ?? 0) == 0);
 
             _typeDictionary = null!; // not needed once initialization is complete
         }
@@ -440,20 +462,26 @@ namespace GraphQL.Types
             }
 
             type.Initialize(context.Schema);
+            if (context.InitializationTrace != null)
+                type.WithMetadata(GraphType.INITIALIZATIION_TRACE_KEY, string.Join(Environment.NewLine, context.InitializationTrace));
             SetGraphType(type.Name, type);
 
             if (type is IComplexGraphType complexType)
             {
+                using var _ = context.Trace($"Loop for fields of complex type '{complexType.Name}'");
                 foreach (var field in complexType.Fields)
                 {
+                    using var __ = context.Trace($"Field '{complexType.Name}.{field.Name}'");
                     HandleField(complexType, field, context, true);
                 }
             }
 
             if (type is IObjectGraphType obj)
             {
+                using var _ = context.Trace($"Loop for interfaces of object type '{obj.Name}'");
                 foreach (var objectInterface in obj.Interfaces.List)
                 {
+                    using var __ = context.Trace($"Interface '{objectInterface.Name}'");
                     object typeOrError = RebuildType(objectInterface, false, context.ClrToGraphTypeMappings);
                     if (typeOrError is string error)
                         throw new InvalidOperationException($"The GraphQL implemented type '{objectInterface.GetFriendlyName()}' for object graph type '{type.Name}' could not be derived implicitly. " + error);
@@ -476,6 +504,7 @@ namespace GraphQL.Types
 
             if (type is UnionGraphType union)
             {
+                using var _ = context.Trace($"Loop for possible types of union type '{union.Name}'");
                 if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
                     throw new InvalidOperationException($"Must provide types for Union '{union}'.");
@@ -483,6 +512,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.PossibleTypes)
                 {
+                    using var __ = context.Trace($"Possible graph type '{unionedType.Name}'");
                     // skip references
                     if (unionedType is GraphQLTypeReference)
                         continue;
@@ -500,6 +530,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
+                    using var __ = context.Trace($"Possible clr type '{unionedType.Name}'");
                     object typeOrError = RebuildType(unionedType, false, context.ClrToGraphTypeMappings);
                     if (typeOrError is string error)
                         throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. " + error);
@@ -559,8 +590,11 @@ namespace GraphQL.Types
 
             if (field.Arguments?.Count > 0)
             {
+                using var _ = context.Trace($"Loop for arguments of field '{field.Name}'");
                 foreach (var arg in field.Arguments.List!)
                 {
+                    using var __ = context.Trace($"Argument '{arg.Name}'");
+
                     if (applyNameConverter)
                     {
                         arg.Name = _nameConverter.NameForArgument(arg.Name, parentType!, field);
@@ -592,8 +626,10 @@ namespace GraphQL.Types
         {
             if (directive.Arguments?.Count > 0)
             {
+                using var _ = context.Trace($"Loop for arguments of directive '{directive.Name}'");
                 foreach (var arg in directive.Arguments.List!)
                 {
+                    using var __ = context.Trace($"Argument '{arg.Name}'");
                     if (arg.ResolvedType == null)
                     {
                         if (arg.Type == null)
@@ -629,6 +665,7 @@ Make sure that your ServiceProvider is configured correctly.");
             context.InFlightRegisteredTypes.Push(namedType);
             try
             {
+                using var _ = context.Trace($"AddTypeWithLoopCheck for type '{namedType.Name}'");
                 AddType(resolvedType, context);
             }
             finally
@@ -639,6 +676,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private IGraphType AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
+            using var _ = context.Trace($"AddTypeIfNotRegistered(Type, TypeCollectionContext) for type '{type.Name}'");
             var namedType = type.GetNamedType();
             var foundType = FindGraphType(namedType);
             if (foundType == null)
@@ -656,7 +694,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
                 {
                     foundType = builtInCustomScalar;
-                    AddType(foundType, _context);
+                    AddType(foundType, context);
                 }
                 else
                 {
@@ -672,6 +710,8 @@ Make sure that your ServiceProvider is configured correctly.");
             var (namedType, namedType2) = type.GetNamedTypes();
             namedType ??= context.ResolveType(namedType2!);
 
+            using var _ = context.Trace($"AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type '{namedType.Name}'");
+
             var existingType = this[namedType.Name];
             if (existingType is null)
             {
@@ -679,11 +719,11 @@ Make sure that your ServiceProvider is configured correctly.");
             }
             else
             {
-                EnsureTypeEquality(existingType, namedType);
+                EnsureTypeEquality(existingType, namedType, context);
             }
         }
 
-        private void EnsureTypeEquality(IGraphType existingType, IGraphType newType)
+        private void EnsureTypeEquality(IGraphType existingType, IGraphType newType, TypeCollectionContext context)
         {
             if (ReferenceEquals(existingType, newType))
             {
@@ -702,7 +742,21 @@ Make sure that your ServiceProvider is configured correctly.");
             }
 
             // All other types are considered "potentially wrong" when being re-registered, throw detailed exception
-            throw new InvalidOperationException($"A different instance of the GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use {nameof(GraphQLTypeReference)} to reference a type instantiated elsewhere.");
+            throw new InvalidOperationException(ErrorMessage());
+
+            string ErrorMessage()
+            {
+                string error = $"A different instance of the GraphType '{newType.GetType().GetFriendlyName()}' with the name '{newType.Name}' has already been registered within the schema. Please use the same instance for all references within the schema, or use {nameof(GraphQLTypeReference)} to reference a type instantiated elsewhere.";
+                var traceInfo = $"To view additional trace enable {nameof(GlobalSwitches)}.{nameof(GlobalSwitches.TrackGraphTypeInitialization)} switch.";
+                if (GlobalSwitches.TrackGraphTypeInitialization)
+                {
+                    var trace1 = $"Existing type trace:{Environment.NewLine}{Environment.NewLine}{existingType.GetMetadata<string>(GraphType.INITIALIZATIION_TRACE_KEY)}";
+                    var trace2 = $"New type trace:{Environment.NewLine}{Environment.NewLine}{(context.InitializationTrace == null ? "" : string.Join(Environment.NewLine, context.InitializationTrace))}";
+                    traceInfo = $"{trace1}{Environment.NewLine}{Environment.NewLine}{trace2}";
+                }
+
+                return $"{error}{Environment.NewLine}{traceInfo}";
+            }
         }
 
         private object RebuildType(Type type, bool input, IEnumerable<IGraphTypeMappingProvider>? typeMappings)

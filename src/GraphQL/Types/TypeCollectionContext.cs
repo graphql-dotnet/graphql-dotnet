@@ -20,6 +20,8 @@ namespace GraphQL.Types
             AddType = addType;
             ClrToGraphTypeMappings = typeMappings;
             Schema = schema;
+            if (GlobalSwitches.TrackGraphTypeInitialization)
+                InitializationTrace = new();
         }
 
         /// <summary>
@@ -37,5 +39,25 @@ namespace GraphQL.Types
         internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
 
         internal ISchema Schema { get; }
+
+        internal List<string>? InitializationTrace { get; set; }
+
+        internal TypeCollectionContextInitializationTrace Trace(string traceElement) => new(this, traceElement);
+    }
+
+    internal readonly struct TypeCollectionContextInitializationTrace : IDisposable
+    {
+        private readonly TypeCollectionContext _context;
+
+        public TypeCollectionContextInitializationTrace(TypeCollectionContext context, string traceElement)
+        {
+            _context = context;
+            context.InitializationTrace?.Add(traceElement);
+        }
+
+        public void Dispose()
+        {
+            _context.InitializationTrace?.RemoveAt(_context.InitializationTrace.Count - 1);
+        }
     }
 }

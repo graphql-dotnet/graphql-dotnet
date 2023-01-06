@@ -66,6 +66,13 @@ public static class GlobalSwitches
     public static bool UseDeclaringTypeNames { get; set; } = false;
 
     /// <summary>
+    /// Enable this switch to see additional debugging information in exception messages during schema initialization.
+    /// <br/>
+    /// By default disabled.
+    /// </summary>
+    public static bool TrackGraphTypeInitialization { get; set; } = true;
+
+    /// <summary>
     /// A collection of global <see cref="GraphQLAttribute"/> instances which are applied while
     /// <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>,
     /// <see cref="Types.AutoRegisteringInputObjectGraphType{TSourceType}">AutoRegisteringInputObjectGraphType</see>,
