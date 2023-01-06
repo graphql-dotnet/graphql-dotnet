@@ -74,7 +74,7 @@ namespace GraphQL.Types
 
         public void Dispose()
         {
-            _context.InitializationTrace?.RemoveAt(_context.InitializationTrace.Count - 1);
+            _context?.InitializationTrace?.RemoveAt(_context.InitializationTrace.Count - 1);
         }
     }
 }
