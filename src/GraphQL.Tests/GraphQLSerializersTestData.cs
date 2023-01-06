@@ -8,8 +8,9 @@ namespace GraphQL.Tests;
 public class GraphQLSerializersTestData : IEnumerable<object[]>
 {
     // See https://github.com/xunit/xunit/issues/1473
-    // Without this wrapper test output is cluttered with tons of messages like that:
+    // Without this wrapper test output is cluttered with tons of xUnit warnings like that:
     // GraphQL.Tests: Non-serializable data ('System.Object[]') found for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests.ToAST_Test'; falling back to single test case.
+    // Also see TheoryExAttribute and TheoryExDiscoverer
     private class Wrapper : IGraphQLTextSerializer, IXunitSerializable
     {
         private IGraphQLTextSerializer _serializer = null!;
@@ -40,7 +41,7 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
             else if (type == "GraphQL.SystemTextJson.GraphQLSerializer")
                 _serializer = CreateSTJ();
             else
-                throw new NotSupportedException("Unknows serializer: " + type);
+                throw new NotSupportedException("Unknown serializer: " + type);
         }
 
         public void Serialize(IXunitSerializationInfo info)

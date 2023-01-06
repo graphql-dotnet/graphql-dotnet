@@ -57,7 +57,7 @@ public class PrintTests
         token.Value.ShouldBe(sample);
     }
 
-    [Theory]
+    [TheoryEx]
     [MemberData(nameof(NodeTests))]
     public void prints_node(ASTNode node, string expected)
     {
@@ -73,7 +73,7 @@ public class PrintTests
         }
     }
 
-    [Theory]
+    [TheoryEx]
     [MemberData(nameof(NodeTests))]
     public void prints_node_cultures(ASTNode node, string expected)
     {

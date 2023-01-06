@@ -76,7 +76,7 @@ public class GetGraphTypeFromTypeTests
     public void GetGraphTypeFromType_ForOpenGeneric_ThrowsArgumentOutOfRangeException() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => typeof(List<>).GetGraphTypeFromType(true));
 
-    [Theory]
+    [TheoryEx]
     //built-in mapping mode
     [InlineData(typeof(byte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ByteGraphType))]
     [InlineData(typeof(sbyte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(SByteGraphType))]
