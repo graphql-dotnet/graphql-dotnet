@@ -49,7 +49,7 @@ namespace GraphQL.Resolvers
             }
 
             // Task<T>
-            if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
+            else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
             {
                 var type = bodyExpression.Type.GetGenericArguments()[0];
 
