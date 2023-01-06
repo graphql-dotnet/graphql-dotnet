@@ -694,7 +694,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
                 {
                     foundType = builtInCustomScalar;
-                    AddType(foundType, context);
+                    AddType(foundType, _context); // TODO: why _context instead of context here? See https://github.com/graphql-dotnet/graphql-dotnet/pull/3488
                 }
                 else
                 {
