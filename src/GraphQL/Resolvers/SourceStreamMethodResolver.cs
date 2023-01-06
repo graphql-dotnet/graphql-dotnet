@@ -200,7 +200,7 @@ namespace GraphQL.Resolvers
                 }
                 public void OnCompleted() => _observer.OnCompleted();
                 public void OnError(Exception error) => _observer.OnError(error);
-                public void OnNext(T value) => _observer.OnNext(value);  //<--- boxing here
+                public void OnNext(T value) => _observer.OnNext(value); // note: boxing here
             }
         }
     }
