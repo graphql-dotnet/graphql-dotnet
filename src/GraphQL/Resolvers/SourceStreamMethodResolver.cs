@@ -92,8 +92,6 @@ namespace GraphQL.Resolvers
                     var func = method.CreateDelegate<Func<Expression, ParameterExpression, Func<IResolveFieldContext, ValueTask<IObservable<object?>>>>>();
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
-
-                throw new InvalidOperationException("If method returns ValueTask<T> than T must be of type IObservable<> or IAsyncEnumerable<>");
             }
 
             // IObservable<T>
