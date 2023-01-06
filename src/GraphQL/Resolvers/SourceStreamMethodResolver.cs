@@ -44,9 +44,7 @@ namespace GraphQL.Resolvers
             // Task<IObservable<object?>>
             else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
-                var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
-                return Compile(Expression.New(constructor, bodyExpression));
+                return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
             // Task<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
@@ -56,14 +54,8 @@ namespace GraphQL.Resolvers
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
                     var innerType = type.GetGenericArguments()[0];
-                    if (!innerType.IsValueType)
-                    {
-                        return Compile(Expression.Call(_castFromTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
-                    else
-                    {
-                        return Compile(Expression.Call(_castFromTask2AsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
+                    var method = innerType.IsValueType ? _castFromTask2AsyncMethodInfo : _castFromTaskAsyncMethodInfo;
+                    return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
                 // Task<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -82,14 +74,8 @@ namespace GraphQL.Resolvers
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
                     var innerType = type.GetGenericArguments()[0];
-                    if (!innerType.IsValueType)
-                    {
-                        return Compile(Expression.Call(_castFromValueTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
-                    else
-                    {
-                        return Compile(Expression.Call(_castFromValueTask2AsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
+                    var method = innerType.IsValueType ? _castFromValueTask2AsyncMethodInfo : _castFromValueTaskAsyncMethodInfo;
+                    return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
                 // ValueTask<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -110,9 +96,7 @@ namespace GraphQL.Resolvers
                     var ctor = adapterType.GetConstructor(new Type[] { bodyExpression.Type })!;
                     bodyExpression = Expression.New(ctor, bodyExpression);
                 }
-                var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(IObservable<object?>) })!;
-                return Compile(Expression.New(constructor, bodyExpression));
+                return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
             // IAsyncEnumerable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -131,6 +115,8 @@ namespace GraphQL.Resolvers
                 return lambda.Compile();
             }
         }
+
+        private static readonly ConstructorInfo _valueTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
 
         private static readonly MethodInfo _convertFromAsyncEnumerableMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(ConvertFromAsyncEnumerable), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static Func<IResolveFieldContext, ValueTask<IObservable<object?>>> ConvertFromAsyncEnumerable<T>(Expression body, ParameterExpression resolveFieldContextParameter)
