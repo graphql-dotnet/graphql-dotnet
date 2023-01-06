@@ -85,7 +85,7 @@ namespace GraphQL.Resolvers
                 }
 
                 // ValueTask<IAsyncEnumerable<T>>
-                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+                else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
                     var innerType = type.GetGenericArguments()[0];
                     var method = _convertFromValueTaskAsyncEnumerableMethodInfo.MakeGenericMethod(innerType);
