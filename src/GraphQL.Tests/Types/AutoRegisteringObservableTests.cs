@@ -27,6 +27,7 @@ public class AutoRegisteringObservableTests
     [InlineData(nameof(TestClass.ListOfStrings3))]
     [InlineData(nameof(TestClass.ListOfStrings4))]
     [InlineData(nameof(TestClass.ListOfStrings5))]
+    [InlineData(nameof(TestClass.ListOfStrings6))]
     public async Task Observable_Basic(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
@@ -40,6 +41,7 @@ public class AutoRegisteringObservableTests
     [InlineData(nameof(TestClass.ListOfNumbers3))]
     [InlineData(nameof(TestClass.ListOfNumbers4))]
     [InlineData(nameof(TestClass.ListOfNumbers5))]
+    [InlineData(nameof(TestClass.ListOfNumbers6))]
     public async Task Observable_Value(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
@@ -245,7 +247,8 @@ public class AutoRegisteringObservableTests
         [OutputType(typeof(StringGraphType))]
         public static IObservable<object> ListOfStrings4() => new object[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static async ValueTask<IObservable<object>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
+        public static async Task<IObservable<object>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
+        public static async ValueTask<IObservable<object>> ListOfStrings6() => new object[] { "a", "b", "c" }.ToObservable();
 
         public static IObservable<int> ListOfNumbers1() => new int[] { 1, 2, 3 }.ToObservable();
         public static async Task<IObservable<int>> ListOfNumbers2() => new int[] { 1, 2, 3 }.ToObservable();
@@ -253,7 +256,8 @@ public class AutoRegisteringObservableTests
         [OutputType(typeof(IntGraphType))]
         public static IObservable<object> ListOfNumbers4() => new object[] { 1, 2, 3 }.ToObservable();
         [OutputType(typeof(IntGraphType))]
-        public static async ValueTask<IObservable<object>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
+        public static async Task<IObservable<object>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
+        public static async ValueTask<IObservable<object>> ListOfNumbers6() => new object[] { 1, 2, 3 }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
         public static async Task<IObservable<string>> ReturnError2() => Observable.Throw<string>(new Exception("sample error"));
