@@ -26,7 +26,26 @@ public class Bug3331
         schema.Query = queryGraphType;
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("A different instance of the GraphType 'MyObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
+            .Message.ShouldBe(@"A different instance of the GraphType 'MyObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.
+Existing type trace:
+
+Loop over manually-added non-scalar types from AdditionalTypeInstances
+AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'Query'
+Loop for fields of complex type 'Query'
+Field 'Query.MyObject'
+AddTypeIfNotRegistered(Type, TypeCollectionContext) for type 'MyObjectGraphType'
+AddTypeWithLoopCheck for type 'MyObjectGraphType'
+
+New type trace:
+
+Loop over manually-added non-scalar types from AdditionalTypeInstances
+AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'Query'
+Loop for fields of complex type 'Query'
+Field 'Query.MyObjects'
+AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'MyObjectDataResult'
+Loop for fields of complex type 'MyObjectDataResult'
+Field 'MyObjectDataResult.Data'
+AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'MyObject'");
 
         // Must have 2 instances
         MyObjectGraphType.SharedInstanceCounter.ShouldBe(2);

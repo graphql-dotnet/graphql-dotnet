@@ -463,7 +463,7 @@ namespace GraphQL.Types
 
             type.Initialize(context.Schema);
             if (context.InitializationTrace != null)
-                type.WithMetadata(GraphType.INITIALIZATIION_TRACE_KEY, string.Join(Environment.NewLine, context.InitializationTrace));
+                type.WithMetadata(INITIALIZATIION_TRACE_KEY, string.Join(Environment.NewLine, context.InitializationTrace));
             SetGraphType(type.Name, type);
 
             if (type is IComplexGraphType complexType)
@@ -750,7 +750,7 @@ Make sure that your ServiceProvider is configured correctly.");
                 var traceInfo = $"To view additional trace enable {nameof(GlobalSwitches)}.{nameof(GlobalSwitches.TrackGraphTypeInitialization)} switch.";
                 if (GlobalSwitches.TrackGraphTypeInitialization)
                 {
-                    var trace1 = $"Existing type trace:{Environment.NewLine}{Environment.NewLine}{existingType.GetMetadata<string>(GraphType.INITIALIZATIION_TRACE_KEY)}";
+                    var trace1 = $"Existing type trace:{Environment.NewLine}{Environment.NewLine}{existingType.GetMetadata<string>(INITIALIZATIION_TRACE_KEY)}";
                     var trace2 = $"New type trace:{Environment.NewLine}{Environment.NewLine}{(context.InitializationTrace == null ? "" : string.Join(Environment.NewLine, context.InitializationTrace))}";
                     traceInfo = $"{trace1}{Environment.NewLine}{Environment.NewLine}{trace2}";
                 }
