@@ -43,7 +43,7 @@ namespace GraphQL.Resolvers
             }
 
             // Task<IObservable<object?>>
-            if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
+            else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
                 return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
