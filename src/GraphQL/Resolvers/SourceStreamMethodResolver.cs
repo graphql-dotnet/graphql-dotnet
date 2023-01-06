@@ -97,7 +97,7 @@ namespace GraphQL.Resolvers
             }
 
             // IObservable<T>
-            if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
+            else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
             {
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
                 if (innerType.IsValueType)
