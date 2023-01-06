@@ -36,7 +36,7 @@ namespace GraphQL.Resolvers
         /// </summary>
         protected virtual Func<IResolveFieldContext, ValueTask<IObservable<object?>>> BuildSourceStreamResolver(ParameterExpression resolveFieldContextParameter, Expression bodyExpression)
         {
-            // IObservable<object?>
+            // ValueTask<IObservable<object?>>
             if (bodyExpression.Type == typeof(ValueTask<IObservable<object?>>))
             {
                 return Compile(bodyExpression);
@@ -44,9 +44,7 @@ namespace GraphQL.Resolvers
             // Task<IObservable<object?>>
             else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
-                var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                var constructor = valueTaskType.GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
-                return Compile(Expression.New(constructor, bodyExpression));
+                return Compile(Expression.New(_valueTaskTaskObservableCtor, bodyExpression));
             }
             // Task<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
@@ -56,10 +54,8 @@ namespace GraphQL.Resolvers
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
                     var innerType = type.GetGenericArguments()[0];
-                    if (!innerType.IsValueType)
-                    {
-                        return Compile(Expression.Call(_castFromTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
+                    var method = innerType.IsValueType ? _castFromTask2AsyncMethodInfo : _castFromTaskAsyncMethodInfo;
+                    return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
                 // Task<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -78,10 +74,8 @@ namespace GraphQL.Resolvers
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
                     var innerType = type.GetGenericArguments()[0];
-                    if (!innerType.IsValueType)
-                    {
-                        return Compile(Expression.Call(_castFromValueTaskAsyncMethodInfo.MakeGenericMethod(innerType), bodyExpression));
-                    }
+                    var method = innerType.IsValueType ? _castFromValueTask2AsyncMethodInfo : _castFromValueTaskAsyncMethodInfo;
+                    return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
                 // ValueTask<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -96,12 +90,13 @@ namespace GraphQL.Resolvers
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
             {
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
-                if (!innerType.IsValueType)
+                if (innerType.IsValueType)
                 {
-                    var valueTaskType = typeof(ValueTask<IObservable<object?>>);
-                    var constructor = valueTaskType.GetConstructor(new Type[] { typeof(IObservable<object?>) })!;
-                    return Compile(Expression.New(constructor, bodyExpression));
+                    var adapterType = typeof(ObservableAdapter<>).MakeGenericType(innerType);
+                    var ctor = adapterType.GetConstructor(new Type[] { bodyExpression.Type })!;
+                    bodyExpression = Expression.New(ctor, bodyExpression);
                 }
+                return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
             // IAsyncEnumerable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
@@ -112,7 +107,7 @@ namespace GraphQL.Resolvers
                 return func(bodyExpression, resolveFieldContextParameter);
             }
 
-            throw new InvalidOperationException("Method must return a IObservable<T>, Task<IObservable<T>> or ValueTask<IObservable<T>> where T is a reference type, or a IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or ValueTask<IAsyncEnumerable<T>>.");
+            throw new InvalidOperationException("Method must return a IObservable<T>, Task<IObservable<T>>, ValueTask<IObservable<T>>, IAsyncEnumerable<T>, Task<IAsyncEnumerable<T>> or ValueTask<IAsyncEnumerable<T>>.");
 
             Func<IResolveFieldContext, ValueTask<IObservable<object?>>> Compile(Expression taskBodyExpression)
             {
@@ -120,6 +115,9 @@ namespace GraphQL.Resolvers
                 return lambda.Compile();
             }
         }
+
+        private static readonly ConstructorInfo _valueTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor(new Type[] { typeof(IObservable<object?>) })!;
+        private static readonly ConstructorInfo _valueTaskTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
 
         private static readonly MethodInfo _convertFromAsyncEnumerableMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(ConvertFromAsyncEnumerable), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static Func<IResolveFieldContext, ValueTask<IObservable<object?>>> ConvertFromAsyncEnumerable<T>(Expression body, ParameterExpression resolveFieldContextParameter)
@@ -149,13 +147,48 @@ namespace GraphQL.Resolvers
         private static async ValueTask<IObservable<object?>> CastFromValueTaskAsync<T>(ValueTask<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
 
+        private static readonly MethodInfo _castFromValueTask2AsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromValueTask2Async), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static async ValueTask<IObservable<object?>> CastFromValueTask2Async<T>(ValueTask<IObservable<T>> task)
+            => new ObservableAdapter<T>(await task.ConfigureAwait(false));
+
         private static readonly MethodInfo _castFromTaskAsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
         private static async ValueTask<IObservable<object?>> CastFromTaskAsync<T>(Task<IObservable<T>> task) where T : class
             => await task.ConfigureAwait(false);
+
+        private static readonly MethodInfo _castFromTask2AsyncMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(CastFromTask2Async), BindingFlags.Static | BindingFlags.NonPublic)!;
+        private static async ValueTask<IObservable<object?>> CastFromTask2Async<T>(Task<IObservable<T>> task)
+            => new ObservableAdapter<T>(await task.ConfigureAwait(false));
 
         /// <inheritdoc cref="ISourceStreamResolver.ResolveAsync(IResolveFieldContext)" />
         public ValueTask<IObservable<object?>> ResolveStreamAsync(IResolveFieldContext context) => _sourceStreamResolver(context);
 
         ValueTask<IObservable<object?>> ISourceStreamResolver.ResolveAsync(IResolveFieldContext context) => ResolveStreamAsync(context);
+
+        /// <summary>
+        /// Converts an <see cref="IObservable{T}"/> for value types into an <see cref="IObservable{T}">IObservable&lt;object?&gt;</see>.
+        /// </summary>
+        private sealed class ObservableAdapter<T> : IObservable<object?>
+        {
+            private readonly IObservable<T> _observable;
+
+            public ObservableAdapter(IObservable<T> observable)
+            {
+                _observable = observable;
+            }
+
+            public IDisposable Subscribe(IObserver<object?> observer) => _observable.Subscribe(new ObserverAdapter(observer));
+
+            private sealed class ObserverAdapter : IObserver<T>
+            {
+                private readonly IObserver<object?> _observer;
+                public ObserverAdapter(IObserver<object?> observer)
+                {
+                    _observer = observer;
+                }
+                public void OnCompleted() => _observer.OnCompleted();
+                public void OnError(Exception error) => _observer.OnError(error);
+                public void OnNext(T value) => _observer.OnNext(value); // note: boxing here
+            }
+        }
     }
 }
