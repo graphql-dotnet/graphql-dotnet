@@ -64,7 +64,7 @@ namespace GraphQL.Types
 
     internal readonly struct TypeCollectionContextInitializationTrace : IDisposable
     {
-        private readonly TypeCollectionContext _context;
+        private readonly TypeCollectionContext? _context;
 
         public TypeCollectionContextInitializationTrace(TypeCollectionContext context, string traceElement)
         {
