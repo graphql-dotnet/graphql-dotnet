@@ -41,18 +41,15 @@ namespace GraphQL.Resolvers
             {
                 return Compile(bodyExpression);
             }
-
             // Task<IObservable<object?>>
             else if (bodyExpression.Type == typeof(Task<IObservable<object?>>))
             {
                 return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
-
             // Task<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(Task<>))
             {
                 var type = bodyExpression.Type.GetGenericArguments()[0];
-
                 // Task<IObservable<T>>
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
@@ -60,7 +57,6 @@ namespace GraphQL.Resolvers
                     var method = innerType.IsValueType ? _castFromTask2AsyncMethodInfo : _castFromTaskAsyncMethodInfo;
                     return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
-
                 // Task<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
@@ -70,12 +66,10 @@ namespace GraphQL.Resolvers
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
             }
-
             // ValueTask<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(ValueTask<>))
             {
                 var type = bodyExpression.Type.GetGenericArguments()[0];
-
                 // ValueTask<IObservable<T>>
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IObservable<>))
                 {
@@ -83,7 +77,6 @@ namespace GraphQL.Resolvers
                     var method = innerType.IsValueType ? _castFromValueTask2AsyncMethodInfo : _castFromValueTaskAsyncMethodInfo;
                     return Compile(Expression.Call(method.MakeGenericMethod(innerType), bodyExpression));
                 }
-
                 // ValueTask<IAsyncEnumerable<T>>
                 else if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
                 {
@@ -93,7 +86,6 @@ namespace GraphQL.Resolvers
                     return func(bodyExpression, resolveFieldContextParameter);
                 }
             }
-
             // IObservable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IObservable<>))
             {
@@ -106,7 +98,6 @@ namespace GraphQL.Resolvers
                 }
                 return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
             }
-
             // IAsyncEnumerable<T>
             else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
             {
