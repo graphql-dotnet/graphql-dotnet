@@ -42,7 +42,24 @@ namespace GraphQL.Types
 
         internal List<string>? InitializationTrace { get; set; }
 
-        internal TypeCollectionContextInitializationTrace Trace(string traceElement) => new(this, traceElement);
+        internal TypeCollectionContextInitializationTrace Trace(string traceElement) =>
+            InitializationTrace == null
+                ? default
+                : new(this, traceElement);
+
+        internal TypeCollectionContextInitializationTrace Trace(string traceElement, object? arg1)
+        {
+            return InitializationTrace == null
+                ? default
+                : new(this, string.Format(traceElement, arg1));
+        }
+
+        internal TypeCollectionContextInitializationTrace Trace(string traceElement, object? arg1, object? arg2)
+        {
+            return InitializationTrace == null
+                ? default
+                : new(this, string.Format(traceElement, arg1, arg2));
+        }
     }
 
     internal readonly struct TypeCollectionContextInitializationTrace : IDisposable

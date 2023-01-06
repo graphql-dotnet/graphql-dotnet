@@ -237,7 +237,7 @@ namespace GraphQL.Types
             {
                 foreach (var directive in directives)
                 {
-                    using var _ = ctx.Trace($"Directive '{directive.Name}'");
+                    using var _ = ctx.Trace("Directive '{0}'", directive.Name);
                     HandleDirective(directive, ctx);
                 }
             }
@@ -468,20 +468,20 @@ namespace GraphQL.Types
 
             if (type is IComplexGraphType complexType)
             {
-                using var _ = context.Trace($"Loop for fields of complex type '{complexType.Name}'");
+                using var _ = context.Trace("Loop for fields of complex type '{0}'", complexType.Name);
                 foreach (var field in complexType.Fields)
                 {
-                    using var __ = context.Trace($"Field '{complexType.Name}.{field.Name}'");
+                    using var __ = context.Trace("Field '{0}.{1}'", complexType.Name, field.Name);
                     HandleField(complexType, field, context, true);
                 }
             }
 
             if (type is IObjectGraphType obj)
             {
-                using var _ = context.Trace($"Loop for interfaces of object type '{obj.Name}'");
+                using var _ = context.Trace("Loop for interfaces of object type '{0}'", obj.Name);
                 foreach (var objectInterface in obj.Interfaces.List)
                 {
-                    using var __ = context.Trace($"Interface '{objectInterface.Name}'");
+                    using var __ = context.Trace("Interface '{0}'", objectInterface.Name);
                     object typeOrError = RebuildType(objectInterface, false, context.ClrToGraphTypeMappings);
                     if (typeOrError is string error)
                         throw new InvalidOperationException($"The GraphQL implemented type '{objectInterface.GetFriendlyName()}' for object graph type '{type.Name}' could not be derived implicitly. " + error);
@@ -504,7 +504,7 @@ namespace GraphQL.Types
 
             if (type is UnionGraphType union)
             {
-                using var _ = context.Trace($"Loop for possible types of union type '{union.Name}'");
+                using var _ = context.Trace("Loop for possible types of union type '{0}'", union.Name);
                 if (!union.Types.Any() && !union.PossibleTypes.Any())
                 {
                     throw new InvalidOperationException($"Must provide types for Union '{union}'.");
@@ -512,7 +512,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.PossibleTypes)
                 {
-                    using var __ = context.Trace($"Possible graph type '{unionedType.Name}'");
+                    using var __ = context.Trace("Possible graph type '{0}'", unionedType.Name);
                     // skip references
                     if (unionedType is GraphQLTypeReference)
                         continue;
@@ -530,7 +530,7 @@ namespace GraphQL.Types
 
                 foreach (var unionedType in union.Types)
                 {
-                    using var __ = context.Trace($"Possible clr type '{unionedType.Name}'");
+                    using var __ = context.Trace("Possible clr type '{0}'", unionedType.Name);
                     object typeOrError = RebuildType(unionedType, false, context.ClrToGraphTypeMappings);
                     if (typeOrError is string error)
                         throw new InvalidOperationException($"The GraphQL type '{unionedType.GetFriendlyName()}' for union graph type '{type.Name}' could not be derived implicitly. " + error);
@@ -590,10 +590,10 @@ namespace GraphQL.Types
 
             if (field.Arguments?.Count > 0)
             {
-                using var _ = context.Trace($"Loop for arguments of field '{field.Name}'");
+                using var _ = context.Trace("Loop for arguments of field '{0}'", field.Name);
                 foreach (var arg in field.Arguments.List!)
                 {
-                    using var __ = context.Trace($"Argument '{arg.Name}'");
+                    using var __ = context.Trace("Argument '{0}'", arg.Name);
 
                     if (applyNameConverter)
                     {
@@ -626,10 +626,10 @@ namespace GraphQL.Types
         {
             if (directive.Arguments?.Count > 0)
             {
-                using var _ = context.Trace($"Loop for arguments of directive '{directive.Name}'");
+                using var _ = context.Trace("Loop for arguments of directive '{0}'", directive.Name);
                 foreach (var arg in directive.Arguments.List!)
                 {
-                    using var __ = context.Trace($"Argument '{arg.Name}'");
+                    using var __ = context.Trace("Argument '{0}'", arg.Name);
                     if (arg.ResolvedType == null)
                     {
                         if (arg.Type == null)
@@ -665,7 +665,7 @@ Make sure that your ServiceProvider is configured correctly.");
             context.InFlightRegisteredTypes.Push(namedType);
             try
             {
-                using var _ = context.Trace($"AddTypeWithLoopCheck for type '{namedType.Name}'");
+                using var _ = context.Trace("AddTypeWithLoopCheck for type '{0}'", namedType.Name);
                 AddType(resolvedType, context);
             }
             finally
@@ -676,7 +676,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
         private IGraphType AddTypeIfNotRegistered(Type type, TypeCollectionContext context)
         {
-            using var _ = context.Trace($"AddTypeIfNotRegistered(Type, TypeCollectionContext) for type '{type.Name}'");
+            using var _ = context.Trace("AddTypeIfNotRegistered(Type, TypeCollectionContext) for type '{0}'", type.Name);
             var namedType = type.GetNamedType();
             var foundType = FindGraphType(namedType);
             if (foundType == null)
@@ -710,7 +710,7 @@ Make sure that your ServiceProvider is configured correctly.");
             var (namedType, namedType2) = type.GetNamedTypes();
             namedType ??= context.ResolveType(namedType2!);
 
-            using var _ = context.Trace($"AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type '{namedType.Name}'");
+            using var _ = context.Trace("AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type '{0}'", namedType.Name);
 
             var existingType = this[namedType.Name];
             if (existingType is null)
