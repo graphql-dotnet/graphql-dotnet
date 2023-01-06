@@ -27,16 +27,16 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns a delegate which returns an instance of a graph type from its .NET type.
         /// </summary>
-        internal Func<Type, IGraphType> ResolveType { get; private set; }
+        internal Func<Type, IGraphType> ResolveType { get; }
 
         /// <summary>
         /// Returns a delegate which adds a graph type instance to the list of named graph types for the schema.
         /// </summary>
-        internal Action<string, IGraphType, TypeCollectionContext> AddType { get; private set; }
+        internal Action<string, IGraphType, TypeCollectionContext> AddType { get; }
 
-        internal IEnumerable<IGraphTypeMappingProvider>? ClrToGraphTypeMappings { get; private set; }
+        internal IEnumerable<IGraphTypeMappingProvider>? ClrToGraphTypeMappings { get; }
 
-        internal Stack<Type> InFlightRegisteredTypes { get; } = new Stack<Type>();
+        internal Stack<Type> InFlightRegisteredTypes { get; } = new();
 
         internal ISchema Schema { get; }
 

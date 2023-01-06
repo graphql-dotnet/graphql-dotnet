@@ -85,21 +85,7 @@ public class SchemaTypesTests
         // Test
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
             .Message.ShouldBe(@"A different instance of the GraphType 'ObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.
-Existing type trace:
-
-Loop over manually-added non-scalar types from AdditionalTypeInstances
-AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'Query'
-Loop for fields of complex type 'Query'
-Field 'Query.first'
-AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'MyObject'
-
-New type trace:
-
-Loop over manually-added non-scalar types from AdditionalTypeInstances
-AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'Query'
-Loop for fields of complex type 'Query'
-Field 'Query.second'
-AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type 'MyObject'");
+To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization switch.");
     }
 
     [Fact]

@@ -70,7 +70,7 @@ public static class GlobalSwitches
     /// <br/>
     /// By default disabled.
     /// </summary>
-    public static bool TrackGraphTypeInitialization { get; set; } = true;
+    public static bool TrackGraphTypeInitialization { get; set; } = false;
 
     /// <summary>
     /// A collection of global <see cref="GraphQLAttribute"/> instances which are applied while
