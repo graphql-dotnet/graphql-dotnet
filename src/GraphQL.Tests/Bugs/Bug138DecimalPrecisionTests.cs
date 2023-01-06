@@ -7,13 +7,13 @@ public class Bug138DecimalPrecisionTests : QueryTestBase<DecimalSchema>
     [Fact]
     public void double_to_decimal_does_not_lose_precision()
     {
-        var query = """
+        const string query = """
                 mutation SetState{
                     set(request:24.15)
                 }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "data": {
                 "set": 24.15
@@ -41,7 +41,7 @@ public class DecimalMutation : ObjectGraphType
             .Argument<DecimalGraphType>("request")
             .Resolve(context =>
             {
-                var val = context.GetArgument<decimal>("request");
+                decimal val = context.GetArgument<decimal>("request");
                 val.ShouldBe(24.15m);
                 return val;
             });

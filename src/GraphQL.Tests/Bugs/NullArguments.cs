@@ -7,12 +7,12 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
     [Fact]
     public void Supports_partially_nullable_fields_on_arguments()
     {
-        var query = """
+        const string query = """
             mutation {
               run(input: {id:null, foo:null,bar:null})
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "run": "idfoobar"
             }
@@ -23,7 +23,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
     [Fact]
     public void Supports_non_null_int()
     {
-        var query = """
+        const string query = """
             mutation {
               run(input: {id:105, foo:null,bar:{id: null, foo:"a", bar:{id:101}}})
             }
@@ -40,7 +40,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
     [Fact]
     public void Supports_non_null_string()
     {
-        var query = """
+        const string query = """
             mutation {
               run(input: {id:105, foo:null,bar:{id: 1, foo:null, bar:{id:101}}})
             }
@@ -57,7 +57,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
     [Fact]
     public void Supports_non_null_object()
     {
-        var query = """
+        const string query = """
             mutation {
               run(input: {id:105, foo:null,bar:{id: 1, foo:"abc", bar:null}})
             }
@@ -90,7 +90,7 @@ public class NullMutation : ObjectGraphType
             .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<NullInputClass>("input");
-                var r = (arg.Id == null ? "id" : string.Empty) +
+                string r = (arg.Id == null ? "id" : string.Empty) +
                       (arg.Foo == null ? "foo" : string.Empty) +
                       (arg.Bar == null ? "bar" : string.Empty);
                 return r;

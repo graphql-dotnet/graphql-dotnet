@@ -28,7 +28,7 @@ public class ShowDownTests
 
     private void buildMany(IDocumentBuilder builder)
     {
-        var query = _query; // SchemaIntrospection.IntrospectionQuery;
+        const string query = _query; // SchemaIntrospection.IntrospectionQuery;
         build(query, builder, 1);
         build(query, builder, 10);
         build(query, builder, 100);
@@ -44,7 +44,7 @@ public class ShowDownTests
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             builder.Build(query);
         }

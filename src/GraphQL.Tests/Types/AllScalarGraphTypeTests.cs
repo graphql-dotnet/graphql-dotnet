@@ -213,7 +213,7 @@ public class AllScalarGraphTypeTests
                 continue;
             }
             g.CanParseValue(converted).ShouldBeTrue();
-            var parsed = g.ParseValue(converted);
+            object parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -266,7 +266,7 @@ public class AllScalarGraphTypeTests
         var g = Create(graphType);
         object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
         g.CanParseValue(converted).ShouldBeTrue();
-        var parsed = g.ParseValue(converted);
+        object parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
 #if NET5_0_OR_GREATER
         if (parsed is Half h1 && value is Half h2)
@@ -323,10 +323,10 @@ public class AllScalarGraphTypeTests
 #endif
 
         var g = Create(graphType);
-        var valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+        string valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
         object converted = $"{{ \"arg\": {valueString} }}".ToDictionary()["arg"];
         g.CanParseValue(converted).ShouldBeTrue($"Converted value: {converted}, Type: {converted.GetType()}");
-        var parsed = g.ParseValue(converted);
+        object parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
 #if NET5_0_OR_GREATER
         if (parsed is Half h1 && value is Half h2)
@@ -401,7 +401,7 @@ public class AllScalarGraphTypeTests
             }
 
             g.CanParseLiteral(astValue).ShouldBeTrue();
-            var parsed = g.ParseLiteral(astValue);
+            object parsed = g.ParseLiteral(astValue);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -481,7 +481,7 @@ public class AllScalarGraphTypeTests
             {
                 continue;
             }
-            var parsed = g.Serialize(converted);
+            object parsed = g.Serialize(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -595,7 +595,7 @@ public class AllScalarGraphTypeTests
     public void parseValue_other_ok(Type graphType, object value, object parsed)
     {
         var g = Create(graphType);
-        var ret = g.ParseValue(value);
+        object ret = g.ParseValue(value);
         ret.ShouldBeOfType(parsed.GetType());
         ret.ShouldBe(parsed);
         g.CanParseValue(value).ShouldBeTrue();
@@ -621,7 +621,7 @@ public class AllScalarGraphTypeTests
         };
 
         var g = Create(graphType);
-        var ret = g.ParseLiteral(astValue);
+        object ret = g.ParseLiteral(astValue);
         ret.ShouldBeOfType(parsed.GetType());
         ret.ShouldBe(parsed);
         g.CanParseLiteral(astValue).ShouldBeTrue();
@@ -637,7 +637,7 @@ public class AllScalarGraphTypeTests
     public void serialize_other_ok(Type graphType, object value, object serialized)
     {
         var g = Create(graphType);
-        var ret = g.Serialize(value);
+        object ret = g.Serialize(value);
         ret.ShouldBeOfType(serialized.GetType());
         ret.ShouldBe(serialized);
         g.CanParseValue(value).ShouldBeTrue();

@@ -88,7 +88,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"{{ {field}(arg: {quotedArg}) }}", expectedResult,
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
@@ -131,7 +131,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"query ($arg: {argumentType}) {{ {field}(arg: $arg) }}", expectedResult, $"{{ \"arg\": {quotedArg} }}".ToInputs(),
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
@@ -158,10 +158,10 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     public void List_NonNull_works_invalid()
     {
         // verify that within lists of non-null values, errors are returned properly
-        var query = "{ listNonNullInvalid }";
-        var response = """{ "listNonNullInvalid": null}""";
+        const string query = "{ listNonNullInvalid }";
+        const string response = """{ "listNonNullInvalid": null}""";
         var result = AssertQueryWithErrors(query, response, expectedErrorCount: 1);
-        var errorIndex = 1;
+        const int errorIndex = 1;
         // index should be 1 here because custom scalar will convert ["hello", "internalNull"] to ["hello", null]
         result.Errors.ShouldNotBeNull();
         result.Errors.Count.ShouldBe(1);

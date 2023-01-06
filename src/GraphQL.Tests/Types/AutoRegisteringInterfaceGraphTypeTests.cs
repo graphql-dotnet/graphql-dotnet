@@ -491,7 +491,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
             RequestServices = provider,
         }).ConfigureAwait(false);
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var actual = serializer.Serialize(result);
+        string actual = serializer.Serialize(result);
         actual.ShouldBeCrossPlatJson(expected);
     }
 

@@ -7,14 +7,14 @@ public class ListWithNullablesTest : QueryTestBase<ListWithNullablesSchema>
     [Fact]
     public void Can_Accept_Null_List_From_Literal()
     {
-        var query = """
+        const string query = """
             query _ {
                 list {
                 value
                 }
             }
             """;
-        var expected = """
+        const string expected = """
             {
                 "list": [{ "value": "one"}, null, { "value": "three" }]
             }

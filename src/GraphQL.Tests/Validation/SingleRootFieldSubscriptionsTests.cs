@@ -34,7 +34,7 @@ public class SingleRootFieldSubscriptionsTests
     [Fact]
     public void Fails_with_more_than_one_root_field_in_anonymous_subscription()
     {
-        string query = """
+        const string query = """
                 subscription {
                     field
                     field2
@@ -51,7 +51,7 @@ public class SingleRootFieldSubscriptionsTests
     [Fact]
     public void Fails_with_more_than_one_root_field_including_introspection_in_anonymous_subscription()
     {
-        string query = """
+        const string query = """
                 subscription {
                     field
                     __typename

@@ -20,7 +20,7 @@ public class InputsConverterTests
     [Fact]
     public void Throws_For_Deep_Objects()
     {
-        var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+        string value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
         Should.Throw<JsonException>(() => JsonSerializer.Deserialize<Inputs>(value, _options));
     }
 
@@ -43,7 +43,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_SimpleValues()
     {
-        string json = """
+        const string json = """
             {
               "int": 123,
               "double": 123.456,
@@ -63,7 +63,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Simple_Null()
     {
-        string json = """
+        const string json = """
             {
               "string": null
             }
@@ -77,7 +77,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array()
     {
-        string json = """
+        const string json = """
             {
               "values": [1, 2, 3]
             }
@@ -91,7 +91,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array_in_Array()
     {
-        string json = """
+        const string json = """
             {
               "values": [[1,2,3]]
             }
@@ -107,7 +107,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_ComplexValue()
     {
-        string json = """
+        const string json = """
             {
               "complex": {
                 "int": 123,
@@ -130,7 +130,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_MixedValue()
     {
-        string json = """
+        const string json = """
             {
               "int": 123,
               "complex": {
@@ -158,7 +158,7 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Nested_SimpleValues()
     {
-        string json = """
+        const string json = """
             {
               "value1": "string",
               "dictionary": {

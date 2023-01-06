@@ -7,12 +7,12 @@ public class NullableInputListTests : QueryTestBase<TestSchema>
     [Fact]
     public void Can_Accept_Null_List_From_Literal()
     {
-        var query = """
+        const string query = """
             query _ {
               example(testInputs:null)
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "example": "null"
             }
@@ -23,12 +23,12 @@ public class NullableInputListTests : QueryTestBase<TestSchema>
     [Fact]
     public void Can_Accept_Null_List_From_Input()
     {
-        var query = """
+        const string query = """
             query _($inputs:[TestInput]) {
               example(testInputs: $inputs)
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "example": "null"
             }
