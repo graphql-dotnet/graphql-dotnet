@@ -248,6 +248,7 @@ public class AutoRegisteringObservableTests
         public static IObservable<object> ListOfStrings4() => new object[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
         public static async Task<IObservable<object>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
+        [OutputType(typeof(StringGraphType))]
         public static async ValueTask<IObservable<object>> ListOfStrings6() => new object[] { "a", "b", "c" }.ToObservable();
 
         public static IObservable<int> ListOfNumbers1() => new int[] { 1, 2, 3 }.ToObservable();
@@ -257,6 +258,7 @@ public class AutoRegisteringObservableTests
         public static IObservable<object> ListOfNumbers4() => new object[] { 1, 2, 3 }.ToObservable();
         [OutputType(typeof(IntGraphType))]
         public static async Task<IObservable<object>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
+        [OutputType(typeof(IntGraphType))]
         public static async ValueTask<IObservable<object>> ListOfNumbers6() => new object[] { 1, 2, 3 }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
