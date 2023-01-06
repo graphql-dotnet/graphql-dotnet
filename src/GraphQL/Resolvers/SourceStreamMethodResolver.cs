@@ -110,7 +110,7 @@ namespace GraphQL.Resolvers
             }
 
             // IAsyncEnumerable<T>
-            if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
+            else if (bodyExpression.Type.IsGenericType && bodyExpression.Type.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>))
             {
                 var innerType = bodyExpression.Type.GetGenericArguments()[0];
                 var method = _convertFromAsyncEnumerableMethodInfo.MakeGenericMethod(innerType);
