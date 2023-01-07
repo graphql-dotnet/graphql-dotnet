@@ -18,7 +18,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void object_type_missing_selection()
     {
-        var query = """
+        const string query = """
                 query directQueryOnObjectWithoutSubFields{
                   human
                 }
@@ -37,7 +37,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void interface_type_missing_selection()
     {
-        var query = """
+        const string query = """
                 {
                   human {
                     pets
@@ -68,7 +68,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void scalar_selection_not_allowed_on_boolean()
     {
-        var query = """
+        const string query = """
                 fragment scalarSelectionNotAllowedOnBoolean on Dog {
                   barks { sinceWhen }
                 }
@@ -87,7 +87,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void scalar_selection_not_allowed_on_enum()
     {
-        var query = """
+        const string query = """
                 fragment scalarSelectionsNotAllowedOnEnum on Cat {
                   furColor { inHexdec }
                 }
@@ -106,7 +106,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void scalar_selection_not_allowed_with_args()
     {
-        var query = """
+        const string query = """
                 fragment scalarSelectionWithArgs on Dog {
                   doesKnowCommand(dogCommand: SIT) { sinceWhen }
                 }
@@ -125,7 +125,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void scalar_selection_not_allowed_with_directives()
     {
-        var query = """
+        const string query = """
                 fragment scalarSelectionsNotAllowedWithDirectives on Dog {
                   name @include(if: true) { isAlsoHumanName }
                 }
@@ -144,7 +144,7 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void scalar_selection_not_allowed_with_directives_and_args()
     {
-        var query = """
+        const string query = """
                 fragment scalarSelectionsNotAllowedWithDirectivesAndArgs on Dog {
                   doesKnowCommand(dogCommand: SIT) @include(if: true) { sinceWhen }
                 }

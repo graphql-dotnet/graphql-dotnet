@@ -64,7 +64,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_output()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }").ConfigureAwait(false);
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("""{"data":{"testOutput": 124}}""");
     }
 
@@ -72,7 +72,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parseliteral()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }").ConfigureAwait(false);
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("""{"data":{"testInput": "122"}}""");
     }
 
@@ -80,7 +80,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parsevalue()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ =>
+        string json = await schema.ExecuteAsync(_ =>
         {
             _.Query = "query ($arg: Int!) { testInput(arg:$arg) }";
             _.Variables = "{\"arg\":123}".ToInputs();
@@ -92,7 +92,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_output_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }").ConfigureAwait(false);
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("""{"data":{"testOutputString": "output-hello"}}""");
     }
 
@@ -100,7 +100,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parseliteral_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }").ConfigureAwait(false);
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }").ConfigureAwait(false);
         json.ShouldBeCrossPlatJson("""{"data":{"testInputString": "input-hello"}}""");
     }
 
@@ -108,7 +108,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_parsevalue_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ =>
+        string json = await schema.ExecuteAsync(_ =>
         {
             _.Query = "query ($arg: String!) { testInputString(arg:$arg) }";
             _.Variables = "{\"arg\":\"hello\"}".ToInputs();
@@ -118,7 +118,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
 
     private Schema BuildSchemaFirst()
     {
-        var typeDefs = """
+        const string typeDefs = """
             type Query {
               testOutput: Int!
               testInput(arg: Int!): ID!
@@ -194,7 +194,7 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
 
         public override object ParseLiteral(GraphQLValue value)
         {
-            var ret = base.ParseLiteral(value);
+            object ret = base.ParseLiteral(value);
             return ret is int i ? i - 1 : ret;
         }
 

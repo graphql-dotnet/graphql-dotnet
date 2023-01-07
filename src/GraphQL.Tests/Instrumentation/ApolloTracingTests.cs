@@ -11,7 +11,7 @@ public class ApolloTracingTests : StarWarsTestBase
     [Fact]
     public void extension_has_expected_format()
     {
-        var query = """
+        const string query = """
             query {
               hero {
                 name
@@ -69,7 +69,7 @@ public class ApolloTracingTests : StarWarsTestBase
     public void serialization_should_have_correct_case(IGraphQLTextSerializer writer)
     {
         var trace = new ApolloTrace(new DateTime(2019, 12, 05, 15, 38, 00, DateTimeKind.Utc), 102.5);
-        var expected = """
+        const string expected = """
         {
           "version": 1,
           "startTime": "2019-12-05T15:38:00Z",
@@ -89,7 +89,7 @@ public class ApolloTracingTests : StarWarsTestBase
         }
         """;
 
-        var result = writer.Serialize(trace);
+        string result = writer.Serialize(trace);
 
         result.ShouldBeCrossPlat(expected);
     }
@@ -133,7 +133,7 @@ public class ApolloTracingTests : StarWarsTestBase
             Query = "{ hero { name } }",
             RequestServices = provider,
         }).ConfigureAwait(false);
-        var resultString = serializer.Serialize(result);
+        string resultString = serializer.Serialize(result);
         if (enable || enableAfter || enableBefore)
         {
             resultString.ShouldStartWith("""{"data":{"hero":{"name":"R2-D2"}},"extensions":{"tracing":{"version":1,"startTime":"2""");

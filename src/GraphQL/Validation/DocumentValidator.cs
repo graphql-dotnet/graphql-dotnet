@@ -125,7 +125,17 @@ namespace GraphQL.Validation
                 }
 
                 // can report errors even without rules enabled
-                variables = await context.GetVariableValuesAsync(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+                (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
+                    ? null
+                    : variableVisitors.Count == 1
+                        ? variableVisitors[0]
+                        : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
+                }
 
                 if (context.HasErrors)
                 {
@@ -155,7 +165,7 @@ namespace GraphQL.Validation
                 if (!context.HasErrors)
                 {
                     context.Reset();
-                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

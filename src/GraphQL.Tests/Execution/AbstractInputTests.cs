@@ -7,7 +7,7 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
     [Fact]
     public void throws_literals()
     {
-        var query = """
+        const string query = """
             mutation M {
               run(input: { id: "123" })
             }

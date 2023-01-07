@@ -2,6 +2,7 @@
 
 using System.Collections;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -268,7 +269,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", 123, null, 123)]
     [InlineData(nameof(ArgumentTests.TypedArg), "arg1", "123", null, 123)]
     [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", "hello", 123, "hello123")]
-    public async Task Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
+    public async Task Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
     {
         var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -353,7 +354,7 @@ public class AutoRegisteringObjectGraphTypeTests
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
         var resolver = field.Resolver.ShouldNotBeNull();
         var obj = new TestClass();
-        var actual = await resolver.ResolveAsync(new ResolveFieldContext
+        object? actual = await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = obj,
             FieldDefinition = new FieldType { Name = fieldName },
@@ -485,6 +486,18 @@ public class AutoRegisteringObjectGraphTypeTests
         graphType.Fields.Find("Field4").ShouldNotBeNull();
         graphType.Fields.Find("Field5").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(5);
+    }
+
+    [Fact]
+    public void CannotBuildWithoutMemberInstanceExpression()
+    {
+        Should.Throw<ArgumentNullException>(() => new NoMemberInstanceExpression<TestBasicClass>())
+            .ParamName.ShouldBe("instanceExpression");
+    }
+
+    public class NoMemberInstanceExpression<T> : AutoRegisteringObjectGraphType<T>
+    {
+        protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;
     }
 
     private class CustomHardcodedArgumentAttributeTestClass

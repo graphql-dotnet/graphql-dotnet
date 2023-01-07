@@ -2,6 +2,7 @@
 
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/graphql-dotnet/graphql-dotnet/releases and https://graphql-dotnet.github.io/docs/migrations/migration7</PackageReleaseNotes>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
@@ -14,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
     <InternalsVisibleTo Condition="'$(SignAssembly)' == 'true'" Include="$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)"/>
     <InternalsVisibleTo Condition="'$(SignAssembly)' != 'true'" Include="$(MSBuildProjectName).Tests"/>

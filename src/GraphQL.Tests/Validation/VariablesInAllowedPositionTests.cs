@@ -195,7 +195,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void int_to_nonnull_int()
     {
-        var query = """
+        const string query = """
             query Query($intArg: Int) {
               complicatedArgs {
                 nonNullIntArgField(nonNullIntArg: $intArg)
@@ -218,7 +218,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void int_to_nonnull_int_within_fragment()
     {
-        var query = """
+        const string query = """
             fragment nonNullIntArgFieldFrag on ComplicatedArgs {
               nonNullIntArgField(nonNullIntArg: $intArg)
             }
@@ -245,7 +245,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void int_to_nonnull_int_within_nested_fragment()
     {
-        var query = """
+        const string query = """
             fragment outerFrag on ComplicatedArgs {
               ...nonNullIntArgFieldFrag
             }
@@ -276,7 +276,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_over_boolean()
     {
-        var query = """
+        const string query = """
             query Query($stringVar: String) {
               complicatedArgs {
                 booleanArgField(booleanArg: $stringVar)
@@ -299,7 +299,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_string_list()
     {
-        var query = """
+        const string query = """
             query Query($stringVar: String) {
               complicatedArgs {
                 stringListArgField(stringListArg: $stringVar)
@@ -322,7 +322,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void boolean_to_nonnull_boolean_in_directive()
     {
-        var query = """
+        const string query = """
             query Query($boolVar: Boolean) {
               dog @include(if: $boolVar)
             }
@@ -343,7 +343,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_nonnull_boolean_in_directive()
     {
-        var query = """
+        const string query = """
             query Query($stringVar: String) {
               dog @include(if: $stringVar)
             }

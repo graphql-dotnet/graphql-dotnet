@@ -14,12 +14,12 @@ public class Bug_nested_type_names_dont_conflict :
         try
         {
             var inputs = """{ "input_0": { "id": "123"} }""".ToInputs();
-            var query = """
+            const string query = """
 mutation M($input_0: Bug_nested_type_names_dont_conflict_MyInputClass_MyInput!) {
   run(input: $input_0)
 }
 """;
-            var expected = """{ "run": "123" }""";
+            const string expected = """{ "run": "123" }""";
             AssertQuerySuccess(query, expected, inputs);
         }
         finally

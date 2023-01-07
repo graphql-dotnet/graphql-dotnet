@@ -10,7 +10,7 @@ public class Issue3233
         var serializer = new SystemTextJson.GraphQLSerializer(new ErrorInfoProvider(opt => opt.ExposeData = true));
         var result = new ExecutionResult();
         result.AddError(new ExecutionError("oops1"));
-        var serialized = serializer.Serialize(result);
+        string serialized = serializer.Serialize(result);
         serialized.ShouldBe("{\"errors\":[{\"message\":\"oops1\"}]}");
 
         result = new ExecutionResult();
@@ -19,7 +19,7 @@ public class Issue3233
         result.AddError(errorWithData);
 
         var ex = Should.Throw<NotSupportedException>(() => serializer.Serialize(result));
-        var messages = new[]
+        string[] messages = new[]
         {
             "The type 'System.Object' is not a supported Dictionary key type. Path: $.",
             "The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.ObjectConverter'. Path: $.",

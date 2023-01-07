@@ -45,7 +45,7 @@ public class RequestServicesTests
 
         // serialize to json to be sure no issues with a validation error without a number
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var resultString = serializer.Serialize(result);
+        string resultString = serializer.Serialize(result);
         resultString.ShouldBe("""{"errors":[{"message":"Num is 1","extensions":{"code":"VALIDATION_ERROR","codes":["VALIDATION_ERROR"]}}]}""");
     }
 
@@ -53,7 +53,7 @@ public class RequestServicesTests
     {
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
-            var num = context.RequestServices.GetRequiredService<Class1>().GetNum;
+            int num = context.RequestServices.GetRequiredService<Class1>().GetNum;
             context.ReportError(new ValidationError($"Num is {num}"));
             return default;
         }

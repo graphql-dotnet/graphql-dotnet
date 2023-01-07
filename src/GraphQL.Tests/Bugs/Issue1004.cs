@@ -7,7 +7,7 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
     [Fact]
     public void Should_Return_Field_Description_From_Interface_If_Not_Overridden()
     {
-        var query = """
+        const string query = """
 {
   __type(name: "Query")
   {
@@ -18,7 +18,7 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
   }
 }
 """;
-        var expected = """
+        const string expected = """
 {
   "__type": {
     "fields": [

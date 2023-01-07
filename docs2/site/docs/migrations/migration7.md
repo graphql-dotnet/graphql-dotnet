@@ -567,7 +567,7 @@ will now throw an exception if a graph type is used as a data model:
 - `AutoRegisteringObjectGraphType<TSourceType>`
 - `AutoRegisteringInputObjectGraphType<TSourceType>`
 - `AutoRegisteringInterfaceGraphType<TSourceType>`
-- 
+
 If it is necessary to do so, you can derive from the `ObjectGraphType` or `InputObjectGraphType` classes
 instead of the generic version.
 
@@ -578,3 +578,14 @@ This prevents the situation where some graph types are not initialized and throw
 If this is causing a problem (perhaps with graph types that are dynamically generated, for instance),
 create and pull from a dictionary of instantiated types, or use `GraphQLTypeReference` to reference
 the graph type by name.
+
+### 16. Values returned from interface fields must resolve to an GraphQL object type
+
+In certain situations, validation of values returned from fields returning interface types did not
+require them to resolve to GraphQL Object types. GraphQL.NET 7.2+ now enforces this validation in all cases.
+
+### 17. `AutoRegisteringInterfaceGraphType` does not generate resolvers
+
+Due to the above validation, resolvers defined on fields of interface types are never be used by
+GraphQL.NET. As such, resolvers are not generated for fields of `AutoRegisteringInterfaceGraphType`s
+in version 7.2+.

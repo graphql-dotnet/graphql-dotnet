@@ -41,7 +41,7 @@ public class ValidationTestBase<TRule, TSchema>
 
             error.Message.ShouldBe(assert.Message);
 
-            var allLocations = string.Concat(error.Locations.Select(l => $"({l.Line},{l.Column})"));
+            string allLocations = string.Concat(error.Locations.Select(l => $"({l.Line},{l.Column})"));
             var locations = error.Locations;
 
             for (int j = 0; j < assert.Locations.Count; j++)
@@ -79,7 +79,7 @@ public class ValidationTestBase<TRule, TSchema>
         config.Rules.Any().ShouldBeTrue("Must provide at least one rule to validate against.");
 
         var result = Validate(config.Query, config.Schema ?? Schema, config.Rules, config.Variables);
-        var message = "";
+        string message = "";
         if (result.Errors?.Any() == true)
         {
             message = string.Join(", ", result.Errors.Select(x => x.Message));

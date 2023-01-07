@@ -7,7 +7,7 @@ public class ArrayOfArrayTest : QueryTestBase<ArrayOfArraySchema>
     [Fact]
     public void ArrayOfArray_Should_Return_As_Is()
     {
-        var query = """
+        const string query = """
 mutation {
   create(input: {ints: [[1],[2,2],[3,3,3]] })
   {
@@ -15,7 +15,7 @@ mutation {
   }
 }
 """;
-        var expected = """
+        const string expected = """
 {
   "create": {
     "ints": [[1],[2,2],[3,3,3]]

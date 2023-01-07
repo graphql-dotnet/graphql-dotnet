@@ -223,6 +223,7 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
@@ -1769,6 +1770,8 @@ namespace GraphQL.Types
         public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
         protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
+        [System.Obsolete("Interface graph types do not support field resolvers; use of this method is unnec" +
+            "essary.")]
         protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
@@ -3039,9 +3042,15 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(System.Collections.Generic.List<GraphQLParser.AST.GraphQLOperationDefinition> operations) { }
+        [System.Obsolete("This method can repeatedly add the same error into ValidationContext.Errors colle" +
+            "ction when called multiple times. Use GetVariablesValuesAsync method instead.")]
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.Variables> GetVariableValuesAsync(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
             where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
+                "Variables",
+                "Errors"})]
+        public System.Threading.Tasks.ValueTask<System.ValueTuple<GraphQL.Validation.Variables, System.Collections.Generic.List<GraphQL.Validation.ValidationError>?>> GetVariablesValuesAsync(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
     }
@@ -3050,10 +3059,10 @@ namespace GraphQL.Validation
     {
         public ValidationError(string message) { }
         public ValidationError(string message, System.Exception? innerException) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
-        public ValidationError(GraphQLParser.ROM originalQuery, string number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, params GraphQLParser.AST.ASTNode[] nodes) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, GraphQLParser.AST.ASTNode node) { }
+        public ValidationError(GraphQLParser.ROM originalQuery, string? number, string message, System.Exception? innerException, params GraphQLParser.AST.ASTNode[]? nodes) { }
         public System.Collections.Generic.IEnumerable<GraphQLParser.AST.ASTNode> Nodes { get; }
         public string? Number { get; set; }
     }
