@@ -26,6 +26,9 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install dependencies
+        working-directory: src
+        run: dotnet restore
       - name: Check formatting
         working-directory: src
         run: |
