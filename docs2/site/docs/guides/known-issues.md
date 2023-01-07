@@ -353,7 +353,7 @@ public class MyUnionGraphType : UnionGraphType
             _ => null,
         };
 
-        // solution 1: register WidgetGraphType as a singleton manually with the DI provider
+        // solution 1: register WidgetGraphType as a singleton manually within the DI provider
 
         // solution 2: remove WidgetGraphType from the constructor and use the following code:
         Type<WidgetGraphType>();
