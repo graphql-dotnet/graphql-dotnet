@@ -330,7 +330,7 @@ public class MyUnionGraphType : UnionGraphType
 {
     public MyUnionGraphType()
     {
-        // creates an instance, which will be different than the one use elsewhere
+        // creates an instance, which will be different than the one used elsewhere
         AddPossibleType(new WidgetGraphType());
 
         // solution:
