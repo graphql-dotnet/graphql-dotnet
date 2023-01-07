@@ -343,9 +343,9 @@ public class MyUnionGraphType : UnionGraphType
 {
     public MyUnionGraphType(WidgetGraphType widgetType)
     {
-        // since graph types are typically registered as transients, this reference to
+        // Since graph types are typically registered as transients, this reference to
         // WidgetGraphType will be different than other instances throughout the schema
-        // and the following code does not work
+        // and the following code does not work.
         AddPossibleType(widgetType);
         ResolveType = obj => obj switch
         {
