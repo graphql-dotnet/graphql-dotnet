@@ -359,7 +359,7 @@ public class MyUnionGraphType : UnionGraphType
         Type<WidgetGraphType>();
         ResolveType = obj => obj switch
         {
-            string => new GraphQLTypeReference("Widget"), // reference by name
+            string => new GraphQLTypeReference("Widget"), // reference by name (newing each time is not nessessary)
             _ => null,
         };
     }
