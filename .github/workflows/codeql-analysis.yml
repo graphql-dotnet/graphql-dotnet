@@ -19,10 +19,10 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-         dotnet-version: '7.0.x'
-         source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        dotnet-version: '7.0.x'
+        source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
       env:
-         NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
