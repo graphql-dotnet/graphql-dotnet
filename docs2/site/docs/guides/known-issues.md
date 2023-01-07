@@ -296,7 +296,7 @@ behavior, please see [issue #3105](https://github.com/graphql-dotnet/graphql-dot
 
 ### Multiple instances of same graph type error
 
-You may encounter errors for the following nature:
+You may encounter errors of the following nature:
 
 > A different instance of the GraphType 'WidgetGraphType' with the name 'Widget' has already been registered within the
 > schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a
