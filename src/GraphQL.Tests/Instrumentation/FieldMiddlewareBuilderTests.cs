@@ -53,7 +53,7 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
@@ -61,12 +61,12 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "Two " + res;
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("One Two Quinn");
     }
 
@@ -77,12 +77,12 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("One Quinn");
     }
 
@@ -100,7 +100,7 @@ public class FieldMiddlewareBuilderTests
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("Quinn");
 
         var record = _context.Metrics.Finish().Skip(1).Single();
@@ -113,7 +113,7 @@ public class FieldMiddlewareBuilderTests
     {
         _builder.Use(new SimpleMiddleware());
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("Quinn");
 
         var record = _context.Metrics.Finish().Skip(1).Single();
@@ -133,7 +133,7 @@ public class FieldMiddlewareBuilderTests
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBeNull();
         _context.Errors.ShouldContain(x => x.Message == "Custom error");
     }
@@ -155,7 +155,7 @@ public class FieldMiddlewareBuilderTests
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
 
         result.ShouldBeNull();
         _context.Errors.ShouldContain(x => x.Message == "Custom error");

@@ -299,7 +299,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task CancelWithinDocumentExecuter_Returns_DoesNotHandle()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -324,7 +324,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ThrowExceptionWithinListener_Before_Returns()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -346,7 +346,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ThrowErrorWithinListener_Before_Returns()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -369,7 +369,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ThrowExceptionWithinListener_After_ReturnsWithData()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -391,7 +391,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ThrowErrorWithinListener_After_ReturnsWithData()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -414,7 +414,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ErrorWithinListener_Before_ReturnsBeforeExecuting()
     {
-        var errorNow = false;
+        bool errorNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -436,7 +436,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task ErrorWithinListener_After_ReturnsAsExecuted()
     {
-        var errorNow = false;
+        bool errorNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(

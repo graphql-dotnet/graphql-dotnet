@@ -8,7 +8,7 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
     [Fact]
     public void Should_Provide_Directives_In_Resolver()
     {
-        var query = """
+        const string query = """
         query Q($var1: Boolean!, $var2: Boolean! = true)
         {
           fieldWith2Literal @skip(if: false) @include(if: true)
@@ -17,7 +17,7 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
           fieldWithoutDirectives
         }
         """;
-        var expected = """
+        const string expected = """
         {
           "fieldWith2Literal": "1",
           "fieldWithVariable": "2",
@@ -31,12 +31,12 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
     [Fact]
     public void Should_Ignore_Unknown_Directives()
     {
-        var query = """
+        const string query = """
         {
           fieldWithoutDirectives @unknown
         }
         """;
-        var expected = """
+        const string expected = """
         {
           "fieldWithoutDirectives": "4"
         }

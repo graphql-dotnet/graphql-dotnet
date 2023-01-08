@@ -15,7 +15,7 @@ public class LongTests
             _.Query = "{ testField }";
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         json.ShouldBe("""

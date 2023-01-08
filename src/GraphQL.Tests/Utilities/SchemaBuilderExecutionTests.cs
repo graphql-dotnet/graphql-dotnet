@@ -50,7 +50,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         result.Errors[0].Code.ShouldBe("OVERFLOW");
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
 
-        var stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
+        string stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
         if (stack.StartsWith("   в "))
             stack = stack.Remove(0, 5);
         if (stack.StartsWith("   at "))
@@ -82,7 +82,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
 
-        var stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
+        string stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
         if (stack.StartsWith("   в "))
             stack = stack.Remove(0, 5);
         if (stack.StartsWith("   at "))
@@ -267,7 +267,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_resolver()
     {
-        var defs = """
+        const string defs = """
             type Post {
               id: ID!
               title: String!
@@ -280,9 +280,9 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
 
         Builder.Types.Include<PostQueryType>();
 
-        var query = "query Posts($id: ID!) { post(id: $id) { id title } }";
-        var expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
-        var variables = """{ "id": "1" }""";
+        const string query = "query Posts($id: ID!) { post(id: $id) { id title } }";
+        const string expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
+        const string variables = """{ "id": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -296,7 +296,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_provide_field_description()
     {
-        var defs = """
+        const string defs = """
             type Post {
               id: ID!
               title: String!
@@ -317,7 +317,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_renamed_field()
     {
-        var defs = """
+        const string defs = """
             type Post {
               id: ID!
               title: String!
@@ -330,9 +330,9 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
 
         Builder.Types.Include<PostQueryRenamedType>();
 
-        var query = "query Posts($id: ID!) { post(id: $id) { id title } }";
-        var expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
-        var variables = """{ "id": "1" }""";
+        const string query = "query Posts($id: ID!) { post(id: $id) { id title } }";
+        const string expected = """{ "post": { "id" : "1", "title": "Post One" } }""";
+        const string variables = """{ "id": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -346,7 +346,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_interfaces()
     {
-        var defs = """
+        const string defs = """
             enum PetKind {
               CAT
               DOG
@@ -375,8 +375,8 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         Builder.Types.For("Cat").IsTypeOf<Cat>();
         Builder.Types.Include<PetQueryType>();
 
-        var query = "{ pet { name } }";
-        var expected = """{ "pet": { "name" : "Eli" } }""";
+        const string query = "{ pet { name } }";
+        const string expected = """{ "pet": { "name" : "Eli" } }""";
 
         AssertQuery(_ =>
         {
@@ -390,7 +390,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void schemabuilder_should_throw_on_invalid_default_value()
     {
-        var defs = """
+        const string defs = """
             enum PetKind {
               CAT
               DOG
@@ -432,14 +432,14 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             """);
 
         var root = new { Hello = "Hello World!" };
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ hello }";
             _.Root = root;
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "hello": "Hello World!" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -453,14 +453,14 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ source }";
             _.Root = new { Hello = "World" };
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "source": true }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -474,10 +474,10 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }").ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "resolve": "Resolved" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -491,10 +491,10 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ => _.Query = """{ resolveWithParam(id: "abcd") }""").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = """{ resolveWithParam(id: "abcd") }""").ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "resolveWithParam": "Resolved abcd" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -508,14 +508,14 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ userContext }";
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -529,14 +529,14 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ userContext }";
             _.UserContext = new ChildMyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -572,14 +572,14 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = """{ userContextWithParam(id: "abcd") }""";
             _.UserContext = new MyUserContext { Name = "Quinn" };
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "userContextWithParam": "Quinn abcd" }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -593,7 +593,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ three }";
             _.Root = new { Hello = "World" };
@@ -601,7 +601,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "three": true }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -615,7 +615,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        var result = await ExecuteAsync(schema, _ =>
+        string result = await ExecuteAsync(schema, _ =>
         {
             _.Query = "{ four(id: 123) }";
             _.Root = new { Hello = "World" };
@@ -623,7 +623,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         }).ConfigureAwait(false);
 
         var expectedResult = CreateQueryResult("""{ "four": true }""");
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -631,7 +631,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void can_execute_complex_schema()
     {
-        var defs = """
+        const string defs = """
             type Post {
               id: ID!
               title: String!
@@ -648,9 +648,9 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         Builder.Types.Include<BlogQueryType>();
         Builder.Types.Include<Blog>();
 
-        var query = "query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
-        var expected = """{ "blog": { "title": "New blog", "post": { "id" : "1", "title": "Post One" } } }""";
-        var variables = """{ "blogId": "1", "postId": "1" }""";
+        const string query = "query Posts($blogId: ID!, $postId: ID!){ blog(id: $blogId){ title post(id: $postId, unused: 0) { id title } } }";
+        const string expected = """{ "blog": { "title": "New blog", "post": { "id" : "1", "title": "Post One" } } }""";
+        const string variables = """{ "blogId": "1", "postId": "1" }""";
 
         AssertQuery(_ =>
         {
@@ -664,7 +664,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     [Fact]
     public void does_not_require_scalar_fields_to_be_defined()
     {
-        var defs = """
+        const string defs = """
             type Person {
               name: String!
               age: Int!
@@ -677,8 +677,8 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         Builder.Types.Include<PeopleQueryType>();
         Builder.Types.Include<PersonQueryType>();
 
-        var query = "{ me { name age } }";
-        var expected = """{ "me": { "name": "Quinn", "age": 100 } }""";
+        const string query = "{ me { name age } }";
+        const string expected = """{ "me": { "name": "Quinn", "age": 100 } }""";
 
         AssertQuery(_ =>
         {
@@ -717,11 +717,11 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
                 _.Types.Include<PetQueryType>();
             });
 
-        var result = await ExecuteAsync(schema, _ => _.Query = "{ pet { ... on Dog { name } } }").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = "{ pet { ... on Dog { name } } }").ConfigureAwait(false);
 
-        var expected = """{ "pet": { "name" : "Eli" } }""";
+        const string expected = """{ "pet": { "name" : "Eli" } }""";
         var expectedResult = CreateQueryResult(expected);
-        var serializedExpectedResult = Serializer.Serialize(expectedResult);
+        string serializedExpectedResult = Serializer.Serialize(expectedResult);
 
         result.ShouldBe(serializedExpectedResult);
     }
@@ -747,19 +747,13 @@ public class Person
 [GraphQLMetadata("Person")]
 public class PersonQueryType
 {
-    public int Age()
-    {
-        return 100;
-    }
+    public int Age() => 100;
 }
 
 [GraphQLMetadata("Query")]
 public class PeopleQueryType
 {
-    public Person Me()
-    {
-        return new Person { Name = "Quinn" };
-    }
+    public Person Me() => new() { Name = "Quinn" };
 }
 
 public static class PostData
@@ -782,10 +776,7 @@ public class Blog
     public string Title { get; set; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
-    public Post Post(string id, long unused)
-    {
-        return PostData.Posts.FirstOrDefault(x => x.Id == id);
-    }
+    public Post Post(string id, long unused) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 [GraphQLMetadata("Query")]
@@ -804,20 +795,14 @@ public class BlogQueryType
 [GraphQLMetadata("Query")]
 public class PostQueryType
 {
-    public Post Post(string id)
-    {
-        return PostData.Posts.FirstOrDefault(x => x.Id == id);
-    }
+    public Post Post(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 [GraphQLMetadata("Query")]
 public class PostQueryRenamedType
 {
     [GraphQLMetadata("post", Description = "A description")]
-    public Post GetPostById(string id)
-    {
-        return PostData.Posts.FirstOrDefault(x => x.Id == id);
-    }
+    public Post GetPostById(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 internal abstract class Pet
@@ -846,12 +831,9 @@ internal class PetQueryType
 {
     public Pet Pet(PetKind type)
     {
-        if (type == PetKind.Dog)
-        {
-            return new Dog { Name = "Eli", Barks = true };
-        }
-
-        return new Cat { Name = "Biscuit", Meows = true };
+        return type == PetKind.Dog
+            ? new Dog { Name = "Eli", Barks = true }
+            : new Cat { Name = "Biscuit", Meows = true };
     }
 }
 
@@ -871,14 +853,10 @@ internal class ParametersType
     public string UserContextWithParam([FromUserContext] MyUserContext context, string id) => $"{context.Name} {id}";
 
     public bool Three(IResolveFieldContext resolveContext, [FromSource] object source, [FromUserContext] MyUserContext context)
-    {
-        return resolveContext != null && context != null && source != null;
-    }
+        => resolveContext != null && context != null && source != null;
 
     public bool Four(IResolveFieldContext resolveContext, [FromSource] object source, [FromUserContext] MyUserContext context, int id)
-    {
-        return resolveContext != null && context != null && source != null && id != 0;
-    }
+        => resolveContext != null && context != null && source != null && id != 0;
 }
 
 internal class MyUserContext : Dictionary<string, object>

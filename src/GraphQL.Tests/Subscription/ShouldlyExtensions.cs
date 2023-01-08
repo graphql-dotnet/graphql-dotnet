@@ -12,8 +12,8 @@ public static class ShouldlyExtensions
     {
         if (expected is string str)
             expected = _serializer.Deserialize<Inputs>(str);
-        var expectedJson = _serializer.Serialize(expected);
-        var actualJson = _serializer.Serialize(actual);
+        string expectedJson = _serializer.Serialize(expected);
+        string actualJson = _serializer.Serialize(actual);
         actualJson.ShouldBe(expectedJson, customMessage);
     }
 

@@ -55,15 +55,15 @@ public class ScopedAttributeTests
         };
         var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.StreamResolver!;
         var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.StreamResolver!;
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("1 2"));
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("2 3"));
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("1 2")).Dispose();
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("2 3")).Dispose();
         Class1.DisposedCount.ShouldBe(0);
-        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
+        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
         Class1.DisposedCount.ShouldBe(1);
-        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
+        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
         Class1.DisposedCount.ShouldBe(2);
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("3 4"));
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("3 4")).Dispose();
         rootServiceProvider.Dispose();
         Class1.DisposedCount.ShouldBe(3);
     }

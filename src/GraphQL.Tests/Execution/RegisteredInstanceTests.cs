@@ -197,7 +197,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         {
             Query = rootType
         };
-        var schema = new SchemaPrinter(s).Print();
+        string schema = new SchemaPrinter(s).Print();
         return schema;
     }
 

@@ -45,8 +45,8 @@ public class SchemaBuilderTestBase
     {
         var runResult = Executer.ExecuteAsync(options).Result;
 
-        var writtenResult = Serializer.Serialize(runResult);
-        var expectedResult = Serializer.Serialize(expectedExecutionResult);
+        string writtenResult = Serializer.Serialize(runResult);
+        string expectedResult = Serializer.Serialize(expectedExecutionResult);
 
         string additionalInfo = null;
 

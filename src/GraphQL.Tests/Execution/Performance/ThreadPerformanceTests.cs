@@ -46,7 +46,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
         private Task<string> Set(string result)
         {
             Calls.Add(result);
-            var list = string.Join(",", Calls.ToList());
+            string list = string.Join(",", Calls.ToList());
             return Task.FromResult(list);
         }
     }
@@ -65,7 +65,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
     // [Fact]
     public void Executes_IsQuickerThanTotalTaskTime()
     {
-        var query = """
+        const string query = """
             query HeroNameAndFriendsQuery {
               halfSecond,
               quarterSecond
@@ -91,7 +91,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
     [Fact]
     public async Task Mutations_RunSynchronously()
     {
-        var query = """
+        const string query = """
             mutation Multiple {
               m1:setFive
               m2:setFive

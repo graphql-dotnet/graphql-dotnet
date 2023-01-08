@@ -1,4 +1,5 @@
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Errors.Custom;
 
 namespace GraphQL.Tests.Complexity;
 
@@ -7,7 +8,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void should_work_when_complexity_within_params()
     {
-        var query = """
+        const string query = """
             query HeroNameQuery {
               hero {
               name
@@ -24,7 +25,7 @@ public class ComplexityValidationTest : ComplexityTestBase
     [Fact]
     public void error_when_too_nested()
     {
-        var query = """
+        const string query = """
             query FriendsOfFriends {
               hero {
               friends {
@@ -42,13 +43,15 @@ public class ComplexityValidationTest : ComplexityTestBase
 
         res.Result.Errors.ShouldNotBe(null);
         res.Result.Errors.Count.ShouldBe(1);
-        res.Result.Errors.First().InnerException?.GetType().ShouldBe(typeof(InvalidOperationException));
+        res.Result.Errors[0].ShouldBeOfType<ComplexityError>();
+        res.Result.Errors[0].Message.ShouldBe("Query is too nested to execute. Depth is 3 levels, maximum allowed on this endpoint is 2.");
+        res.Result.Errors[0].InnerException.ShouldBeNull();
     }
 
     [Fact]
     public void fail_when_too_complex()
     {
-        var query = """
+        const string query = """
             query BasicQuery {
               hero {
               id
@@ -63,13 +66,15 @@ public class ComplexityValidationTest : ComplexityTestBase
 
         res.Result.Errors.ShouldNotBe(null);
         res.Result.Errors.Count.ShouldBe(1);
-        res.Result.Errors.First().InnerException?.GetType().ShouldBe(typeof(InvalidOperationException));
+        res.Result.Errors[0].ShouldBeOfType<ComplexityError>();
+        res.Result.Errors[0].Message.ShouldBe("Query is too complex to execute. Complexity is 20, maximum allowed on this endpoint is 10. The field with the highest complexity is 'hero' with value 5.");
+        res.Result.Errors[0].InnerException.ShouldBeNull();
     }
 
     [Fact]
     public void fail_when_too_complex_and_nested()
     {
-        var query = """
+        const string query = """
             query FriendsOfFriends {
               hero {
                 friends {
@@ -95,6 +100,8 @@ public class ComplexityValidationTest : ComplexityTestBase
 
         res.Result.Errors.ShouldNotBe(null);
         res.Result.Errors.Count.ShouldBe(1);
-        res.Result.Errors.First().InnerException?.GetType().ShouldBe(typeof(InvalidOperationException));
+        res.Result.Errors[0].ShouldBeOfType<ComplexityError>();
+        res.Result.Errors[0].Message.ShouldBe("Query is too complex to execute. Complexity is 480, maximum allowed on this endpoint is 25. The field with the highest complexity is 'friends' with value 125.");
+        res.Result.Errors[0].InnerException.ShouldBeNull();
     }
 }

@@ -9,7 +9,7 @@ public class SchemaBuilderTests
     [Fact]
     public void should_set_query_by_name()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               id: String
             }
@@ -29,7 +29,7 @@ public class SchemaBuilderTests
     [Fact]
     public void should_set_mutation_by_name()
     {
-        var definitions = """
+        const string definitions = """
             type Mutation {
               mutate: String
             }
@@ -49,7 +49,7 @@ public class SchemaBuilderTests
     [Fact]
     public void should_set_subscription_by_name()
     {
-        var definitions = """
+        const string definitions = """
             type Subscription {
               subscribe: String
             }
@@ -69,7 +69,7 @@ public class SchemaBuilderTests
     [Fact]
     public void configures_schema_from_schema_type()
     {
-        var definitions = """
+        const string definitions = """
             type MyQuery {
               id: String
             }
@@ -114,7 +114,7 @@ public class SchemaBuilderTests
     [Fact]
     public void configures_schema_from_schema_type_and_directives()
     {
-        var definitions = """
+        const string definitions = """
             type MyQuery  {
               id: String
             }
@@ -190,7 +190,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_type_with_arguments()
     {
-        var definitions = """"
+        const string definitions = """"
                 type Query {
                   """
                   Post description
@@ -226,7 +226,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_type_with_arguments_with_dependent_default_values()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               post(arg: [SomeInputType] = [{ name: "John" }]): String
             }
@@ -259,7 +259,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_interface()
     {
-        var definitions = """"
+        const string definitions = """"
                 """
                 Example description
                 """
@@ -288,7 +288,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_enum()
     {
-        var definitions = """"
+        const string definitions = """"
                 """
                 Example description
                 """
@@ -322,7 +322,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_case_insensitive_typed_enum()
     {
-        var definitions = """
+        const string definitions = """
             enum PetKind {
               CAT
               DOG
@@ -342,7 +342,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_scalars()
     {
-        var definitions = """
+        const string definitions = """
             scalar CustomScalar
 
             type Query {
@@ -369,7 +369,7 @@ public class SchemaBuilderTests
     [Fact]
     public void references_other_types()
     {
-        var definitions = """
+        const string definitions = """
             type Post {
               id: ID!
               title: String
@@ -409,7 +409,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_unions()
     {
-        var definitions = """"
+        const string definitions = """"
                 type Human {
                     name: String
                 }
@@ -440,7 +440,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types()
     {
-        var definitions = """"
+        const string definitions = """"
                 """
                 Example description
                 """
@@ -466,7 +466,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types_with_default_values()
     {
-        var definitions = """
+        const string definitions = """
             input ReviewInput {
               stars: Int! = 23
             }
@@ -484,7 +484,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types_with_dependent_default_values()
     {
-        var definitions = """
+        const string definitions = """
             input SomeInputType1 {
               test: SomeInputType2! = { arg1: 22 }
             }
@@ -515,7 +515,7 @@ public class SchemaBuilderTests
     [Fact]
     public void input_types_default_value_loops_throw1()
     {
-        var definitions = """
+        const string definitions = """
             input SomeInputType1 {
               test: SomeInputType1 = { }
             }
@@ -528,7 +528,7 @@ public class SchemaBuilderTests
     [Fact]
     public void input_types_default_value_loops_throw2()
     {
-        var definitions = """
+        const string definitions = """
             input SomeInputType1 {
               test: SomeInputType2 = { }
             }
@@ -549,7 +549,7 @@ public class SchemaBuilderTests
     {
         // see: https://github.com/graphql-dotnet/graphql-dotnet/pull/2696#discussion_r764975585
 
-        var definitions = """
+        const string definitions = """
             input SomeInputType1 {
               test: SomeInputType1 = { test: null }
             }
@@ -562,7 +562,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_directives()
     {
-        var definitions = """"
+        const string definitions = """"
             """
             Example description
             """
@@ -593,7 +593,7 @@ public class SchemaBuilderTests
     [Fact]
     public void custom_deprecation_on_type_field()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               stars: Int @deprecated(reason: "a reason")
             }
@@ -611,7 +611,7 @@ public class SchemaBuilderTests
     [Fact]
     public void default_deprecation_on_type_field()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               stars: Int @deprecated
             }
@@ -629,7 +629,7 @@ public class SchemaBuilderTests
     [Fact]
     public void deprecate_enum_value()
     {
-        var definitions = """
+        const string definitions = """
             enum PetKind {
               CAT @deprecated(reason: "dogs rule")
               DOG
@@ -649,7 +649,7 @@ public class SchemaBuilderTests
     [Fact]
     public void deprecated_prefers_metadata_values()
     {
-        var definitions = """
+        const string definitions = """
             type Movie {
               movies: Int @deprecated
             }
@@ -667,7 +667,7 @@ public class SchemaBuilderTests
     [Fact]
     public void build_extension_type()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               author(id: Int): String
             }
@@ -686,7 +686,7 @@ public class SchemaBuilderTests
     [Fact]
     public void build_extension_type_out_of_order()
     {
-        var definitions = """
+        const string definitions = """
             extend type Query {
               author(id: Int): String
             }
@@ -705,7 +705,7 @@ public class SchemaBuilderTests
     [Fact]
     public async Task builds_with_customized_clr_type()
     {
-        var definitions = """
+        const string definitions = """
             type Query {
               test: MyTestType
             }

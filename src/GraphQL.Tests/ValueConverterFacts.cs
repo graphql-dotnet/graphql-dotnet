@@ -9,7 +9,7 @@ public class ValueConverterFacts
     [InlineData(1234L, 1234.0)]
     public void LongConversions(long source, object expected)
     {
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldBeOfType(expected.GetType());
         actual.ShouldBe(expected);
@@ -19,7 +19,7 @@ public class ValueConverterFacts
     [InlineData(12.5f, 12.5)]
     public void FloatConversions(float source, object expected)
     {
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldBeOfType(expected.GetType());
         actual.ShouldBe(expected);
@@ -30,7 +30,7 @@ public class ValueConverterFacts
     [InlineData(12.5f, 12.5)]
     public void ToDecimalConversions(object source, object expected)
     {
-        var actual = ValueConverter.ConvertTo(source, typeof(decimal));
+        object actual = ValueConverter.ConvertTo(source, typeof(decimal));
 
         actual.ShouldBeOfType(typeof(decimal));
         actual.ShouldBe(new decimal((double)expected));
@@ -44,7 +44,7 @@ public class ValueConverterFacts
     [InlineData("100.1", 100.1d)]
     public void StringConversions(string source, object expected)
     {
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -54,9 +54,9 @@ public class ValueConverterFacts
     [Fact]
     public void StringConversionToDecimal()
     {
-        string source = "100.1";
-        decimal expected = 100.1m;
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        const string source = "100.1";
+        const decimal expected = 100.1m;
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -69,7 +69,7 @@ public class ValueConverterFacts
         var utcNow = DateTime.UtcNow;
         string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
         DateTime expected = utcNow;
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
@@ -110,14 +110,14 @@ public class ValueConverterFacts
         var utcNow = DateTimeOffset.UtcNow;
         string source = utcNow.ToString("O", DateTimeFormatInfo.InvariantInfo);
         DateTimeOffset expected = utcNow;
-        var actual = ValueConverter.ConvertTo(source, expected.GetType());
+        object actual = ValueConverter.ConvertTo(source, expected.GetType());
 
         actual.ShouldNotBeNull();
         actual.ShouldBeOfType(expected.GetType());
         actual.ShouldBe(expected);
     }
 
-    [Theory]
+    [TheoryEx]
     [InlineData(typeof(string), typeof(DateTime))]
     [InlineData(typeof(string), typeof(sbyte))]
     [InlineData(typeof(string), typeof(byte))]

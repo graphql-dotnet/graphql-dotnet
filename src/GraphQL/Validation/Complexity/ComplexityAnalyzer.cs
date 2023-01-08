@@ -23,11 +23,21 @@ namespace GraphQL.Validation.Complexity
 
             if (complexityResult.Complexity > complexityParameters.MaxComplexity)
                 throw new ComplexityError(
-                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key}");
+                    $"Query is too complex to execute. Complexity is {complexityResult.Complexity}, maximum allowed on this endpoint is {complexityParameters.MaxComplexity}. The field with the highest complexity is '{GetName(complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key)}' with value {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Value}.");
 
             if (complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
                 throw new ComplexityError(
                     $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
+
+            string GetName(ASTNode node)
+            {
+                return node switch
+                {
+                    GraphQLField f => f.Name.StringValue,
+                    GraphQLFragmentSpread fs => fs.FragmentName.Name.StringValue,
+                    _ => throw new NotSupportedException(node.ToString()),
+                };
+            }
         }
 
         /// <summary>

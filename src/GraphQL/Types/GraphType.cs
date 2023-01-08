@@ -51,7 +51,8 @@ namespace GraphQL.Types
                 }
             }
 
-            name = name.Replace('`', '_');
+            name = name.Replace('`', '_')
+                       .Replace('@', '_'); // https://github.com/graphql-dotnet/graphql-dotnet/issues/3472
             if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
                 name = name.Substring(0, name.Length - nameof(GraphType).Length);
 

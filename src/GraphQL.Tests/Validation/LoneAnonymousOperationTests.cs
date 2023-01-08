@@ -66,7 +66,7 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
     [Fact]
     public void multiple_anon_operations()
     {
-        var query = """
+        const string query = """
                 {
                   fieldA
                 }
@@ -87,7 +87,7 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
     [Fact]
     public void anon_operation_with_mutation()
     {
-        var query = """
+        const string query = """
                 {
                   fieldA
                 }
@@ -107,7 +107,7 @@ public class LoneAnonymousOperationTests : ValidationTestBase<LoneAnonymousOpera
     [Fact]
     public void anon_operation_with_subscription()
     {
-        var query = """
+        const string query = """
                 {
                   fieldA
                 }

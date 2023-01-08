@@ -26,9 +26,9 @@ public class Bug850MutationAlias : QueryTestBase<NestedMutationSchema>
 """
                 .ToInputs();
 
-        string query = "mutation createProgram($program: ProgramInput!) { createProgram(program: $program) }";
+        const string query = "mutation createProgram($program: ProgramInput!) { createProgram(program: $program) }";
 
-        string expected = """{ "createProgram": true }""";
+        const string expected = """{ "createProgram": true }""";
 
         AssertQuerySuccess(query, expected, inputs);
     }

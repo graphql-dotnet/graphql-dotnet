@@ -133,7 +133,7 @@ public class SchemaTests
 
     private void ContainsTypeNames(ISchema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes[typeName];
             type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
@@ -142,7 +142,7 @@ public class SchemaTests
 
     private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
             type.ShouldBe(null, $"Found {typeName} in type lookup.");
@@ -158,7 +158,7 @@ public class SchemaTests
             schema.AllTypes.Count.ShouldNotBe(0);
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
