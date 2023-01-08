@@ -744,7 +744,7 @@ namespace GraphQL
             if (serviceLifetime == ServiceLifetime.Scoped)
             {
                 // this code prevents registrations of scoped middleware for a singleton schema, which is impossible.
-                throw new ArgumentOutOfRangeException("Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
+                throw new ArgumentOutOfRangeException(nameof(serviceLifetime), "Please specify a transient or singleton service lifetime. Specifying transient will cause the middleware lifetime to match that of the schema. Using a scoped schema will then have scoped middleware.");
             }
 
             // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
@@ -808,7 +808,7 @@ namespace GraphQL
 
             builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(middleware);
             if (install)
-                builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(middleware));
+                builder.ConfigureSchema((schema, _) => schema.FieldMiddleware.Use(middleware));
             return builder;
         }
 
@@ -1084,7 +1084,7 @@ namespace GraphQL
             {
                 if (enableMetricsPredicate(options))
                     options.EnableMetrics = true;
-                DateTime start = DateTime.UtcNow;
+                var start = DateTime.UtcNow;
                 var ret = await next(options).ConfigureAwait(false);
                 if (options.EnableMetrics)
                 {

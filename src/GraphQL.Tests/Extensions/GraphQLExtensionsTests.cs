@@ -135,27 +135,27 @@ public class GraphQLExtensionsTests
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(IsValidDefaultTestData))]
     public void IsValidDefault_Test(IGraphType type, object value, bool expected) => type.IsValidDefault(value).ShouldBe(expected);
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(IsValidDefaultExceptionTestData))]
     public void IsValidDefault_Exception_Test(IGraphType type, object value, Exception expected)
     {
         Should.Throw(() => type.IsValidDefault(value), expected.GetType()).Message.ShouldBe(expected.Message);
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(ToASTTestData))]
     public void ToAST_Test(IGraphType type, object value, GraphQLValue expected)
     {
-        var actual = type.ToAST(value).Print();
-        var result = expected.Print();
+        string actual = type.ToAST(value).Print();
+        string result = expected.Print();
         actual.ShouldBe(result);
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(ToASTExceptionTestData))]
     public void ToAST_Exception_Test(IGraphType type, object value, Exception expected)
     {

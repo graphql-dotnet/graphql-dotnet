@@ -8,7 +8,7 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
     [Fact]
     public void Union_SubFields_WithoutTypename()
     {
-        string query = """
+        const string query = """
             query {
                 test {
                     ... on TypeA {
@@ -18,7 +18,7 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
             }
             """;
 
-        string expected = """
+        const string expected = """
             {
                 "test": {
                     "id": "123"
@@ -31,7 +31,7 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
     [Fact]
     public void Union_SubFields_WithTypename()
     {
-        string query = """
+        const string query = """
             query {
                 test_with_typename {
                     __typename
@@ -42,7 +42,7 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
             }
             """;
 
-        string expected = """
+        const string expected = """
             {
                 "test_with_typename": {
                     "__typename": "TypeA",

@@ -60,7 +60,7 @@ public class DocumentExecuterTests
 
         // verify executing with Schema1 works with custom class
         var executer1 = provider.GetRequiredService<StringExecuter<Schema1>>();
-        var result1 = await executer1.ExecuteAsync("{hero}").ConfigureAwait(false);
+        string result1 = await executer1.ExecuteAsync("{hero}").ConfigureAwait(false);
         result1.ShouldBe("{\"data\":{\"hero\":\"hello\"}}");
 
         // verify executing with Schema2 works with IDocumentExecuter<> directly

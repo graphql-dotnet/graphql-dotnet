@@ -18,7 +18,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             ctx.SubFields.Keys.ShouldContain("friends");
             return new List<Human>();
         });
-        var query = """
+        const string query = """
             {
               listOfHumans {
                 id
@@ -29,7 +29,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "listOfHumans": []
             }
@@ -48,7 +48,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return null;
         });
 
-        var query = """
+        const string query = """
             {
               singleHuman {
                 id
@@ -58,7 +58,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
               }
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "singleHuman": null
             }
@@ -76,7 +76,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             ctx.SubFields.Keys.ShouldContain("friends");
             return new List<Human>();
         });
-        var query = """
+        const string query = """
             {
               listOfCharacters {
                 id
@@ -87,7 +87,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "listOfCharacters": []
             }
@@ -105,7 +105,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
            ctx.SubFields.Keys.ShouldContain("friends");
            return Task.FromResult<object>(null);
        });
-        var query = """
+        const string query = """
             {
               singleCharacter {
                 id
@@ -116,7 +116,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "singleCharacter": null
             }
@@ -133,12 +133,12 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return 1;
         });
 
-        var query = """
+        const string query = """
             {
               someNumber
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "someNumber": 1
             }
@@ -155,12 +155,12 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { 1, 2 };
         });
 
-        var query = """
+        const string query = """
             {
               someNumbers
             }
             """;
-        var expected = """
+        const string expected = """
             {
               "someNumbers": [1,2]
             }
@@ -179,7 +179,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new Human { Id = "1", Name = "Luke" };
         });
 
-        var query = """
+        const string query = """
             query Luke {
               luke {
                 ...HumanData
@@ -192,7 +192,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "luke": {
                 "id": "1",
@@ -215,7 +215,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new Human { Id = "1", Name = "Luke" };
         });
 
-        var query = """
+        const string query = """
             query Luke {
               luke {
                 ...on Human
@@ -227,7 +227,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "luke": {
                 "id": "1",
@@ -250,7 +250,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
         });
 
-        var query = """
+        const string query = """
             query Luke {
               lukes {
                 ...HumanData
@@ -263,7 +263,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "lukes": [
                 {
@@ -292,7 +292,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
         });
 
-        var query = """
+        const string query = """
             query Luke {
               lukes {
                 ... on Human
@@ -304,7 +304,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "lukes": [
                 {

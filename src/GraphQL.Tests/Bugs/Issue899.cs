@@ -7,7 +7,7 @@ public class Issue899 : QueryTestBase<Issue899Schema>
     [Fact]
     public void Issue899_Should_Work()
     {
-        var query = """
+        const string query = """
         query {
           level1(arg1: "1") {
             level2(arg2: "2") {
@@ -18,7 +18,7 @@ public class Issue899 : QueryTestBase<Issue899Schema>
           }
         }
         """;
-        var expected = """
+        const string expected = """
         {
           "level1": {
             "level2": [[{

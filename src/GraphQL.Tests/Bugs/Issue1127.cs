@@ -8,12 +8,12 @@ public class Issue1127 : QueryTestBase<Issue1127Schema>
     [Fact]
     public void Issue1127_Should_Work()
     {
-        var query = """
+        const string query = """
         query {
           getsome(s2: null, s3: "aaa" input2: null, input3: { name: "struct"})
         }
         """;
-        var expected = """
+        const string expected = """
         {
           "getsome": "completed"
         }

@@ -8,7 +8,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void can_set_metadata_from_custom_attribute()
     {
-        var defs = """
+        const string defs = """
             type Post {
               id: ID!
               title: String!
@@ -33,7 +33,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void impl_type_sets_isTypeOfFunc()
     {
-        var defs = """
+        const string defs = """
             interface IUniqueElement
             {
               id: ID!
@@ -65,7 +65,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void impl_type_sets_default_isTypeOfFunc()
     {
-        var defs = """
+        const string defs = """
             interface IUniqueElement
             {
               id: ID!

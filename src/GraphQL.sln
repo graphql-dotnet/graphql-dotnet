@@ -104,6 +104,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		..\.github\workflows\build-artifacts-code.yml = ..\.github\workflows\build-artifacts-code.yml
 		..\.github\workflows\codeql-analysis.yml = ..\.github\workflows\codeql-analysis.yml
 		..\.github\workflows\dependency-review.yml = ..\.github\workflows\dependency-review.yml
+		..\.github\workflows\format.yml = ..\.github\workflows\format.yml
 		..\.github\workflows\label.yml = ..\.github\workflows\label.yml
 		..\.github\workflows\publish-code.yml = ..\.github\workflows\publish-code.yml
 		..\.github\workflows\publish-documentation.yml = ..\.github\workflows\publish-documentation.yml

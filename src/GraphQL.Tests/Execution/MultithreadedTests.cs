@@ -37,7 +37,7 @@ public class MultithreadedTests
         starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
         starWarsTest.Schema.FieldMiddleware = middleware;
         await testExecution().ConfigureAwait(false);
-        var correctCount = count;
+        int correctCount = count;
 
         // test initializing the schema first, followed by 3 simultaneous executions
         starWarsTest = new StarWarsTestBase();

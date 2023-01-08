@@ -8,7 +8,7 @@ public class RecordTest : QueryTestBase<RecordSchema>
     [Fact]
     public void Record_Should_Return_As_Is()
     {
-        var query = """
+        const string query = """
 {
   search(input: {})
   {
@@ -16,7 +16,7 @@ public class RecordTest : QueryTestBase<RecordSchema>
   }
 }
 """;
-        var expected = """
+        const string expected = """
 {
   "search": {
     "id": null

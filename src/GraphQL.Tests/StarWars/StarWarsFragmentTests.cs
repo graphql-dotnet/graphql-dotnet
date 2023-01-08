@@ -9,7 +9,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
     [Fact]
     public void use_fragment_spread_to_avoid_duplicate_content()
     {
-        var query = """
+        const string query = """
             query SomeDroids {
               r2d2: droid(id: "3") {
                 ...DroidFragment
@@ -24,7 +24,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "r2d2": {
                 "name": "R2-D2"
@@ -41,7 +41,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
     [Fact]
     public void use_inline_fragment_on_interface()
     {
-        var query = """
+        const string query = """
             query SomeDroids {
               r2d2: droid(id: "3") {
                 ... on Character {
@@ -51,7 +51,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "r2d2": {
                 "name": "R2-D2"
@@ -65,7 +65,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
     [Fact]
     public void use_unnamed_inline_fragment_on_interface()
     {
-        var query = """
+        const string query = """
             query SomeDroids {
               r2d2: droid(id: "3") {
                 ... {
@@ -75,7 +75,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
             }
             """;
 
-        var expected = """
+        const string expected = """
             {
               "r2d2": {
                 "name": "R2-D2"
@@ -89,7 +89,7 @@ public class StarWarsFragmentTests : StarWarsTestBase
     [Fact]
     public void use_undefined_fragment()
     {
-        var query = """
+        const string query = """
             query someDroids {
               r2d2: droid(id: "3") {
                 ...unknown_fragment

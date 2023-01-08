@@ -29,7 +29,7 @@ public class Bug2839SystemTextJson
             options.Converters.Add(new MyDateTimeConverter());
         });
 
-        var str = writer.Serialize(result);
+        string str = writer.Serialize(result);
         str.ShouldBeCrossPlatJson("""{"data":{"TEST":{"THISISASTRING":"String Value","THISISADATETIME":"2022-Jan-04"}}}""");
     }
 

@@ -55,9 +55,10 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
         IDictionary<string, object> userContext = null,
         CancellationToken cancellationToken = default,
         IEnumerable<IValidationRule> rules = null,
-        INameConverter nameConverter = null)
+        INameConverter nameConverter = null,
+        bool suppressSerializeExpected = false)
     {
-        var queryResult = CreateQueryResult(expected);
+        object queryResult = suppressSerializeExpected ? expected : CreateQueryResult(expected);
         return AssertQuery(query, queryResult, variables, root, userContext, cancellationToken, rules, null, nameConverter);
     }
 
@@ -164,8 +165,8 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
         foreach (var writer in GraphQLSerializersTestData.AllWriters)
         {
-            var writtenResult = writer.Serialize(renderResult);
-            var expectedResult = writer.Serialize(expectedExecutionResult);
+            string writtenResult = writer.Serialize(renderResult);
+            string expectedResult = writer.Serialize(expectedExecutionResult);
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
 
@@ -205,8 +206,8 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
         foreach (var writer in GraphQLSerializersTestData.AllWriters)
         {
-            var writtenResult = writer.Serialize(runResult);
-            var expectedResult = expectedExecutionResultOrJson is string s ? s : writer.Serialize((ExecutionResult)expectedExecutionResultOrJson);
+            string writtenResult = writer.Serialize(runResult);
+            string expectedResult = expectedExecutionResultOrJson is string s ? s : writer.Serialize((ExecutionResult)expectedExecutionResultOrJson);
 
             string additionalInfo = $"{writer.GetType().FullName} failed: ";
 

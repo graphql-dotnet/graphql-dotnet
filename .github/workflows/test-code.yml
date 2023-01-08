@@ -48,11 +48,6 @@ jobs:
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
-      - name: Check formatting
-        if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
-        run: |
-          dotnet format --no-restore --verify-no-changes --severity warn --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
