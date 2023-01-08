@@ -362,6 +362,8 @@ public class MyUnionGraphType : UnionGraphType
             string => new GraphQLTypeReference("Widget"), // reference by name (newing each time is not nessessary)
             _ => null,
         };
+
+        // solution 3: remove ResolveType and rely on IObjectGraphType.IsTypeOf of each union member type
     }
 }
 ```
