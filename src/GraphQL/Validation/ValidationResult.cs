@@ -1,3 +1,6 @@
+using GraphQL.Execution;
+using GraphQLParser.AST;
+
 namespace GraphQL.Validation
 {
     /// <inheritdoc cref="IValidationResult"/>
@@ -9,7 +12,10 @@ namespace GraphQL.Validation
         /// <param name="errors">Set of validation errors.</param>
         public ValidationResult(IEnumerable<ValidationError> errors)
         {
-            Errors.AddRange(errors);
+            if (errors.Any())
+            {
+                Errors.AddRange(errors);
+            }
         }
 
         /// <summary>
@@ -17,22 +23,33 @@ namespace GraphQL.Validation
         /// </summary>
         /// <param name="errors">Set of validation errors.</param>
         public ValidationResult(params ValidationError[] errors)
+            : this((IEnumerable<ValidationError>)errors)
         {
-            Errors.AddRange(errors);
         }
 
         /// <inheritdoc/>
-        public bool IsValid => Errors.Count == 0;
+        public bool IsValid => (_errors?.Count ?? 0) == 0;
+
+        private ExecutionErrors? _errors;
 
         /// <inheritdoc/>
-        public ExecutionErrors Errors { get; } = new ExecutionErrors();
+        public ExecutionErrors Errors => _errors ??= new ExecutionErrors();
+
+        /// <inheritdoc/>
+        public Variables? Variables { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
     }
 
     // Optimization for validation "green path" - does not allocate memory in managed heap.
     /// <summary>
     /// A validation result that indicates no errors were found during validation of the document.
     /// </summary>
-    public sealed class SuccessfullyValidatedResult : IValidationResult
+    internal sealed class SuccessfullyValidatedResult : IValidationResult
     {
         private SuccessfullyValidatedResult() { }
 
@@ -50,5 +67,14 @@ namespace GraphQL.Validation
         /// Returns an empty list of execution errors.
         /// </summary>
         public ExecutionErrors Errors => EmptyExecutionErrors.Instance;
+
+        /// <inheritdoc/>
+        public Variables? Variables => Variables.None;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -27,6 +28,20 @@ namespace GraphQL.Types
         /// Searches the list for a field specified by its name and returns it.
         /// </summary>
         public FieldType? Find(string name)
+        {
+            foreach (var field in List)
+            {
+                if (field.Name == name)
+                    return field;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Searches the list for a field specified by its name and returns it.
+        /// </summary>
+        public FieldType? Find(ROM name)
         {
             foreach (var field in List)
             {
