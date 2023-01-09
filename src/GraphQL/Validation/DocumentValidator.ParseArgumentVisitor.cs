@@ -70,14 +70,12 @@ public partial class DocumentValidator
             var fragmentName = fragmentSpread.FragmentName.Name.Value;
             if ((context.VisitedFragments ??= new()).Add(fragmentName))
             {
-                foreach (var definition in context.ValidationContext.Document.Definitions)
+                var definition = context.ValidationContext.Document.FindFragmentDefinition(fragmentName);
+                if (definition != null)
                 {
                     // the fragment name should be one of the definitions in the document, or the
                     // document would not have passed validation
-                    if (definition is GraphQLFragmentDefinition fragment && fragment.FragmentName.Name.Value == fragmentName)
-                    {
-                        return VisitFragmentDefinitionAsync(fragment, context);
-                    }
+                    return VisitFragmentDefinitionAsync(definition, context);
                 }
             }
             return default;
