@@ -16,7 +16,7 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(Bug2958DecimalPrecisionTestData))]
     public void double_to_decimal_does_not_lose_precision(IGraphQLTextSerializer serializer)
     {

@@ -117,7 +117,7 @@ public class ValueConverterFacts
         actual.ShouldBe(expected);
     }
 
-    [Theory]
+    [TheoryEx]
     [InlineData(typeof(string), typeof(DateTime))]
     [InlineData(typeof(string), typeof(sbyte))]
     [InlineData(typeof(string), typeof(byte))]
