@@ -5,7 +5,7 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Contains a list of the validation errors found after validating a document against a set of validation rules.
-    /// If the document passes validation, this will also contain the set of parsed variables and argument values.
+    /// If the document passes validation, this will also contain the set of parsed variables and argument values for fields and applied directives.
     /// </summary>
     public interface IValidationResult
     {
