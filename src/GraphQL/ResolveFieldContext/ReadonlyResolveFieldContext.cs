@@ -71,7 +71,7 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IDictionary<string, ArgumentValue>? Arguments
-            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArguments;
+            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArgumentValues;
 
         /// <inheritdoc/>
         public IDictionary<string, DirectiveInfo>? Directives

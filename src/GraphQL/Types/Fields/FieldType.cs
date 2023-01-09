@@ -80,7 +80,7 @@ namespace GraphQL.Types
         /// default set needs to be returned. 
         /// Note that this value is automatically initialized during schema initialization.
         /// </summary>
-        public IDictionary<string, ArgumentValue>? DefaultArguments { get; set; }
+        internal IDictionary<string, ArgumentValue>? DefaultArgumentValues { get; set; }
 
         /// <summary>
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.

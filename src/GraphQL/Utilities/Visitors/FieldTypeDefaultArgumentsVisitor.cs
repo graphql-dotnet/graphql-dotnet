@@ -4,7 +4,7 @@ using GraphQL.Types;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Sets <see cref="FieldType.DefaultArguments"/> for each <see cref="FieldType"/>.
+    /// Sets <see cref="FieldType.DefaultArgumentValues"/> for each <see cref="FieldType"/>.
     /// </summary>
     public sealed class FieldTypeDefaultArgumentsVisitor : BaseSchemaNodeVisitor
     {
@@ -22,7 +22,7 @@ namespace GraphQL.Utilities
         {
             if (field.Arguments?.Count > 0)
             {
-                field.DefaultArguments = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
+                field.DefaultArgumentValues = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
             }
         }
 
@@ -31,7 +31,7 @@ namespace GraphQL.Utilities
         {
             if (field.Arguments?.Count > 0)
             {
-                field.DefaultArguments = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
+                field.DefaultArgumentValues = field.Arguments.ToDictionary(arg => arg.Name, arg => new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault));
             }
         }
     }
