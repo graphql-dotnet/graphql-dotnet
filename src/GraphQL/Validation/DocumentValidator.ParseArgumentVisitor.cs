@@ -123,7 +123,7 @@ public partial class DocumentValidator
                 }
             }
             // if any directives were supplied in the document for the field, load all defined arguments
-            // for directvies on the field
+            // for directives on the field
             if (field.Directives?.Count > 0)
             {
                 try
