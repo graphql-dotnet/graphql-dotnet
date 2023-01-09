@@ -16,11 +16,12 @@ public class BomTests
         int counter = 0;
         List<string> files = new();
 
+        string[] extensions = { ".cs", ".csproj", ".sln" };
         foreach (string file in Directory.EnumerateFiles(gitRoot.FullName, "*.*", SearchOption.AllDirectories))
         {
             ++counter;
 
-            if (file.EndsWith(".cs") || file.EndsWith(".csproj"))
+            if (extensions.Any(file.EndsWith))
             {
                 using var stream = File.OpenRead(file);
 
@@ -35,6 +36,6 @@ public class BomTests
         Console.WriteLine("Files checked: " + counter);
 
         if (files.Count > 0)
-            throw new InvalidOperationException("Remove BOM from files. Files with BOM found:" + Environment.NewLine + string.Join(Environment.NewLine, files));
+            throw new InvalidOperationException("Remove BOM from files. You can do this with any Hex Editor such as Notepad++. Files with BOM found:" + Environment.NewLine + string.Join(Environment.NewLine, files));
     }
 }
