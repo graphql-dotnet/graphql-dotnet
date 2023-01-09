@@ -2035,7 +2035,6 @@ namespace GraphQL.Types
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments? Arguments { get; set; }
-        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? DefaultArguments { get; set; }
         public object? DefaultValue { get; set; }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
