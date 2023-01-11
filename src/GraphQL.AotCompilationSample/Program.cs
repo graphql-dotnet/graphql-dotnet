@@ -56,6 +56,12 @@ Console.WriteLine();
 Console.WriteLine(response);
 Console.WriteLine();
 
+if (response != """{"data":{"hero":{"id":"3","name":"R2-D2"}}}""")
+{
+    Console.WriteLine("Unexpected response; exiting.");
+    return 1; // return application exit code of 1 indicating failure
+}
+
 var introspectionQuery = """
   query IntrospectionQuery {
     __schema {
