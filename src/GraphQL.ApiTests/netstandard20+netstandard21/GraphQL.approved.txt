@@ -2969,8 +2969,8 @@ namespace GraphQL.Validation
     }
     public class InvalidLiteralError : GraphQL.Validation.ValidationError
     {
-        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode fieldOrFragmentSpread, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument argument, GraphQLParser.AST.ASTNode node, System.Exception innerException) { }
-        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode fieldOrFragmentSpread, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument argument, GraphQLParser.AST.ASTNode node, string message) { }
+        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, System.Exception innerException) { }
+        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, string message, System.Exception? innerException = null) { }
     }
     [System.Serializable]
     public class InvalidVariableError : GraphQL.Validation.ValidationError

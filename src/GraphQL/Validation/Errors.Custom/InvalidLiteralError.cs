@@ -1,3 +1,4 @@
+using System;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation
@@ -13,8 +14,8 @@ namespace GraphQL.Validation
         /// <summary>
         /// Initializes a new instance of the <see cref="InvalidLiteralError"/> class for a specified literal and error message.
         /// </summary>
-        public InvalidLiteralError(GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive, GraphQLArgument argument, ASTNode node, string message)
-            : base(document.Source, NUMBER, $"Invalid literal for {GetFieldDescription(fieldOrFragmentSpread)} {(directive != null ? $"directive '{directive.Name.StringValue} '" : "")}argument '{argument.Name.StringValue}'. {message}", node)
+        public InvalidLiteralError(GraphQLDocument document, ASTNode parentNode, GraphQLDirective? directive, GraphQLArgument? argument, ASTNode node, string message, Exception? innerException = null)
+            : base(document.Source, NUMBER, $"Invalid literal for {GetFieldDescription(parentNode)}{(directive != null ? $" directive '{directive.Name.StringValue}'" : "")}{(argument != null ? $" argument '{argument.Name.StringValue}'" : "")}. {message}", innerException, node)
         {
             Code = "INVALID_LITERAL";
         }
@@ -23,10 +24,9 @@ namespace GraphQL.Validation
         /// Initializes a new instance of the <see cref="InvalidLiteralError"/> class for a specified literal
         /// and exeption. Loads any exception data from the inner exception into this instance.
         /// </summary>
-        public InvalidLiteralError(GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive, GraphQLArgument argument, ASTNode node, Exception innerException)
-            : base(document.Source, NUMBER, $"Invalid literal for {GetFieldDescription(fieldOrFragmentSpread)} {(directive != null ? $"directive '{directive.Name.StringValue} '" : "")}argument '{argument.Name.StringValue}'. {innerException.Message}", innerException, node)
+        public InvalidLiteralError(GraphQLDocument document, ASTNode parentNode, GraphQLDirective? directive, GraphQLArgument? argument, ASTNode node, Exception innerException)
+            : this(document, parentNode, directive, argument, node, innerException.Message, innerException)
         {
-            Code = "INVALID_LITERAL";
         }
 
         private static string GetFieldDescription(ASTNode node) => node switch

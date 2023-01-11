@@ -73,7 +73,7 @@ namespace GraphQL.Execution
                     Argument = argNode,
                     Document = document,
                     Directive = directive,
-                    FieldOrFragmentSpread = fieldOrFragmentSpread,
+                    ParentNode = fieldOrFragmentSpread,
                     Variables = variables,
                 }, arg.DefaultValue);
             }
@@ -84,7 +84,10 @@ namespace GraphQL.Execution
         internal readonly ref struct CoerceValueContext
         {
             public GraphQLDocument? Document { get; init; }
-            public ASTNode? FieldOrFragmentSpread { get; init; }
+            /// <summary>
+            /// This is typically either a field, a fragment spread, or variable definition
+            /// </summary>
+            public ASTNode? ParentNode { get; init; }
             public GraphQLDirective? Directive { get; init; }
             public GraphQLArgument? Argument { get; init; }
             public Variables? Variables { get; init; }
@@ -130,9 +133,9 @@ namespace GraphQL.Execution
                 {
                     return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
                 }
-                catch (Exception ex) when (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
+                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
                 {
-                    throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input, ex);
+                    throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
                 }
             }
 
@@ -166,9 +169,9 @@ namespace GraphQL.Execution
             {
                 if (input is not GraphQLObjectValue objectValue)
                 {
-                    if (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
+                    if (context.Document != null && context.ParentNode != null)
                     {
-                        throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input,
+                        throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input,
                             $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                     }
                     else
@@ -216,9 +219,9 @@ namespace GraphQL.Execution
                 {
                     return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
                 }
-                catch (Exception ex) when (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
+                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
                 {
-                    throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input, ex);
+                    throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
                 }
             }
 
