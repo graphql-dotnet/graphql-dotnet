@@ -165,11 +165,21 @@ internal static class AutoRegisteringOutputHelper
                     x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
                     x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
                                                                              // exclude methods generated for record types: bool Equals(TSourceType)
-                    !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
+                    !IsRecordEqualsMethod<TSourceType>(x) &&
                     x.Name != "<Clone>$");                                   // exclude methods generated for record types
             return properties.Concat<MemberInfo>(methods);
         }
     }
+
+    private static bool IsRecordEqualsMethod<TSourceType>(MethodInfo method) =>
+        method.Name == "Equals"
+        && !method.IsStatic
+        && method.GetParameters().Length == 1
+        && IsTypeSourceOrAncestor(typeof(TSourceType), method.GetParameters()[0].ParameterType)
+        && method.ReturnType == typeof(bool);
+
+    private static bool IsTypeSourceOrAncestor(Type sourceType, Type type) =>
+        sourceType == type || sourceType.BaseType != typeof(object) && sourceType.BaseType is not null && IsTypeSourceOrAncestor(sourceType.BaseType, type);
 
     /// <summary>
     /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>

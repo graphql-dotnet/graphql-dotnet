@@ -436,6 +436,16 @@ public class AutoRegisteringObjectGraphTypeTests
     }
 
     [Fact]
+    public void TestInheritedRecordNoExtraFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<TestInheritedRecord>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Find("Description").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(3);
+    }
+
+    [Fact]
     public void TestBasicRecordStructNoExtraFields()
     {
         var graphType = new AutoRegisteringObjectGraphType<TestBasicRecordStruct>();
@@ -741,6 +751,14 @@ public class AutoRegisteringObjectGraphTypeTests
     }
 
     private record TestBasicRecord(int Id, string Name);
+    private record TestInheritedRecord : TestBasicRecord
+    {
+        public string Description { get; init; }
+        public TestInheritedRecord(int Id, string Name, string Description) : base(Id, Name)
+        {
+            this.Description = Description;
+        }
+    }
 
     private record struct TestBasicRecordStruct(int Id, string Name);
 
