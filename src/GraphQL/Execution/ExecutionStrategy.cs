@@ -120,29 +120,18 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual bool ShouldIncludeNode(ExecutionContext context, IHasDirectivesNode node)
         {
-            var directives = node.Directives;
-
-            if (directives != null)
+            if (context.DirectiveValues?.TryGetValue((ASTNode)node, out var directives) ?? false)
             {
-                var directive = directives.Find(context.Schema.Directives.Skip.Name);
-                if (directive != null)
+                if (directives.TryGetValue(context.Schema.Directives.Skip.Name, out var skipDirective) &&
+                    (bool)skipDirective.Arguments["if"].Value!)
                 {
-                    var arg = context.Schema.Directives.Skip.Arguments!.Find("if")!;
-
-#pragma warning disable CS8605 // Unboxing a possibly null value.
-                    if ((bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value)
-#pragma warning restore CS8605 // Unboxing a possibly null value.
-                        return false;
+                    return false;
                 }
 
-                directive = directives.Find(context.Schema.Directives.Include.Name);
-                if (directive != null)
+                if (directives.TryGetValue(context.Schema.Directives.Include.Name, out var includeDirective) &&
+                    !(bool)includeDirective.Arguments["if"].Value!)
                 {
-                    var arg = context.Schema.Directives.Include.Arguments!.Find("if")!;
-
-#pragma warning disable CS8605 // Unboxing a possibly null value.
-                    return (bool)ExecutionHelper.CoerceValue(arg.ResolvedType!, directive.Arguments?.ValueFor(arg.Name), context.Variables, arg.DefaultValue).Value;
-#pragma warning restore CS8605 // Unboxing a possibly null value.
+                    return false;
                 }
             }
 

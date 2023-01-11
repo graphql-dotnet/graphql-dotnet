@@ -16,14 +16,14 @@ namespace GraphQL.Execution
         /// Returns a dictionary of directives with their arguments values for a field.
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static IDictionary<string, DirectiveInfo>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema, GraphQLDocument document)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(IHasDirectivesNode node, Variables? variables, ISchema schema, GraphQLDocument document)
         {
-            if (field.Directives == null || field.Directives.Count == 0)
+            if (node.Directives == null || node.Directives.Count == 0)
                 return null;
 
             Dictionary<string, DirectiveInfo>? directives = null;
 
-            foreach (var dir in field.Directives.Items)
+            foreach (var dir in node.Directives.Items)
             {
                 var dirDefinition = schema.Directives.Find(dir.Name);
 
@@ -35,7 +35,7 @@ namespace GraphQL.Execution
 
                 (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(
                     dirDefinition,
-                    GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, field, dir) ?? _emptyDirectiveArguments);
+                    GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir) ?? _emptyDirectiveArguments);
             }
 
             return directives;
@@ -45,7 +45,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive.
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, GraphQLField field, GraphQLDirective? directive)
+        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
                 return null;
@@ -73,7 +73,7 @@ namespace GraphQL.Execution
                     Argument = argNode,
                     Document = document,
                     Directive = directive,
-                    Field = field,
+                    FieldOrFragmentSpread = fieldOrFragmentSpread,
                     Variables = variables,
                 }, arg.DefaultValue);
             }
@@ -84,7 +84,7 @@ namespace GraphQL.Execution
         internal readonly ref struct CoerceValueContext
         {
             public GraphQLDocument? Document { get; init; }
-            public GraphQLField? Field { get; init; }
+            public ASTNode? FieldOrFragmentSpread { get; init; }
             public GraphQLDirective? Directive { get; init; }
             public GraphQLArgument? Argument { get; init; }
             public Variables? Variables { get; init; }
@@ -130,9 +130,9 @@ namespace GraphQL.Execution
                 {
                     return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
                 }
-                catch (Exception ex) when (context.Document != null && context.Field != null && context.Argument != null)
+                catch (Exception ex) when (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
                 {
-                    throw new InvalidLiteralError(context.Document, context.Field, context.Directive, context.Argument, input, ex);
+                    throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input, ex);
                 }
             }
 
@@ -166,9 +166,9 @@ namespace GraphQL.Execution
             {
                 if (input is not GraphQLObjectValue objectValue)
                 {
-                    if (context.Document != null && context.Field != null && context.Argument != null)
+                    if (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
                     {
-                        throw new InvalidLiteralError(context.Document, context.Field, context.Directive, context.Argument, input,
+                        throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input,
                             $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                     }
                     else
@@ -216,9 +216,9 @@ namespace GraphQL.Execution
                 {
                     return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
                 }
-                catch (Exception ex) when (context.Document != null && context.Field != null && context.Argument != null)
+                catch (Exception ex) when (context.Document != null && context.FieldOrFragmentSpread != null && context.Argument != null)
                 {
-                    throw new InvalidLiteralError(context.Document, context.Field, context.Directive, context.Argument, input, ex);
+                    throw new InvalidLiteralError(context.Document, context.FieldOrFragmentSpread, context.Directive, context.Argument, input, ex);
                 }
             }
 

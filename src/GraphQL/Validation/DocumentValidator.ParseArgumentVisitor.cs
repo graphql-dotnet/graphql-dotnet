@@ -17,12 +17,39 @@ public partial class DocumentValidator
 
         private ParseArgumentVisitor() { }
 
+        public override ValueTask VisitAsync(ASTNode? node, Context context)
+        {
+            if (node is IHasDirectivesNode hasDirectivesNode)
+            {
+                // if any directives were supplied in the document for the field or fragment spread,
+                // load all defined arguments for directives on the field or fragment spread
+                if (hasDirectivesNode.Directives?.Count > 0)
+                {
+                    try
+                    {
+                        var directives = ExecutionHelper.GetDirectives(hasDirectivesNode, context.Variables, context.Schema, context.ValidationContext.Document);
+                        if (directives != null)
+                        {
+                            (context.DirectiveValues ??= new()).Add(node, directives);
+                        }
+                    }
+                    catch (ValidationError ex)
+                    {
+                        // todo: report error properly
+                        context.ValidationContext.ReportError(ex);
+                    }
+                }
+            }
+
+            return base.VisitAsync(node, context);
+        }
+
         protected override ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
         {
             // parses the selected operation only
             var selectedOperation = context.ValidationContext.Operation;
             if (selectedOperation != null)
-                return VisitOperationDefinitionAsync(selectedOperation, context);
+                return VisitAsync(selectedOperation, context);
             // if no operation is selected, nothing is parsed
             return default;
         }
@@ -76,7 +103,7 @@ public partial class DocumentValidator
                 {
                     // the fragment name should be one of the definitions in the document, or the
                     // document would not have passed validation
-                    return VisitFragmentDefinitionAsync(definition, context);
+                    return VisitAsync(definition, context);
                 }
             }
             return default;
@@ -122,24 +149,6 @@ public partial class DocumentValidator
                     context.ValidationContext.ReportError(ex);
                 }
             }
-            // if any directives were supplied in the document for the field, load all defined arguments
-            // for directives on the field
-            if (field.Directives?.Count > 0)
-            {
-                try
-                {
-                    var directives = ExecutionHelper.GetDirectives(field, context.Variables, schema, context.ValidationContext.Document);
-                    if (directives != null)
-                    {
-                        (context.DirectiveValues ??= new()).Add(field, directives);
-                    }
-                }
-                catch (ValidationError ex)
-                {
-                    // todo: report error properly
-                    context.ValidationContext.ReportError(ex);
-                }
-            }
             // if the field's type is an object, process child fields
             if (fieldType.ResolvedType?.GetNamedType() is IComplexGraphType type)
             {
@@ -158,7 +167,7 @@ public partial class DocumentValidator
             public Variables Variables { get; set; }
             public CancellationToken CancellationToken => ValidationContext.CancellationToken;
             public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
-            public Dictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+            public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
             public HashSet<GraphQLParser.ROM>? VisitedFragments { get; set; }
 
             private static Stack<IComplexGraphType>? _reusableTypes;
