@@ -200,7 +200,7 @@ namespace GraphQL.Validation
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
+                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue).Value;
                         }
                         catch (Exception ex)
                         {

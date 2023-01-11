@@ -111,16 +111,15 @@ public partial class DocumentValidator
             {
                 try
                 {
-                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables);
+                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
                     if (arguments != null)
                     {
                         (context.ArgumentValues ??= new()).Add(field, arguments);
                     }
                 }
-                catch (Exception ex)
+                catch (ValidationError ex)
                 {
-                    // todo: report error properly
-                    context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve field '{field.Name.Value}'.", ex));
+                    context.ValidationContext.ReportError(ex);
                 }
             }
             // if any directives were supplied in the document for the field, load all defined arguments
@@ -129,16 +128,16 @@ public partial class DocumentValidator
             {
                 try
                 {
-                    var directives = ExecutionHelper.GetDirectives(field, context.Variables, schema);
+                    var directives = ExecutionHelper.GetDirectives(field, context.Variables, schema, context.ValidationContext.Document);
                     if (directives != null)
                     {
                         (context.DirectiveValues ??= new()).Add(field, directives);
                     }
                 }
-                catch (Exception ex)
+                catch (ValidationError ex)
                 {
                     // todo: report error properly
-                    context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve field '{field.Name.Value}'.", ex));
+                    context.ValidationContext.ReportError(ex);
                 }
             }
             // if the field's type is an object, process child fields
