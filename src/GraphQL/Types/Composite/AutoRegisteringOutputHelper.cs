@@ -164,9 +164,8 @@ internal static class AutoRegisteringOutputHelper
                     x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
                     x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
                     x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
-                                                                             // exclude methods generated for record types: bool Equals(TSourceType)
-                    !IsRecordEqualsMethod<TSourceType>(x) &&
-                    x.Name != "<Clone>$");                                   // exclude methods generated for record types
+                    !IsRecordEqualsMethod<TSourceType>(x) &&                 // exclude methods generated for record types: public virtual/override bool Equals(RECORD_TYPE)
+                    x.Name != "<Clone>$");                                   // exclude methods generated for record types: public [new] virtual RECORD_TYPE <Clone>$()
             return properties.Concat<MemberInfo>(methods);
         }
     }

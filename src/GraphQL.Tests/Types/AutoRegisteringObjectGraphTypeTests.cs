@@ -4,6 +4,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -436,6 +437,16 @@ public class AutoRegisteringObjectGraphTypeTests
     }
 
     [Fact]
+    public void TestInheritedRecordWithOverridesNoExtraFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<TestInheritedRecordWithOverrides>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Find("Description").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(3);
+    }
+
+    [Fact]
     public void TestInheritedRecordNoExtraFields()
     {
         var graphType = new AutoRegisteringObjectGraphType<TestInheritedRecord>();
@@ -751,6 +762,7 @@ public class AutoRegisteringObjectGraphTypeTests
     }
 
     private record TestBasicRecord(int Id, string Name);
+
     private record TestInheritedRecord : TestBasicRecord
     {
         public string Description { get; init; }
@@ -758,6 +770,17 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             this.Description = Description;
         }
+    }
+
+    private record TestInheritedRecordWithOverrides : TestInheritedRecord
+    {
+        public TestInheritedRecordWithOverrides(int Id, string Name, string Description) : base(Id, Name, Description)
+        {
+        }
+        protected override bool PrintMembers(StringBuilder builder) => base.PrintMembers(builder);
+        public override string ToString() => base.ToString();
+        public override int GetHashCode() => base.GetHashCode();
+        protected override Type EqualityContract => base.EqualityContract;
     }
 
     private record struct TestBasicRecordStruct(int Id, string Name);
