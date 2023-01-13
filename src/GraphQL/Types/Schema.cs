@@ -114,19 +114,8 @@ namespace GraphQL.Types
         /// <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and executes them.
         /// </summary>
         public Schema(IServiceProvider services, bool runConfigurations = true)
+            : this(services, (runConfigurations ? services.GetService(typeof(IEnumerable<IConfigureSchema>)) as IEnumerable<IConfigureSchema> : null)!)
         {
-            _services = services;
-
-            Directives = new SchemaDirectives();
-            Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
-
-            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
-            {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
-            }
         }
 
         /// <summary>
@@ -141,12 +130,9 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (configurations != null)
+            foreach (var configuration in configurations ?? Array.Empty<IConfigureSchema>())
             {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
+                configuration.Configure(this, services);
             }
         }
 

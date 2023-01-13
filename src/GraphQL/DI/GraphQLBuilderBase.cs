@@ -21,6 +21,9 @@ namespace GraphQL.DI
         /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
+#if NET5_0_OR_GREATER
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))]
+#endif
         protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IGraphQLSerializer is registered
@@ -74,23 +77,7 @@ namespace GraphQL.DI
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Services.Configure<ErrorInfoProviderOptions>();
-
-            // for AOT-compiled scenarios, preserve a few types necessary for DI injection to work properly
-            Preserve<IConfigureExecution[]>();
-            Preserve<IConfigureSchema[]>();
-            Preserve<IGraphTypeMappingProvider[]>();
-            Preserve(typeof(ErrorInfoProviderOptions)); // this should be preserved by the above call to Configure<ErrorInfoProviderOptions>(), but it is not
         }
-
-        /// <summary>
-        /// Preserves the specified type in AOT-compiled scenarios.
-        /// </summary>
-        private static void Preserve<T>() { }
-        private static void Preserve(
-#if NET5_0_OR_GREATER
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-            Type t) => GC.KeepAlive(t);
 
         /// <inheritdoc />
         public abstract IServiceRegister Services { get; }
