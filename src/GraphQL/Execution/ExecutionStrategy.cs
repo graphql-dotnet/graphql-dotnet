@@ -122,6 +122,7 @@ namespace GraphQL.Execution
         {
             if (context.DirectiveValues?.TryGetValue((ASTNode)node, out var directives) ?? false)
             {
+                // where @skip and @include are used, validation will ensure that the 'if' argument exists and is a non-null boolean
                 if (directives.TryGetValue(context.Schema.Directives.Skip.Name, out var skipDirective) &&
                     (bool)skipDirective.Arguments["if"].Value!)
                 {
