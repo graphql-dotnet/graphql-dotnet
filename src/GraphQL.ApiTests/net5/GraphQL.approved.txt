@@ -1140,8 +1140,8 @@ namespace GraphQL.Execution
     public static class ExecutionHelper
     {
         public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue? input, GraphQL.Validation.Variables? variables = null, object? fieldDefault = null) { }
-        public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue>? GetArguments(GraphQL.Types.QueryArguments? definitionArguments, GraphQLParser.AST.GraphQLArguments? astArguments, GraphQL.Validation.Variables? variables) { }
-        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(GraphQLParser.AST.IHasDirectivesNode node, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema) { }
+        public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue>? GetArguments(GraphQL.Types.QueryArguments? definitionArguments, GraphQLParser.AST.GraphQLArguments? astArguments, GraphQL.Validation.Variables? variables, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode fieldOrFragmentSpread, GraphQLParser.AST.GraphQLDirective? directive) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(GraphQLParser.AST.IHasDirectivesNode node, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document) { }
     }
     public abstract class ExecutionNode
     {
@@ -2973,6 +2973,11 @@ namespace GraphQL.Validation
     public interface IVariableVisitorProvider
     {
         GraphQL.Validation.IVariableVisitor GetVisitor(GraphQL.Validation.ValidationContext context);
+    }
+    public class InvalidLiteralError : GraphQL.Validation.ValidationError
+    {
+        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, System.Exception innerException) { }
+        public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, string message, System.Exception? innerException = null) { }
     }
     [System.Serializable]
     public class InvalidVariableError : GraphQL.Validation.ValidationError
