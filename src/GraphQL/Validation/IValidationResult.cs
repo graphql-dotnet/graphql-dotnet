@@ -38,6 +38,6 @@ namespace GraphQL.Validation
         /// values for each directive.
         /// If the document did not pass validation, or if no directives were found, this value will be <see langword="null"/>.
         /// </summary>
-        IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+        IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
     }
 }

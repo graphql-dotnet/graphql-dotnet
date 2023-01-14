@@ -82,7 +82,7 @@ namespace GraphQL.Execution
         IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
         /// <inheritdoc cref="IValidationResult.DirectiveValues"/>
-        IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+        IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.

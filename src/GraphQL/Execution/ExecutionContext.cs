@@ -71,7 +71,7 @@ namespace GraphQL.Execution
         public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
         /// <inheritdoc/>
-        public IReadOnlyDictionary<GraphQLField, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+        public IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 
         /// <inheritdoc/>
         public ExecutionErrors Errors { get; set; }
