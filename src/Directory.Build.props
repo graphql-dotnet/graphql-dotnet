@@ -25,6 +25,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="PolySharp" Version="1.10.0" Condition="'$(TargetFramework)' != 'net5' AND '$(TargetFramework)' != 'net6' AND '$(TargetFramework)' != 'net7'">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Roslynator.Analyzers" Version="4.2.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
