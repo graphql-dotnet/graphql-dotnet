@@ -1,5 +1,4 @@
 // See https://aka.ms/new-console-template for more information
-using System.Diagnostics.CodeAnalysis;
 using GraphQL;
 using GraphQL.StarWars;
 using GraphQL.Types;

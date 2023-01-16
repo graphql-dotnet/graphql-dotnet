@@ -1,7 +1,4 @@
 using System.Collections;
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -57,9 +54,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
 
     /// <inheritdoc/>
     public IServiceRegister Configure<
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-#endif
     TOptions>(Action<TOptions, IServiceProvider>? action = null)
         where TOptions : class, new()
     {
@@ -94,9 +89,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
 
     /// <inheritdoc/>
     public IServiceRegister Register(Type serviceType,
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
     {
         if (serviceType == null)
@@ -155,9 +148,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
 
     /// <inheritdoc/>
     public IServiceRegister TryRegister(Type serviceType,
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
     {
         if (serviceType == null)
