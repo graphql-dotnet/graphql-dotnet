@@ -842,9 +842,7 @@ namespace GraphQL
         /// dependency injection framework.
         /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddSerializer<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TSerializer>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder)
             where TSerializer : class, IGraphQLSerializer
         {
             builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);
