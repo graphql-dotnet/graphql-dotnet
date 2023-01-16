@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
@@ -85,9 +82,7 @@ namespace GraphQL
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
         public static void RegisterTypeMapping<TClrType,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {

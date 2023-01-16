@@ -1,7 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -55,9 +51,7 @@ namespace GraphQL.Types
 
     /// <inheritdoc cref="NonNullGraphType"/>
     public sealed class NonNullGraphType<
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
     T> : NonNullGraphType
         where T : IGraphType
     {

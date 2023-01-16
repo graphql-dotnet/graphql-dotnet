@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
@@ -21,9 +18,7 @@ namespace GraphQL.DI
         /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-#if NET5_0_OR_GREATER
         [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
-#endif
         protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IGraphQLSerializer is registered

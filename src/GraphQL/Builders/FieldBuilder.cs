@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -67,9 +64,7 @@ namespace GraphQL.Builders
 
         /// <inheritdoc cref="Create(IGraphType, string)"/>
         public static FieldBuilder<TSourceType, TReturnType> Create(
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type? type = null, string name = "default")
         {
             var fieldType = new FieldType
@@ -226,9 +221,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument(typeof(TArgumentGraphType), name, configure);
@@ -278,9 +271,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Argument(
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type type, string name, Action<QueryArgument>? configure = null)
         {
             var arg = new QueryArgument(type)

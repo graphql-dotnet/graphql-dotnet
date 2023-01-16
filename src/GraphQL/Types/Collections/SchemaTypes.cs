@@ -56,7 +56,6 @@ namespace GraphQL.Types
             [typeof(Uri)] = typeof(UriGraphType),
         });
 
-#if NET5_0_OR_GREATER
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]
@@ -111,7 +110,6 @@ namespace GraphQL.Types
                 GC.KeepAlive(typeof(GraphQLClrOutputTypeReference<T>));
             }
         }
-#endif
 
         // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;

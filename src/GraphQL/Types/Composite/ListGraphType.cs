@@ -1,7 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -49,9 +45,7 @@ namespace GraphQL.Types
 
     /// <inheritdoc cref="ListGraphType"/>
     public sealed class ListGraphType<
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
     T> : ListGraphType
         where T : IGraphType
     {

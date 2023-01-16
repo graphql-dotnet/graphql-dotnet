@@ -1,7 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace GraphQL.DI
 {
     /// <summary>
@@ -16,9 +12,7 @@ namespace GraphQL.DI
         /// and requesting an <see cref="IEnumerable{T}"/> of the service type should return all of the registrations.
         /// </summary>
         IServiceRegister Register(Type serviceType,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
 
         /// <inheritdoc cref="Register(Type, Type, ServiceLifetime, bool)"/>
@@ -34,9 +28,7 @@ namespace GraphQL.DI
         /// has not already been registered.
         /// </summary>
         IServiceRegister TryRegister(Type serviceType,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
         /// <summary>
@@ -62,9 +54,7 @@ namespace GraphQL.DI
         /// will return a default instance (unless otherwise configured with a subsequent call to <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider}?)">Configure</see>).
         /// </summary>
         IServiceRegister Configure<
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-#endif
         TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
     }

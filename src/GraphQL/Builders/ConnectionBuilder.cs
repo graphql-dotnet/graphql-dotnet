@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;

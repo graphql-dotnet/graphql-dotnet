@@ -14,6 +14,10 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)graphql.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Using Include="System.Diagnostics.CodeAnalysis"/>
+  </ItemGroup>
+
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
     <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" Visible="false" />
     <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />

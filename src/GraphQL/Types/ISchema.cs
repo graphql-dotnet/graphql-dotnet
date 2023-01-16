@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -115,9 +112,7 @@ namespace GraphQL.Types
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
         void RegisterType(
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type type);
 
         /// <summary>
@@ -132,9 +127,7 @@ namespace GraphQL.Types
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="graphType">Inferred GraphType.</param>
         void RegisterTypeMapping(Type clrType,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type graphType);
 
         /// <summary>

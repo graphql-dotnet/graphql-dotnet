@@ -1,7 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace GraphQL.Types.Relay
 {
     /// <summary>
@@ -13,9 +9,7 @@ namespace GraphQL.Types.Relay
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the result data set's data type.</typeparam>
     public class EdgeType<
-#if NET5_0_OR_GREATER
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
     TNodeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
     {

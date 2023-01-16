@@ -1,7 +1,4 @@
 using System.Diagnostics;
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
@@ -315,9 +312,7 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public void RegisterType(
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type type)
         {
             CheckDisposed();
@@ -358,9 +353,7 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
             Type graphType)
         {
             (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));

@@ -1,6 +1,3 @@
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
@@ -37,9 +34,7 @@ namespace GraphQL
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
         public static IServiceRegister Register<TService,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
@@ -63,9 +58,7 @@ namespace GraphQL
 
         /// <inheritdoc cref="TryRegister{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime)"/>
         public static IServiceRegister TryRegister<
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
@@ -78,9 +71,7 @@ namespace GraphQL
         /// will be created when an instance is needed.
         /// </summary>
         public static IServiceRegister TryRegister<TService,
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
@@ -113,9 +104,7 @@ namespace GraphQL
 
         /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
         public static IServiceRegister Configure<
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-#endif
         TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
             => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
@@ -850,9 +839,7 @@ namespace GraphQL
         /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
         public static IGraphQLBuilder AddSerializer<
-#if NET5_0_OR_GREATER
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
         TSerializer>(this IGraphQLBuilder builder)
             where TSerializer : class, IGraphQLSerializer
         {
