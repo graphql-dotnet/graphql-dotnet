@@ -22,7 +22,7 @@ namespace GraphQL.DI
         /// implementation does not support subscriptions.
         /// </summary>
 #if NET5_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
 #endif
         protected virtual void RegisterDefaultServices()
         {

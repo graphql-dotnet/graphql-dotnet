@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Numerics;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
@@ -60,63 +57,61 @@ namespace GraphQL.Types
         });
 
 #if NET5_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<int>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<long>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<BigInteger>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<double>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<float>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<decimal>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<string>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<bool>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<DateTime>))]
-#if NET5_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<Half>))]
-#endif
-#if NET6_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<DateOnly>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<TimeOnly>))]
-#endif
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<DateTimeOffset>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<TimeSpan>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<Guid>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<short>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<ushort>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<ulong>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<uint>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<byte>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<sbyte>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<Uri>))]
-
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<int>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<long>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<BigInteger>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<double>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<float>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<decimal>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<string>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<bool>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<DateTime>))]
-#if NET5_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<Half>))]
-#endif
-#if NET6_0_OR_GREATER
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<DateOnly>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<TimeOnly>))]
-#endif
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<DateTimeOffset>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<TimeSpan>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<Guid>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<short>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<ushort>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<ulong>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<uint>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<byte>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<sbyte>))]
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<Uri>))]
-#endif
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(NonNullGraphType<>))]
         static SchemaTypes()
         {
+            // The above attributes preserve those classes when T is a reference type, but not
+            // when T is a value type, which is necessary for GraphQL CLR type references.
+            // Also, specifying the closed generic type does not help, so the only way to force
+            // the trimmer to preserve types such as GraphQLClrInputTypeReference<int> is to
+            // directly reference the type within the compiled MSIL, even if the code does
+            // not actually run. While this does not help with user defined structs, the combination
+            // of the above attributes and below code will allow all built-in types to be handled
+            // by the auto-registering graph types such as AutoRegisteringObjectGraphType and
+            // similar code.
+
+            if (BuiltInScalarMappings != null) // always true
+                return; // no need to actually execute the below code, but it must be present in the compiled IL
+
+            // prevent trimming of these input and output type reference types
+            Preserve<int>();
+            Preserve<long>();
+            Preserve<BigInteger>();
+            Preserve<double>();
+            Preserve<float>();
+            Preserve<decimal>();
+            Preserve<string>();
+            Preserve<bool>();
+            Preserve<DateTime>();
+#if NET5_0_OR_GREATER
+            Preserve<Half>();
+#endif
+#if NET6_0_OR_GREATER
+            Preserve<DateOnly>();
+            Preserve<TimeOnly>();
+#endif
+            Preserve<DateTimeOffset>();
+            Preserve<TimeSpan>();
+            Preserve<Guid>();
+            Preserve<short>();
+            Preserve<ushort>();
+            Preserve<ulong>();
+            Preserve<uint>();
+            Preserve<byte>();
+            Preserve<sbyte>();
+            Preserve<Uri>();
+
+            static void Preserve<T>()
+            {
+                // force the MSIL to contain strong references to the specified type
+                GC.KeepAlive(typeof(GraphQLClrInputTypeReference<T>));
+                GC.KeepAlive(typeof(GraphQLClrOutputTypeReference<T>));
+            }
         }
+#endif
 
         // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
@@ -190,8 +185,9 @@ namespace GraphQL.Types
         /// <param name="schema">A schema for which this instance is created.</param>
         /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
         /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
-            : this()
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             Initialize(schema, serviceProvider, graphTypeMappings);
         }
