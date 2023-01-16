@@ -21,10 +21,10 @@ serviceCollection.AddGraphQL(b => b
 
 serviceCollection.AddSingleton<StarWarsData>();
 
-// must manually preserve the query and mutation types or AOT will trim their constructors
+// must manually register the query and mutation types or AOT will trim their constructors
 // all other graph types' constructors are preserved via calls to Field<T>
-Preserve<StarWarsQuery>();
-Preserve<StarWarsMutation>();
+serviceCollection.AddTransient<StarWarsQuery>();
+serviceCollection.AddTransient<StarWarsMutation>();
 
 // other notes:
 // - auto clr type mappings are generally not supported
@@ -77,10 +77,6 @@ response = serializer.Serialize(ret);
 Console.WriteLine("Executing introspection query:");
 Console.WriteLine();
 Console.WriteLine(response);
-
-// forces AOT to preserve the specified type's definition and public constructors
-static void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>()
-    => GC.KeepAlive(typeof(T)); // GC.KeepAlive forces the type to be preserved
 
 // return an application exit code if there were any errors
 return ret.Errors?.Count ?? 0;
