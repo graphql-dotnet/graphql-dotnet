@@ -61,100 +61,7 @@ if (response != """{"data":{"hero":{"id":"3","name":"R2-D2"}}}""")
     return 1; // return application exit code of 1 indicating failure
 }
 
-var introspectionQuery = """
-  query IntrospectionQuery {
-    __schema {
-      description
-      queryType { name }
-      mutationType { name }
-      subscriptionType { name }
-      types {
-        ...FullType
-      }
-      directives {
-        name
-        description
-        locations
-        args {
-          ...InputValue
-        }
-      }
-    }
-  }
-
-  fragment FullType on __Type {
-    kind
-    name
-    description
-    fields(includeDeprecated: true) {
-      name
-      description
-      args {
-        ...InputValue
-      }
-      type {
-        ...TypeRef
-      }
-      isDeprecated
-      deprecationReason
-    }
-    inputFields {
-      ...InputValue
-    }
-    interfaces {
-      ...TypeRef
-    }
-    enumValues(includeDeprecated: true) {
-      name
-      description
-      isDeprecated
-      deprecationReason
-    }
-    possibleTypes {
-      ...TypeRef
-    }
-  }
-
-  fragment InputValue on __InputValue {
-    name
-    description
-    type { ...TypeRef }
-    defaultValue
-  }
-
-  fragment TypeRef on __Type {
-    kind
-    name
-    ofType {
-      kind
-      name
-      ofType {
-        kind
-        name
-        ofType {
-          kind
-          name
-          ofType {
-            kind
-            name
-            ofType {
-              kind
-              name
-              ofType {
-                kind
-                name
-                ofType {
-                  kind
-                  name
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-""";
+var introspectionQuery = LoadResource("IntrospectionQuery.graphql");
 
 
 ret = await executer.ExecuteAsync(new ExecutionOptions
@@ -177,3 +84,10 @@ static void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.
 
 // return an application exit code if there were any errors
 return ret.Errors?.Count ?? 0;
+
+static string LoadResource(string resourceName)
+{
+    using var stream = typeof(Program).Assembly.GetManifestResourceStream("GraphQL.AotCompilationSample." + resourceName)!;
+    using var reader = new StreamReader(stream);
+    return reader.ReadToEnd();
+}
