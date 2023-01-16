@@ -40,4 +40,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System.Diagnostics.CodeAnalysis"/>
+  </ItemGroup>
+
 </Project>
