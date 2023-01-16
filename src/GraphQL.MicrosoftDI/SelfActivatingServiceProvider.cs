@@ -36,7 +36,7 @@ public class SelfActivatingServiceProvider : IServiceProvider
     }
 
     /// <inheritdoc cref="ActivatorUtilities.GetServiceOrCreateInstance(IServiceProvider, Type)"/>
-    public object GetService(Type serviceType)
+    public object? GetService(Type serviceType)
     {
         // if the type is an interface, attempt to retrieve the interface registration from the
         // underlying service provider or else return null. (May trigger an exception in a method

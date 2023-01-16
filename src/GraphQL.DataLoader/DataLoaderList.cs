@@ -1,6 +1,7 @@
 namespace GraphQL.DataLoader;
 
 public partial class DataLoaderBase<TKey, T>
+        where TKey : notnull
 {
     private class DataLoaderList : Dictionary<TKey, DataLoaderPair<TKey, T>>, IDataLoader
     {
