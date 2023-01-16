@@ -24,7 +24,9 @@ namespace GraphQL
 
         #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
-        public static IServiceRegister Register<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             => services.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
 
@@ -591,6 +593,7 @@ namespace GraphQL
         /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema)"/>
         /// within the schema constructor.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
             => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
@@ -605,6 +608,7 @@ namespace GraphQL
         /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema, Assembly)"/>
         /// within the schema constructor.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder, Assembly assembly)
         {
             if (assembly == null)

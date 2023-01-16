@@ -133,6 +133,17 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 - [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
 - [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
+## Ahead-of-time compilation
+
+GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows for use within
+iOS and Android apps, as well as other environments where JIT compilation is not available. It may be necessary to explicitly
+instruct the AOT complier to include the .NET types necessary for your schema to operate correctly. Of particular note,
+your query, mutation and subscription types' constructors may be trimmed; register them in your DI engine to prevent this.
+Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
+`RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
+demonstration of AOT compilation. Schema-first and type-first schemas may have additional limitations. AOT compilation
+has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL.NET framework to build a fully functional GraphQL endpoint.
