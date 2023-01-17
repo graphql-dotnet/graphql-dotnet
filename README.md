@@ -142,7 +142,7 @@ instruct the AOT compiler to include the .NET types necessary for your schema to
 your query, mutation and subscription types' constructors may be trimmed; register them in your DI engine to prevent this.
 Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
 `RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
-demonstration of AOT compilation. Schema-first and type-first schemas may have additional limitations. AOT compilation
+demonstration of AOT compilation. Schema-first and type-first schemas are not supported. AOT compilation
 has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
 
 ## Training
