@@ -18,7 +18,7 @@ namespace GraphQL.DI
         /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
-        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // TODO: this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
         protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IGraphQLSerializer is registered
