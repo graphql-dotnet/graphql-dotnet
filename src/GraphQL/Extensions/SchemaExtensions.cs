@@ -27,7 +27,9 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        public static void RegisterType<T>(this ISchema schema)
+        public static void RegisterType<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+        T>(this ISchema schema)
             where T : IGraphType
         {
             schema.RegisterType(typeof(T));
