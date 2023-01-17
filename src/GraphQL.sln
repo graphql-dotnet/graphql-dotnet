@@ -145,6 +145,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "Graph
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample", "GraphQL.AotCompilationSample\GraphQL.AotCompilationSample.csproj", "{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars.TypeFirst", "GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.TypeFirst", "GraphQL.AotCompilationSample.TypeFirst\GraphQL.AotCompilationSample.TypeFirst.csproj", "{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -219,6 +223,14 @@ Global
 		{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
