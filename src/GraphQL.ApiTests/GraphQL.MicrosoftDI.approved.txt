@@ -153,7 +153,7 @@ namespace GraphQL.MicrosoftDI
     public class SelfActivatingServiceProvider : System.IServiceProvider
     {
         public SelfActivatingServiceProvider(System.IServiceProvider serviceProvider) { }
-        public object GetService(System.Type serviceType) { }
+        public object? GetService(System.Type serviceType) { }
     }
 }
 namespace GraphQL
