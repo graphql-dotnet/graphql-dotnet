@@ -298,7 +298,10 @@ namespace GraphQL
         /// <br/><br/>
         /// This allows for a schema that is entirely configured with CLR types.
         /// </summary>
-        public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
+        [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
+        public static IGraphQLBuilder AddAutoSchema<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
+        TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
             builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
             builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
@@ -310,7 +313,9 @@ namespace GraphQL
         /// Configures <see cref="Schema.Mutation"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TMutationClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithMutation<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
+        TMutationClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -324,7 +329,9 @@ namespace GraphQL
         /// Configures <see cref="Schema.Subscription"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TSubscriptionClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithSubscription<
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
+        TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -633,6 +640,7 @@ namespace GraphQL
         /// and/or output types to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> or
         /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> graph types.
         /// </summary>
+        [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
         {
             builder.AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(mapInputTypes, mapOutputTypes));
