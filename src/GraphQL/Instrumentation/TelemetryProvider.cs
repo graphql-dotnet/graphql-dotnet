@@ -18,7 +18,7 @@ namespace GraphQL.Instrumentation;
 /// </summary>
 public class TelemetryProvider : IConfigureExecution
 {
-    private readonly ActivitySource _activitySource;
+    private static readonly ActivitySource _activitySource;
     private readonly TelemetryOptions _telemetryOptions;
     private const string ACTIVITY_OPERATION_NAME = "graphql";
 
@@ -27,12 +27,16 @@ public class TelemetryProvider : IConfigureExecution
     /// </summary>
     public static string SourceName => "GraphQL";
 
+    static TelemetryProvider()
+    {
+        _activitySource = new ActivitySource(SourceName, typeof(TelemetryProvider).Assembly.GetNuGetVersion());
+    }
+
     /// <summary>
     /// Initializes a new instance with the specified options.
     /// </summary>
     public TelemetryProvider(TelemetryOptions options)
     {
-        _activitySource = new ActivitySource(SourceName, typeof(TelemetryProvider).Assembly.GetNuGetVersion());
         _telemetryOptions = options;
     }
 
