@@ -13,17 +13,17 @@ namespace GraphQL.Execution
         private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
 
         /// <summary>
-        /// Returns a dictionary of directives with their arguments values for a field.
+        /// Returns a dictionary of directives with their arguments values for a node (field, fragment spread, inline fragment).
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static IDictionary<string, DirectiveInfo>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(IHasDirectivesNode node, Variables? variables, ISchema schema)
         {
-            if (field.Directives == null || field.Directives.Count == 0)
+            if (node.Directives == null || node.Directives.Count == 0)
                 return null;
 
             Dictionary<string, DirectiveInfo>? directives = null;
 
-            foreach (var dir in field.Directives.Items)
+            foreach (var dir in node.Directives.Items)
             {
                 var dirDefinition = schema.Directives.Find(dir.Name);
 
