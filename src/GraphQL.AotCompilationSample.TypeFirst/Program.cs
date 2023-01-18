@@ -5,6 +5,7 @@ using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
 using GraphQL.Types.Relay.DataObjects;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 Console.WriteLine("Sample of AOT compilation of a GraphQL query on a type-first schema");
 Console.WriteLine();
@@ -20,22 +21,20 @@ serviceCollection.AddGraphQL(b => b
 );
 
 #pragma warning disable IL2111 // Method with parameters or return value with `DynamicallyAccessedMembersAttribute` is accessed via reflection. Trimmer can't guarantee availability of the requirements of the method.
-// all types within GraphQL.StarWars.TypeFirst are rooted via TrimmerRootAssembly in the csproj so they will not be trimmed
-// for enumeration types, must also root these two types (for each enum in the schema)
+// All CLR types (within GraphQL.StarWars.TypeFirst) must be rooted in the csproj file via
+// TrimmerRootAssembly or else they will be trimmed by the linker, and the auto-registering
+// graph types will not find any properties/methods to register.
+// For enumeration types, must also root these two types (for each enum in the schema)
 Preserve<GraphQLClrOutputTypeReference<Episodes>>();
 Preserve<EnumerationGraphType<Episodes>>();
-// for connection types, must also root the connection types used in the schema
+// for connection types, must also root the connection types used in the schema, as they do
+// not exist within the GraphQL.StarWars.TypeFirst assembly
 Preserve<Connection<IStarWarsCharacter>>();
 Preserve<Edge<IStarWarsCharacter>>();
 Preserve<PageInfo>();
 #pragma warning restore IL2111 // Method with parameters or return value with `DynamicallyAccessedMembersAttribute` is accessed via reflection. Trimmer can't guarantee availability of the requirements of the method.
 
 serviceCollection.AddSingleton<StarWarsData>();
-
-// must manually register the query and mutation types or AOT will trim their constructors
-// all other graph types' constructors are preserved via calls to Field<T>
-//serviceCollection.AddTransient<StarWarsQuery>();
-//serviceCollection.AddTransient<StarWarsMutation>();
 
 // other notes:
 // - auto clr type mappings are generally not supported
@@ -50,6 +49,9 @@ var services = serviceCollection.BuildServiceProvider();
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 
+Console.WriteLine("Executing request: { hero { id name } }");
+Console.WriteLine();
+
 var ret = await executer.ExecuteAsync(new ExecutionOptions
 {
     Schema = services.GetRequiredService<ISchema>(),
@@ -61,8 +63,6 @@ var ret = await executer.ExecuteAsync(new ExecutionOptions
 var serializer = services.GetRequiredService<IGraphQLTextSerializer>();
 var response = serializer.Serialize(ret);
 
-Console.WriteLine("Executing request: { hero { id name } }");
-Console.WriteLine();
 Console.WriteLine(response);
 Console.WriteLine();
 
@@ -74,6 +74,8 @@ if (response != """{"data":{"hero":{"id":"3","name":"R2-D2"}}}""")
 
 var introspectionQuery = LoadResource("IntrospectionQuery.graphql");
 
+Console.WriteLine("Executing introspection query:");
+Console.WriteLine();
 
 ret = await executer.ExecuteAsync(new ExecutionOptions
 {
@@ -85,8 +87,6 @@ ret = await executer.ExecuteAsync(new ExecutionOptions
 
 response = serializer.Serialize(ret);
 
-Console.WriteLine("Executing introspection query:");
-Console.WriteLine();
 Console.WriteLine(response);
 
 // return an application exit code if there were any errors
@@ -99,5 +99,5 @@ static string LoadResource(string resourceName)
     return reader.ReadToEnd();
 }
 
-void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>() => Preserve2(typeof(T));
-void Preserve2([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Type t) => GC.KeepAlive(t);
+// This 'roots' the specified type, forcing the trimmer to retain the specified type and all its members.
+void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>() => GC.KeepAlive(typeof(T));
