@@ -26,5 +26,4 @@ public interface IStarWarsCharacter
 
     [Ignore]
     string Cursor { get; set; }
-
 }
