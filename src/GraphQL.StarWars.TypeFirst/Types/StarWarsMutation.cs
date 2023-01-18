@@ -1,6 +1,4 @@
-using GraphQL.StarWars.TypeFirst.Types;
-
-namespace GraphQL.StarWars.TypeFirst;
+namespace GraphQL.StarWars.TypeFirst.Types;
 
 [Name("Mutation")]
 public class StarWarsMutation
