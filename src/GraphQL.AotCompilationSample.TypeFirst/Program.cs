@@ -5,7 +5,6 @@ using GraphQL.StarWars.TypeFirst.Types;
 using GraphQL.Types;
 using GraphQL.Types.Relay.DataObjects;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 Console.WriteLine("Sample of AOT compilation of a GraphQL query on a type-first schema");
 Console.WriteLine();
@@ -15,15 +14,19 @@ IServiceCollection serviceCollection = new ServiceCollection();
 //   - AddClrTypeMappings
 //   - AddAutoClrMappings
 //   - AddAutoSchema
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 serviceCollection.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddAutoSchema<StarWarsQuery>(c => c.WithMutation<StarWarsMutation>())
 );
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 
 #pragma warning disable IL2111 // Method with parameters or return value with `DynamicallyAccessedMembersAttribute` is accessed via reflection. Trimmer can't guarantee availability of the requirements of the method.
-// All CLR types (within GraphQL.StarWars.TypeFirst) must be rooted in the csproj file via
-// TrimmerRootAssembly or else they will be trimmed by the linker, and the auto-registering
-// graph types will not find any properties/methods to register.
+// All CLR types for the schema (within GraphQL.StarWars.TypeFirst) must be rooted in the csproj
+// file via TrimmerRootAssembly or else they will be trimmed by the linker, and the auto-registering
+// graph types will not find any properties/methods to register. However, any services such as the
+// StarWarsData service do not need to be rooted in the csproj file, as the linker will intelligently
+// preserve the service's constructor (due to AddSingleton) and any methods that are called on it.
 // For enumeration types, must also root these two types (for each enum in the schema)
 Preserve<GraphQLClrOutputTypeReference<Episodes>>();
 Preserve<EnumerationGraphType<Episodes>>();

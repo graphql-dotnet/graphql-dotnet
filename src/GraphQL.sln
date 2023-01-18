@@ -145,9 +145,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "Graph
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample", "GraphQL.AotCompilationSample\GraphQL.AotCompilationSample.csproj", "{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars.TypeFirst", "GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.StarWars.TypeFirst", "GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.TypeFirst", "GraphQL.AotCompilationSample.TypeFirst\GraphQL.AotCompilationSample.TypeFirst.csproj", "{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AotCompilation", "AotCompilation", "{EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -251,6 +253,8 @@ Global
 		{92C246A6-E740-41AA-B77A-B939C54B1D8E} = {3DB29B96-B428-46A6-A4D3-FA677110B654}
 		{185923DF-89EE-457B-8DA0-3CBBE080EC32} = {2EA5354E-F4EF-4469-86AE-F1D36C7F8977}
 		{82BE75F5-9C90-427D-8268-1C640A90CE98} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{789A6AD9-D4F0-44E6-A9BA-57B1BA3A616A} = {EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71} = {EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

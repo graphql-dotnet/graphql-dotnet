@@ -135,15 +135,15 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Ahead-of-time compilation
 
-GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows for use within
-iOS and Android apps, as well as other environments where such features as JIT compilation or
-dynamic code generation are not available. It may be necessary to explicitly
-instruct the AOT compiler to include the .NET types necessary for your schema to operate correctly. Of particular note,
-your query, mutation and subscription types' constructors may be trimmed; register them in your DI engine to prevent this.
+GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows
+for use within iOS and Android apps, as well as other environments where such features as JIT compilation or
+dynamic code generation are not available. It may be necessary to explicitly instruct the AOT compiler
+to include the .NET types necessary for your schema to operate correctly. Of particular note, your query,
+mutation and subscription types' constructors may be trimmed; register them in your DI engine to prevent this.
 Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
 `RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
-demonstration of AOT compilation. Schema-first and type-first schemas are not supported. AOT compilation
-has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
+demonstration of AOT compilation. Schema-first and type-first schemas have additional limtations and configuration requirements.
+AOT compilation has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
 
 ## Training
 

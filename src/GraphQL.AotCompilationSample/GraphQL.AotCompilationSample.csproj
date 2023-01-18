@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,12 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="IntrospectionQuery.graphql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.*" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="IntrospectionQuery.graphql" />
     <EmbeddedResource Include="IntrospectionQuery.graphql" />
   </ItemGroup>
 
