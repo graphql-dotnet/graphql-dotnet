@@ -1188,7 +1188,8 @@ namespace GraphQL.Execution
         protected virtual System.Threading.Tasks.Task SetArrayItemNodesAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         protected virtual void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         protected virtual void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
-        protected virtual bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQLParser.AST.IHasDirectivesNode node) { }
+        protected virtual bool ShouldIncludeNode<TASTNode>(GraphQL.Execution.ExecutionContext context, TASTNode node)
+            where TASTNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasDirectivesNode { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>

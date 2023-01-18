@@ -118,9 +118,10 @@ namespace GraphQL.Execution
         /// is <see langword="false"/> and the @include condition is <see langword="true"/>. Stated conversely, the field or
         /// fragment must not be queried if either the @skip condition is <see langword="true"/> or the @include condition is <see langword="false"/>.
         /// </summary>
-        protected virtual bool ShouldIncludeNode(ExecutionContext context, IHasDirectivesNode node)
+        protected virtual bool ShouldIncludeNode<TASTNode>(ExecutionContext context, TASTNode node)
+            where TASTNode : ASTNode, IHasDirectivesNode
         {
-            if (context.DirectiveValues?.TryGetValue((ASTNode)node, out var directives) ?? false)
+            if (context.DirectiveValues?.TryGetValue(node, out var directives) ?? false)
             {
                 // where @skip and @include are used, validation will ensure that the 'if' argument exists and is a non-null boolean
                 if (directives.TryGetValue(context.Schema.Directives.Skip.Name, out var skipDirective) &&

@@ -35,7 +35,6 @@ public partial class DocumentValidator
                     }
                     catch (ValidationError ex)
                     {
-                        // todo: report error properly
                         context.ValidationContext.ReportError(ex);
                     }
                 }
