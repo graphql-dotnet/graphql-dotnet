@@ -404,7 +404,6 @@ public class Bug3507Schema : Schema
         var type = new ObjectGraphType { Name = "MyQuery" };
         type.Field<BooleanGraphType>("updateDate")
             .Argument<DateGraphType>("newDate", true)
-            .Argument<int>("id")
             .Resolve()
             .WithScope()
             .ResolveAsync(_ => Task.FromResult((object)true));
