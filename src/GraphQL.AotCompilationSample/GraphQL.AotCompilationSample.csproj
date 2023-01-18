@@ -8,6 +8,10 @@
     <PublishAot>true</PublishAot>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(PackingNuget)' != ''">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.*" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.*" />
