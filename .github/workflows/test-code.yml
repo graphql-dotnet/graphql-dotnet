@@ -75,6 +75,7 @@ jobs:
         working-directory: src/GraphQL.AotCompilationSample
         run: |
           dotnet publish -c Release -o publish
+          thisdoesntwork
           publish/GraphQL.AotCompilationSample
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
