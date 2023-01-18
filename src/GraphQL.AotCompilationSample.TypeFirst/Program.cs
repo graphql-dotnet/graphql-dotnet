@@ -103,5 +103,7 @@ static string LoadResource(string resourceName)
 }
 
 // This 'roots' the specified type, forcing the trimmer to retain the specified type and all its members.
-// 'Rooting' the type also means that all of its statically understood dependencies will be retained as well. 
+// 'Rooting' the type also means that all of its statically understood type references (types exclusive of
+their members), and statically understood members (constructors, methods, properties, etc) within
+other assemblies will be retained as well.
 void Preserve<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] T>() => GC.KeepAlive(typeof(T));
