@@ -41,7 +41,8 @@ public partial class DocumentValidator
                         string NodeDescription() => node switch
                         {
                             GraphQLField field => $"field '{field.Name.Value}'",
-                            GraphQLFragmentSpread fragment => $"fragment spread {fragment.FragmentName.Name}",
+                            GraphQLInlineFragment => $"inline fragment",
+                            GraphQLFragmentSpread fragment => $"fragment spread '{fragment.FragmentName.Name}'",
                             GraphQLVariableDefinition varDef => $"variable definition '{varDef.Variable.Name}'",
                             _ => "node"
                         };
