@@ -61,7 +61,7 @@ jobs:
         run: dotnet build --no-restore -c Release -p:Version=$version
       - name: Pack solution [Release]
         working-directory: src
-        run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -p:PackingNuGet=true -o out
+        run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o out
       - name: Upload Nuget packages as workflow artifacts
         uses: actions/upload-artifact@v3
         with:
