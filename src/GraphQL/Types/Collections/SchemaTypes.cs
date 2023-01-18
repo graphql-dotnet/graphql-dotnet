@@ -791,7 +791,12 @@ Make sure that your ServiceProvider is configured correctly.");
             var ret = GetGraphTypeFromClrType(clrType, input, typeMappings);
 
             if (ret == null)
-                return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
+            {
+                string additionalMessage = typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? $" Note that '{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). Most likely you need to specify corresponding CLR type instead of GraphType."
+                    : "";
+                return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?{additionalMessage}";
+            }
 
             return ret;
         }

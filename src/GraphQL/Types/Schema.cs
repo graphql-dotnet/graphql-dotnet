@@ -366,7 +366,14 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public void RegisterTypeMapping(Type clrType, Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((CheckType(clrType ?? throw new ArgumentNullException(nameof(clrType))), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+
+            Type CheckType(Type clrType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? throw new ArgumentException($"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.", nameof(clrType))
+                    : clrType;
+            }
         }
 
         /// <inheritdoc/>
