@@ -6,9 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(PackingNuget)' != ''">
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
