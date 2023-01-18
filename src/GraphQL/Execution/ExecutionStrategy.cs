@@ -121,7 +121,7 @@ namespace GraphQL.Execution
         protected virtual bool ShouldIncludeNode<TASTNode>(ExecutionContext context, TASTNode node)
             where TASTNode : ASTNode, IHasDirectivesNode
         {
-            if (context.DirectiveValues?.TryGetValue((ASTNode)node, out var directives) ?? false)
+            if (context.DirectiveValues?.TryGetValue(node, out var directives) ?? false)
             {
                 // where @skip and @include are used, validation will ensure that the 'if' argument exists and is a non-null boolean
                 if (directives.TryGetValue(context.Schema.Directives.Skip.Name, out var skipDirective) &&
