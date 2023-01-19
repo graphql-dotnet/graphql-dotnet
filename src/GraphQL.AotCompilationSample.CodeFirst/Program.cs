@@ -34,10 +34,13 @@ serviceCollection.AddTransient<StarWarsMutation>();
 // - strongly recommend each field has the explicit graph type specified and a resolver specified
 
 #pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
-var services = serviceCollection.BuildServiceProvider();
+using var services = serviceCollection.BuildServiceProvider();
 #pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
+
+Console.WriteLine("Executing request: { hero { id name } }");
+Console.WriteLine();
 
 var ret = await executer.ExecuteAsync(new ExecutionOptions
 {
@@ -50,8 +53,6 @@ var ret = await executer.ExecuteAsync(new ExecutionOptions
 var serializer = services.GetRequiredService<IGraphQLTextSerializer>();
 var response = serializer.Serialize(ret);
 
-Console.WriteLine("Executing request: { hero { id name } }");
-Console.WriteLine();
 Console.WriteLine(response);
 Console.WriteLine();
 
@@ -63,6 +64,8 @@ if (response != """{"data":{"hero":{"id":"3","name":"R2-D2"}}}""")
 
 var introspectionQuery = LoadResource("IntrospectionQuery.graphql");
 
+Console.WriteLine("Executing introspection query:");
+Console.WriteLine();
 
 ret = await executer.ExecuteAsync(new ExecutionOptions
 {
@@ -74,8 +77,6 @@ ret = await executer.ExecuteAsync(new ExecutionOptions
 
 response = serializer.Serialize(ret);
 
-Console.WriteLine("Executing introspection query:");
-Console.WriteLine();
 Console.WriteLine(response);
 
 // return an application exit code if there were any errors
