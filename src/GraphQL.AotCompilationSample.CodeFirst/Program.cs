@@ -84,7 +84,7 @@ return ret.Errors?.Count ?? 0;
 
 static string LoadResource(string resourceName)
 {
-    using var stream = typeof(Program).Assembly.GetManifestResourceStream("GraphQL.AotCompilationSample." + resourceName)!;
+    using var stream = typeof(Program).Assembly.GetManifestResourceStream("GraphQL.AotCompilationSample.CodeFirst." + resourceName)!;
     using var reader = new StreamReader(stream);
     return reader.ReadToEnd();
 }
