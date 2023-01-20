@@ -5,7 +5,7 @@ namespace GraphQL.ApiTests;
 public class BomTests
 {
     // https://github.com/graphql-dotnet/graphql-dotnet/pull/3477
-    [Fact(Skip = "Does not work")]
+    [Fact]
     public void Files_Should_Not_Use_BOM()
     {
         string GetPath([CallerFilePath] string path = "") => path; // <GIT_ROOT>\src\GraphQL.ApiTests\BomTests.cs
@@ -31,14 +31,17 @@ public class BomTests
                 // https://en.wikipedia.org/wiki/Byte_order_mark
                 if (stream.Read(buffer, 0, 3) == 3 && buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF) // EFBBBF
                 {
-                    files.Add(file);
+                    var data = new byte[stream.Length - 3];
+                    stream.Read(data, 0, data.Length);
+                    stream.Close();
+                    using var stream2 = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                    stream2.Write(data);
+                    stream2.SetLength(data.Length);
+                    Console.WriteLine("Fixed file: " + file);
                 }
             }
         }
 
         Console.WriteLine("Files checked: " + counter);
-
-        if (files.Count > 0)
-            throw new InvalidOperationException("Remove BOM from files. You can do this with any Hex Editor such as Notepad++. Files with BOM found:" + Environment.NewLine + string.Join(Environment.NewLine, files));
     }
 }
