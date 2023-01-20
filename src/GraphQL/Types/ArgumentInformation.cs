@@ -124,6 +124,7 @@ namespace GraphQL.Types
         /// <br/><br/>
         /// As of .NET 7, this method cannot be used in AOT compilation scenarios.
         /// </summary>
+        [RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
         public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
         {
             if (argumentDelegate == null)
