@@ -63,9 +63,7 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Create(IGraphType, string)"/>
-        public static FieldBuilder<TSourceType, TReturnType> Create(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type? type = null, string name = "default")
+        public static FieldBuilder<TSourceType, TReturnType> Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null, string name = "default")
         {
             var fieldType = new FieldType
             {
@@ -220,9 +218,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument(typeof(TArgumentGraphType), name, configure);
 
@@ -270,9 +266,7 @@ namespace GraphQL.Builders
         /// <param name="type">The graph type of the argument.</param>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type type, string name, Action<QueryArgument>? configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type, string name, Action<QueryArgument>? configure = null)
         {
             var arg = new QueryArgument(type)
             {

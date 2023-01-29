@@ -44,9 +44,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="ListGraphType"/>
-    public sealed class ListGraphType<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    T> : ListGraphType
+    public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : ListGraphType
         where T : IGraphType
     {
         /// <summary>

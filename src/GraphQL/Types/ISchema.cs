@@ -111,9 +111,7 @@ namespace GraphQL.Types
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        void RegisterType(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type type);
+        void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type);
 
         /// <summary>
         /// Registers type mapping from CLR type to GraphType.
@@ -126,9 +124,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="graphType">Inferred GraphType.</param>
-        void RegisterTypeMapping(Type clrType,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type graphType);
+        void RegisterTypeMapping(Type clrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType);
 
         /// <summary>
         /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.

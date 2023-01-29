@@ -53,9 +53,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
         };
 
     /// <inheritdoc/>
-    public IServiceRegister Configure<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-    TOptions>(Action<TOptions, IServiceProvider>? action = null)
+    public IServiceRegister Configure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(Action<TOptions, IServiceProvider>? action = null)
         where TOptions : class, new()
     {
         this.TryRegister(services => services.GetService<IOptions<TOptions>>()?.Value ?? new TOptions(), ServiceLifetime.Singleton);
@@ -88,9 +86,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     }
 
     /// <inheritdoc/>
-    public IServiceRegister Register(Type serviceType,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
+    public IServiceRegister Register(Type serviceType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type implementationType, ServiceLifetime serviceLifetime, bool replace = false)
     {
         if (serviceType == null)
             throw new ArgumentNullException(nameof(serviceType));
@@ -147,9 +143,7 @@ public class GraphQLBuilder : GraphQLBuilderBase, IServiceCollection, IServiceRe
     }
 
     /// <inheritdoc/>
-    public IServiceRegister TryRegister(Type serviceType,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+    public IServiceRegister TryRegister(Type serviceType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type implementationType, DI.ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
     {
         if (serviceType == null)
             throw new ArgumentNullException(nameof(serviceType));

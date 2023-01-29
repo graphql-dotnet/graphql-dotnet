@@ -27,9 +27,7 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        public static void RegisterType<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        T>(this ISchema schema)
+        public static void RegisterType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this ISchema schema)
             where T : IGraphType
         {
             schema.RegisterType(typeof(T));
@@ -83,9 +81,7 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
-        public static void RegisterTypeMapping<TClrType,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TGraphType>(this ISchema schema)
+        public static void RegisterTypeMapping<TClrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {
             Preserve<GraphQLClrInputTypeReference<TClrType>>();

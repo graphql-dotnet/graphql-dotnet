@@ -9,11 +9,7 @@ namespace GraphQL.Types.Relay
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the result data set's data type.</typeparam>
     /// <typeparam name="TEdgeType">The edge graph type of node, typically <see cref="EdgeType{TNodeType}"/>.</typeparam>
-    public class ConnectionType<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    TNodeType,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    TEdgeType> : ObjectGraphType<object>
+    public class ConnectionType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
     {
