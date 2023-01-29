@@ -108,7 +108,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(Type type)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
@@ -133,7 +133,7 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
         public FieldType Field(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -164,7 +164,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType Field<TGraphType>(
+        public FieldType Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -196,7 +196,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldDelegate<TGraphType>(
+        public FieldType FieldDelegate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -240,7 +240,7 @@ namespace GraphQL.Types
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
         public FieldType FieldAsync(
-            Type type,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -271,7 +271,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldAsync<TGraphType>(
+        public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -304,7 +304,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldAsync<TGraphType, TReturnType>(
+        public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -337,7 +337,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldSubscribe<TGraphType>(
+        public FieldType FieldSubscribe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -374,7 +374,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldSubscribeAsync<TGraphType>(
+        public FieldType FieldSubscribeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -405,7 +405,7 @@ namespace GraphQL.Types
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name)
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(string name)
             where TGraphType : IGraphType
         {
             var builder = CreateBuilder<TReturnType>(typeof(TGraphType)).Name(name);
@@ -462,7 +462,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="type">The .NET type of the graph type of this field.</param>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, object> Field(string name, Type type)
+        public virtual FieldBuilder<TSourceType, object> Field(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             var builder = CreateBuilder<object>(type).Name(name);
             AddField(builder.FieldType);
@@ -493,10 +493,10 @@ namespace GraphQL.Types
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
         /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
-           string name,
-           Expression<Func<TSourceType, TProperty>> expression,
-           bool nullable = false,
-           Type? type = null)
+            string name,
+            Expression<Func<TSourceType, TProperty>> expression,
+            bool nullable = false,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
         {
             try
             {
@@ -538,7 +538,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
-            Type? type = null)
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
         {
             string name;
             try
