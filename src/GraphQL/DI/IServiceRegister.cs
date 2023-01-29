@@ -27,9 +27,11 @@ namespace GraphQL.DI
         /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
         /// has not already been registered.
         /// </summary>
-        IServiceRegister TryRegister(Type serviceType,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
+        IServiceRegister TryRegister(
+            Type serviceType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type implementationType,
+            ServiceLifetime serviceLifetime,
+            RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency
