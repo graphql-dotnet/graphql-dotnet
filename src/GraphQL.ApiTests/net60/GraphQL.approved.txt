@@ -727,6 +727,8 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are n" +
+            "ot trimmed by the compiler.")]
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
         public static void AutoRegister<TClrType>(this GraphQL.Types.ISchema schema, GraphQL.AutoRegisteringMode mode = 3) { }
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
@@ -744,6 +746,8 @@ namespace GraphQL
         public static void RegisterTypeMappings(this GraphQL.Types.ISchema schema, System.Reflection.Assembly assembly) { }
         public static void RegisterTypes<TSchema>(this TSchema schema, params GraphQL.Types.IGraphType[] types)
             where TSchema : GraphQL.Types.ISchema { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types\' constructors are not trimmed by the compiler." +
+            "")]
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params System.Type[] types)
             where TSchema : GraphQL.Types.ISchema { }
         public static void RegisterVisitor<TVisitor>(this GraphQL.Types.ISchema schema)
