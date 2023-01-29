@@ -311,7 +311,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterType[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+        public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             CheckDisposed();
             CheckInitialized();
