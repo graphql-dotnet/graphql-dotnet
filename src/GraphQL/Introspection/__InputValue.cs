@@ -21,7 +21,7 @@ namespace GraphQL.Introspection
                 "and optionally a default value.";
 
             Field<NonNullGraphType<StringGraphType>>("name")
-                .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name);
+                .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name); // avoid implicit use of FieldNameResolver here to make the code compatible with AOT compilation
 
             Field<StringGraphType>("description")
                 .Resolve(context => context.Source is QueryArgument arg ? arg.Description : ((FieldType)context.Source).Description);

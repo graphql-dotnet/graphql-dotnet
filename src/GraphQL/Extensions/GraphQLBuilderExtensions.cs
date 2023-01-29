@@ -24,9 +24,7 @@ namespace GraphQL
 
         #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
-        public static IServiceRegister Register<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             => services.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
 
@@ -35,9 +33,7 @@ namespace GraphQL
         /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IServiceRegister Register<TService,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
             => services.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
@@ -59,9 +55,7 @@ namespace GraphQL
             => services.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
 
         /// <inheritdoc cref="TryRegister{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime)"/>
-        public static IServiceRegister TryRegister<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
@@ -72,9 +66,7 @@ namespace GraphQL
         /// has not already been registered. An instance of <typeparamref name="TImplementation"/>
         /// will be created when an instance is needed.
         /// </summary>
-        public static IServiceRegister TryRegister<TService,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+        public static IServiceRegister TryRegister<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
             => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, mode);
@@ -105,9 +97,7 @@ namespace GraphQL
             => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), mode);
 
         /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
-        public static IServiceRegister Configure<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-        TOptions>(this IServiceRegister services, Action<TOptions>? action)
+        public static IServiceRegister Configure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
             => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
@@ -299,9 +289,7 @@ namespace GraphQL
         /// This allows for a schema that is entirely configured with CLR types.
         /// </summary>
         [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
-        public static IGraphQLBuilder AddAutoSchema<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
-        TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
+        public static IGraphQLBuilder AddAutoSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
             builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
             builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
@@ -313,9 +301,7 @@ namespace GraphQL
         /// Configures <see cref="Schema.Mutation"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TMutationClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithMutation<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
-        TMutationClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithMutation<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TMutationClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -329,9 +315,7 @@ namespace GraphQL
         /// Configures <see cref="Schema.Subscription"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TSubscriptionClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithSubscription<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)]
-        TSubscriptionClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithSubscription<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -850,9 +834,7 @@ namespace GraphQL
         /// dependency injection framework.
         /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddSerializer<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-        TSerializer>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddSerializer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSerializer>(this IGraphQLBuilder builder)
             where TSerializer : class, IGraphQLSerializer
         {
             builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);

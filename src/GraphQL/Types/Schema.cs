@@ -311,9 +311,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterType(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type type)
+        public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             CheckDisposed();
             CheckInitialized();
@@ -352,7 +350,8 @@ namespace GraphQL.Types
         private List<(Type clrType, Type graphType)>? _clrToGraphTypeMappings;
 
         /// <inheritdoc/>
-        public void RegisterTypeMapping(Type clrType,
+        public void RegisterTypeMapping(
+            Type clrType,
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
             Type graphType)
         {

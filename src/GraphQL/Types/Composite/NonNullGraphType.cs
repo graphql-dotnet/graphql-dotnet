@@ -50,9 +50,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="NonNullGraphType"/>
-    public sealed class NonNullGraphType<
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-    T> : NonNullGraphType
+    public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : NonNullGraphType
         where T : IGraphType
     {
         /// <summary>

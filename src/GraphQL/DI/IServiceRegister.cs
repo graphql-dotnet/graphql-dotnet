@@ -11,9 +11,11 @@ namespace GraphQL.DI
         /// When not replacing existing registrations, requesting the service type should return the most recent registration,
         /// and requesting an <see cref="IEnumerable{T}"/> of the service type should return all of the registrations.
         /// </summary>
-        IServiceRegister Register(Type serviceType,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type implementationType, ServiceLifetime serviceLifetime, bool replace = false);
+        IServiceRegister Register(
+            Type serviceType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type implementationType,
+            ServiceLifetime serviceLifetime,
+            bool replace = false);
 
         /// <inheritdoc cref="Register(Type, Type, ServiceLifetime, bool)"/>
         IServiceRegister Register(Type serviceType, Func<IServiceProvider, object> implementationFactory, ServiceLifetime serviceLifetime, bool replace = false);
@@ -27,9 +29,11 @@ namespace GraphQL.DI
         /// in case of <see cref="RegistrationCompareMode.ServiceTypeAndImplementationType"/>)
         /// has not already been registered.
         /// </summary>
-        IServiceRegister TryRegister(Type serviceType,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
-            Type implementationType, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
+        IServiceRegister TryRegister(
+            Type serviceType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type implementationType,
+            ServiceLifetime serviceLifetime,
+            RegistrationCompareMode mode = RegistrationCompareMode.ServiceType);
 
         /// <summary>
         /// Registers the service of type <paramref name="serviceType"/> with the dependency
@@ -53,9 +57,7 @@ namespace GraphQL.DI
         /// If <paramref name="action"/> is <see langword="null"/> then <typeparamref name="TOptions"/> is still configured and
         /// will return a default instance (unless otherwise configured with a subsequent call to <see cref="Configure{TOptions}(Action{TOptions, IServiceProvider}?)">Configure</see>).
         /// </summary>
-        IServiceRegister Configure<
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-        TOptions>(Action<TOptions, IServiceProvider>? action = null)
+        IServiceRegister Configure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new();
     }
 }
