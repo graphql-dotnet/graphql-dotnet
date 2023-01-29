@@ -126,6 +126,7 @@ namespace GraphQL.Types
         /// </summary>
         public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
         {
+            // TODO: Determine if this method can be used in AOT compilation scenarios with future versions of .NET.
             if (argumentDelegate == null)
                 throw new ArgumentNullException(nameof(argumentDelegate));
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
