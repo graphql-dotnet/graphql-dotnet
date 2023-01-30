@@ -104,6 +104,11 @@ namespace GraphQL
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
+            if (typeof(IGraphType).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), $"The graph type '{type.GetFriendlyName()}' cannot be used as a CLR type.");
+            }
+
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
                 type = type.GetGenericArguments()[0];
