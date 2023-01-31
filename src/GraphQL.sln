@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
@@ -143,6 +143,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "GraphQL.DataLoader\GraphQL.DataLoader.csproj", "{466AD883-96BD-458E-9872-3C14E49D18F8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.StarWars.TypeFirst", "GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.TypeFirst", "GraphQL.AotCompilationSample.TypeFirst\GraphQL.AotCompilationSample.TypeFirst.csproj", "{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AotCompilation", "AotCompilation", "{EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.CodeFirst", "GraphQL.AotCompilationSample.CodeFirst\GraphQL.AotCompilationSample.CodeFirst.csproj", "{AF935624-E6BC-4C61-99A7-DC0A829DB933}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -213,6 +221,18 @@ Global
 		{466AD883-96BD-458E-9872-3C14E49D18F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{466AD883-96BD-458E-9872-3C14E49D18F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{466AD883-96BD-458E-9872-3C14E49D18F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FBC5401-91F4-4BFA-BBD8-758B857BE03A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -233,6 +253,8 @@ Global
 		{92C246A6-E740-41AA-B77A-B939C54B1D8E} = {3DB29B96-B428-46A6-A4D3-FA677110B654}
 		{185923DF-89EE-457B-8DA0-3CBBE080EC32} = {2EA5354E-F4EF-4469-86AE-F1D36C7F8977}
 		{82BE75F5-9C90-427D-8268-1C640A90CE98} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{16E4BB19-ADBB-472F-BADD-87BC8F4A7C71} = {EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}
+		{AF935624-E6BC-4C61-99A7-DC0A829DB933} = {EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

@@ -23,7 +23,7 @@ public class DataLoaderContext
         if (dataLoaderFactory == null)
             throw new ArgumentNullException(nameof(dataLoaderFactory));
 
-        IDataLoader loader;
+        IDataLoader? loader;
 
         lock (_loaders)
         {

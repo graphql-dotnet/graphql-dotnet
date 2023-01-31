@@ -121,15 +121,38 @@ namespace GraphQL.Types
         /// The delegate must be of the type
         /// <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;
         /// where <typeparamref name="TParameterType"/> matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
+        /// <br/><br/>
+        /// As of .NET 7, this method cannot be used in AOT compilation scenarios.
         /// </summary>
+        [RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
         public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
         {
+            // TODO: Determine if this method can be used in AOT compilation scenarios with future versions of .NET.
             if (argumentDelegate == null)
                 throw new ArgumentNullException(nameof(argumentDelegate));
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
                 throw new ArgumentException($"Delegate must be of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.", nameof(argumentDelegate));
 
             Expression = (IResolveFieldContext context) => argumentDelegate(context);
+        }
+
+        /// <summary>
+        /// Sets a delegate to be used to populate this method argument while building the field resolver.
+        /// An expression is generated that calls <paramref name="argumentDelegate"/> and stored within <see cref="Expression"/>.
+        /// The result of the delegate is cast to the method parameter type.
+        /// <br/><br/>
+        /// See <see cref="SetDelegate{TParameterType}(Func{IResolveFieldContext, TParameterType})"/> for a
+        /// type-safe version of this method, recommended for use with <see cref="GraphQLAttribute.Modify{TParameterType}(ArgumentInformation)"/>.
+        /// </summary>
+        public void SetDelegateWithCast(Func<IResolveFieldContext, object?> argumentDelegate)
+        {
+            if (argumentDelegate == null)
+                throw new ArgumentNullException(nameof(argumentDelegate));
+
+            Expression<Func<IResolveFieldContext, object?>> expr = (IResolveFieldContext context) => argumentDelegate(context);
+            Expression = System.Linq.Expressions.Expression.Lambda(
+                System.Linq.Expressions.Expression.Convert(expr.Body, ParameterInfo.ParameterType),
+                expr.Parameters[0]);
         }
 
         /// <summary>

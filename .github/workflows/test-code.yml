@@ -71,6 +71,16 @@ jobs:
         if: ${{ startsWith(matrix.os, 'windows') }}
         working-directory: src
         run: dotnet test --no-restore --no-build
+      - name: Test code-first AOT compilation
+        working-directory: src/GraphQL.AotCompilationSample.CodeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.CodeFirst
+      - name: Test type-first AOT compilation
+        working-directory: src/GraphQL.AotCompilationSample.TypeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.TypeFirst
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3
