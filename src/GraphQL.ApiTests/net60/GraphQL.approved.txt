@@ -1452,10 +1452,10 @@ namespace GraphQL.Instrumentation
         public virtual float SortOrder { get; }
         public static string SourceName { get; }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
-        protected virtual System.Threading.Tasks.Task SetInitialTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
-        protected virtual System.Threading.Tasks.Task SetOperationTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
-        protected virtual System.Threading.Tasks.Task SetResultTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
-        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivity(GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivityAsync(GraphQL.ExecutionOptions options) { }
     }
     public interface IFieldMiddleware
     {

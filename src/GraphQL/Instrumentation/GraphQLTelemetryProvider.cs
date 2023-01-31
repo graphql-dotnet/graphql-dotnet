@@ -47,14 +47,14 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         // start the Activity
-        using var activity = await StartActivity(options).ConfigureAwait(false);
+        using var activity = await StartActivityAsync(options).ConfigureAwait(false);
 
         // if no event listeners, do not record any telemetry
         if (activity == null)
             return await next(options).ConfigureAwait(false);
 
         // record the requested operation name and optionally the GraphQL document
-        await SetInitialTags(activity, options).ConfigureAwait(false);
+        await SetInitialTagsAsync(activity, options).ConfigureAwait(false);
 
         // record the operation type and the operation name (which may be specified within the
         // document even if not specified in the request)
@@ -64,7 +64,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         var result = await next(options).ConfigureAwait(false);
 
         // record the status
-        await SetResultTags(activity, options, result).ConfigureAwait(false);
+        await SetResultTagsAsync(activity, options, result).ConfigureAwait(false);
 
         // return the result
         return result;
@@ -73,14 +73,14 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <summary>
     /// Creates an <see cref="Activity"/> for the specified <see cref="ExecutionOptions"/> and starts it.
     /// </summary>
-    protected virtual ValueTask<Activity?> StartActivity(ExecutionOptions options)
+    protected virtual ValueTask<Activity?> StartActivityAsync(ExecutionOptions options)
         => new(_activitySource.StartActivity(ACTIVITY_OPERATION_NAME));
 
     /// <summary>
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionOptions"/>.
     /// The default implementation sets the <c>graphql.operation.name</c> and <c>graphql.document</c> tags.
     /// </summary>
-    protected virtual Task SetInitialTags(Activity activity, ExecutionOptions options)
+    protected virtual Task SetInitialTagsAsync(Activity activity, ExecutionOptions options)
     {
         activity.SetTag("graphql.operation.name", options.OperationName);
         if (_telemetryOptions.RecordDocument && activity.IsAllDataRequested)
@@ -93,7 +93,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// The default implementation sets the <c>graphql.operation.name</c> and <c>graphql.operation.type</c> tags, and sets the
     /// <see cref="Activity.DisplayName"/> property based on the operation name and type.
     /// </summary>
-    protected virtual Task SetOperationTags(Activity activity, ExecutionOptions options, ISchema schema, GraphQLDocument document, GraphQLOperationDefinition operation)
+    protected virtual Task SetOperationTagsAsync(Activity activity, ExecutionOptions options, ISchema schema, GraphQLDocument document, GraphQLOperationDefinition operation)
     {
         var operationType = operation.Operation.ToString().ToLowerInvariant();
         activity.SetTag("graphql.operation.type", operationType);
@@ -107,7 +107,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionResult"/>.
     /// The default implementation for .NET 6+ sets the status code tag based on the <see cref="ExecutionResult.Errors"/> property.
     /// </summary>
-    protected virtual Task SetResultTags(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
+    protected virtual Task SetResultTagsAsync(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
     {
 #if NET6_0_OR_GREATER
         var failed = result.Errors?.Count > 0;
@@ -131,7 +131,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
 
         public override Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
-            => _provider.SetOperationTags(_activity, _options, context.Schema, context.Document, context.Operation);
+            => _provider.SetOperationTagsAsync(_activity, _options, context.Schema, context.Document, context.Operation);
     }
 }
 
