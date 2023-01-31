@@ -136,6 +136,13 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
     [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>))]
     [InlineData(typeof(IEnumerable<IEnumerable<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>))]
+    //built-in mapping mode - graph types
+    [InlineData(typeof(IntGraphType), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(IntGraphType), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
     //output mapping mode
     [InlineData(typeof(int), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
     [InlineData(typeof(string), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
@@ -181,6 +188,13 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))]
     [InlineData(typeof(IEnumerable<KeyValuePair<int, string>>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
     [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
+    //output mapping mode - graph types
+    [InlineData(typeof(IntGraphType), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(IntGraphType), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
     //input mapping mode
     [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
     //data loader compatibility
@@ -375,6 +389,23 @@ public class GetGraphTypeFromTypeTests
         var inputTypeActual = schema.Query.Fields.Find("test").Arguments.Find("arg").ResolvedType.ShouldBeOfType<InputObjectGraphType>();
         inputTypeActual.ShouldBe(inputType);
         inputTypeActual.Fields.Find("field").Type.ShouldBe(mappedType);
+    }
+
+    [Fact]
+    public void GraphTypesAsClrTypesAreDisallowed()
+    {
+        var expectedMessage = "The graph type 'IntGraphType' cannot be used as a CLR type.";
+
+        Should.Throw<ArgumentOutOfRangeException>(() => typeof(IntGraphType).GetGraphTypeFromType())
+            .Message.ShouldStartWith(expectedMessage);
+
+        var graphType = new ObjectGraphType();
+        Should.Throw<ArgumentException>(() => graphType.Field<IntGraphType>("test", true))
+            .Message.ShouldStartWith("The GraphQL type for field 'Object.test' could not be derived implicitly from type 'IntGraphType'. " + expectedMessage);
+
+        var fieldBuilder = graphType.Field<string>("example");
+        Should.Throw<ArgumentException>(() => fieldBuilder.Argument<IntGraphType>("test", true))
+            .Message.ShouldStartWith("The GraphQL type for argument 'example.test' could not be derived implicitly from type 'IntGraphType'. " + expectedMessage);
     }
 
     private class MyClassObjectType : ObjectGraphType<MyClass>

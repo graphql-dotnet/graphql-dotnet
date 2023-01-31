@@ -27,7 +27,7 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        public static void RegisterType<T>(this ISchema schema)
+        public static void RegisterType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this ISchema schema)
             where T : IGraphType
         {
             schema.RegisterType(typeof(T));
@@ -40,6 +40,7 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
+        [RequiresUnreferencedCode("Please ensure that the graph types' constructors are not trimmed by the compiler.")]
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params Type[] types)
             where TSchema : ISchema
         {
@@ -81,11 +82,18 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
-        public static void RegisterTypeMapping<TClrType, TGraphType>(this ISchema schema)
+        public static void RegisterTypeMapping<TClrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {
+            Preserve<GraphQLClrInputTypeReference<TClrType>>();
+            Preserve<GraphQLClrOutputTypeReference<TClrType>>();
             schema.RegisterTypeMapping(typeof(TClrType), typeof(TGraphType));
         }
+
+        /// <summary>
+        /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
+        /// </summary>
+        private static void Preserve<T>() => GC.KeepAlive(typeof(T));
 
         /// <summary>
         /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.
@@ -99,6 +107,7 @@ namespace GraphQL
         /// <param name="schema">The schema for which the mapping is registered.</param>
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
+        [RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are not trimmed by the compiler.")]
         public static void AutoRegister(this ISchema schema, Type clrType, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
             if (mode.HasFlag(AutoRegisteringMode.Output))
@@ -121,7 +130,10 @@ namespace GraphQL
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
-            schema.AutoRegister(typeof(TClrType), mode);
+            if (mode.HasFlag(AutoRegisteringMode.Output))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringObjectGraphType<TClrType>>();
+            if (mode.HasFlag(AutoRegisteringMode.Input))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringInputObjectGraphType<TClrType>>();
         }
 
         /// <summary>
@@ -137,8 +149,9 @@ namespace GraphQL
         /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
         /// the mappings prior to execution.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this ISchema schema)
-        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+            => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
@@ -153,6 +166,7 @@ namespace GraphQL
         /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder, Assembly)"/> as it will
         /// precompute the mappings prior to execution.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
         {
             if (assembly == null)
