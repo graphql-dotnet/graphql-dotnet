@@ -5,7 +5,7 @@ namespace GraphQL.Instrumentation;
 /// <summary>
 /// Options for configuring the telemetry instrumentation.
 /// </summary>
-public class TelemetryOptions
+public class GraphQLTelemetryOptions
 {
     // see https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md
 

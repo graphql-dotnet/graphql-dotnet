@@ -1183,14 +1183,14 @@ namespace GraphQL
         /// <remarks>
         /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
         /// </remarks>
-        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions>? configure = null)
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
             => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
 
-        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{TelemetryOptions}?)"/>
-        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<TelemetryOptions, IServiceProvider>? configure)
+        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
         {
             builder.Services.Configure(configure);
-            builder.ConfigureExecution<TelemetryProvider>();
+            builder.ConfigureExecution<GraphQLTelemetryProvider>();
             return builder;
         }
 #endif

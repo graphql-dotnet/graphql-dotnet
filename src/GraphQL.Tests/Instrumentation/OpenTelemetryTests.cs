@@ -26,7 +26,7 @@ public class OpenTelemetryTests : IDisposable
             {
                 services.AddOpenTelemetry()
                     .WithTracing(b => b
-                        .AddSource(TelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
                         .AddInMemoryExporter(_exportedActivities))
                     .StartWithHost(); // relies on HostBuilder to start telemetry services (typical for ASP.NET applications)
 

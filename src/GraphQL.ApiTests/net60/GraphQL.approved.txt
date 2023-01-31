@@ -400,8 +400,8 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.TelemetryOptions>? configure = null) { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.TelemetryOptions, System.IServiceProvider>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.GraphQLTelemetryOptions>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Instrumentation.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
         public static GraphQL.IConfigureAutoSchema WithMutation<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
@@ -1441,6 +1441,22 @@ namespace GraphQL.Instrumentation
         public static GraphQL.Instrumentation.IFieldMiddlewareBuilder Use(this GraphQL.Instrumentation.IFieldMiddlewareBuilder builder, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
     }
     public delegate System.Threading.Tasks.ValueTask<object?> FieldMiddlewareDelegate(GraphQL.IResolveFieldContext context);
+    public class GraphQLTelemetryOptions
+    {
+        public GraphQLTelemetryOptions() { }
+        public bool RecordDocument { get; set; }
+    }
+    public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
+    {
+        public GraphQLTelemetryProvider(GraphQL.Instrumentation.GraphQLTelemetryOptions options) { }
+        public virtual float SortOrder { get; }
+        public static string SourceName { get; }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.Task SetInitialTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.Task SetOperationTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
+        protected virtual System.Threading.Tasks.Task SetResultTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivity(GraphQL.ExecutionOptions options) { }
+    }
     public interface IFieldMiddleware
     {
         System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next);
@@ -1482,22 +1498,6 @@ namespace GraphQL.Instrumentation
         public string? Subject { get; set; }
         public void MarkEnd(double end) { }
         public T? MetaField<T>(string key) { }
-    }
-    public class TelemetryOptions
-    {
-        public TelemetryOptions() { }
-        public bool RecordDocument { get; set; }
-    }
-    public class TelemetryProvider : GraphQL.DI.IConfigureExecution
-    {
-        public TelemetryProvider(GraphQL.Instrumentation.TelemetryOptions options) { }
-        public virtual float SortOrder { get; }
-        public static string SourceName { get; }
-        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
-        protected virtual System.Threading.Tasks.Task SetInitialTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
-        protected virtual System.Threading.Tasks.Task SetOperationTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
-        protected virtual System.Threading.Tasks.Task SetResultTags(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
-        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivity(GraphQL.ExecutionOptions options) { }
     }
     public readonly struct ValueStopwatch
     {

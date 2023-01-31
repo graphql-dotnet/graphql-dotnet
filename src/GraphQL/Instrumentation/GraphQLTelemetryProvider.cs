@@ -16,10 +16,10 @@ namespace GraphQL.Instrumentation;
 /// To use a derived class, call <see cref="GraphQLBuilderExtensions.ConfigureExecution{TConfigureExecution}(IGraphQLBuilder)"/> with the type of your derived class.
 /// </para>
 /// </summary>
-public class TelemetryProvider : IConfigureExecution
+public class GraphQLTelemetryProvider : IConfigureExecution
 {
     private static readonly ActivitySource _activitySource;
-    private readonly TelemetryOptions _telemetryOptions;
+    private readonly GraphQLTelemetryOptions _telemetryOptions;
     private const string ACTIVITY_OPERATION_NAME = "graphql";
 
     /// <summary>
@@ -27,15 +27,15 @@ public class TelemetryProvider : IConfigureExecution
     /// </summary>
     public static string SourceName => "GraphQL";
 
-    static TelemetryProvider()
+    static GraphQLTelemetryProvider()
     {
-        _activitySource = new ActivitySource(SourceName, typeof(TelemetryProvider).Assembly.GetNuGetVersion());
+        _activitySource = new ActivitySource(SourceName, typeof(GraphQLTelemetryProvider).Assembly.GetNuGetVersion());
     }
 
     /// <summary>
     /// Initializes a new instance with the specified options.
     /// </summary>
-    public TelemetryProvider(TelemetryOptions options)
+    public GraphQLTelemetryProvider(GraphQLTelemetryOptions options)
     {
         _telemetryOptions = options;
     }
@@ -119,11 +119,11 @@ public class TelemetryProvider : IConfigureExecution
     // note: this could be implemented as a validation rule with no public API changes
     private class TelemetryListener : DocumentExecutionListenerBase
     {
-        private readonly TelemetryProvider _provider;
+        private readonly GraphQLTelemetryProvider _provider;
         private readonly Activity _activity;
         private readonly ExecutionOptions _options;
 
-        public TelemetryListener(TelemetryProvider provider, Activity activity, ExecutionOptions options)
+        public TelemetryListener(GraphQLTelemetryProvider provider, Activity activity, ExecutionOptions options)
         {
             _provider = provider;
             _activity = activity;
@@ -136,4 +136,5 @@ public class TelemetryProvider : IConfigureExecution
 }
 
 #endif
+
 
