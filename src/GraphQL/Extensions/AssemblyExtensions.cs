@@ -79,7 +79,7 @@ namespace GraphQL
             if (version == null)
                 return null;
             var i = version.LastIndexOf('+');
-            return i != -1 ? version.Substring(0, i) : version;
+            return i == -1 ? version : version.Substring(0, i);
         }
     }
 }
