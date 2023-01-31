@@ -1172,7 +1172,7 @@ namespace GraphQL
         #region - UseTelemetry -
 #if NET5_0_OR_GREATER
         /// <summary>
-        /// Configures the GraphQL server to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
+        /// Configures the GraphQL engine to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
         /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
         /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
         /// </summary>
