@@ -92,7 +92,7 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void Passing_GraphType_InsteadOf_ClrType_Should_Produce_Friendly_Error()
     {
-        ShouldThrow<Bug3507Schema, InvalidOperationException>("The GraphQL type for argument 'MyQuery.updateDate.newDate' could not be derived implicitly. Could not find type mapping from CLR type 'GraphQL.Types.DateGraphType' to GraphType. Did you forget to register the type mapping with the 'ISchema.RegisterTypeMapping'? Note that 'GraphQL.Types.DateGraphType' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). Most likely you need to specify corresponding CLR type instead of GraphType.");
+        Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
     }
 }
 
