@@ -119,19 +119,19 @@ public class TelemetryProvider : IConfigureExecution
     // note: this could be implemented as a validation rule with no public API changes
     private class TelemetryListener : DocumentExecutionListenerBase
     {
-        private readonly TelemetryProvider _telemetryConfiguration;
+        private readonly TelemetryProvider _provider;
         private readonly Activity _activity;
         private readonly ExecutionOptions _options;
 
-        public TelemetryListener(TelemetryProvider telemetryConfiguration, Activity activity, ExecutionOptions options)
+        public TelemetryListener(TelemetryProvider provider, Activity activity, ExecutionOptions options)
         {
-            _telemetryConfiguration = telemetryConfiguration;
+            _provider = provider;
             _activity = activity;
             _options = options;
         }
 
         public override Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult)
-            => _telemetryConfiguration.SetOperationTags(_activity, _options, context.Schema, context.Document, context.Operation);
+            => _provider.SetOperationTags(_activity, _options, context.Schema, context.Document, context.Operation);
     }
 }
 
