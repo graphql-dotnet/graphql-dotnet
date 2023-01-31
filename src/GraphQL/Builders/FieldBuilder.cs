@@ -239,7 +239,7 @@ namespace GraphQL.Builders
             }
             catch (ArgumentOutOfRangeException exp)
             {
-                throw new ArgumentException($"The GraphQL type for argument '{FieldType.Name}.{name}' could not be derived implicitly from type '{typeof(TArgumentClrType).Name}'.", exp);
+                throw new ArgumentException($"The GraphQL type for argument '{FieldType.Name}.{name}' could not be derived implicitly from type '{typeof(TArgumentClrType).Name}'. " + exp.Message, exp);
             }
 
             return Argument(type, name, configure);

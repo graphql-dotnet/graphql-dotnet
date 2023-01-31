@@ -447,7 +447,7 @@ namespace GraphQL.Types
             }
             catch (ArgumentOutOfRangeException exp)
             {
-                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from type '{typeof(TReturnType).Name}'.", exp);
+                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from type '{typeof(TReturnType).Name}'. " + exp.Message, exp);
             }
 
             var builder = CreateBuilder<TReturnType>(type)
@@ -505,7 +505,7 @@ namespace GraphQL.Types
             }
             catch (ArgumentOutOfRangeException exp)
             {
-                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'.", exp);
+                throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'. " + exp.Message, exp);
             }
 
             var builder = CreateBuilder<TProperty>(type)
