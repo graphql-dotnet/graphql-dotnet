@@ -360,7 +360,7 @@ namespace GraphQL.Types
             Type CheckType(Type clrType)
             {
                 return typeof(IGraphType).IsAssignableFrom(clrType)
-                    ? throw new ArgumentException($"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.", nameof(clrType))
+                    ? throw new ArgumentOutOfRangeException(nameof(clrType), $"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.")
                     : clrType;
             }
         }
