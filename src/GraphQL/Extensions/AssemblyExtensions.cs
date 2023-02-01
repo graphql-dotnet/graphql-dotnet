@@ -22,6 +22,7 @@ namespace GraphQL
         /// Skips classes where the source type is <see cref="object"/>, or where the class is marked with
         /// the <see cref="DoNotMapClrTypeAttribute"/>.
         /// </summary>
+        [RequiresUnreferencedCode("Types containing in the provided assembly might be removed")]
         public static List<(Type ClrType, Type GraphType)> GetClrTypeMappings(this Assembly assembly)
         {
             //create a list of type mappings

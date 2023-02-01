@@ -303,7 +303,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return type;
         }
 
-        private void InitializeField(FieldConfig config, Type? parentType)
+        private void InitializeField(FieldConfig config, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] Type? parentType)
         {
             config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
 
@@ -324,7 +324,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
-        private void InitializeSubscriptionField(FieldConfig config, Type? parentType)
+        private void InitializeSubscriptionField(FieldConfig config, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] Type? parentType)
         {
             config.ResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.Resolver);
             config.StreamResolverAccessor ??= parentType.ToAccessor(config.Name, ResolverType.StreamResolver);

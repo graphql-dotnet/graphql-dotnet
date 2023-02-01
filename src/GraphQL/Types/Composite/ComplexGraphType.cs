@@ -415,13 +415,13 @@ namespace GraphQL.Types
 
         /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
         [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>()
             where TGraphType : IGraphType
             => Field<TGraphType, TReturnType>("default");
 
         /// <inheritdoc cref="Field{TGraphType}(string)"/>
         [Obsolete("Please call Field<TGraphType>(string name) instead.")]
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+        public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>()
             where TGraphType : IGraphType
             => Field<TGraphType, object>("default");
 
@@ -430,7 +430,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
+        public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(string name)
             where TGraphType : IGraphType
             => Field<TGraphType, object>(name);
 
@@ -555,7 +555,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-        public ConnectionBuilder<TSourceType> Connection<TNodeType>()
+        public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>()
             where TNodeType : IGraphType
         {
             var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
@@ -564,7 +564,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
+        public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
         {
@@ -574,7 +574,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
+        public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, TConnectionType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
