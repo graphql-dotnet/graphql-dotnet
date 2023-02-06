@@ -155,26 +155,13 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you can pull in those dependencies via constructor injection OR via `GetRequiredService` as follows:
-
-
-```csharp
-public class StarWarsSchema : Schema
-{
-    public StarWarsSchema(IServiceProvider serviceProvider, StarWarsQuery query, StarWarsMutation mutation)
-        : base(serviceProvider)
-    {
-        Query = query;
-        Mutation = mutation;
-    }
-}
-```
+If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you will need
+to manually pull in those dependencies from the `SelfActivatingServiceProvider` via `GetRequiredService` as follows:
 
 ```csharp
 public class StarWarsSchema : Schema
 {
-    public StarWarsSchema(IServiceProvider serviceProvider)
-        : base(serviceProvider)
+    public StarWarsSchema(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         Query = serviceProvider.GetRequiredService<StarWarsQuery>();
         Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();
