@@ -31,11 +31,11 @@ You can override the default implementation by passing a `IServiceProvider` to t
 ```csharp
 public class StarWarsSchema : GraphQL.Types.Schema
 {
-    public StarWarsSchema(IServiceProvider provider)
+    public StarWarsSchema(IServiceProvider provider, StarWarsQuery query, StarWarsMutation mutation)
         : base(provider)
     {
-        Query = provider.GetRequiredService<StarWarsQuery>();
-        Mutation = provider.GetRequiredService<StarWarsMutation>();
+        Query = query;
+        Mutation = mutation;
     }
 }
 ```
@@ -155,8 +155,20 @@ public void ConfigureServices(IServiceCollection services)
 }
 ```
 
-If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you will need
-to manually pull in those dependencies from the `SelfActivatingServiceProvider` via `GetRequiredService` as follows:
+If you previously pulled in your query, mutation and/or subscription classes via dependency injection, you can pull in those dependencies via constructor injection OR via `GetRequiredService` as follows:
+
+
+```csharp
+public class StarWarsSchema : Schema
+{
+    public StarWarsSchema(IServiceProvider serviceProvider, StarWarsQuery query, StarWarsMutation mutation)
+        : base(serviceProvider)
+    {
+        Query = query;
+        Mutation = mutation;
+    }
+}
+```
 
 ```csharp
 public class StarWarsSchema : Schema
