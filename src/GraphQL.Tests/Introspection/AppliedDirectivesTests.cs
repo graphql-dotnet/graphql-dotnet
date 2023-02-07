@@ -19,7 +19,7 @@ public class AppliedDirectivesTests
         string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
-        json.ShouldBe("AppliedDirectivesResult".ReadJsonResult());
+        json.ShouldBeCrossPlat("AppliedDirectivesResult".ReadJsonResult());
     }
 
     private class AppliedSchema : Schema

@@ -26,7 +26,7 @@ public class Bug3331
         schema.Query = queryGraphType;
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe(@"A different instance of the GraphType 'MyObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.
+            .Message.ShouldBeCrossPlat(@"A different instance of the GraphType 'MyObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.
 To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization switch.");
 
         // Must have 2 instances

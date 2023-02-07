@@ -1,0 +1,132 @@
+namespace GraphQL.Federation.Attributes
+{
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ExternalAttribute : GraphQL.GraphQLAttribute
+    {
+        public ExternalAttribute() { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class InaccessibleAttribute : GraphQL.GraphQLAttribute
+    {
+        public InaccessibleAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
+    public class KeyAttribute : GraphQL.GraphQLAttribute
+    {
+        public KeyAttribute(string fields) { }
+        public KeyAttribute(params string[] fields) { }
+        public bool Resolvable { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class OverrideAttribute : GraphQL.GraphQLAttribute
+    {
+        public OverrideAttribute(string from) { }
+        public string From { get; }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ProvidesAttribute : GraphQL.GraphQLAttribute
+    {
+        public ProvidesAttribute(string fields) { }
+        public ProvidesAttribute(params string[] fields) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class RequiresAttribute : GraphQL.GraphQLAttribute
+    {
+        public RequiresAttribute(string fields) { }
+        public RequiresAttribute(params string[] fields) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ShareableAttribute : GraphQL.GraphQLAttribute
+    {
+        public ShareableAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+}
+namespace GraphQL.Federation.Enums
+{
+    [System.Flags]
+    public enum FederationDirectiveEnum
+    {
+        Key = 1,
+        Shareable = 2,
+        Inaccessible = 4,
+        Override = 8,
+        External = 16,
+        Provides = 32,
+        Requires = 64,
+    }
+}
+namespace GraphQL.Federation.Extensions
+{
+    public class FederatedSchemaBuilder : GraphQL.Utilities.SchemaBuilder
+    {
+        public FederatedSchemaBuilder() { }
+        public override GraphQL.Types.Schema Build(string typeDefinitions) { }
+    }
+    public static class FederatedSchemaHelper
+    {
+        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Federation.Extensions.FederatedSchemaBuilder>? configure = null) { }
+        public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder>? configure = null)
+            where TFederatedSchemaBuilder : GraphQL.Federation.Extensions.FederatedSchemaBuilder, new () { }
+    }
+    public static class FederationFieldExtensions
+    {
+        public static void External(this GraphQL.Types.FieldType fieldType) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> External<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder) { }
+        public static void Inaccessible(this GraphQL.Types.FieldType fieldType) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Inaccessible<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder) { }
+        public static void Override(this GraphQL.Types.FieldType fieldType, string from) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Override<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder, string from) { }
+        public static void Provides(this GraphQL.Types.FieldType fieldType, string[] fields) { }
+        public static void Provides(this GraphQL.Types.FieldType fieldType, string fields) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Provides<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder, string fields) { }
+        public static void Requires(this GraphQL.Types.FieldType fieldType, string[] fields) { }
+        public static void Requires(this GraphQL.Types.FieldType fieldType, string fields) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Requires<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder, string fields) { }
+        public static void Shareable(this GraphQL.Types.FieldType fieldType) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Shareable<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> fieldBuilder) { }
+    }
+    public static class FederationGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.Federation.Enums.FederationDirectiveEnum import, bool addFields = true, GraphQL.Utilities.SchemaPrinterOptions? schemaPrinterOptions = null) { }
+    }
+    public static class FederationGraphTypeExtensions
+    {
+        public static GraphQL.Builders.FieldBuilder<T, object> AddEntities<T>(this GraphQL.Types.ComplexGraphType<T> graphType) { }
+        public static GraphQL.Builders.FieldBuilder<T, object> AddServices<T>(this GraphQL.Types.ComplexGraphType<T> graphType) { }
+        public static void Inaccessible(this GraphQL.Types.IGraphType graphType) { }
+        public static void Key(this GraphQL.Types.IObjectGraphType graphType, string[] fields, bool resolvable = true) { }
+        public static void Key(this GraphQL.Types.IObjectGraphType graphType, string fields, bool resolvable = true) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, GraphQL.Federation.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType> resolver) { }
+        public static void Shareable(this GraphQL.Types.IGraphType graphType) { }
+    }
+}
+namespace GraphQL.Federation
+{
+    public class FuncFederationResolver<TSourceType> : GraphQL.Federation.IFederationResolver
+    {
+        public FuncFederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, object?> resolve) { }
+        public System.Type SourceType { get; }
+        public object? Resolve(GraphQL.IResolveFieldContext context, object source) { }
+    }
+    public interface IFederationResolver
+    {
+        System.Type SourceType { get; }
+        object? Resolve(GraphQL.IResolveFieldContext context, object source);
+    }
+}

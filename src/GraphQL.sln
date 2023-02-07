@@ -151,6 +151,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AotCompilation", "AotCompil
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.CodeFirst", "GraphQL.AotCompilationSample.CodeFirst\GraphQL.AotCompilationSample.CodeFirst.csproj", "{AF935624-E6BC-4C61-99A7-DC0A829DB933}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation", "GraphQL.Federation\GraphQL.Federation.csproj", "{255DC1CA-C3F2-4ACC-9D02-C9C2F17F70EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Tests", "GraphQL.Federation.Tests\GraphQL.Federation.Tests.csproj", "{6A945753-1FEF-4FE9-9C28-5962A546C94B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -233,6 +237,14 @@ Global
 		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF935624-E6BC-4C61-99A7-DC0A829DB933}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255DC1CA-C3F2-4ACC-9D02-C9C2F17F70EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255DC1CA-C3F2-4ACC-9D02-C9C2F17F70EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255DC1CA-C3F2-4ACC-9D02-C9C2F17F70EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255DC1CA-C3F2-4ACC-9D02-C9C2F17F70EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A945753-1FEF-4FE9-9C28-5962A546C94B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A945753-1FEF-4FE9-9C28-5962A546C94B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A945753-1FEF-4FE9-9C28-5962A546C94B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A945753-1FEF-4FE9-9C28-5962A546C94B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

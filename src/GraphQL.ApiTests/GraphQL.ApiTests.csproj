@@ -16,6 +16,7 @@
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
     <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
+    <ProjectReference Include="..\GraphQL.Federation\GraphQL.Federation.csproj" />
   </ItemGroup>
 
 </Project>

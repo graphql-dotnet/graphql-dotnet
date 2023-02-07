@@ -12,8 +12,8 @@ public class Bug2194
         CultureTestHelper.UseCultures(() =>
         {
             var printer = new SchemaPrinter(new Bug2194Schema(), new SchemaPrinterOptions { IncludeDeprecationReasons = false, IncludeDescriptions = false });
-            string printed = printer.Print();
-            printed.ShouldBe("Bug2194".ReadSDL());
+            var printed = printer.Print();
+            printed.ShouldBeCrossPlat("Bug2194".ReadSDL());
         });
     }
 

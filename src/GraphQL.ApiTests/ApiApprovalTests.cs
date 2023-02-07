@@ -18,6 +18,7 @@ public class ApiApprovalTests
     [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]
     [InlineData(typeof(Caching.MemoryDocumentCache))]
     [InlineData(typeof(DataLoader.DataLoaderContext))]
+    [InlineData(typeof(Federation.IFederationResolver))]
     public void PublicApi(Type type)
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;

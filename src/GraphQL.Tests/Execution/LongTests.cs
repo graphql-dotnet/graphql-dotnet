@@ -18,7 +18,7 @@ public class LongTests
         string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
-        json.ShouldBe("""
+        json.ShouldBeCrossPlat("""
             {
               "data": {
                 "testField": 9223372036854775807
