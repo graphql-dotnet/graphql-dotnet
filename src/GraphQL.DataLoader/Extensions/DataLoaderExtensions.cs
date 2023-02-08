@@ -123,6 +123,12 @@ public static class DataLoaderExtensions
     /// <returns>A pending data loader operation that can return a value once the data loaders and the chained delegate finish.</returns>
     public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, CancellationToken, Task<TResult>> chainedDelegate)
     {
+        // ensure that the source list has been enumerated; otherwise LoadAsync would not have
+        // been called, so the ids would not have been queued for execution prior to the
+        // first call to GetResultAsync
+        if (parents is not IList<IDataLoaderResult<T>>)
+            parents = parents.ToList();
+
         return new SimpleDataLoader<TResult>(async cancellationToken =>
         {
             List<T> list = parents is ICollection collection
@@ -139,6 +145,12 @@ public static class DataLoaderExtensions
     /// <inheritdoc cref="Then{T, TResult}(IEnumerable{IDataLoaderResult{T}}, Func{IEnumerable{T}, CancellationToken, Task{TResult}})"/>
     public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, Task<TResult>> chainedDelegate)
     {
+        // ensure that the source list has been enumerated; otherwise LoadAsync would not have
+        // been called, so the ids would not have been queued for execution prior to the
+        // first call to GetResultAsync
+        if (parents is not IList<IDataLoaderResult<T>>)
+            parents = parents.ToList();
+
         return new SimpleDataLoader<TResult>(async cancellationToken =>
         {
             List<T> list = parents is ICollection collection
@@ -155,6 +167,12 @@ public static class DataLoaderExtensions
     /// <inheritdoc cref="Then{T, TResult}(IEnumerable{IDataLoaderResult{T}}, Func{IEnumerable{T}, CancellationToken, Task{TResult}})"/>
     public static IDataLoaderResult<TResult> Then<T, TResult>(this IEnumerable<IDataLoaderResult<T>> parents, Func<IEnumerable<T>, TResult> chainedDelegate)
     {
+        // ensure that the source list has been enumerated; otherwise LoadAsync would not have
+        // been called, so the ids would not have been queued for execution prior to the
+        // first call to GetResultAsync
+        if (parents is not IList<IDataLoaderResult<T>>)
+            parents = parents.ToList();
+
         return new SimpleDataLoader<TResult>(async cancellationToken =>
         {
             List<T> list = parents is ICollection collection
