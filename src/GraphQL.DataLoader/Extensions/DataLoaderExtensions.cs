@@ -111,10 +111,6 @@ public static class DataLoaderExtensions
 
     /// <summary>
     /// Chains post-processing to a list of pending data loader operations.
-    /// <br/><br/>
-    /// Be sure the source list has been enumerated, for instance by calling
-    /// <see cref="Enumerable.ToList{TSource}(IEnumerable{TSource})">ToList</see>,
-    /// before calling this function.
     /// </summary>
     /// <typeparam name="T">The type of the return value of the data loaders.</typeparam>
     /// <typeparam name="TResult">The type of the result.</typeparam>
