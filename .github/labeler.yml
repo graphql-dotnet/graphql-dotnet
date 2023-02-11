@@ -5,6 +5,8 @@ test:
   - src/GraphQL.MicrosoftDI.Tests/**/*
   - src/GraphQL.Tests/**/*
   - src/GraphQL.ApiTests/**/*.cs
+  - src/Tests.props
+  - src/xunit.runner.json
 
 CI:
   - .github/workflows/**/*
