@@ -18,9 +18,13 @@ namespace GraphQL.Instrumentation;
 /// </summary>
 public class GraphQLTelemetryProvider : IConfigureExecution
 {
-    private static readonly ActivitySource _activitySource;
     private readonly GraphQLTelemetryOptions _telemetryOptions;
     private const string ACTIVITY_OPERATION_NAME = "graphql";
+
+    /// <summary>
+    /// Returns an <see cref="System.Diagnostics.ActivitySource"/> instance to be used for GraphQL.NET telemetry.
+    /// </summary>
+    protected static ActivitySource ActivitySource { get; }
 
     /// <summary>
     /// Gets the source name used for telemetry.
@@ -29,7 +33,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     static GraphQLTelemetryProvider()
     {
-        _activitySource = new ActivitySource(SourceName, typeof(GraphQLTelemetryProvider).Assembly.GetNuGetVersion());
+        ActivitySource = new ActivitySource(SourceName, typeof(GraphQLTelemetryProvider).Assembly.GetNuGetVersion());
     }
 
     /// <summary>
@@ -74,7 +78,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// Creates an <see cref="Activity"/> for the specified <see cref="ExecutionOptions"/> and starts it.
     /// </summary>
     protected virtual ValueTask<Activity?> StartActivityAsync(ExecutionOptions options)
-        => new(_activitySource.StartActivity(ACTIVITY_OPERATION_NAME));
+        => new(ActivitySource.StartActivity(ACTIVITY_OPERATION_NAME));
 
     /// <summary>
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionOptions"/>.

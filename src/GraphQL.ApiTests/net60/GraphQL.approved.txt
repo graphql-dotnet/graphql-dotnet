@@ -1450,6 +1450,7 @@ namespace GraphQL.Instrumentation
     {
         public GraphQLTelemetryProvider(GraphQL.Instrumentation.GraphQLTelemetryOptions options) { }
         public virtual float SortOrder { get; }
+        protected static System.Diagnostics.ActivitySource ActivitySource { get; }
         public static string SourceName { get; }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
         protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
