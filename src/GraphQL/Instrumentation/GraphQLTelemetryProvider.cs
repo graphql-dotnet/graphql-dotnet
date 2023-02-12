@@ -46,7 +46,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        // start the Activity
+        // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block 
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
 
         // if no event listeners, do not record any telemetry
