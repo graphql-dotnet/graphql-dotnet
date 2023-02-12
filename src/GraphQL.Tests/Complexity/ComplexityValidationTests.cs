@@ -1,3 +1,5 @@
+using GraphQL.Execution;
+using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Errors.Custom;
@@ -170,6 +172,6 @@ public class ComplexityValidationTest : ComplexityTestBase
 
         res.Result.Errors.ShouldNotBe(null);
         res.Result.Errors.Count.ShouldBe(1);
-        res.Result.Errors[0].ShouldBeOfType<NoFragmentCyclesError>().Message.ShouldBe("Cannot spread fragment 'RecursiveFragment' within itself.");
+        res.Result.Errors[0].ShouldBeOfType<ValidationError>().Message.ShouldBe("It looks like document has fragment cycle. Please make sure you are using standard validation rules especially NoFragmentCycles one.");
     }
 }

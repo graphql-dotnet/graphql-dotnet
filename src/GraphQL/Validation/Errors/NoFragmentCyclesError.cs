@@ -8,11 +8,6 @@ namespace GraphQL.Validation.Errors
     {
         internal const string NUMBER = "5.5.2.2";
 
-        internal NoFragmentCyclesError(GraphQLDocument document, string fragName, params ASTNode[] nodes)
-            : base(document.Source, NUMBER, CycleErrorMessage(fragName, Array.Empty<string>()), nodes)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>

@@ -121,7 +121,6 @@ namespace GraphQL.Validation.Complexity
         private static Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
         {
             Stack<GraphQLSelectionSet> _selectionSetsToVisit = new();
-            HashSet<ROM> _visitedFragments = new();
             Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> dependencies = new();
 
             foreach (var fragmentDef in document.Definitions.OfType<GraphQLFragmentDefinition>())
@@ -136,15 +135,18 @@ namespace GraphQL.Validation.Complexity
                 HashSet<GraphQLFragmentDefinition>? dependencies = null;
                 _selectionSetsToVisit.Push(def.SelectionSet);
 
+                int counter = 0;
+                const int MAX_ITERATIONS = 2000;
                 while (_selectionSetsToVisit.Count > 0)
                 {
+                    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+                    if (++counter > MAX_ITERATIONS)
+                        throw new ValidationError("It looks like document has fragment cycle. Please make sure you are using standard validation rules especially NoFragmentCycles one.");
+
                     foreach (var selection in _selectionSetsToVisit.Pop().Selections)
                     {
                         if (selection is GraphQLFragmentSpread spread)
                         {
-                            if (!_visitedFragments.Add(spread.FragmentName.Name.Value))
-                                throw new NoFragmentCyclesError(document, spread.FragmentName.Name.StringValue);
-
                             var frag = document.FindFragmentDefinition(spread.FragmentName.Name.Value);
                             if (frag != null)
                             {
@@ -160,7 +162,6 @@ namespace GraphQL.Validation.Complexity
                 }
 
                 _selectionSetsToVisit.Clear();
-                _visitedFragments.Clear();
                 return dependencies;
             }
         }
