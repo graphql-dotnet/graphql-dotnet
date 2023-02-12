@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 using GraphQL.Validation.Errors.Custom;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -120,6 +121,7 @@ namespace GraphQL.Validation.Complexity
         private static Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> BuildDependencies(GraphQLDocument document)
         {
             Stack<GraphQLSelectionSet> _selectionSetsToVisit = new();
+            HashSet<ROM> _visitedFragments = new();
             Dictionary<GraphQLFragmentDefinition, HashSet<GraphQLFragmentDefinition>?> dependencies = new();
 
             foreach (var fragmentDef in document.Definitions.OfType<GraphQLFragmentDefinition>())
@@ -140,6 +142,9 @@ namespace GraphQL.Validation.Complexity
                     {
                         if (selection is GraphQLFragmentSpread spread)
                         {
+                            if (!_visitedFragments.Add(spread.FragmentName.Name.Value))
+                                throw new NoFragmentCyclesError(document, spread.FragmentName.Name.StringValue);
+
                             var frag = document.FindFragmentDefinition(spread.FragmentName.Name.Value);
                             if (frag != null)
                             {
@@ -155,6 +160,7 @@ namespace GraphQL.Validation.Complexity
                 }
 
                 _selectionSetsToVisit.Clear();
+                _visitedFragments.Clear();
                 return dependencies;
             }
         }
