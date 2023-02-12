@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using GraphQL.Types;
-using GraphQL.Validation.Errors;
 using GraphQL.Validation.Errors.Custom;
 using GraphQLParser;
 using GraphQLParser.AST;
