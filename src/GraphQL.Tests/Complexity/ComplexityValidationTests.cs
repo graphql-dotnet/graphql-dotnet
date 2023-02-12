@@ -104,4 +104,35 @@ public class ComplexityValidationTest : ComplexityTestBase
         res.Result.Errors[0].Message.ShouldBe("Query is too complex to execute. Complexity is 480, maximum allowed on this endpoint is 25. The field with the highest complexity is 'friends' with value 125.");
         res.Result.Errors[0].InnerException.ShouldBeNull();
     }
+
+    [Fact]
+    public void recursive_fragment_ends_in_deadlock()
+    {
+        const string query = """
+            {
+                type_All(limit: 20) { 
+                    items { 
+                        links(limit: 20) { 
+                            items { 
+                                ... RecursiveFragment
+                            }
+                        }
+                    } 
+                }
+            } 
+            fragment RecursiveFragment on Type   {
+               links(limit: 20) {
+                    items {
+                        ... RecursiveFragment
+                    }
+                }
+            }
+            """;
+
+        // Execution ends with deadlock in GraphQL.Validation.Complexity.CompexityAnalyzer/BuildDependencies()/GetDependencies()
+        var complexityConfiguration = new ComplexityConfiguration();
+        var res = Execute(complexityConfiguration, query);
+
+        // TODO Assert 
+    }
 }
