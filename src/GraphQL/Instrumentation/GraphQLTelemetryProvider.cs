@@ -99,7 +99,13 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// </summary>
     protected virtual Task SetOperationTagsAsync(Activity activity, ExecutionOptions options, ISchema schema, GraphQLDocument document, GraphQLOperationDefinition operation)
     {
-        var operationType = operation.Operation.ToString().ToLowerInvariant();
+        var operationType = operation.Operation switch
+        {
+            OperationType.Query => "query",
+            OperationType.Mutation => "mutation",
+            OperationType.Subscription => "subscription",
+            _ => "unknown", // cannot occur
+        };
         activity.SetTag("graphql.operation.type", operationType);
         var operationName = operation.Name?.StringValue;
         activity.SetTag("graphql.operation.name", operationName);
