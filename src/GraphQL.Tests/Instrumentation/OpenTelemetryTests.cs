@@ -67,7 +67,7 @@ public class OpenTelemetryTests : IDisposable
         });
         activity.DisplayName.ShouldBe("query helloQuery");
 #if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Ok);
+        activity.Status.ShouldBe(ActivityStatusCode.Unset);
 #endif
     }
 
@@ -94,7 +94,7 @@ public class OpenTelemetryTests : IDisposable
         });
         activity.DisplayName.ShouldBe("query");
 #if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Ok);
+        activity.Status.ShouldBe(ActivityStatusCode.Unset);
 #endif
     }
 
@@ -118,6 +118,9 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.document", "query helloQuery { hello { dummy } }"),
             new("graphql.operation.type", "query"),
             new("graphql.operation.name", "helloQuery"),
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
         });
         activity.DisplayName.ShouldBe("query helloQuery");
 #if NET6_0_OR_GREATER
@@ -143,6 +146,9 @@ public class OpenTelemetryTests : IDisposable
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "{"),
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
         });
         activity.DisplayName.ShouldBe("graphql");
 #if NET6_0_OR_GREATER
