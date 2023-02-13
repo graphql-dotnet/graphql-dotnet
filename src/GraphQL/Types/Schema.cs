@@ -131,6 +131,8 @@ namespace GraphQL.Types
             {
                 configuration.Configure(this, services);
             }
+
+            GraphQLEventSource.Log.SchemaCreated(this);
         }
 
         /// <summary>
@@ -196,6 +198,7 @@ namespace GraphQL.Types
                     CreateAndInitializeSchemaTypes();
 
                     Initialized = true;
+                    GraphQLEventSource.Log.SchemaInitialized(this);
                 }
                 catch (Exception ex)
                 {
