@@ -3,6 +3,9 @@ using GraphQL.Types;
 
 namespace GraphQL;
 
+/// <summary>
+/// EventSource events emitted from the project.
+/// </summary>
 [EventSource(Name = "GraphQL")]
 internal class GraphQLEventSource : EventSource
 {
