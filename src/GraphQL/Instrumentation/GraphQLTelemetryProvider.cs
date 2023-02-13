@@ -75,6 +75,17 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
         catch (Exception ex)
         {
+            // Since DocumentExecuter catches and wraps most exceptions, this should only be thrown
+            // if the request was canceled or if ThrowOnUnhandledException is true. And since
+            // OperationCanceledExceptions are not a fault, we do not record them as such.
+            if (ex is not OperationCanceledException)
+            {
+#if NET6_0_OR_GREATER
+                activity.SetStatus(ActivityStatusCode.Error);
+#else
+                activity.SetTag("otel.status_code", "ERROR");
+#endif
+            }
             _telemetryOptions.EnrichWithException(activity, ex);
             throw;
         }
@@ -99,7 +110,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     protected virtual Task SetInitialTagsAsync(Activity activity, ExecutionOptions options)
     {
         activity.SetTag("graphql.operation.name", options.OperationName);
-        if (_telemetryOptions.RecordDocument && activity.IsAllDataRequested)
+        if (_telemetryOptions.RecordDocument /* && activity.IsAllDataRequested */)
             activity.SetTag("graphql.document", options.Query);
         _telemetryOptions.EnrichWithExecutionOptions(activity, options);
         return Task.CompletedTask;
@@ -130,12 +141,14 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     /// <summary>
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionResult"/>.
-    /// The default implementation for .NET 6+ sets the status code tag based on the <see cref="ExecutionResult.Errors"/> property.
-    /// For other platforms method does nothing.
+    /// The default implementation sets the status code tag to indicate an error only if there are
+    /// any <see cref="UnhandledError"/> instances within the <see cref="ExecutionResult.Errors"/> property,
+    /// as these would indicate a server-side error (e.g. SQL timeout) rather than a client-side error
+    /// (e.g. invalid document syntax).
     /// </summary>
     protected virtual Task SetResultTagsAsync(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
     {
-        if (result.Errors?.Count > 0)
+        if (result.Errors?.Count > 0 && result.Errors.Any(x => x is UnhandledError))
         {
 #if NET6_0_OR_GREATER
             activity.SetStatus(ActivityStatusCode.Error);
