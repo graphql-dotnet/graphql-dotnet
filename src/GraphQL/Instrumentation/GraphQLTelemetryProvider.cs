@@ -110,6 +110,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
             OperationType.Subscription => "subscription",
             _ => "unknown", // cannot occur
         };
+        // https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/instrumentation/graphql/
         activity.SetTag("graphql.operation.type", operationType);
         var operationName = operation.Name?.StringValue;
         activity.SetTag("graphql.operation.name", operationName);
