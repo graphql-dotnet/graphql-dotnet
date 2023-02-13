@@ -116,6 +116,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <summary>
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionResult"/>.
     /// The default implementation for .NET 6+ sets the status code tag based on the <see cref="ExecutionResult.Errors"/> property.
+    /// For other platforms method does nothing.
     /// </summary>
     protected virtual Task SetResultTagsAsync(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
     {
