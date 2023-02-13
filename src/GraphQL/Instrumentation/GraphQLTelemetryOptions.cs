@@ -1,9 +1,8 @@
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
-using GraphQLParser.AST;
-using System.Reflection.Metadata;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Instrumentation;
 

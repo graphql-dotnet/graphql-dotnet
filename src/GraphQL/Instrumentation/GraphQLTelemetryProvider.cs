@@ -68,7 +68,16 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         options.Listeners.Add(new TelemetryListener(this, activity, options));
 
         // execute the request
-        var result = await next(options).ConfigureAwait(false);
+        ExecutionResult result;
+        try
+        {
+            result = await next(options).ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            _telemetryOptions.EnrichWithException(activity, ex);
+            throw;
+        }
 
         // record the status
         await SetResultTagsAsync(activity, options, result).ConfigureAwait(false);
