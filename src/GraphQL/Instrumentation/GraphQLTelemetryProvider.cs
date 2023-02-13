@@ -50,6 +50,9 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
+        if (!_telemetryOptions.Filter(options))
+            return await next(options).ConfigureAwait(false);
+
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block 
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
 
@@ -89,6 +92,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         activity.SetTag("graphql.operation.name", options.OperationName);
         if (_telemetryOptions.RecordDocument && activity.IsAllDataRequested)
             activity.SetTag("graphql.document", options.Query);
+        _telemetryOptions.EnrichWithExecutionOptions(activity, options);
         return Task.CompletedTask;
     }
 
@@ -110,6 +114,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         var operationName = operation.Name?.StringValue;
         activity.SetTag("graphql.operation.name", operationName);
         activity.DisplayName = operationName == null ? operationType : $"{operationType} {operationName}";
+        _telemetryOptions.EnrichWithDocument(activity, options, schema, document, operation);
         return Task.CompletedTask;
     }
 
@@ -119,10 +124,15 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// </summary>
     protected virtual Task SetResultTagsAsync(Activity activity, ExecutionOptions executionOptions, ExecutionResult result)
     {
+        if (result.Errors?.Count > 0)
+        {
 #if NET6_0_OR_GREATER
-        var failed = result.Errors?.Count > 0;
-        activity.SetStatus(failed ? ActivityStatusCode.Error : ActivityStatusCode.Ok);
+            activity.SetStatus(ActivityStatusCode.Error);
+#else
+            activity.SetTag("otel.status_code", "ERROR");
 #endif
+        }
+        _telemetryOptions.EnrichWithExecutionResult(activity, executionOptions, result);
         return Task.CompletedTask;
     }
 
