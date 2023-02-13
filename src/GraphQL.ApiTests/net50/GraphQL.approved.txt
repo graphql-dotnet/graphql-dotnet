@@ -1444,6 +1444,11 @@ namespace GraphQL.Instrumentation
     public class GraphQLTelemetryOptions
     {
         public GraphQLTelemetryOptions() { }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.Types.ISchema, GraphQLParser.AST.GraphQLDocument, GraphQLParser.AST.GraphQLOperationDefinition> EnrichWithDocument { get; set; }
+        public System.Action<System.Diagnostics.Activity, System.Exception> EnrichWithException { get; set; }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions> EnrichWithExecutionOptions { get; set; }
+        public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.ExecutionResult> EnrichWithExecutionResult { get; set; }
+        public System.Func<GraphQL.ExecutionOptions, bool> Filter { get; set; }
         public bool RecordDocument { get; set; }
     }
     public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
