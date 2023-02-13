@@ -355,7 +355,24 @@ namespace GraphQL.Types
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
             Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((
+                CheckClrType(clrType ?? throw new ArgumentNullException(nameof(clrType))),
+                CheckGraphType(graphType ?? throw new ArgumentNullException(nameof(graphType)))
+            ));
+
+            Type CheckClrType(Type clrType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? throw new ArgumentOutOfRangeException(nameof(clrType), $"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.")
+                    : clrType;
+            }
+
+            Type CheckGraphType(Type graphType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(graphType)
+                    ? graphType
+                    : throw new ArgumentOutOfRangeException(nameof(graphType), $"{graphType.FullName}' must be a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify GraphType type instead of CLR type.");
+            }
         }
 
         /// <inheritdoc/>

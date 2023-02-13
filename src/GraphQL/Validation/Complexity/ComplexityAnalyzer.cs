@@ -134,8 +134,14 @@ namespace GraphQL.Validation.Complexity
                 HashSet<GraphQLFragmentDefinition>? dependencies = null;
                 _selectionSetsToVisit.Push(def.SelectionSet);
 
+                int counter = 0;
+                const int MAX_ITERATIONS = 2000;
                 while (_selectionSetsToVisit.Count > 0)
                 {
+                    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+                    if (++counter > MAX_ITERATIONS)
+                        throw new ValidationError("It looks like document has fragment cycle. Please make sure you are using standard validation rules especially NoFragmentCycles one.");
+
                     foreach (var selection in _selectionSetsToVisit.Pop().Selections)
                     {
                         if (selection is GraphQLFragmentSpread spread)
