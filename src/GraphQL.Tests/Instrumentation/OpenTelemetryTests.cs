@@ -153,6 +153,33 @@ public class OpenTelemetryTests : IDisposable
     }
 
     [Fact]
+    public async Task Filterable()
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query helloQuery { hello }",
+            RequestServices = _host.Services,
+        };
+        var ranFilter = false;
+        _options.Filter = options =>
+        {
+            options.ShouldBe(executionOptions);
+            ranFilter = true;
+            return false;
+        };
+
+        // execute GraphQL document
+        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+
+        // verify GraphQL response
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+
+        // verify activity telemetry
+        _exportedActivities.ShouldBeEmpty();
+        ranFilter.ShouldBeTrue();
+    }
+
+    [Fact]
     public async Task WithValidationError()
     {
         // execute GraphQL document
