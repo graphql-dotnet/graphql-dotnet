@@ -22,5 +22,7 @@ public class PersistedQueryUnsupportedVersionError : RequestError
         // unavailable because the version number is unsupported
 
         // https://github.com/apollographql/apollo-link-persisted-queries
+
+        this.AddExtension("reason", $"Automatic persisted queries protocol version '{version}' is not supported.");
     }
 }

@@ -61,6 +61,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
         AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "PersistedQueryNotSupported");
+        result.Errors.Single().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Automatic persisted queries protocol version '2' is not supported."));
     }
 
     [Theory]
