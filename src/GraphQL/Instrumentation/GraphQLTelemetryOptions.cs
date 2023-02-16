@@ -34,7 +34,7 @@ public class GraphQLTelemetryOptions
     public Action<Activity, ExecutionOptions, ISchema, GraphQLDocument, GraphQLOperationDefinition> EnrichWithDocument { get; set; } = (_, _, _, _, _) => { };
 
     /// <summary>
-    /// A delegate which can be used to add additional data to the telemetry at the conclustion of the request.
+    /// A delegate which can be used to add additional data to the telemetry at the conclusion of the request.
     /// </summary>
     public Action<Activity, ExecutionOptions, ExecutionResult> EnrichWithExecutionResult { get; set; } = (_, _, _) => { };
 
