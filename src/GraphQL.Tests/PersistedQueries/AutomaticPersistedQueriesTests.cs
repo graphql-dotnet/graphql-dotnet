@@ -82,6 +82,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
         AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "PersistedQueryNotFound");
+        result.Errors.Single().ShouldBeOfType<PersistedQueryNotFoundError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Persisted query with hash '1' was not found."));
     }
 
     [Theory]
