@@ -60,7 +60,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
 
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
-        AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "Automatic persisted queries protocol of version '2' is not supported.");
+        AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "PersistedQueryNotSupported");
+        result.Errors.Single().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Automatic persisted queries protocol version '2' is not supported."));
     }
 
     [Theory]
@@ -79,7 +81,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
 
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
 
-        AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "Persisted query with '1' hash was not found.");
+        AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "PersistedQueryNotFound");
+        result.Errors.Single().ShouldBeOfType<PersistedQueryNotFoundError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Persisted query with hash '1' was not found."));
     }
 
     [Theory]
@@ -101,7 +105,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
             opt.Extensions = extentions;
         }).ConfigureAwait(false);
 
-        AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The 'badHash' hash doesn't correspond to a query.");
+        AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The hash 'badHash' doesn't correspond to the provided query.");
     }
 
     [Theory]
