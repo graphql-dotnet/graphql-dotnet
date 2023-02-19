@@ -28,13 +28,4 @@ internal class GraphQLEventSource : EventSource
             WriteEvent(2, schema.GetType().Name);
         }
     }
-
-    [Event(2, Message = "Error accured while processing trace event, MySqlTraceEventType: {0}, Message {1}, Exception: {2}", Level = EventLevel.Error)]
-    public void ErrorTraceEvent1111111111(string message, string exception)
-    {
-        if (IsEnabled())
-        {
-            WriteEvent(1, message, exception);
-        }
-    }
 }
