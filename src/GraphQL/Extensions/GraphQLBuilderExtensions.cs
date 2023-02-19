@@ -2,6 +2,9 @@ using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+#if NET5_0_OR_GREATER
+using GraphQL.Telemetry;
+#endif
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;

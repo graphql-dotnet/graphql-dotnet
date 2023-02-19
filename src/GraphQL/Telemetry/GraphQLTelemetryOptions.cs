@@ -4,7 +4,7 @@ using System.Diagnostics;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Instrumentation;
+namespace GraphQL.Telemetry;
 
 /// <summary>
 /// Options for configuring the telemetry instrumentation.

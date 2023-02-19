@@ -1,7 +1,7 @@
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
-using GraphQL.Instrumentation;
+using GraphQL.Telemetry;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

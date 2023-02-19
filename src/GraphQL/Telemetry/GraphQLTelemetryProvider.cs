@@ -7,7 +7,7 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 
-namespace GraphQL.Instrumentation;
+namespace GraphQL.Telemetry;
 
 /// <summary>
 /// Provides telemetry through the <see cref="Activity">System.Diagnostics.Activity API</see> as an <see cref="IConfigureExecution"/> implementation.
