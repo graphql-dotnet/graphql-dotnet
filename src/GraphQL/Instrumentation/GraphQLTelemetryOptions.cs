@@ -17,6 +17,11 @@ public class GraphQLTelemetryOptions
     /// Indicates whether the GraphQL document is included in the telemetry.
     /// </summary>
     public bool RecordDocument { get; set; } = true; // recommended
+    
+    /// <summary>
+    /// Sanitizes recorded GraphQL document to exclude sensitive information when <see cref="RecordDocument"/> is <see langword="true"/>.
+    /// </summary>
+    public Func<Activity, ExecutionOptions, string> SanitizeDocument { get; set; } = (_, options) => options.Query; 
 
     /// <summary>
     /// Indicates whether the GraphQL execution is included in the telemetry.
