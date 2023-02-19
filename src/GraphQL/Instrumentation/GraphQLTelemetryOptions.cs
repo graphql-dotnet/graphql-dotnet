@@ -42,9 +42,12 @@ public class GraphQLTelemetryOptions
     /// <summary>
     /// A delegate which can be used to add additional data to the telemetry if an unhandled exception occurs
     /// during the execution.
+    /// <br/>
     /// This would almost never occur as GraphQL.NET catches all exceptions and returns them as part of the
     /// execution result, unless <see cref="ExecutionOptions.ThrowOnUnhandledException"/> was set or an
     /// <see cref="OperationCanceledException"/> occurs.
+    /// <br/>
+    /// In case of OpenTelemetry SDK you may use `Activity.RecordException` method to add additional data.
     /// </summary>
     public Action<Activity, Exception> EnrichWithException { get; set; } = (_, _) => { };
 }
