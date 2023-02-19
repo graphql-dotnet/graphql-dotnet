@@ -11,7 +11,7 @@ internal class GraphQLEventSource : EventSource
 {
     public static readonly GraphQLEventSource Log = new();
 
-    [Event(1, Level = EventLevel.Informational)]
+    [NonEvent]
     public void SchemaCreated(Schema schema)
     {
         if (IsEnabled())
@@ -20,12 +20,30 @@ internal class GraphQLEventSource : EventSource
         }
     }
 
-    [Event(2, Level = EventLevel.Informational)]
+    [Event(1, Level = EventLevel.Informational)]
+    public void SchemaCreated(string schemaTypeName)
+    {
+        if (IsEnabled())
+        {
+            WriteEvent(1, schemaTypeName);
+        }
+    }
+
+    [NonEvent]
     public void SchemaInitialized(Schema schema)
     {
         if (IsEnabled())
         {
             WriteEvent(2, schema.GetType().Name);
+        }
+    }
+
+    [Event(2, Level = EventLevel.Informational)]
+    public void SchemaInitialized(string schemaTypeName)
+    {
+        if (IsEnabled())
+        {
+            WriteEvent(2, schemaTypeName);
         }
     }
 }
