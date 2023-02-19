@@ -17,11 +17,11 @@ public class GraphQLTelemetryOptions
     /// Indicates whether the GraphQL document is included in the telemetry.
     /// </summary>
     public bool RecordDocument { get; set; } = true; // recommended
-    
+
     /// <summary>
     /// Sanitizes recorded GraphQL document to exclude sensitive information when <see cref="RecordDocument"/> is <see langword="true"/>.
     /// </summary>
-    public Func<Activity, ExecutionOptions, string> SanitizeDocument { get; set; } = (_, options) => options.Query; 
+    public Func<ExecutionOptions, string?> SanitizeDocument { get; set; } = options => options.Query;
 
     /// <summary>
     /// Indicates whether the GraphQL execution is included in the telemetry.
@@ -47,12 +47,14 @@ public class GraphQLTelemetryOptions
     /// <summary>
     /// A delegate which can be used to add additional data to the telemetry if an unhandled exception occurs
     /// during the execution.
-    /// <br/>
+    /// <para>
     /// This would almost never occur as GraphQL.NET catches all exceptions and returns them as part of the
     /// execution result, unless <see cref="ExecutionOptions.ThrowOnUnhandledException"/> was set or an
     /// <see cref="OperationCanceledException"/> occurs.
-    /// <br/>
-    /// In case of OpenTelemetry SDK you may use `Activity.RecordException` method to add additional data.
+    /// </para>
+    /// <para>
+    /// When using the OpenTelemetry SDK you may use the Activity.RecordException extension method to add additional data.
+    /// </para>
     /// </summary>
     public Action<Activity, Exception> EnrichWithException { get; set; } = (_, _) => { };
 }

@@ -52,6 +52,33 @@ public class OpenTelemetryTests : IDisposable
         // execute GraphQL document
         var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
+            Query = "{ hello }",
+            RequestServices = _host.Services,
+        }).ConfigureAwait(false);
+
+        // verify GraphQL response
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+
+        // verify activity telemetry
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        {
+            new("graphql.document", "{ hello }"),
+            new("graphql.operation.type", "query"),
+            // no operation name
+        });
+        activity.DisplayName.ShouldBe("query");
+#if NET6_0_OR_GREATER
+        activity.Status.ShouldBe(ActivityStatusCode.Unset);
+#endif
+    }
+
+    [Fact]
+    public async Task WithOperationNameTest()
+    {
+        // execute GraphQL document
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
+        {
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
         }).ConfigureAwait(false);
@@ -74,8 +101,10 @@ public class OpenTelemetryTests : IDisposable
     }
 
     [Fact]
-    public async Task BasicTest2()
+    public async Task DocumentFilterTest()
     {
+        _options.SanitizeDocument = options => options.Query?.Replace("hello", "testing");
+
         // execute GraphQL document
         var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
@@ -90,7 +119,7 @@ public class OpenTelemetryTests : IDisposable
         var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
-            new("graphql.document", "{ hello }"),
+            new("graphql.document", "{ testing }"),
             new("graphql.operation.type", "query"),
             // no operation name
         });

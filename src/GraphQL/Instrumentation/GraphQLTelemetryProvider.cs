@@ -11,7 +11,7 @@ namespace GraphQL.Instrumentation;
 
 /// <summary>
 /// Provides telemetry through the <see cref="Activity">System.Diagnostics.Activity API</see> as an <see cref="IConfigureExecution"/> implementation.
-/// Derive from this class to add additional telemetry. Also you may add additional telemetry configuring `GraphQLTelemetryOptions`.
+/// Derive from this class to add additional telemetry. Also you may add additional telemetry configuring <see cref="GraphQLTelemetryOptions"/>.
 /// <para>
 /// To use a derived class, call <see cref="GraphQLBuilderExtensions.ConfigureExecution{TConfigureExecution}(IGraphQLBuilder)"/> with the type of your derived class.
 /// </para>
@@ -109,11 +109,13 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// </summary>
     protected virtual Task SetInitialTagsAsync(Activity activity, ExecutionOptions options)
     {
-        activity.SetTag("graphql.operation.name", options.OperationName);
-        if (_telemetryOptions.RecordDocument /* && activity.IsAllDataRequested */)
+        if (options.OperationName != null)
+            activity.SetTag("graphql.operation.name", options.OperationName);
+        if (_telemetryOptions.RecordDocument && activity.IsAllDataRequested)
         {
-            var document = options.SanitizeDocument(activity, options);
-            activity.SetTag("graphql.document", document);
+            var document = _telemetryOptions.SanitizeDocument(options);
+            if (document != null)
+                activity.SetTag("graphql.document", document);
         }
         _telemetryOptions.EnrichWithExecutionOptions(activity, options);
         return Task.CompletedTask;
@@ -136,7 +138,8 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         // https://opentelemetry.io/docs/reference/specification/trace/semantic_conventions/instrumentation/graphql/
         activity.SetTag("graphql.operation.type", operationType);
         var operationName = operation.Name?.StringValue;
-        activity.SetTag("graphql.operation.name", operationName);
+        if (operationName != null)
+            activity.SetTag("graphql.operation.name", operationName);
         activity.DisplayName = operationName == null ? operationType : $"{operationType} {operationName}";
         _telemetryOptions.EnrichWithDocument(activity, options, schema, document, operation);
         return Task.CompletedTask;

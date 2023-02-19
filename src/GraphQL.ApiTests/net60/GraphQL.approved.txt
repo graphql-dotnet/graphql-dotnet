@@ -1450,6 +1450,7 @@ namespace GraphQL.Instrumentation
         public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.ExecutionResult> EnrichWithExecutionResult { get; set; }
         public System.Func<GraphQL.ExecutionOptions, bool> Filter { get; set; }
         public bool RecordDocument { get; set; }
+        public System.Func<GraphQL.ExecutionOptions, string?> SanitizeDocument { get; set; }
     }
     public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
     {
