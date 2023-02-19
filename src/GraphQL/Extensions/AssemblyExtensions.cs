@@ -72,5 +72,14 @@ namespace GraphQL
             //return the list of type mappings
             return typeMappings;
         }
+
+        internal static string? GetNuGetVersion(this Assembly assembly)
+        {
+            var version = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+            if (version == null)
+                return null;
+            var i = version.LastIndexOf('+');
+            return i == -1 ? version : version.Substring(0, i);
+        }
     }
 }
