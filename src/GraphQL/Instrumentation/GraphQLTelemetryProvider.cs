@@ -11,7 +11,7 @@ namespace GraphQL.Instrumentation;
 
 /// <summary>
 /// Provides telemetry through the <see cref="Activity">System.Diagnostics.Activity API</see> as an <see cref="IConfigureExecution"/> implementation.
-/// Derive from this class to add additional telemetry.
+/// Derive from this class to add additional telemetry. Also you may add additional telemetry configuring `GraphQLTelemetryOptions`.
 /// <para>
 /// To use a derived class, call <see cref="GraphQLBuilderExtensions.ConfigureExecution{TConfigureExecution}(IGraphQLBuilder)"/> with the type of your derived class.
 /// </para>
