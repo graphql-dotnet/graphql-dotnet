@@ -111,7 +111,10 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     {
         activity.SetTag("graphql.operation.name", options.OperationName);
         if (_telemetryOptions.RecordDocument /* && activity.IsAllDataRequested */)
-            activity.SetTag("graphql.document", options.Query);
+        {
+            var document = options.SanitizeDocument(activity, options);
+            activity.SetTag("graphql.document", document);
+        }
         _telemetryOptions.EnrichWithExecutionOptions(activity, options);
         return Task.CompletedTask;
     }
