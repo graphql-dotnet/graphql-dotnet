@@ -24,7 +24,8 @@ public class GraphQLTelemetryOptions
     public Func<ExecutionOptions, bool> Filter { get; set; } = _ => true;
 
     /// <summary>
-    /// A delegate which can be used to add additional data to the telemetry at the start of the request.
+    /// A delegate which can be used to add additional data to the telemetry at the very beginning of the request
+    /// before control falls into actual GraphQL execution engine pipeline.
     /// </summary>
     public Action<Activity, ExecutionOptions> EnrichWithExecutionOptions { get; set; } = (_, _) => { };
 
