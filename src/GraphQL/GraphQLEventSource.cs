@@ -6,10 +6,30 @@ namespace GraphQL;
 /// <summary>
 /// EventSource events emitted from the project.
 /// </summary>
-[EventSource(Name = "GraphQL")]
-internal class GraphQLEventSource : EventSource
+[EventSource(Name = "GraphQL-NET")]
+internal sealed class GraphQLEventSource : EventSource
 {
-    public static readonly GraphQLEventSource Log = new();
+    public static GraphQLEventSource Log { get; } = new();
+
+#if DEBUG
+    public GraphQLEventSource()
+        : base(EventSourceSettings.ThrowOnEventWriteErrors)
+    {
+    }
+#endif
+
+    // https://learn.microsoft.com/en-us/dotnet/core/diagnostics/eventsource-instrumentation#setting-event-keywords
+#pragma warning disable IDE1006 // Naming Styles
+    public class Keywords
+    {
+        public const EventKeywords Schema = (EventKeywords)1;
+        public const EventKeywords Parsing = (EventKeywords)2;
+        public const EventKeywords Validation = (EventKeywords)4;
+        public const EventKeywords Execution = (EventKeywords)8;
+        public const EventKeywords Introspection = (EventKeywords)16;
+        public const EventKeywords DataLoader = (EventKeywords)32;
+    }
+#pragma warning restore IDE1006 // Naming Styles
 
     [NonEvent]
     public void SchemaCreated(Schema schema)
