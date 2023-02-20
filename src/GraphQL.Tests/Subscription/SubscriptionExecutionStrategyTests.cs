@@ -8,11 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription;
 
-public class SubscriptionExecutionStrategyTests
+public class SubscriptionExecutionStrategyTests : IDisposable
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
     private IDisposable? SubscriptionObj { get; set; }
+    private IDisposable? ServiceProviderDisposable { get; set; }
+
+    public void Dispose() => ServiceProviderDisposable?.Dispose();
 
     [Fact]
     public async Task Basic()
@@ -608,8 +611,11 @@ public class SubscriptionExecutionStrategyTests
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
-        var provider = services.BuildServiceProvider(); // not disposed intentionally
-        var executer = provider.GetService<IDocumentExecuter>();
+        var provider = services.BuildServiceProvider();
+        if (ServiceProviderDisposable != null)
+            throw new InvalidOperationException("Cannot run ExecuteAsync twice within one test");
+        ServiceProviderDisposable = provider; // only disposed after execution is complete
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
             Schema = provider.GetRequiredService<ISchema>(),

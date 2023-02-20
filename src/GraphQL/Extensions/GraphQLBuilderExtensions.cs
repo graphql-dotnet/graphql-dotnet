@@ -2,6 +2,9 @@ using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+#if NET5_0_OR_GREATER
+using GraphQL.Telemetry;
+#endif
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
@@ -1171,6 +1174,29 @@ namespace GraphQL
 
             return builder;
         }
+        #endregion
+
+        #region - UseTelemetry -
+#if NET5_0_OR_GREATER
+        /// <summary>
+        /// Configures the GraphQL engine to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
+        /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
+        /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
+        /// </summary>
+        /// <remarks>
+        /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
+        /// </remarks>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
+            => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
+
+        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
+        {
+            builder.Services.Configure(configure);
+            builder.ConfigureExecution<GraphQLTelemetryProvider>();
+            return builder;
+        }
+#endif
         #endregion
     }
 }
