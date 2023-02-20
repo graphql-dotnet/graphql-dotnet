@@ -211,6 +211,7 @@ public class OpenTelemetryTests : IDisposable
         ranFilter.ShouldBeTrue();
         _testEventListener.Events.Count.ShouldBeGreaterThan(0);
         _testEventListener.Events.ShouldContain(e => e.EventName == "RequestIsFilteredOut");
+        _testEventListener.Events.ShouldNotContain(e => e.EventName == "RequestFilterException");
     }
 
     [Fact]
