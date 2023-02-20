@@ -1,5 +1,5 @@
 using System.Diagnostics.Tracing;
-using GraphQL.Types;
+using System.Globalization;
 
 namespace GraphQL;
 
@@ -31,39 +31,67 @@ internal sealed class GraphQLEventSource : EventSource
     }
 #pragma warning restore IDE1006 // Naming Styles
 
-    [NonEvent]
-    public void SchemaCreated(Schema schema)
+    [Event(1, Level = EventLevel.Verbose)]
+    public void RequestIsFilteredOut()
     {
-        if (IsEnabled())
+        WriteEvent(1);
+    }
+
+    [NonEvent]
+    public void RequestFilterException(Exception ex)
+    {
+        if (IsEnabled(EventLevel.Error, EventKeywords.All))
         {
-            WriteEvent(1, schema.GetType().Name);
+            RequestFilterException(ex.ToInvariantString());
         }
     }
 
-    [Event(1, Level = EventLevel.Informational)]
+    [Event(2, Message = "Filter threw exception, request will not be traced.", Level = EventLevel.Error)]
+    public void RequestFilterException(string exception)
+    {
+        WriteEvent(2, exception);
+    }
+
+    [Event(3, Level = EventLevel.Informational, Keywords = Keywords.Schema)]
     public void SchemaCreated(string schemaTypeName)
     {
-        if (IsEnabled())
+        if (IsEnabled(EventLevel.Informational, Keywords.Schema))
         {
-            WriteEvent(1, schemaTypeName);
+            WriteEvent(3, schemaTypeName);
         }
     }
 
-    [NonEvent]
-    public void SchemaInitialized(Schema schema)
-    {
-        if (IsEnabled())
-        {
-            WriteEvent(2, schema.GetType().Name);
-        }
-    }
-
-    [Event(2, Level = EventLevel.Informational)]
+    [Event(4, Level = EventLevel.Informational, Keywords = Keywords.Schema)]
     public void SchemaInitialized(string schemaTypeName)
     {
-        if (IsEnabled())
+        if (IsEnabled(EventLevel.Informational, Keywords.Schema))
         {
-            WriteEvent(2, schemaTypeName);
+            WriteEvent(4, schemaTypeName);
+        }
+    }
+}
+
+// Copied from https://github.com/open-telemetry/opentelemetry-dotnet-contrib/blob/main/src/OpenTelemetry.Contrib.Shared/Api/ExceptionExtensions.cs
+internal static class ExceptionExtensions
+{
+    /// <summary>
+    /// Returns a culture-independent string representation of the given <paramref name="exception"/> object,
+    /// appropriate for diagnostics tracing.
+    /// </summary>
+    /// <param name="exception">Exception to convert to string.</param>
+    /// <returns>Exception as string with no culture.</returns>
+    public static string ToInvariantString(this Exception exception)
+    {
+        var originalUICulture = Thread.CurrentThread.CurrentUICulture;
+
+        try
+        {
+            Thread.CurrentThread.CurrentUICulture = CultureInfo.InvariantCulture;
+            return exception.ToString();
+        }
+        finally
+        {
+            Thread.CurrentThread.CurrentUICulture = originalUICulture;
         }
     }
 }

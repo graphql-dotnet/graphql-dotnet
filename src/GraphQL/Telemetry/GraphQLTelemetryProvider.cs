@@ -50,10 +50,21 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (!_telemetryOptions.Filter(options))
+        try
+        {
+            if (_telemetryOptions.Filter?.Invoke(options) == false)
+            {
+                GraphQLEventSource.Log.RequestIsFilteredOut();
+                return await next(options).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            GraphQLEventSource.Log.RequestFilterException(ex);
             return await next(options).ConfigureAwait(false);
+        }
 
-        // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block 
+        // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
 
         // do not record any telemetry if there are no listeners or it decided not to sample the current request
