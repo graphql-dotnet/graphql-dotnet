@@ -16,7 +16,7 @@ internal static class ObservableExtensions
     /// pending asynchronous transformations that a cancellation has been requested.
     /// </para>
     /// <para>
-    /// Also preserves the <see cref="ExecutionContext"/> contract of calling
+    /// Also preserves the <see cref="ExecutionContext"/> of the calling
     /// method and restores it during the subsequent asynchronous transformations.
     /// </para>
     /// <para>
@@ -257,16 +257,16 @@ internal static class ObservableExtensions
                 cts.Cancel();
                 // dispose the cancellation token source
                 cts.Dispose();
-                // detach the observable sequence
-                _disposeAction?.Invoke();
-                // release references to the degree possible
-                _disposeAction = null;
                 // dispose of the execution context
                 lock (this)
                 {
                     _executionContext?.Dispose();
                     _executionContext = null;
                 }
+                // detach the observable sequence
+                _disposeAction?.Invoke();
+                // release references to the degree possible
+                _disposeAction = null;
             }
 
             /// <summary>
