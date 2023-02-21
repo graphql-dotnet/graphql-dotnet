@@ -7,6 +7,7 @@ namespace GraphQL.DataLoader;
 /// <typeparam name="T">The type of the value</typeparam>
 /// <remarks>This class is thread safe.</remarks>
 public abstract partial class DataLoaderBase<TKey, T> : IDataLoader, IDataLoader<TKey, T>
+    where TKey : notnull
 {
     //this class supports adding more items after DispatchAsync has been called,
     //  and calling DispatchAsync will then load those items

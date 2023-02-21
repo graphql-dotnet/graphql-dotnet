@@ -1,3 +1,4 @@
+using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
@@ -85,6 +86,13 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     public void SchemaWithDirective_Should_Not_Throw()
     {
         ShouldNotThrow<SchemaWithDirective>();
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507
+    [Fact]
+    public void Passing_GraphType_InsteadOf_ClrType_Should_Produce_Friendly_Error()
+    {
+        Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
     }
 
     [Fact]
@@ -394,5 +402,19 @@ public class SchemaWithDirective : Schema
 
         Directives.Register(new MaxLength());
         this.RegisterVisitor<MaxLengthDirectiveVisitor>();
+    }
+}
+
+public class Bug3507Schema : Schema
+{
+    public Bug3507Schema()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<BooleanGraphType>("updateDate")
+            .Argument<DateGraphType>("newDate", true)
+            .Resolve()
+            .WithScope()
+            .ResolveAsync(_ => Task.FromResult((object)true));
+        Query = type;
     }
 }

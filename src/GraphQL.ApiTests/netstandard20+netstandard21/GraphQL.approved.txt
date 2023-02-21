@@ -196,19 +196,19 @@ namespace GraphQL
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
         public FromServicesAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromSourceAttribute : GraphQL.GraphQLAttribute
     {
         public FromSourceAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromUserContextAttribute : GraphQL.GraphQLAttribute
     {
         public FromUserContextAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -1741,6 +1741,7 @@ namespace GraphQL.Types
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
+        public void SetDelegateWithCast(System.Func<GraphQL.IResolveFieldContext, object?> argumentDelegate) { }
     }
     public class AsIsCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -1751,7 +1752,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringGraphTypeMappingProvider() { }
         public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
-        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
+        public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
     {
