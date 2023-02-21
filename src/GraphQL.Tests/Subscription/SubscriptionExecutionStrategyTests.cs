@@ -2,7 +2,6 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
-using System.Reactive;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
