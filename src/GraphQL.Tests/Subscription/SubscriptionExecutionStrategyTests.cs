@@ -2,6 +2,7 @@
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
+using System.Reactive;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -492,6 +493,43 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         result.Executed.ShouldBeTrue();
     }
 
+    private static readonly AsyncLocal<string?> _asyncLocal = new();
+
+    [Fact]
+    public async Task NetExecutionContextIsCarriedOver()
+    {
+        // This verifies that the System.Thread.ExecutionContext is preserved during data events after the initial subscription.
+        // This means that AsyncLocal instances will contain the values they had during the initial subscription during the
+        // execution of field resolvers. As HttpContextAccessor is based on AsyncLocal, this allows subscription field resolvers
+        // that references IHttpContextAccessor.HttpContext to access the correct HttpContext of the connected client, rather
+        // than the HttpContext of the event source, which would be unexpected. Of course, any processing before it reaches
+        // GraphQL would be run in the execution context of the event source.
+
+        // simulate the ExecutionContext of a connecting client and execute a subscription
+        _asyncLocal.Value.ShouldBeNull();
+        await ConnectClientAsync().ConfigureAwait(false);
+
+        // simulate the ExecutionContext of an event source and raise an event
+        _asyncLocal.Value.ShouldBeNull();
+        await RaiseEventAsync().ConfigureAwait(false);
+
+        // verify that the connected client has recieved an event with its own context applied during the execution of the resolvers
+        _asyncLocal.Value.ShouldBeNull();
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"data":{"testComplex":{"asyncLocalValue":"client"}}}""");
+
+        async Task ConnectClientAsync()
+        {
+            _asyncLocal.Value = "client";
+            await ExecuteAsync("subscription { testComplex { asyncLocalValue } }").ConfigureAwait(false);
+        }
+
+        async Task RaiseEventAsync()
+        {
+            _asyncLocal.Value = "source";
+            Source.Next("hello");
+        }
+    }
+
     #region - Schema -
     private class Query
     {
@@ -575,6 +613,11 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         {
             var provider = (IServiceProvider)context.UserContext["provider"]!;
             return object.ReferenceEquals(context.RequestServices, provider);
+        }
+
+        public string? AsyncLocalValue()
+        {
+            return _asyncLocal.Value;
         }
     }
     #endregion
