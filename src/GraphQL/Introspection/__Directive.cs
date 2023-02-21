@@ -32,7 +32,8 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations");
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations")
+                .Resolve(context => context.Source!.Locations);
 
             Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
                 .Resolve(context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>());

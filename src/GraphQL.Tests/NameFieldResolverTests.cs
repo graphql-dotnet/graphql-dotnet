@@ -20,6 +20,8 @@ public class NameFieldResolverTests
     [InlineData("FULLINFOWITHPARAM", "test Anyone 20")]
     [InlineData("FullInfoWithContext", "Anyone 20")]
     [InlineData("FromService", "hello")]
+    [InlineData("FromSource", "Anyone")]
+    [InlineData("FromUserContext", "Anyone 30")]
     [InlineData("AmbiguousExample", "", true)]
     [InlineData("ShadowedName", "Anyone")]
     [InlineData("BaseName", "Base")]
@@ -45,6 +47,7 @@ public class NameFieldResolverTests
                     { "prefix", new ArgumentValue("test ", ArgumentSource.Literal) }
                 },
                 RequestServices = services.BuildServiceProvider(),
+                UserContext = new Dictionary<string, object> { { "name", "Anyone 30" } },
             });
 
         if (throws)
@@ -75,6 +78,10 @@ public class NameFieldResolverTests
         public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source).FullInfo();
 
         public string FromService([FromServices] Class1 obj) => obj.Value;
+
+        public string FromSource([FromSource] Person person) => person.Name;
+
+        public string FromUserContext([FromUserContext] IDictionary<string, object> userContext) => (string)userContext["name"];
 
         public string AmbiguousExample() => "";
 

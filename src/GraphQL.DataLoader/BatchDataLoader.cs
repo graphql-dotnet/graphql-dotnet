@@ -6,6 +6,7 @@ namespace GraphQL.DataLoader;
 /// <typeparam name="TKey">The type of the key</typeparam>
 /// <typeparam name="T">The type of the return value</typeparam>
 public class BatchDataLoader<TKey, T> : DataLoaderBase<TKey, T>
+    where TKey : notnull
 {
     private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> _loader;
     private readonly T _defaultValue;

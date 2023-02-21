@@ -11,7 +11,12 @@ public class PersistedQueryNotFoundError : RequestError
     /// Initializes a new instance.
     /// </summary>
     public PersistedQueryNotFoundError(string hash)
-        : base($"Persisted query with '{hash}' hash was not found.")
+        : base("PersistedQueryNotFound")
     {
+        // note: the message "PersistedQueryNotFound" is defined by the spec to be
+        // returned when the hash cannot be found in the local cache
+
+        // https://github.com/apollographql/apollo-link-persisted-queries
+        this.AddExtension("reason", $"Persisted query with hash '{hash}' was not found.");
     }
 }

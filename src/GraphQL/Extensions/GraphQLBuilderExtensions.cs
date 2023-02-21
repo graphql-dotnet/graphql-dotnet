@@ -2,6 +2,9 @@ using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+#if NET5_0_OR_GREATER
+using GraphQL.Telemetry;
+#endif
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
@@ -24,7 +27,7 @@ namespace GraphQL
 
         #region - Additional overloads for Register, TryRegister and Configure -
         /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
-        public static IServiceRegister Register<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             => services.Register(typeof(TService), typeof(TService), serviceLifetime, replace);
 
@@ -33,7 +36,7 @@ namespace GraphQL
         /// An instance of <typeparamref name="TImplementation"/> will be created when an instance is needed.
         /// Optionally removes any existing implementation of the same service type.
         /// </summary>
-        public static IServiceRegister Register<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
+        public static IServiceRegister Register<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, bool replace = false)
             where TService : class
             where TImplementation : class, TService
             => services.Register(typeof(TService), typeof(TImplementation), serviceLifetime, replace);
@@ -55,7 +58,7 @@ namespace GraphQL
             => services.Register(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), replace);
 
         /// <inheritdoc cref="TryRegister{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime)"/>
-        public static IServiceRegister TryRegister<TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+        public static IServiceRegister TryRegister<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TService>(this IServiceRegister services, ServiceLifetime serviceLifetime)
             where TService : class
             => services.TryRegister(typeof(TService), typeof(TService), serviceLifetime);
 
@@ -66,7 +69,7 @@ namespace GraphQL
         /// has not already been registered. An instance of <typeparamref name="TImplementation"/>
         /// will be created when an instance is needed.
         /// </summary>
-        public static IServiceRegister TryRegister<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
+        public static IServiceRegister TryRegister<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime, RegistrationCompareMode mode = RegistrationCompareMode.ServiceType)
             where TService : class
             where TImplementation : class, TService
             => services.TryRegister(typeof(TService), typeof(TImplementation), serviceLifetime, mode);
@@ -97,7 +100,7 @@ namespace GraphQL
             => services.TryRegister(typeof(TService), implementationInstance ?? throw new ArgumentNullException(nameof(implementationInstance)), mode);
 
         /// <inheritdoc cref="IServiceRegister.Configure{TOptions}(Action{TOptions, IServiceProvider})"/>
-        public static IServiceRegister Configure<TOptions>(this IServiceRegister services, Action<TOptions>? action)
+        public static IServiceRegister Configure<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(this IServiceRegister services, Action<TOptions>? action)
             where TOptions : class, new()
             => services.Configure<TOptions>(action == null ? null : (opt, _) => action(opt));
         #endregion
@@ -288,7 +291,8 @@ namespace GraphQL
         /// <br/><br/>
         /// This allows for a schema that is entirely configured with CLR types.
         /// </summary>
-        public static IGraphQLBuilder AddAutoSchema<TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
+        [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
+        public static IGraphQLBuilder AddAutoSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TQueryClrType>(this IGraphQLBuilder builder, Action<IConfigureAutoSchema>? configure = null)
         {
             builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
             builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
@@ -300,7 +304,7 @@ namespace GraphQL
         /// Configures <see cref="Schema.Mutation"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TMutationClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithMutation<TMutationClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithMutation<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TMutationClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -314,7 +318,7 @@ namespace GraphQL
         /// Configures <see cref="Schema.Subscription"/> to an instance of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
         /// with <typeparamref name="TSubscriptionClrType"/> as TSourceType.
         /// </summary>
-        public static IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this IConfigureAutoSchema builder)
+        public static IConfigureAutoSchema WithSubscription<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods | DynamicallyAccessedMemberTypes.PublicProperties)] TSubscriptionClrType>(this IConfigureAutoSchema builder)
         {
             builder.Builder.ConfigureSchema((schema, provider) =>
             {
@@ -583,6 +587,7 @@ namespace GraphQL
         /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema)"/>
         /// within the schema constructor.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder)
             => builder.AddClrTypeMappings(Assembly.GetCallingAssembly());
 
@@ -597,6 +602,7 @@ namespace GraphQL
         /// This is equivalent to calling <see cref="SchemaExtensions.RegisterTypeMappings(ISchema, Assembly)"/>
         /// within the schema constructor.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddClrTypeMappings(this IGraphQLBuilder builder, Assembly assembly)
         {
             if (assembly == null)
@@ -621,6 +627,7 @@ namespace GraphQL
         /// and/or output types to <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/> or
         /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> graph types.
         /// </summary>
+        [RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compiler.")]
         public static IGraphQLBuilder AddAutoClrMappings(this IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true)
         {
             builder.AddGraphTypeMappingProvider(new AutoRegisteringGraphTypeMappingProvider(mapInputTypes, mapOutputTypes));
@@ -830,7 +837,7 @@ namespace GraphQL
         /// dependency injection framework.
         /// If supported, the class is also registered as type <see cref="IGraphQLTextSerializer"/>.
         /// </summary>
-        public static IGraphQLBuilder AddSerializer<TSerializer>(this IGraphQLBuilder builder)
+        public static IGraphQLBuilder AddSerializer<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSerializer>(this IGraphQLBuilder builder)
             where TSerializer : class, IGraphQLSerializer
         {
             builder.Services.Register<IGraphQLSerializer, TSerializer>(ServiceLifetime.Singleton, true);
@@ -1167,6 +1174,29 @@ namespace GraphQL
 
             return builder;
         }
+        #endregion
+
+        #region - UseTelemetry -
+#if NET5_0_OR_GREATER
+        /// <summary>
+        /// Configures the GraphQL engine to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
+        /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
+        /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
+        /// </summary>
+        /// <remarks>
+        /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
+        /// </remarks>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
+            => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
+
+        /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+        public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
+        {
+            builder.Services.Configure(configure);
+            builder.ConfigureExecution<GraphQLTelemetryProvider>();
+            return builder;
+        }
+#endif
         #endregion
     }
 }

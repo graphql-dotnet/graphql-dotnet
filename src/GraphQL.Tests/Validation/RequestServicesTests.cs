@@ -53,7 +53,7 @@ public class RequestServicesTests
     {
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
-            int num = context.RequestServices.GetRequiredService<Class1>().GetNum;
+            int num = context.RequestServices!.GetRequiredService<Class1>().GetNum;
             context.ReportError(new ValidationError($"Num is {num}"));
             return default;
         }
