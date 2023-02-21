@@ -83,4 +83,10 @@ public static class GlobalSwitches
     /// The collection is not thread-safe; instances should be added prior to schema initialization.
     /// </summary>
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
+
+    /// <summary>
+    /// Enable this switch to skip the schema validation rule requiring schemas to have a Query type defined.
+    /// </summary>
+    [Obsolete("This functionality is deprecated and will be removed in the next version of GraphQL.NET.")]
+    public static bool AllowSchemaWithoutQuery { get; set; }
 }

@@ -184,7 +184,10 @@ public class SchemaTests
     [Fact]
     public void initialized_schema_should_throw_error_when_register_type_or_directive()
     {
-        var schema = new Schema();
+        var schema = new Schema()
+        {
+            Query = new DummyType()
+        };
 
         schema.Initialized.ShouldBeFalse();
         schema.Initialize();

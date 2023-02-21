@@ -219,6 +219,9 @@ namespace GraphQL
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
+        [System.Obsolete("This functionality is deprecated and will be removed in the next version of Graph" +
+            "QL.NET.")]
+        public static bool AllowSchemaWithoutQuery { get; set; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }

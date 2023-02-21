@@ -29,6 +29,7 @@ public class DecimalSchema : Schema
 {
     public DecimalSchema()
     {
+        Query = new DummyType();
         Mutation = new DecimalMutation();
     }
 }

@@ -22,6 +22,7 @@ public class MutationSchema : Schema
 {
     public MutationSchema()
     {
+        Query = new DummyType();
         Mutation = new MyMutation();
     }
 }
