@@ -333,7 +333,7 @@ namespace GraphQL.Types
             }
 
 #pragma warning disable CS0618 // Type or member is obsolete
-            if (schema.Query == null && !GlobalSwitches.AllowSchemaWithoutQuery)
+            if (schema.Query == null && GlobalSwitches.RequireRootQueryType)
                 throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
 #pragma warning restore CS0618 // Type or member is obsolete
 

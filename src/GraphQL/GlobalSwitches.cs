@@ -87,6 +87,6 @@ public static class GlobalSwitches
     /// <summary>
     /// Enable this switch to skip the schema validation rule requiring schemas to have a Query type defined.
     /// </summary>
-    [Obsolete("This functionality is deprecated and will be removed in the next version of GraphQL.NET.")]
-    public static bool AllowSchemaWithoutQuery { get; set; }
+    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+    public static bool RequireRootQueryType { get; set; } = true;
 }

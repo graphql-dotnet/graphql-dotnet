@@ -219,13 +219,13 @@ namespace GraphQL
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
-        [System.Obsolete("This functionality is deprecated and will be removed in the next version of Graph" +
-            "QL.NET.")]
-        public static bool AllowSchemaWithoutQuery { get; set; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
+            "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+        public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }

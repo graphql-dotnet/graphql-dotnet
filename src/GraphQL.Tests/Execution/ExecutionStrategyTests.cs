@@ -18,7 +18,7 @@ public class ExecutionStrategyTests
             var schema = new Schema();
             if (noQuery)
             {
-                GlobalSwitches.AllowSchemaWithoutQuery = true;
+                GlobalSwitches.RequireRootQueryType = false;
             }
             else
             {
@@ -39,7 +39,7 @@ public class ExecutionStrategyTests
         }
         finally
         {
-            GlobalSwitches.AllowSchemaWithoutQuery = false;
+            GlobalSwitches.RequireRootQueryType = true;
         }
     }
 }
