@@ -100,6 +100,9 @@ internal static class ObservableExtensions
                 }
                 finally
                 {
+                    // note that in .NET Core, this is a no-op, although docs say to be sure it is disposed
+                    // https://learn.microsoft.com/en-us/dotnet/api/system.threading.executioncontext.dispose?view=net-7.0
+                    // https://github.com/dotnet/runtime/blob/c7ca00b016c44de1f8301439256378230c2b0ca9/src/libraries/System.Private.CoreLib/src/System/Threading/ExecutionContext.cs#L548
                     context.Dispose();
                 }
             }
@@ -122,6 +125,9 @@ internal static class ObservableExtensions
                 }
                 finally
                 {
+                    // note that in .NET Core, this is a no-op, although docs say to be sure it is disposed
+                    // https://learn.microsoft.com/en-us/dotnet/api/system.threading.executioncontext.dispose?view=net-7.0
+                    // https://github.com/dotnet/runtime/blob/c7ca00b016c44de1f8301439256378230c2b0ca9/src/libraries/System.Private.CoreLib/src/System/Threading/ExecutionContext.cs#L548
                     context.Dispose();
                 }
             }
