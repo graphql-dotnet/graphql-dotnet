@@ -497,7 +497,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task NetExecutionContextIsCarriedOver()
     {
-        // This verifies that the System.Thread.ExecutionContext is preserved during data events after the initial subscription.
+        // This verifies that the System.Threading.ExecutionContext is preserved during data events after the initial subscription.
         // This means that AsyncLocal instances will contain the values they had during the initial subscription during the
         // execution of field resolvers. As HttpContextAccessor is based on AsyncLocal, this allows subscription field resolvers
         // that references IHttpContextAccessor.HttpContext to access the correct HttpContext of the connected client, rather
