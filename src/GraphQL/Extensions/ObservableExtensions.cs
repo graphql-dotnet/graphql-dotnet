@@ -93,7 +93,14 @@ internal static class ObservableExtensions
                         return;
                     context = _executionContext.CreateCopy();
                 }
-                ExecutionContext.Run(context, _ => Queue(QueueType.Data, _transformNext(value, _token), default), null);
+                try
+                {
+                    ExecutionContext.Run(context, _ => Queue(QueueType.Data, _transformNext(value, _token), default), null);
+                }
+                finally
+                {
+                    context.Dispose();
+                }
             }
 
             public void OnError(Exception error)
@@ -107,7 +114,14 @@ internal static class ObservableExtensions
                         return;
                     context = _executionContext.CreateCopy();
                 }
-                ExecutionContext.Run(context, _ => Queue(QueueType.Error, default, _transformError(error, _token)), null);
+                try
+                {
+                    ExecutionContext.Run(context, _ => Queue(QueueType.Error, default, _transformError(error, _token)), null);
+                }
+                finally
+                {
+                    context.Dispose();
+                }
             }
 
             public void OnCompleted() => Queue(QueueType.Completion, default, default);
