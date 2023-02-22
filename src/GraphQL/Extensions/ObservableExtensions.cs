@@ -91,6 +91,7 @@ internal static class ObservableExtensions
                 {
                     if (_executionContext == null)
                         return;
+                    // ExecutionContext instances can only be used once, so a copy must be made for each use
                     context = _executionContext.CreateCopy();
                 }
                 try
@@ -112,6 +113,7 @@ internal static class ObservableExtensions
                 {
                     if (_executionContext == null)
                         return;
+                    // ExecutionContext instances can only be used once, so a copy must be made for each use
                     context = _executionContext.CreateCopy();
                 }
                 try
