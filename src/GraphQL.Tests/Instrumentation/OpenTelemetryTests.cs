@@ -68,9 +68,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -95,9 +93,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "helloQuery"), // operation name pulled from document
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -124,9 +120,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -176,9 +170,7 @@ public class OpenTelemetryTests : IDisposable
             new("testresult", "test3"),
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -230,9 +222,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "helloQuery"),
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -255,9 +245,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.document", "{"),
         });
         activity.DisplayName.ShouldBe("graphql");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -284,9 +272,7 @@ public class OpenTelemetryTests : IDisposable
 #endif
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Error);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
     }
 
     [Fact]
@@ -308,9 +294,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name within ExecutionOptions, and request was canceled before parsing
         });
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -333,9 +317,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.document", "query helloQuery { hello }"),
         });
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -360,9 +342,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "cancelQuery"),
         });
         activity.DisplayName.ShouldBe("query cancelQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     private class Query
