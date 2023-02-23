@@ -223,6 +223,9 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
+            "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+        public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }

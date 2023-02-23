@@ -125,6 +125,10 @@ public class AuthorizationTests
     public void SchemaBuilder()
     {
         var schema = Schema.For("""
+schema {
+  query: Class1
+}
+
 type Class1 {
   id: String!
   name: String!

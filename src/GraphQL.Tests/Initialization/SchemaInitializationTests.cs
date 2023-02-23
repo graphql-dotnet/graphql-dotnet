@@ -94,6 +94,12 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     {
         Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
     }
+
+    [Fact]
+    public void SchemaWithoutQuery_Should_Throw()
+    {
+        ShouldThrow<Schema, InvalidOperationException>("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
+    }
 }
 
 public class EmptyQuerySchema : Schema
@@ -315,6 +321,7 @@ public class SchemaWithEnumWithoutValues1 : Schema
     {
         var type = new EnumerationGraphType<EnumWithoutValues>();
         RegisterType(type);
+        Query = new DummyType();
     }
 }
 
@@ -324,6 +331,7 @@ public class SchemaWithEnumWithoutValues2 : Schema
     {
         var type = new EnumerationGraphType();
         RegisterType(type);
+        Query = new DummyType();
     }
 }
 
@@ -333,7 +341,7 @@ public class SchemaWithDirective : Schema
     public class MaxLength : Directive
     {
         public MaxLength()
-          : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
+            : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
         {
             Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
             Arguments = new QueryArguments(
@@ -347,7 +355,7 @@ public class SchemaWithDirective : Schema
                     Name = "max",
                     Description = "If specified, specifies the maximum length that the input field or argument must have."
                 }
-          );
+            );
         }
     }
 
