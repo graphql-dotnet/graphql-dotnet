@@ -13,7 +13,7 @@ Pursuant to the GraphQL specification, a query type is required for any schema.
 This is enforced during schema validation but may be bypassed as follows:
 
 ```csharp
-GlobalSwitches.AllowSchemaWithoutQuery = true;
+GlobalSwitches.RequireRootQueryType = false;
 ```
 
 Future versions of GraphQL.NET will not contain this property.
