@@ -16,5 +16,5 @@ This is enforced during schema validation but may be bypassed as follows:
 GlobalSwitches.RequireRootQueryType = false;
 ```
 
-Future versions of GraphQL.NET will not contain this property.
+Future versions of GraphQL.NET will not contain this property and each schema will always be required to have a root Query type to comply with the GraphQL specification.
 
