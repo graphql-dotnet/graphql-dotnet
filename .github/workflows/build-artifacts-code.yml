@@ -54,7 +54,7 @@ jobs:
         run: dotnet build --no-restore -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER
       - name: Pack solution [Release]
         working-directory: src
-        run: dotnet pack --no-restore --no-build -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -p:PackageOutputPath=out
+        run: dotnet pack --no-restore --no-build -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -p:PackageOutputPath=../out
         # See: https://github.com/dotnet/sdk/issues/30624#issuecomment-1432118204
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
