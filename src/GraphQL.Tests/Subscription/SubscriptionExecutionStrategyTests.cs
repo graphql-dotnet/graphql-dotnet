@@ -8,11 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription;
 
-public class SubscriptionExecutionStrategyTests
+public class SubscriptionExecutionStrategyTests : IDisposable
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
     private IDisposable? SubscriptionObj { get; set; }
+    private IDisposable? ServiceProviderDisposable { get; set; }
+
+    public void Dispose() => ServiceProviderDisposable?.Dispose();
 
     [Fact]
     public async Task Basic()
@@ -489,6 +492,43 @@ public class SubscriptionExecutionStrategyTests
         result.Executed.ShouldBeTrue();
     }
 
+    private static readonly AsyncLocal<string?> _asyncLocal = new();
+
+    [Fact]
+    public async Task NetExecutionContextIsCarriedOver()
+    {
+        // This verifies that the System.Threading.ExecutionContext is preserved during data events after the initial subscription.
+        // This means that AsyncLocal instances will contain the values they had during the initial subscription during the
+        // execution of field resolvers. As HttpContextAccessor is based on AsyncLocal, this allows subscription field resolvers
+        // that reference IHttpContextAccessor.HttpContext to access the correct HttpContext of the connected client, rather
+        // than the HttpContext of the event source, which would be unexpected. Of course, any processing before it reaches
+        // GraphQL would be run in the execution context of the event source.
+
+        // simulate the ExecutionContext of a connecting client and execute a subscription
+        _asyncLocal.Value.ShouldBeNull();
+        await ConnectClientAsync().ConfigureAwait(false);
+
+        // simulate the ExecutionContext of an event source and raise an event
+        _asyncLocal.Value.ShouldBeNull();
+        await RaiseEventAsync().ConfigureAwait(false);
+
+        // verify that the connected client has recieved an event with its own context applied during the execution of the resolvers
+        _asyncLocal.Value.ShouldBeNull();
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"data":{"testComplex":{"asyncLocalValue":"client"}}}""");
+
+        async Task ConnectClientAsync()
+        {
+            _asyncLocal.Value = "client";
+            await ExecuteAsync("subscription { testComplex { asyncLocalValue } }").ConfigureAwait(false);
+        }
+
+        async Task RaiseEventAsync()
+        {
+            _asyncLocal.Value = "source";
+            Source.Next("hello");
+        }
+    }
+
     #region - Schema -
     private class Query
     {
@@ -573,6 +613,11 @@ public class SubscriptionExecutionStrategyTests
             var provider = (IServiceProvider)context.UserContext["provider"]!;
             return object.ReferenceEquals(context.RequestServices, provider);
         }
+
+        public string? AsyncLocalValue()
+        {
+            return _asyncLocal.Value;
+        }
     }
     #endregion
 
@@ -608,8 +653,11 @@ public class SubscriptionExecutionStrategyTests
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
-        var provider = services.BuildServiceProvider(); // not disposed intentionally
-        var executer = provider.GetService<IDocumentExecuter>();
+        var provider = services.BuildServiceProvider();
+        if (ServiceProviderDisposable != null)
+            throw new InvalidOperationException("Cannot run ExecuteAsync twice within one test");
+        ServiceProviderDisposable = provider; // only disposed after execution is complete
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
             Schema = provider.GetRequiredService<ISchema>(),

@@ -19,6 +19,7 @@ namespace GraphQL
         /// <returns>
         ///   <see langword="true"/> if the specified type is neither abstract nor an interface; otherwise, <see langword="false"/>.
         /// </returns>
+        [Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static bool IsConcrete(this Type type)
         {
             if (type == null)
