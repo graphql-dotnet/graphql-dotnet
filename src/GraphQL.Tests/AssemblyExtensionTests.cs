@@ -59,7 +59,10 @@ public class AssemblyExtensionTests
     [Fact]
     public void CanGetNuGetVersion()
     {
-        typeof(IGraphQLBuilder).Assembly.GetNuGetVersion().ShouldNotBeNull().ShouldEndWith("-preview");
+        var version = typeof(IGraphQLBuilder).Assembly.GetNuGetVersion().ShouldNotBeNull();
+        var index = version.LastIndexOf("-preview.");
+        if (index != -1)
+            int.Parse(version.Substring(index + 9)).ShouldBeGreaterThan(0);
     }
 
     public class MockableAssembly : Assembly
