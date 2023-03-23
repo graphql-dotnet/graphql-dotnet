@@ -106,7 +106,7 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
-### 9. `Field<TReturnType>` and `Argument<TArgumentClrType> overloads to create field and argument builders with inferred graph types
+### 9. `Field<TReturnType>` and `Argument<TArgumentClrType>` overloads to create field and argument builders with inferred graph types
 
 To define a field with a field builder, previously the graph type was always required, like this:
 
