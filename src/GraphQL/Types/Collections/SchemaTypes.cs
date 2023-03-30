@@ -441,12 +441,17 @@ namespace GraphQL.Types
         /// </summary>
         public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder)
         {
+            ApplyMiddleware(fieldMiddlewareBuilder, null);
+        }
+
+        internal void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder, ISchema? schema)
+        {
             var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
 
             // allocation free optimization if no middlewares are defined
             if (transform != null)
             {
-                ApplyMiddleware(transform);
+                ApplyMiddleware(transform, schema);
             }
         }
 
@@ -458,6 +463,11 @@ namespace GraphQL.Types
         /// </summary>
         public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
         {
+            ApplyMiddleware(transform, null);
+        }
+
+        private void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform, ISchema? schema)
+        {
             if (transform == null)
                 throw new ArgumentNullException(nameof(transform));
 
@@ -467,7 +477,7 @@ namespace GraphQL.Types
                 {
                     foreach (var field in complex.Fields.List)
                     {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+                        var inner = field.Resolver ?? (complex == schema?.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
 
                         var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
 
