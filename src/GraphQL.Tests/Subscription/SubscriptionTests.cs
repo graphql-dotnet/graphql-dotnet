@@ -74,7 +74,7 @@ public class SubscriptionTests
         var schema = new ChatSchema(chat);
         if (useMiddleware)
         {
-            // see
+            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3568
             var my = new NoopMiddleware();
             schema.FieldMiddleware.Use(next => context => my.ResolveAsync(context, next));
         }
