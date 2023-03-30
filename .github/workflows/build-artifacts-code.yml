@@ -10,6 +10,7 @@ on:
     paths:
       - src/**
       - .github/workflows/**
+      - "*.sln"
 
 env:
   NODE_VERSION: '10.x'   # Node 10 LTS
