@@ -467,7 +467,7 @@ namespace GraphQL.Types
                 {
                     foreach (var field in complex.Fields.List)
                     {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+                        var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
 
                         var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
 
