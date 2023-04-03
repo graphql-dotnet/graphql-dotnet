@@ -94,6 +94,14 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     {
         Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
     }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/pull/3571
+    [Fact]
+    public void Deprecate_Required_Arguments_And_Input_Fields_Produce_Friendly_Error()
+    {
+        ShouldThrow<Issue3571Schema1, InvalidOperationException>("The required argument 'flag' of field 'MyQuery.str' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+        ShouldThrow<Issue3571Schema2, InvalidOperationException>("The required input field 'age' of an Input Object 'PersonInput' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+    }
 }
 
 public class EmptyQuerySchema : Schema
@@ -408,5 +416,45 @@ public class Bug3507Schema : Schema
             .WithScope()
             .ResolveAsync(_ => Task.FromResult((object)true));
         Query = type;
+    }
+}
+
+public class Issue3571Schema1 : Schema
+{
+    public Issue3571Schema1()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<NonNullGraphType<BooleanGraphType>>("flag", arg => arg.DeprecationReason = "Use some other argument.")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+}
+
+public class Issue3571Schema2 : Schema
+{
+    public Issue3571Schema2()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name);
+            Field(x => x.Age).DeprecationReason("Use some other input field.");
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
     }
 }

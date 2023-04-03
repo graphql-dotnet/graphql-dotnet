@@ -23,7 +23,7 @@ namespace GraphQL.Types
     /// Represents an argument to a field or directive.
     /// </summary>
     [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
-    public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription
+    public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription, IProvideDeprecationReason
     {
         private Type? _type;
         private IGraphType? _resolvedType;
@@ -72,6 +72,13 @@ namespace GraphQL.Types
         /// Gets or sets the description of the argument.
         /// </summary>
         public string? Description { get; set; }
+
+        /// <inheritdoc/>
+        public string? DeprecationReason
+        {
+            get => this.GetDeprecationReason();
+            set => this.SetDeprecationReason(value);
+        }
 
         /// <summary>
         /// Gets or sets the default value of the argument.
