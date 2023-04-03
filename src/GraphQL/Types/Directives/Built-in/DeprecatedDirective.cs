@@ -7,9 +7,6 @@ namespace GraphQL.Types
     /// </summary>
     public class DeprecatedDirective : Directive
     {
-        private static readonly DirectiveLocation[] _officialLocations = new[] { DirectiveLocation.FieldDefinition, DirectiveLocation.EnumValue };
-        private static readonly DirectiveLocation[] _draftLocations = new[] { DirectiveLocation.FieldDefinition, DirectiveLocation.EnumValue, DirectiveLocation.ArgumentDefinition, DirectiveLocation.InputFieldDefinition };
-
         /// <inheritdoc/>
         public override bool? Introspectable => true;
 
@@ -17,19 +14,7 @@ namespace GraphQL.Types
         /// Initializes a new instance of the 'deprecated' directive.
         /// </summary>
         public DeprecatedDirective()
-            : this(false)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the 'deprecated' directive.
-        /// </summary>
-        /// <param name="deprecationOfInputValues">
-        /// Allows deprecation of input values - arguments on a field or input fields on an input type.
-        /// This feature is from a working draft of the specification.
-        /// </param>
-        public DeprecatedDirective(bool deprecationOfInputValues)
-            : base("deprecated", deprecationOfInputValues ? _draftLocations : _officialLocations)
+            : base("deprecated", DirectiveLocation.FieldDefinition, DirectiveLocation.EnumValue)
         {
             Description = "Marks an element of a GraphQL schema as no longer supported.";
             Arguments = new QueryArguments(new QueryArgument<StringGraphType>

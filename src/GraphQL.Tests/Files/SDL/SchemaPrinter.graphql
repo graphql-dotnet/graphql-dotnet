@@ -6,7 +6,7 @@ schema {
 # Marks an element of a GraphQL schema as no longer supported.
 directive @deprecated(
   reason: String = "No longer supported"
-) on FIELD_DEFINITION | ENUM_VALUE
+) on FIELD_DEFINITION | ENUM_VALUE | ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
 # Directs the executor to include this field or fragment only when the 'if' argument is true.
 directive @include(

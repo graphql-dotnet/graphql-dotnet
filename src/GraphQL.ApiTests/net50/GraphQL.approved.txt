@@ -1994,7 +1994,6 @@ namespace GraphQL.Types
     public class DeprecatedDirective : GraphQL.Types.Directive
     {
         public DeprecatedDirective() { }
-        public DeprecatedDirective(bool deprecationOfInputValues) { }
         public override bool? Introspectable { get; }
     }
     public class Directive : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
