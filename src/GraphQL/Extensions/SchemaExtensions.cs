@@ -198,6 +198,7 @@ namespace GraphQL
 
             schema.Features.AppliedDirectives = true;
             schema.Features.RepeatableDirectives = true;
+            schema.Features.DeprecationOfInputValues = true;
 
             if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
                 schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();

@@ -185,6 +185,7 @@ namespace GraphQL
     {
         public ExperimentalFeatures() { }
         public bool AppliedDirectives { get; set; }
+        public bool DeprecationOfInputValues { get; set; }
         public bool RepeatableDirectives { get; set; }
     }
     public enum ExperimentalIntrospectionFeaturesMode
@@ -1599,10 +1600,12 @@ namespace GraphQL.Introspection
     public class @__Field : GraphQL.Types.ObjectGraphType<GraphQL.Types.IFieldType>
     {
         public @__Field(bool allowAppliedDirectives = false) { }
+        public @__Field(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__InputValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.IProvideMetadata>
     {
         public @__InputValue(bool allowAppliedDirectives = false) { }
+        public @__InputValue(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__Schema : GraphQL.Types.ObjectGraphType<GraphQL.Types.ISchema>
     {
@@ -1611,6 +1614,7 @@ namespace GraphQL.Introspection
     public class @__Type : GraphQL.Types.ObjectGraphType<GraphQL.Types.IGraphType>
     {
         public @__Type(bool allowAppliedDirectives = false) { }
+        public @__Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__TypeKind : GraphQL.Types.EnumerationGraphType<GraphQL.Introspection.TypeKind>
     {
@@ -1997,6 +2001,7 @@ namespace GraphQL.Types
     public class DeprecatedDirective : GraphQL.Types.Directive
     {
         public DeprecatedDirective() { }
+        public DeprecatedDirective(bool deprecationOfInputValues) { }
         public override bool? Introspectable { get; }
     }
     public class Directive : GraphQL.Utilities.MetadataProvider, GraphQL.Types.INamedType, GraphQL.Types.IProvideDescription
@@ -2377,11 +2382,12 @@ namespace GraphQL.Types
         public bool Contains(GraphQL.Types.IObjectGraphType type) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IObjectGraphType> GetEnumerator() { }
     }
-    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideResolvedType
+    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideResolvedType
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
         public object? DefaultValue { get; set; }
+        public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }

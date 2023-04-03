@@ -125,7 +125,7 @@ namespace GraphQL.Types
             _services = services;
 
             Directives = new SchemaDirectives();
-            Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
+            Directives.Register(Directives.Include, Directives.Skip, Features.DeprecationOfInputValues ? Directives.DeprecatedDraft : Directives.Deprecated);
 
             foreach (var configuration in configurations ?? Array.Empty<IConfigureSchema>())
             {

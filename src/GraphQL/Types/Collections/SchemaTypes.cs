@@ -217,7 +217,7 @@ namespace GraphQL.Types
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
             _typeDictionary = new Dictionary<Type, IGraphType>();
-            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
+            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives, schema.Features.DeprecationOfInputValues);
 
             _context = new TypeCollectionContext(
                type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
@@ -346,7 +346,7 @@ namespace GraphQL.Types
                 yield return schema.Subscription;
         }
 
-        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
+        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable, bool deprecationOfInputValues)
         {
             return (allowAppliedDirectives
                 ? new IGraphType[]
@@ -357,9 +357,9 @@ namespace GraphQL.Types
                     new __TypeKind(),
                     new __EnumValue(true),
                     new __Directive(true, allowRepeatable),
-                    new __Field(true),
-                    new __InputValue(true),
-                    new __Type(true),
+                    new __Field(true, deprecationOfInputValues),
+                    new __InputValue(true, deprecationOfInputValues),
+                    new __Type(true, deprecationOfInputValues),
                     new __Schema(true)
                 }
                 : new IGraphType[]
@@ -370,9 +370,9 @@ namespace GraphQL.Types
                     new __TypeKind(),
                     new __EnumValue(false),
                     new __Directive(false, allowRepeatable),
-                    new __Field(false),
-                    new __InputValue(false),
-                    new __Type(false),
+                    new __Field(false, deprecationOfInputValues),
+                    new __InputValue(false, deprecationOfInputValues),
+                    new __Type(false, deprecationOfInputValues),
                     new __Schema(false)
                 })
             .ToDictionary(t => t.GetType());

@@ -25,6 +25,9 @@ namespace GraphQL.Types
         /// </summary>
         public virtual DeprecatedDirective Deprecated { get; } = new DeprecatedDirective();
 
+        // TODO: remove this one when the next version of the spec will be released
+        internal DeprecatedDirective DeprecatedDraft { get; } = new DeprecatedDirective(deprecationOfInputValues: true);
+
         /// <summary>
         /// Gets the count of directives.
         /// </summary>

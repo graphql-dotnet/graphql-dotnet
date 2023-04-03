@@ -19,4 +19,12 @@ public class ExperimentalFeatures
     /// This feature is from a working draft of the specification (not experimental, just not released yet).
     /// </summary>
     public bool RepeatableDirectives { get; set; } = false;
+
+    /// <summary>
+    /// Enables deprecation of input values - arguments on a field or input fields on an input type.
+    /// <br/><br/>
+    /// This feature is from a working draft of the specification (not experimental, just not released yet).
+    /// </summary>
+    public bool DeprecationOfInputValues { get; set; } = false;
+
 }
