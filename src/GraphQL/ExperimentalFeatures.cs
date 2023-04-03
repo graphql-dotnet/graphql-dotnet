@@ -26,5 +26,4 @@ public class ExperimentalFeatures
     /// This feature is from a working draft of the specification (not experimental, just not released yet).
     /// </summary>
     public bool DeprecationOfInputValues { get; set; } = false;
-
 }
