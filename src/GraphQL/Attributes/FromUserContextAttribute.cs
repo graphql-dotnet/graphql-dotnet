@@ -10,9 +10,9 @@ namespace GraphQL
     public class FromUserContextAttribute : GraphQLAttribute
     {
         /// <inheritdoc/>
-        public override void Modify<TParameterType>(ArgumentInformation argumentInformation)
+        public override void Modify(ArgumentInformation argumentInformation)
         {
-            argumentInformation.SetDelegate(context => (TParameterType)context.UserContext!);
+            argumentInformation.SetDelegateWithCast(context => context.UserContext);
         }
     }
 }

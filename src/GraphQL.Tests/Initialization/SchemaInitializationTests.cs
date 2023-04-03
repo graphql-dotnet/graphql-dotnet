@@ -1,3 +1,4 @@
+using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
@@ -85,6 +86,19 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     public void SchemaWithDirective_Should_Not_Throw()
     {
         ShouldNotThrow<SchemaWithDirective>();
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507
+    [Fact]
+    public void Passing_GraphType_InsteadOf_ClrType_Should_Produce_Friendly_Error()
+    {
+        Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
+    }
+
+    [Fact]
+    public void SchemaWithoutQuery_Should_Throw()
+    {
+        ShouldThrow<Schema, InvalidOperationException>("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
     }
 }
 
@@ -307,6 +321,7 @@ public class SchemaWithEnumWithoutValues1 : Schema
     {
         var type = new EnumerationGraphType<EnumWithoutValues>();
         RegisterType(type);
+        Query = new DummyType();
     }
 }
 
@@ -316,6 +331,7 @@ public class SchemaWithEnumWithoutValues2 : Schema
     {
         var type = new EnumerationGraphType();
         RegisterType(type);
+        Query = new DummyType();
     }
 }
 
@@ -325,7 +341,7 @@ public class SchemaWithDirective : Schema
     public class MaxLength : Directive
     {
         public MaxLength()
-          : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
+            : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
         {
             Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
             Arguments = new QueryArguments(
@@ -339,7 +355,7 @@ public class SchemaWithDirective : Schema
                     Name = "max",
                     Description = "If specified, specifies the maximum length that the input field or argument must have."
                 }
-          );
+            );
         }
     }
 
@@ -386,5 +402,19 @@ public class SchemaWithDirective : Schema
 
         Directives.Register(new MaxLength());
         this.RegisterVisitor<MaxLengthDirectiveVisitor>();
+    }
+}
+
+public class Bug3507Schema : Schema
+{
+    public Bug3507Schema()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<BooleanGraphType>("updateDate")
+            .Argument<DateGraphType>("newDate", true)
+            .Resolve()
+            .WithScope()
+            .ResolveAsync(_ => Task.FromResult((object)true));
+        Query = type;
     }
 }

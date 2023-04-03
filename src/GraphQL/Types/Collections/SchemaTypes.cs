@@ -56,6 +56,61 @@ namespace GraphQL.Types
             [typeof(Uri)] = typeof(UriGraphType),
         });
 
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(NonNullGraphType<>))]
+        static SchemaTypes()
+        {
+            // The above attributes preserve those classes when T is a reference type, but not
+            // when T is a value type, which is necessary for GraphQL CLR type references.
+            // Also, specifying the closed generic type does not help, so the only way to force
+            // the trimmer to preserve types such as GraphQLClrInputTypeReference<int> is to
+            // directly reference the type within the compiled MSIL, even if the code does
+            // not actually run. While this does not help with user defined structs, the combination
+            // of the above attributes and below code will allow all built-in types to be handled
+            // by the auto-registering graph types such as AutoRegisteringObjectGraphType and
+            // similar code.
+
+            if (BuiltInScalarMappings != null) // always true
+                return; // no need to actually execute the below code, but it must be present in the compiled IL
+
+            // prevent trimming of these input and output type reference types
+            Preserve<int>();
+            Preserve<long>();
+            Preserve<BigInteger>();
+            Preserve<double>();
+            Preserve<float>();
+            Preserve<decimal>();
+            Preserve<string>();
+            Preserve<bool>();
+            Preserve<DateTime>();
+#if NET5_0_OR_GREATER
+            Preserve<Half>();
+#endif
+#if NET6_0_OR_GREATER
+            Preserve<DateOnly>();
+            Preserve<TimeOnly>();
+#endif
+            Preserve<DateTimeOffset>();
+            Preserve<TimeSpan>();
+            Preserve<Guid>();
+            Preserve<short>();
+            Preserve<ushort>();
+            Preserve<ulong>();
+            Preserve<uint>();
+            Preserve<byte>();
+            Preserve<sbyte>();
+            Preserve<Uri>();
+
+            static void Preserve<T>()
+            {
+                // force the MSIL to contain strong references to the specified type
+                GC.KeepAlive(typeof(GraphQLClrInputTypeReference<T>));
+                GC.KeepAlive(typeof(GraphQLClrOutputTypeReference<T>));
+            }
+        }
+
         // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
         private Dictionary<Type, IGraphType> _introspectionTypes;
 
@@ -277,9 +332,10 @@ namespace GraphQL.Types
                 }
             }
 
-            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
-            // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (schema.Query == null && GlobalSwitches.RequireRootQueryType)
+                throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
+#pragma warning restore CS0618 // Type or member is obsolete
 
             if (schema.Query != null)
                 yield return schema.Query;
@@ -791,7 +847,12 @@ Make sure that your ServiceProvider is configured correctly.");
             var ret = GetGraphTypeFromClrType(clrType, input, typeMappings);
 
             if (ret == null)
-                return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?";
+            {
+                string additionalMessage = typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? $" Note that '{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). Most likely you need to specify corresponding CLR type instead of GraphType."
+                    : "";
+                return $"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?{additionalMessage}";
+            }
 
             return ret;
         }

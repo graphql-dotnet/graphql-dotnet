@@ -30,6 +30,7 @@ public class ArrayOfArraySchema : Schema
 {
     public ArrayOfArraySchema()
     {
+        Query = new DummyType();
         Mutation = new ArrayOfArrayMutation();
     }
 }

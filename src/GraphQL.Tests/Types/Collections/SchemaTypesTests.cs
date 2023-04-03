@@ -59,7 +59,7 @@ public class SchemaTypesTests
             Name = "Query"
         };
 
-        schema.RegisterType(queryGraphType);
+        schema.Query = queryGraphType;
 
         // Object 1
         var graphType1 = new ObjectGraphType

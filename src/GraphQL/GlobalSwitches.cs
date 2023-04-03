@@ -83,4 +83,12 @@ public static class GlobalSwitches
     /// The collection is not thread-safe; instances should be added prior to schema initialization.
     /// </summary>
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
+
+    /// <summary>
+    /// Enables the schema validation rule requiring schemas to have a Query type defined.
+    /// This is required by the GraphQL specification.
+    /// See <see href="https://spec.graphql.org/October2021/#sec-Root-Operation-Types">Root Operation Types</see>.
+    /// </summary>
+    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+    public static bool RequireRootQueryType { get; set; } = true;
 }

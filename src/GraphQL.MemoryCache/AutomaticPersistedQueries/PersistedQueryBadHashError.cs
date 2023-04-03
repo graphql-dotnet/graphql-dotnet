@@ -11,7 +11,7 @@ public class PersistedQueryBadHashError : RequestError
     /// Initializes a new instance.
     /// </summary>
     public PersistedQueryBadHashError(string hash)
-        : base($"The '{hash}' hash doesn't correspond to a query.")
+        : base($"The hash '{hash}' doesn't correspond to the provided query.")
     {
     }
 }

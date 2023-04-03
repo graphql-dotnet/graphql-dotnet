@@ -23,7 +23,7 @@ namespace GraphQL
             where T : class
             => (T)ToObject(source, typeof(T));
 
-        private static readonly List<object> _emptyValues = new();
+        private static readonly List<object?> _emptyValues = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -51,14 +51,14 @@ namespace GraphQL
             }
 
             // Returns values (from source or defaults) that match constructor signature + used keys from source
-            (List<object>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
+            (List<object?>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
             {
                 // parameterless constructors are the most common use case
                 if (parameters.Length == 0)
                     return (_emptyValues, null);
 
                 // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
-                List<object>? values = null;
+                List<object?>? values = null;
                 List<string>? keys = null;
 
                 if (parameters.All(p =>
@@ -109,7 +109,7 @@ namespace GraphQL
 
             ConstructorInfo? targetCtor = null;
             ParameterInfo[]? ctorParameters = null;
-            List<object>? values = null;
+            List<object?>? values = null;
             List<string>? usedKeys = null;
 
             foreach (var ctor in ctorCandidates)

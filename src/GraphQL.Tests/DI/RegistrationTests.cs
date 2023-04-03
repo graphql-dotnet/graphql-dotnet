@@ -52,6 +52,8 @@ public class RegistrationTests : QueryTestBase<RegistrationTests.MySchema>
             multipleArray.Length.ShouldBe(2);
             multipleArray[0].ShouldBeOfType<ClassMultiple1>();
             multipleArray[1].ShouldBeOfType<ClassMultiple2>();
+
+            Query = new DummyType();
         }
     }
 

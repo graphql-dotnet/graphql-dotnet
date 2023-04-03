@@ -22,6 +22,7 @@ public class AbstractInputSchema : Schema
 {
     public AbstractInputSchema()
     {
+        Query = new DummyType();
         Mutation = new AbstractInputMutation();
     }
 }

@@ -8,7 +8,7 @@ namespace GraphQL.Types.Relay
     /// or has the same members.
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the result data set's data type.</typeparam>
-    public class EdgeType<TNodeType> : ObjectGraphType<object>
+    public class EdgeType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
     {
         /// <inheritdoc/>

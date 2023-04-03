@@ -32,6 +32,7 @@ mutation M($input_0: Bug_nested_type_names_dont_conflict_MyInputClass_MyInput!) 
     {
         public MutationSchema()
         {
+            Query = new DummyType();
             Mutation = new MyMutation();
         }
     }

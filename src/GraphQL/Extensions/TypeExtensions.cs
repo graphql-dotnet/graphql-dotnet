@@ -1,6 +1,5 @@
 using System.Collections;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Types;
@@ -20,6 +19,7 @@ namespace GraphQL
         /// <returns>
         ///   <see langword="true"/> if the specified type is neither abstract nor an interface; otherwise, <see langword="false"/>.
         /// </returns>
+        [Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static bool IsConcrete(this Type type)
         {
             if (type == null)
@@ -105,6 +105,11 @@ namespace GraphQL
         /// <remarks>This can handle arrays, lists and other collections implementing IEnumerable.</remarks>
         public static Type GetGraphTypeFromType(this Type type, bool isNullable = false, TypeMappingMode mode = TypeMappingMode.UseBuiltInScalarMappings)
         {
+            if (typeof(IGraphType).IsAssignableFrom(type))
+            {
+                throw new ArgumentOutOfRangeException(nameof(type), $"The graph type '{type.GetFriendlyName()}' cannot be used as a CLR type.");
+            }
+
             while (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IDataLoaderResult<>))
             {
                 type = type.GetGenericArguments()[0];

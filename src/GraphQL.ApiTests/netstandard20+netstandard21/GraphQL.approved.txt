@@ -196,19 +196,19 @@ namespace GraphQL
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
         public FromServicesAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromSourceAttribute : GraphQL.GraphQLAttribute
     {
         public FromSourceAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromUserContextAttribute : GraphQL.GraphQLAttribute
     {
         public FromUserContextAttribute() { }
-        public override void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
+        public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
     public sealed class FuncServiceProvider : System.IServiceProvider
     {
@@ -223,6 +223,9 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
+            "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+        public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
@@ -757,6 +760,7 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
@@ -1738,6 +1742,7 @@ namespace GraphQL.Types
                 "Expression"})]
         public virtual System.ValueTuple<GraphQL.Types.QueryArgument?, System.Linq.Expressions.LambdaExpression?> ConstructQueryArgument() { }
         public void SetDelegate<TParameterType>(System.Func<GraphQL.IResolveFieldContext, TParameterType?> argumentDelegate) { }
+        public void SetDelegateWithCast(System.Func<GraphQL.IResolveFieldContext, object?> argumentDelegate) { }
     }
     public class AsIsCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -1748,7 +1753,7 @@ namespace GraphQL.Types
     {
         public AutoRegisteringGraphTypeMappingProvider() { }
         public AutoRegisteringGraphTypeMappingProvider(bool mapInputTypes, bool mapOutputTypes, bool mapInterfaceTypes = true) { }
-        public System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
+        public virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Type? preferredType) { }
     }
     public static class AutoRegisteringHelper
     {

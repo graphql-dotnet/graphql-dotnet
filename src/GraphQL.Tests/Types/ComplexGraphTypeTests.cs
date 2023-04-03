@@ -518,11 +518,11 @@ public class ComplexGraphTypeTests
         type.Fields.Find("field3").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
 
         var e1 = Should.Throw<ArgumentException>(() => type.Field<int?>("field4"));
-        e1.Message.ShouldBe("The GraphQL type for field 'TestObject.field4' could not be derived implicitly from type 'Nullable`1'.");
+        e1.Message.ShouldStartWith("The GraphQL type for field 'TestObject.field4' could not be derived implicitly from type 'Nullable`1'. Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
         e1.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
 
         var e2 = Should.Throw<ArgumentException>(() => type.Field<int?>("field5", false));
-        e2.Message.ShouldBe("The GraphQL type for field 'TestObject.field5' could not be derived implicitly from type 'Nullable`1'.");
+        e2.Message.ShouldStartWith("The GraphQL type for field 'TestObject.field5' could not be derived implicitly from type 'Nullable`1'. Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
         e2.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
 
         type.Field<int?>("field6", true).Resolve(_ => 3);
