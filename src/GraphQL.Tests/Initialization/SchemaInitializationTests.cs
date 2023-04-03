@@ -99,8 +99,8 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void Deprecate_Required_Arguments_And_Input_Fields_Produce_Friendly_Error()
     {
-        ShouldThrow<Issue3571Schema1, InvalidOperationException>("The required argument 'flag' of field 'MyQuery.str' has not default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
-        ShouldThrow<Issue3571Schema2, InvalidOperationException>("The required input field 'age' of an Input Object 'PersonInput' has not default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+        ShouldThrow<Issue3571Schema1, InvalidOperationException>("The required argument 'flag' of field 'MyQuery.str' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+        ShouldThrow<Issue3571Schema2, InvalidOperationException>("The required input field 'age' of an Input Object 'PersonInput' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
     }
 }
 

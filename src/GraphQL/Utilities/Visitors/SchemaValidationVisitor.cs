@@ -87,7 +87,7 @@ namespace GraphQL.Utilities
 
             // 2.4.3
             if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
-                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has not default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
         }
 
         #endregion
@@ -153,7 +153,7 @@ namespace GraphQL.Utilities
 
             // 2.4.3
             if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
-                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has not default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
         }
 
         #endregion
@@ -209,7 +209,7 @@ namespace GraphQL.Utilities
 
             // 2.4
             if (field.ResolvedType is NonNullGraphType && field.DefaultValue is null && field.DeprecationReason is not null)
-                throw new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has not default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+                throw new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
         }
 
         #endregion
