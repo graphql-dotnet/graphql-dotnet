@@ -469,7 +469,7 @@ namespace GraphQL.Types
 
             foreach (var item in Dictionary)
             {
-                if (item.Value is IComplexGraphType complex)
+                if (item.Value is IComplexGraphType complex && item.Value is not IInputObjectGraphType)
                 {
                     foreach (var field in complex.Fields.List)
                     {

@@ -97,10 +97,26 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
 
     // https://github.com/graphql-dotnet/graphql-dotnet/pull/3571
     [Fact]
-    public void Deprecate_Required_Arguments_And_Input_Fields_Produce_Friendly_Error()
+    public void Deprecate_Required_Arguments_And_Input_Fields_Should_Produce_Friendly_Error()
     {
         ShouldThrow<Issue3571Schema1, InvalidOperationException>("The required argument 'flag' of field 'MyQuery.str' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
         ShouldThrow<Issue3571Schema2, InvalidOperationException>("The required input field 'age' of an Input Object 'PersonInput' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2994
+    [Fact]
+    public void StreamResolver_On_Wrong_Fields_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithFieldStreamResolver1, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolver2, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolver3, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/1176
+    [Fact]
+    public void Resolver_On_InputField_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithInputFieldResolver, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have Resolver set. You should set Resolver only for output types.");
     }
 }
 
@@ -448,6 +464,96 @@ public class Issue3571Schema2 : Schema
         {
             Field(x => x.Name);
             Field(x => x.Age).DeprecationReason("Use some other input field.");
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}
+
+public class SchemaWithFieldStreamResolver1 : Schema
+{
+    public SchemaWithFieldStreamResolver1()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .ResolveStream(_ => new Subscription.SampleObservable<string>())
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+}
+
+public class SchemaWithFieldStreamResolver2 : Schema
+{
+    public SchemaWithFieldStreamResolver2()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<MyInterface>("hero").Resolve(_ => null);
+        Query = type;
+    }
+
+    private class MyInterface : InterfaceGraphType
+    {
+        public MyInterface()
+        {
+            Name = "My";
+
+            Field<StringGraphType>("id")
+                .ResolveStream(_ => new Subscription.SampleObservable<string>())
+                .Resolve(_ => "abc");
+        }
+    }
+}
+
+public class SchemaWithFieldStreamResolver3 : Schema
+{
+    public SchemaWithFieldStreamResolver3()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name).ResolveStream(_ => new Subscription.SampleObservable<string>());
+            Field(x => x.Age);
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}
+
+public class SchemaWithInputFieldResolver : Schema
+{
+    public SchemaWithInputFieldResolver()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name).Resolve(_ => "abc");
+            Field(x => x.Age);
         }
     }
 
