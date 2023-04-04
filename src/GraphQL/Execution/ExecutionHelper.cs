@@ -85,7 +85,7 @@ namespace GraphQL.Execution
         {
             public GraphQLDocument? Document { get; init; }
             /// <summary>
-            /// This is typically either a field, a fragment spread, or variable definition
+            /// This is typically either a field, a fragment spread, or variable definition.
             /// </summary>
             public ASTNode? ParentNode { get; init; }
             public GraphQLDirective? Directive { get; init; }
