@@ -241,6 +241,15 @@ exception details were located along with exception message. To use old behavior
 we have added a new `ErrorInfoProviderOptions.ExposeExceptionDetails` property and marked
 `ErrorInfoProviderOptions.ExposeExceptionStackTrace` property as obsolete.
 
+### 12. Allow deprecation of input values
+
+Since 7.4 you can also deprecate arguments on a field and input fields on an input type. It
+was done to conform the draft GraphQL spec. See https://github.com/graphql-dotnet/graphql-dotnet/pull/3571.
+
+Since this feature may be potentially breaking for your app, clients or tooling it was done as opt-in.
+Either set `schema.Features.DeprecationOfInputValues = true;` or call `schema.EnableExperimentalIntrospectionFeatures()`
+method before initializing a schema.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
