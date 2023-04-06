@@ -104,7 +104,8 @@ internal static class AutoRegisteringOutputHelper
         }
         if (buildMemberInstanceExpressionFunc == null)
         {
-            fieldType.Resolver = _invalidFieldResolver;
+            // interface types do not set resolvers
+            fieldType.Resolver = null;
             // fieldType.StreamResolver = _invalidStreamResolver; // Do not set it; SchemaValidationVisitor has all needed checks
         }
     }
