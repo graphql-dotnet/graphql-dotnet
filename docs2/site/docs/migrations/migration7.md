@@ -603,7 +603,7 @@ in version 7.2+.
 
 Starting with version 7.4, the `StreamResolver` property should be set exclusively for root fields
 in subscriptions, while the `Resolver` property should only be assigned to object output types'
-fields. Fields within union types, interface types and input object types should not set these
+fields. Fields within interface types and input object types should not set these
 properties. This modification may lead to potential disruptions in your applications, as the
 schema may trigger an exception during initialization. To eliminate this exception, simply
 cease assigning these properties for the fields specified in the exception message.
