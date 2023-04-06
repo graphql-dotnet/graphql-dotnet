@@ -9,7 +9,6 @@ namespace GraphQL.Types;
 /// </summary>
 internal static class AutoRegisteringOutputHelper
 {
-    private static readonly IFieldResolver _invalidFieldResolver = new FuncFieldResolver<object?>(_ => throw new InvalidOperationException("This field resolver should never be called. It is only used to prevent the default field resolver from being used."));
     /// <summary>
     /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
     /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
