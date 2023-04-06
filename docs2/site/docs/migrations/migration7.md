@@ -601,7 +601,9 @@ in version 7.2+.
 
 ### 18. `SchemaValidationVisitor` has more runtime checks
 
-From version 7.4 on, only root fields of subscriptions should set `StreamResolver` and only object
-output types should set `Resolver` properties. This change may be potentially breaking for your apps,
-because schema will throw exception during initialization. To get rid of that exception just stop
-setting these properties for fields mentioned in exception message.
+Starting with version 7.4, the `StreamResolver` property should be set exclusively for root fields
+in subscriptions, while the `Resolver` property should only be assigned to object output types'
+fields. Fields within union types, interface types and input object types should not set these
+properties. This modification may lead to potential disruptions in your applications, as the
+schema may trigger an exception during initialization. To eliminate this exception, simply
+cease assigning these properties for the fields specified in the exception message.
