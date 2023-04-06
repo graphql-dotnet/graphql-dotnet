@@ -135,6 +135,9 @@ namespace GraphQL.Utilities
 
             if (field.StreamResolver != null && type != schema.Subscription)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+
+            if (field.Resolver != null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
         }
 
         /// <inheritdoc/>
@@ -221,7 +224,7 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
 
             if (field.Resolver != null)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for output types.");
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types.");
         }
 
         #endregion

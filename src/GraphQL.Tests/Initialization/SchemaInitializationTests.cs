@@ -107,16 +107,22 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void StreamResolver_On_Wrong_Fields_Should_Produce_Friendly_Error()
     {
-        ShouldThrow<SchemaWithFieldStreamResolver1, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolver2, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolver3, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnNonRootSubscriptionField, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInputObject, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/1176
     [Fact]
     public void Resolver_On_InputField_Should_Produce_Friendly_Error()
     {
-        ShouldThrow<SchemaWithInputFieldResolver, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have Resolver set. You should set Resolver only for output types.");
+        ShouldThrow<SchemaWithInputFieldResolver, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have Resolver set. You should set Resolver only for fields of object output types.");
+    }
+
+    [Fact]
+    public void Resolver_On_InterfaceField_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithFieldResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
     }
 }
 
@@ -475,9 +481,9 @@ public class Issue3571Schema2 : Schema
     }
 }
 
-public class SchemaWithFieldStreamResolver1 : Schema
+public class SchemaWithFieldStreamResolverOnNonRootSubscriptionField : Schema
 {
-    public SchemaWithFieldStreamResolver1()
+    public SchemaWithFieldStreamResolverOnNonRootSubscriptionField()
     {
         var type = new ObjectGraphType { Name = "MyQuery" };
         type.Field<StringGraphType>("str")
@@ -487,9 +493,29 @@ public class SchemaWithFieldStreamResolver1 : Schema
     }
 }
 
-public class SchemaWithFieldStreamResolver2 : Schema
+public class SchemaWithFieldStreamResolverOnFieldOfInterface : Schema
 {
-    public SchemaWithFieldStreamResolver2()
+    public SchemaWithFieldStreamResolverOnFieldOfInterface()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<MyInterface>("hero");
+        Query = type;
+    }
+
+    private class MyInterface : InterfaceGraphType
+    {
+        public MyInterface()
+        {
+            Name = "My";
+
+            Field<StringGraphType>("id").ResolveStream(_ => new Subscription.SampleObservable<string>());
+        }
+    }
+}
+
+public class SchemaWithFieldResolverOnFieldOfInterface : Schema
+{
+    public SchemaWithFieldResolverOnFieldOfInterface()
     {
         var type = new ObjectGraphType { Name = "MyQuery" };
         type.Field<MyInterface>("hero").Resolve(_ => null);
@@ -502,16 +528,14 @@ public class SchemaWithFieldStreamResolver2 : Schema
         {
             Name = "My";
 
-            Field<StringGraphType>("id")
-                .ResolveStream(_ => new Subscription.SampleObservable<string>())
-                .Resolve(_ => "abc");
+            Field<StringGraphType>("id").Resolve(_ => "abc");
         }
     }
 }
 
-public class SchemaWithFieldStreamResolver3 : Schema
+public class SchemaWithFieldStreamResolverOnFieldOfInputObject : Schema
 {
-    public SchemaWithFieldStreamResolver3()
+    public SchemaWithFieldStreamResolverOnFieldOfInputObject()
     {
         var type = new ObjectGraphType { Name = "MyQuery" };
         type.Field<StringGraphType>("str")

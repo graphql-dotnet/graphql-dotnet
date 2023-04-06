@@ -514,7 +514,7 @@ namespace GraphQL.Types
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
 
-            if (this is not IInputObjectGraphType)
+            if (this is IObjectGraphType)
                 builder.Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression));
 
             if (expression.Body is MemberExpression expr)
