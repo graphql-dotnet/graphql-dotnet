@@ -469,9 +469,9 @@ namespace GraphQL.Types
 
             foreach (var item in Dictionary)
             {
-                if (item.Value is IComplexGraphType complex)
+                if (item.Value is IObjectGraphType obj)
                 {
-                    foreach (var field in complex.Fields.List)
+                    foreach (var field in obj.Fields.List)
                     {
                         var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
 

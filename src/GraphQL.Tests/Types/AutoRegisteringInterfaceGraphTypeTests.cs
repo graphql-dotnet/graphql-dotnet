@@ -270,7 +270,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null)]
     [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null)]
     [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123)]
-    public async Task Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value)
+    public void Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value)
     {
         var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -294,9 +294,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         serviceCollection.AddSingleton<string>("testService");
         using var provider = serviceCollection.BuildServiceProvider();
         context.RequestServices = provider;
-        fieldType.Resolver.ShouldNotBeNull();
-        var ex = await Should.ThrowAsync<InvalidOperationException>(async () => await fieldType.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false);
-        ex.Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
+        fieldType.Resolver.ShouldBeNull();
     }
 
     [Fact]
@@ -342,29 +340,11 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [InlineData("Field4")]
     [InlineData("Field6AltName")]
     [InlineData("Field7")]
-    public async Task FieldResolvers_Invalid(string fieldName)
+    public void FieldResolvers_Of_InterfaceGraphType_ShouldBe_Null(string fieldName)
     {
         var graph = new AutoRegisteringInterfaceGraphType<TestInterface>();
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
-        var resolver = field.Resolver.ShouldNotBeNull();
-        var obj = new TestClass();
-        var ex = await Should.ThrowAsync<InvalidOperationException>(async () => await resolver.ResolveAsync(new ResolveFieldContext
-        {
-            Source = obj,
-            FieldDefinition = new FieldType { Name = fieldName },
-        }).ConfigureAwait(false)).ConfigureAwait(false);
-        ex.Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
-    }
-
-    [Fact]
-    public async Task ThrowsWhenSourceNull()
-    {
-        var graphType = new AutoRegisteringInterfaceGraphType<NullSourceFailureTest>();
-        var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
-        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
-            .Message.ShouldBe("This field resolver should never be called. It is only used to prevent the default field resolver from being used.");
+        field.Resolver.ShouldBeNull();
     }
 
     [Fact]
@@ -664,12 +644,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
         string Example2();
     }
 
-    private interface NullSourceFailureTest
-    {
-        bool Example1 { get; set; }
-        string Example2();
-    }
-
     private interface FieldTests
     {
         [Name("Test1")]
@@ -798,17 +772,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
             field.Name += "Prop";
             return field;
         }
-    }
-
-    private class TestClass : TestInterface
-    {
-        public int Field1 { get; set; } = 1;
-        public int Field2 => 2;
-        public int Field3 { set { } }
-        public int Field4() => 4;
-        [Name("Field6AltName")]
-        public int Field6 => 6;
-        public Task<int> Field7 => Task.FromResult(7);
     }
 
     private interface TestInterface

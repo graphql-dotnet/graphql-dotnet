@@ -598,3 +598,12 @@ require them to resolve to GraphQL Object types. GraphQL.NET 7.2+ now enforces t
 Due to the above validation, resolvers defined on fields of interface types are never be used by
 GraphQL.NET. As such, resolvers are not generated for fields of `AutoRegisteringInterfaceGraphType`s
 in version 7.2+.
+
+### 18. `SchemaValidationVisitor` has more runtime checks
+
+Starting with version 7.4, the `StreamResolver` property should be set exclusively for root fields
+in subscriptions, while the `Resolver` property should only be assigned to object output types'
+fields. Fields within interface types and input object types should not set these
+properties. This modification may lead to potential disruptions in your applications, as the
+schema may trigger an exception during initialization. To eliminate this exception, simply
+cease assigning these properties for the fields specified in the exception message.
