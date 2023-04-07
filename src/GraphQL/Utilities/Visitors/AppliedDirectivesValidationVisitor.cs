@@ -94,9 +94,8 @@ namespace GraphQL.Utilities
 
                 foreach (var appliedDirective in appliedDirectives)
                 {
-                    var schemaDirective = schema.Directives.Find(appliedDirective.Name);
-                    if (schemaDirective == null)
-                        throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
+                    var schemaDirective = schema.Directives.Find(appliedDirective.Name)
+                        ?? throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
 
                     if (location != null && !schemaDirective.Locations.Contains(location.Value))
                     {

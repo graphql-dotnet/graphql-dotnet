@@ -112,7 +112,12 @@
             {
               "name": "inputFields",
               "appliedDirectives": [],
-              "args": []
+              "args": [
+                {
+                  "name": "includeDeprecated",
+                  "appliedDirectives": []
+                }
+              ]
             },
             {
               "name": "ofType",
@@ -148,7 +153,12 @@
             {
               "name": "args",
               "appliedDirectives": [],
-              "args": []
+              "args": [
+                {
+                  "name": "includeDeprecated",
+                  "appliedDirectives": []
+                }
+              ]
             },
             {
               "name": "type",
@@ -197,11 +207,26 @@
               "args": []
             },
             {
+              "name": "isDeprecated",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
+              "name": "deprecationReason",
+              "appliedDirectives": [],
+              "args": []
+            },
+            {
               "name": "appliedDirectives",
               "appliedDirectives": [],
               "args": []
             }
           ]
+        },
+        {
+          "name": "Boolean",
+          "appliedDirectives": [],
+          "fields": null
         },
         {
           "name": "__AppliedDirective",
@@ -234,11 +259,6 @@
               "args": []
             }
           ]
-        },
-        {
-          "name": "Boolean",
-          "appliedDirectives": [],
-          "fields": null
         },
         {
           "name": "__EnumValue",

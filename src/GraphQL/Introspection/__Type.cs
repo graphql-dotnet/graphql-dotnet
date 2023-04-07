@@ -13,6 +13,19 @@ namespace GraphQL.Introspection
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Type(bool allowAppliedDirectives = false)
+            : this(allowAppliedDirectives, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="__Type"/> introspection type.
+        /// </summary>
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        /// <param name="deprecationOfInputValues">
+        /// Allows deprecation of input values - arguments on a field or input fields on an input type.
+        /// This feature is from a working draft of the specification.
+        /// </param>
+        public __Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
             Name = nameof(__Type);
 
@@ -140,16 +153,18 @@ namespace GraphQL.Introspection
                     return null;
                 });
 
-            Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields").ResolveAsync(async context =>
+            var inputFieldsField = Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields").ResolveAsync(async context =>
             {
                 if (context.Source is IInputObjectGraphType type)
                 {
                     var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
+                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+
                     int index = 0;
                     foreach (var field in type.Fields.List)
                     {
-                        if (await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                        if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
                             inputFields[index++] = field;
                     }
 
@@ -162,6 +177,8 @@ namespace GraphQL.Introspection
 
                 return null;
             });
+            if (deprecationOfInputValues)
+                inputFieldsField.Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False);
 
             Field<__Type>("ofType").Resolve(context =>
             {
