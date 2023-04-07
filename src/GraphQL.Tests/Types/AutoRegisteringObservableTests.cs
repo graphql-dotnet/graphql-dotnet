@@ -17,7 +17,7 @@ public class AutoRegisteringObservableTests
     private ISourceStreamResolver GetResolver(string fieldName)
     {
         var graph = new AutoRegisteringObjectGraphType<TestClass>();
-        var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
+        var field = graph.Fields.Find(fieldName).ShouldBeOfType<SubscriptionRootFieldType>();
         return field.StreamResolver.ShouldNotBeNull();
     }
 

@@ -77,7 +77,7 @@ namespace GraphQL.Types
         /// to the field were supplied within the request. This property serves as an optimization in
         /// <see cref="ReadonlyResolveFieldContext.Arguments"/>. So basically, we are optimizing for
         /// the idea that much of the time there are no field arguments specified, and simply the
-        /// default set needs to be returned. 
+        /// default set needs to be returned.
         /// Note that this value is automatically initialized during schema initialization.
         /// </summary>
         internal IDictionary<string, ArgumentValue>? DefaultArgumentValues { get; set; }
@@ -86,7 +86,13 @@ namespace GraphQL.Types
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
         /// </summary>
         public IFieldResolver? Resolver { get; set; }
+    }
 
+    /// <summary>
+    /// Represents a root field of a subscription graph type.
+    /// </summary>
+    public class SubscriptionRootFieldType : FieldType
+    {
         /// <summary>
         /// Gets or sets a subscription resolver for the field. Only applicable to the root fields of subscription.
         /// </summary>

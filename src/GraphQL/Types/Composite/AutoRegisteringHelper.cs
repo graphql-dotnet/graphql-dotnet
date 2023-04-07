@@ -141,11 +141,11 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+        internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType, Func<MemberInfo, FieldType> fieldTypeFactory)
         {
             var typeInformation = getTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            var fieldType = CreateField(memberInfo, graphType, isInputType);
+            var fieldType = CreateField(memberInfo, graphType, isInputType, fieldTypeFactory);
             // set resolver, if applicable
             buildFieldType?.Invoke(fieldType, memberInfo);
             // apply field attributes after resolver has been set
@@ -156,16 +156,16 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
+        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType, Func<MemberInfo, FieldType> fieldTypeFactory)
         {
-            var fieldType = new FieldType()
-            {
-                Name = memberInfo.Name,
-                Description = memberInfo.Description(),
-                DeprecationReason = memberInfo.ObsoleteMessage(),
-                Type = graphType,
-                DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
-            };
+            var fieldType = fieldTypeFactory(memberInfo);
+
+            fieldType.Name = memberInfo.Name;
+            fieldType.Description = memberInfo.Description();
+            fieldType.DeprecationReason = memberInfo.ObsoleteMessage();
+            fieldType.Type = graphType;
+            fieldType.DefaultValue = isInputType ? memberInfo.DefaultValue() : null;
+
             if (isInputType)
             {
                 fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);

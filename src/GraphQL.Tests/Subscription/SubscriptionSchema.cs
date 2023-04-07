@@ -23,14 +23,14 @@ public class ChatSubscriptions : ObjectGraphType
     public ChatSubscriptions(IChat chat)
     {
         _chat = chat;
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "messageAdded",
             Type = typeof(MessageType),
             StreamResolver = new SourceStreamResolver<Message>(Subscribe)
         });
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "messageAddedByUser",
             Arguments = new QueryArguments(
@@ -40,14 +40,14 @@ public class ChatSubscriptions : ObjectGraphType
             StreamResolver = new SourceStreamResolver<Message>(SubscribeById)
         });
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "messageAddedAsync",
             Type = typeof(MessageType),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeAsync)
         });
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "messageAddedByUserAsync",
             Arguments = new QueryArguments(
@@ -57,14 +57,14 @@ public class ChatSubscriptions : ObjectGraphType
             StreamResolver = new SourceStreamResolver<Message>(SubscribeByIdAsync)
         });
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "messageGetAll",
             Type = typeof(ListGraphType<MessageType>),
             StreamResolver = new SourceStreamResolver<List<Message>>(_ => _chat.MessagesGetAll())
         });
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "newMessageContent",
             Type = typeof(StringGraphType),

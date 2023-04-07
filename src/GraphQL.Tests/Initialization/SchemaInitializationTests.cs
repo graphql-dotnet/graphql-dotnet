@@ -1,4 +1,5 @@
 using GraphQL.MicrosoftDI;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser.AST;
@@ -113,9 +114,9 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void StreamResolver_On_Wrong_Fields_Should_Produce_Friendly_Error()
     {
-        ShouldThrow<SchemaWithFieldStreamResolverOnNonRootSubscriptionField, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInputObject, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnNonRootSubscriptionField, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInputObject, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/1176
@@ -494,9 +495,13 @@ public class SchemaWithFieldStreamResolverOnNonRootSubscriptionField : Schema
     public SchemaWithFieldStreamResolverOnNonRootSubscriptionField()
     {
         var type = new ObjectGraphType { Name = "MyQuery" };
-        type.Field<StringGraphType>("str")
-            .ResolveStream(_ => new Subscription.SampleObservable<string>())
-            .Resolve(_ => "abc");
+        type.AddField(new SubscriptionRootFieldType
+        {
+            Name = "str",
+            ResolvedType = new StringGraphType(),
+            Resolver = new FuncFieldResolver<string>(_ => "abc"),
+            StreamResolver = new SourceStreamResolver<string>(_ => new Subscription.SampleObservable<string>())
+        });
         Query = type;
     }
 }
@@ -516,7 +521,12 @@ public class SchemaWithFieldStreamResolverOnFieldOfInterface : Schema
         {
             Name = "My";
 
-            Field<StringGraphType>("id").ResolveStream(_ => new Subscription.SampleObservable<string>());
+            AddField(new SubscriptionRootFieldType
+            {
+                Name = "id",
+                ResolvedType = new StringGraphType(),
+                StreamResolver = new SourceStreamResolver<string>(_ => new Subscription.SampleObservable<string>())
+            });
         }
     }
 }
@@ -556,16 +566,18 @@ public class SchemaWithFieldStreamResolverOnFieldOfInputObject : Schema
     {
         public PersonInput()
         {
-            Field(x => x.Name).ResolveStream(_ => new Subscription.SampleObservable<string>());
-            Field(x => x.Age);
+            AddField(new SubscriptionRootFieldType
+            {
+                Name = "name",
+                ResolvedType = new StringGraphType(),
+                StreamResolver = new SourceStreamResolver<string>(_ => new Subscription.SampleObservable<string>())
+            });
         }
     }
 
     private class Person
     {
         public string Name { get; set; }
-
-        public int Age { get; set; }
     }
 }
 

@@ -346,7 +346,7 @@ namespace GraphQL.Types
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new FieldType
+            return AddField(new SubscriptionRootFieldType
             {
                 Name = name,
                 Description = description,
@@ -383,7 +383,7 @@ namespace GraphQL.Types
             string? deprecationReason = null)
             where TGraphType : IGraphType
         {
-            return AddField(new FieldType
+            return AddField(new SubscriptionRootFieldType
             {
                 Name = name,
                 Description = description,
@@ -397,6 +397,22 @@ namespace GraphQL.Types
                     ? new SourceStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
                     : null
             });
+        }
+
+        /// <summary>
+        /// Creates a field builder used by SubscriptionField() methods.
+        /// </summary>
+        protected virtual SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+        {
+            return SubscriptionRootFieldBuilder<TSourceType, TReturnType>.Create(type);
+        }
+
+        /// <summary>
+        /// Creates a field builder used by SubscriptionField() methods.
+        /// </summary>
+        protected virtual SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>(IGraphType type)
+        {
+            return SubscriptionRootFieldBuilder<TSourceType, TReturnType>.Create(type);
         }
 
         /// <summary>

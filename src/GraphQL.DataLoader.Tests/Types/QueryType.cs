@@ -32,8 +32,7 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync();
             });
 
-        Field<OrderType, Order>()
-            .Name("Order")
+        Field<OrderType, Order>("Order")
             .Description("Get Order by ID")
             .Argument<NonNullGraphType<IntGraphType>>("orderId", "")
             .ResolveAsync(ctx =>
@@ -44,8 +43,7 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync(ctx.GetArgument<int>("orderId"));
             });
 
-        Field<ListGraphType<OrderType>, IEnumerable<Order>>()
-            .Name("Orders")
+        Field<ListGraphType<OrderType>, IEnumerable<Order>>("Orders")
             .Description("Get all Orders")
             .ResolveAsync(ctx =>
             {
@@ -55,8 +53,7 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync();
             });
 
-        Field<NonNullGraphType<ListGraphType<UserType>>, IEnumerable<IDataLoaderResult<User>>>()
-            .Name("SpecifiedUsers")
+        Field<NonNullGraphType<ListGraphType<UserType>>, IEnumerable<IDataLoaderResult<User>>>("SpecifiedUsers")
             .Description("Get Users by ID")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
             .Resolve(ctx =>
@@ -69,8 +66,7 @@ public class QueryType : ObjectGraphType
                 return ret;
             });
 
-        Field<NonNullGraphType<ListGraphType<UserType>>, IDataLoaderResult<IEnumerable<User>>>()
-            .Name("SpecifiedUsersWithThen")
+        Field<NonNullGraphType<ListGraphType<UserType>>, IDataLoaderResult<IEnumerable<User>>>("SpecifiedUsersWithThen")
             .Description("Get Users by ID skipping null matches")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
             .Resolve(ctx =>

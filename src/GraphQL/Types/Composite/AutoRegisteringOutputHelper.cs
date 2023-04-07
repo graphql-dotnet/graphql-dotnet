@@ -12,7 +12,7 @@ internal static class AutoRegisteringOutputHelper
     /// <summary>
     /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
     /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
-    /// and <see cref="FieldType.StreamResolver"/>.
+    /// and <see cref="SubscriptionRootFieldType.StreamResolver"/>.
     /// <br/><br/>
     /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
     /// member from <see cref="IResolveFieldContext.Source"/>.
@@ -41,7 +41,6 @@ internal static class AutoRegisteringOutputHelper
             {
                 var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
                 fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
             }
         }
         else if (memberInfo is MethodInfo methodInfo)
@@ -70,13 +69,12 @@ internal static class AutoRegisteringOutputHelper
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
-                    fieldType.StreamResolver = resolver;
+                    (fieldType as SubscriptionRootFieldType ?? throw new InvalidOperationException("BOOM!")).StreamResolver = resolver;
                 }
                 else
                 {
                     var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
-                    fieldType.StreamResolver = null;
                 }
             }
             fieldType.Arguments = queryArguments;
@@ -88,7 +86,6 @@ internal static class AutoRegisteringOutputHelper
             {
                 var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
                 fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
             }
         }
         else if (memberInfo == null)
@@ -103,7 +100,6 @@ internal static class AutoRegisteringOutputHelper
         {
             // interface types do not set resolvers
             fieldType.Resolver = null;
-            fieldType.StreamResolver = null;
         }
     }
 
@@ -111,7 +107,7 @@ internal static class AutoRegisteringOutputHelper
     /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
     /// Also checks for <see cref="IAsyncEnumerable{T}"/> and task that returns an <see cref="IAsyncEnumerable{T}"/>.
     /// </summary>
-    private static bool IsObservableOrAsyncEnumerable(Type type)
+    internal static bool IsObservableOrAsyncEnumerable(Type type)
     {
         if (!type.IsGenericType)
             return false;

@@ -28,7 +28,7 @@ namespace GraphQL.Builders
     }
 
     /// <summary>
-    /// Builds a field for a graph with a specified source type and return type.
+    /// Builds a field for a graph type with a specified source type and return type.
     /// </summary>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
@@ -310,26 +310,6 @@ namespace GraphQL.Builders
         public virtual FieldBuilder<TSourceType, TReturnType> Configure(Action<FieldType> configure)
         {
             configure(FieldType);
-            return this;
-        }
-
-        /// <summary>
-        /// Sets a source stream resolver for the field.
-        /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStream(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
-        {
-            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
-            FieldType.Resolver ??= SourceFieldResolver.Instance;
-            return this;
-        }
-
-        /// <summary>
-        /// Sets a source stream resolver for the field.
-        /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
-        {
-            FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
-            FieldType.Resolver ??= SourceFieldResolver.Instance;
             return this;
         }
 

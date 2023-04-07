@@ -921,8 +921,6 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveDelegate(System.Delegate? resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
@@ -947,6 +945,14 @@ namespace GraphQL.Builders
         public bool IsUnidirectional { get; }
         public int? Last { get; }
         public int? PageSize { get; }
+    }
+    public class SubscriptionRootFieldBuilder<TSourceType, TReturnType> : GraphQL.Builders.FieldBuilder<TSourceType, TReturnType>
+    {
+        protected SubscriptionRootFieldBuilder(GraphQL.Types.SubscriptionRootFieldType fieldType) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
+        public static GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> Create(System.Type? type = null, string name = "default") { }
     }
 }
 namespace GraphQL.Conversion
@@ -1854,66 +1860,16 @@ namespace GraphQL.Types
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(System.Type type) { }
+        protected virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>(System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, System.Type type) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType Field(System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please call Field<TGraphType>(string name) instead.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type? type = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, System.Type? type = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType Field<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>(string name)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync(System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync<TGraphType, TReturnType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldDelegate<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Delegate? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldSubscribe<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.IObservable<object?>>? subscribe = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldSubscribeAsync<TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<object?>>>? subscribeAsync = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
@@ -2051,7 +2007,6 @@ namespace GraphQL.Types
         public string Name { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
-        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
@@ -2486,6 +2441,11 @@ namespace GraphQL.Types
         public override bool CanParseValue(object? value) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
+    }
+    public class SubscriptionRootFieldType : GraphQL.Types.FieldType
+    {
+        public SubscriptionRootFieldType() { }
+        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
     }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {

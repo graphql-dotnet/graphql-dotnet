@@ -64,8 +64,8 @@ namespace GraphQL.Utilities
 
             ValidateFieldArgumentsUniqueness(field, type);
 
-            if (field.StreamResolver != null && type != schema.Subscription)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            if (field is SubscriptionRootFieldType && type != schema.Subscription)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
         }
 
         /// <inheritdoc/>
@@ -133,8 +133,8 @@ namespace GraphQL.Utilities
 
             ValidateFieldArgumentsUniqueness(field, type);
 
-            if (field.StreamResolver != null && type != schema.Subscription)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            if (field is SubscriptionRootFieldType && type != schema.Subscription)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
 
             if (field.Resolver != null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
@@ -220,8 +220,8 @@ namespace GraphQL.Utilities
             if (field.ResolvedType is NonNullGraphType && field.DefaultValue is null && field.DeprecationReason is not null)
                 throw new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
 
-            if (field.StreamResolver != null)
-                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            if (field is SubscriptionRootFieldType)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not be of SubscriptionRootFieldType type. You should use SubscriptionRootFieldType only for the root fields of subscriptions.");
 
             if (field.Resolver != null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types.");

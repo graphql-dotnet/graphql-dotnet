@@ -20,9 +20,9 @@ public class ScopedAttribute : GraphQLAttribute
             fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
         }
 
-        if (fieldType.StreamResolver != null)
+        if (fieldType is SubscriptionRootFieldType field && field.StreamResolver != null)
         {
-            fieldType.StreamResolver = new DynamicScopedSourceStreamResolver(fieldType.StreamResolver);
+            field.StreamResolver = new DynamicScopedSourceStreamResolver(field.StreamResolver);
         }
     }
 }

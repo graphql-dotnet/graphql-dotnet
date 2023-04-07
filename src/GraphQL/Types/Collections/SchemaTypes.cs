@@ -474,7 +474,7 @@ namespace GraphQL.Types
                 {
                     foreach (var field in obj.Fields.List)
                     {
-                        var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
+                        var inner = field.Resolver ?? (field is SubscriptionRootFieldType ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
 
                         var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
 

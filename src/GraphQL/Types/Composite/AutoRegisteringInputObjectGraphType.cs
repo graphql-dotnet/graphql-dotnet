@@ -53,7 +53,7 @@ namespace GraphQL.Types
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
-            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true);
+            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true, _ => new FieldType());
 
         /// <summary>
         /// Returns a list of properties or fields that should have fields created for them.
