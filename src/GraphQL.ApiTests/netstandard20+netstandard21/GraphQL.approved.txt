@@ -185,6 +185,7 @@ namespace GraphQL
     {
         public ExperimentalFeatures() { }
         public bool AppliedDirectives { get; set; }
+        public bool DeprecationOfInputValues { get; set; }
         public bool RepeatableDirectives { get; set; }
     }
     public enum ExperimentalIntrospectionFeaturesMode
@@ -757,6 +758,7 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
+        [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
         public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
@@ -1192,8 +1194,8 @@ namespace GraphQL.Execution
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
     {
         public ExecutionStrategyRegistration(GraphQL.Execution.IExecutionStrategy Strategy, GraphQLParser.AST.OperationType Operation) { }
-        public GraphQLParser.AST.OperationType Operation { get; set; }
-        public GraphQL.Execution.IExecutionStrategy Strategy { get; set; }
+        public GraphQLParser.AST.OperationType Operation { get; init; }
+        public GraphQL.Execution.IExecutionStrategy Strategy { get; init; }
     }
     public enum ExposeExceptionDetailsMode
     {
@@ -1579,10 +1581,12 @@ namespace GraphQL.Introspection
     public class @__Field : GraphQL.Types.ObjectGraphType<GraphQL.Types.IFieldType>
     {
         public @__Field(bool allowAppliedDirectives = false) { }
+        public @__Field(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__InputValue : GraphQL.Types.ObjectGraphType<GraphQL.Types.IProvideMetadata>
     {
         public @__InputValue(bool allowAppliedDirectives = false) { }
+        public @__InputValue(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__Schema : GraphQL.Types.ObjectGraphType<GraphQL.Types.ISchema>
     {
@@ -1591,6 +1595,7 @@ namespace GraphQL.Introspection
     public class @__Type : GraphQL.Types.ObjectGraphType<GraphQL.Types.IGraphType>
     {
         public @__Type(bool allowAppliedDirectives = false) { }
+        public @__Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
     }
     public class @__TypeKind : GraphQL.Types.EnumerationGraphType<GraphQL.Introspection.TypeKind>
     {
@@ -2314,11 +2319,12 @@ namespace GraphQL.Types
         public bool Contains(GraphQL.Types.IObjectGraphType type) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IObjectGraphType> GetEnumerator() { }
     }
-    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideResolvedType
+    public class QueryArgument : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideResolvedType
     {
         public QueryArgument(GraphQL.Types.IGraphType type) { }
         public QueryArgument(System.Type type) { }
         public object? DefaultValue { get; set; }
+        public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
@@ -3047,17 +3053,17 @@ namespace GraphQL.Validation
     {
         public ValidationOptions() { }
         public ValidationOptions(GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? rules, System.Collections.Generic.IDictionary<string, object?> userContext, GraphQL.Instrumentation.Metrics metrics, GraphQL.Inputs variables, GraphQL.Inputs extensions, GraphQLParser.AST.GraphQLOperationDefinition operation, System.IServiceProvider? requestServices, System.Security.Claims.ClaimsPrincipal? user, System.Threading.CancellationToken cancellationToken) { }
-        public System.Threading.CancellationToken CancellationToken { get; set; }
-        public GraphQLParser.AST.GraphQLDocument Document { get; set; }
-        public GraphQL.Inputs Extensions { get; set; }
-        public GraphQL.Instrumentation.Metrics Metrics { get; set; }
-        public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; set; }
-        public System.IServiceProvider? RequestServices { get; set; }
-        public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; set; }
-        public GraphQL.Types.ISchema Schema { get; set; }
-        public System.Security.Claims.ClaimsPrincipal? User { get; set; }
-        public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
-        public GraphQL.Inputs Variables { get; set; }
+        public System.Threading.CancellationToken CancellationToken { get; init; }
+        public GraphQLParser.AST.GraphQLDocument Document { get; init; }
+        public GraphQL.Inputs Extensions { get; init; }
+        public GraphQL.Instrumentation.Metrics Metrics { get; init; }
+        public GraphQLParser.AST.GraphQLOperationDefinition Operation { get; init; }
+        public System.IServiceProvider? RequestServices { get; init; }
+        public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? Rules { get; init; }
+        public GraphQL.Types.ISchema Schema { get; init; }
+        public System.Collections.Generic.IDictionary<string, object?> UserContext { get; init; }
+        public System.Security.Claims.ClaimsPrincipal? User { get; init; }
+        public GraphQL.Inputs Variables { get; init; }
     }
     public class ValidationResult : GraphQL.Validation.IValidationResult
     {

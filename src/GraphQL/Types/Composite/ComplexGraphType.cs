@@ -510,10 +510,12 @@ namespace GraphQL.Types
 
             var builder = CreateBuilder<TProperty>(type)
                 .Name(name)
-                .Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression))
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
+
+            if (this is IObjectGraphType)
+                builder.Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression));
 
             if (expression.Body is MemberExpression expr)
             {

@@ -217,7 +217,13 @@ namespace GraphQL.Types
             var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
             _typeDictionary = new Dictionary<Type, IGraphType>();
-            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives);
+            if (schema.Features.DeprecationOfInputValues)
+            {
+                // TODO: remove this code block when the next version of the spec will be released
+                schema.Directives.Deprecated.Locations.Add(GraphQLParser.AST.DirectiveLocation.ArgumentDefinition);
+                schema.Directives.Deprecated.Locations.Add(GraphQLParser.AST.DirectiveLocation.InputFieldDefinition);
+            }
+            _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives, schema.Features.DeprecationOfInputValues);
 
             _context = new TypeCollectionContext(
                type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
@@ -346,7 +352,7 @@ namespace GraphQL.Types
                 yield return schema.Subscription;
         }
 
-        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable)
+        private static Dictionary<Type, IGraphType> CreateIntrospectionTypes(bool allowAppliedDirectives, bool allowRepeatable, bool deprecationOfInputValues)
         {
             return (allowAppliedDirectives
                 ? new IGraphType[]
@@ -357,9 +363,9 @@ namespace GraphQL.Types
                     new __TypeKind(),
                     new __EnumValue(true),
                     new __Directive(true, allowRepeatable),
-                    new __Field(true),
-                    new __InputValue(true),
-                    new __Type(true),
+                    new __Field(true, deprecationOfInputValues),
+                    new __InputValue(true, deprecationOfInputValues),
+                    new __Type(true, deprecationOfInputValues),
                     new __Schema(true)
                 }
                 : new IGraphType[]
@@ -370,9 +376,9 @@ namespace GraphQL.Types
                     new __TypeKind(),
                     new __EnumValue(false),
                     new __Directive(false, allowRepeatable),
-                    new __Field(false),
-                    new __InputValue(false),
-                    new __Type(false),
+                    new __Field(false, deprecationOfInputValues),
+                    new __InputValue(false, deprecationOfInputValues),
+                    new __Type(false, deprecationOfInputValues),
                     new __Schema(false)
                 })
             .ToDictionary(t => t.GetType());
@@ -463,11 +469,11 @@ namespace GraphQL.Types
 
             foreach (var item in Dictionary)
             {
-                if (item.Value is IComplexGraphType complex)
+                if (item.Value is IObjectGraphType obj)
                 {
-                    foreach (var field in complex.Fields.List)
+                    foreach (var field in obj.Fields.List)
                     {
-                        var inner = field.Resolver ?? NameFieldResolver.Instance;
+                        var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
 
                         var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
 

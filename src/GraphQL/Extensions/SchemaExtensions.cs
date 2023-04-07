@@ -181,7 +181,7 @@ namespace GraphQL
         /// <summary>
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
-        /// for more information.
+        /// for more information. This method must be called before schema initialization.
         /// <br/><br/>
         /// Keep in mind that the implementation of experimental features can change over time, up to their complete
         /// removal, if the official specification is supplemented with all the missing features.
@@ -198,6 +198,7 @@ namespace GraphQL
 
             schema.Features.AppliedDirectives = true;
             schema.Features.RepeatableDirectives = true;
+            schema.Features.DeprecationOfInputValues = true;
 
             if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
                 schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();

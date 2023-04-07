@@ -1,4 +1,5 @@
 using System.Reactive.Linq;
+using GraphQL.Instrumentation;
 
 namespace GraphQL.Tests.Subscription;
 
@@ -52,8 +53,10 @@ public class SubscriptionTests
         data["messageGetAll"].ShouldNotBeNull();
     }
 
-    [Fact]
-    public async Task SubscribeToContent()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task SubscribeToContent(bool useMiddleware)
     {
         /* Given */
         var addedMessage = new Message
@@ -69,7 +72,12 @@ public class SubscriptionTests
 
         var chat = new Chat();
         var schema = new ChatSchema(chat);
-
+        if (useMiddleware)
+        {
+            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3568
+            var my = new NoopMiddleware();
+            schema.FieldMiddleware.Use(next => context => my.ResolveAsync(context, next));
+        }
         /* When */
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
@@ -84,6 +92,8 @@ public class SubscriptionTests
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
+        var errors = message.Errors;
+        errors.ShouldBeNull();
         var data = message.Data.ToDict();
         data.ShouldNotBeNull();
         data["newMessageContent"].ShouldNotBeNull();
@@ -261,5 +271,10 @@ public class SubscriptionTests
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync()).ConfigureAwait(false);
         error.InnerException.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
+    }
+
+    private class NoopMiddleware : IFieldMiddleware
+    {
+        public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next) => next(context);
     }
 }
