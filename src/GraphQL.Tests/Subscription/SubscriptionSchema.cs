@@ -27,7 +27,6 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageAdded",
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(Subscribe)
         });
 
@@ -38,7 +37,6 @@ public class ChatSubscriptions : ObjectGraphType
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
             ),
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeById)
         });
 
@@ -46,7 +44,6 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageAddedAsync",
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeAsync)
         });
 
@@ -57,7 +54,6 @@ public class ChatSubscriptions : ObjectGraphType
                 new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
             ),
             Type = typeof(MessageType),
-            Resolver = new FuncFieldResolver<Message>(ResolveMessage),
             StreamResolver = new SourceStreamResolver<Message>(SubscribeByIdAsync)
         });
 
@@ -65,22 +61,20 @@ public class ChatSubscriptions : ObjectGraphType
         {
             Name = "messageGetAll",
             Type = typeof(ListGraphType<MessageType>),
-            Resolver = new FuncFieldResolver<List<Message>>(context => context.Source as List<Message>),
-            StreamResolver = new SourceStreamResolver<List<Message>>(context => _chat.MessagesGetAll())
+            StreamResolver = new SourceStreamResolver<List<Message>>(_ => _chat.MessagesGetAll())
         });
 
         AddField(new FieldType
         {
             Name = "newMessageContent",
             Type = typeof(StringGraphType),
-            Resolver = new FuncFieldResolver<string>(context => context.Source as string),
             StreamResolver = new SourceStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
         });
     }
 
     private IObservable<Message> SubscribeById(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = _chat.Messages();
 
@@ -89,17 +83,10 @@ public class ChatSubscriptions : ObjectGraphType
 
     private async ValueTask<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = await _chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
-    }
-
-    private Message ResolveMessage(IResolveFieldContext context)
-    {
-        var message = context.Source as Message;
-
-        return message;
     }
 
     private IObservable<Message> Subscribe(IResolveFieldContext context)
@@ -117,11 +104,9 @@ public class ChatMutation : ObjectGraphType<object>
 {
     public ChatMutation(IChat chat)
     {
-        Field<MessageType>("addMessage",
-            arguments: new QueryArguments(
-                new QueryArgument<MessageInputType> { Name = "message" }
-            ),
-            resolve: context =>
+        Field<MessageType>("addMessage")
+            .Argument<MessageInputType>("message")
+            .Resolve(context =>
             {
                 var receivedMessage = context.GetArgument<ReceivedMessage>("message");
                 var message = chat.AddMessage(receivedMessage);
@@ -134,7 +119,7 @@ public class ChatQuery : ObjectGraphType
 {
     public ChatQuery(IChat chat)
     {
-        Field<ListGraphType<MessageType>>("messages", resolve: context => chat.AllMessages.Take(100));
+        Field<ListGraphType<MessageType>>("messages").Resolve(_ => chat.AllMessages.Take(100));
     }
 }
 
@@ -233,7 +218,7 @@ public class Chat : IChat
 
     public Message AddMessage(ReceivedMessage message)
     {
-        if (!Users.TryGetValue(message.FromId, out var displayName))
+        if (!Users.TryGetValue(message.FromId, out string displayName))
         {
             displayName = "(unknown)";
         }

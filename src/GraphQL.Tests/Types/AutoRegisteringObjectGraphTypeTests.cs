@@ -2,7 +2,9 @@
 
 using System.Collections;
 using System.ComponentModel;
+using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -67,7 +69,7 @@ public class AutoRegisteringObjectGraphTypeTests
     public void Class_CanOverrideDefaultName()
     {
         var graphType = new TestOverrideDefaultName<TestClass>();
-        graphType.Name.ShouldBe("TestClassInput");
+        graphType.Name.ShouldBe("TestClassOutput");
     }
 
     [Fact]
@@ -268,7 +270,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(ArgumentTests.IdIntArg), "arg1", 123, null, 123)]
     [InlineData(nameof(ArgumentTests.TypedArg), "arg1", "123", null, 123)]
     [InlineData(nameof(ArgumentTests.MultipleArgs), "arg1", "hello", 123, "hello123")]
-    public async Task Argument_ResolverTests_WithNonNullString(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
+    public async Task Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value, object? expected)
     {
         var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -353,7 +355,7 @@ public class AutoRegisteringObjectGraphTypeTests
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
         var resolver = field.Resolver.ShouldNotBeNull();
         var obj = new TestClass();
-        var actual = await resolver.ResolveAsync(new ResolveFieldContext
+        object? actual = await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = obj,
             FieldDefinition = new FieldType { Name = fieldName },
@@ -379,11 +381,11 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new TestFieldSupport<NullSourceFailureTest>();
         var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
     }
 
@@ -392,11 +394,11 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new TestFieldSupport<NullSourceStructFailureTest>();
         var context = new ResolveFieldContext();
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example1")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example2")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
-        (await Should.ThrowAsync<NullReferenceException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
+        (await Should.ThrowAsync<InvalidOperationException>(async () => await graphType.Fields.Find("Example3")!.Resolver!.ResolveAsync(context).ConfigureAwait(false)).ConfigureAwait(false))
             .Message.ShouldBe("IResolveFieldContext.Source is null; please use static methods when using an AutoRegisteringObjectGraphType as a root graph type or provide a root value.");
     }
 
@@ -432,6 +434,26 @@ public class AutoRegisteringObjectGraphTypeTests
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void TestInheritedRecordWithOverridesNoExtraFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<TestInheritedRecordWithOverrides>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Find("Description").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(3);
+    }
+
+    [Fact]
+    public void TestInheritedRecordNoExtraFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<TestInheritedRecord>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Find("Description").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(3);
     }
 
     [Fact]
@@ -473,6 +495,30 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             Source = new CustomHardcodedArgumentAttributeTestClass(),
         }).ConfigureAwait(false)).ShouldBe("85");
+    }
+
+    [Fact]
+    public void TestInheritedFields()
+    {
+        var graphType = new AutoRegisteringObjectGraphType<InheritanceTests>();
+        graphType.Fields.Find("Field1").ShouldNotBeNull();
+        graphType.Fields.Find("Field2").ShouldNotBeNull();
+        graphType.Fields.Find("Field3").ShouldNotBeNull();
+        graphType.Fields.Find("Field4").ShouldNotBeNull();
+        graphType.Fields.Find("Field5").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(5);
+    }
+
+    [Fact]
+    public void CannotBuildWithoutMemberInstanceExpression()
+    {
+        Should.Throw<ArgumentNullException>(() => new NoMemberInstanceExpression<TestBasicClass>())
+            .ParamName.ShouldBe("instanceExpression");
+    }
+
+    public class NoMemberInstanceExpression<T> : AutoRegisteringObjectGraphType<T>
+    {
+        protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;
     }
 
     private class CustomHardcodedArgumentAttributeTestClass
@@ -534,9 +580,17 @@ public class AutoRegisteringObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
+#if NET48
         [InputType(typeof(IdGraphType))]
+#else
+        [InputType<IdGraphType>()]
+#endif
         public int? Field6 { get; set; }
+#if NET48
         [OutputType(typeof(IdGraphType))]
+#else
+        [OutputType<IdGraphType>()]
+#endif
         public int? Field7 { get; set; }
         [DefaultValue("hello")]
         public string? Field8 { get; set; }
@@ -592,7 +646,13 @@ public class AutoRegisteringObjectGraphTypeTests
         public string NamedArg([Name("arg1rename")] string arg1) => arg1;
         public string IdArg([Id] string arg1) => arg1;
         public int IdIntArg([Id] int arg1) => arg1;
-        public int TypedArg([InputType(typeof(StringGraphType))] int arg1) => arg1;
+        public int TypedArg(
+#if NET48
+        [InputType(typeof(StringGraphType))]
+#else
+        [InputType<StringGraphType>()]
+#endif
+        int arg1) => arg1;
         public string MultipleArgs(string arg1, int arg2) => arg1 + arg2.ToString();
     }
 
@@ -669,11 +729,11 @@ public class AutoRegisteringObjectGraphTypeTests
     [Description("Test description")]
     private class TestClass_WithMultipleAttributes { }
 
-    private class TestOverrideDefaultName<T> : AutoRegisteringInputObjectGraphType<T>
+    private class TestOverrideDefaultName<T> : AutoRegisteringObjectGraphType<T>
     {
         protected override void ConfigureGraph()
         {
-            Name = typeof(T).Name + "Input";
+            Name = typeof(T).Name + "Output";
             base.ConfigureGraph();
         }
     }
@@ -703,6 +763,26 @@ public class AutoRegisteringObjectGraphTypeTests
 
     private record TestBasicRecord(int Id, string Name);
 
+    private record TestInheritedRecord : TestBasicRecord
+    {
+        public string Description { get; init; }
+        public TestInheritedRecord(int Id, string Name, string Description) : base(Id, Name)
+        {
+            this.Description = Description;
+        }
+    }
+
+    private record TestInheritedRecordWithOverrides : TestInheritedRecord
+    {
+        public TestInheritedRecordWithOverrides(int Id, string Name, string Description) : base(Id, Name, Description)
+        {
+        }
+        protected override bool PrintMembers(StringBuilder builder) => base.PrintMembers(builder);
+        public override string ToString() => base.ToString();
+        public override int GetHashCode() => base.GetHashCode();
+        protected override Type EqualityContract => base.EqualityContract;
+    }
+
     private record struct TestBasicRecordStruct(int Id, string Name);
 
     private class TestBasicClass
@@ -720,5 +800,20 @@ public class AutoRegisteringObjectGraphTypeTests
         public static string Name = "Example";
         [Name("IdAndName")]
         public string IdName(string prefix) => prefix + Name + Id.ToString();
+    }
+
+    public class InheritanceTestsParent
+    {
+        public int Field1 => 1;
+        public int Field2() => 2;
+        public virtual int Field3() => 3;
+    }
+
+    public class InheritanceTests : InheritanceTestsParent
+    {
+        public int Field4 => 4;
+        public int Field5() => 5;
+        public override int Field3() => 3;
+        public override int GetHashCode() => 123;
     }
 }

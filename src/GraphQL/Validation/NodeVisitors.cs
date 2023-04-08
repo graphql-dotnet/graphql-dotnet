@@ -18,16 +18,16 @@ namespace GraphQL.Validation
             _nodeVisitors = nodeVisitors ?? throw new ArgumentNullException(nameof(nodeVisitors));
         }
 
-        void INodeVisitor.Enter(ASTNode node, ValidationContext context)
+        async ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
         {
             foreach (var n in _nodeVisitors)
-                n.Enter(node, context);
+                await n.EnterAsync(node, context).ConfigureAwait(false);
         }
 
-        void INodeVisitor.Leave(ASTNode node, ValidationContext context)
+        async ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context)
         {
             foreach (var n in _nodeVisitors)
-                n.Leave(node, context);
+                await n.LeaveAsync(node, context).ConfigureAwait(false);
         }
     }
 }

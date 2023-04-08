@@ -1,5 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -58,14 +59,22 @@ namespace GraphQL.Utilities.Federation
                 schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
-            query.Field("_service", new NonNullGraphType(new GraphQLTypeReference("_Service")), resolve: context => new { });
+            var service = new FieldType
+            {
+                Name = "_service",
+                ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
+                Resolver = new FuncFieldResolver<object>(_ => new { })
+            };
+            query.AddField(service);
 
             var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
-            query.FieldAsync(
-                "_entities",
-                new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                arguments: new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
-                resolve: async context =>
+
+            var entities = new FieldType
+            {
+                Name = "_entities",
+                Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+                ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     AddTypeNameToSelection(context.FieldAst, context.Document);
 
@@ -104,7 +113,9 @@ namespace GraphQL.Utilities.Federation
                     }
 
                     return results;
-                });
+                })
+            };
+            query.AddField(entities);
         }
 
         private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)

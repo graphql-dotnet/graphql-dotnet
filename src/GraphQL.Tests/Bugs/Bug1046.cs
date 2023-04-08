@@ -25,13 +25,13 @@ public class Bug1046
         var response = new DocumentExecuter().ExecuteAsync(_ =>
         {
             _.Schema = schema;
-            _.Query = @"
+            _.Query = """
 query {
   inst {
     id
   }
 }
-";
+""";
         }).Result;
         response.Data.ShouldNotBeNull();
     }
@@ -41,7 +41,7 @@ public class QueryGraphType : ObjectGraphType
 {
     public QueryGraphType()
     {
-        Field<InterfaceGraphType>("inst", resolve: c => new Implementation());
+        Field<InterfaceGraphType>("inst").Resolve(_ => new Implementation());
     }
 }
 

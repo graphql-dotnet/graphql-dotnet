@@ -5,7 +5,7 @@ namespace GraphQL.Tests.Subscription;
 
 public class SubscriptionWithAutoGraphTypeTests
 {
-    private readonly Chat Chat = new Chat();
+    private readonly Chat Chat = new();
 
     protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
     {

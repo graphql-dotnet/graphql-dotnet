@@ -1,21 +1,24 @@
 # GraphQL for .NET
 
-[![Join the chat at https://gitter.im/graphql-dotnet/graphql-dotnet](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graphql-dotnet/graphql-dotnet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
-[![Test code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/test-code.yml)
-[![Build artifacts](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/build-artifacts-code.yml)
-[![Publish code](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/publish-code.yml)
-[![CodeQL analysis](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/graphql-dotnet/graphql-dotnet/actions/workflows/codeql-analysis.yml)
+[![License](https://img.shields.io/github/license/graphql-dotnet/graphql-dotnet)](LICENSE.md)
 [![codecov](https://codecov.io/gh/graphql-dotnet/graphql-dotnet/branch/master/graph/badge.svg?token=iXZo1jZvFo)](https://codecov.io/gh/graphql-dotnet/graphql-dotnet)
+[![Nuget](https://img.shields.io/nuget/dt/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![Nuget](https://img.shields.io/nuget/v/GraphQL)](https://www.nuget.org/packages/GraphQL)
+[![GitHub Release Date](https://img.shields.io/github/release-date/graphql-dotnet/graphql-dotnet?label=released)](https://github.com/graphql-dotnet/graphql-dotnet/releases)
+[![GitHub commits since latest release (by date)](https://img.shields.io/github/commits-since/graphql-dotnet/graphql-dotnet/latest?label=new+commits)](https://github.com/graphql-dotnet/graphql-dotnet/commits/master)
+![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
 
-[![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors) 
-
+[![GitHub contributors](https://img.shields.io/github/contributors/graphql-dotnet/graphql-dotnet)](https://github.com/graphql-dotnet/graphql-dotnet/graphs/contributors)
 ![Activity](https://img.shields.io/github/commit-activity/w/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/m/graphql-dotnet/graphql-dotnet)
 ![Activity](https://img.shields.io/github/commit-activity/y/graphql-dotnet/graphql-dotnet)
 
-![Size](https://img.shields.io/github/repo-size/graphql-dotnet/graphql-dotnet)
+| :heart: [Become a backer!](https://opencollective.com/graphql-net#backer) :heart: | [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors)  |
+|-|-|
+
+| :heavy_dollar_sign: [Get paid for contributing!](BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
+|-|-|
+
 
 This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
 
@@ -78,7 +81,8 @@ We provide several serializers (or you can bring your own).
 
 #### 3. Document Caching
 
-For caching of parsed GraphQL documents you'll need an `IDocumentCache` implementation.
+The recommended way to setup caching layer (for caching of parsed GraphQL documents) is to
+inherit from `IConfigureExecution` interface and register your class as its implementation.
 We provide in-memory implementation on top of `Microsoft.Extensions.Caching.Memory` package.
 
 ```
@@ -129,6 +133,18 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 - [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
 - [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
+## Ahead-of-time compilation
+
+GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows
+for use within iOS and Android apps, as well as other environments where such features as JIT compilation or
+dynamic code generation are not available. It may be necessary to explicitly instruct the AOT compiler
+to include the .NET types necessary for your schema to operate correctly. Of particular note, your query,
+mutation and subscription types' constructors may be trimmed; register them in your DI engine to prevent this.
+Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
+`RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
+demonstration of AOT compilation. Schema-first and type-first schemas have additional limtations and configuration requirements.
+AOT compilation has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
+
 ## Training
 
 * [API Development in .NET with GraphQL](https://www.lynda.com/NET-tutorials/API-Development-NET-GraphQL/664823-2.html) - [Glenn Block](https://twitter.com/gblock) demonstrates how to use the GraphQL.NET framework to build a fully functional GraphQL endpoint.
@@ -136,8 +152,9 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Upgrade Guides
 
-You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/3.0.0/lib/netstandard2.0/diff/2.4.0/).
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.3/).
 
+* [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)
 * [3.x to 4.x](https://graphql-dotnet.github.io/docs/migrations/migration4)
 * [2.4.x to 3.x](https://graphql-dotnet.github.io/docs/migrations/migration3)
@@ -335,12 +352,16 @@ This project exists thanks to all the people who contribute.
 PRs are welcome! Looking for something to work on? The list of [open issues](https://github.com/graphql-dotnet/graphql-dotnet/issues)
 is a great place to start. You can help the project simply respond to some of the [asked questions](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aissue+is%3Aopen+label%3Aquestion).
 
-The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 5.x.x.
-If you have a PR with some breaking changes, then please target it to the `develop` branch that tracks changes for v6.0.0.
+The default branch is `master`. It is designed for non-breaking changes, that is to publish versions 7.x.x.
+If you have a PR with some breaking changes, then please target it to the `develop` branch that tracks changes for v8.0.0.
 
 ## Backers
 
 Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/graphql-net#backer).
+
+Contributions are very much appreciated and are used to support the project primarily via [bounties](BOUNTY.md) paid directly to contributors to the project.
+Please help us to express gratitude to those individuals who devote time and energy to contributing to this project by supporting their efforts in a tangible means.
+A list of the outstanding issues to which we are sponsoring via bounties can be found [here](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty).
 
 <a href="https://opencollective.com/graphql-net#backers" target="_blank"><img src="https://opencollective.com/graphql-net/backers.svg?width=890"></a>
 

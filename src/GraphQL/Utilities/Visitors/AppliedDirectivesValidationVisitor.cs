@@ -11,7 +11,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Returns a static instance of the <see cref="AppliedDirectivesValidationVisitor"/> class.
         /// </summary>
-        public static readonly AppliedDirectivesValidationVisitor Instance = new AppliedDirectivesValidationVisitor();
+        public static readonly AppliedDirectivesValidationVisitor Instance = new();
 
         private AppliedDirectivesValidationVisitor()
         {
@@ -94,9 +94,8 @@ namespace GraphQL.Utilities
 
                 foreach (var appliedDirective in appliedDirectives)
                 {
-                    var schemaDirective = schema.Directives.Find(appliedDirective.Name);
-                    if (schemaDirective == null)
-                        throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
+                    var schemaDirective = schema.Directives.Find(appliedDirective.Name)
+                        ?? throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
 
                     if (location != null && !schemaDirective.Locations.Contains(location.Value))
                     {

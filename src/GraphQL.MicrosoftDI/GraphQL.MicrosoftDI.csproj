@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <Description>Microsoft DI extensions for GraphQL.NET</Description>
     <PackageTags>GraphQL;dependency injection;di</PackageTags>
   </PropertyGroup>
@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
   </ItemGroup>
 
 </Project>

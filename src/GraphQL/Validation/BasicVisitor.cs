@@ -4,8 +4,8 @@ using GraphQLParser.Visitors;
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// Walks an AST node tree executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/>
-    /// and <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
+    /// Walks an AST node tree executing <see cref="INodeVisitor.EnterAsync(ASTNode, ValidationContext)"/>
+    /// and <see cref="INodeVisitor.LeaveAsync(ASTNode, ValidationContext)"/> methods for each node.
     /// </summary>
     public class BasicVisitor : ASTVisitor<BasicVisitor.State>
     {
@@ -26,20 +26,20 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Walks the specified <see cref="ASTNode"/>, executing <see cref="INodeVisitor.Enter(ASTNode, ValidationContext)"/> and
-        /// <see cref="INodeVisitor.Leave(ASTNode, ValidationContext)"/> methods for each node.
+        /// Walks the specified <see cref="ASTNode"/>, executing <see cref="INodeVisitor.EnterAsync(ASTNode, ValidationContext)"/> and
+        /// <see cref="INodeVisitor.LeaveAsync(ASTNode, ValidationContext)"/> methods for each node.
         /// </summary>
         public override async ValueTask VisitAsync(ASTNode? node, State context)
         {
             if (node != null)
             {
                 for (int i = 0; i < _visitors.Count; ++i)
-                    _visitors[i].Enter(node, context.Context);
+                    await _visitors[i].EnterAsync(node, context.Context).ConfigureAwait(false);
 
                 await base.VisitAsync(node, context).ConfigureAwait(false);
 
                 for (int i = _visitors.Count - 1; i >= 0; --i)
-                    _visitors[i].Leave(node, context.Context);
+                    await _visitors[i].LeaveAsync(node, context.Context).ConfigureAwait(false);
             }
         }
 

@@ -12,11 +12,11 @@ public class BasicTests : SystemTestBase<Startup>
         {
             var input = new GraphQLRequest
             {
-                Query = @"{ hero { name} }"
+                Query = "{ hero { name} }"
             };
             scenario.Post.Json(input).ToUrl("/graphql");
             scenario.StatusCodeShouldBe(HttpStatusCode.OK);
-            scenario.GraphQL().ShouldBeSuccess(@"{ ""hero"": { ""name"": ""R2-D2"" }}");
+            scenario.GraphQL().ShouldBeSuccess("""{ "hero": { "name": "R2-D2" }}""");
         }).ConfigureAwait(false);
     }
 }

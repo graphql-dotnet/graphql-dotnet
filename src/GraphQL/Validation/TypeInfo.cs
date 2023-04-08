@@ -11,11 +11,11 @@ namespace GraphQL.Validation
     public class TypeInfo : INodeVisitor
     {
         private readonly ISchema _schema;
-        private readonly Stack<IGraphType?> _typeStack = new Stack<IGraphType?>();
-        private readonly Stack<IGraphType?> _inputTypeStack = new Stack<IGraphType?>();
-        private readonly Stack<IGraphType> _parentTypeStack = new Stack<IGraphType>();
-        private readonly Stack<FieldType?> _fieldDefStack = new Stack<FieldType?>();
-        private readonly Stack<ASTNode> _ancestorStack = new Stack<ASTNode>();
+        private readonly Stack<IGraphType?> _typeStack = new();
+        private readonly Stack<IGraphType?> _inputTypeStack = new();
+        private readonly Stack<IGraphType> _parentTypeStack = new();
+        private readonly Stack<FieldType?> _fieldDefStack = new();
+        private readonly Stack<ASTNode> _ancestorStack = new();
         private Directive? _directive;
         private QueryArgument? _argument;
 
@@ -93,14 +93,14 @@ namespace GraphQL.Validation
         public QueryArgument? GetArgument() => _argument;
 
         /// <inheritdoc/>
-        public void Enter(ASTNode node, ValidationContext context)
+        public ValueTask EnterAsync(ASTNode node, ValidationContext context)
         {
             _ancestorStack.Push(node);
 
             if (node is GraphQLSelectionSet)
             {
                 _parentTypeStack.Push(GetLastType()!);
-                return;
+                return default;
             }
 
             if (node is GraphQLField field)
@@ -110,7 +110,7 @@ namespace GraphQL.Validation
                 _fieldDefStack.Push(fieldType);
                 var targetType = fieldType?.ResolvedType;
                 _typeStack.Push(targetType);
-                return;
+                return default;
             }
 
             if (node is GraphQLDirective directive)
@@ -134,28 +134,28 @@ namespace GraphQL.Validation
                     type = _schema.Subscription;
                 }
                 _typeStack.Push(type);
-                return;
+                return default;
             }
 
             if (node is GraphQLFragmentDefinition def1)
             {
                 var type = _schema.AllTypes[def1.TypeCondition.Type.Name];
                 _typeStack.Push(type);
-                return;
+                return default;
             }
 
             if (node is GraphQLInlineFragment def)
             {
                 var type = def.TypeCondition != null ? _schema.AllTypes[def.TypeCondition.Type.Name] : GetLastType();
                 _typeStack.Push(type);
-                return;
+                return default;
             }
 
             if (node is GraphQLVariableDefinition varDef)
             {
                 var inputType = varDef.Type.GraphTypeFromType(_schema);
                 _inputTypeStack.Push(inputType);
-                return;
+                return default;
             }
 
             if (node is GraphQLArgument argAst)
@@ -195,10 +195,12 @@ namespace GraphQL.Validation
 
                 _inputTypeStack.Push(fieldType);
             }
+
+            return default;
         }
 
         /// <inheritdoc/>
-        public void Leave(ASTNode node, ValidationContext context)
+        public ValueTask LeaveAsync(ASTNode node, ValidationContext context)
         {
             _ancestorStack.Pop();
 
@@ -232,6 +234,8 @@ namespace GraphQL.Validation
             {
                 _inputTypeStack.Pop();
             }
+
+            return default;
         }
 
         private static FieldType? GetFieldDef(ISchema schema, IGraphType parentType, GraphQLField field)

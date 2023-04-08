@@ -8,14 +8,16 @@ public class Issue1285 : QueryTestBase<Issue1285Schema>
     [Fact]
     public void Issue1285_Should_Work()
     {
-        var query = @"
-query {
-  getsome(input: { readOnlyProp: 7, privateSetProp: 3, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
-}
-";
-        var expected = @"{
-  ""getsome"": null
-}";
+        const string query = """
+        query {
+          getsome(input: { readOnlyProp: 7, privateSetProp: 3, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
+        }
+        """;
+        const string expected = """
+        {
+          "getsome": null
+        }
+        """;
         AssertQuerySuccess(query, expected, null);
     }
 }
@@ -32,12 +34,9 @@ public class Issue1285Query : ObjectGraphType
 {
     public Issue1285Query()
     {
-        Field<ListGraphType<IntGraphType>>(
-            "getsome",
-            arguments: new QueryArguments(
-                new QueryArgument<ArrayInputType> { Name = "input" }
-            ),
-            resolve: ctx =>
+        Field<ListGraphType<IntGraphType>>("getsome")
+            .Argument<ArrayInputType>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ArrayInput>("input");
 

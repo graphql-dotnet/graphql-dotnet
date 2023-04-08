@@ -90,13 +90,15 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         try
         {
-            if (node.FieldDefinition?.StreamResolver == null)
+            var resolver = node.FieldDefinition?.StreamResolver;
+
+            if (resolver == null)
             {
                 // todo: this should be caught by schema validation
                 throw new InvalidOperationException($"Stream resolver not set for field '{node.Field.Name}'.");
             }
 
-            sourceStream = await node.FieldDefinition.StreamResolver.ResolveAsync(resolveContext).ConfigureAwait(false);
+            sourceStream = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
             if (sourceStream == null)
             {
@@ -126,6 +128,10 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         // cannot throw an exception here
         return sourceStream
+            // Note: SelectCatchAsync also captures the System.Threading.ExecutionContext and restores it
+            // when the delegate is invoked, so resolvers run within the original subscription's context
+            // and not the context of the data event. Effectively, IHttpContextAccessor.HttpContext will
+            // now return the original subscription's HttpContext as would be expected by any field resolver.
             .SelectCatchAsync(
                 async (value, token) =>
                 {

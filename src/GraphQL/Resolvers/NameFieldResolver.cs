@@ -22,7 +22,7 @@ namespace GraphQL.Resolvers
         /// <summary>
         /// Returns the static instance of the <see cref="NameFieldResolver"/> class.
         /// </summary>
-        public static NameFieldResolver Instance { get; } = new NameFieldResolver();
+        public static NameFieldResolver Instance { get; } = new();
 
         /// <inheritdoc/>
         public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => Resolve(context, context.FieldDefinition.Name);

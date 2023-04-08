@@ -55,9 +55,9 @@ public class Bug68NonNullEnumGraphTypeTests
         {
             var query = new ObjectGraphType();
             if (includeNullable)
-                query.Field<NullableSchemaType>("nullable", resolve: c => new NullableSchemaType());
+                query.Field<NullableSchemaType>("nullable").Resolve(_ => new NullableSchemaType());
             if (includeNonNullable)
-                query.Field<NonNullableSchemaType>("nonNullable", resolve: c => new NonNullableSchemaType());
+                query.Field<NonNullableSchemaType>("nonNullable").Resolve(_ => new NonNullableSchemaType());
 
             Query = query;
         }
@@ -67,7 +67,7 @@ public class Bug68NonNullEnumGraphTypeTests
     {
         public NullableSchemaType()
         {
-            Field<EnumType<Foo>>("a", resolve: _ => Foo.Bar);
+            Field<EnumType<Foo>>("a").Resolve(_ => Foo.Bar);
         }
     }
 
@@ -75,7 +75,7 @@ public class Bug68NonNullEnumGraphTypeTests
     {
         public NonNullableSchemaType()
         {
-            Field<NonNullGraphType<EnumType<Foo>>>("a", resolve: _ => Foo.Bar);
+            Field<NonNullGraphType<EnumType<Foo>>>("a").Resolve(_ => Foo.Bar);
         }
     }
 }
@@ -97,13 +97,13 @@ public class EnumType<T> : EnumerationGraphType
         var type = typeof(T);
         Name = DeriveGraphQlName(type.Name);
 
-        foreach (var enumName in type.GetEnumNames())
+        foreach (string enumName in type.GetEnumNames())
         {
             var enumMember = type
               .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
               .First();
 
-            var name = DeriveEnumValueName(enumMember.Name);
+            string name = DeriveEnumValueName(enumMember.Name);
 
             Add(name, Enum.Parse(type, enumName));
         }
@@ -141,7 +141,7 @@ public class EnumType<T> : EnumerationGraphType
     private static string DeriveEnumValueName(string name)
     {
         return Regex
-          .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
+          .Replace(name, "([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
           .ToUpperInvariant();
     }
 }

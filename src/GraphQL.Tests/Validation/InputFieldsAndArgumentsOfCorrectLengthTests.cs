@@ -9,12 +9,13 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     [Fact]
     public void good_literal_input_field_length()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
             {
               complicatedArgs {
-                complexArgField(complexArg: { requiredField: true, stringField: ""aaaa"" })
+                complexArgField(complexArg: { requiredField: true, stringField: "aaaa" })
               }
-            }");
+            }
+            """);
     }
 
     [Fact]
@@ -22,12 +23,14 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldPassRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: { requiredField: true, stringField: $value })
                   }
-                }";
+                }
+                """;
             _.Variables = new Dictionary<string, object> { ["value"] = "aaaa" }.ToInputs();
         });
     }
@@ -37,16 +40,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
                   complicatedArgs {
-                    complexArgField(complexArg: { requiredField: true, stringField: ""aa"" })
+                    complexArgField(complexArg: { requiredField: true, stringField: "aa" })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (2). Length must be in range [3, 7].",
-               line: 4,
-               column: 72);
+               line: 3,
+               column: 56);
         });
     }
 
@@ -55,16 +59,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: { requiredField: true, stringField: $value })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (2). Length must be in range [3, 7].",
                line: 4,
-               column: 72);
+               column: 56);
             _.Variables = new Dictionary<string, object> { ["value"] = "aa" }.ToInputs();
         });
     }
@@ -74,16 +80,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
                   complicatedArgs {
-                    complexArgField(complexArg: { requiredField: true, stringField: ""aaaaaaaa"" })
+                    complexArgField(complexArg: { requiredField: true, stringField: "aaaaaaaa" })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (8). Length must be in range [3, 7].",
-               line: 4,
-               column: 72);
+               line: 3,
+               column: 56);
         });
     }
 
@@ -92,16 +99,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: { requiredField: true, stringField: $value })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (8). Length must be in range [3, 7].",
                line: 4,
-               column: 72);
+               column: 56);
             _.Variables = new Dictionary<string, object> { ["value"] = "aaaaaaaa" }.ToInputs();
         });
     }
@@ -111,16 +120,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
                   complicatedArgs {
                     complexArgField(complexArg: { requiredField: true, stringField: null })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
-               line: 4,
-               column: 72);
+               line: 3,
+               column: 56);
         });
     }
 
@@ -129,16 +139,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: { requiredField: true, stringField: $value })
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
                line: 4,
-               column: 72);
+               column: 56);
             _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
         });
     }
@@ -150,13 +162,15 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldPassRule(_ =>
         {
-            _.Query = @"query q($complex: ComplexInput!)
+            _.Query = """
+                query q($complex: ComplexInput!)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: $complex)
                   }
-                }";
-            _.Variables = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aaaa"" } }".ToInputs();
+                }
+                """;
+            _.Variables = """{ "complex": { "requiredField": true, "stringField": "aaaa" } }""".ToInputs();
         });
     }
 
@@ -165,17 +179,19 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($complex: ComplexInput!)
+            _.Query = """
+                query q($complex: ComplexInput!)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: $complex)
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Variable 'complex.stringField' has invalid length (2). Length must be in range [3, 7].",
                line: 1,
                column: 9);
-            _.Variables = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aa"" } }".ToInputs();
+            _.Variables = """{ "complex": { "requiredField": true, "stringField": "aa" } }""".ToInputs();
         });
     }
 
@@ -184,17 +200,19 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($complex: ComplexInput!)
+            _.Query = """
+                query q($complex: ComplexInput!)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: $complex)
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Variable 'complex.stringField' has invalid length (8). Length must be in range [3, 7].",
                line: 1,
                column: 9);
-            _.Variables = @"{ ""complex"": { ""requiredField"": true, ""stringField"": ""aaaaaaaa"" } }".ToInputs();
+            _.Variables = """{ "complex": { "requiredField": true, "stringField": "aaaaaaaa" } }""".ToInputs();
         });
     }
 
@@ -203,17 +221,19 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($complex: ComplexInput!)
+            _.Query = """
+                query q($complex: ComplexInput!)
                 {
                   complicatedArgs {
                     complexArgField(complexArg: $complex)
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Variable 'complex.stringField' has invalid length (null). Length must be in range [3, 7].",
                line: 1,
                column: 9);
-            _.Variables = @"{ ""complex"": { ""requiredField"": true, ""stringField"": null } }".ToInputs();
+            _.Variables = """{ "complex": { "requiredField": true, "stringField": null } }""".ToInputs();
         });
     }
 
@@ -222,12 +242,13 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     [Fact]
     public void good_literal_argument_length()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
             {
-              human(id: ""aaa"") {
+              human(id: "aaa") {
                 id
               }
-            }");
+            }
+            """);
     }
 
     [Fact]
@@ -235,12 +256,14 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldPassRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   human(id: $value) {
                     id
                   }
-                }";
+                }
+                """;
             _.Variables = new Dictionary<string, object> { ["value"] = "aaa" }.ToInputs();
         });
     }
@@ -250,16 +273,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
-                  human(id: ""a"") {
+                  human(id: "a") {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (1). Length must be in range [2, 5].",
-               line: 3,
-               column: 25);
+               line: 2,
+               column: 9);
         });
     }
 
@@ -268,16 +292,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   human(id: $value) {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (1). Length must be in range [2, 5].",
                line: 3,
-               column: 25);
+               column: 9);
             _.Variables = new Dictionary<string, object> { ["value"] = "a" }.ToInputs();
         });
     }
@@ -287,16 +313,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
-                  human(id: ""aaaaaa"") {
+                  human(id: "aaaaaa") {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (6). Length must be in range [2, 5].",
-               line: 3,
-               column: 25);
+               line: 2,
+               column: 9);
         });
     }
 
@@ -305,16 +332,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   human(id: $value) {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (6). Length must be in range [2, 5].",
                line: 3,
-               column: 25);
+               column: 9);
             _.Variables = new Dictionary<string, object> { ["value"] = "aaaaaa" }.ToInputs();
         });
     }
@@ -324,16 +353,17 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                 {
                   human(id: null) {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
-               line: 3,
-               column: 25);
+               line: 2,
+               column: 9);
         });
     }
 
@@ -342,16 +372,18 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"query q($value: String)
+            _.Query = """
+                query q($value: String)
                 {
                   human(id: $value) {
                     id
                   }
-                }";
+                }
+                """;
             _.Error(
                message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
                line: 3,
-               column: 25);
+               column: 9);
             _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
         });
     }

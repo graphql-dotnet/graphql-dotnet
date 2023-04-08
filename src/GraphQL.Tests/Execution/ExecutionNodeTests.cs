@@ -101,8 +101,7 @@ public class AliasedFieldTestObject : ObjectGraphType
 {
     public AliasedFieldTestObject()
     {
-        Field<StringGraphType>(
-            "name",
-            resolve: context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
+        Field<StringGraphType>("name")
+            .Resolve(context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
     }
 }

@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DateTimeOffsetGraphTypeTests
 {
-    private readonly DateTimeOffsetGraphType _type = new DateTimeOffsetGraphType();
+    private readonly DateTimeOffsetGraphType _type = new();
 
     [Fact]
     public void coerces_valid_date()
@@ -14,9 +14,9 @@ public class DateTimeOffsetGraphTypeTests
         CultureTestHelper.UseCultures(() =>
         {
             var expected = DateTimeOffset.UtcNow;
-            var input = expected.ToString("O", DateTimeFormatInfo.InvariantInfo);
+            string input = expected.ToString("O", DateTimeFormatInfo.InvariantInfo);
 
-            var actual = _type.ParseValue(input);
+            object actual = _type.ParseValue(input);
 
             actual.ShouldBe(expected);
         });

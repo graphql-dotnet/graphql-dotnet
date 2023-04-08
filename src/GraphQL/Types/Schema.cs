@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
@@ -8,11 +10,72 @@ using GraphQLParser.AST;
 namespace GraphQL.Types
 {
     /// <inheritdoc cref="ISchema"/>
+    [DebuggerTypeProxy(typeof(SchemaDebugView))]
     public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
+        private sealed class SchemaDebugView
+        {
+            private readonly Schema _schema;
+
+            public SchemaDebugView(Schema schema)
+            {
+                _schema = schema;
+            }
+
+            public Dictionary<string, object?> Metadata => _schema.Metadata;
+
+            public ExperimentalFeatures Features => _schema.Features;
+
+            public INameConverter NameConverter => _schema.NameConverter;
+
+            public IFieldMiddlewareBuilder FieldMiddleware => _schema.FieldMiddleware;
+
+            public bool Initialized => _schema.Initialized;
+
+            public string? Description => _schema.Description;
+
+            public IObjectGraphType Query => _schema.Query;
+
+            public IObjectGraphType? Mutation => _schema.Mutation;
+
+            public IObjectGraphType? Subscription => _schema.Subscription;
+
+            public ISchemaFilter Filter => _schema.Filter;
+
+            /// <inheritdoc/>
+            public ISchemaComparer Comparer => _schema.Comparer;
+
+            /// <inheritdoc/>
+            public SchemaDirectives Directives => _schema.Directives;
+
+            /// <inheritdoc/>
+            public SchemaTypes? AllTypes => _schema._allTypes;
+
+            public string AllTypesMessage => _schema._allTypes == null ? "AllTypes property too early initialization was suppressed to prevent unforeseen consequences. You may click Raw View in debugger window to evaluate all properties." : string.Empty;
+
+            public IEnumerable<Type> AdditionalTypes => _schema.AdditionalTypes;
+
+            public IEnumerable<IGraphType> AdditionalTypeInstances => _schema.AdditionalTypeInstances;
+
+            /// <inheritdoc/>
+            public FieldType? SchemaMetaFieldType => AllTypes?.SchemaMetaFieldType;
+
+            /// <inheritdoc/>
+            public FieldType? TypeMetaFieldType => AllTypes?.TypeMetaFieldType;
+
+            /// <inheritdoc/>
+            public FieldType? TypeNameMetaFieldType => AllTypes?.TypeNameMetaFieldType;
+
+            public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _schema.TypeMappings;
+
+            /// <inheritdoc/>
+            public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings => _schema.BuiltInTypeMappings;
+        }
+
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
+        private ExceptionDispatchInfo? _initializationException;
         private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
@@ -48,19 +111,8 @@ namespace GraphQL.Types
         /// <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and executes them.
         /// </summary>
         public Schema(IServiceProvider services, bool runConfigurations = true)
+            : this(services, (runConfigurations ? services.GetService(typeof(IEnumerable<IConfigureSchema>)) as IEnumerable<IConfigureSchema> : null)!)
         {
-            _services = services;
-
-            Directives = new SchemaDirectives();
-            Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
-
-            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
-            {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
-            }
         }
 
         /// <summary>
@@ -75,12 +127,9 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (configurations != null)
+            foreach (var configuration in configurations ?? Array.Empty<IConfigureSchema>())
             {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
+                configuration.Configure(this, services);
             }
         }
 
@@ -140,9 +189,19 @@ namespace GraphQL.Types
                 if (Initialized)
                     return;
 
-                CreateAndInitializeSchemaTypes();
+                _initializationException?.Throw();
 
-                Initialized = true;
+                try
+                {
+                    CreateAndInitializeSchemaTypes();
+
+                    Initialized = true;
+                }
+                catch (Exception ex)
+                {
+                    _initializationException = ExceptionDispatchInfo.Capture(ex);
+                    throw;
+                }
             }
         }
 
@@ -174,7 +233,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="serviceType">An object that specifies the type of service object to get.</param>
         /// <returns>
-        /// A service object of type <paramref name="serviceType"/> or <c>null</c> if there is no service
+        /// A service object of type <paramref name="serviceType"/> or <see langword="null"/> if there is no service
         /// object of type serviceType.
         /// </returns>
         object? IServiceProvider.GetService(Type serviceType) => _services.GetService(serviceType);
@@ -235,7 +294,7 @@ namespace GraphQL.Types
 
             if (!typeof(ISchemaNodeVisitor).IsAssignableFrom(type))
             {
-                throw new ArgumentOutOfRangeException(nameof(type), "Type must be of ISchemaNodeVisitor.");
+                throw new ArgumentOutOfRangeException(nameof(type), $"Type must be of {nameof(ISchemaNodeVisitor)}.");
             }
 
             if (!(_visitorTypes ??= new()).Contains(type))
@@ -252,7 +311,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterType(Type type)
+        public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             CheckDisposed();
             CheckInitialized();
@@ -291,9 +350,29 @@ namespace GraphQL.Types
         private List<(Type clrType, Type graphType)>? _clrToGraphTypeMappings;
 
         /// <inheritdoc/>
-        public void RegisterTypeMapping(Type clrType, Type graphType)
+        public void RegisterTypeMapping(
+            Type clrType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+            Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((
+                CheckClrType(clrType ?? throw new ArgumentNullException(nameof(clrType))),
+                CheckGraphType(graphType ?? throw new ArgumentNullException(nameof(graphType)))
+            ));
+
+            Type CheckClrType(Type clrType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? throw new ArgumentOutOfRangeException(nameof(clrType), $"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.")
+                    : clrType;
+            }
+
+            Type CheckGraphType(Type graphType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(graphType)
+                    ? graphType
+                    : throw new ArgumentOutOfRangeException(nameof(graphType), $"{graphType.FullName}' must be a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify GraphType type instead of CLR type.");
+            }
         }
 
         /// <inheritdoc/>

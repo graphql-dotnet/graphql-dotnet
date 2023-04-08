@@ -1,6 +1,3 @@
-#if NETSTANDARD2_1
-using System.Diagnostics.CodeAnalysis;
-#endif
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 
@@ -173,10 +170,7 @@ namespace GraphQL.Builders
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
-#if NETSTANDARD2_1
-            [AllowNull]
-#endif
-            TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
+            [AllowNull] TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
             {

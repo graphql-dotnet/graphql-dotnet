@@ -80,17 +80,13 @@ public class StarWarsQuery : ObjectGraphType
 
   public StarWarsQuery()
   {
-    Field<DroidType>(
-      "droid",
-      arguments: new QueryArguments(
-        new QueryArgument<IdGraphType> { Name = "id" }
-      ),
-      resolve: context =>
+    Field<DroidType>("droid")
+      .Argument<IdGraphType>("id")
+      .Resolve(context =>
       {
         var id = context.GetArgument<string>("id");
         return _droids.FirstOrDefault(x => x.Id == id);
-      }
-    );
+      });
   }
 }
 

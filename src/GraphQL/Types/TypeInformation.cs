@@ -206,7 +206,9 @@ namespace GraphQL.Types
                     if (type.Type.IsGenericType)
                     {
                         var genericType = type.Type.GetGenericTypeDefinition();
-                        if (genericType == typeof(Task<>) || genericType == typeof(ValueTask<>) || genericType == typeof(IDataLoaderResult<>) || genericType == typeof(IObservable<>))
+                        if (genericType == typeof(Task<>) || genericType == typeof(ValueTask<>)
+                            || genericType == typeof(IAsyncEnumerable<>)
+                            || genericType == typeof(IDataLoaderResult<>) || genericType == typeof(IObservable<>))
                         {
                             //unwrap type
                             IsNullable |= type.Nullable != NullabilityState.NotNull;
@@ -271,6 +273,8 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes for the specified member to this instance.
+        /// Also scans the member's owning module and assembly for globally-applied attributes,
+        /// and applies attributes defined within <see cref="GlobalSwitches.GlobalAttributes"/>.
         /// </summary>
         public virtual void ApplyAttributes()
         {
@@ -287,10 +291,12 @@ namespace GraphQL.Types
                 }
             }
 
-            var attributes = memberOrParameter.GetCustomAttributes(typeof(GraphQLAttribute), false);
+            var attributes = ParameterInfo != null
+                ? ParameterInfo.GetGraphQLAttributes()
+                : MemberInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
-                ((GraphQLAttribute)attr).Modify(this);
+                attr.Modify(this);
             }
         }
 

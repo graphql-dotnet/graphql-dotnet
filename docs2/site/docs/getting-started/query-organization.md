@@ -18,9 +18,9 @@ public class Query : ObjectGraphType
   public Query()
   {
     Name = "Query";
-    Field<CustomerGraphType>("customer", arguments: ..., resolve:...);
-    Field<OrderGraphType>("order", arguments: ..., resolve:...);
-    Field<ListGraphType<ProductGraphType>>("products", arguments: ..., resolve:...);
+    Field<CustomerGraphType>("customer").Arguments(...).Resolve(...);
+    Field<OrderGraphType>("order").Arguments(...).Resolve(...);
+    Field<ListGraphType<ProductGraphType>>("products").Arguments(...).Resolve(...);
   }
 }
 ```
@@ -51,8 +51,8 @@ public class Query : ObjectGraphType
   public Query()
   {
     Name = "Query";
-    Field<AccountGroupGraphType>("account", resolve: context => new {});
-    Field<RetailGroupGraphType>("retail", resolve: context => new {});
+    Field<AccountGroupGraphType>("account").Resolve(context => new {});
+    Field<RetailGroupGraphType>("retail").Resolve(context => new {});
   }
 }
 
@@ -61,8 +61,8 @@ public class AccountGroupGraphType : ObjectGraphType
   public AccountGroupGraphType()
   {
     Name = "Account";
-    Field<CustomerGraphType>("customer", arguments: ..., resolve:...);
-    Field<OrderGraphType>("order", arguments: ..., resolve:...);
+    Field<CustomerGraphType>("customer").Arguments(...).Resolve(...);
+    Field<OrderGraphType>("order").Arguments(...).Resolve(...);
   }
 }
 
@@ -71,7 +71,7 @@ public class RetailGroupGraphType : ObjectGraphType
   public RetailGroupGraphType()
   {
     Name = "Retail";
-    Field<ListGraphType<ProductGraphType>>("products", arguments: ..., resolve:...);
+    Field<ListGraphType<ProductGraphType>>("products").Arguments(...).Resolve(...);
   }
 }
 ```

@@ -20,11 +20,6 @@ namespace GraphQL.SystemTextJson
         public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }
-    public static class GraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
-    }
     public class GraphQLRequestJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transport.GraphQLRequest>
     {
         public GraphQLRequestJsonConverter() { }
@@ -48,6 +43,7 @@ namespace GraphQL.SystemTextJson
         public GraphQLSerializer(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public bool IsNativelyAsync { get; }
         protected System.Text.Json.JsonSerializerOptions SerializerOptions { get; }
         public T? Deserialize<T>(string? json) { }
         public System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
@@ -77,5 +73,13 @@ namespace GraphQL.SystemTextJson
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+    }
+}
+namespace GraphQL
+{
+    public static class SystemTextJsonGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
     }
 }

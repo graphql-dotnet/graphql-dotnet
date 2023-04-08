@@ -19,11 +19,11 @@ namespace GraphQL.Validation.Rules
         {
             public static readonly FieldVisitor Instance = new();
 
-            public override void VisitField(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
+            public override ValueTask VisitFieldAsync(ValidationContext context, GraphQLVariableDefinition variable, VariableName variableName, IInputObjectGraphType type, FieldType field, object? variableValue, object? parsedValue)
             {
                 var lengthDirective = field.FindAppliedDirective("length");
                 if (lengthDirective == null)
-                    return;
+                    return default;
 
                 var min = lengthDirective.FindArgument("min")?.Value;
                 var max = lengthDirective.FindArgument("max")?.Value;
@@ -38,6 +38,8 @@ namespace GraphQL.Validation.Rules
                     if (min != null && str.Length < (int)min || max != null && str.Length > (int)max)
                         context.ReportError(new InputFieldsAndArgumentsOfCorrectLengthError(context, variable, variableName, str.Length, (int?)min, (int?)max));
                 }
+
+                return default;
             }
         }
 
@@ -57,7 +59,7 @@ namespace GraphQL.Validation.Rules
             new MatchingNodeVisitor<GraphQLArgument>((arg, context) => CheckLength(arg, arg.Value, context.TypeInfo.GetArgument(), context)),
             new MatchingNodeVisitor<GraphQLObjectField>((field, context) =>
             {
-                if (context.TypeInfo.GetInputType(1) is IInputObjectGraphType input)
+                if (context.TypeInfo.GetInputType(1)?.GetNamedType() is IInputObjectGraphType input)
                     CheckLength(field, field.Value, input.GetField(field.Name), context);
             })
         );

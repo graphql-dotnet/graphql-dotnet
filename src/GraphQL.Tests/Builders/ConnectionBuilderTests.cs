@@ -61,57 +61,76 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     [Fact]
     public void should_resolve_in_query()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection1 {
-                    totalCount
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  }
-                }}",
-            @"{ ""parent"": {
-                ""connection1"": {
-                  ""totalCount"": 3,
-                  ""edges"": [
-                    { ""cursor"": ""1"", ""node"": { ""field1"": ""one"", ""field2"": 1 } },
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""two"", ""field2"": 2 } },
-                    { ""cursor"": ""3"", ""node"": { ""field1"": ""three"", ""field2"": 3 } }
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection1 {
+                  totalCount
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection1": {
+                  "totalCount": 3,
+                  "edges": [
+                    { "cursor": "1", "node": { "field1": "one", "field2": 1 } },
+                    { "cursor": "2", "node": { "field1": "two", "field2": 2 } },
+                    { "cursor": "3", "node": { "field1": "three", "field2": 3 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""one"", ""field2"": 1 },
-                    { ""field1"": ""two"", ""field2"": 2 },
-                    { ""field1"": ""three"", ""field2"": 3 }
+                  "items": [
+                    { "field1": "one", "field2": 1 },
+                    { "field1": "two", "field2": 2 },
+                    { "field1": "three", "field2": 3 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]
     public void should_yield_pagination_information()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection2(first: 1, after: ""1"") {
-                    totalCount
-                    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  } }}",
-            @"{ ""parent"": {
-                ""connection2"": {
-                  ""totalCount"": 3,
-                  ""pageInfo"": {
-                    ""hasNextPage"": true,
-                    ""hasPreviousPage"": true,
-                    ""startCursor"": ""2"",
-                    ""endCursor"": ""2""
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection2(first: 1, after: "1") {
+                  totalCount
+                  pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection2": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": true,
+                    "hasPreviousPage": true,
+                    "startCursor": "2",
+                    "endCursor": "2"
                   },
-                  ""edges"": [
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""TWO"", ""field2"": 22 } }
+                  "edges": [
+                    { "cursor": "2", "node": { "field1": "TWO", "field2": 22 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""TWO"", ""field2"": 22 }
+                  "items": [
+                    { "field1": "TWO", "field2": 22 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]
@@ -201,7 +220,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as Connection<Child>;
 
         result.ShouldNotBeNull();
@@ -255,7 +274,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
         result.ShouldNotBeNull();
@@ -332,7 +351,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
         var result = boxedResult as ParentChildrenConnection;
 
         result.ShouldNotBeNull();
@@ -421,12 +440,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         public ParentChildrenConnectionType()
         {
-            Field<NonNullGraphType<IntGraphType>>()
-                .Name("highestField2")
+            Field<NonNullGraphType<IntGraphType>>("highestField2")
                 .Description("The highest value of all Child's Field2 values in current page of the connection.");
 
-            Field<NonNullGraphType<IntGraphType>>()
-                .Name("connectionField1")
+            Field<NonNullGraphType<IntGraphType>>("connectionField1")
                 .Description("An example of a manually set field on the connection.");
         }
     }
@@ -440,14 +457,13 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         public ParentChildrenEdgeType()
         {
-            Field<NonNullGraphType<DateTimeGraphType>>()
-                .Name("friendedAd")
+            Field<NonNullGraphType<DateTimeGraphType>>("friendedAd")
                 .Description("When parent became friend with child.");
         }
     }
 
     private const int ConnectionField1Value = 123;
-    private static readonly DateTime FriendedAt = new DateTime(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    private static readonly DateTime FriendedAt = new(2019, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     public class ParentType : ObjectGraphType<Parent>
     {
@@ -474,11 +490,9 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Child";
 
-            Field<StringGraphType>()
-                .Name("field1");
+            Field<StringGraphType>("field1");
 
-            Field<IntGraphType>()
-                .Name("field2");
+            Field<IntGraphType>("field2");
         }
     }
 
@@ -536,8 +550,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Query";
 
-            Field<ParentType>()
-                .Name("parent")
+            Field<ParentType>("parent")
                 .Resolve(_ => new Parent());
         }
     }

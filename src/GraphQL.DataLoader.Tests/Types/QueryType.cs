@@ -10,10 +10,8 @@ public class QueryType : ObjectGraphType
     {
         Name = "Query";
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("Users")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("Users")
             .Description("Get all Users")
-            .Returns<IEnumerable<User>>()
             .ResolveAsync(ctx =>
             {
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
@@ -22,10 +20,8 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync();
             });
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("UsersWithDelay")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("UsersWithDelay")
             .Description("Get all Users")
-            .Returns<IEnumerable<User>>()
             .ResolveAsync(async ctx =>
             {
                 await System.Threading.Tasks.Task.Delay(20).ConfigureAwait(false);
@@ -83,16 +79,12 @@ public class QueryType : ObjectGraphType
                     users.GetUsersByIdAsync);
 
                 var ids = ctx.GetArgument<IEnumerable<int>>("ids");
-                // note: does not work properly without ToList, because LoadAsync would not have
-                // been called, so the ids would not have been queued for execution prior to the
-                // first call to GetResultAsync
-                var ret = ids.Select(id => loader.LoadAsync(id)).ToList();
+                var ret = ids.Select(id => loader.LoadAsync(id));
                 var ret2 = ret.Then(values => values.Where(x => x != null));
                 return ret2;
             });
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>()
-            .Name("ExerciseListsOfLists")
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ExerciseListsOfLists")
             .Argument<ListGraphType<ListGraphType<IntGraphType>>>("values")
             .Resolve(ctx =>
             {

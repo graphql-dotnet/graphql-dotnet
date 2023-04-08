@@ -1,4 +1,7 @@
+using System.Security.Claims;
 using GraphQL.Execution;
+using GraphQL.Types;
+using GraphQL.Validation;
 
 namespace GraphQL.Tests.Execution;
 
@@ -19,25 +22,25 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_converts_int_to_long()
     {
-        int val = 1;
+        const int val = 1;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<long>("a");
+        long result = _context.GetArgument<long>("a");
         result.ShouldBe(1);
     }
 
     [Fact]
     public void argument_converts_long_to_int()
     {
-        long val = 1;
+        const long val = 1;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<int>("a");
+        int result = _context.GetArgument<int>("a");
         result.ShouldBe(1);
     }
 
     [Fact]
     public void long_to_int_should_throw_for_out_of_range()
     {
-        long val = 89429901947254093;
+        const long val = 89429901947254093;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
     }
@@ -45,25 +48,25 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_returns_boxed_string_uncast()
     {
-        var val = "one";
+        const string val = "one";
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<object>("a");
+        object result = _context.GetArgument<object>("a");
         result.ShouldBe("one");
     }
 
     [Fact]
     public void argument_returns_long()
     {
-        long val = 1000000000000001;
+        const long val = 1000000000000001;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<long>("a");
+        long result = _context.GetArgument<long>("a");
         result.ShouldBe(1000000000000001);
     }
 
     [Fact]
     public void argument_returns_enum()
     {
-        var val = SomeEnum.Two;
+        const SomeEnum val = SomeEnum.Two;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
@@ -72,7 +75,7 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_returns_enum_from_string()
     {
-        var val = "two";
+        const string val = "two";
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
@@ -81,7 +84,7 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_returns_enum_from_number()
     {
-        var val = 1;
+        const int val = 1;
         _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
@@ -178,6 +181,52 @@ public class ResolveFieldContextTests
 
         _context.SetOutputExtension("a.b.c", "override");
         _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task User_Returns_ClaimsPrincipal(bool isAuthenticated)
+    {
+        var schema = new Schema();
+        var queryType = new ObjectGraphType();
+        queryType.Field<BooleanGraphType>("IsAuthenticated")
+            .Resolve(context => context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated);
+        schema.Query = queryType;
+        var executer = new DocumentExecuter();
+        var options = new ExecutionOptions
+        {
+            Schema = schema,
+            Query = "{ isAuthenticated }",
+            ValidationRules = DocumentValidator.CoreRules.Append(new VerifyUserValidationRule { ShouldBeAuthenticated = isAuthenticated }),
+            User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
+        };
+        options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
+        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
+        string resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultText.ShouldBe(isAuthenticated ? """{"data":{"isAuthenticated":true}}""" : """{"data":{"isAuthenticated":false}}""");
+    }
+
+    private class VerifyUserDocumentListener : DocumentExecutionListenerBase
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public override Task BeforeExecutionAsync(IExecutionContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return Task.CompletedTask;
+        }
+    }
+
+    private class VerifyUserValidationRule : IValidationRule
+    {
+        public bool ShouldBeAuthenticated { get; set; }
+
+        public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context)
+        {
+            context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
+            return default;
+        }
     }
 
     [Fact]

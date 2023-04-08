@@ -52,7 +52,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ testSub { one two } }";
+            _.Query = "{ testSub { one two } }";
         }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
@@ -66,7 +66,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ testSubList { one two } }";
+            _.Query = "{ testSubList { one two } }";
         }).ConfigureAwait(false);
 
         result.Errors.Count.ShouldBe(1);
@@ -85,9 +85,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
 
         AssertQueryIgnoreErrors(
             "{ testasync }",
-            CreateQueryResult(@"{
-   ""testasync"": null
-}", errors),
+            CreateQueryResult("""{ "testasync": null }""", errors),
             expectedErrorCount: 1,
             renderErrors: true);
     }
@@ -98,20 +96,16 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         {
             Name = "Query";
 
-            Field<StringGraphType>()
-                .Name("test")
+            Field<StringGraphType>("test")
                 .Resolve(_ => throw new Exception("wat"));
 
-            FieldAsync<StringGraphType>(
-                "testasync",
-                resolve: _ => throw new Exception("wat"));
+            Field<StringGraphType>("testasync")
+                .ResolveAsync(_ => throw new Exception("wat"));
 
-            Field<TestSubObject>()
-                .Name("testSub")
+            Field<TestSubObject>("testSub")
                 .Resolve(_ => new { One = "One", Two = "Two" });
 
-            Field<ListGraphType<TestSubObject>>()
-                .Name("testSubList")
+            Field<ListGraphType<TestSubObject>>("testSubList")
                 .Resolve(_ => new[] { new Thing { One = "One", Two = "Two" } });
         }
     }
@@ -127,11 +121,9 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
         public TestSubObject()
         {
             Name = "Sub";
-            Field<StringGraphType>()
-                .Name("one");
+            Field<StringGraphType>("one");
 
-            Field<StringGraphType>()
-                .Name("two")
+            Field<StringGraphType>("two")
                 .Resolve(_ => throw new Exception("wat"));
         }
     }

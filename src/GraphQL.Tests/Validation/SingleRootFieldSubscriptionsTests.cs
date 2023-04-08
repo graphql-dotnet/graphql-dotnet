@@ -34,34 +34,34 @@ public class SingleRootFieldSubscriptionsTests
     [Fact]
     public void Fails_with_more_than_one_root_field_in_anonymous_subscription()
     {
-        string query = @"
+        const string query = """
                 subscription {
                     field
                     field2
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 4, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 3, 9);
         });
     }
 
     [Fact]
     public void Fails_with_more_than_one_root_field_including_introspection_in_anonymous_subscription()
     {
-        string query = @"
+        const string query = """
                 subscription {
                     field
                     __typename
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 4, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(default), 3, 9);
         });
     }
 
@@ -69,17 +69,17 @@ public class SingleRootFieldSubscriptionsTests
     public void Fails_with_more_than_one_root_field()
     {
         const string subscriptionName = "NamedSubscription";
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     field
                     field2
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 4, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 9);
         });
     }
 
@@ -87,17 +87,17 @@ public class SingleRootFieldSubscriptionsTests
     public void Fails_with_more_than_one_root_field_including_introspection()
     {
         const string subscriptionName = "NamedSubscription";
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     field
                     __typename
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 4, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 9);
         });
     }
 
@@ -105,7 +105,7 @@ public class SingleRootFieldSubscriptionsTests
     public void Fails_with_more_than_one_root_field_in_fragment_spead()
     {
         const string subscriptionName = "NamedSubscription";
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     ...newMessageFields
                 }
@@ -117,12 +117,12 @@ public class SingleRootFieldSubscriptionsTests
                     }
                     disallowedSecondRootField
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 2, 9);
         });
     }
 
@@ -130,7 +130,7 @@ public class SingleRootFieldSubscriptionsTests
     public void Fails_with_more_than_one_root_field_in_inline_fragment()
     {
         const string subscriptionName = "NamedSubscription";
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     ...on Subscription {
                         newMessage {
@@ -140,30 +140,30 @@ public class SingleRootFieldSubscriptionsTests
                         disallowedSecondRootField
                     }
                 }
-            ";
+            """;
 
         ShouldFailRule(config =>
         {
             config.Query = query;
-            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 3, 21);
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 2, 9);
         });
     }
 
     [Fact]
     public void Pass_with_one_root_field_in_fragment_spead()
     {
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     ...newMessageFields
                 }
-                
+
                 fragment newMessageFields on Subscription {
                     newMessage {
                         body
                         sender
                     }
                 }
-            ";
+            """;
 
         ShouldPassRule(query);
     }
@@ -171,7 +171,7 @@ public class SingleRootFieldSubscriptionsTests
     [Fact]
     public void Pass_with_one_root_field_in_inline_fragment()
     {
-        const string query = @"
+        const string query = """
                 subscription NamedSubscription {
                     ...on Subscription {
                         newMessage {
@@ -180,7 +180,7 @@ public class SingleRootFieldSubscriptionsTests
                         }
                     }
                 }
-            ";
+            """;
 
         ShouldPassRule(query);
     }

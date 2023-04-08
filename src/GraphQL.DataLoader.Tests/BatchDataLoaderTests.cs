@@ -1,14 +1,13 @@
 using GraphQL.DataLoader.Tests.Models;
 using GraphQL.DataLoader.Tests.Stores;
 using Moq;
-using Nito.AsyncEx;
 
 namespace GraphQL.DataLoader.Tests;
 
 public class BatchDataLoaderTests : DataLoaderTestBase
 {
     [Fact]
-    public void Operations_Are_Batched()
+    public async Task Operations_Are_Batched()
     {
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(2);
@@ -21,25 +20,21 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         User user1 = null;
         User user2 = null;
 
-        // Run within an async context to make sure we won't deadlock
-        AsyncContext.Run(async () =>
-        {
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
-            // Start async tasks to load by ID
-            var result1 = loader.LoadAsync(1);
-            var result2 = loader.LoadAsync(2);
+        // Start async tasks to load by ID
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(2);
 
-            // Dispatch loading
-            await loader.DispatchAsync().ConfigureAwait(false);
+        // Dispatch loading
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-            var task1 = result1.GetResultAsync();
-            var task2 = result2.GetResultAsync();
+        var task1 = result1.GetResultAsync();
+        var task2 = result2.GetResultAsync();
 
-            // Now await tasks
-            user1 = await task1.ConfigureAwait(false);
-            user2 = await task2.ConfigureAwait(false);
-        });
+        // Now await tasks
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();
@@ -52,7 +47,7 @@ public class BatchDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public void Batched_Honors_MaxBatchSize()
+    public async Task Batched_Honors_MaxBatchSize()
     {
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(4);
@@ -68,34 +63,30 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         User user4 = null;
         User user5 = null;
 
-        // Run within an async context to make sure we won't deadlock
-        AsyncContext.Run(async () =>
-        {
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, null, null, 2);
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, null, null, 2);
 
-            // Start async tasks to load by ID
-            var result1 = loader.LoadAsync(1);
-            var result2 = loader.LoadAsync(2);
-            var result3 = loader.LoadAsync(3);
-            var result4 = loader.LoadAsync(4);
-            var result5 = loader.LoadAsync(5);
+        // Start async tasks to load by ID
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(2);
+        var result3 = loader.LoadAsync(3);
+        var result4 = loader.LoadAsync(4);
+        var result5 = loader.LoadAsync(5);
 
-            // Dispatch loading
-            await loader.DispatchAsync().ConfigureAwait(false);
+        // Dispatch loading
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-            var task1 = result1.GetResultAsync();
-            var task2 = result2.GetResultAsync();
-            var task3 = result3.GetResultAsync();
-            var task4 = result4.GetResultAsync();
-            var task5 = result5.GetResultAsync();
+        var task1 = result1.GetResultAsync();
+        var task2 = result2.GetResultAsync();
+        var task3 = result3.GetResultAsync();
+        var task4 = result4.GetResultAsync();
+        var task5 = result5.GetResultAsync();
 
-            // Now await tasks
-            user1 = await task1.ConfigureAwait(false);
-            user2 = await task2.ConfigureAwait(false);
-            user3 = await task3.ConfigureAwait(false);
-            user4 = await task4.ConfigureAwait(false);
-            user5 = await task5.ConfigureAwait(false);
-        });
+        // Now await tasks
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
+        user3 = await task3.ConfigureAwait(false);
+        user4 = await task4.ConfigureAwait(false);
+        user5 = await task5.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();
@@ -116,7 +107,7 @@ public class BatchDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public void Results_Are_Cached()
+    public async Task Results_Are_Cached()
     {
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(2);
@@ -130,37 +121,33 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         User user2 = null;
         User user3 = null;
 
-        // Run within an async context to make sure we won't deadlock
-        AsyncContext.Run(async () =>
-        {
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
-            // Start async tasks to load by ID
-            var result1 = loader.LoadAsync(1);
-            var result2 = loader.LoadAsync(2);
+        // Start async tasks to load by ID
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(2);
 
-            // Dispatch loading
-            await loader.DispatchAsync().ConfigureAwait(false);
+        // Dispatch loading
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-            var task1 = result1.GetResultAsync();
-            var task2 = result2.GetResultAsync();
+        var task1 = result1.GetResultAsync();
+        var task2 = result2.GetResultAsync();
 
-            // Now await tasks
-            user1 = await task1.ConfigureAwait(false);
-            user2 = await task2.ConfigureAwait(false);
+        // Now await tasks
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
 
-            var result3 = loader.LoadAsync(1);
+        var result3 = loader.LoadAsync(1);
 
-            //testing status meaningless with new design
-            var task3 = result3.GetResultAsync();
-            task3.Status.ShouldBe(TaskStatus.RanToCompletion,
-                "Task should already be complete because value comes from cache");
+        //testing status meaningless with new design
+        var task3 = result3.GetResultAsync();
+        task3.Status.ShouldBe(TaskStatus.RanToCompletion,
+            "Task should already be complete because value comes from cache");
 
-            // This should not actually run the fetch delegate again
-            await loader.DispatchAsync().ConfigureAwait(false);
+        // This should not actually run the fetch delegate again
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-            user3 = await task3.ConfigureAwait(false);
-        });
+        user3 = await task3.ConfigureAwait(false);
 
         user3.ShouldBeSameAs(user1);
 
@@ -168,7 +155,7 @@ public class BatchDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public void NonExistent_Key_Will_Return_Default_Value()
+    public async Task NonExistent_Key_Will_Return_Default_Value()
     {
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(2);
@@ -183,30 +170,26 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         User user2 = null;
         User user3 = null;
 
-        // Run within an async context to make sure we won't deadlock
-        AsyncContext.Run(async () =>
-        {
-            // There is no user with the ID of 3
-            // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
-            var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
+        // There is no user with the ID of 3
+        // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, defaultValue: nullObjectUser);
 
-            // Start async tasks to load by ID
-            var result1 = loader.LoadAsync(1);
-            var result2 = loader.LoadAsync(2);
-            var result3 = loader.LoadAsync(3);
+        // Start async tasks to load by ID
+        var result1 = loader.LoadAsync(1);
+        var result2 = loader.LoadAsync(2);
+        var result3 = loader.LoadAsync(3);
 
-            // Dispatch loading
-            await loader.DispatchAsync().ConfigureAwait(false);
+        // Dispatch loading
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-            var task1 = result1.GetResultAsync();
-            var task2 = result2.GetResultAsync();
-            var task3 = result3.GetResultAsync();
+        var task1 = result1.GetResultAsync();
+        var task2 = result2.GetResultAsync();
+        var task3 = result3.GetResultAsync();
 
-            // Now await tasks
-            user1 = await task1.ConfigureAwait(false);
-            user2 = await task2.ConfigureAwait(false);
-            user3 = await task3.ConfigureAwait(false);
-        });
+        // Now await tasks
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
+        user3 = await task3.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();

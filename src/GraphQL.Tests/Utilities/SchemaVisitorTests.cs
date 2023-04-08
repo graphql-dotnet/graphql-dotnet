@@ -11,15 +11,15 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
     {
         AssertQuery(_ =>
         {
-            _.Definitions = @"
-                    type Query {
-                        hello: String @upper
-                    }
-                ";
+            _.Definitions = """
+                type Query {
+                  hello: String @upper
+                }
+                """;
             _.ConfigureBuildedSchema = schema => { schema.Directives.Register(new UpperDirective()); schema.RegisterVisitor<UppercaseDirectiveVisitor>(); };
             _.Query = "{ hello }";
             _.Root = new { Hello = "Hello World!" };
-            _.ExpectedResult = @"{ ""hello"": ""HELLO WORLD!"" }";
+            _.ExpectedResult = """{ "hello": "HELLO WORLD!" }""";
         });
     }
 
@@ -46,42 +46,42 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         Builder.Types.For("TestType").IsTypeOf<TestType>();
         Builder.Types.For("TestTypeForUnion").IsTypeOf<TestTypeForUnion>();
 
-        var schema = Builder.Build(@"
-                    type Query {
-                        hello: String
-                    }
+        var schema = Builder.Build("""
+            type Query {
+              hello: String
+            }
 
-                    interface TestInterface @description(text: ""interface""){
-                        id: ID!
-                    }
+            interface TestInterface @description(text: "interface") {
+              id: ID!
+            }
 
-                    type TestType implements TestInterface @description(text: ""type"") {
-                        id: ID!
-                        name(arg: Int @description(text: ""arg"")): String @description(text: ""field"")
-                    }
+            type TestType implements TestInterface @description(text: "type") {
+              id: ID!
+              name(arg: Int @description(text: "arg")): String @description(text: "field")
+            }
 
-                    type TestTypeForUnion {
-                        field: ID!
-                    }
+            type TestTypeForUnion {
+              field: ID!
+            }
 
-                    union TestUnion @description(text: ""union"") = TestType | TestTypeForUnion
+            union TestUnion @description(text: "union") = TestType | TestTypeForUnion
 
-                    enum TestEnum @description(text: ""enum-definition""){
-                      TESTVAL1 @description(text: ""enum-value"")
-                      TESTVAL2
-                      TESTVAL3
-                    }
+            enum TestEnum @description(text: "enum-definition"){
+              TESTVAL1 @description(text: "enum-value")
+              TESTVAL2
+              TESTVAL3
+            }
 
-                    input TestInputType @description(text: ""input-type"") {
-                        id: Int = 0 @description(text: ""input-field"")
-                    }
+            input TestInputType @description(text: "input-type") {
+              id: Int = 0 @description(text: "input-field")
+            }
 
-                    scalar TestScalar @description(text: ""scalar"")
+            scalar TestScalar @description(text: "scalar")
 
-                    schema @description(text: ""schema description"") {
-                      query: Query
-                    }
-            ");
+            schema @description(text: "schema description") {
+              query: Query
+            }
+            """);
         schema.Directives.Register(new Directive("description",
             DirectiveLocation.Schema, DirectiveLocation.Union, DirectiveLocation.Interface, DirectiveLocation.Object,
             DirectiveLocation.InputObject, DirectiveLocation.FieldDefinition, DirectiveLocation.InputFieldDefinition,
@@ -149,10 +149,9 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         objectType.HasAppliedDirectives().ShouldBeTrue();
         objectType.GetAppliedDirectives().Count.ShouldBe(1);
 
-        var field = objectType.Field<StringGraphType>("test");
-        field.ApplyDirective("field");
-        field.HasAppliedDirectives().ShouldBeTrue();
-        field.GetAppliedDirectives().Count.ShouldBe(1);
+        var field = objectType.Field<StringGraphType>("test").Directive("field");
+        field.FieldType.HasAppliedDirectives().ShouldBeTrue();
+        field.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
 
         var interfaceType = new InterfaceGraphType();
         interfaceType.ApplyDirective("interface");
@@ -184,10 +183,9 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         inputType.HasAppliedDirectives().ShouldBeTrue();
         inputType.GetAppliedDirectives().Count.ShouldBe(1);
 
-        var input = inputType.Field<StringGraphType>("test");
-        input.ApplyDirective("inputField");
-        input.HasAppliedDirectives().ShouldBeTrue();
-        input.GetAppliedDirectives().Count.ShouldBe(1);
+        var input = inputType.Field<StringGraphType>("test").Directive("inputField");
+        input.FieldType.HasAppliedDirectives().ShouldBeTrue();
+        input.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
 
         var scalarType = new BigIntGraphType();
         scalarType.ApplyDirective("scalar");

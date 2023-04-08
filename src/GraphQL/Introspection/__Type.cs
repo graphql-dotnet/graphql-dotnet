@@ -3,16 +3,29 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// <c>__Type</c> is at the core of the type introspection system.
+    /// <see cref="__Type"/> is at the core of the type introspection system.
     /// It represents scalars, interfaces, object types, unions, enums in the system.
     /// </summary>
     public class __Type : ObjectGraphType<IGraphType>
     {
         /// <summary>
-        /// Initializes a new instance of the <c>__Type</c> introspection type.
+        /// Initializes a new instance of the <see cref="__Type"/> introspection type.
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Type(bool allowAppliedDirectives = false)
+            : this(allowAppliedDirectives, false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="__Type"/> introspection type.
+        /// </summary>
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        /// <param name="deprecationOfInputValues">
+        /// Allows deprecation of input values - arguments on a field or input fields on an input type.
+        /// This feature is from a working draft of the specification.
+        /// </param>
+        public __Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
             Name = nameof(__Type);
 
@@ -29,25 +42,20 @@ namespace GraphQL.Introspection
                 "types, Union and Interface, provide the Object types possible " +
                 "at runtime. List and NonNull types compose other types.";
 
-            Field<NonNullGraphType<__TypeKind>>("kind", resolve: context =>
+            Field<NonNullGraphType<__TypeKind>>("kind").Resolve(context =>
             {
                 return context.Source is IGraphType type
                     ? KindForInstance(type)
                     : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
             });
 
-            Field<StringGraphType>("name", resolve: context => context.Source!.Name);
+            Field<StringGraphType>("name").Resolve(context => context.Source!.Name);
 
-            Field<StringGraphType>("description");
+            Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Field>>>("fields", null,
-                new QueryArguments(
-                    new QueryArgument<BooleanGraphType>
-                    {
-                        Name = "includeDeprecated",
-                        DefaultValue = BoolBox.False
-                    }),
-                async context =>
+            Field<ListGraphType<NonNullGraphType<__Field>>>("fields")
+                .Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False)
+                .ResolveAsync(async context =>
                 {
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
@@ -72,7 +80,7 @@ namespace GraphQL.Introspection
                     return null;
                 });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("interfaces", resolve: async context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("interfaces").ResolveAsync(async context =>
             {
                 if (context.Source is IImplementInterfaces type)
                 {
@@ -95,7 +103,7 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes", resolve: async context =>
+            Field<ListGraphType<NonNullGraphType<__Type>>>("possibleTypes").ResolveAsync(async context =>
             {
                 if (context.Source is IAbstractGraphType type)
                 {
@@ -118,13 +126,9 @@ namespace GraphQL.Introspection
                 return null;
             });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues",
-                arguments: new QueryArguments(new QueryArgument<BooleanGraphType>
-                {
-                    Name = "includeDeprecated",
-                    DefaultValue = BoolBox.False
-                }),
-                resolve: async context =>
+            Field<ListGraphType<NonNullGraphType<__EnumValue>>>("enumValues")
+                .Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False)
+                .ResolveAsync(async context =>
                 {
                     if (context.Source is EnumerationGraphType type)
                     {
@@ -149,16 +153,18 @@ namespace GraphQL.Introspection
                     return null;
                 });
 
-            FieldAsync<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields", resolve: async context =>
+            var inputFieldsField = Field<ListGraphType<NonNullGraphType<__InputValue>>>("inputFields").ResolveAsync(async context =>
             {
                 if (context.Source is IInputObjectGraphType type)
                 {
                     var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
+                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+
                     int index = 0;
                     foreach (var field in type.Fields.List)
                     {
-                        if (await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                        if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
                             inputFields[index++] = field;
                     }
 
@@ -171,8 +177,10 @@ namespace GraphQL.Introspection
 
                 return null;
             });
+            if (deprecationOfInputValues)
+                inputFieldsField.Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False);
 
-            Field<__Type>("ofType", resolve: context =>
+            Field<__Type>("ofType").Resolve(context =>
             {
                 return context.Source switch
                 {

@@ -34,7 +34,7 @@ public class BugWithCustomScalarsInDirectiveQuery : ObjectGraphType
     public BugWithCustomScalarsInDirectiveQuery()
     {
         Name = "Query";
-        Field<StringGraphType>("str", resolve: _ => "aaa");
+        Field<StringGraphType>("str").Resolve(_ => "aaa");
     }
 }
 

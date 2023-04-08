@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections;
+using System.Diagnostics;
 using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -150,12 +151,15 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
-        /// the object execution node result is not <see langword="null"/>.
+        /// the object execution node result is not <see langword="null"/> or object execution
+        /// node is <see cref="RootExecutionNode"/>.
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var parentType = parent.GetObjectGraphType(context.Schema)!;
-            var fields = System.Threading.Interlocked.Exchange(ref context.ReusableFields, null);
+            Debug.Assert(parent.Result != null || parent is RootExecutionNode);
+
+            var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
+            var fields = Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
             var subFields = new ExecutionNode[fields.Count];
@@ -171,7 +175,7 @@ namespace GraphQL.Execution
             parent.SubFields = subFields;
 
             fields.Clear();
-            System.Threading.Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
+            Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
         }
 
         /// <summary>
@@ -224,7 +228,20 @@ namespace GraphQL.Execution
         /// <returns>A list of collected fields</returns>
         protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
+            //Debug.Assert(specificType is not IAbstractGraphType); //TODO: think about it
+
             fields ??= new();
+
+            // TODO: DESIGN REVIEW NEEDED
+            // https://github.com/graphql-dotnet/graphql-dotnet/pull/3416
+            // SetSubFieldNodes calls CollectFieldsFrom always with IComplexGraphType resolved type even for unions and interfaces since
+            // GetObjectGraphType works well when ExecutionNode.Result is already set. In case of GetSubFields (that is called usually
+            // from IResolveFieldContext.SubFields) we have a problem - there is no ExecutionNode.Result yet (resolver did not return yet)
+            // so GetObjectGraphType returns null in case of abstract graph type (interface or union) and we try to solve it by choosing
+            // an "approximate" type - interface/union type itself. For interface it works better than for union - at least we can return
+            // fields of interface, it makes sense. What should we return in case of union? First/last/random union member? Probably the
+            // best answer here - nothing. See 'GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)' call inside
+            // CollectFields that effectively filters out all unions allowing only __typename field.
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
             int countOfSpreads = GetFragmentSpreads(context, selectionSet);
@@ -259,9 +276,10 @@ namespace GraphQL.Execution
                         {
                             if (ShouldIncludeNode(context, field))
                             {
-                                var fieldType = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
-                                if (fieldType == null)
-                                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
+                                // parentType argument for GetFieldDefinition may be null in case of union field, in that case
+                                // GetFieldDefinition will not throw only if field is __typename
+                                var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)
+                                    ?? throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
                                 Add(fields, field, fieldType);
                             }
@@ -429,6 +447,15 @@ namespace GraphQL.Execution
         }
 
         /// <summary>
+        /// Selects resolver for the specified execution node. By default returns resolver from
+        /// <see cref="ExecutionNode.FieldDefinition"/> if specified. Otherwise returns
+        /// <see cref="SourceFieldResolver.Instance"/> for top level nodes of subscriptions or
+        /// <see cref="NameFieldResolver.Instance"/> for all other cases.
+        /// </summary>
+        protected virtual IFieldResolver SelectResolver(ExecutionNode node, ExecutionContext context)
+            => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
+
+        /// <summary>
         /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
         /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
         /// </summary>
@@ -442,11 +469,11 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext? resolveContext = System.Threading.Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                var resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
-                var resolver = node.FieldDefinition!.Resolver ?? NameFieldResolver.Instance;
-                var result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
+                var resolver = SelectResolver(node, context);
+                object? result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
                 node.Result = result;
 
@@ -459,7 +486,7 @@ namespace GraphQL.Execution
                     {
                         // also see FuncFieldResolver.GetResolverFor as it relates to context re-use
                         resolveContext.Reset(null, null);
-                        System.Threading.Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                        Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
                     }
                 }
             }
@@ -601,10 +628,9 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
         {
-            var result = node.Result;
+            object? result = node.Result;
 
             IGraphType? fieldType = node.ResolvedType;
-            var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is NonNullGraphType nonNullType)
             {
@@ -614,13 +640,15 @@ namespace GraphQL.Execution
                         + $" Field: {node.Name}, Type: {nonNullType}.");
                 }
 
-                objectType = nonNullType.ResolvedType as IObjectGraphType;
+                fieldType = nonNullType.ResolvedType;
             }
 
             if (result == null)
             {
                 return;
             }
+
+            var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is IAbstractGraphType abstractType)
             {
@@ -630,7 +658,7 @@ namespace GraphQL.Execution
                 {
                     throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
-                        $"runtime for field {node.Parent?.GraphType?.Name}.{node.Name} " +
+                        $"runtime for field {(node.IndexInParentNode.HasValue ? node.Parent?.Parent : node.Parent)?.GraphType?.Name}.{node.FieldDefinition.Name} " +
                         $"with value '{result}', received 'null'.");
                 }
 

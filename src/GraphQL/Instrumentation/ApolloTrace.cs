@@ -13,7 +13,9 @@ namespace GraphQL.Instrumentation
         public ApolloTrace(DateTime start, double durationMs)
         {
             StartTime = start.ToUniversalTime();
-            EndTime = StartTime.AddMilliseconds(durationMs);
+            // https://github.com/dotnet/runtime/pull/73198 fixes AddMilliseconds, but it is only available NET7+
+            // Use AddTicks instead to fix it for all frameworks
+            EndTime = StartTime.AddTicks((long)(durationMs * TimeSpan.TicksPerMillisecond));
             Duration = ConvertTime(durationMs);
         }
 

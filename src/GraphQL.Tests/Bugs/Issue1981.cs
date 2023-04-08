@@ -8,34 +8,39 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
     [Fact]
     public void Should_Provide_Directives_In_Resolver()
     {
-        var query = @"query Q($var1: Boolean!, $var2: Boolean! = true)
-{
-  fieldWith2Literal @skip(if: false) @include(if: true)
-  fieldWithVariable @include(if: $var1)
-  fieldWithVariableDefault @include(if: $var2)
-  fieldWithoutDirectives
-}
-";
-        var expected = @"{
-  ""fieldWith2Literal"": ""1"",
-  ""fieldWithVariable"": ""2"",
-  ""fieldWithVariableDefault"": ""3"",
-  ""fieldWithoutDirectives"": ""4""
-}";
-        AssertQuerySuccess(query, expected, @"{ ""var1"": true }".ToInputs());
+        const string query = """
+        query Q($var1: Boolean!, $var2: Boolean! = true)
+        {
+          fieldWith2Literal @skip(if: false) @include(if: true)
+          fieldWithVariable @include(if: $var1)
+          fieldWithVariableDefault @include(if: $var2)
+          fieldWithoutDirectives
+        }
+        """;
+        const string expected = """
+        {
+          "fieldWith2Literal": "1",
+          "fieldWithVariable": "2",
+          "fieldWithVariableDefault": "3",
+          "fieldWithoutDirectives": "4"
+        }
+        """;
+        AssertQuerySuccess(query, expected, """{ "var1": true }""".ToInputs());
     }
 
     [Fact]
     public void Should_Ignore_Unknown_Directives()
     {
-        var query = @"
-{
-  fieldWithoutDirectives @unknown
-}
-";
-        var expected = @"{
-  ""fieldWithoutDirectives"": ""4""
-}";
+        const string query = """
+        {
+          fieldWithoutDirectives @unknown
+        }
+        """;
+        const string expected = """
+        {
+          "fieldWithoutDirectives": "4"
+        }
+        """;
         // empty validation rules to bypass validation error from KnownDirectivesInAllowedLocations
         AssertQuerySuccess(query, expected, rules: Array.Empty<IValidationRule>());
     }
@@ -54,7 +59,8 @@ public class Issue1981Query : ObjectGraphType
     public Issue1981Query()
     {
         Name = "Query";
-        Field<StringGraphType>("fieldWith2Literal", resolve: ctx =>
+        Field<StringGraphType>("fieldWith2Literal")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -79,7 +85,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "1";
         });
-        Field<StringGraphType>("fieldWithVariable", resolve: ctx =>
+        Field<StringGraphType>("fieldWithVariable")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -96,7 +103,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "2";
         });
-        Field<StringGraphType>("fieldWithVariableDefault", resolve: ctx =>
+        Field<StringGraphType>("fieldWithVariableDefault")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldNotBeNull();
             ctx.HasDirectives().ShouldBeTrue();
@@ -109,7 +117,8 @@ public class Issue1981Query : ObjectGraphType
 
             return "3";
         });
-        Field<StringGraphType>("fieldWithoutDirectives", resolve: ctx =>
+        Field<StringGraphType>("fieldWithoutDirectives")
+            .Resolve(ctx =>
         {
             ctx.Directives.ShouldBeNull();
             ctx.HasDirectives().ShouldBeFalse();

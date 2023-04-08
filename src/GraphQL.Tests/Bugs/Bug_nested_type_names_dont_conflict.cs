@@ -13,13 +13,13 @@ public class Bug_nested_type_names_dont_conflict :
 
         try
         {
-            var inputs = @"{ ""input_0"": { ""id"": ""123""} }".ToInputs();
-            var query = @"
+            var inputs = """{ "input_0": { "id": "123"} }""".ToInputs();
+            const string query = """
 mutation M($input_0: Bug_nested_type_names_dont_conflict_MyInputClass_MyInput!) {
   run(input: $input_0)
 }
-";
-            var expected = @"{ ""run"": ""123"" }";
+""";
+            const string expected = """{ "run": "123" }""";
             AssertQuerySuccess(query, expected, inputs);
         }
         finally
@@ -40,14 +40,12 @@ mutation M($input_0: Bug_nested_type_names_dont_conflict_MyInputClass_MyInput!) 
     {
         public MyMutation()
         {
-            Field<StringGraphType>(
-                "run",
-                arguments: new QueryArguments(new QueryArgument<MyInputClass.MyInput> { Name = "input" }),
-                resolve: ctx => ctx.GetArgument<MyInputClass>("input").Id);
-            Field<StringGraphType>(
-                "run2",
-                arguments: new QueryArguments(new QueryArgument<MyInputClass2.MyInput> { Name = "input" }),
-                resolve: ctx => ctx.GetArgument<MyInputClass2>("input").Id);
+            Field<StringGraphType>("run")
+                .Argument<MyInputClass.MyInput>("input")
+                .Resolve(ctx => ctx.GetArgument<MyInputClass>("input").Id);
+            Field<StringGraphType>("run2")
+                .Argument<MyInputClass2.MyInput>("input")
+                .Resolve(ctx => ctx.GetArgument<MyInputClass2>("input").Id);
         }
     }
 

@@ -17,6 +17,7 @@ namespace GraphQL.Caching
     {
         public const string SUPPORTED_VERSION = "1";
         protected AutomaticPersistedQueriesExecutionBase() { }
+        public virtual float SortOrder { get; }
         protected virtual bool CheckHash(string hash, string query) { }
         protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
@@ -28,22 +29,17 @@ namespace GraphQL.Caching
         protected abstract System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string hash);
         protected abstract System.Threading.Tasks.Task SetQueryAsync(string hash, string query);
     }
-    public static class GraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
-        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
-    }
-    public class MemoryDocumentCache : GraphQL.Caching.IDocumentCache, System.IDisposable
+    public class MemoryDocumentCache : GraphQL.DI.IConfigureExecution, System.IDisposable
     {
         public MemoryDocumentCache() { }
         public MemoryDocumentCache(Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
         protected MemoryDocumentCache(Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache, bool disposeMemoryCache, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions> options) { }
+        public virtual float SortOrder { get; }
         public virtual void Dispose() { }
-        public virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(string query) { }
-        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(string query) { }
-        public virtual System.Threading.Tasks.ValueTask SetAsync(string query, GraphQLParser.AST.GraphQLDocument value) { }
+        public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.ValueTask<GraphQLParser.AST.GraphQLDocument?> GetAsync(GraphQL.ExecutionOptions options) { }
+        protected virtual Microsoft.Extensions.Caching.Memory.MemoryCacheEntryOptions GetMemoryCacheEntryOptions(GraphQL.ExecutionOptions options) { }
+        protected virtual System.Threading.Tasks.ValueTask SetAsync(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument value) { }
     }
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
@@ -61,5 +57,23 @@ namespace GraphQL.Caching
     public class PersistedQueryUnsupportedVersionError : GraphQL.Execution.RequestError
     {
         public PersistedQueryUnsupportedVersionError(string? version) { }
+    }
+}
+namespace GraphQL
+{
+    public static class MemoryCacheGraphQLBuilderExtensions
+    {
+        [System.Obsolete("Please use UseAutomaticPersistedQueries. This method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
+        [System.Obsolete("Please use UseAutomaticPersistedQueries. This method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
+        [System.Obsolete("Please use UseMemoryCache. This method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
+        [System.Obsolete("Please use UseMemoryCache. This method will be removed in v8.")]
+        public static GraphQL.DI.IGraphQLBuilder AddMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UseAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseAutomaticPersistedQueries(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.AutomaticPersistedQueriesCacheOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UseMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder UseMemoryCache(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Caching.MemoryDocumentCacheOptions, System.IServiceProvider>? action) { }
     }
 }

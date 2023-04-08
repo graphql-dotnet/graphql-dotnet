@@ -10,11 +10,11 @@ namespace GraphQL.Validation
         /// <summary>
         /// Called when the node walker is entering a node.
         /// </summary>
-        void Enter(ASTNode node, ValidationContext context);
+        ValueTask EnterAsync(ASTNode node, ValidationContext context);
 
         /// <summary>
         /// Called when the node walker is leaving a node.
         /// </summary>
-        void Leave(ASTNode node, ValidationContext context);
+        ValueTask LeaveAsync(ASTNode node, ValidationContext context);
     }
 }
