@@ -1,17 +1,22 @@
-const path = require('path')
-const sourceNodes = require('./gatsby/sourceNodes')
-const menuNodeType = require('./menuNodeType')
-const GithubSlugger = require('github-slugger')
+import path from 'path'
+import menuNodeType from './menuNodeType.js'
+import sourceNodesG from './gatsby/sourceNodes.js'
+import GithubSlugger from 'github-slugger'
+import GraphQLJSON from 'graphql-type-json'
 const slugger = new GithubSlugger()
 
-exports.sourceNodes = sourceNodes
+export const sourceNodes = sourceNodesG
 
-exports.onCreateNode = ({ node, boundActionCreators, getNode }, options) => {
+export const onPostBuild = ({ reporter }) => {
+  reporter.info(`Your Gatsby site has been built!`)
+}
+
+export const onCreateNode = ({ node, actions, getNode }, options) => {
   if (node.internal.type !== 'MarkdownRemark') {
     return
   }
 
-  const { createNodeField } = boundActionCreators
+  const { createNodeField } = actions
 
   const markdownAbsolutePath = getNode(node.parent).absolutePath
   const docsAbsolutePath = path.parse(options.config).dir
@@ -23,8 +28,8 @@ exports.onCreateNode = ({ node, boundActionCreators, getNode }, options) => {
   })
 }
 
-exports.createPages = ({ graphql, boundActionCreators }, options) => {
-  const { createPage } = boundActionCreators
+export const createPages = ({ graphql, actions }, options) => {
+  const { createPage } = actions
   const docsSiteDirectory = path.dirname(options.config)
 
   slugger.reset()
@@ -76,6 +81,15 @@ exports.createPages = ({ graphql, boundActionCreators }, options) => {
   })
 }
 
-exports.setFieldsOnGraphQLNodeType = actions => {
-  return menuNodeType(actions)
+// export const setFieldsOnGraphQLNodeType = actions => {
+//   return menuNodeType(actions)
+// }
+
+export const createSchemaCustomization = ({actions}) => {
+  const { createTypes } = actions
+  createTypes(`
+    type DocsMenu implements Node {
+      pages: JSON
+    }
+  `)
 }

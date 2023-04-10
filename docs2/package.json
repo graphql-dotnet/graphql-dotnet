@@ -11,30 +11,31 @@
     "format": "prettier --write 'src/**/*.js'"
   },
   "dependencies": {
-    "classnames": "^2.2.6",
-    "gatsby": "1.9.273",
-    "gatsby-link": "^1.6.40",
-    "gatsby-plugin-react-helmet": "^2.0.10",
-    "gatsby-remark-autolink-headers": "^1.4.19",
-    "gatsby-remark-images": "^1.5.67",
-    "gatsby-remark-prismjs": "^2.0.4",
-    "gatsby-source-filesystem": "^1.5.39",
-    "gatsby-transformer-remark": "^1.7.44",
-    "gatsby-transformer-yaml": "^1.5.18",
-    "normalize.css": "^8.0.0",
-    "prismjs": "^1.27.0",
-    "prop-types": "^15.6.2",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.2",
-    "react-helmet": "^5.2.0"
+    "classnames": "^2.3.2",
+    "gatsby": "5.8.1",
+    "gatsby-link": "^5.8.0",
+    "gatsby-plugin-react-helmet": "^6.8.0",
+    "gatsby-plugin-sharp": "^5.8.1",
+    "gatsby-remark-autolink-headers": "^6.8.0",
+    "gatsby-remark-images": "^7.8.0",
+    "gatsby-remark-prismjs": "^7.8.0",
+    "gatsby-source-filesystem": "^5.8.0",
+    "gatsby-transformer-remark": "^6.8.0",
+    "gatsby-transformer-yaml": "^5.8.0",
+    "normalize.css": "^8.0.1",
+    "prismjs": "^1.29.0",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-helmet": "^6.1.0"
   },
   "devDependencies": {
-    "chokidar": "^2.0.4",
-    "gatsby-node-helpers": "^0.3.0",
-    "gh-pages": "^3.1.0",
-    "github-slugger": "^1.2.0",
-    "js-yaml": "^3.13.1",
+    "chokidar": "^3.5.3",
+    "gatsby-node-helpers": "^1.2.1",
+    "gh-pages": "^5.0.0",
+    "github-slugger": "^2.0.0",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "prettier": "^1.12.0"
+    "prettier": "^2.8.7"
   }
 }
