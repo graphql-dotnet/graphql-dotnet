@@ -66,7 +66,7 @@ export const createPages = ({ graphql, actions }, options) => {
 
             createPage({
               path: path.join(pagePath, slug),
-              component: path.resolve('./src/templates/docs-page.js'),
+              component: path.resolve('./src/components/docs-page.js'),
               context: {
                 relativePath: path.join(pagePath, item.file)
               }
