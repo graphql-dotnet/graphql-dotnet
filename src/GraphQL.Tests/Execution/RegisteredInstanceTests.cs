@@ -157,7 +157,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         {
             Name = "NestedObjType"
         };
-        nestedObjType.AddField(new FieldType
+        nestedObjType.AddField(new ObjectFieldType
         {
             ResolvedType = new IntGraphType(),
             Name = "intField"
@@ -187,7 +187,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
             }
         }
 
-        rootType.AddField(new FieldType
+        rootType.AddField(new ObjectFieldType
         {
             Name = "listOfObjField",
             ResolvedType = resolvedType

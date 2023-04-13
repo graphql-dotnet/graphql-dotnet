@@ -26,9 +26,9 @@ namespace GraphQL.Validation.Rules
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
 
-                if (fieldDef?.Arguments?.Count > 0)
+                if (fieldDef is IFieldTypeWithArguments ftwa && ftwa.Arguments?.Count > 0)
                 {
-                    foreach (var arg in fieldDef.Arguments.List!)
+                    foreach (var arg in ftwa.Arguments.List!)
                     {
                         if (arg.DefaultValue == null &&
                             arg.ResolvedType is NonNullGraphType &&

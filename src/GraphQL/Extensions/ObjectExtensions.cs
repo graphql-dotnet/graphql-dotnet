@@ -46,7 +46,7 @@ namespace GraphQL
                 var complexType = mappedType?.GetNamedType() as IComplexGraphType;
 
                 // type may not contain mapping information
-                field = complexType?.GetField(key);
+                field = complexType?.Fields().GetField(key);
                 return field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
             }
 

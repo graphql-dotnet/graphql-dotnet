@@ -39,27 +39,27 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Visits field of registered within the schema object graph type.
         /// </summary>
-        void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
+        void VisitObjectFieldDefinition(ObjectFieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field of registered within the schema interface graph type.
         /// </summary>
-        void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
+        void VisitInterfaceFieldDefinition(InterfaceFieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field of registered within the schema input object graph type.
         /// </summary>
-        void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
+        void VisitInputObjectFieldDefinition(InputFieldType field, IInputObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field argument of registered within the schema object graph type.
         /// </summary>
-        void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
+        void VisitObjectFieldArgumentDefinition(QueryArgument argument, ObjectFieldType field, IObjectGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits field argument of registered within the schema interface graph type.
         /// </summary>
-        void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
+        void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, InterfaceFieldType field, IInterfaceGraphType type, ISchema schema);
 
         /// <summary>
         /// Visits directive argument.

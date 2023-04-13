@@ -245,23 +245,23 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         schema.Description.ShouldBe("Animals - cats and dogs");
         schema.AllTypes.Count.ShouldBe(16);
 
-        var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
+        var cat = schema.AllTypes.OfType<IObjectGraphType>().First(t => t.Name == "Cat");
         cat.Description.ShouldBe(" A cat");
-        cat.GetField("name").Description.ShouldBe(" cat's name");
-        cat.GetField("weight").Arguments[0].Name.ShouldBe("inPounds");
-        cat.GetField("weight").Arguments[0].ResolvedType.GetType().ShouldBe(typeof(BooleanGraphType));
-        cat.GetField("weight").Arguments[0].Description.ShouldBe("comment on argument");
-        var dog = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Dog");
+        cat.Fields.Find("name").Description.ShouldBe(" cat's name");
+        cat.Fields.Find("weight").Arguments[0].Name.ShouldBe("inPounds");
+        cat.Fields.Find("weight").Arguments[0].ResolvedType.GetType().ShouldBe(typeof(BooleanGraphType));
+        cat.Fields.Find("weight").Arguments[0].Description.ShouldBe("comment on argument");
+        var dog = schema.AllTypes.OfType<IObjectGraphType>().First(t => t.Name == "Dog");
         dog.Description.ShouldBe(" A dog");
-        dog.GetField("age").Description.ShouldBe(" dog's age");
+        dog.Fields.Find("age").Description.ShouldBe(" dog's age");
 
         var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
         pet.Description.ShouldBe("Cats with dogs");
         pet.PossibleTypes.Count.ShouldBe(2);
 
-        var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
-        query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
-        query.GetField("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
+        var query = schema.AllTypes.OfType<IObjectGraphType>().First(t => t.Name == "Query");
+        query.Fields.Find("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
+        query.Fields.Find("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
     }
 
     [Fact]
@@ -564,7 +564,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             """);
 
         var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
-        type.GetField("homePlanet").DefaultValue.ShouldBeNull();
+        type.Fields.Find("homePlanet").DefaultValue.ShouldBeNull();
     }
 
     [Fact]

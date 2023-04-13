@@ -200,8 +200,8 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="policy"> Authorization policy name. </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder, string policy)
+        public static ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
+            this ObjectFieldBuilder<TSourceType, TReturnType> builder, string policy)
         {
             builder.FieldType.AuthorizeWithPolicy(policy);
             return builder;
@@ -215,8 +215,8 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder, string roles)
+        public static ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+            this ObjectFieldBuilder<TSourceType, TReturnType> builder, string roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
             return builder;
@@ -229,24 +229,24 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles"> List of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder, params string[] roles)
+        public static ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+            this ObjectFieldBuilder<TSourceType, TReturnType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
             return builder;
         }
 
         /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
-        public static FieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder)
+        public static ObjectFieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
+            this ObjectFieldBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.Authorize();
             return builder;
         }
 
         /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
-        public static FieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
-            this FieldBuilder<TSourceType, TReturnType> builder)
+        public static ObjectFieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
+            this ObjectFieldBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.AllowAnonymous();
             return builder;

@@ -79,7 +79,7 @@ public class NameConverterTests : BasicQueryTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.GetField("peRsoN");
+        var field = query.Fields.Find("peRsoN");
         field.Arguments.Find("id").ShouldNotBeNull();
     }
 
@@ -90,7 +90,7 @@ public class NameConverterTests : BasicQueryTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.GetField("PeRsoN");
+        var field = query.Fields.Find("PeRsoN");
         field.Arguments.Find("ID").ShouldNotBeNull();
     }
 }

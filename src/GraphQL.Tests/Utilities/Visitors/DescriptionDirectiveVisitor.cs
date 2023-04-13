@@ -31,11 +31,11 @@ public class DescriptionDirectiveVisitor : BaseSchemaNodeVisitor
 
     public override void VisitInputObject(IInputObjectGraphType type, ISchema schema) => SetDescription(type);
 
-    public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => SetDescription(field);
+    public override void VisitObjectFieldDefinition(ObjectFieldType field, IObjectGraphType type, ISchema schema) => SetDescription(field);
 
-    public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => SetDescription(field);
+    public override void VisitInputObjectFieldDefinition(InputFieldType field, IInputObjectGraphType type, ISchema schema) => SetDescription(field);
 
-    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => SetDescription(argument);
+    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, ObjectFieldType field, IObjectGraphType type, ISchema schema) => SetDescription(argument);
 
     public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => SetDescription(argument);
 

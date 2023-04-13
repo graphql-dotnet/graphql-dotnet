@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Errors
                     node.Name.StringValue,
                     fieldDef.Name,
                     parentType.ToString()!,
-                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //ISSUE:allocation
+                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments()?.List?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }

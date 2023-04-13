@@ -65,12 +65,12 @@ namespace GraphQL.Builders
         /// <summary>
         /// Returns the generated field.
         /// </summary>
-        public FieldType FieldType { get; protected set; }
+        public ObjectFieldType FieldType { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
         /// </summary>
-        protected ConnectionBuilder(FieldType fieldType)
+        protected ConnectionBuilder(ObjectFieldType fieldType)
         {
             FieldType = fieldType;
         }
@@ -106,7 +106,7 @@ namespace GraphQL.Builders
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
-            var fieldType = new FieldType
+            var fieldType = new ObjectFieldType
             {
                 Name = name,
                 Type = typeof(TConnectionType),
@@ -143,21 +143,27 @@ namespace GraphQL.Builders
             return this;
         }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
+        /// <summary>
+        /// Sets the name of the field.
+        /// </summary>
         public virtual ConnectionBuilder<TSourceType> Name(string name)
         {
             FieldType.Name = name;
             return this;
         }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
+        /// <summary>
+        /// Sets the description of the field.
+        /// </summary>
         public virtual ConnectionBuilder<TSourceType> Description(string? description)
         {
             FieldType.Description = description;
             return this;
         }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
+        /// <summary>
+        /// Sets the deprecation reason of the field.
+        /// </summary>
         public virtual ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason)
         {
             FieldType.DeprecationReason = deprecationReason;

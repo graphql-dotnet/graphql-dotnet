@@ -4,7 +4,8 @@ using GraphQL.Types;
 namespace GraphQL.Utilities
 {
     /// <summary>
-    /// Sets <see cref="FieldType.DefaultArgumentValues"/> for each <see cref="FieldType"/>.
+    /// Sets <see cref="ObjectFieldType.DefaultArgumentValues"/> for each <see cref="ObjectFieldType"/>.
+    /// Sets <see cref="InterfaceFieldType.DefaultArgumentValues"/> for each <see cref="InterfaceFieldType"/>.
     /// </summary>
     public sealed class FieldTypeDefaultArgumentsVisitor : BaseSchemaNodeVisitor
     {
@@ -18,7 +19,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc/>
-        public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
+        public override void VisitObjectFieldDefinition(ObjectFieldType field, IObjectGraphType type, ISchema schema)
         {
             if (field.Arguments?.Count > 0)
             {
@@ -27,7 +28,7 @@ namespace GraphQL.Utilities
         }
 
         /// <inheritdoc/>
-        public override void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema)
+        public override void VisitInterfaceFieldDefinition(InterfaceFieldType field, IInterfaceGraphType type, ISchema schema)
         {
             if (field.Arguments?.Count > 0)
             {

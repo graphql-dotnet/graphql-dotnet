@@ -298,7 +298,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// <summary>
     /// Builds an execution node with the specified parameters.
     /// </summary>
-    protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode, object source)
+    protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, ObjectFieldType fieldDefinition, int? indexInParentNode, object source)
     {
         if (graphType is NonNullGraphType nonNullFieldType)
             graphType = nonNullFieldType.ResolvedType!;

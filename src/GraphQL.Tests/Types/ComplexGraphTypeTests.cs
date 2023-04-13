@@ -21,7 +21,7 @@ public class ComplexGraphTypeTests
         }
     }
 
-    internal class GenericFieldType<T> : FieldType { }
+    internal class GenericFieldType<T> : ObjectFieldType { }
 
     [Description("Object for test")]
     [Obsolete("Obsolete for test")]
@@ -242,7 +242,7 @@ public class ComplexGraphTypeTests
     [Fact]
     public void infers_field_default_from_expression()
     {
-        var type = new ComplexType<TestObject>();
+        var type = new InputObjectGraphType<TestObject>();
         _ = type.Field(d => d.someDate);
 
         type.Fields.Last().DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
@@ -295,7 +295,7 @@ public class ComplexGraphTypeTests
     {
         var type = new ComplexType<Droid>();
 
-        var fieldType = new FieldType
+        var fieldType = new ObjectFieldType
         {
             Name = "name",
             ResolvedType = null,
@@ -305,7 +305,7 @@ public class ComplexGraphTypeTests
         var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
         exception.ParamName.ShouldBe("fieldType");
-        exception.Message.ShouldStartWith("The declared field 'name' on 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
+        exception.Message.ShouldStartWith("The declared field 'name' on Object 'Droid' requires a field 'Type' when no 'ResolvedType' is provided.");
     }
 
     [Fact]
@@ -323,7 +323,7 @@ public class ComplexGraphTypeTests
         var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.AddField(fieldType));
 
         exception.ParamName.ShouldBe("fieldType");
-        exception.Message.ShouldStartWith("The declared field 'genericname' on 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
+        exception.Message.ShouldStartWith("The declared field 'genericname' on Object 'ListOfDroid' requires a field 'Type' when no 'ResolvedType' is provided.");
     }
 
     private static Exception test_field_name(string fieldName)

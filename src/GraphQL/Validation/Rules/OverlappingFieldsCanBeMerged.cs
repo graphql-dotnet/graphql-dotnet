@@ -698,10 +698,10 @@ namespace GraphQL.Validation.Rules
                 {
                     var fieldName = field.Name;
                     FieldType? fieldDef = null;
-                    if (isObjectType(parentType) || isInterfaceType(parentType))
-                    {
-                        fieldDef = (parentType as IComplexGraphType)!.GetField(fieldName);
-                    }
+                    if (parentType is IObjectGraphType ogt)
+                        fieldDef = ogt.Fields.Find(fieldName);
+                    else if (parentType is IInterfaceGraphType igt)
+                        fieldDef = igt.Fields.Find(fieldName);
 
                     var responseName = field.Alias is null ? fieldName : field.Alias.Name;
 

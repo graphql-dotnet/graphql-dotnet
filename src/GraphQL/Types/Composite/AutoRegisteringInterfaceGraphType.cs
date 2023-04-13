@@ -40,13 +40,16 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
         AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
     }
 
-    /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.ProvideFields"/>
-    protected virtual IEnumerable<FieldType> ProvideFields()
+    /// <summary>
+    /// Returns a list of <see cref="InterfaceFieldType"/> instances representing the fields ready to be
+    /// added to the graph type.
+    /// </summary>
+    protected virtual IEnumerable<InterfaceFieldType> ProvideFields()
         => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, false);
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.CreateField(MemberInfo)"/>
-    protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false, _ => new FieldType());
+    protected virtual InterfaceFieldType? CreateField(MemberInfo memberInfo)
+        => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false, _ => new InterfaceFieldType());
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)

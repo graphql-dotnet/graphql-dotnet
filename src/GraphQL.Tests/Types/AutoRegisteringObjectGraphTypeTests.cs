@@ -148,7 +148,6 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field8").ShouldNotBeNull();
-        fieldType.DefaultValue.ShouldBeNull();
     }
 
     [Fact]
@@ -358,7 +357,7 @@ public class AutoRegisteringObjectGraphTypeTests
         object? actual = await resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = obj,
-            FieldDefinition = new FieldType { Name = fieldName },
+            FieldDefinition = new ObjectFieldType { Name = fieldName },
         }).ConfigureAwait(false);
         actual.ShouldBe(expected);
     }
@@ -658,7 +657,7 @@ public class AutoRegisteringObjectGraphTypeTests
 
     private class TestChangingFieldList<T> : AutoRegisteringObjectGraphType<T>
     {
-        protected override IEnumerable<FieldType> ProvideFields()
+        protected override IEnumerable<ObjectFieldType> ProvideFields()
         {
             yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
         }
@@ -672,7 +671,7 @@ public class AutoRegisteringObjectGraphTypeTests
 
     private class TestChangingName<T> : AutoRegisteringObjectGraphType<T>
     {
-        protected override FieldType CreateField(MemberInfo memberInfo)
+        protected override ObjectFieldType CreateField(MemberInfo memberInfo)
         {
             var field = base.CreateField(memberInfo)!;
             field.Name += "Prop";

@@ -148,7 +148,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
     {
         var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find("Field8").ShouldNotBeNull();
-        fieldType.DefaultValue.ShouldBeNull();
     }
 
     [Fact]
@@ -294,7 +293,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
         serviceCollection.AddSingleton<string>("testService");
         using var provider = serviceCollection.BuildServiceProvider();
         context.RequestServices = provider;
-        fieldType.Resolver.ShouldBeNull();
     }
 
     [Fact]
@@ -344,7 +342,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
     {
         var graph = new AutoRegisteringInterfaceGraphType<TestInterface>();
         var field = graph.Fields.Find(fieldName).ShouldNotBeNull();
-        field.Resolver.ShouldBeNull();
     }
 
     [Fact]
@@ -550,9 +547,9 @@ public class AutoRegisteringInterfaceGraphTypeTests
         {
             Should.Throw<ArgumentNullException>(() => BuildFieldType(null!, typeof(TestProtectedMethods).GetMethod(nameof(Test))!))
                 .ParamName.ShouldBe("fieldType");
-            Should.Throw<ArgumentNullException>(() => BuildFieldType(new FieldType(), null!))
+            Should.Throw<ArgumentNullException>(() => BuildFieldType(new ObjectFieldType(), null!))
                 .ParamName.ShouldBe("memberInfo");
-            Should.Throw<ArgumentOutOfRangeException>(() => BuildFieldType(new FieldType(), typeof(TestProtectedMethods)))
+            Should.Throw<ArgumentOutOfRangeException>(() => BuildFieldType(new ObjectFieldType(), typeof(TestProtectedMethods)))
                 .ParamName.ShouldBe("memberInfo");
         }
     }
@@ -758,7 +755,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private class TestChangingFieldList<T> : AutoRegisteringInterfaceGraphType<T>
     {
-        protected override IEnumerable<FieldType> ProvideFields()
+        protected override IEnumerable<InterfaceFieldType> ProvideFields()
         {
             yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
         }
@@ -766,7 +763,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private class TestChangingName<T> : AutoRegisteringInterfaceGraphType<T>
     {
-        protected override FieldType CreateField(MemberInfo memberInfo)
+        protected override InterfaceFieldType CreateField(MemberInfo memberInfo)
         {
             var field = base.CreateField(memberInfo)!;
             field.Name += "Prop";

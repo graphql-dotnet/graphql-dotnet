@@ -63,14 +63,14 @@ namespace GraphQL.Validation.Rules
 
                 foreach (var possibleType in absType.PossibleTypes.List)
                 {
-                    if (possibleType.HasField(fieldName))
+                    if (possibleType.Fields.Find(fieldName) != null)
                     {
                         // This object defines this field.
                         suggestedObjectTypes.Add(possibleType.Name);
 
                         foreach (var possibleInterface in possibleType.ResolvedInterfaces.List)
                         {
-                            if (possibleInterface.HasField(fieldName))
+                            if (possibleInterface.Fields.Find(fieldName) != null)
                             {
                                 // This interface type defines this field.
                                 interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
@@ -94,7 +94,7 @@ namespace GraphQL.Validation.Rules
         {
             if (type is IComplexGraphType complexType)
             {
-                return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
+                return StringUtils.SuggestionList(fieldName, complexType.Fields().AsEnumerable().Select(x => x.Name));
             }
 
             return Enumerable.Empty<string>();

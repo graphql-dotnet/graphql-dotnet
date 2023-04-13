@@ -96,7 +96,7 @@ namespace GraphQL.Utilities.Federation
         {
             Schema?.Initialize();
 
-            var fields = type?.Fields
+            var fields = type?.Fields().AsEnumerable()
                 .Where(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name))
                 .Select(x =>
                 new

@@ -5,7 +5,7 @@ namespace GraphQL.Introspection
     /// <summary>
     /// The <see cref="__Field"/> introspection type represents each field in an Object or Interface type.
     /// </summary>
-    public class __Field : ObjectGraphType<IFieldType>
+    public class __Field : ObjectGraphType<IFieldTypeWithArguments>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="__Field"/> introspection type.

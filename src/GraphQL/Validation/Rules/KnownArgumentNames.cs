@@ -28,7 +28,7 @@ namespace GraphQL.Validation.Rules
                 var fieldDef = context.TypeInfo.GetFieldDef();
                 if (fieldDef != null)
                 {
-                    var fieldArgDef = fieldDef.Arguments?.Find(node.Name);
+                    var fieldArgDef = fieldDef.Arguments()?.Find(node.Name);
                     if (fieldArgDef == null)
                     {
                         var parentType = context.TypeInfo.GetParentType() ?? throw new InvalidOperationException("Parent type must not be null.");

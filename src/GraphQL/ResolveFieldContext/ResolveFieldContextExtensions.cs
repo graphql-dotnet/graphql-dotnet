@@ -74,11 +74,11 @@ namespace GraphQL
                     return true;
                 }
 
-                result = inputObject.ToObject(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
+                result = inputObject.ToObject(argumentType, context.FieldDefinition?.Arguments()?.Find(argumentName)?.ResolvedType);
                 return true;
             }
 
-            result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType);
+            result = arg.Value.GetPropertyValue(argumentType, context.FieldDefinition?.Arguments()?.Find(argumentName)?.ResolvedType);
             return true;
         }
 
@@ -94,6 +94,8 @@ namespace GraphQL
         /// Determines if this field is an introspection field (__schema, __type, __typename) -- but not if it is a field of an introspection type.
         /// </summary>
         private static bool IsIntrospectionField(this FieldType fieldType) => fieldType?.Name?.StartsWith("__") ?? false;
+
+        internal static QueryArguments? Arguments(this FieldType fieldType) => fieldType is IFieldTypeWithArguments ftwa ? ftwa.Arguments : null;
 
         /// <summary>Returns the <see cref="IResolveFieldContext"/> typed as an <see cref="IResolveFieldContext{TSource}"/></summary>
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to the specified type</exception>

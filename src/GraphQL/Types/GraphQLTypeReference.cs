@@ -21,7 +21,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the GraphQL type name that this reference is a placeholder for.
         /// </summary>
-        public string TypeName { get; private set; }
+        public string TypeName { get; }
 
         /// <inheritdoc/>
         public Func<object, bool>? IsTypeOf
@@ -38,6 +38,11 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
+
+        TypeFields<ObjectFieldType> IObjectGraphType.Fields => throw Invalid();
+
+        /// <inheritdoc/>
+        public ObjectFieldType AddField(ObjectFieldType fieldType) => throw Invalid();
 
         private InvalidOperationException Invalid() => new($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
@@ -62,6 +67,10 @@ namespace GraphQL.Types
         private GraphQLClrOutputTypeReference()
         {
         }
+
+        ObjectFieldType IObjectGraphType.AddField(ObjectFieldType fieldType) => throw new NotImplementedException();
+
+        TypeFields<ObjectFieldType> IObjectGraphType.Fields => throw new NotImplementedException();
 
         Func<object, bool>? IObjectGraphType.IsTypeOf { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 

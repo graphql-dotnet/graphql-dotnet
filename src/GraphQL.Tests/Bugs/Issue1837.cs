@@ -54,15 +54,15 @@ public class Issue1837ArrayInputType : InputObjectGraphType
     {
         var ex = Should.Throw<ArgumentOutOfRangeException>(() =>
         {
-            AddField(new FieldType
+            AddField(new InputFieldType
             {
                 ResolvedType = new ListGraphType<OutputIntGraphType>(),
                 Name = "abc"
             });
         });
-        ex.Message.ShouldStartWith("Input type 'Issue1837ArrayInputType' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type.");
+        ex.Message.ShouldStartWith("Input Object 'Issue1837ArrayInputType' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type.");
 
-        AddField(new FieldType
+        AddField(new InputFieldType
         {
             ResolvedType = new ListGraphType<IntGraphType> { ResolvedType = new IntGraphType() },
             Name = "abc"

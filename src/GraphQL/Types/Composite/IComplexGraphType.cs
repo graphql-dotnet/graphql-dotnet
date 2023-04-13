@@ -1,5 +1,3 @@
-using GraphQLParser;
-
 namespace GraphQL.Types;
 
 /// <summary>
@@ -7,24 +5,24 @@ namespace GraphQL.Types;
 /// </summary>
 public interface IComplexGraphType : IGraphType
 {
-    /// <summary>
-    /// Returns a list of the fields configured for this graph type.
-    /// </summary>
-    TypeFields Fields { get; }
+}
 
+/// <summary>
+/// Extensions for <see cref="IComplexGraphType"/>.
+/// </summary>
+public static class ComplexGraphTypeExtensions
+{
     /// <summary>
-    /// Adds a field to this graph type.
+    /// Returns a set of fields configured for any <see cref="IComplexGraphType"/>.
     /// </summary>
-    FieldType AddField(FieldType fieldType);
-
-    /// <summary>
-    /// Returns <see langword="true"/> when a field matching the specified name is configured for this graph type.
-    /// </summary>
-    bool HasField(string name);
-
-    /// <summary>
-    /// Returns the <see cref="FieldType"/> for the field matching the specified name that
-    /// is configured for this graph type, or <see langword="null"/> if none is found.
-    /// </summary>
-    FieldType? GetField(ROM name);
+    public static ITypeFields Fields(this IComplexGraphType type)
+    {
+        return type switch
+        {
+            IObjectGraphType obj => obj.Fields,
+            IInterfaceGraphType iface => iface.Fields,
+            IInputObjectGraphType input => input.Fields,
+            _ => throw new NotSupportedException()
+        };
+    }
 }

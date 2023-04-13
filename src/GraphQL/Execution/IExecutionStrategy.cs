@@ -28,6 +28,6 @@ namespace GraphQL.Execution
         /// union field this method returns empty set since we don't know the concrete union member if <see cref="ExecutionNode.Result"/>
         /// was not set yet.
         /// </summary>
-        Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
+        Dictionary<string, (GraphQLField field, ObjectFieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
     }
 }

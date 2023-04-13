@@ -250,7 +250,7 @@ namespace GraphQL.Utilities
         {
             Schema?.Initialize();
 
-            var fields = type.Fields.OrderBy<FieldType>(Options.Comparer?.FieldComparer(type)).Select(x => PrintInputValue(x));
+            var fields = type.Fields.List.OrderBy<InputFieldType>(Options.Comparer?.FieldComparer(type)).Select(x => PrintInputValue(x));
             return FormatDescription(type.Description) + "input {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, string.Join(Environment.NewLine, fields));
         }
 
@@ -258,7 +258,7 @@ namespace GraphQL.Utilities
         {
             Schema?.Initialize();
 
-            var fields = type?.Fields
+            var fields = type?.Fields().AsEnumerable()
                 .OrderBy<FieldType>(Options.Comparer?.FieldComparer(type))
                 .Select(x =>
                 new
@@ -280,15 +280,15 @@ namespace GraphQL.Utilities
         {
             Schema?.Initialize();
 
-            if (field.Arguments == null || field.Arguments.Count == 0)
+            if (field is not IFieldTypeWithArguments ftwa || ftwa.Arguments == null || ftwa.Arguments.Count == 0)
             {
                 return string.Empty;
             }
 
-            return "({0})".ToFormat(string.Join(", ", field.Arguments.OrderBy(Options.Comparer?.ArgumentComparer(field)).Select(PrintInputValue))); //TODO: iterator allocation
+            return "({0})".ToFormat(string.Join(", ", ftwa.Arguments.OrderBy(Options.Comparer?.ArgumentComparer(field)).Select(PrintInputValue))); //TODO: iterator allocation
         }
 
-        public string PrintInputValue(FieldType field)
+        public string PrintInputValue(InputFieldType field)
         {
             Schema?.Initialize();
 

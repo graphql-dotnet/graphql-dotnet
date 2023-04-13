@@ -59,7 +59,7 @@ namespace GraphQL.Utilities.Federation
                 schema.Query = query = new ObjectGraphType { Name = "Query" };
             }
 
-            var service = new FieldType
+            var service = new ObjectFieldType
             {
                 Name = "_service",
                 ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
@@ -69,7 +69,7 @@ namespace GraphQL.Utilities.Federation
 
             var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
 
-            var entities = new FieldType
+            var entities = new ObjectFieldType
             {
                 Name = "_entities",
                 Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),

@@ -167,7 +167,7 @@ namespace GraphQL
             }
         }
 
-        internal static void AddAppliedDirectivesField<TSourceType>(this ComplexGraphType<TSourceType> type, string element)
+        internal static void AddAppliedDirectivesField<TSourceType>(this ObjectGraphType<TSourceType> type, string element)
             where TSourceType : IProvideMetadata
         {
             type.Field<NonNullGraphType<ListGraphType<NonNullGraphType<__AppliedDirective>>>>("appliedDirectives")

@@ -41,7 +41,7 @@ public class ExecutionNodeTests
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
             new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
-            objectGraphType.GetField("name"),
+            objectGraphType.Fields.Find("name"),
             indexInParentNode: null);
 
         var path = node.Path.ToList();
@@ -57,7 +57,7 @@ public class ExecutionNodeTests
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
             new GraphQLField { Name = new GraphQLName("name") },
-            objectGraphType.GetField("name"),
+            objectGraphType.Fields.Find("name"),
             indexInParentNode: null);
 
         var path = node.Path.ToList();
@@ -73,7 +73,7 @@ public class ExecutionNodeTests
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
             new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
-            objectGraphType.GetField("name"),
+            objectGraphType.Fields.Find("name"),
             indexInParentNode: null);
 
         var path = node.ResponsePath.ToList();
@@ -89,7 +89,7 @@ public class ExecutionNodeTests
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
             new GraphQLField { Name = new GraphQLName("name") },
-            objectGraphType.GetField("name"),
+            objectGraphType.Fields.Find("name"),
             indexInParentNode: null);
 
         var path = node.ResponsePath.ToList();

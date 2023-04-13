@@ -19,7 +19,7 @@ public class UpperDirective : Directive
 /// </summary>
 public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
 {
-    public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
+    public override void VisitObjectFieldDefinition(ObjectFieldType field, IObjectGraphType type, ISchema schema)
     {
         var applied = field.FindAppliedDirective("upper");
         if (applied != null)

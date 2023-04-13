@@ -9,13 +9,13 @@ namespace GraphQL.MicrosoftDI;
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
     /// <summary>
     /// Initializes a new instance with the specified properties.
     /// </summary>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -57,11 +57,11 @@ public class ResolverBuilder<TSourceType, TReturnType>
     /// <summary>
     /// Specifies the delegate to execute when the field is being resolved.
     /// </summary>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         => _scoped ? _builder.ResolveScoped(resolver) : _builder.Resolve(resolver);
 
     /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
         => _scoped ? _builder.ResolveScopedAsync(resolver) : _builder.ResolveAsync(resolver);
 }
 
@@ -70,11 +70,11 @@ public class ResolverBuilder<TSourceType, TReturnType>
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType, T1>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(ObjectFieldBuilder{TSourceType, TReturnType}, bool)"/>
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -92,7 +92,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, TReturnType?> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -103,7 +103,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, Task<TReturnType?>> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -119,11 +119,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(ObjectFieldBuilder{TSourceType, TReturnType}, bool)"/>
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -141,7 +141,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, TReturnType?> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -153,7 +153,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, Task<TReturnType?>> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -170,11 +170,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(ObjectFieldBuilder{TSourceType, TReturnType}, bool)"/>
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -192,7 +192,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, TReturnType?> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -205,7 +205,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, Task<TReturnType?>> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -223,11 +223,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(ObjectFieldBuilder{TSourceType, TReturnType}, bool)"/>
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -245,7 +245,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, TReturnType?> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -259,7 +259,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType?>> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -278,11 +278,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
 /// </summary>
 public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
 {
-    private readonly FieldBuilder<TSourceType, TReturnType> _builder;
+    private readonly ObjectFieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
-    public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(ObjectFieldBuilder{TSourceType, TReturnType}, bool)"/>
+    public ResolverBuilder(ObjectFieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
         _scoped = scoped;
@@ -296,7 +296,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
-    public FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType?> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType?> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -311,7 +311,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
     }
 
     /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
-    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType?>> resolver)
+    public ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType?>> resolver)
     {
         Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(

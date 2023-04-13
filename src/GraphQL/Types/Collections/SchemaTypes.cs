@@ -531,7 +531,7 @@ namespace GraphQL.Types
             if (type is IComplexGraphType complexType)
             {
                 using var _ = context.Trace("Loop for fields of complex type '{0}'", complexType.Name);
-                foreach (var field in complexType.Fields)
+                foreach (var field in complexType.Fields().AsEnumerable())
                 {
                     using var __ = context.Trace("Field '{0}.{1}'", complexType.Name, field.Name);
                     HandleField(complexType, field, context, true);
@@ -650,10 +650,10 @@ namespace GraphQL.Types
                 AddTypeIfNotRegistered(field.ResolvedType, context);
             }
 
-            if (field.Arguments?.Count > 0)
+            if (field is IFieldTypeWithArguments ftwa && ftwa.Arguments?.Count > 0)
             {
                 using var _ = context.Trace("Loop for arguments of field '{0}'", field.Name);
-                foreach (var arg in field.Arguments.List!)
+                foreach (var arg in ftwa.Arguments.List!)
                 {
                     using var __ = context.Trace("Argument '{0}'", arg.Name);
 
@@ -916,13 +916,13 @@ Make sure that your ServiceProvider is configured correctly.");
         {
             if (type is IComplexGraphType complexType)
             {
-                foreach (var field in complexType.Fields)
+                foreach (var field in complexType.Fields().AsEnumerable())
                 {
                     field.ResolvedType = ConvertTypeReference(type, field.ResolvedType!);
 
-                    if (field.Arguments?.Count > 0)
+                    if (field is IFieldTypeWithArguments ftwa && ftwa.Arguments?.Count > 0)
                     {
-                        foreach (var arg in field.Arguments.List!)
+                        foreach (var arg in ftwa.Arguments.List!)
                         {
                             arg.ResolvedType = ConvertTypeReference(type, arg.ResolvedType!);
                         }
@@ -1050,11 +1050,11 @@ Make sure that your ServiceProvider is configured correctly.");
             {
                 if (fieldOwner is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0)
                 {
-                    foreach (var field in fieldOwner.Fields.Where(field => field.Description == null))
+                    foreach (var field in fieldOwner.Fields().AsEnumerable().Where(field => field.Description == null))
                     {
                         foreach (var iface in implementation.ResolvedInterfaces.List)
                         {
-                            var fieldFromInterface = iface.GetField(field.Name);
+                            var fieldFromInterface = iface.Fields.Find(field.Name);
                             if (fieldFromInterface?.Description != null)
                             {
                                 field.Description = fieldFromInterface.Description;
@@ -1067,18 +1067,18 @@ Make sure that your ServiceProvider is configured correctly.");
         }
 
         /// <summary>
-        /// Returns the <see cref="FieldType"/> instance for the <c>__schema</c> meta-field.
+        /// Returns the <see cref="ObjectFieldType"/> instance for the <c>__schema</c> meta-field.
         /// </summary>
-        protected internal virtual FieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
+        protected internal virtual ObjectFieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
 
         /// <summary>
-        /// Returns the <see cref="FieldType"/> instance for the <c>__type</c> meta-field.
+        /// Returns the <see cref="ObjectFieldType"/> instance for the <c>__type</c> meta-field.
         /// </summary>
-        protected internal virtual FieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
+        protected internal virtual ObjectFieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
 
         /// <summary>
-        /// Returns the <see cref="FieldType"/> instance for the <c>__typename</c> meta-field.
+        /// Returns the <see cref="ObjectFieldType"/> instance for the <c>__typename</c> meta-field.
         /// </summary>
-        protected internal virtual FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
+        protected internal virtual ObjectFieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
     }
 }

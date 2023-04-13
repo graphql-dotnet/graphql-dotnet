@@ -43,15 +43,18 @@ namespace GraphQL.Types
             AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
         }
 
-        /// <inheritdoc cref="AutoRegisteringHelper.ProvideFields(IEnumerable{MemberInfo}, Func{MemberInfo, FieldType?}, bool)"/>
-        protected virtual IEnumerable<FieldType> ProvideFields()
+        /// <summary>
+        /// Returns a list of <see cref="ObjectFieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
+        /// </summary>
+        protected virtual IEnumerable<ObjectFieldType> ProvideFields()
             => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, false);
 
         /// <summary>
         /// Processes the specified member and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a member.
         /// </summary>
-        protected virtual FieldType? CreateField(MemberInfo memberInfo)
+        protected virtual ObjectFieldType? CreateField(MemberInfo memberInfo)
             => AutoRegisteringHelper.CreateField(
                 memberInfo,
                 GetTypeInformation,
@@ -59,7 +62,7 @@ namespace GraphQL.Types
                 false,
                 memberInfo => memberInfo is MethodInfo methodInfo && AutoRegisteringOutputHelper.IsObservableOrAsyncEnumerable(methodInfo.ReturnType)
                     ? new SubscriptionRootFieldType()
-                    : new FieldType());
+                    : new ObjectFieldType());
 
         /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument})"/>
         protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)

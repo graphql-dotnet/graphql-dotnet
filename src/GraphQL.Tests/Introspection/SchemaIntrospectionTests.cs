@@ -131,19 +131,19 @@ public class SchemaIntrospectionTests
     private static IObjectGraphType TestQueryType()
     {
         var type1 = new ObjectGraphType { Name = "Letters" };
-        type1.AddField(new FieldType { Name = "bravo", ResolvedType = new StringGraphType() });
-        type1.AddField(new FieldType { Name = "charlie", ResolvedType = new IntGraphType() });
-        type1.AddField(new FieldType { Name = "alfa", ResolvedType = new ListGraphType(new IntGraphType()) });
-        type1.AddField(new FieldType { Name = "delta", ResolvedType = new StringGraphType() });
+        type1.AddField(new ObjectFieldType { Name = "bravo", ResolvedType = new StringGraphType() });
+        type1.AddField(new ObjectFieldType { Name = "charlie", ResolvedType = new IntGraphType() });
+        type1.AddField(new ObjectFieldType { Name = "alfa", ResolvedType = new ListGraphType(new IntGraphType()) });
+        type1.AddField(new ObjectFieldType { Name = "delta", ResolvedType = new StringGraphType() });
 
         var type2 = new ObjectGraphType { Name = "Things" };
-        type2.AddField(new FieldType { Name = "foo", ResolvedType = new IntGraphType() });
-        type2.AddField(new FieldType { Name = "bar", ResolvedType = new IntGraphType() });
-        type2.AddField(new FieldType { Name = "baz", ResolvedType = new NonNullGraphType(new IntGraphType()) });
+        type2.AddField(new ObjectFieldType { Name = "foo", ResolvedType = new IntGraphType() });
+        type2.AddField(new ObjectFieldType { Name = "bar", ResolvedType = new IntGraphType() });
+        type2.AddField(new ObjectFieldType { Name = "baz", ResolvedType = new NonNullGraphType(new IntGraphType()) });
 
         var queryType = new ObjectGraphType { Name = "Query" };
-        queryType.AddField(new FieldType { Name = "field2", ResolvedType = type2 });
-        queryType.AddField(new FieldType { Name = "field1", ResolvedType = type1 });
+        queryType.AddField(new ObjectFieldType { Name = "field2", ResolvedType = type2 });
+        queryType.AddField(new ObjectFieldType { Name = "field1", ResolvedType = type1 });
 
         return queryType;
     }

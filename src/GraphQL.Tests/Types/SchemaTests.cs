@@ -216,7 +216,7 @@ public class SchemaTests
     {
         var schema = new CustomTypesSchema();
         var query = new ObjectGraphType();
-        var field = new FieldType()
+        var field = new ObjectFieldType
         {
             Name = "test",
             Type = typeof(IntGraphType),

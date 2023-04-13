@@ -11,7 +11,7 @@ internal static class AutoRegisteringOutputHelper
 {
     /// <summary>
     /// Configures query arguments and a field resolver for the specified <see cref="FieldType"/>, overwriting
-    /// any existing configuration within <see cref="FieldType.Arguments"/>, <see cref="FieldType.Resolver"/>
+    /// any existing configuration within <see cref="ObjectFieldType.Arguments"/>, <see cref="ObjectFieldType.Resolver"/>
     /// and <see cref="SubscriptionRootFieldType.StreamResolver"/>.
     /// <br/><br/>
     /// For fields and properties, no query arguments are added and the field resolver simply pulls the appropriate
@@ -28,19 +28,17 @@ internal static class AutoRegisteringOutputHelper
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
         Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc)
     {
-        // Note: If buildMemberInstanceExpressionFunc is null, then it is assumed this is for
-        // an interface graph type and the field resolver will be set to always throw an exception.
-
         if (fieldType == null)
             throw new ArgumentNullException(nameof(fieldType));
 
         if (memberInfo is PropertyInfo propertyInfo)
         {
-            fieldType.Arguments = null;
             if (buildMemberInstanceExpressionFunc != null)
             {
-                var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
-                fieldType.Resolver = resolver;
+                if (fieldType is not ObjectFieldType oft)
+                    throw new InvalidOperationException($"The member '{propertyInfo.DeclaringType?.Name}.{propertyInfo.Name}' is a resolver, but the specified fieldType is not a ObjectFieldType.");
+
+                oft.Resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
             }
         }
         else if (memberInfo is MethodInfo methodInfo)
@@ -67,25 +65,32 @@ internal static class AutoRegisteringOutputHelper
                 var memberInstanceExpression = buildMemberInstanceExpressionFunc(methodInfo);
                 if (IsObservableOrAsyncEnumerable(methodInfo.ReturnType))
                 {
+                    if (fieldType is not SubscriptionRootFieldType srft)
+                        throw new InvalidOperationException($"The member '{methodInfo.DeclaringType?.Name}.{methodInfo.Name}' is a stream resolver, but the specified fieldType is not a SubscriptionRootFieldType.");
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
-                    fieldType.Resolver = resolver;
-                    (fieldType as SubscriptionRootFieldType ?? throw new InvalidOperationException("BOOM!")).StreamResolver = resolver;
+                    srft.Resolver = resolver;
+                    srft.StreamResolver = resolver;
                 }
                 else
                 {
-                    var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
-                    fieldType.Resolver = resolver;
+                    if (fieldType is not ObjectFieldType oft)
+                        throw new InvalidOperationException($"The member '{methodInfo.DeclaringType?.Name}.{methodInfo.Name}' is a resolver, but the specified fieldType is not a ObjectFieldType.");
+
+                    oft.Resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
                 }
             }
-            fieldType.Arguments = queryArguments;
+
+            if (fieldType is IFieldTypeWithArguments ftwa)
+                ftwa.Arguments = queryArguments;
         }
         else if (memberInfo is FieldInfo fieldInfo)
         {
-            fieldType.Arguments = null;
             if (buildMemberInstanceExpressionFunc != null)
             {
-                var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
-                fieldType.Resolver = resolver;
+                if (fieldType is not ObjectFieldType oft)
+                    throw new InvalidOperationException($"The member '{fieldInfo.DeclaringType?.Name}.{fieldInfo.Name}' is a resolver, but the specified fieldType is not a ObjectFieldType.");
+
+                oft.Resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
             }
         }
         else if (memberInfo == null)
@@ -95,11 +100,6 @@ internal static class AutoRegisteringOutputHelper
         else
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
-        }
-        if (buildMemberInstanceExpressionFunc == null)
-        {
-            // interface types do not set resolvers
-            fieldType.Resolver = null;
         }
     }
 

@@ -99,12 +99,12 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
     public void subfields_is_not_null_for_single_InterfaceGraphType()
     {
         RootQuery.Field<CharacterInterface>("singleCharacter").ResolveAsync(ctx =>
-       {
-           ctx.SubFields.ShouldNotBeNull();
-           ctx.SubFields.Keys.ShouldContain("id");
-           ctx.SubFields.Keys.ShouldContain("friends");
-           return Task.FromResult<object>(null);
-       });
+        {
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return Task.FromResult<object>(null);
+        });
         const string query = """
             {
               singleCharacter {

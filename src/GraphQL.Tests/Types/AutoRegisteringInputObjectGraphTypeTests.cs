@@ -375,7 +375,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
 
     private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
     {
-        protected override IEnumerable<FieldType> ProvideFields()
+        protected override IEnumerable<InputFieldType> ProvideFields()
         {
             yield return CreateField(GetRegisteredMembers().First(x => x.Name == "Field1"))!;
         }
@@ -389,7 +389,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
 
     private class TestChangingName<T> : AutoRegisteringInputObjectGraphType<T>
     {
-        protected override FieldType CreateField(MemberInfo memberInfo)
+        protected override InputFieldType CreateField(MemberInfo memberInfo)
         {
             var field = base.CreateField(memberInfo)!;
             field.Name += "Prop";

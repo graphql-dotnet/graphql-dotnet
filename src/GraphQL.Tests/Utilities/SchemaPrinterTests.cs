@@ -1203,7 +1203,7 @@ public class SchemaPrinterTests
     {
         var root = new ObjectGraphType { Name = "Query" };
 
-        var f = new FieldType
+        var f = new ObjectFieldType
         {
             Name = "bestColor",
             Arguments = new QueryArguments(new QueryArgument<RgbEnum>
@@ -1254,7 +1254,7 @@ public class SchemaPrinterTests
                 Name = "Root"
             }
         };
-        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        schema.Query.AddField(new ObjectFieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
         string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
@@ -1441,7 +1441,7 @@ enum __TypeKind {
                 Name = "Root"
             }
         };
-        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        schema.Query.AddField(new ObjectFieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = false });
         string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 
@@ -1702,7 +1702,7 @@ enum __TypeKind {
             }
         }
         .EnableExperimentalIntrospectionFeatures();
-        schema.Query.Fields.Add(new FieldType { Name = "unused", ResolvedType = new StringGraphType() });
+        schema.Query.AddField(new ObjectFieldType { Name = "unused", ResolvedType = new StringGraphType() });
         var printer = new SchemaPrinter(schema, new SchemaPrinterOptions { IncludeDescriptions = true, PrintDescriptionsAsComments = true });
         string result = Environment.NewLine + printer.PrintIntrospectionSchema();
 

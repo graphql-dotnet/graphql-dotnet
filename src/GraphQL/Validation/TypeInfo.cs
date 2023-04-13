@@ -163,7 +163,7 @@ namespace GraphQL.Validation
                 QueryArgument? argDef = null;
                 IGraphType? argType = null;
 
-                var args = GetDirective() != null ? GetDirective()?.Arguments : GetFieldDef()?.Arguments;
+                var args = GetDirective() != null ? GetDirective()?.Arguments : GetFieldDef()?.Arguments();
 
                 if (args != null)
                 {
@@ -188,7 +188,7 @@ namespace GraphQL.Validation
 
                 if (objectType is IInputObjectGraphType complexType)
                 {
-                    var inputField = complexType.GetField(objectField.Name);
+                    var inputField = complexType.Fields.Find(objectField.Name);
 
                     fieldType = inputField?.ResolvedType;
                 }
@@ -257,11 +257,14 @@ namespace GraphQL.Validation
                 return schema.TypeNameMetaFieldType;
             }
 
-            if (parentType is IObjectGraphType || parentType is IInterfaceGraphType)
+            if (parentType is IObjectGraphType obj)
             {
-                var complexType = (IComplexGraphType)parentType;
+                return obj.Fields.Find(field.Name);
+            }
 
-                return complexType.GetField(field.Name);
+            if (parentType is IInterfaceGraphType iface)
+            {
+                return iface.Fields.Find(field.Name);
             }
 
             return null;

@@ -93,28 +93,28 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
         };
 
         // Total
-        graphType.AddField(new FieldType
+        graphType.AddField(new ObjectFieldType
         {
             Name = nameof(DataResult<MyObject>.Total),
             ResolvedType = new LongGraphType(),
         });
 
         // Offset
-        graphType.AddField(new FieldType
+        graphType.AddField(new ObjectFieldType
         {
             Name = nameof(DataResult<MyObject>.Skip),
             ResolvedType = new IntGraphType(),
         });
 
         // Take
-        graphType.AddField(new FieldType
+        graphType.AddField(new ObjectFieldType
         {
             Name = nameof(DataResult<MyObject>.Take),
             ResolvedType = new IntGraphType(),
         });
 
         // Data
-        graphType.AddField(new FieldType
+        graphType.AddField(new ObjectFieldType
         {
             Name = nameof(DataResult<MyObject>.Data),
             ResolvedType = new ListGraphType(objectGraphType),

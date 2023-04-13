@@ -103,7 +103,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             {
                 Query = new ObjectGraphType()
             };
-            schema.Query.AddField(new FieldType { Name = "field1", Type = typeof(IntGraphType) });
+            schema.Query.AddField(new ObjectFieldType { Name = "field1", Type = typeof(IntGraphType) });
             Initialize(schema, serviceProvider, null);
             Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider, null));
         }

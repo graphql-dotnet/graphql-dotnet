@@ -11,7 +11,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="NullExecutionNode"/> with the specified values.
         /// </summary>
-        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
+        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, ObjectFieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
             Result = null;

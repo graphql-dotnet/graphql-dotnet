@@ -44,16 +44,19 @@ namespace GraphQL.Types
             AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
         }
 
-        /// <inheritdoc cref="AutoRegisteringHelper.ProvideFields(IEnumerable{MemberInfo}, Func{MemberInfo, FieldType?}, bool)"/>
-        protected virtual IEnumerable<FieldType> ProvideFields()
+        /// <summary>
+        /// Returns a list of <see cref="InputFieldType"/> instances representing the fields ready to be
+        /// added to the graph type.
+        /// </summary>
+        protected virtual IEnumerable<InputFieldType> ProvideFields()
             => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, true);
 
         /// <summary>
         /// Processes the specified property or field and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
-        protected virtual FieldType? CreateField(MemberInfo memberInfo)
-            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true, _ => new FieldType());
+        protected virtual InputFieldType? CreateField(MemberInfo memberInfo)
+            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true, _ => new InputFieldType());
 
         /// <summary>
         /// Returns a list of properties or fields that should have fields created for them.

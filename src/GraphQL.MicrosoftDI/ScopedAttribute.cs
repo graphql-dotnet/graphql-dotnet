@@ -15,9 +15,9 @@ public class ScopedAttribute : GraphQLAttribute
         if (isInputType)
             return;
 
-        if (fieldType.Resolver != null)
+        if (fieldType is ObjectFieldType oft && oft.Resolver != null)
         {
-            fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
+            oft.Resolver = new DynamicScopedFieldResolver(oft.Resolver);
         }
 
         if (fieldType is SubscriptionRootFieldType field && field.StreamResolver != null)
