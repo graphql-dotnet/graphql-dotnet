@@ -12,7 +12,7 @@ on:
       - .github/workflows/**
 
 env:
-  NODE_VERSION: '10.x'   # Node 10 LTS
+  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
 
 jobs:
   buildcheck:
