@@ -33,6 +33,7 @@ public class ComplexGraphTypeTests
         [Description("Super secret")]
         public string? someString { get; set; }
         [Obsolete("Use someInt")]
+        [DefaultValue(true)]
         public bool someBoolean { get; set; }
         [DefaultValue(typeof(DateTime), "2019/03/14")]
         public DateTime someDate { get; set; }

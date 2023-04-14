@@ -319,6 +319,7 @@ namespace GraphQL.Builders
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveStream(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
         {
             FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
+            FieldType.Resolver ??= SourceFieldResolver.Instance;
             return this;
         }
 
@@ -328,6 +329,7 @@ namespace GraphQL.Builders
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
         {
             FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
+            FieldType.Resolver ??= SourceFieldResolver.Instance;
             return this;
         }
 

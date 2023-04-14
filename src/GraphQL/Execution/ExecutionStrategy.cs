@@ -278,9 +278,8 @@ namespace GraphQL.Execution
                             {
                                 // parentType argument for GetFieldDefinition may be null in case of union field, in that case
                                 // GetFieldDefinition will not throw only if field is __typename
-                                var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field);
-                                if (fieldType == null)
-                                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
+                                var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)
+                                    ?? throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
                                 Add(fields, field, fieldType);
                             }

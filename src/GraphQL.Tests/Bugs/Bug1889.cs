@@ -58,7 +58,7 @@ public class RGraphInterface : InterfaceGraphType<R>
     {
         Name = "RInterface";
 
-        Field<NonNullGraphType<StringGraphType>>("Value").Resolve(ctx => ctx.Source.Value);
+        Field<NonNullGraphType<StringGraphType>>("Value");
     }
 }
 
@@ -78,7 +78,7 @@ public class AGraphInterface : InterfaceGraphType<A>
     {
         Name = "AInterface";
 
-        Field<NonNullGraphType<RGraphInterface>>("R").Resolve(ctx => ctx.Source.methodUsedToGetRValue());
+        Field<NonNullGraphType<RGraphInterface>>("R");
     }
 }
 

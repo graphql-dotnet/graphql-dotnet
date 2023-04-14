@@ -106,7 +106,7 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
-### 9. `Field<TReturnType>` and `Argument<TArgumentClrType> overloads to create field and argument builders with inferred graph types
+### 9. `Field<TReturnType>` and `Argument<TArgumentClrType>` overloads to create field and argument builders with inferred graph types
 
 To define a field with a field builder, previously the graph type was always required, like this:
 
@@ -240,6 +240,15 @@ exception details were located along with exception message. To use old behavior
 `ExposeExceptionStackTrace` property to `true`. To better reflect the meaning of these changes
 we have added a new `ErrorInfoProviderOptions.ExposeExceptionDetails` property and marked
 `ErrorInfoProviderOptions.ExposeExceptionStackTrace` property as obsolete.
+
+### 12. Allow deprecation of input values
+
+Since 7.4 you can also deprecate arguments on a field and input fields on an input type. It
+was done to conform the draft GraphQL spec. See https://github.com/graphql-dotnet/graphql-dotnet/pull/3571.
+
+Since this feature may be potentially breaking for your app, clients or tooling it was done as opt-in.
+Either set `schema.Features.DeprecationOfInputValues = true;` or call `schema.EnableExperimentalIntrospectionFeatures()`
+method before initializing a schema.
 
 ## Breaking Changes
 
@@ -589,3 +598,12 @@ require them to resolve to GraphQL Object types. GraphQL.NET 7.2+ now enforces t
 Due to the above validation, resolvers defined on fields of interface types are never be used by
 GraphQL.NET. As such, resolvers are not generated for fields of `AutoRegisteringInterfaceGraphType`s
 in version 7.2+.
+
+### 18. `SchemaValidationVisitor` has more runtime checks
+
+Starting with version 7.4, the `StreamResolver` property should be set exclusively for root fields
+in subscriptions, while the `Resolver` property should only be assigned to object output types'
+fields. Fields within interface types and input object types should not set these
+properties. This modification may lead to potential disruptions in your applications, as the
+schema may trigger an exception during initialization. To eliminate this exception, simply
+cease assigning these properties for the fields specified in the exception message.
