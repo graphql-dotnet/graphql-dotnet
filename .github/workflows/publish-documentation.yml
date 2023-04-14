@@ -31,9 +31,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: yarn
-        run: yarn
-        working-directory: main
       - name: yarn docs2
         working-directory: main/docs2
         run: yarn
