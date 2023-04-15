@@ -172,7 +172,7 @@ namespace GraphQL.Types
 
             if (isInputType)
             {
-                fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+                fieldType.WithMetadata(ObjectExtensions.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
             }
             if (!isInputType &&
                 memberInfo is MethodInfo methodInfo &&

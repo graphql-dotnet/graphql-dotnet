@@ -75,9 +75,7 @@ namespace GraphQL
                 ? ret
                 : FieldDefinition is ObjectFieldType oft
                     ? oft.DefaultArgumentValues
-                    : FieldDefinition is InterfaceFieldType ift
-                        ? ift.DefaultArgumentValues
-                        : null;
+                    : null;
 
         /// <inheritdoc/>
         public IDictionary<string, DirectiveInfo>? Directives

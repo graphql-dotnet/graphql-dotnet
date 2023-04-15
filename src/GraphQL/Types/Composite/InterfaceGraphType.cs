@@ -207,7 +207,7 @@ namespace GraphQL.Types
 
             if (expression.Body is MemberExpression expr)
             {
-                builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+                builder.FieldType.Metadata[ObjectExtensions.ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
             }
 
             AddField(builder.FieldType);

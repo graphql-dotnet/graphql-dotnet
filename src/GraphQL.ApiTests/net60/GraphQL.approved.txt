@@ -2794,7 +2794,6 @@ namespace GraphQL.Utilities
     public sealed class FieldTypeDefaultArgumentsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.FieldTypeDefaultArgumentsVisitor Instance;
-        public override void VisitInterfaceFieldDefinition(GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public interface ISchemaNodeVisitor

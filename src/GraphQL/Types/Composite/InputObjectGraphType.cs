@@ -175,7 +175,7 @@ namespace GraphQL.Types
                 return null;
 
             // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
-            string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+            string propertyName = field.GetMetadata(ObjectExtensions.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
             PropertyInfo? propertyInfo;
             try
             {
@@ -302,7 +302,7 @@ namespace GraphQL.Types
 
             if (expression.Body is MemberExpression expr)
             {
-                builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+                builder.FieldType.Metadata[ObjectExtensions.ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
             }
 
             AddField(builder.FieldType);

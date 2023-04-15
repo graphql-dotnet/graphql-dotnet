@@ -1,7 +1,12 @@
 namespace GraphQL.Types;
 
 /// <summary>
-/// Represents an interface for all complex (that is, having their own properties) input and output graph types.
+/// Represents an interface for all complex (that is, having their own properties) input and output graph types:
+/// <list type="number">
+///<item><see cref="IObjectGraphType"/></item>
+///<item><see cref="IInterfaceGraphType"/></item>
+///<item><see cref="IInputObjectGraphType"/></item>
+/// </list>
 /// </summary>
 public interface IComplexGraphType : IGraphType
 {
@@ -22,7 +27,7 @@ public static class ComplexGraphTypeExtensions
             IObjectGraphType obj => obj.Fields,
             IInterfaceGraphType iface => iface.Fields,
             IInputObjectGraphType input => input.Fields,
-            _ => throw new NotSupportedException()
+            _ => throw new NotSupportedException(type.GetType().Name)
         };
     }
 }

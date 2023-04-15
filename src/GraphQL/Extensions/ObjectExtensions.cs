@@ -25,6 +25,8 @@ namespace GraphQL
 
         private static readonly List<object?> _emptyValues = new();
 
+        internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
+
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// Can use any constructor of the indicated type, provided that there are keys in the
@@ -47,7 +49,7 @@ namespace GraphQL
 
                 // type may not contain mapping information
                 field = complexType?.Fields().GetField(key);
-                return field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
+                return field?.GetMetadata(ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
             }
 
             // Returns values (from source or defaults) that match constructor signature + used keys from source

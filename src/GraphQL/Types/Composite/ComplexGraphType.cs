@@ -1,12 +1,15 @@
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Represents a default base class for all complex (that is, having their own properties) input and output graph types.
+    /// Represents a default base class for all complex (that is, having their own properties) input and output graph types:
+    /// <list type="number">
+    ///<item><see cref="ObjectGraphType{TSourceType}"/></item>
+    ///<item><see cref="InterfaceGraphType{TSourceType}"/></item>
+    ///<item><see cref="InputObjectGraphType{TSourceType}"/></item>
+    /// </list>
     /// </summary>
     public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
     {
-        internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
-
         /// <inheritdoc/>
         protected ComplexGraphType()
         {
