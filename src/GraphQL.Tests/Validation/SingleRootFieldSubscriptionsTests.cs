@@ -102,6 +102,63 @@ public class SingleRootFieldSubscriptionsTests
     }
 
     [Fact]
+    public void Fails_with_single_root_introspection_field()
+    {
+        const string subscriptionName = "NamedSubscription";
+        const string query = """
+            subscription NamedSubscription {
+              __typename
+            }
+            """;
+
+        ShouldFailRule(config =>
+        {
+            config.Query = query;
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 2, 3);
+        });
+    }
+
+    [Fact]
+    public void Fails_with_single_root_introspection_field_in_fragment_spead()
+    {
+        const string subscriptionName = "NamedSubscription";
+        const string query = """
+            subscription NamedSubscription {
+              ...newMessageFields
+            }
+
+            fragment newMessageFields on Subscription {
+              __typename
+            }
+            """;
+
+        ShouldFailRule(config =>
+        {
+            config.Query = query;
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 2, 3);
+        });
+    }
+
+    [Fact]
+    public void Fails_with_single_root_introspection_field_in_inline_fragment()
+    {
+        const string subscriptionName = "NamedSubscription";
+        const string query = """
+            subscription NamedSubscription {
+              ...on Subscription {
+                __typename
+              }
+            }
+            """;
+
+        ShouldFailRule(config =>
+        {
+            config.Query = query;
+            config.Error(SingleRootFieldSubscriptionsError.InvalidNumberOfRootFieldMessage(new GraphQLName(subscriptionName)), 2, 3);
+        });
+    }
+
+    [Fact]
     public void Fails_with_more_than_one_root_field_in_fragment_spead()
     {
         const string subscriptionName = "NamedSubscription";

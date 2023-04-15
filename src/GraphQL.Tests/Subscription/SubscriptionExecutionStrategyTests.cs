@@ -479,7 +479,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     {
         var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false).ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo("""{"errors":[{"message":"Anonymous Subscription must select only one top level field.","locations":[{"line":1,"column":21}],"extensions":{"code":"SINGLE_ROOT_FIELD_SUBSCRIPTIONS","codes":["SINGLE_ROOT_FIELD_SUBSCRIPTIONS"],"number":"5.2.3.1"}}]}""");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Anonymous Subscription must have exactly one root field and that field must not be an introspection field.","locations":[{"line":1,"column":21}],"extensions":{"code":"SINGLE_ROOT_FIELD_SUBSCRIPTIONS","codes":["SINGLE_ROOT_FIELD_SUBSCRIPTIONS"],"number":"5.2.3.1"}}]}""");
     }
 
     [Fact]
