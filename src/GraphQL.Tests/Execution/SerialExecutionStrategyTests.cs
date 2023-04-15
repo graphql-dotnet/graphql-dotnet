@@ -41,10 +41,16 @@ public class SerialExecutionStrategyTests
             resolver(context);
             return new object[] { "a", "a", "a" };
         });
+        var mutationGraphType = new ObjectGraphType { Name = "Mutation" };
+        mutationGraphType.Field("families", new ListGraphType(familiesGraphType)).Resolve(context =>
+        {
+            resolver(context);
+            return new object[] { "a", "a", "a" };
+        });
         var schema = new Schema
         {
             Query = queryGraphType,
-            Mutation = queryGraphType,
+            Mutation = mutationGraphType,
         };
         var documentExecuter = new DocumentExecuter();
         var executionOptions = new ExecutionOptions()
