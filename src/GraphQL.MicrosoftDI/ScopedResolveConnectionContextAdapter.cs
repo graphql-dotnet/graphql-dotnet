@@ -52,7 +52,7 @@ internal sealed class ScopedResolveConnectionContextAdapter<TSource> : IResolveC
 
     public IEnumerable<object> ResponsePath => _baseContext.ResponsePath;
 
-    public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _baseContext.SubFields;
+    public Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)>? SubFields => _baseContext.SubFields;
 
     public IServiceProvider RequestServices { get; }
 

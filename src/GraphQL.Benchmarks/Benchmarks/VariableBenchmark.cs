@@ -150,8 +150,8 @@ public class VariableBenchmark : IBenchmark
         public MyInputObjectGraphType()
         {
             Name = "MyInputObject";
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ints").Resolve(context => context.Source.Ints);
-            Field<NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>>("widgets").Resolve(context => context.Source.Widgets);
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ints");
+            Field<NonNullGraphType<ListGraphType<MySubInputObjectGraphType>>>("widgets");
         }
     }
 
@@ -160,10 +160,10 @@ public class VariableBenchmark : IBenchmark
         public MySubInputObjectGraphType()
         {
             Name = "MySubInputObject";
-            Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source.Name);
-            Field<StringGraphType>("description").Resolve(context => context.Source.Description);
-            Field<NonNullGraphType<FloatGraphType>>("amount").Resolve(context => context.Source.Amount);
-            Field<NonNullGraphType<IntGraphType>>("quantity").Resolve(context => context.Source.Quantity);
+            Field<NonNullGraphType<StringGraphType>>("name");
+            Field<StringGraphType>("description");
+            Field<NonNullGraphType<FloatGraphType>>("amount");
+            Field<NonNullGraphType<IntGraphType>>("quantity");
         }
     }
 }

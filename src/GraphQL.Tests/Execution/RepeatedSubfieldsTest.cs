@@ -42,14 +42,14 @@ public class RepeatedSubfieldsTests
     private GraphQLField SecondTestField { get; }
     private GraphQLField AliasedTestField { get; }
 
-    private Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+    private Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
     {
         return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
     }
 
     private class MyExecutionStrategy : ParallelExecutionStrategy
     {
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+        public Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)> MyCollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
             => CollectFieldsFrom(executionContext, graphType, selectionSet, null);
     }
 
@@ -66,7 +66,7 @@ public class RepeatedSubfieldsTests
         };
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Fields.Add(new FieldType
+        query.AddField(new ObjectFieldType
         {
             Name = "test",
             ResolvedType = new StringGraphType()
@@ -96,7 +96,7 @@ public class RepeatedSubfieldsTests
         };
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Fields.Add(new FieldType
+        query.AddField(new ObjectFieldType
         {
             Name = "test",
             ResolvedType = new StringGraphType()
@@ -147,7 +147,7 @@ public class RepeatedSubfieldsTests
         };
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Fields.Add(new FieldType
+        query.AddField(new ObjectFieldType
         {
             Name = "test",
             ResolvedType = new StringGraphType()

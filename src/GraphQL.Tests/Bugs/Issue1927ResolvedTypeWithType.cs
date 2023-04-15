@@ -8,10 +8,10 @@ public class Issue1927ResolvedTypeWithType
     public void test_outputs()
     {
         var innerObject = new ObjectGraphType() { Name = "inner" };
-        innerObject.AddField(new FieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
+        innerObject.AddField(new ObjectFieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
         var list = new ListGraphType(innerObject);
         var obj = new ObjectGraphType();
-        obj.AddField(new FieldType { Name = "list", ResolvedType = list, Type = list.GetType() });
+        obj.AddField(new ObjectFieldType { Name = "list", ResolvedType = list, Type = list.GetType() });
         var schema = new Schema
         {
             Query = obj
@@ -23,12 +23,12 @@ public class Issue1927ResolvedTypeWithType
     public void test_inputs()
     {
         var innerObject = new InputObjectGraphType() { Name = "inner" };
-        innerObject.AddField(new FieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
+        innerObject.AddField(new InputFieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
         var list = new ListGraphType(innerObject);
         var inputObj = new InputObjectGraphType();
-        inputObj.AddField(new FieldType { Name = "list", ResolvedType = list, Type = list.GetType() });
+        inputObj.AddField(new InputFieldType { Name = "list", ResolvedType = list, Type = list.GetType() });
         var obj = new ObjectGraphType();
-        var field = new FieldType
+        var field = new ObjectFieldType
         {
             Name = "hello",
             ResolvedType = new StringGraphType(),
@@ -46,6 +46,6 @@ public class Issue1927ResolvedTypeWithType
     [Fact]
     public void test_fieldtype_type()
     {
-        Should.Throw<ArgumentOutOfRangeException>(() => new FieldType { Type = typeof(string) });
+        Should.Throw<ArgumentOutOfRangeException>(() => new ObjectFieldType { Type = typeof(string) });
     }
 }

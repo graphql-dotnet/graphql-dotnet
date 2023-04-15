@@ -17,17 +17,17 @@ namespace GraphQL
         public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> builder) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(this GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> builder) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Authorize<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder) { }
         public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> builder) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(this GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> builder) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string policy) { }
         public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> builder, string policy) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string policy) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(this GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> builder, string policy) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, string roles) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(this GraphQL.Builders.ConnectionBuilder<TSourceType> builder, params string[] roles) { }
         public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, string roles)
@@ -36,8 +36,8 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IProvideMetadata { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> builder, string roles) { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> builder, params string[] roles) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, string roles) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, params string[] roles) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> builder, string roles) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(this GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> builder, params string[] roles) { }
         public static System.Collections.Generic.List<string>? GetPolicies(this GraphQL.Types.IProvideMetadata provider) { }
         public static System.Collections.Generic.List<string>? GetRoles(this GraphQL.Types.IProvideMetadata provider) { }
         public static bool IsAnonymousAllowed(this GraphQL.Types.IProvideMetadata provider) { }
@@ -500,7 +500,7 @@ namespace GraphQL
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "Field",
                 "FieldType"})]
-        System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; }
+        System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? SubFields { get; }
         System.Security.Claims.ClaimsPrincipal? User { get; }
         GraphQL.Validation.Variables Variables { get; }
     }
@@ -669,7 +669,7 @@ namespace GraphQL
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "Field",
                 "FieldType"})]
-        public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; }
+        public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? SubFields { get; }
         public System.Security.Claims.ClaimsPrincipal? User { get; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; }
         public GraphQL.Validation.Variables Variables { get; }
@@ -701,7 +701,7 @@ namespace GraphQL
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "Field",
                 "FieldType"})]
-        public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? SubFields { get; set; }
+        public System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? SubFields { get; set; }
         public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
         public GraphQL.Validation.Variables Variables { get; set; }
@@ -828,8 +828,8 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType>
     {
-        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
-        public GraphQL.Types.FieldType FieldType { get; set; }
+        protected ConnectionBuilder(GraphQL.Types.ObjectFieldType fieldType) { }
+        public GraphQL.Types.ObjectFieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
@@ -865,8 +865,8 @@ namespace GraphQL.Builders
     }
     public class ConnectionBuilder<TSourceType, TReturnType>
     {
-        protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
-        public GraphQL.Types.FieldType FieldType { get; set; }
+        protected ConnectionBuilder(GraphQL.Types.ObjectFieldType fieldType) { }
+        public GraphQL.Types.ObjectFieldType FieldType { get; set; }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
@@ -895,57 +895,6 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    [System.Obsolete("This class will be removed in v8.")]
-    public static class FieldBuilder
-    {
-        [System.Obsolete("Please use FieldBuilder<TSourceType, TReturnType>.Create() method. This method wi" +
-            "ll be removed in v8.")]
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(GraphQL.Types.IGraphType type) { }
-        [System.Obsolete("Please use FieldBuilder<TSourceType, TReturnType>.Create() method. This method wi" +
-            "ll be removed in v8.")]
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(System.Type? type = null) { }
-    }
-    public class FieldBuilder<TSourceType, TReturnType>
-    {
-        protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
-        public GraphQL.Types.FieldType FieldType { get; }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
-            where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
-            where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
-            where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        [System.Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads" +
-            " to set default value for parameter or use Arguments() method. This method will " +
-            "be removed in v8.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType? defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
-            where TArgumentGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Arguments(params GraphQL.Types.QueryArgument[] arguments) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Arguments(System.Collections.Generic.IEnumerable<GraphQL.Types.QueryArgument> arguments) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType? defaultValue = default) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string? description) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveDelegate(System.Delegate? resolve) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
-    }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
         string? After { get; }
@@ -956,6 +905,85 @@ namespace GraphQL.Builders
         int? PageSize { get; }
     }
     public interface IResolveConnectionContext<out T> : GraphQL.Builders.IResolveConnectionContext, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<T> { }
+    public class InputFieldBuilder
+    {
+        protected InputFieldBuilder(GraphQL.Types.InputFieldType fieldType) { }
+        public GraphQL.Types.InputFieldType FieldType { get; }
+        public virtual GraphQL.Builders.InputFieldBuilder Configure(System.Action<GraphQL.Types.InputFieldType> configure) { }
+        public virtual GraphQL.Builders.InputFieldBuilder DefaultValue(object? defaultValue = null) { }
+        public virtual GraphQL.Builders.InputFieldBuilder DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Description(string? description) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Directive(string name) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Directive(string name, string argumentName, object? argumentValue) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Name(string name) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Type(GraphQL.Types.IGraphType type) { }
+        public static GraphQL.Builders.InputFieldBuilder Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.InputFieldBuilder Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
+    }
+    public class InterfaceFieldBuilder<TSourceType, TReturnType>
+    {
+        protected InterfaceFieldBuilder(GraphQL.Types.InterfaceFieldType fieldType) { }
+        public GraphQL.Types.InterfaceFieldType FieldType { get; }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Arguments(params GraphQL.Types.QueryArgument[] arguments) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Arguments(System.Collections.Generic.IEnumerable<GraphQL.Types.QueryArgument> arguments) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Description(string? description) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Directive(string name) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Name(string name) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
+        public static GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
+    }
+    public class ObjectFieldBuilder<TSourceType, TReturnType>
+    {
+        protected ObjectFieldBuilder(GraphQL.Types.ObjectFieldType fieldType) { }
+        public GraphQL.Types.ObjectFieldType FieldType { get; }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
+            where TArgumentGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Arguments(params GraphQL.Types.QueryArgument[] arguments) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Arguments(System.Collections.Generic.IEnumerable<GraphQL.Types.QueryArgument> arguments) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Description(string? description) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Directive(string name) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Name(string name) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> ResolveDelegate(System.Delegate? resolve) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
+    }
     public class ResolveConnectionContext<T> : GraphQL.ResolveFieldContext<T>, GraphQL.Builders.IResolveConnectionContext, GraphQL.Builders.IResolveConnectionContext<T>, GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<T>
     {
         public ResolveConnectionContext(GraphQL.IResolveFieldContext context, bool isUnidirectional, int? defaultPageSize) { }
@@ -965,6 +993,14 @@ namespace GraphQL.Builders
         public bool IsUnidirectional { get; }
         public int? Last { get; }
         public int? PageSize { get; }
+    }
+    public class SubscriptionRootFieldBuilder<TSourceType, TReturnType> : GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType>
+    {
+        protected SubscriptionRootFieldBuilder(GraphQL.Types.SubscriptionRootFieldType fieldType) { }
+        public virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
+        public virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
+        public static GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
     }
 }
 namespace GraphQL.Conversion
@@ -1072,7 +1108,7 @@ namespace GraphQL.Execution
     }
     public class ArrayExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode>? Items { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
         public override bool PropagateNull() { }
@@ -1169,9 +1205,9 @@ namespace GraphQL.Execution
     }
     public abstract class ExecutionNode
     {
-        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        protected ExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode) { }
         public GraphQLParser.AST.GraphQLField Field { get; }
-        public GraphQL.Types.FieldType FieldDefinition { get; }
+        public GraphQL.Types.ObjectFieldType FieldDefinition { get; }
         public GraphQL.Types.IGraphType GraphType { get; }
         public int? IndexInParentNode { get; }
         public string? Name { get; }
@@ -1187,26 +1223,26 @@ namespace GraphQL.Execution
     public abstract class ExecutionStrategy : GraphQL.Execution.IExecutionStrategy
     {
         protected ExecutionStrategy() { }
-        protected virtual GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode = default) { }
+        protected virtual GraphQL.Execution.ExecutionNode BuildExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode = default) { }
         protected virtual GraphQL.Execution.RootExecutionNode BuildExecutionRootNode(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IObjectGraphType rootType) { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "field",
                 "fieldType"})]
-        protected virtual System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>> CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQLParser.AST.GraphQLSelectionSet selectionSet, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+        protected virtual System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>> CollectFieldsFrom(GraphQL.Execution.ExecutionContext context, GraphQL.Types.IGraphType specificType, GraphQLParser.AST.GraphQLSelectionSet selectionSet, [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "field",
-                "fieldType"})] System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? fields) { }
+                "fieldType"})] System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? fields) { }
         protected virtual System.Threading.Tasks.Task CompleteDataLoaderNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual System.Threading.Tasks.Task CompleteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected bool DoesFragmentConditionMatch(GraphQL.Execution.ExecutionContext context, GraphQLParser.ROM fragmentName, GraphQL.Types.IGraphType type) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task ExecuteNodeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         public abstract System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode);
-        protected GraphQL.Types.FieldType? GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IComplexGraphType parentType, GraphQLParser.AST.GraphQLField field) { }
+        protected GraphQL.Types.ObjectFieldType? GetFieldDefinition(GraphQL.Types.ISchema schema, GraphQL.Types.IComplexGraphType parentType, GraphQLParser.AST.GraphQLField field) { }
         protected virtual GraphQL.Types.IObjectGraphType GetOperationRootType(GraphQL.Execution.ExecutionContext context) { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "field",
                 "fieldType"})]
-        public virtual System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
+        public virtual System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? GetSubFields(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
         protected virtual System.Threading.Tasks.Task<bool> ProcessNodeUnhandledExceptionAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, System.Exception ex) { }
         protected virtual GraphQL.Resolvers.IFieldResolver SelectResolver(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
         protected virtual System.Threading.Tasks.Task SetArrayItemNodesAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
@@ -1282,7 +1318,7 @@ namespace GraphQL.Execution
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "field",
                 "fieldType"})]
-        System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.FieldType>>? GetSubFields(GraphQL.Execution.ExecutionContext executionContext, GraphQL.Execution.ExecutionNode executionNode);
+        System.Collections.Generic.Dictionary<string, System.ValueTuple<GraphQLParser.AST.GraphQLField, GraphQL.Types.ObjectFieldType>>? GetSubFields(GraphQL.Execution.ExecutionContext executionContext, GraphQL.Execution.ExecutionNode executionNode);
     }
     public interface IExecutionStrategySelector
     {
@@ -1309,12 +1345,12 @@ namespace GraphQL.Execution
     }
     public class NullExecutionNode : GraphQL.Execution.ExecutionNode
     {
-        public NullExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public NullExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode) { }
         public override object? ToValue() { }
     }
     public class ObjectExecutionNode : GraphQL.Execution.ExecutionNode, GraphQL.Execution.IParentExecutionNode
     {
-        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode) { }
         public virtual GraphQLParser.AST.GraphQLSelectionSet? SelectionSet { get; }
         public GraphQL.Execution.ExecutionNode[]? SubFields { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
@@ -1350,7 +1386,7 @@ namespace GraphQL.Execution
     }
     public class SubscriptionArrayExecutionNode : GraphQL.Execution.ArrayExecutionNode
     {
-        public SubscriptionArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public SubscriptionArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode, object source) { }
         public override object Source { get; }
     }
     public class SubscriptionExecutionStrategy : GraphQL.Execution.ExecutionStrategy
@@ -1358,7 +1394,7 @@ namespace GraphQL.Execution
         public SubscriptionExecutionStrategy() { }
         public SubscriptionExecutionStrategy(GraphQL.Execution.IExecutionStrategy baseExecutionStrategy) { }
         public static GraphQL.Execution.SubscriptionExecutionStrategy Instance { get; }
-        protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        protected GraphQL.Execution.ExecutionNode BuildSubscriptionExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode, object source) { }
         protected virtual GraphQL.Execution.ExecutionContext CloneExecutionContext(GraphQL.Execution.ExecutionContext context, System.Threading.CancellationToken token) { }
         public override System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context) { }
         public override System.Threading.Tasks.Task ExecuteNodeTreeAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode rootNode) { }
@@ -1369,12 +1405,12 @@ namespace GraphQL.Execution
     }
     public class SubscriptionObjectExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
-        public SubscriptionObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public SubscriptionObjectExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode, object source) { }
         public override object Source { get; }
     }
     public class SubscriptionValueExecutionNode : GraphQL.Execution.ValueExecutionNode
     {
-        public SubscriptionValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode, object source) { }
+        public SubscriptionValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode, object source) { }
         public override object Source { get; }
     }
     [System.Serializable]
@@ -1398,7 +1434,7 @@ namespace GraphQL.Execution
     }
     public class ValueExecutionNode : GraphQL.Execution.ExecutionNode
     {
-        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
+        public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.ObjectFieldType fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Types.ScalarGraphType GraphType { get; }
         public override object? ToValue() { }
     }
@@ -1553,7 +1589,7 @@ namespace GraphQL.Introspection
         System.Threading.Tasks.Task<bool> AllowField(GraphQL.Types.IGraphType parent, GraphQL.Types.IFieldType field);
         System.Threading.Tasks.Task<bool> AllowType(GraphQL.Types.IGraphType type);
     }
-    public class SchemaMetaFieldType : GraphQL.Types.FieldType
+    public class SchemaMetaFieldType : GraphQL.Types.ObjectFieldType
     {
         public SchemaMetaFieldType() { }
     }
@@ -1577,11 +1613,11 @@ namespace GraphQL.Introspection
         [System.ComponentModel.Description("Indicates this type is a non-null. `ofType` is a valid field.")]
         NON_NULL = 7,
     }
-    public class TypeMetaFieldType : GraphQL.Types.FieldType
+    public class TypeMetaFieldType : GraphQL.Types.ObjectFieldType
     {
         public TypeMetaFieldType() { }
     }
-    public class TypeNameMetaFieldType : GraphQL.Types.FieldType
+    public class TypeNameMetaFieldType : GraphQL.Types.ObjectFieldType
     {
         public TypeNameMetaFieldType() { }
     }
@@ -1605,7 +1641,7 @@ namespace GraphQL.Introspection
     {
         public @__EnumValue(bool allowAppliedDirectives = false) { }
     }
-    public class @__Field : GraphQL.Types.ObjectGraphType<GraphQL.Types.IFieldType>
+    public class @__Field : GraphQL.Types.ObjectGraphType<GraphQL.Types.IFieldTypeWithArguments>
     {
         public @__Field(bool allowAppliedDirectives = false) { }
         public @__Field(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false) { }
@@ -1817,10 +1853,10 @@ namespace GraphQL.Types
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ConfigureGraph() { }
-        protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual GraphQL.Types.InputFieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
-        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.InputFieldType> ProvideFields() { }
     }
     public class AutoRegisteringInterfaceGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InterfaceGraphType<TSourceType>
     {
@@ -1832,12 +1868,12 @@ namespace GraphQL.Types
             "essary.")]
         protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
-        protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual GraphQL.Types.InterfaceFieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
-        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.InterfaceFieldType> ProvideFields() { }
     }
     public class AutoRegisteringObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ObjectGraphType<TSourceType>
     {
@@ -1847,12 +1883,12 @@ namespace GraphQL.Types
         protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
         protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
-        protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
+        protected virtual GraphQL.Types.ObjectFieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
         protected virtual System.Collections.Generic.IEnumerable<System.Reflection.MemberInfo> GetRegisteredMembers() { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.TypeInformation GetTypeInformation(System.Reflection.ParameterInfo parameterInfo) { }
-        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> ProvideFields() { }
+        protected virtual System.Collections.Generic.IEnumerable<GraphQL.Types.ObjectFieldType> ProvideFields() { }
     }
     public class AutoSchema<TQueryClrType> : GraphQL.Types.Schema
     {
@@ -1886,85 +1922,13 @@ namespace GraphQL.Types
         public CamelCaseAttribute() { }
         public override string ChangeEnumCase(string val) { }
     }
+    public static class ComplexGraphTypeExtensions
+    {
+        public static GraphQL.Types.ITypeFields Fields(this GraphQL.Types.IComplexGraphType type) { }
+    }
     public abstract class ComplexGraphType<TSourceType> : GraphQL.Types.GraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         protected ComplexGraphType() { }
-        public GraphQL.Types.TypeFields Fields { get; }
-        public virtual GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>()
-            where TNodeType : GraphQL.Types.IGraphType { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
-            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType Field([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please call Field<TGraphType>(string name) instead.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldDelegate<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Delegate? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldSubscribe<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.IObservable<object?>>? subscribe = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method may be removed in " +
-            "a future release. For now you can continue to use this API but we do not encoura" +
-            "ge this.")]
-        public GraphQL.Types.FieldType FieldSubscribeAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<object?>>>? subscribeAsync = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
-        public bool HasField(string name) { }
     }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -2089,17 +2053,13 @@ namespace GraphQL.Types
         protected override GraphQL.Types.EnumValuesBase CreateValues() { }
         public override object? ParseValue(object? value) { }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public abstract class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
-        public FieldType() { }
-        public GraphQL.Types.QueryArguments? Arguments { get; set; }
-        public object? DefaultValue { get; set; }
+        protected FieldType() { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
-        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
@@ -2118,6 +2078,7 @@ namespace GraphQL.Types
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public string TypeName { get; }
+        public GraphQL.Types.ObjectFieldType AddField(GraphQL.Types.ObjectFieldType fieldType) { }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
@@ -2156,17 +2117,14 @@ namespace GraphQL.Types
         System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         void AddPossibleType(GraphQL.Types.IObjectGraphType type);
     }
-    public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IFieldType : GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
-        GraphQL.Types.TypeFields Fields { get; }
-        GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType);
-        GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name);
-        bool HasField(string name);
+        string Name { get; set; }
     }
-    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public interface IFieldTypeWithArguments : GraphQL.Types.IFieldType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments? Arguments { get; set; }
-        string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2187,18 +2145,26 @@ namespace GraphQL.Types
     }
     public interface IInputObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        GraphQL.Types.TypeFields<GraphQL.Types.InputFieldType> Fields { get; }
+        GraphQL.Types.InputFieldType AddField(GraphQL.Types.InputFieldType fieldType);
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
         GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
-    public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    {
+        GraphQL.Types.TypeFields<GraphQL.Types.InterfaceFieldType> Fields { get; }
+        GraphQL.Types.InterfaceFieldType AddField(GraphQL.Types.InterfaceFieldType fieldType);
+    }
     public interface INamedType
     {
         string Name { get; set; }
     }
     public interface IObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        GraphQL.Types.TypeFields<GraphQL.Types.ObjectFieldType> Fields { get; }
         System.Func<object, bool>? IsTypeOf { get; set; }
+        GraphQL.Types.ObjectFieldType AddField(GraphQL.Types.ObjectFieldType fieldType);
         void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IProvideDeprecationReason
@@ -2238,20 +2204,26 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         GraphQL.Conversion.INameConverter NameConverter { get; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
-        GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        GraphQL.Types.ObjectFieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
         System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
-        GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        GraphQL.Types.ObjectFieldType TypeMetaFieldType { get; }
+        GraphQL.Types.ObjectFieldType TypeNameMetaFieldType { get; }
         void Initialize();
         void RegisterType(GraphQL.Types.IGraphType type);
         void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type);
         void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType);
         void RegisterVisitor(GraphQL.Utilities.ISchemaNodeVisitor visitor);
         void RegisterVisitor(System.Type type);
+    }
+    public interface ITypeFields
+    {
+        int Count { get; }
+        System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> AsEnumerable();
+        GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name);
     }
     public class IdGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2265,6 +2237,11 @@ namespace GraphQL.Types
     {
         public IncludeDirective() { }
     }
+    public class InputFieldType : GraphQL.Types.FieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IProvideResolvedType
+    {
+        public InputFieldType() { }
+        public object? DefaultValue { get; set; }
+    }
     public class InputObjectGraphType : GraphQL.Types.InputObjectGraphType<object>
     {
         public InputObjectGraphType() { }
@@ -2272,6 +2249,17 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
+        public GraphQL.Types.TypeFields<GraphQL.Types.InputFieldType> Fields { get; }
+        public virtual GraphQL.Types.InputFieldType AddField(GraphQL.Types.InputFieldType fieldType) { }
+        protected virtual GraphQL.Builders.InputFieldBuilder CreateBuilder(GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.InputFieldBuilder CreateBuilder([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field(string name, GraphQL.Types.IGraphType type) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name)
+            where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field<TReturnType>(string name, bool nullable = false) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.InputFieldBuilder Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
@@ -2283,16 +2271,34 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class InterfaceFieldType : GraphQL.Types.FieldType, GraphQL.Types.IFieldType, GraphQL.Types.IFieldTypeWithArguments, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    {
+        public InterfaceFieldType() { }
+        public GraphQL.Types.QueryArguments? Arguments { get; set; }
+    }
     public class InterfaceGraphType : GraphQL.Types.InterfaceGraphType<object>
     {
         public InterfaceGraphType() { }
     }
-    public class InterfaceGraphType<TSource> : GraphQL.Types.ComplexGraphType<TSource>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public class InterfaceGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InterfaceGraphType() { }
+        public GraphQL.Types.TypeFields<GraphQL.Types.InterfaceFieldType> Fields { get; }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
         public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        public virtual GraphQL.Types.InterfaceFieldType AddField(GraphQL.Types.InterfaceFieldType fieldType) { }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
+        protected virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, object> Field<TGraphType>(string name)
+            where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.InterfaceFieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
+            where TGraphType : GraphQL.Types.IGraphType { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
     {
@@ -2343,29 +2349,47 @@ namespace GraphQL.Types
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }
+    public class ObjectFieldType : GraphQL.Types.FieldType, GraphQL.Types.IFieldType, GraphQL.Types.IFieldTypeWithArguments, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    {
+        public ObjectFieldType() { }
+        public GraphQL.Types.QueryArguments? Arguments { get; set; }
+        public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
+    }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
     }
-    [System.Obsolete("This class will be removed in v8.")]
-    public static class ObjectGraphTypeExtensions
-    {
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
-            "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v8.")]
-        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, object?>? resolve = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
-            "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v8.")]
-        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object?>>? resolve = null) { }
-    }
     public class ObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public ObjectGraphType() { }
+        public GraphQL.Types.TypeFields<GraphQL.Types.ObjectFieldType> Fields { get; }
         public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public virtual GraphQL.Types.ObjectFieldType AddField(GraphQL.Types.ObjectFieldType fieldType) { }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>()
+            where TNodeType : GraphQL.Types.IGraphType { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
+            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
+        protected virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        protected virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.SubscriptionRootFieldBuilder<TSourceType, TReturnType> CreateSubscriptionRootBuilder<TReturnType>([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, object> Field<TGraphType>(string name)
+            where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.ObjectFieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
+            where TGraphType : GraphQL.Types.IGraphType { }
         public void Interface(System.Type type) { }
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
@@ -2468,14 +2492,14 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
-        public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
+        public GraphQL.Types.ObjectFieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
         public System.Collections.Generic.IEnumerable<System.ValueTuple<System.Type, System.Type>> TypeMappings { get; }
-        public GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        public GraphQL.Types.ObjectFieldType TypeMetaFieldType { get; }
+        public GraphQL.Types.ObjectFieldType TypeNameMetaFieldType { get; }
         protected virtual void CoerceInputTypeDefaultValues() { }
         protected virtual GraphQL.Types.SchemaTypes CreateSchemaTypes() { }
         public void Dispose() { }
@@ -2512,9 +2536,9 @@ namespace GraphQL.Types
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
-        protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        protected virtual GraphQL.Types.ObjectFieldType SchemaMetaFieldType { get; }
+        protected virtual GraphQL.Types.ObjectFieldType TypeMetaFieldType { get; }
+        protected virtual GraphQL.Types.ObjectFieldType TypeNameMetaFieldType { get; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
         public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
@@ -2542,6 +2566,11 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class SubscriptionRootFieldType : GraphQL.Types.ObjectFieldType
+    {
+        public SubscriptionRootFieldType() { }
+        public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
+    }
     public class TimeSpanMillisecondsGraphType : GraphQL.Types.ScalarGraphType
     {
         public TimeSpanMillisecondsGraphType() { }
@@ -2563,15 +2592,18 @@ namespace GraphQL.Types
         public static string Name(this GraphQLParser.AST.GraphQLType type) { }
         public static GraphQL.Types.IGraphType? NamedGraphTypeFromType(this GraphQLParser.AST.GraphQLType type, GraphQL.Types.ISchema schema) { }
     }
-    public class TypeFields : System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType>, System.Collections.IEnumerable
+    public class TypeFields<TFieldType> : GraphQL.Types.ITypeFields, System.Collections.Generic.IEnumerable<TFieldType>, System.Collections.IEnumerable
+        where TFieldType : GraphQL.Types.FieldType
     {
         public TypeFields() { }
         public int Count { get; }
-        public bool Contains(GraphQL.Types.FieldType field) { }
+        public System.Collections.Generic.IEnumerable<GraphQL.Types.FieldType> AsEnumerable() { }
         public bool Contains(GraphQL.Types.IFieldType field) { }
-        public GraphQL.Types.FieldType? Find(GraphQLParser.ROM name) { }
-        public GraphQL.Types.FieldType? Find(string name) { }
-        public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
+        public bool Contains(TFieldType field) { }
+        public TFieldType? Find(GraphQLParser.ROM name) { }
+        public TFieldType? Find(string name) { }
+        public System.Collections.Generic.IEnumerator<TFieldType> GetEnumerator() { }
+        public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
     }
     public class TypeInformation
     {
@@ -2695,13 +2727,13 @@ namespace GraphQL.Utilities
         public void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitInputObjectFieldDefinition(GraphQL.Types.InputFieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitInterfaceFieldDefinition(GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2721,13 +2753,13 @@ namespace GraphQL.Utilities
         public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitInputObjectFieldDefinition(GraphQL.Types.InputFieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitInterfaceFieldDefinition(GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public virtual void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public virtual void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema) { }
         public virtual void VisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2748,8 +2780,7 @@ namespace GraphQL.Utilities
     public sealed class FieldTypeDefaultArgumentsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.FieldTypeDefaultArgumentsVisitor Instance;
-        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public interface ISchemaNodeVisitor
     {
@@ -2758,13 +2789,13 @@ namespace GraphQL.Utilities
         void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
         void VisitEnumValue(GraphQL.Types.EnumValueDefinition value, GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
         void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema);
-        void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema);
+        void VisitInputObjectFieldDefinition(GraphQL.Types.InputFieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema);
         void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema);
-        void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema);
-        void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema);
+        void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema);
+        void VisitInterfaceFieldDefinition(GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema);
         void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema);
-        void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema);
-        void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema);
+        void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema);
+        void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema);
         void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema);
         void VisitSchema(GraphQL.Types.ISchema schema);
         void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema);
@@ -2809,12 +2840,13 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.QueryArgument ToArgument(GraphQL.Utilities.ArgumentConfig argumentConfig, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.Directive ToDirective(GraphQLParser.AST.GraphQLDirectiveDefinition directiveDef) { }
         protected virtual GraphQL.Types.EnumerationGraphType ToEnumerationType(GraphQLParser.AST.GraphQLEnumTypeDefinition enumDef) { }
-        protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
-        protected virtual GraphQL.Types.FieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
+        protected virtual GraphQL.Types.InputFieldType ToFieldType(string parentTypeName, GraphQLParser.AST.GraphQLInputValueDefinition inputDef) { }
         protected virtual GraphQL.Types.InputObjectGraphType ToInputObjectType(GraphQLParser.AST.GraphQLInputObjectTypeDefinition inputDef) { }
+        protected virtual GraphQL.Types.InterfaceFieldType ToInterfaceFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.InterfaceGraphType ToInterfaceType(GraphQLParser.AST.GraphQLInterfaceTypeDefinition interfaceDef) { }
+        protected virtual GraphQL.Types.ObjectFieldType ToObjectFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.IObjectGraphType ToObjectGraphType(GraphQLParser.AST.GraphQLObjectTypeDefinition astType, bool isExtensionType = false) { }
-        protected virtual GraphQL.Types.FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
+        protected virtual GraphQL.Types.ObjectFieldType ToSubscriptionFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.UnionGraphType ToUnionType(GraphQLParser.AST.GraphQLUnionTypeDefinition unionDef) { }
         protected virtual void Validate(GraphQLParser.AST.GraphQLDocument document) { }
     }
@@ -2839,7 +2871,7 @@ namespace GraphQL.Utilities
         public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
         public string PrintFilteredSchema(System.Func<string, bool> directiveFilter, System.Func<string, bool> typeFilter) { }
         public string PrintInputObject(GraphQL.Types.IInputObjectGraphType type) { }
-        public string PrintInputValue(GraphQL.Types.FieldType field) { }
+        public string PrintInputValue(GraphQL.Types.InputFieldType field) { }
         public string PrintInputValue(GraphQL.Types.QueryArgument argument) { }
         public virtual string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
         public string PrintIntrospectionSchema() { }
@@ -2868,13 +2900,13 @@ namespace GraphQL.Utilities
         public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public override void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObjectFieldDefinition(GraphQL.Types.InputFieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldDefinition(GraphQL.Types.InterfaceFieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
-        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldDefinition(GraphQL.Types.ObjectFieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public static class StringUtils

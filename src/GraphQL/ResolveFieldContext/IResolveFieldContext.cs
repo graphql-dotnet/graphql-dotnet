@@ -88,7 +88,7 @@ namespace GraphQL
         /// returns empty set since we don't know the concrete union member until we get a concrete runtime value from
         /// the resolver.
         /// </summary>
-        Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; }
+        Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)>? SubFields { get; }
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.

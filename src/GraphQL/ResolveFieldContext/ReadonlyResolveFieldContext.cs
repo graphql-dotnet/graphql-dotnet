@@ -16,7 +16,7 @@ namespace GraphQL
         // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
-        private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
+        private Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
         /// <summary>
@@ -71,7 +71,11 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IDictionary<string, ArgumentValue>? Arguments
-            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArgumentValues;
+            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false
+                ? ret
+                : FieldDefinition is ObjectFieldType oft
+                    ? oft.DefaultArgumentValues
+                    : null;
 
         /// <inheritdoc/>
         public IDictionary<string, DirectiveInfo>? Directives
@@ -108,7 +112,7 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields
+        public Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)>? SubFields
             => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>

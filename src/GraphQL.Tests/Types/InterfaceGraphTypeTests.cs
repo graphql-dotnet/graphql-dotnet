@@ -69,8 +69,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         public MyInterface()
         {
             Field<string>("hello", true)
-                .Argument<string>("name", true, arg => arg.DefaultValue = "world")
-                .DefaultValue("world");
+                .Argument<string>("name", true, arg => arg.DefaultValue = "world");
         }
     }
 

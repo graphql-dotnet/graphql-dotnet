@@ -95,7 +95,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Builds an execution node with the specified parameters.
         /// </summary>
-        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode = null)
+        protected virtual ExecutionNode BuildExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, ObjectFieldType fieldDefinition, int? indexInParentNode = null)
         {
             if (graphType is NonNullGraphType nonNullFieldType)
                 graphType = nonNullFieldType.ResolvedType!;
@@ -173,7 +173,7 @@ namespace GraphQL.Execution
         /// Returns a <see cref="FieldType"/> for the specified AST <see cref="GraphQLField"/> within a specified parent
         /// output graph type within a given schema. For meta-fields, returns the proper meta-field field type.
         /// </summary>
-        protected FieldType? GetFieldDefinition(ISchema schema, IComplexGraphType parentType, GraphQLField field)
+        protected ObjectFieldType? GetFieldDefinition(ISchema schema, IComplexGraphType parentType, GraphQLField field)
         {
             if (field.Name == schema.SchemaMetaFieldType.Name && schema.Query == parentType)
             {
@@ -193,11 +193,25 @@ namespace GraphQL.Execution
                 throw new ArgumentNullException(nameof(parentType), $"Schema is not configured correctly to fetch field '{field.Name}'. Are you missing a root type?");
             }
 
-            return parentType.GetField(field.Name);
+            // Normally should always be true and return some field.
+            if (parentType is IObjectGraphType ogt)
+                return ogt.Fields.Find(field.Name);
+
+            // See subfields_is_not_null_for_single_InterfaceGraphType test.
+            // This code is placed here to be able to query SubFields inside resolver but it is not good to do so
+            // since resolver does not return result and we can not infer CONCRETE object graph type from this result.
+            // As a workaround we use the first object graph type that implements interface.
+            if (parentType is IInterfaceGraphType igt)
+            {
+                var first = igt.PossibleTypes.List[0];
+                return first.Fields.Find(field.Name);
+            }
+
+            return null;
         }
 
         /// <inheritdoc/>
-        public virtual Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
+        public virtual Dictionary<string, (GraphQLField field, ObjectFieldType fieldType)>? GetSubFields(ExecutionContext context, ExecutionNode node)
         {
             return node.Field?.SelectionSet?.Selections?.Count > 0
                 ? CollectFieldsFrom(context, node.FieldDefinition!.ResolvedType!, node.Field.SelectionSet, null)
@@ -217,7 +231,7 @@ namespace GraphQL.Execution
         /// <param name="selectionSet">The selection set from the document.</param>
         /// <param name="fields">A dictionary to append the collected list of fields to; if <see langword="null"/>, a new dictionary will be created.</param>
         /// <returns>A list of collected fields</returns>
-        protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
+        protected virtual Dictionary<string, (GraphQLField field, ObjectFieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, ObjectFieldType fieldType)>? fields)
         {
             //Debug.Assert(specificType is not IAbstractGraphType); //TODO: think about it
 
@@ -247,7 +261,7 @@ namespace GraphQL.Execution
 
             return fields;
 
-            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)> fields, ROM[]? visitedFragmentNames, int foundFragments)
+            void CollectFields(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, ObjectFieldType fieldType)> fields, ROM[]? visitedFragmentNames, int foundFragments)
             {
                 static bool Contains(ROM[] array, ROM item, int count)
                 {
@@ -298,7 +312,7 @@ namespace GraphQL.Execution
                 }
             }
 
-            static void Add(Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
+            static void Add(Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)> fields, GraphQLField field, ObjectFieldType fieldType)
             {
                 string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 

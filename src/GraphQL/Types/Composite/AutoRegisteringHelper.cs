@@ -6,7 +6,7 @@ using GraphQL.Resolvers;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Helper methods for auto-registering graph types, <see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveDelegate(Delegate?)">Resolve</see>,
+    /// Helper methods for auto-registering graph types, <see cref="Builders.ObjectFieldBuilder{TSourceType, TReturnType}.ResolveDelegate(Delegate?)">Resolve</see>,
     /// schema builder method builders, and <see cref="NameFieldResolver"/>.
     /// </summary>
     public static class AutoRegisteringHelper
@@ -141,11 +141,12 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+        internal static TFieldType CreateField<TFieldType>(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType, Func<MemberInfo, TFieldType> fieldTypeFactory)
+            where TFieldType : FieldType
         {
             var typeInformation = getTypeInformation(memberInfo);
             var graphType = typeInformation.ConstructGraphType();
-            var fieldType = CreateField(memberInfo, graphType, isInputType);
+            var fieldType = CreateField(memberInfo, graphType, isInputType, fieldTypeFactory);
             // set resolver, if applicable
             buildFieldType?.Invoke(fieldType, memberInfo);
             // apply field attributes after resolver has been set
@@ -156,19 +157,22 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
         /// </summary>
-        internal static FieldType CreateField(MemberInfo memberInfo, Type graphType, bool isInputType)
+        internal static TFieldType CreateField<TFieldType>(MemberInfo memberInfo, Type graphType, bool isInputType, Func<MemberInfo, TFieldType> fieldTypeFactory)
+            where TFieldType : FieldType
         {
-            var fieldType = new FieldType()
-            {
-                Name = memberInfo.Name,
-                Description = memberInfo.Description(),
-                DeprecationReason = memberInfo.ObsoleteMessage(),
-                Type = graphType,
-                DefaultValue = isInputType ? memberInfo.DefaultValue() : null,
-            };
+            var fieldType = fieldTypeFactory(memberInfo);
+
+            fieldType.Name = memberInfo.Name;
+            fieldType.Description = memberInfo.Description();
+            fieldType.DeprecationReason = memberInfo.ObsoleteMessage();
+            fieldType.Type = graphType;
+
+            if (fieldType is InputFieldType ift)
+                ift.DefaultValue = isInputType ? memberInfo.DefaultValue() : null;
+
             if (isInputType)
             {
-                fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+                fieldType.WithMetadata(ObjectExtensions.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
             }
             if (!isInputType &&
                 memberInfo is MethodInfo methodInfo &&
@@ -245,7 +249,8 @@ namespace GraphQL.Types
         /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
         /// added to the graph type.
         /// </summary>
-        internal static IEnumerable<FieldType> ProvideFields(IEnumerable<MemberInfo> members, Func<MemberInfo, FieldType?> createField, bool isInputType)
+        internal static IEnumerable<TFieldType> ProvideFields<TFieldType>(IEnumerable<MemberInfo> members, Func<MemberInfo, TFieldType?> createField, bool isInputType)
+            where TFieldType : FieldType
         {
             foreach (var memberInfo in members)
             {

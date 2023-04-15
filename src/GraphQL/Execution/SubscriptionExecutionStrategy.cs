@@ -90,13 +90,8 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         try
         {
-            var resolver = node.FieldDefinition?.StreamResolver;
-
-            if (resolver == null)
-            {
-                // todo: this should be caught by schema validation
-                throw new InvalidOperationException($"Stream resolver not set for field '{node.Field.Name}'.");
-            }
+            var resolver = (node.FieldDefinition as SubscriptionRootFieldType)?.StreamResolver
+                ?? throw new InvalidOperationException($"Stream resolver not set for field '{node.Field.Name}'."); // TODO: this should be caught by schema validation
 
             sourceStream = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
@@ -303,7 +298,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// <summary>
     /// Builds an execution node with the specified parameters.
     /// </summary>
-    protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode, object source)
+    protected ExecutionNode BuildSubscriptionExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, ObjectFieldType fieldDefinition, int? indexInParentNode, object source)
     {
         if (graphType is NonNullGraphType nonNullFieldType)
             graphType = nonNullFieldType.ResolvedType!;

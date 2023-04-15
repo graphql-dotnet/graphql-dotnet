@@ -57,7 +57,7 @@ public class AdapterTests
             InputExtensions = new Dictionary<string, object>() { { "7", new object() } },
             OutputExtensions = new Dictionary<string, object>() { { "1", new object() } },
             FieldAst = new GraphQLField { Name = new GraphQLName("test") },
-            FieldDefinition = new FieldType(),
+            FieldDefinition = new ObjectFieldType(),
             Metrics = new Instrumentation.Metrics(),
             Operation = new GraphQLOperationDefinition(),
             ParentType = Mock.Of<IObjectGraphType>(),
@@ -67,7 +67,7 @@ public class AdapterTests
             RootValue = new object(),
             Schema = Mock.Of<ISchema>(),
             Source = "hello",
-            SubFields = new Dictionary<string, (GraphQLField, FieldType)>(),
+            SubFields = new Dictionary<string, (GraphQLField, ObjectFieldType)>(),
             UserContext = new Dictionary<string, object>() { { "3", new object() } },
             Variables = new Variables(),
         };

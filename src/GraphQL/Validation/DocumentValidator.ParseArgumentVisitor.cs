@@ -137,17 +137,17 @@ public partial class DocumentValidator
                 field.Name.Value == schema.TypeMetaFieldType.Name ? schema.TypeMetaFieldType :
                 field.Name.Value == schema.TypeNameMetaFieldType.Name ? schema.TypeNameMetaFieldType :
                 field.Name.Value == schema.SchemaMetaFieldType.Name ? schema.SchemaMetaFieldType :
-                context.Type?.Fields.Find(field.Name.Value);
+                context.Type?.Fields().GetField(field.Name.Value);
             // should not be null, or the document would have failed validation
             if (fieldType == null)
                 return;
             // if any arguments were supplied in the document for the field, load all defined arguments
             // for the field
-            if (field.Arguments?.Count > 0)
+            if (field.Arguments?.Count > 0 && fieldType is IFieldTypeWithArguments ftwa)
             {
                 try
                 {
-                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables);
+                    var arguments = ExecutionHelper.GetArguments(ftwa.Arguments, field.Arguments, context.Variables);
                     if (arguments != null)
                     {
                         (context.ArgumentValues ??= new()).Add(field, arguments);

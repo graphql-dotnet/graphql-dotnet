@@ -182,7 +182,7 @@ namespace GraphQL
         {
             foreach (var field in iface.Fields)
             {
-                var found = type.GetField(field.Name);
+                var found = type.Fields.Find(field.Name);
 
                 if (found == null)
                 {

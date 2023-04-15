@@ -10,7 +10,7 @@ public class InputObjectGraphTypeTests
         var type = new InputObjectGraphType();
         var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<ObjectGraphType>("test"));
 
-        exception.Message.ShouldContain("Input type 'InputObject' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
+        exception.Message.ShouldContain("Input Object 'InputObject' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");
     }
 
     [Fact]
@@ -18,6 +18,6 @@ public class InputObjectGraphTypeTests
     {
         var type = new ObjectGraphType();
         var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<InputObjectGraphType>("test"));
-        exception.Message.ShouldContain("Output type 'Object' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
+        exception.Message.ShouldContain("Object type 'Object' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
     }
 }

@@ -7,7 +7,7 @@ namespace GraphQL.Introspection
     /// The <c>__schema</c> meta-field is available on the root of a query operation and
     /// returns a <see cref="__Schema"/> graph type for the schema.
     /// </summary>
-    public class SchemaMetaFieldType : FieldType
+    public class SchemaMetaFieldType : ObjectFieldType
     {
         /// <summary>
         /// Initializes a new instance of the <c>__schema</c> meta-field.

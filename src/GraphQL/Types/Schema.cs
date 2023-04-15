@@ -58,13 +58,13 @@ namespace GraphQL.Types
             public IEnumerable<IGraphType> AdditionalTypeInstances => _schema.AdditionalTypeInstances;
 
             /// <inheritdoc/>
-            public FieldType? SchemaMetaFieldType => AllTypes?.SchemaMetaFieldType;
+            public ObjectFieldType? SchemaMetaFieldType => AllTypes?.SchemaMetaFieldType;
 
             /// <inheritdoc/>
-            public FieldType? TypeMetaFieldType => AllTypes?.TypeMetaFieldType;
+            public ObjectFieldType? TypeMetaFieldType => AllTypes?.TypeMetaFieldType;
 
             /// <inheritdoc/>
-            public FieldType? TypeNameMetaFieldType => AllTypes?.TypeNameMetaFieldType;
+            public ObjectFieldType? TypeNameMetaFieldType => AllTypes?.TypeNameMetaFieldType;
 
             public IEnumerable<(Type clrType, Type graphType)> TypeMappings => _schema.TypeMappings;
 
@@ -266,13 +266,13 @@ namespace GraphQL.Types
         public IEnumerable<IGraphType> AdditionalTypeInstances => _additionalInstances ?? Enumerable.Empty<IGraphType>();
 
         /// <inheritdoc/>
-        public FieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
+        public ObjectFieldType SchemaMetaFieldType => AllTypes.SchemaMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeMetaFieldType => AllTypes.TypeMetaFieldType;
+        public ObjectFieldType TypeMetaFieldType => AllTypes.TypeMetaFieldType;
 
         /// <inheritdoc/>
-        public FieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
+        public ObjectFieldType TypeNameMetaFieldType => AllTypes.TypeNameMetaFieldType;
 
         /// <inheritdoc/>
         public void RegisterVisitor(ISchemaNodeVisitor visitor)
@@ -512,7 +512,7 @@ namespace GraphQL.Types
                 if (inProcess.Contains(inputType))
                     throw new InvalidOperationException($"Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: {string.Join(", ", inProcess.Select(x => $"'{x.Name}'"))}.");
                 inProcess.Push(inputType);
-                foreach (var field in inputType.Fields)
+                foreach (var field in inputType.Fields.List)
                 {
                     if (field.DefaultValue is GraphQLValue value)
                     {

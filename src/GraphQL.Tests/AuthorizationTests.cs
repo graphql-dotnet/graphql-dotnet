@@ -7,7 +7,7 @@ public class AuthorizationTests
     [Fact]
     public void Field()
     {
-        var field = new FieldType();
+        var field = new ObjectFieldType();
         field.IsAuthorizationRequired().ShouldBeFalse();
         field.AuthorizeWithPolicy("Policy1");
         field.IsAuthorizationRequired().ShouldBeTrue();
@@ -28,7 +28,7 @@ public class AuthorizationTests
     [Fact]
     public void NoRoles()
     {
-        var field = new FieldType();
+        var field = new ObjectFieldType();
         field.AuthorizeWithRoles();
         field.AuthorizeWithRoles("");
         field.AuthorizeWithRoles(" ");
@@ -39,7 +39,7 @@ public class AuthorizationTests
     [Fact]
     public void AllowAnonymous()
     {
-        var field = new FieldType();
+        var field = new ObjectFieldType();
         field.IsAnonymousAllowed().ShouldBeFalse();
         field.AllowAnonymous();
         field.IsAnonymousAllowed().ShouldBeTrue();
@@ -48,7 +48,7 @@ public class AuthorizationTests
     [Fact]
     public void Authorize()
     {
-        var field = new FieldType();
+        var field = new ObjectFieldType();
         field.IsAuthorizationRequired().ShouldBeFalse();
         field.Authorize();
         field.IsAuthorizationRequired().ShouldBeTrue();

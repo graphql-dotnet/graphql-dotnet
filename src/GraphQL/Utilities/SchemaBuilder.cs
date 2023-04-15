@@ -274,9 +274,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             typeConfig.CopyMetadataTo(type);
 
-            Func<string, GraphQLFieldDefinition, FieldType> constructFieldType = IsSubscriptionType(type)
+            Func<string, GraphQLFieldDefinition, ObjectFieldType> constructFieldType = IsSubscriptionType(type)
                 ? ToSubscriptionFieldType
-                : ToFieldType;
+                : ToObjectFieldType;
 
             if (astType.Fields != null)
             {
@@ -353,9 +353,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         }
 
         /// <summary>
-        /// Returns a <see cref="FieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
+        /// Returns a <see cref="ObjectFieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
         /// </summary>
-        protected virtual FieldType ToFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
+        protected virtual ObjectFieldType ToObjectFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
 
@@ -366,12 +366,43 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownField(fieldConfig, typeConfig);
 
-            var field = new FieldType
+            var field = new ObjectFieldType
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
                 ResolvedType = ToGraphType(fieldDef.Type!),
-                Resolver = fieldConfig.Resolver
+                Resolver = fieldConfig.Resolver,
+            };
+
+            fieldConfig.CopyMetadataTo(field);
+
+            field.Arguments = ToQueryArguments(fieldConfig, fieldDef.Arguments?.Items);
+
+            field.SetAstType(fieldDef);
+            OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
+
+            return field;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="InterfaceFieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
+        /// </summary>
+        protected virtual InterfaceFieldType ToInterfaceFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
+        {
+            var typeConfig = Types.For(parentTypeName);
+
+            AssertKnownType(typeConfig);
+
+            var fieldConfig = typeConfig.FieldFor((string)fieldDef.Name); //TODO:alloc
+            InitializeField(fieldConfig, typeConfig.Type);
+
+            AssertKnownField(fieldConfig, typeConfig);
+
+            var field = new InterfaceFieldType
+            {
+                Name = fieldConfig.Name,
+                Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
+                ResolvedType = ToGraphType(fieldDef.Type!),
             };
 
             fieldConfig.CopyMetadataTo(field);
@@ -387,7 +418,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         /// <summary>
         /// Returns a subscription <see cref="FieldType"/> from the specified <see cref="GraphQLFieldDefinition"/>.
         /// </summary>
-        protected virtual FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
+        protected virtual ObjectFieldType ToSubscriptionFieldType(string parentTypeName, GraphQLFieldDefinition fieldDef)
         {
             var typeConfig = Types.For(parentTypeName);
 
@@ -398,7 +429,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownField(fieldConfig, typeConfig);
 
-            var field = new FieldType
+            var field = new SubscriptionRootFieldType
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
@@ -420,7 +451,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         /// <summary>
         /// Returns a <see cref="FieldType"/> from the specified <see cref="GraphQLInputValueDefinition"/>.
         /// </summary>
-        protected virtual FieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
+        protected virtual InputFieldType ToFieldType(string parentTypeName, GraphQLInputValueDefinition inputDef)
         {
             var typeConfig = Types.For(parentTypeName);
 
@@ -431,7 +462,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownField(fieldConfig, typeConfig);
 
-            var field = new FieldType
+            var field = new InputFieldType
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
@@ -468,7 +499,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (interfaceDef.Fields != null)
             {
                 foreach (var f in interfaceDef.Fields)
-                    type.AddField(ToFieldType(type.Name, f));
+                    type.AddField(ToInterfaceFieldType(type.Name, f));
             }
 
             return type;

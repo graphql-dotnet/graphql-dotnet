@@ -131,9 +131,9 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         var inputType = type.ShouldBeOfType<InputObjectGraphType>();
         inputType.Description.ShouldBe("input-type");
 
-        field = inputType.Fields.FirstOrDefault(f => f.Name == "id");
-        field.ShouldNotBeNull();
-        field.Description.ShouldBe("input-field");
+        var field2 = inputType.Fields.FirstOrDefault(f => f.Name == "id");
+        field2.ShouldNotBeNull();
+        field2.Description.ShouldBe("input-field");
     }
 
     [Fact]

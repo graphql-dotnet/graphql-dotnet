@@ -135,7 +135,7 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         public ExecutionErrors Errors => _context.Errors;
         public IEnumerable<object> Path => _context.Path;
         public IEnumerable<object> ResponsePath => _context.ResponsePath;
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _context.SubFields;
+        public Dictionary<string, (GraphQLField Field, ObjectFieldType FieldType)>? SubFields => _context.SubFields;
         public IReadOnlyDictionary<string, object?> InputExtensions => _context.InputExtensions;
         public IDictionary<string, object?> OutputExtensions => _context.OutputExtensions;
         public IServiceProvider? RequestServices => _context.RequestServices;

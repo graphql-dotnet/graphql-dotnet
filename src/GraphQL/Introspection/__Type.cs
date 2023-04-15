@@ -60,12 +60,12 @@ namespace GraphQL.Introspection
                     if (context.Source is IObjectGraphType || context.Source is IInterfaceGraphType)
                     {
                         var type = (IComplexGraphType)context.Source;
-                        var fields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
+                        var fields = context.ArrayPool.Rent<FieldType>(type.Fields().Count);
 
                         bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
 
                         int index = 0;
-                        foreach (var field in type.Fields.List)
+                        foreach (var field in type.Fields().AsEnumerable()) //TODO: enumerator allocation
                         {
                             if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
                                 fields[index++] = field;

@@ -84,17 +84,6 @@ public class FieldBuilderTests
     }
 
     [Fact]
-    public void can_have_a_default_value()
-    {
-        var objectType = new ObjectGraphType();
-        objectType.Field<IntGraphType>("_")
-            .Returns<int>()
-            .DefaultValue(15);
-
-        objectType.Fields.First().DefaultValue.ShouldBe(15);
-    }
-
-    [Fact]
     public void can_have_arguments_with_and_without_default_values_and_with_metadata()
     {
         var objectType = new ObjectGraphType();
@@ -250,7 +239,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType, int?>("skip", "desc1")
+            .Argument<IntGraphType>("skip")
+            .Description("desc1")
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(null);
@@ -273,7 +263,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType, int?>("skip", "desc1")
+            .Argument<IntGraphType>("skip")
+            .Description("desc1")
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(null);
@@ -293,7 +284,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+            .Argument<EpisodeEnum>("episode")
+            .Description("episodes")
             .Resolve(context =>
             {
                 context.GetArgument<Episodes>("episode").ShouldBe(Episodes.JEDI);
@@ -316,7 +308,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+            .Argument<EpisodeEnum>("episode")
+            .Description("episodes")
             .Resolve(context =>
             {
                 context.GetArgument("episode", Episodes.EMPIRE).ShouldBe(Episodes.EMPIRE);

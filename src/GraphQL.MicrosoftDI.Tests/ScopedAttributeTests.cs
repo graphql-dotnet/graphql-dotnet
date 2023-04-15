@@ -53,8 +53,8 @@ public class ScopedAttributeTests
             Source = new TestClass(),
             RequestServices = rootServiceProvider,
         };
-        var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.StreamResolver!;
-        var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.StreamResolver!;
+        var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription)).ShouldBeOfType<SubscriptionRootFieldType>().StreamResolver!;
+        var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription)).ShouldBeOfType<SubscriptionRootFieldType>().StreamResolver!;
         (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
         (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("1 2")).Dispose();
         (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("2 3")).Dispose();

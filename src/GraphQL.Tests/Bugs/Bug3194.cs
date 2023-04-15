@@ -20,7 +20,7 @@ type Query {
 """,
             c => c.Types.Include(typeof(QueryType)));
         schema.Initialize();
-        var queryType = schema.AllTypes["Query"].ShouldBeAssignableTo<IComplexGraphType>();
+        var queryType = schema.AllTypes["Query"].ShouldBeAssignableTo<IObjectGraphType>();
 
         var fieldType = queryType.Fields.Find("hello").ShouldNotBeNull();
         var resolver = fieldType.Resolver.ShouldNotBeNull();

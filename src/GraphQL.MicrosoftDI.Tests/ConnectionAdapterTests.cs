@@ -34,7 +34,7 @@ public class ConnectionAdapterTests
         rccMock.SetupGet(x => x.InputExtensions).Returns(new Dictionary<string, object>() { { "7", new object() } });
         rccMock.SetupGet(x => x.OutputExtensions).Returns(new Dictionary<string, object>() { { "1", new object() } });
         rccMock.SetupGet(x => x.FieldAst).Returns(new GraphQLField { Name = new GraphQLName("test") });
-        rccMock.SetupGet(x => x.FieldDefinition).Returns(new FieldType());
+        rccMock.SetupGet(x => x.FieldDefinition).Returns(new ObjectFieldType());
         rccMock.SetupGet(x => x.Metrics).Returns(new Instrumentation.Metrics());
         rccMock.SetupGet(x => x.Operation).Returns(new GraphQLOperationDefinition());
         rccMock.SetupGet(x => x.ParentType).Returns(Mock.Of<IObjectGraphType>());
@@ -44,7 +44,7 @@ public class ConnectionAdapterTests
         rccMock.SetupGet(x => x.RootValue).Returns(new object());
         rccMock.SetupGet(x => x.Schema).Returns(Mock.Of<ISchema>());
         rccMock.SetupGet(x => x.Source).Returns("hello");
-        rccMock.SetupGet(x => x.SubFields).Returns(new Dictionary<string, (GraphQLField, FieldType)>());
+        rccMock.SetupGet(x => x.SubFields).Returns(new Dictionary<string, (GraphQLField, ObjectFieldType)>());
         rccMock.SetupGet(x => x.UserContext).Returns(new Dictionary<string, object>() { { "3", new object() } });
         rccMock.SetupGet(x => x.Variables).Returns(new Variables());
         rccMock.SetupGet(x => x.First).Returns(10);

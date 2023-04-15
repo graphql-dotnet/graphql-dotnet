@@ -14,7 +14,7 @@ public class SubscriptionType : ObjectGraphType
 
         Name = "Subscription";
 
-        AddField(new FieldType
+        AddField(new SubscriptionRootFieldType
         {
             Name = "orderAdded",
             Type = typeof(OrderType),

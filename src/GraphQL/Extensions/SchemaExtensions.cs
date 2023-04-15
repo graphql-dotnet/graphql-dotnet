@@ -336,15 +336,15 @@ namespace GraphQL
 
             public override void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema) => Replace(argument);
 
-            public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
+            public override void VisitInputObjectFieldDefinition(InputFieldType field, IInputObjectGraphType type, ISchema schema) => Replace(field);
 
-            public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema) => Replace(argument);
+            public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, InterfaceFieldType field, IInterfaceGraphType type, ISchema schema) => Replace(argument);
 
-            public override void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema) => Replace(field);
+            public override void VisitInterfaceFieldDefinition(InterfaceFieldType field, IInterfaceGraphType type, ISchema schema) => Replace(field);
 
-            public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema) => Replace(argument);
+            public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, ObjectFieldType field, IObjectGraphType type, ISchema schema) => Replace(argument);
 
-            public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema) => Replace(field);
+            public override void VisitObjectFieldDefinition(ObjectFieldType field, IObjectGraphType type, ISchema schema) => Replace(field);
 
             private void Replace(IProvideResolvedType provider)
             {

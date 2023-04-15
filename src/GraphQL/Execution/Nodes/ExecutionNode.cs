@@ -29,7 +29,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the graph's field type of this node.
         /// </summary>
-        public FieldType FieldDefinition { get; }
+        public ObjectFieldType FieldDefinition { get; }
 
         /// <summary>
         /// For child array item nodes of a <see cref="ListGraphType"/>, returns the index of this array item within the field; otherwise, <see langword="null"/>.
@@ -75,7 +75,7 @@ namespace GraphQL.Execution
         /// <param name="field">The AST field of this node</param>
         /// <param name="fieldDefinition">The graph's field type of this node</param>
         /// <param name="indexInParentNode">For child array item nodes of a <see cref="ListGraphType"/>, the index of this array item within the field; otherwise, <see langword="null"/></param>
-        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
+        protected ExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, ObjectFieldType fieldDefinition, int? indexInParentNode)
         {
             Debug.Assert(field?.Name == fieldDefinition?.Name); // ? for RootExecutionNode
 

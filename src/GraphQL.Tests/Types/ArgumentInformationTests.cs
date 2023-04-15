@@ -10,7 +10,7 @@ public class ArgumentInformationTests
     [Fact]
     public void Expression_Accepts_Null()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo))
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo))
         {
             Expression = null
         };
@@ -20,7 +20,7 @@ public class ArgumentInformationTests
     [Fact]
     public void Expression_Parses_Int()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo))
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo))
         {
             Expression = (IResolveFieldContext context) => 23
         };
@@ -30,7 +30,7 @@ public class ArgumentInformationTests
     [Fact]
     public void Expression_Parses_Object()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo))
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo))
         {
             Expression = (IResolveFieldContext context) => 23
         };
@@ -40,7 +40,7 @@ public class ArgumentInformationTests
     [Fact]
     public void Expression_Throws_For_Invalid_ObjectType()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo));
         var error = Should.Throw<ArgumentException>(() => info.Expression = (IResolveFieldContext context) => "hello");
         error.Message.ShouldBe("Value must be a lambda expression delegate of type Func<IResolveFieldContext, Int32>.");
     }
@@ -48,7 +48,7 @@ public class ArgumentInformationTests
     [Fact]
     public void Expression_Throws_For_Invalid_Type()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo));
         var error = Should.Throw<ArgumentException>(() => info.Expression = (IResolveFieldContext context) => "hello");
         error.Message.ShouldBe("Value must be a lambda expression delegate of type Func<IResolveFieldContext, Int32>.");
     }
@@ -56,7 +56,7 @@ public class ArgumentInformationTests
     [Fact]
     public void SetDelegate_Parses_Int()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo));
         info.SetDelegate(context => 23);
         info.Expression!.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
     }
@@ -64,15 +64,15 @@ public class ArgumentInformationTests
     [Fact]
     public void SetDelegate_Throws_For_Invalid_Type()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
-        var error = Should.Throw<ArgumentException>(() => info.SetDelegate(context => "hello"));
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo));
+        var error = Should.Throw<ArgumentException>(() => info.SetDelegate(_ => "hello"));
         error.Message.ShouldStartWith("Delegate must be of type Func<IResolveFieldContext, Int32>.");
     }
 
     [Fact]
     public void SetDelegate_Throws_For_Null()
     {
-        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
+        var info = new ArgumentInformation(_testParameterInfo, typeof(object), new ObjectFieldType(), new TypeInformation(_testParameterInfo));
         var error = Should.Throw<ArgumentNullException>(() => info.SetDelegate<int>(null!));
     }
 
