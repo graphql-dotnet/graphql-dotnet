@@ -20,45 +20,39 @@ namespace GraphQL.Validation.Rules
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((operation, context) =>
         {
-            if (!IsSubscription(operation))
-            {
+            if (operation.Operation != OperationType.Subscription)
                 return;
-            }
 
-            int rootFields = operation.SelectionSet.Selections.Count;
+            var rootFields = operation.SelectionSet.Selections;
 
-            if (rootFields != 1)
-            {
-                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation,
-                    operation.SelectionSet.Selections.Skip(1).ToArray()));
-            }
+            if (rootFields.Count != 1)
+                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, rootFields.Skip(1).ToArray()));
 
-            var fragment = operation.SelectionSet.Selections.FirstOrDefault(IsFragment);
+            if (rootFields[0] is GraphQLField field && IsIntrospectionField(field))
+                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, field));
+
+            var fragment = operation.SelectionSet.Selections.Find(node => node is GraphQLFragmentSpread || node is GraphQLInlineFragment);
 
             if (fragment == null)
-            {
                 return;
-            }
 
             if (fragment is GraphQLFragmentSpread fragmentSpread)
             {
                 var fragmentDefinition = context.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
-                rootFields = fragmentDefinition?.SelectionSet.Selections.Count ?? 0;
+                if (fragmentDefinition == null)
+                    return;
+
+                rootFields = fragmentDefinition.SelectionSet.Selections;
             }
-            else if (fragment is GraphQLInlineFragment fragmentSelectionSet)
+            else if (fragment is GraphQLInlineFragment inlineFragment)
             {
-                rootFields = fragmentSelectionSet.SelectionSet.Selections.Count;
+                rootFields = inlineFragment.SelectionSet.Selections;
             }
 
-            if (rootFields != 1)
-            {
+            if (rootFields.Count != 1 || (rootFields[0] is GraphQLField field2 && IsIntrospectionField(field2)))
                 context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, fragment));
-            }
-
         });
 
-        private static bool IsSubscription(GraphQLOperationDefinition operation) => operation.Operation == OperationType.Subscription;
-
-        private static bool IsFragment(ASTNode selection) => selection is GraphQLFragmentSpread || selection is GraphQLInlineFragment;
+        private static bool IsIntrospectionField(GraphQLField field) => field.Name.Value.Length >= 2 && field.Name.Value.Span[0] == '_' && field.Name.Value.Span[1] == '_';
     }
 }
