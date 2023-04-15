@@ -229,6 +229,17 @@ namespace GraphQL.Utilities
 
         #endregion
 
+        // See https://spec.graphql.org/October2021/#sec-Root-Operation-Types
+        /// <inheritdoc/>
+        public override void VisitSchema(ISchema schema)
+        {
+            var n1 = schema.Query?.Name;
+            var n2 = schema.Mutation?.Name;
+            var n3 = schema.Subscription?.Name;
+            if (n1 == n2 || n1 == n3 || n2 == n3)
+                throw new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided.");
+        }
+
         // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Unions
         // Union types have the potential to be invalid if incorrectly defined.
         /// <inheritdoc/>
