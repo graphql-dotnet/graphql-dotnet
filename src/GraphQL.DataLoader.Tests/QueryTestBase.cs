@@ -29,6 +29,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
         services.AddSingleton<DataLoaderTestSchema>();
         services.AddSingleton<SubscriptionType>();
         services.AddSingleton<QueryType>();
+        services.AddSingleton<MutationType>();
         services.AddSingleton<OrderType>();
         services.AddSingleton<UserType>();
         services.AddSingleton<OrderItemType>();

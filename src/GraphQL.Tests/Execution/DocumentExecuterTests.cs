@@ -25,9 +25,11 @@ public class DocumentExecuterTests
             selector,
             new IConfigureExecution[] { });
         var schema = new Schema();
-        var graphType = new AutoRegisteringObjectGraphType<SampleGraph>();
-        schema.Query = graphType;
-        schema.Mutation = graphType;
+        var graphType1 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        var graphType2 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        graphType2.Name += "Mutation";
+        schema.Query = graphType1;
+        schema.Mutation = graphType2;
         schema.Initialize();
         var ret = await executer.ExecuteAsync(new ExecutionOptions()
         {
