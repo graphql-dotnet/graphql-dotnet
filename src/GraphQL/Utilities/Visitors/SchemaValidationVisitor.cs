@@ -236,7 +236,7 @@ namespace GraphQL.Utilities
             var n1 = schema.Query?.Name;
             var n2 = schema.Mutation?.Name;
             var n3 = schema.Subscription?.Name;
-            if (n1 == n2 || n1 == n3 || n2 == n3)
+            if (n1 == n2 && n1 != null || n1 == n3 && n1 != null || n2 == n3 && n2 != null)
                 throw new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided.");
         }
 
