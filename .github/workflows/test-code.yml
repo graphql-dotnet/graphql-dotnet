@@ -8,6 +8,8 @@ on:
     paths:
       - src/**
       - .github/workflows/**
+      - "*.sln"
+
   # Upload code coverage results when PRs are merged
   push:
     branches:
