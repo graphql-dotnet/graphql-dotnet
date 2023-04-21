@@ -130,6 +130,12 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     {
         ShouldThrow<SchemaWithFieldResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
     }
+
+    [Fact]
+    public void SchemaWithTheSameRootOperationTypes_Should_Throw()
+    {
+        ShouldThrow<SchemaWithTheSameRootOperationTypes, InvalidOperationException>("The query, mutation, and subscription root types must all be different types if provided.");
+    }
 }
 
 public class EmptyQuerySchema : Schema
@@ -594,5 +600,17 @@ public class SchemaWithInputFieldResolver : Schema
         public string Name { get; set; }
 
         public int Age { get; set; }
+    }
+}
+
+public class SchemaWithTheSameRootOperationTypes : Schema
+{
+    public SchemaWithTheSameRootOperationTypes()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Resolve(_ => "abc");
+        Query = type;
+        Mutation = type;
     }
 }

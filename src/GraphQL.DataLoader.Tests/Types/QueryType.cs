@@ -94,3 +94,12 @@ public class QueryType : ObjectGraphType
             });
     }
 }
+
+public class MutationType : QueryType
+{
+    public MutationType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders)
+        : base(accessor, users, orders)
+    {
+        Name = "Mutation";
+    }
+}

@@ -2875,6 +2875,7 @@ namespace GraphQL.Utilities
         public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitSchema(GraphQL.Types.ISchema schema) { }
         public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public static class StringUtils

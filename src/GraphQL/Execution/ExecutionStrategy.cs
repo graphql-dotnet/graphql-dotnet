@@ -303,10 +303,9 @@ namespace GraphQL.Execution
                 string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 
                 fields[name] = fields.TryGetValue(name, out var original)
-                    ? (new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    ? (new GraphQLField(original.Field.Name) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
                         Alias = original.Field.Alias,
-                        Name = original.Field.Name,
                         Arguments = original.Field.Arguments,
                         SelectionSet = Merge(original.Field.SelectionSet, field.SelectionSet),
                         Directives = original.Field.Directives,
@@ -324,10 +323,7 @@ namespace GraphQL.Execution
                 if (otherSelection == null)
                     return selection;
 
-                return new GraphQLSelectionSet
-                {
-                    Selections = selection.Selections.Union(otherSelection.Selections).ToList()
-                };
+                return new GraphQLSelectionSet(selection.Selections.Union(otherSelection.Selections).ToList());
             }
 
             static int GetFragmentSpreads(ExecutionContext context, GraphQLSelectionSet selectionSet)

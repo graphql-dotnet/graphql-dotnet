@@ -108,7 +108,7 @@ public class EnumerationGraphType : ScalarGraphType
 
         return foundByValue == null
             ? value == null ? GraphQLValuesCache.Null : ThrowASTConversionError(value)
-            : new GraphQLEnumValue { Name = new GraphQLName(foundByValue.Name) };
+            : new GraphQLEnumValue(new GraphQLName(foundByValue.Name));
     }
 }
 

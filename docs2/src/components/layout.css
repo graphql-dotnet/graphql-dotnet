@@ -29,6 +29,12 @@ body {
   overflow: auto;
 }
 
+/* https://github.com/gatsbyjs/gatsby/issues/7310#issuecomment-419977425 this div
+auto-matically added by reach router breaking scroll in the website */
+#gatsby-focus-wrapper {
+  height: 100%;
+}
+
 ul {
   margin: 0;
   padding: 0;
