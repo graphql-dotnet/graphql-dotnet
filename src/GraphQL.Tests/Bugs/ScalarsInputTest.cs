@@ -219,6 +219,7 @@ public class SchemaForScalars : Schema
 {
     public SchemaForScalars()
     {
+        Query = new DummyType();
         Mutation = new ScalarsMutation();
     }
 }

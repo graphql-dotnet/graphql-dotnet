@@ -30,6 +30,10 @@ public class SchemaBuilderTests
     public void should_set_mutation_by_name()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             type Mutation {
               mutate: String
             }
@@ -50,6 +54,10 @@ public class SchemaBuilderTests
     public void should_set_subscription_by_name()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             type Subscription {
               subscribe: String
             }
@@ -260,6 +268,10 @@ public class SchemaBuilderTests
     public void builds_interface()
     {
         const string definitions = """"
+                type Query {
+                    dummy: String
+                }
+
                 """
                 Example description
                 """
@@ -289,6 +301,10 @@ public class SchemaBuilderTests
     public void builds_enum()
     {
         const string definitions = """"
+                type Query {
+                    dummy: String
+                }
+
                 """
                 Example description
                 """
@@ -323,6 +339,10 @@ public class SchemaBuilderTests
     public void builds_case_insensitive_typed_enum()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             enum PetKind {
               CAT
               DOG
@@ -410,6 +430,10 @@ public class SchemaBuilderTests
     public void builds_unions()
     {
         const string definitions = """"
+                type Query {
+                   dummy: String
+                }
+
                 type Human {
                     name: String
                 }
@@ -441,6 +465,10 @@ public class SchemaBuilderTests
     public void builds_input_types()
     {
         const string definitions = """"
+                type Query {
+                  dummy: String
+                }
+
                 """
                 Example description
                 """
@@ -467,6 +495,10 @@ public class SchemaBuilderTests
     public void builds_input_types_with_default_values()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             input ReviewInput {
               stars: Int! = 23
             }
@@ -485,6 +517,10 @@ public class SchemaBuilderTests
     public void builds_input_types_with_dependent_default_values()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             input SomeInputType1 {
               test: SomeInputType2! = { arg1: 22 }
             }
@@ -516,6 +552,10 @@ public class SchemaBuilderTests
     public void input_types_default_value_loops_throw1()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             input SomeInputType1 {
               test: SomeInputType1 = { }
             }
@@ -529,6 +569,10 @@ public class SchemaBuilderTests
     public void input_types_default_value_loops_throw2()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             input SomeInputType1 {
               test: SomeInputType2 = { }
             }
@@ -563,6 +607,10 @@ public class SchemaBuilderTests
     public void builds_directives()
     {
         const string definitions = """"
+            type Query {
+              dummy: String
+            }
+
             """
             Example description
             """
@@ -630,6 +678,10 @@ public class SchemaBuilderTests
     public void deprecate_enum_value()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             enum PetKind {
               CAT @deprecated(reason: "dogs rule")
               DOG
@@ -650,6 +702,10 @@ public class SchemaBuilderTests
     public void deprecated_prefers_metadata_values()
     {
         const string definitions = """
+            type Query {
+              dummy: String
+            }
+
             type Movie {
               movies: Int @deprecated
             }

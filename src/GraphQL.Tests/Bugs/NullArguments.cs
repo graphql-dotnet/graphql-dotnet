@@ -76,6 +76,7 @@ public class NullMutationSchema : Schema
 {
     public NullMutationSchema()
     {
+        Query = new DummyType();
         Mutation = new NullMutation();
     }
 }

@@ -338,9 +338,10 @@ namespace GraphQL.Types
                 }
             }
 
-            //TODO: According to the specification, Query is a required type. But if you uncomment these lines, then the mass of tests begin to fail, because they do not set Query.
-            // if (Query == null)
-            //    throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (schema.Query == null && GlobalSwitches.RequireRootQueryType)
+                throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
+#pragma warning restore CS0618 // Type or member is obsolete
 
             if (schema.Query != null)
                 yield return schema.Query;

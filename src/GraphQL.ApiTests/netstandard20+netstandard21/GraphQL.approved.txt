@@ -106,7 +106,7 @@ namespace GraphQL
         public DocumentExecuter() { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator) { }
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations) { }
-        protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.Variables variables, GraphQL.Instrumentation.Metrics metrics) { }
+        protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.IValidationResult validationResult, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
         protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
@@ -224,6 +224,9 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
+            "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+        public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
@@ -1115,7 +1118,9 @@ namespace GraphQL.Execution
     {
         public ExecutionContext() { }
         public ExecutionContext(GraphQL.Execution.ExecutionContext context) { }
+        public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
+        public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
         public GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; set; }
@@ -1141,7 +1146,7 @@ namespace GraphQL.Execution
     {
         public static GraphQL.Execution.ArgumentValue CoerceValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue? input, GraphQL.Validation.Variables? variables = null, object? fieldDefault = null) { }
         public static System.Collections.Generic.Dictionary<string, GraphQL.Execution.ArgumentValue>? GetArguments(GraphQL.Types.QueryArguments? definitionArguments, GraphQLParser.AST.GraphQLArguments? astArguments, GraphQL.Validation.Variables? variables) { }
-        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(GraphQLParser.AST.GraphQLField field, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(GraphQLParser.AST.IHasDirectivesNode node, GraphQL.Validation.Variables? variables, GraphQL.Types.ISchema schema) { }
     }
     public abstract class ExecutionNode
     {
@@ -1188,7 +1193,8 @@ namespace GraphQL.Execution
         protected virtual System.Threading.Tasks.Task SetArrayItemNodesAsync(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ArrayExecutionNode parent) { }
         protected virtual void SetNodeError(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node, GraphQL.ExecutionError error) { }
         protected virtual void SetSubFieldNodes(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ObjectExecutionNode parent) { }
-        protected virtual bool ShouldIncludeNode(GraphQL.Execution.ExecutionContext context, GraphQLParser.AST.IHasDirectivesNode node) { }
+        protected virtual bool ShouldIncludeNode<TASTNode>(GraphQL.Execution.ExecutionContext context, TASTNode node)
+            where TASTNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasDirectivesNode { }
         protected virtual void ValidateNodeResult(GraphQL.Execution.ExecutionContext context, GraphQL.Execution.ExecutionNode node) { }
     }
     public class ExecutionStrategyRegistration : System.IEquatable<GraphQL.Execution.ExecutionStrategyRegistration>
@@ -1230,7 +1236,9 @@ namespace GraphQL.Execution
     }
     public interface IExecutionContext : GraphQL.Execution.IProvideUserContext
     {
+        System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; }
         System.Threading.CancellationToken CancellationToken { get; }
+        System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         GraphQLParser.AST.GraphQLDocument Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
         GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; }
@@ -2506,6 +2514,7 @@ namespace GraphQL.Types
         public int Count { get; }
         public bool Contains(GraphQL.Types.FieldType field) { }
         public bool Contains(GraphQL.Types.IFieldType field) { }
+        public GraphQL.Types.FieldType? Find(GraphQLParser.ROM name) { }
         public GraphQL.Types.FieldType? Find(string name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.FieldType> GetEnumerator() { }
     }
@@ -2680,6 +2689,12 @@ namespace GraphQL.Utilities
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public GraphQL.Reflection.IAccessor? StreamResolverAccessor { get; set; }
         public GraphQL.Utilities.ArgumentConfig ArgumentFor(string argumentName) { }
+    }
+    public sealed class FieldTypeDefaultArgumentsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static readonly GraphQL.Utilities.FieldTypeDefaultArgumentsVisitor Instance;
+        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public interface ISchemaNodeVisitor
     {
@@ -2930,17 +2945,11 @@ namespace GraphQL.Validation
     {
         public static readonly System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule> CoreRules;
         public DocumentValidator() { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "validationResult",
-                "variables"})]
-        public System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
+        public System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
     }
     public interface IDocumentValidator
     {
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "validationResult",
-                "variables"})]
-        System.Threading.Tasks.Task<System.ValueTuple<GraphQL.Validation.IValidationResult, GraphQL.Validation.Variables>> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
+        System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
     }
     public interface INodeVisitor
     {
@@ -2949,8 +2958,11 @@ namespace GraphQL.Validation
     }
     public interface IValidationResult
     {
+        System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; }
+        System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         GraphQL.ExecutionErrors Errors { get; }
         bool IsValid { get; }
+        GraphQL.Validation.Variables? Variables { get; }
     }
     public interface IValidationRule
     {
@@ -2986,12 +2998,6 @@ namespace GraphQL.Validation
     public sealed class NodeVisitors : GraphQL.Validation.INodeVisitor
     {
         public NodeVisitors(params GraphQL.Validation.INodeVisitor[] nodeVisitors) { }
-    }
-    public sealed class SuccessfullyValidatedResult : GraphQL.Validation.IValidationResult
-    {
-        public static readonly GraphQL.Validation.IValidationResult Instance;
-        public GraphQL.ExecutionErrors Errors { get; }
-        public bool IsValid { get; }
     }
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
@@ -3070,8 +3076,11 @@ namespace GraphQL.Validation
     {
         public ValidationResult(params GraphQL.Validation.ValidationError[] errors) { }
         public ValidationResult(System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> errors) { }
+        public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; set; }
+        public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQL.ExecutionErrors Errors { get; }
         public bool IsValid { get; }
+        public GraphQL.Validation.Variables? Variables { get; set; }
     }
     public class Variable
     {
