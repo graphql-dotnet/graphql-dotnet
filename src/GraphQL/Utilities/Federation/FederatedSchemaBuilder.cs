@@ -122,7 +122,7 @@ namespace GraphQL.Utilities.Federation
         {
             if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
             {
-                setToAlter!.Selections.Insert(0, new GraphQLField { Name = new GraphQLName("__typename") });
+                setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
             }
         }
 
