@@ -181,7 +181,7 @@ public class DocumentExecuterTests
 
     private class TestQueryExecutionStrategy : ParallelExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();
@@ -192,7 +192,7 @@ public class DocumentExecuterTests
 
     private class TestMutationExecutionStrategy : SerialExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();

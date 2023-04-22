@@ -124,9 +124,9 @@ public class ScopedAttributeTests
 
     private class Class1 : IDisposable
     {
-        public static int DisposedCount = 0;
+        public static int DisposedCount;
 
-        private bool _disposed = false;
+        private bool _disposed;
         private int _value;
 
         public int Value

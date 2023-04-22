@@ -190,7 +190,7 @@ namespace GraphQL.Types
             Initialize(schema, serviceProvider, graphTypeMappings);
         }
 
-        private bool _initialized = false;
+        private bool _initialized;
         /// <summary>
         /// Initializes the instance for the specified schema, and with the specified type resolver.
         /// </summary>

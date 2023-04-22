@@ -1286,7 +1286,8 @@ public class GraphQLBuilderExtensionTests
 
     private class MyMiddleware : IFieldMiddleware
     {
-        public bool RanMiddleware { get; set; } = false;
+        public bool RanMiddleware { get; set; }
+
         public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             RanMiddleware = true;
