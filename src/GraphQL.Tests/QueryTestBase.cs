@@ -23,6 +23,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
         Executer = new DocumentExecuter(new TDocumentBuilder(), new DocumentValidator());
     }
 
+#pragma warning disable xUnit1013 // public method should be marked as test
     // WARNING: it is not static only for discoverability
     // WARNING: do not set any instance data inside
     // WARNING: method works on temporaly created instance
@@ -30,6 +31,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     {
         register.TryRegister(typeof(TSchema), typeof(TSchema), ServiceLifetime.Singleton);
     }
+#pragma warning restore xUnit1013 // public method should be marked as test
 
     private IServiceProvider _serviceProvider;
 
