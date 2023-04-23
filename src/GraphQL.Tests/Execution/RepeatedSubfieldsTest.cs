@@ -42,7 +42,7 @@ public class RepeatedSubfieldsTests
     private GraphQLField SecondTestField { get; }
     private GraphQLField AliasedTestField { get; }
 
-    private Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+    private static Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
     {
         return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
     }

@@ -68,6 +68,7 @@ public class ScopedAttributeTests
         Class1.DisposedCount.ShouldBe(3);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
     private class TestClass
     {
         public string UnscopedField([FromServices] Class1 arg1, [FromServices] Class2 arg2)

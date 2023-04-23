@@ -23,7 +23,7 @@ public class DocumentExecuterTests
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
             selector,
-            new IConfigureExecution[] { });
+            Array.Empty<IConfigureExecution>());
         var schema = new Schema();
         var graphType1 = new AutoRegisteringObjectGraphType<SampleGraph>();
         var graphType2 = new AutoRegisteringObjectGraphType<SampleGraph>();

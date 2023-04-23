@@ -10,31 +10,57 @@ using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
 
-public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
+public sealed class OpenTelemetryTests : IDisposable
 {
-    private readonly OpenTelemetryFixture _fixture;
+    private readonly List<Activity> _exportedActivities = new();
+    private readonly IHost _host;
+    private readonly IDocumentExecuter<ISchema> _executer;
+    private readonly IGraphQLTextSerializer _serializer;
+    private readonly GraphQLTelemetryOptions _options;
 
-    public OpenTelemetryTests(OpenTelemetryFixture fixture)
+    public OpenTelemetryTests()
     {
-        fixture.Reset();
-        _fixture = fixture;
+        // configure services
+        _host = new HostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddOpenTelemetry()
+                    .WithTracing(b => b
+                        .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddInMemoryExporter(_exportedActivities));
+
+                services.AddGraphQL(b => b
+                    .AddSystemTextJson()
+                    .AddAutoSchema<Query>()
+                    .UseTelemetry());
+            })
+            .Build();
+
+        // starts telemetry services
+        _host.Start();
+
+        _executer = _host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
+        _serializer = _host.Services.GetRequiredService<IGraphQLTextSerializer>();
+        _options = _host.Services.GetRequiredService<GraphQLTelemetryOptions>();
     }
+
+    public void Dispose() => _host.Dispose();
 
     [Fact]
     public async Task BasicTest()
     {
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "{ hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
-        _fixture.Serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "{ hello }"),
@@ -49,17 +75,17 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithOperationNameTest()
     {
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
-        _fixture.Serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
@@ -73,20 +99,20 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     [Fact]
     public async Task DocumentFilterTest()
     {
-        _fixture.Options.SanitizeDocument = options => options.Query?.Replace("hello", "testing");
+        _options.SanitizeDocument = options => options.Query?.Replace("hello", "testing");
 
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "{ hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
-        _fixture.Serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "{ testing }"),
@@ -103,23 +129,23 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
         var executionOptions = new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         };
 
-        _fixture.Options.EnrichWithExecutionOptions = (activity, options) =>
+        _options.EnrichWithExecutionOptions = (activity, options) =>
         {
             options.ShouldBe(executionOptions);
             activity.SetTag("testoptions", "test1");
         };
-        _fixture.Options.EnrichWithDocument = (activity, options, schema, document, operation) =>
+        _options.EnrichWithDocument = (activity, options, schema, document, operation) =>
         {
             options.ShouldBe(executionOptions);
-            schema.AllTypes["Query"].ShouldBeOfType<AutoRegisteringObjectGraphType<OpenTelemetryFixture.Query>>();
+            schema.AllTypes["Query"].ShouldBeOfType<AutoRegisteringObjectGraphType<Query>>();
             document.Source.ToString().ShouldBe(executionOptions.Query);
             operation.Operation.ShouldBe(GraphQLParser.AST.OperationType.Query);
             activity.SetTag("testdocument", "test2");
         };
-        _fixture.Options.EnrichWithExecutionResult = (activity, options, result) =>
+        _options.EnrichWithExecutionResult = (activity, options, result) =>
         {
             options.ShouldBe(executionOptions);
             result.Query.ToString().ShouldBe(executionOptions.Query);
@@ -127,13 +153,13 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
         };
 
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
 
         // verify GraphQL response
-        _fixture.Serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
@@ -153,10 +179,10 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
         var executionOptions = new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         };
-        var ranFilter = false;
-        _fixture.Options.Filter = options =>
+        bool ranFilter = false;
+        _options.Filter = options =>
         {
             options.ShouldBe(executionOptions);
             ranFilter = true;
@@ -164,13 +190,13 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
         };
 
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
 
         // verify GraphQL response
-        _fixture.Serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
-        _fixture.ExportedActivities.ShouldBeEmpty();
+        _exportedActivities.ShouldBeEmpty();
         ranFilter.ShouldBeTrue();
     }
 
@@ -178,17 +204,17 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithValidationError()
     {
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "query helloQuery { hello { dummy } }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "query helloQuery { hello { dummy } }"),
@@ -203,17 +229,17 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithParseError()
     {
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "{",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "{"),
@@ -226,17 +252,17 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithServerError()
     {
         // execute GraphQL document
-        var result = await _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "{ serverError }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
         }).ConfigureAwait(false);
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "{ serverError }"),
@@ -253,15 +279,15 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithCancellation1()
     {
         // execute GraphQL document
-        await Should.ThrowAsync<OperationCanceledException>(() => _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        await Should.ThrowAsync<OperationCanceledException>(() => _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
         })).ConfigureAwait(false);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
@@ -275,16 +301,16 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     public async Task WithCancellation1b()
     {
         // execute GraphQL document
-        await Should.ThrowAsync<OperationCanceledException>(() => _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        await Should.ThrowAsync<OperationCanceledException>(() => _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
             OperationName = "helloQuery",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
         })).ConfigureAwait(false);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.operation.name", "helloQuery"), // operation name pulled from ExecutionOptions
@@ -299,16 +325,16 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
     {
         // execute GraphQL document
         var cts = new CancellationTokenSource();
-        await Should.ThrowAsync<OperationCanceledException>(() => _fixture.Executer.ExecuteAsync(new ExecutionOptions
+        await Should.ThrowAsync<OperationCanceledException>(() => _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "query cancelQuery { cancel }",
-            RequestServices = _fixture.Host.Services,
+            RequestServices = _host.Services,
             Root = cts,
             CancellationToken = cts.Token,
         })).ConfigureAwait(false);
 
         // verify activity telemetry
-        var activity = _fixture.ExportedActivities.ShouldHaveSingleItem();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
         activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
         {
             new("graphql.document", "query cancelQuery { cancel }"),
@@ -318,61 +344,8 @@ public class OpenTelemetryTests : IClassFixture<OpenTelemetryFixture>
         activity.DisplayName.ShouldBe("query cancelQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
-}
 
-public class OpenTelemetryFixture : IDisposable
-{
-    public OpenTelemetryFixture()
-    {
-        // configure services
-        Host = new HostBuilder()
-            .ConfigureServices(services =>
-            {
-                services.AddOpenTelemetry()
-                    .WithTracing(b => b
-                        .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
-                        .AddInMemoryExporter(ExportedActivities));
-
-                services.AddGraphQL(b => b
-                    .AddSystemTextJson()
-                    .AddAutoSchema<Query>()
-                    .UseTelemetry());
-            })
-            .Build();
-
-        // starts telemetry services
-        Host.Start();
-    }
-
-    public void Reset()
-    {
-        ExportedActivities.Clear();
-
-        var defaultOptions = new GraphQLTelemetryOptions();
-        var options = Options;
-
-        options.RecordDocument = defaultOptions.RecordDocument;
-        options.SanitizeDocument = defaultOptions.SanitizeDocument;
-        options.Filter = defaultOptions.Filter;
-        options.EnrichWithExecutionOptions = defaultOptions.EnrichWithExecutionOptions;
-        options.EnrichWithDocument = defaultOptions.EnrichWithDocument;
-        options.EnrichWithExecutionResult = defaultOptions.EnrichWithExecutionResult;
-        options.EnrichWithException = defaultOptions.EnrichWithException;
-    }
-
-    public IHost Host { get; }
-
-    public List<Activity> ExportedActivities { get; } = new();
-
-    public GraphQLTelemetryOptions Options => Host.Services.GetRequiredService<GraphQLTelemetryOptions>();
-
-    public IDocumentExecuter<ISchema> Executer => Host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
-
-    public IGraphQLTextSerializer Serializer => Host.Services.GetRequiredService<IGraphQLTextSerializer>();
-
-    public void Dispose() => Host.Dispose();
-
-    internal class Query
+    private class Query
     {
         public static string Hello => "World";
 

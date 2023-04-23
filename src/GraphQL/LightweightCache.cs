@@ -13,11 +13,7 @@ public class LightweightCache<TKey, TValue> : IEnumerable<TValue>
     where TKey : notnull
 {
     private readonly IDictionary<TKey, TValue> _values;
-    private Func<TKey, TValue> _onMissing = delegate (TKey key)
-    {
-        var message = $"Key '{key}' could not be found";
-        throw new KeyNotFoundException(message);
-    };
+    private Func<TKey, TValue> _onMissing = (TKey key) => throw new KeyNotFoundException($"Key '{key}' could not be found");
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LightweightCache{TKey, TValue}"/> class.
