@@ -912,7 +912,7 @@ public class GraphQLBuilderExtensionTests
         MockSetupRegister<MyValidationRule, MyValidationRule>(serviceLifetime);
         MockSetupRegister<IValidationRule, MyValidationRule>(serviceLifetime);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-         mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
+        mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
         if (useForCachedDocuments)
         {
