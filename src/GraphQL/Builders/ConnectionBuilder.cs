@@ -50,7 +50,7 @@ namespace GraphQL.Builders
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
     // TODO: Remove in v5
-    public class ConnectionBuilder<TSourceType>
+    public class ConnectionBuilder<TSourceType> : IProvideMetadata
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
 
@@ -362,5 +362,13 @@ namespace GraphQL.Builders
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
         }
+
+        // Allow metadata builder extension methods to read/write to the underlying field type without unnecessarily
+        // exposing metadata methods directly on the field builder; users can always use the FieldType property
+        // to access the underlying metadata directly.
+        Dictionary<string, object?> IMetadataBuilder.Metadata => FieldType.Metadata;
+        TType IMetadataBuilder.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IMetadataBuilder.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IMetadataBuilder.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

@@ -28,7 +28,8 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// </summary>
-        public static AppliedDirectives? GetAppliedDirectives(this IProvideMetadata provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
+        public static AppliedDirectives? GetAppliedDirectives(this IProvideMetadata provider) => GetAppliedDirectivesInternal(provider);
+        private static AppliedDirectives? GetAppliedDirectivesInternal(this IMetadataBuilder provider) => provider.GetMetadata<AppliedDirectives>(DIRECTIVES_KEY);
 
         /// <summary>
         /// Finds applied directive by its name from the specified provider if any. Otherwise returns <see langword="null"/>.
@@ -51,7 +52,7 @@ namespace GraphQL
         /// <param name="name">Directive name.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
-            where TMetadataProvider : IProvideMetadata => provider.ApplyDirective(name, _ => { });
+            where TMetadataProvider : IMetadataBuilder => provider.ApplyDirective(name, _ => { });
 
         /// <summary>
         /// Apply directive specifying one argument. If the directive declaration has other arguments,
@@ -66,7 +67,7 @@ namespace GraphQL
         /// <param name="argumentValue">Argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argumentName, object? argumentValue)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataBuilder
             => provider.ApplyDirective(name, directive => directive.AddArgument(new DirectiveArgument(argumentName) { Value = argumentValue }));
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace GraphQL
         /// <param name="argument2Value">Second argument value.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataBuilder
             => provider.ApplyDirective(name, directive => directive
                                                 .AddArgument(new DirectiveArgument(argument1Name) { Value = argument1Value })
                                                 .AddArgument(new DirectiveArgument(argument2Name) { Value = argument2Value }));
@@ -100,7 +101,7 @@ namespace GraphQL
         /// <param name="configure">Configuration delegate.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name, Action<AppliedDirective> configure)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataBuilder
         {
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
@@ -108,7 +109,7 @@ namespace GraphQL
             var directive = new AppliedDirective(name);
             configure(directive);
 
-            var directives = provider.GetAppliedDirectives() ?? new AppliedDirectives();
+            var directives = provider.GetAppliedDirectivesInternal() ?? new AppliedDirectives();
             directives.Add(directive);
 
             provider.Metadata[DIRECTIVES_KEY] = directives;
@@ -126,9 +127,9 @@ namespace GraphQL
         /// <param name="name">Directive name.</param>
         /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider RemoveAppliedDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
-             where TMetadataProvider : IProvideMetadata
+             where TMetadataProvider : IMetadataBuilder
         {
-            provider.GetAppliedDirectives()?.Remove(name);
+            provider.GetAppliedDirectivesInternal()?.Remove(name);
             return provider;
         }
 

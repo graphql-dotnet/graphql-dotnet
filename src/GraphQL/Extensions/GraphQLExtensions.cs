@@ -254,12 +254,12 @@ namespace GraphQL
         /// Adds a key-value metadata pair to the specified provider.
         /// </summary>
         /// <typeparam name="TMetadataProvider"> The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining. </typeparam>
-        /// <param name="provider"> Metadata provider which must implement <see cref="IProvideMetadata"/> interface. </param>
+        /// <param name="provider"> Metadata provider which must implement <see cref="IMetadataBuilder"/> interface. </param>
         /// <param name="key"> String key. </param>
         /// <param name="value"> Arbitrary value. </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataBuilder
         {
             provider.Metadata[key] = value;
             return provider;

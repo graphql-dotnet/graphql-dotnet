@@ -18,3 +18,12 @@ GlobalSwitches.RequireRootQueryType = false;
 
 Future versions of GraphQL.NET will not contain this property and each schema will always be required to have a root Query type to comply with the GraphQL specification.
 
+### 2. Use `ApplyDirective` instead of `Directive` on field builders
+
+The `Directive` method on field builders has been renamed to `ApplyDirective` to better fit with
+other field builder extension methods.
+
+### 3. Use `WithComplexityImpact` instead of `ComplexityImpact` on field builders
+
+The `ComplexityImpact` method on field builders has been renamed to `WithComplexityImpact` to better fit with
+other field builder extension methods.

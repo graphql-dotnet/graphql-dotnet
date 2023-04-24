@@ -34,7 +34,7 @@ namespace GraphQL.Utilities
         /// Copies metadata to the specified target.
         /// </summary>
         /// <param name="target">Target for copying metadata.</param>
-        public void CopyMetadataTo(IProvideMetadata target)
+        public void CopyMetadataTo(IMetadataBuilder target)
         {
             var local = _metadata;
             if (local?.Count > 0)

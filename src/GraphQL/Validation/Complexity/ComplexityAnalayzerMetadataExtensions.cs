@@ -17,7 +17,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// <param name="impact">Field's complexity impact.</param>
     /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
     public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
-        where TMetadataProvider : IProvideMetadata
+        where TMetadataProvider : IMetadataBuilder
         => provider.WithMetadata(COMPLEXITY_IMPACT, impact);
 
     /// <summary>
