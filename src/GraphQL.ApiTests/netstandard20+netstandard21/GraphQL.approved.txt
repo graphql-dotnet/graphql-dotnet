@@ -55,6 +55,12 @@ namespace GraphQL
         public static object Boxed(this bool value) { }
         public static object? Boxed(this bool? value) { }
     }
+    public static class ComplexityAnalayzerMetadataExtensions
+    {
+        public static double? GetComplexityImpact(this GraphQL.Types.IProvideMetadata provider) { }
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
+            where TMetadataProvider : GraphQL.Types.IMetadataBuilder { }
+    }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
@@ -3089,12 +3095,6 @@ namespace GraphQL.Validation
 }
 namespace GraphQL.Validation.Complexity
 {
-    public static class ComplexityAnalayzerMetadataExtensions
-    {
-        public static double? GetComplexityImpact(this GraphQL.Types.IProvideMetadata provider) { }
-        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
-            where TMetadataProvider : GraphQL.Types.IMetadataBuilder { }
-    }
     [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This class will b" +
         "e removed in v8.")]
     public class ComplexityAnalyzer : GraphQL.Validation.Complexity.IComplexityAnalyzer

@@ -1,6 +1,7 @@
 using GraphQL.Types;
+using GraphQL.Validation.Complexity;
 
-namespace GraphQL.Validation.Complexity;
+namespace GraphQL;
 
 /// <summary>
 /// Provides extension methods for working with field's complexity impact.
@@ -13,7 +14,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
-    /// <param name="provider">Metadata provider which must implement <see cref="IProvideMetadata"/> interface.</param>
+    /// <param name="provider">Metadata provider which must implement <see cref="IMetadataBuilder"/> interface.</param>
     /// <param name="impact">Field's complexity impact.</param>
     /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
     public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
