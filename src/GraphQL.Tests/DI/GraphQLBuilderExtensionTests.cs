@@ -904,6 +904,8 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, ServiceLifetime.Singleton)]
     [InlineData(true, ServiceLifetime.Scoped)]
     [InlineData(false, ServiceLifetime.Scoped)]
+    [InlineData(true, ServiceLifetime.Transient)]
+    [InlineData(false, ServiceLifetime.Transient)]
     public void AddValidationRule(bool useForCachedDocuments, ServiceLifetime serviceLifetime)
     {
         var instance = new MyValidationRule();
