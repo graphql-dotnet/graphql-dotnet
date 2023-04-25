@@ -108,7 +108,7 @@ namespace GraphQL
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
-        /// Thread safe method to get value by path (key1.key2.keyN) from input extensions dictionary.
+        /// Method to get value by path (key1.key2.keyN) from input extensions dictionary.
         /// </summary>
         /// <param name="context">Context with dictionary of extra information supplied with the GraphQL request.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
@@ -121,30 +121,27 @@ namespace GraphQL
             if (context.InputExtensions == null || context.InputExtensions.Count == 0)
                 return null;
 
-            lock (context.InputExtensions)
+            // actually context.InputExtensions is of type GraphQL.Inputs
+            if (context.InputExtensions is not IDictionary<string, object?> values || values.Count == 0)
+                return null;
+
+            if (path.IndexOf('.') != -1)
             {
-                // actually context.InputExtensions is of type GraphQL.Inputs
-                if (context.InputExtensions is not IDictionary<string, object?> values || values.Count == 0)
-                    return null;
+                string[] keys = path.Split(_separators);
 
-                if (path.IndexOf('.') != -1)
+                for (int i = 0; i < keys.Length - 1; ++i)
                 {
-                    string[] keys = path.Split(_separators);
-
-                    for (int i = 0; i < keys.Length - 1; ++i)
-                    {
-                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
-                            values = d;
-                        else
-                            return null;
-                    }
-
-                    return values.TryGetValue(keys[keys.Length - 1], out object? result) ? result : null;
+                    if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
+                        values = d;
+                    else
+                        return null;
                 }
-                else
-                {
-                    return values.TryGetValue(path, out object? result) ? result : null;
-                }
+
+                return values.TryGetValue(keys[keys.Length - 1], out object? result) ? result : null;
+            }
+            else
+            {
+                return values.TryGetValue(path, out object? result) ? result : null;
             }
         }
 
