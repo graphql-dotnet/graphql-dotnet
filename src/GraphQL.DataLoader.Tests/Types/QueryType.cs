@@ -12,7 +12,7 @@ public class QueryType : ObjectGraphType
 
         Field<ListGraphType<UserType>, IEnumerable<User>>("Users")
             .Description("Get all Users")
-            .ResolveAsync(ctx =>
+            .ResolveAsync(_ =>
             {
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
                     users.GetAllUsersAsync);
@@ -22,9 +22,9 @@ public class QueryType : ObjectGraphType
 
         Field<ListGraphType<UserType>, IEnumerable<User>>("UsersWithDelay")
             .Description("Get all Users")
-            .ResolveAsync(async ctx =>
+            .ResolveAsync(async _ =>
             {
-                await System.Threading.Tasks.Task.Delay(20).ConfigureAwait(false);
+                await Task.Delay(20).ConfigureAwait(false);
 
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
                     users.GetAllUsersAsync);
@@ -47,7 +47,7 @@ public class QueryType : ObjectGraphType
         Field<ListGraphType<OrderType>, IEnumerable<Order>>()
             .Name("Orders")
             .Description("Get all Orders")
-            .ResolveAsync(ctx =>
+            .ResolveAsync(_ =>
             {
                 var loader = accessor.Context.GetOrAddLoader("GetAllOrders",
                     orders.GetAllOrdersAsync);
