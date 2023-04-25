@@ -18,16 +18,6 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
 
         /// <summary>
-        /// Indicates whether to use ',' instead of '&amp;' when inheriting a type from multiple interfaces.
-        /// </summary>
-        public bool OldImplementsSyntax { get; set; }
-
-        /// <summary>
-        /// Indicates whether to print descriptions as comments for compatibility with the 2016 GraphQL specification.
-        /// </summary>
-        public bool PrintDescriptionsAsComments { get; set; } = true;
-
-        /// <summary>
         /// Provides the ability to order the schema elements upon printing.
         /// By default all elements are returned as-is; no sorting is applied.
         /// </summary>
