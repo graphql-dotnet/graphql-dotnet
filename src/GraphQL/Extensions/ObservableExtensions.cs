@@ -63,17 +63,8 @@ internal static class ObservableExtensions
             }
             catch (Exception ex)
             {
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        ex = await _transformError(ex, default).ConfigureAwait(false);
-                    }
-                    finally
-                    {
-                        observer.OnError(ex);
-                    }
-                });
+                // transform and post error to source
+                newObserver.OnError(ex);
             }
             return newObserver;
         }
