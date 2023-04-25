@@ -272,6 +272,20 @@ public class ObservableExtensionsTests
         });
     }
 
+    [Fact]
+    public async Task ExceptionsDuringSubscribeProduceOnError()
+    {
+        var errorObservable = new ErrorObservable();
+        var observable = errorObservable.SelectCatchAsync<string, string>((s, _) => new(s), (ex, _) => new(new ExecutionError(ex.Message)));
+        using var subscription = observable.Subscribe(Observer);
+        await Observer.WaitForAsync("Error 'ExecutionError'. ").ConfigureAwait(false);
+    }
+
+    private class ErrorObservable : IObservable<string>
+    {
+        public IDisposable Subscribe(IObserver<string> observer) => throw new NotImplementedException("This is a test");
+    }
+
     private class SampleObserver : IObserver<string>
     {
         private readonly System.Text.StringBuilder _stringBuilder = new();

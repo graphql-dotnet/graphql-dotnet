@@ -48,12 +48,24 @@ internal static class ObservableExtensions
         /// are passed to the underlying <see cref="IObservable{T}"/> and also used
         /// to signal pending asynchronous tasks that cancellation has been requested
         /// and also used to prevent further event notifications.
+        /// <br/><br/>
+        /// Exceptions during the call to the underlying <see cref="IObservable{T}.Subscribe(IObserver{T})"/>
+        /// method are caught, transformed, and a subscription is created which will immediately produce an error and terminate.
+        /// This allows these errors to be handled by the unhandled exception delegate.
         /// </summary>
         public IDisposable Subscribe(IObserver<TOut> observer)
         {
             IDisposable? subscription = null;
             var newObserver = new Observer(observer, _transformNext, _transformError, () => subscription?.Dispose());
-            subscription = _source.Subscribe(newObserver);
+            try
+            {
+                subscription = _source.Subscribe(newObserver);
+            }
+            catch (Exception ex)
+            {
+                // transform and post error to source
+                newObserver.OnError(ex);
+            }
             return newObserver;
         }
 
