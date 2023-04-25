@@ -900,24 +900,28 @@ public class GraphQLBuilderExtensionTests
 
     #region - AddValidationRule -
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void AddValidationRule(bool useForCachedDocuments)
+    [InlineData(true, ServiceLifetime.Singleton)]
+    [InlineData(false, ServiceLifetime.Singleton)]
+    [InlineData(true, ServiceLifetime.Scoped)]
+    [InlineData(false, ServiceLifetime.Scoped)]
+    [InlineData(true, ServiceLifetime.Transient)]
+    [InlineData(false, ServiceLifetime.Transient)]
+    public void AddValidationRule(bool useForCachedDocuments, ServiceLifetime serviceLifetime)
     {
         var instance = new MyValidationRule();
-        MockSetupRegister<MyValidationRule, MyValidationRule>();
-        MockSetupRegister<IValidationRule, MyValidationRule>();
+        MockSetupRegister<MyValidationRule, MyValidationRule>(serviceLifetime);
+        MockSetupRegister<IValidationRule, MyValidationRule>(serviceLifetime);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
         if (useForCachedDocuments)
         {
             //verify default argument value
-            _builder.AddValidationRule<MyValidationRule>(true);
+            _builder.AddValidationRule<MyValidationRule>(true, serviceLifetime);
         }
         else
         {
-            _builder.AddValidationRule<MyValidationRule>();
+            _builder.AddValidationRule<MyValidationRule>(serviceLifetime: serviceLifetime);
         }
         var opts = getOpts();
         opts.ValidationRules.ShouldNotBeNull();
