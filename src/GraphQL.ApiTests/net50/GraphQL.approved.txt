@@ -2858,8 +2858,6 @@ namespace GraphQL.Utilities
         public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
-        public bool OldImplementsSyntax { get; set; }
-        public bool PrintDescriptionsAsComments { get; set; }
     }
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
