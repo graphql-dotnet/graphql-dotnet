@@ -108,6 +108,47 @@ namespace GraphQL
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
+        /// Thread safe method to get value by path (key1.key2.keyN) from input extensions dictionary.
+        /// </summary>
+        /// <param name="context">Context with dictionary of extra information supplied with the GraphQL request.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <returns>Value, if any exists on the specified path, otherwise <see langword="null"/>.</returns>
+        public static object? GetInputExtension(this IResolveFieldContext context, string path)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            if (context.InputExtensions == null || context.InputExtensions.Count == 0)
+                return null;
+
+            lock (context.InputExtensions)
+            {
+                // actually context.InputExtensions is of type GraphQL.Inputs
+                if (context.InputExtensions is not IDictionary<string, object?> values || values.Count == 0)
+                    return null;
+
+                if (path.IndexOf('.') != -1)
+                {
+                    string[] keys = path.Split(_separators);
+
+                    for (int i = 0; i < keys.Length - 1; ++i)
+                    {
+                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
+                            values = d;
+                        else
+                            return null;
+                    }
+
+                    return values.TryGetValue(keys[keys.Length - 1], out object? result) ? result : null;
+                }
+                else
+                {
+                    return values.TryGetValue(path, out object? result) ? result : null;
+                }
+            }
+        }
+
+        /// <summary>
         /// Thread safe method to get value by path (key1.key2.keyN) from output extensions dictionary.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
