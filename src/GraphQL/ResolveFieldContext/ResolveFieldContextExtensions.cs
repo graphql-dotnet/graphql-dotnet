@@ -121,7 +121,7 @@ namespace GraphQL
             // Actually context.InputExtensions is of type GraphQL.Inputs : ReadOnlyDictionary<string, object?> and
             // ReadOnlyDictionary<string, object?> implements IDictionary<string, object?> so this cast should never
             // return null for majority of cases.
-            return GetByPath(context.InputExtensions as IDictionary<string, object?>, path, true);
+            return GetByPath(context.InputExtensions as IDictionary<string, object?>, path, false);
         }
 
         /// <summary>
