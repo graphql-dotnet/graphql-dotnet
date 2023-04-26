@@ -23,6 +23,10 @@ public static TMetadataBuilder RequireAdmin<TMetadataBuilder>(this TMetadataBuil
 }
 ```
 
+Both interfaces extend `IProvideMetadata` with read/write access to the metadata contained within the graph or field type.
+Be sure not to write metadata during the execution of a query, as the same graph/field type instance may be used for
+multiple queries and you would run into concurrency issues.
+
 ## Breaking Changes
 
 ### 1. Query type is required
