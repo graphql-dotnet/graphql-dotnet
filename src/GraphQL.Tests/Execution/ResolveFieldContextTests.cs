@@ -157,11 +157,14 @@ public class ResolveFieldContextTests
     {
         IResolveFieldContext context = null;
         Should.Throw<ArgumentNullException>(() => context.GetOutputExtension("e"));
+        Should.Throw<ArgumentNullException>(() => context.GetInputExtension("e"));
         Should.Throw<ArgumentNullException>(() => context.SetOutputExtension("e", 1));
 
         context = new ResolveFieldContext();
         context.GetOutputExtension("a").ShouldBe(null);
         context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+        context.GetInputExtension("a").ShouldBe(null);
+        context.GetInputExtension("a.b.c.d").ShouldBe(null);
         Should.Throw<ArgumentException>(() => context.SetOutputExtension("e", 1));
     }
 
@@ -181,6 +184,28 @@ public class ResolveFieldContextTests
 
         _context.SetOutputExtension("a.b.c", "override");
         _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+    }
+
+    [Fact]
+    public void GetInputExtension_Should_Return_Value()
+    {
+        var context = new ResolveFieldContext
+        {
+            InputExtensions = new Dictionary<string, object>
+            {
+                ["a"] = 1,
+                ["b"] = new Dictionary<string, object>
+                {
+                    ["c"] = true
+                },
+                ["d"] = new object()
+            }
+        };
+        context.GetInputExtension("a").ShouldBe(1);
+        context.GetInputExtension("b.c").ShouldBe(true);
+        context.GetInputExtension("a.x").ShouldBe(null);
+        context.GetInputExtension("b.x").ShouldBe(null);
+        context.GetInputExtension("d").ShouldBeOfType<object>();
     }
 
     [Theory]
