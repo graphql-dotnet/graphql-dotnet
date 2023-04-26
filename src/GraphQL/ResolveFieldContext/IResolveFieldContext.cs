@@ -92,8 +92,9 @@ namespace GraphQL
 
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.
-        /// This is reserved for implementors to extend the protocol however they see fit, and
-        /// hence there are no additional restrictions on its contents.
+        /// This is reserved for implementors to extend the protocol however they see fit,
+        /// and hence there are no additional restrictions on its contents. Also you may use
+        /// <see cref="ResolveFieldContextExtensions.GetInputExtension(IResolveFieldContext, string)">GetInputExtension</see> method.
         /// </summary>
         IReadOnlyDictionary<string, object?> InputExtensions { get; }
 
