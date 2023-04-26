@@ -5,6 +5,24 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
+### 1. `IMetadataReader` and `IMetadataWriter` interfaces added
+
+This makes it convenient to add extension methods to graph types or fields that can be used to read or write metadata
+such as authentication information. Methods for `IMetadataWriter` types will appear on both field builders and graph/field
+types, while methods for `IMetadataReader` types will only appear on graph and field types. You can also access the
+`IMetadataReader` reader from the `IMetadataWriter.MetadataReader` property. Here is an example:
+
+```csharp
+public static TMetadataBuilder RequireAdmin<TMetadataBuilder>(this TMetadataBuilder builder)
+    where TMetadataBuilder : IMetadataWriter
+{
+    if (builder.MetadataReader.GetRoles?.Contains("Guests"))
+        throw new InvalidOperationException("Cannot require admin and guest access at the same time.");
+    builder.AuthorizeWithRoles("Administrators");
+    return builder;
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
