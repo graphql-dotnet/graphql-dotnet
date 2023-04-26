@@ -23,7 +23,7 @@ namespace GraphQL.DI
         /// The default sort order of configurations are as follows:
         /// </para>
         /// <list type="bullet">
-        /// <item>100: Option configurations -- 'Add' calls such as <see cref="GraphQLBuilderExtensions.AddValidationRule{TValidationRule}(IGraphQLBuilder, bool)">AddValidationRule</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})">ConfigureExecutionOptions</see> calls</item>
+        /// <item>100: Option configurations -- 'Add' calls such as <see cref="GraphQLBuilderExtensions.AddValidationRule{TValidationRule}(IGraphQLBuilder, bool, ServiceLifetime)">AddValidationRule</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecutionOptions(IGraphQLBuilder, Action{ExecutionOptions})">ConfigureExecutionOptions</see> calls</item>
         /// <item>200: Execution configurations -- 'Use' calls such as <see cref="GraphQLBuilderExtensions.UseApolloTracing(IGraphQLBuilder, bool)">UseApolloTracing</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see> calls</item>
         /// </list>
         /// </summary>
