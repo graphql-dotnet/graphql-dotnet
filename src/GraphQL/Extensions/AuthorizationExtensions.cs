@@ -40,7 +40,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> List of authorization policy names applied to this metadata provider. </returns>
-        public static List<string>? GetPolicies(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(POLICY_KEY);
+        public static List<string>? GetPolicies(this IMetadataReader provider) => provider.GetMetadata<List<string>>(POLICY_KEY);
 
         /// <summary>
         /// Gets a list of authorization roles names for the specified metadata provider if any.
@@ -51,20 +51,20 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> List of authorization role names applied to this metadata provider. </returns>
-        public static List<string>? GetRoles(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(ROLE_KEY);
+        public static List<string>? GetRoles(this IMetadataReader provider) => provider.GetMetadata<List<string>>(ROLE_KEY);
 
         /// <summary>
         /// Returns a boolean typically indicating if anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
-        public static bool IsAnonymousAllowed(this IProvideMetadata provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
+        public static bool IsAnonymousAllowed(this IMetadataReader provider) => provider.GetMetadata(ANONYMOUS_KEY, false);
 
         /// <summary>
         /// Adds metadata to typically indicate that anonymous access should be allowed to a field of a graph type
         /// requiring authorization, providing that no other fields were selected.
         /// </summary>
         public static TMetadataProvider AllowAnonymous<TMetadataProvider>(this TMetadataProvider provider)
-            where TMetadataProvider : IMetadataBuilder
+            where TMetadataProvider : IMetadataWriter
         {
             provider.Metadata[ANONYMOUS_KEY] = true;
             return provider;
@@ -78,7 +78,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         /// <returns> <see langword="true"/> if any authorization policy is applied, otherwise <see langword="false"/>. </returns>
-        public static bool IsAuthorizationRequired(this IProvideMetadata provider)
+        public static bool IsAuthorizationRequired(this IMetadataReader provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace GraphQL
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
         public static TMetadataProvider Authorize<TMetadataProvider>(this TMetadataProvider provider)
-            where TMetadataProvider : IMetadataBuilder
+            where TMetadataProvider : IMetadataWriter
         {
             provider.Metadata[AUTHORIZE_KEY] = true;
             return provider;
@@ -109,12 +109,12 @@ namespace GraphQL
         /// <param name="policy"> Authorization policy name. </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
-            where TMetadataProvider : IMetadataBuilder
+            where TMetadataProvider : IMetadataWriter
         {
             if (policy == null)
                 throw new ArgumentNullException(nameof(policy));
 
-            var list = provider.GetMetadata<List<string>>(POLICY_KEY) ?? new List<string>();
+            var list = provider.MetadataReader.GetPolicies() ?? new List<string>();
 
             if (!list.Contains(policy))
                 list.Add(policy);
@@ -139,12 +139,12 @@ namespace GraphQL
         /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, string roles)
-            where TMetadataProvider : IMetadataBuilder
+            where TMetadataProvider : IMetadataWriter
         {
             if (roles == null)
                 throw new ArgumentNullException(nameof(roles));
 
-            var list = provider.GetMetadata<List<string>>(ROLE_KEY) ?? new List<string>();
+            var list = provider.MetadataReader.GetRoles() ?? new List<string>();
 
             foreach (var role in roles.Split(','))
             {
@@ -172,12 +172,12 @@ namespace GraphQL
         /// <param name="roles"> List of authorization role name(s). </param>
         /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
         public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, params string[] roles)
-            where TMetadataProvider : IMetadataBuilder
+            where TMetadataProvider : IMetadataWriter
         {
             if (roles == null)
                 throw new ArgumentNullException(nameof(roles));
 
-            var list = provider.GetMetadata<List<string>>(ROLE_KEY) ?? new List<string>();
+            var list = provider.MetadataReader.GetRoles() ?? new List<string>();
 
             foreach (var role in roles)
             {

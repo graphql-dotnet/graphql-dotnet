@@ -10,7 +10,7 @@ namespace GraphQL.Builders
     /// </summary>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-    public class FieldBuilder<TSourceType, TReturnType> : IMetadataBuilder
+    public class FieldBuilder<TSourceType, TReturnType> : IMetadataWriter
     {
         /// <summary>
         /// Returns the generated field.
@@ -364,9 +364,10 @@ namespace GraphQL.Builders
         // Allow metadata builder extension methods to read/write to the underlying field type without unnecessarily
         // exposing metadata methods directly on the field builder; users can always use the FieldType property
         // to access the underlying metadata directly.
-        Dictionary<string, object?> IMetadataBuilder.Metadata => FieldType.Metadata;
-        TType IMetadataBuilder.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
-        TType IMetadataBuilder.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
-        bool IMetadataBuilder.HasMetadata(string key) => FieldType.HasMetadata(key);
+        Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+        IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

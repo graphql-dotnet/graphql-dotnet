@@ -6,7 +6,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source and return type.
     /// </summary>
-    public class ConnectionBuilder<TSourceType, TReturnType> : IMetadataBuilder
+    public class ConnectionBuilder<TSourceType, TReturnType> : IMetadataWriter
     {
         private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
@@ -279,9 +279,10 @@ namespace GraphQL.Builders
         // Allow metadata builder extension methods to read/write to the underlying field type without unnecessarily
         // exposing metadata methods directly on the field builder; users can always use the FieldType property
         // to access the underlying metadata directly.
-        Dictionary<string, object?> IMetadataBuilder.Metadata => FieldType.Metadata;
-        TType IMetadataBuilder.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
-        TType IMetadataBuilder.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
-        bool IMetadataBuilder.HasMetadata(string key) => FieldType.HasMetadata(key);
+        Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+        IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }
