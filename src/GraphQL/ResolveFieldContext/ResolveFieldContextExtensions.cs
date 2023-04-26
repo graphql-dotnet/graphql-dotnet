@@ -118,31 +118,10 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.InputExtensions == null || context.InputExtensions.Count == 0)
-                return null;
-
-            // actually context.InputExtensions is of type GraphQL.Inputs
-            if (context.InputExtensions is not IDictionary<string, object?> values || values.Count == 0)
-                return null;
-
-            if (path.IndexOf('.') != -1)
-            {
-                string[] keys = path.Split(_separators);
-
-                for (int i = 0; i < keys.Length - 1; ++i)
-                {
-                    if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
-                        values = d;
-                    else
-                        return null;
-                }
-
-                return values.TryGetValue(keys[keys.Length - 1], out object? result) ? result : null;
-            }
-            else
-            {
-                return values.TryGetValue(path, out object? result) ? result : null;
-            }
+            // Actually context.InputExtensions is of type GraphQL.Inputs : ReadOnlyDictionary<string, object?> and
+            // ReadOnlyDictionary<string, object?> implements IDictionary<string, object?> so this cast should never
+            // return null for majority of cases.
+            return GetByPath(context.InputExtensions as IDictionary<string, object?>, path, true);
         }
 
         /// <summary>
@@ -156,12 +135,14 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.OutputExtensions == null || context.OutputExtensions.Count == 0)
-                return null;
+            return GetByPath(context.OutputExtensions, path, true);
+        }
 
-            lock (context.OutputExtensions)
+        private static object? GetByPath(IDictionary<string, object?>? dictionary, string path, bool useLock)
+        {
+            object? Get()
             {
-                var values = context.OutputExtensions;
+                var values = dictionary;
 
                 if (path.IndexOf('.') != -1)
                 {
@@ -181,6 +162,19 @@ namespace GraphQL
                 {
                     return values.TryGetValue(path, out object? result) ? result : null;
                 }
+            }
+
+            if (dictionary == null || dictionary.Count == 0)
+                return null;
+
+            if (useLock)
+            {
+                lock (dictionary)
+                    return Get();
+            }
+            else
+            {
+                return Get();
             }
         }
 
