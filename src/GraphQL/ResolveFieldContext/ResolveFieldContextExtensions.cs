@@ -118,10 +118,7 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            // Actually context.InputExtensions is of type GraphQL.Inputs : ReadOnlyDictionary<string, object?> and
-            // ReadOnlyDictionary<string, object?> implements IDictionary<string, object?> so this cast should never
-            // return null for majority of cases.
-            return GetByPath(context.InputExtensions as IDictionary<string, object?>, path, false);
+            return GetByPath(context.InputExtensions, path, false);
         }
 
         /// <summary>
@@ -135,10 +132,12 @@ namespace GraphQL
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            return GetByPath(context.OutputExtensions, path, true);
+            // Actually Dictionary<TKey, TValue> (as a widely used class) implements IReadOnlyDictionary<TKey, TValue>
+            // so this cast should never hurt for majority of cases.
+            return GetByPath(context.OutputExtensions as IReadOnlyDictionary<string, object?>, path, true);
         }
 
-        private static object? GetByPath(IDictionary<string, object?>? dictionary, string path, bool useLock)
+        private static object? GetByPath(IReadOnlyDictionary<string, object?>? dictionary, string path, bool useLock)
         {
             object? Get()
             {
@@ -150,7 +149,7 @@ namespace GraphQL
 
                     for (int i = 0; i < keys.Length - 1; ++i)
                     {
-                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
+                        if (values.TryGetValue(keys[i], out object? v) && v is IReadOnlyDictionary<string, object?> d)
                             values = d;
                         else
                             return null;
