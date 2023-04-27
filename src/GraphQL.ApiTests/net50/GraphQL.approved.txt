@@ -2816,24 +2816,24 @@ namespace GraphQL.Utilities
         protected virtual bool IsDefinedType(string typeName) { }
         public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
         public string Print() { }
-        public string PrintArgs(GraphQL.Types.FieldType field) { }
+        public virtual string PrintArgs(GraphQL.Types.FieldType field) { }
         public virtual string PrintComment(string? comment, string indentation = "", bool firstInBlock = true) { }
         public string PrintDeprecation(string? reason) { }
         public string PrintDescription(string? description, string indentation = "", bool firstInBlock = true) { }
         public string PrintDirective(GraphQL.Types.Directive directive) { }
-        public string PrintEnum(GraphQL.Types.EnumerationGraphType type) { }
+        public virtual string PrintEnum(GraphQL.Types.EnumerationGraphType type) { }
         public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
         public string PrintFilteredSchema(System.Func<string, bool> directiveFilter, System.Func<string, bool> typeFilter) { }
-        public string PrintInputObject(GraphQL.Types.IInputObjectGraphType type) { }
+        public virtual string PrintInputObject(GraphQL.Types.IInputObjectGraphType type) { }
         public string PrintInputValue(GraphQL.Types.FieldType field) { }
         public string PrintInputValue(GraphQL.Types.QueryArgument argument) { }
         public virtual string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
         public string PrintIntrospectionSchema() { }
         public virtual string PrintObject(GraphQL.Types.IObjectGraphType type) { }
-        public string PrintScalar(GraphQL.Types.ScalarGraphType type) { }
+        public virtual string PrintScalar(GraphQL.Types.ScalarGraphType type) { }
         public string? PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
         public string PrintType(GraphQL.Types.IGraphType type) { }
-        public string PrintUnion(GraphQL.Types.UnionGraphType type) { }
+        public virtual string PrintUnion(GraphQL.Types.UnionGraphType type) { }
         protected static bool IsBuiltInDirective(string directiveName) { }
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
