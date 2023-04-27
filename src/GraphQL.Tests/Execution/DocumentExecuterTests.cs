@@ -23,11 +23,13 @@ public class DocumentExecuterTests
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
             selector,
-            new IConfigureExecution[] { });
+            Array.Empty<IConfigureExecution>());
         var schema = new Schema();
-        var graphType = new AutoRegisteringObjectGraphType<SampleGraph>();
-        schema.Query = graphType;
-        schema.Mutation = graphType;
+        var graphType1 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        var graphType2 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        graphType2.Name += "Mutation";
+        schema.Query = graphType1;
+        schema.Mutation = graphType2;
         schema.Initialize();
         var ret = await executer.ExecuteAsync(new ExecutionOptions()
         {
@@ -179,7 +181,7 @@ public class DocumentExecuterTests
 
     private class TestQueryExecutionStrategy : ParallelExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();
@@ -190,7 +192,7 @@ public class DocumentExecuterTests
 
     private class TestMutationExecutionStrategy : SerialExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();

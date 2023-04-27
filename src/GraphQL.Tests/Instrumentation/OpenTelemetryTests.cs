@@ -10,7 +10,7 @@ using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
 
-public class OpenTelemetryTests : IDisposable
+public sealed class OpenTelemetryTests : IDisposable
 {
     private readonly TestEventListener _testEventListener = new();
     private readonly List<Activity> _exportedActivities = new();
@@ -184,7 +184,7 @@ public class OpenTelemetryTests : IDisposable
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
         };
-        var ranFilter = false;
+        bool ranFilter = false;
         _options.Filter = options =>
         {
             options.ShouldBe(executionOptions);

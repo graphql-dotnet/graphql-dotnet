@@ -68,9 +68,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         cts.CancelAfter(TimeSpan.FromMilliseconds(5));
 
-        var task = result.GetResultAsync(cts.Token);
-
-        await Should.ThrowAsync<TaskCanceledException>(task).ConfigureAwait(false);
+        await Should.ThrowAsync<OperationCanceledException>(async () => await result.GetResultAsync(cts.Token).ConfigureAwait(false)).ConfigureAwait(false);
 
         mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
     }

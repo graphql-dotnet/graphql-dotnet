@@ -1,6 +1,6 @@
-const _ = require('lodash')
-const url = require('url')
-const path = require('path')
+import _ from 'lodash'
+import url from 'url'
+import path from 'path'
 
 const NOT_MATCHING_URL = '/'
 
@@ -92,7 +92,7 @@ function getSidemenuWithUrl(menu = [], urlPrefix = '/') {
  * @param {Menu[]} navNode
  * @return {Object} extended menu node
  */
-function attachUrlToNavNode(navNode = []) {
+function attachUrlToNavNodeFunc(navNode = []) {
   return navNode
     .map(page => {
       const url = getPageUrl(page)
@@ -109,4 +109,4 @@ function attachUrlToNavNode(navNode = []) {
     })
 }
 
-exports.attachUrlToNavNode = attachUrlToNavNode
+export const attachUrlToNavNode = attachUrlToNavNodeFunc

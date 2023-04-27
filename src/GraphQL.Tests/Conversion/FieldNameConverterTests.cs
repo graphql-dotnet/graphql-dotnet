@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Conversion;
 
 public class NameConverterTests : BasicQueryTestBase
 {
-    public ISchema build_schema(INameConverter converter = null, string argument = "Id")
+    public static ISchema build_schema(INameConverter converter = null, string argument = "Id")
     {
         var schema = new Schema
         {

@@ -126,7 +126,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 else if (def is GraphQLObjectTypeExtension ext)
                 {
                     //TODO: rewrite and add support for other extensions
-                    var typeDef = new GraphQLObjectTypeDefinition
+                    var typeDef = new GraphQLObjectTypeDefinition(ext.Name)
                     {
                         Comments = ext.Comments,
                         Description = null,
@@ -134,7 +134,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         Fields = ext.Fields,
                         Interfaces = ext.Interfaces,
                         Location = ext.Location,
-                        Name = ext.Name,
                     };
                     var type = ToObjectGraphType(typeDef, true);
                     _types[type.Name] = type;

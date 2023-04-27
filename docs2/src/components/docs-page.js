@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { graphql } from 'gatsby'
+import Layout from './layout'
 
-const DocsPage = ({ data }) => {
+const DocsPage = ({data}) => {
   const page = data.markdownRemark
   const metadata = data.site.siteMetadata
   const editUrl = metadata.githubEditUrl + '/' + page.fields.relativePath
@@ -17,7 +19,17 @@ const DocsPage = ({ data }) => {
   )
 }
 
-DocsPage.propTypes = {
+
+const LayoutWrapper = (props) => {
+  return (
+    <Layout location={props.location}>
+      <DocsPage data = {props.data}/>
+    </Layout>
+  )
+}
+
+LayoutWrapper.propTypes = {
+  location: PropTypes.object,
   data: PropTypes.object
 }
 
@@ -37,4 +49,4 @@ export const query = graphql`
   }
 `
 
-export default DocsPage
+export default LayoutWrapper

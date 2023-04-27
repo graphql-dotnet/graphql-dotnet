@@ -40,7 +40,7 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <returns> List of authorization policy names applied to this metadata provider. </returns>
+        /// <returns>List of authorization policy names applied to this metadata provider.</returns>
         public static List<string>? GetPolicies(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(POLICY_KEY);
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <returns> List of authorization role names applied to this metadata provider. </returns>
+        /// <returns>List of authorization role names applied to this metadata provider.</returns>
         public static List<string>? GetRoles(this IProvideMetadata provider) => provider.GetMetadata<List<string>>(ROLE_KEY);
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <returns> <see langword="true"/> if any authorization policy is applied, otherwise <see langword="false"/>. </returns>
+        /// <returns><see langword="true"/>if any authorization policy is applied, otherwise <see langword="false"/>.</returns>
         public static bool IsAuthorizationRequired(this IProvideMetadata provider)
             => provider.GetMetadata(AUTHORIZE_KEY, false) || GetPolicies(provider)?.Count > 0 || GetRoles(provider)?.Count > 0;
 
@@ -107,8 +107,8 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <param name="policy"> Authorization policy name. </param>
-        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
+        /// <param name="policy">Authorization policy name.</param>
+        /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider AuthorizeWithPolicy<TMetadataProvider>(this TMetadataProvider provider, string policy)
             where TMetadataProvider : IProvideMetadata
         {
@@ -137,8 +137,8 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
+        /// <param name="roles">Comma-separated list of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, string roles)
             where TMetadataProvider : IProvideMetadata
         {
@@ -170,8 +170,8 @@ namespace GraphQL
         /// Metadata provider. This can be an instance of <see cref="GraphType"/>,
         /// <see cref="FieldType"/>, <see cref="Schema"/> or others.
         /// </param>
-        /// <param name="roles"> List of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="provider"/>. </returns>
+        /// <param name="roles">List of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
         public static TMetadataProvider AuthorizeWithRoles<TMetadataProvider>(this TMetadataProvider provider, params string[] roles)
             where TMetadataProvider : IProvideMetadata
         {
@@ -198,8 +198,8 @@ namespace GraphQL
         /// <typeparam name="TSourceType"></typeparam>
         /// <typeparam name="TReturnType"></typeparam>
         /// <param name="builder"></param>
-        /// <param name="policy"> Authorization policy name. </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="policy">Authorization policy name.</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string policy)
         {
@@ -213,8 +213,8 @@ namespace GraphQL
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="roles">Comma-separated list of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string roles)
         {
@@ -227,8 +227,8 @@ namespace GraphQL
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="roles"> List of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="roles">List of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, params string[] roles)
         {
@@ -258,8 +258,8 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TSourceType"></typeparam>
         /// <param name="builder"></param>
-        /// <param name="policy"> Authorization policy name. </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="policy">Authorization policy name.</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string policy)
         {
@@ -273,8 +273,8 @@ namespace GraphQL
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="roles"> Comma-separated list of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="roles">Comma-separated list of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string roles)
         {
@@ -287,8 +287,8 @@ namespace GraphQL
         /// contains a role with the same name, then it will not be added twice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="roles"> List of authorization role name(s). </param>
-        /// <returns> The reference to the specified <paramref name="builder"/>. </returns>
+        /// <param name="roles">List of authorization role name(s).</param>
+        /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
         public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
             this ConnectionBuilder<TSourceType> builder, params string[] roles)
         {

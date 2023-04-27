@@ -16,7 +16,7 @@
 | :heart: [Become a backer!](https://opencollective.com/graphql-net#backer) :heart: | [![Backers on Open Collective](https://opencollective.com/graphql-net/backers/badge.svg)](#backers) [![Sponsors on Open Collective](https://opencollective.com/graphql-net/sponsors/badge.svg)](#sponsors)  |
 |-|-|
 
-| :heavy_dollar_sign: [Get paid for contributing!](BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
+| :heavy_dollar_sign: [Get paid for contributing!](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
 |-|-|
 
 

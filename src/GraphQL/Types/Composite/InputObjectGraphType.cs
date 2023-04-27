@@ -102,11 +102,7 @@ namespace GraphQL.Types
                 var fieldValue = field.ResolvedType!.ToAST(GetFieldValue(field, value));
                 if (fieldValue is not GraphQLNullValue)
                 {
-                    objectValue.Fields.Add(new GraphQLObjectField
-                    {
-                        Name = new GraphQLName(field.Name),
-                        Value = fieldValue
-                    });
+                    objectValue.Fields.Add(new GraphQLObjectField(new GraphQLName(field.Name), fieldValue));
                 }
             }
 

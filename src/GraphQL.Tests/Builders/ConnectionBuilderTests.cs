@@ -140,7 +140,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
 
         type.Connection<ObjectGraphType>()
             .Name("testConnection")
-            .Resolve(resArgs =>
+            .Resolve(_ =>
                 new Connection<Child>
                 {
                     TotalCount = 1,
@@ -179,10 +179,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
             result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.Field1.ShouldBe("abcd");
             result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Items[0].Field1.ShouldBe("abcd");
         }
     }
 
@@ -214,7 +214,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         };
         type.Connection<ObjectGraphType>()
             .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
@@ -232,10 +232,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
             result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.Field1.ShouldBe("abcd");
             result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Items[0].Field1.ShouldBe("abcd");
         }
     }
 
@@ -268,7 +268,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         };
         type.Connection<ChildType, ParentChildrenEdgeType>()
             .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
@@ -286,10 +286,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
             result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.Field1.ShouldBe("abcd");
             result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Items[0].Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
         }
     }
@@ -345,7 +345,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         };
         type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>()
             .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
@@ -363,10 +363,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
             result.Edges.Count.ShouldBe(3);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.Field1.ShouldBe("abcd");
             result.Items.Count.ShouldBe(3);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Items[0].Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
             result.HighestField2.ShouldBe(10);
             result.ConnectionField1.ShouldBe(ConnectionField1Value);
