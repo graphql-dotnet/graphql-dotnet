@@ -363,7 +363,7 @@ namespace GraphQL.Builders
             }
         }
 
-        // Allow metadata builder extension methods to read/write to the underlying field type without unnecessarily
+        // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
         // exposing metadata methods directly on the field builder; users can always use the FieldType property
         // to access the underlying metadata directly.
         Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
