@@ -17,21 +17,21 @@ namespace GraphQL.Introspection
         /// Returns a comparer for fields withing enclosing type.
         /// If this returns <see langword="null"/> then the original field ordering is preserved.
         /// </summary>
-        /// <param name="parent"> Parent type to which the fields belong. </param>
+        /// <param name="parent">Parent type to which the fields belong.</param>
         IComparer<IFieldType>? FieldComparer(IGraphType parent);
 
         /// <summary>
         /// Returns a comparer for field arguments.
         /// If this returns <see langword="null"/> then the original argument ordering is preserved.
         /// </summary>
-        /// <param name="field"> The field to which the arguments belong. </param>
+        /// <param name="field">The field to which the arguments belong.</param>
         IComparer<QueryArgument>? ArgumentComparer(IFieldType field);
 
         /// <summary>
         /// Returns a comparer for enum values.
         /// If this returns <see langword="null"/> then the original enum value ordering is preserved.
         /// </summary>
-        /// <param name="parent"> The enumeration to which the enum values belong. </param>
+        /// <param name="parent">The enumeration to which the enum values belong.</param>
         IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent);
 
         /// <summary>
