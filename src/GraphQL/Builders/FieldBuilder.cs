@@ -6,33 +6,11 @@ using GraphQL.Validation.Complexity;
 namespace GraphQL.Builders
 {
     /// <summary>
-    /// Static methods to create field builders.
-    /// </summary>
-    [Obsolete("This class will be removed in v8.")]
-    public static class FieldBuilder
-    {
-        /// <summary>
-        /// Returns a builder for a new field with a specified source type, return type and graph type.
-        /// </summary>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-        /// <param name="type">The graph type of the field.</param>
-        [Obsolete("Please use FieldBuilder<TSourceType, TReturnType>.Create() method. This method will be removed in v8.")]
-        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(Type? type = null)
-            => FieldBuilder<TSourceType, TReturnType>.Create(type);
-
-        /// <inheritdoc cref="Create{TSourceType, TReturnType}(Type)"/>
-        [Obsolete("Please use FieldBuilder<TSourceType, TReturnType>.Create() method. This method will be removed in v8.")]
-        public static FieldBuilder<TSourceType, TReturnType> Create<TSourceType, TReturnType>(IGraphType type)
-            => FieldBuilder<TSourceType, TReturnType>.Create(type);
-    }
-
-    /// <summary>
     /// Builds a field for a graph with a specified source type and return type.
     /// </summary>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-    public class FieldBuilder<TSourceType, TReturnType>
+    public class FieldBuilder<TSourceType, TReturnType> : IMetadataWriter
     {
         /// <summary>
         /// Returns the generated field.
@@ -338,11 +316,9 @@ namespace GraphQL.Builders
         /// then their default values (if any) will be used.
         /// </summary>
         /// <param name="name">Directive name.</param>
+        [Obsolete("Please use the ApplyDirective method")]
         public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name)
-        {
-            FieldType.ApplyDirective(name);
-            return this;
-        }
+            => this.ApplyDirective(name);
 
         /// <summary>
         /// Apply directive to field specifying one argument. If the directive declaration has other arguments,
@@ -351,11 +327,9 @@ namespace GraphQL.Builders
         /// <param name="name">Directive name.</param>
         /// <param name="argumentName">Argument name.</param>
         /// <param name="argumentValue">Argument value.</param>
+        [Obsolete("Please use the ApplyDirective method")]
         public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue)
-        {
-            FieldType.ApplyDirective(name, argumentName, argumentValue);
-            return this;
-        }
+            => this.ApplyDirective(name, argumentName, argumentValue);
 
         /// <summary>
         /// Apply directive specifying two arguments. If the directive declaration has other arguments,
@@ -366,31 +340,34 @@ namespace GraphQL.Builders
         /// <param name="argument1Value">First argument value.</param>
         /// <param name="argument2Name">Second argument name.</param>
         /// <param name="argument2Value">Second argument value.</param>
+        [Obsolete("Please use the ApplyDirective method")]
         public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
-        {
-            FieldType.ApplyDirective(name, argument1Name, argument1Value, argument2Name, argument2Value);
-            return this;
-        }
+            => this.ApplyDirective(name, argument1Name, argument1Value, argument2Name, argument2Value);
 
         /// <summary>
         /// Apply directive to field specifying configuration delegate.
         /// </summary>
         /// <param name="name">Directive name.</param>
         /// <param name="configure">Configuration delegate.</param>
+        [Obsolete("Please use the ApplyDirective method")]
         public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
-        {
-            FieldType.ApplyDirective(name, configure);
-            return this;
-        }
+            => this.ApplyDirective(name, configure);
 
         /// <summary>
         /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
         /// </summary>
         /// <param name="impact">Field's complexity impact.</param>
+        [Obsolete("Please use the WithComplexityImpact method")]
         public virtual FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact)
-        {
-            FieldType.WithComplexityImpact(impact);
-            return this;
-        }
+            => this.WithComplexityImpact(impact);
+
+        // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
+        // exposing metadata methods directly on the field builder; users can always use the FieldType property
+        // to access the underlying metadata directly.
+        Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+        IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

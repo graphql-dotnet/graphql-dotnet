@@ -40,7 +40,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a graph type within the GraphQL schema.
     /// </summary>
-    public interface IGraphType : IProvideMetadata, IProvideDescription, IProvideDeprecationReason, INamedType
+    public interface IGraphType : IMetadataReader, IMetadataWriter, IProvideDescription, IProvideDeprecationReason, INamedType
     {
         /// <summary>
         /// Initializes the graph type.

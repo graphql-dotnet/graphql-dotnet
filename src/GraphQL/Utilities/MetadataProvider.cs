@@ -5,13 +5,17 @@ namespace GraphQL.Utilities
     /// <summary>
     /// Default implementation of <see cref="IProvideMetadata"/>. This is the base class for numerous
     /// descendants like <see cref="GraphType"/>, <see cref="FieldType"/>, <see cref="Schema"/> and others.
+    /// Provides access to metadata reading and writing extension methods through <see cref="IMetadataReader"/>
+    /// and <see cref="IMetadataWriter"/>.
     /// </summary>
-    public class MetadataProvider : IProvideMetadata
+    public class MetadataProvider : IMetadataReader, IMetadataWriter
     {
         private Dictionary<string, object?>? _metadata;
 
         /// <inheritdoc />
         public Dictionary<string, object?> Metadata => _metadata ??= new();
+
+        IMetadataReader IMetadataWriter.MetadataReader => this;
 
         /// <inheritdoc />
         public TType GetMetadata<TType>(string key, TType defaultValue = default!)
@@ -34,7 +38,7 @@ namespace GraphQL.Utilities
         /// Copies metadata to the specified target.
         /// </summary>
         /// <param name="target">Target for copying metadata.</param>
-        public void CopyMetadataTo(IProvideMetadata target)
+        public void CopyMetadataTo(IMetadataWriter target)
         {
             var local = _metadata;
             if (local?.Count > 0)

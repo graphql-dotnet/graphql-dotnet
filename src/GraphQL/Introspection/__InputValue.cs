@@ -5,7 +5,7 @@ namespace GraphQL.Introspection
     /// <summary>
     /// The <see cref="__InputValue"/> introspection type represents field and directive arguments as well as the inputFields of an input object.
     /// </summary>
-    public class __InputValue : ObjectGraphType<IProvideMetadata> // context.Source either QueryArgument or FieldType
+    public class __InputValue : ObjectGraphType<IMetadataReader> // context.Source either QueryArgument or FieldType
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="__InputValue"/> introspection type.

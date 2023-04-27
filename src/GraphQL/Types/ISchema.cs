@@ -12,7 +12,7 @@ namespace GraphQL.Types
     /// <br/><br/>
     /// <see cref="Schema"/> only requires the <see cref="Schema.Query">Query</see> property to be set; although commonly the <see cref="Schema.Mutation">Mutation</see> and/or <see cref="Schema.Subscription">Subscription</see> properties are also set.
     /// </summary>
-    public interface ISchema : IProvideMetadata, IProvideDescription
+    public interface ISchema : IMetadataReader, IProvideDescription
     {
         /// <inheritdoc cref="ExperimentalFeatures"/>
         ExperimentalFeatures Features { get; set; }
