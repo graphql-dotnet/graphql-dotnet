@@ -124,8 +124,9 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
         });
     }
 
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2864
     [Fact]
-    public void within_schema_language_well_placed_directives()
+    public void within_schema_language_unknown_directives()
     {
         ShouldFailRule(_ =>
         {

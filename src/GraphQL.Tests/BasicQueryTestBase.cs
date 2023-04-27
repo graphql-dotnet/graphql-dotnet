@@ -97,5 +97,5 @@ public class BasicQueryTestBase
         return runResult;
     }
 
-    public ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
+    public static ExecutionResult CreateQueryResult(string result) => result.ToExecutionResult();
 }

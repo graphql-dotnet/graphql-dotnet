@@ -695,6 +695,7 @@ namespace GraphQL
         public static object? GetArgument(this GraphQL.IResolveFieldContext context, System.Type argumentType, string name, object? defaultValue = null) { }
         public static TType GetArgument<TType>(this GraphQL.IResolveFieldContext context, string name, TType defaultValue = default) { }
         public static GraphQL.Execution.DirectiveInfo? GetDirective(this GraphQL.IResolveFieldContext context, string name) { }
+        public static object? GetInputExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static object? GetOutputExtension(this GraphQL.IResolveFieldContext context, string path) { }
         public static bool HasArgument(this GraphQL.IResolveFieldContext context, string name) { }
         public static bool HasDirective(this GraphQL.IResolveFieldContext context, string name) { }

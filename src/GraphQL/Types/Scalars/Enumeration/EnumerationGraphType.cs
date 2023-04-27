@@ -117,7 +117,7 @@ public class EnumerationGraphType : ScalarGraphType
 /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
 /// Also it can get descriptions for enum fields from the XML comments.
 /// </summary>
-/// <typeparam name="TEnum"> The enum to take values from. </typeparam>
+/// <typeparam name="TEnum">The enum to take values from.</typeparam>
 public class EnumerationGraphType<TEnum> : EnumerationGraphType
     where TEnum : Enum
 {
@@ -129,7 +129,7 @@ public class EnumerationGraphType<TEnum> : EnumerationGraphType
     public EnumerationGraphType()
     {
         var type = typeof(TEnum);
-        var names = Enum.GetNames(type);
+        string[] names = Enum.GetNames(type);
         var enumMembers = names.Select(n => (name: n, member: type
                 .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .First()));

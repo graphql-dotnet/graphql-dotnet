@@ -62,7 +62,7 @@ public class GraphQLBuilderExtensionTests
         where TOptions : class, new()
     {
         int ran = 0;
-        Action<TOptions> action = options => ran++;
+        Action<TOptions> action = _ => ran++;
         _builderMock.Setup(b => b.Configure(It.IsAny<Action<TOptions, IServiceProvider>>())).Returns<Action<TOptions, IServiceProvider>>(action2 =>
         {
             ran.ShouldBe(0);
@@ -76,7 +76,7 @@ public class GraphQLBuilderExtensionTests
     private Action<TOptions, IServiceProvider> MockSetupConfigure2<TOptions>()
         where TOptions : class, new()
     {
-        Action<TOptions, IServiceProvider> action = (opts, _) => { };
+        Action<TOptions, IServiceProvider> action = (_, _) => { };
         _builderMock.Setup(b => b.Configure(action)).Returns(_builder).Verifiable();
         return action;
     }
@@ -662,7 +662,7 @@ public class GraphQLBuilderExtensionTests
     public void AddDocumentListener_Factory()
     {
         var instance = new MyDocumentListener();
-        Func<IServiceProvider, MyDocumentListener> factory = services => instance;
+        Func<IServiceProvider, MyDocumentListener> factory = _ => instance;
         _builderMock.Setup(b => b.Register(typeof(IDocumentExecutionListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.Register(typeof(MyDocumentListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -711,14 +711,14 @@ public class GraphQLBuilderExtensionTests
         {
             mockServiceProvider.Setup(sp => sp.GetService(typeof(MyMiddleware))).Returns(instance).Verifiable();
         }
-        if (install == true && usePredicate == false && serviceLifetime == ServiceLifetime.Transient)
+        if (install && !usePredicate && serviceLifetime == ServiceLifetime.Transient)
         {
-            //verify that defaults parameters are configured appropriately
+            // verify that defaults parameters are configured appropriately
             _builder.UseMiddleware<MyMiddleware>();
         }
         else if (usePredicate)
         {
-            _builder.UseMiddleware<MyMiddleware>((services, schema) => install, serviceLifetime);
+            _builder.UseMiddleware<MyMiddleware>((_, _) => install, serviceLifetime);
         }
         else
         {
@@ -754,14 +754,14 @@ public class GraphQLBuilderExtensionTests
         {
             runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
         }
-        if (install == true && usePredicate == false)
+        if (install && !usePredicate)
         {
             //verify that defaults parameters are configured appropriately
             _builder.UseMiddleware(instance);
         }
         else if (usePredicate)
         {
-            _builder.UseMiddleware(instance, (services, schema) => install);
+            _builder.UseMiddleware(instance, (_, _) => install);
         }
         else
         {
@@ -857,7 +857,7 @@ public class GraphQLBuilderExtensionTests
         bool ran = false;
         var schema = new TestSchema();
         var execute = MockSetupConfigureSchema(schema);
-        _builder.ConfigureSchema((schema2, services) =>
+        _builder.ConfigureSchema((schema2, _) =>
         {
             schema2.ShouldBe(schema);
             ran = true;
@@ -1092,7 +1092,7 @@ public class GraphQLBuilderExtensionTests
     public void AddExecutionStrategy_Factory()
     {
         var instance = new TestExecutionStrategy();
-        Func<IServiceProvider, IExecutionStrategy> func = (provider) => instance;
+        Func<IServiceProvider, IExecutionStrategy> func = _ => instance;
         _builderMock.Setup(x => x.Register(typeof(ExecutionStrategyRegistration), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
             .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
             {
@@ -1290,7 +1290,8 @@ public class GraphQLBuilderExtensionTests
 
     private class MyMiddleware : IFieldMiddleware
     {
-        public bool RanMiddleware { get; set; } = false;
+        public bool RanMiddleware { get; set; }
+
         public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             RanMiddleware = true;
