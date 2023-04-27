@@ -18,8 +18,7 @@ public static TMetadataBuilder RequireAdmin<TMetadataBuilder>(this TMetadataBuil
 {
     if (builder.MetadataReader.GetRoles?.Contains("Guests"))
         throw new InvalidOperationException("Cannot require admin and guest access at the same time.");
-    builder.AuthorizeWithRoles("Administrators");
-    return builder;
+    return builder.AuthorizeWithRoles("Administrators");
 }
 ```
 
