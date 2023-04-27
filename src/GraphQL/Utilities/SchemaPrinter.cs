@@ -276,7 +276,7 @@ namespace GraphQL.Utilities
                     f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
-        public string PrintArgs(FieldType field)
+        public virtual string PrintArgs(FieldType field)
         {
             Schema?.Initialize();
 
