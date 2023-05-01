@@ -48,3 +48,25 @@ other field builder extension methods.
 
 The `ComplexityImpact` method on field builders has been renamed to `WithComplexityImpact` to better fit with
 other field builder extension methods.
+
+### 4. Relay types must be registered within the DI provider
+
+Previuosly the Relay graph types were instantiated directly by the `SchemaTypes` class. This has been changed so that
+the types are now pulled from the DI container. No changes are required if you are using the provided DI builder methods,
+as they automatically register the relay types. Otherwise, you will need to manually register the Relay graph types.
+
+```csharp
+// v7 and prior -- builder methods -- NO CHANGES REQUIRED
+services.AddGraphQL(b => {
+  b.AddSchema<StarWarsSchema>();
+});
+
+// v7 and prior -- manual registration
+services.AddSingleton<StarWarsSchema>(); // and other types
+
+// v8
+services.AddSingleton<PageInfoType>();
+services.AddSingleton(typeof(EdgeType<>);
+services.AddSingleton(typeof(ConnectionType<>);
+services.AddSingleton(typeof(ConnectionType<,>);
+```
