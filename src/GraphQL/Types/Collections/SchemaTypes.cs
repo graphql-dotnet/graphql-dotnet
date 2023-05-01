@@ -740,17 +740,7 @@ Make sure that your ServiceProvider is configured correctly.");
         var foundType = FindGraphType(namedType);
         if (foundType == null)
         {
-            if (namedType == typeof(PageInfoType))
-            {
-                foundType = new PageInfoType();
-                AddType(foundType, context);
-            }
-            else if (namedType.IsGenericType && (namedType.ImplementsGenericType(typeof(EdgeType<>)) || namedType.ImplementsGenericType(typeof(ConnectionType<,>))))
-            {
-                foundType = (IGraphType)Activator.CreateInstance(namedType)!;
-                AddType(foundType, context);
-            }
-            else if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
+            if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
             {
                 foundType = builtInCustomScalar;
                 AddType(foundType, _context); // TODO: why _context instead of context here? See https://github.com/graphql-dotnet/graphql-dotnet/pull/3488
