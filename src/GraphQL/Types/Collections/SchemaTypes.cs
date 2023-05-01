@@ -7,7 +7,6 @@ using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Resolvers;
 using GraphQL.Types.Collections;
-using GraphQL.Types.Relay;
 using GraphQL.Utilities;
 using GraphQLParser;
 
