@@ -44,7 +44,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public async Task Operation_Can_Be_Canceled()
+    public async Task Operation_Can_Be_Cancelled()
     {
         using var cts = new CancellationTokenSource();
 
