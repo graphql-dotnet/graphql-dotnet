@@ -1,7 +1,6 @@
 <Project>
 
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>See https://github.com/graphql-dotnet/graphql-dotnet/releases and https://graphql-dotnet.github.io/docs/migrations/migration7</PackageReleaseNotes>
     <Nullable>enable</Nullable>
