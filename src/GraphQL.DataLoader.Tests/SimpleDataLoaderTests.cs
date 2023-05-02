@@ -48,7 +48,6 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     {
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
-        var tcs = new TaskCompletionSource<bool>();
 
         var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
@@ -57,8 +56,6 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         mock.Setup(store => store.GetAllUsersAsync(token))
             .Returns(async (CancellationToken ct) =>
             {
-                // notify that the operation has started
-                tcs.SetResult(true);
                 // wait for cancellation
                 await Task.Delay(60000, ct).ConfigureAwait(false);
                 // should not occur
@@ -75,9 +72,6 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         // start reading result
         var task = result.GetResultAsync(token);
-
-        // wait for task to start
-        await tcs.Task.ConfigureAwait(false);
 
         // trigger cancellation
         cts.Cancel();
