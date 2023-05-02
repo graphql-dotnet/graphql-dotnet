@@ -44,33 +44,79 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public async Task Operation_Can_Be_Cancelled()
+    public async Task Operation_Can_Be_Canceled_After_Started()
     {
         using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+        var tcs = new TaskCompletionSource<bool>();
 
         var mock = new Mock<IUsersStore>();
         var users = Fake.Users.Generate(2);
 
-        mock.Setup(store => store.GetAllUsersAsync(cts.Token))
+        // mock store method to expect cancellation
+        mock.Setup(store => store.GetAllUsersAsync(token))
             .Returns(async (CancellationToken ct) =>
             {
+                // notify that the operation has started
+                tcs.SetResult(true);
+                // wait for cancellation
                 await Task.Delay(60000, ct).ConfigureAwait(false);
-                ct.ThrowIfCancellationRequested();
-
+                // should not occur
                 return users;
             });
 
         var usersStore = mock.Object;
 
+        // create loader
         var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
+        // start the pending load operation (will wait for GetResultAsync to be called)
         var result = loader.LoadAsync();
 
-        cts.CancelAfter(TimeSpan.FromMilliseconds(5));
+        // start reading result
+        var task = result.GetResultAsync(token);
 
-        await Should.ThrowAsync<OperationCanceledException>(async () => await result.GetResultAsync(cts.Token).ConfigureAwait(false)).ConfigureAwait(false);
+        // wait for task to start
+        await tcs.Task.ConfigureAwait(false);
 
-        mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
+        // trigger cancellation
+        cts.Cancel();
+
+        // ensure that the task is cancelled
+        await Should.ThrowAsync<OperationCanceledException>(task).ConfigureAwait(false);
+
+        // ensure that the mock function was called with the proper token (and it was cancelled while running)
+        mock.Verify(x => x.GetAllUsersAsync(token), Times.Once);
+    }
+
+    [Fact]
+    public async Task Operation_Can_Be_Canceled_Before_Started()
+    {
+        using var cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        var mock = new Mock<IUsersStore>();
+        var users = Fake.Users.Generate(2);
+
+        // mock store method to expect cancellation
+        mock.Setup(store => store.GetAllUsersAsync(token)).Returns(Task.FromResult<IEnumerable<User>>(users));
+
+        var usersStore = mock.Object;
+
+        // create loader
+        var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
+
+        // start the pending load operation (will wait for GetResultAsync to be called)
+        var result = loader.LoadAsync();
+
+        // trigger cancellation
+        cts.Cancel();
+
+        // ensure that GetResultAsync throws a cancellation exception
+        await Should.ThrowAsync<OperationCanceledException>(async () => await result.GetResultAsync(token).ConfigureAwait(false)).ConfigureAwait(false);
+
+        // ensure that the mock function was never called (since it was canceled early)
+        mock.Verify(x => x.GetAllUsersAsync(token), Times.Never);
     }
 
     [Fact]
