@@ -47,13 +47,12 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     public async Task Operation_Can_Be_Canceled()
     {
         using var cts = new CancellationTokenSource();
-        var token = cts.Token;
 
         var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
 
         // mock store method to expect cancellation
-        mock.Setup(store => store.GetAllUsersAsync(token))
+        mock.Setup(store => store.GetAllUsersAsync(cts.Token))
             .Returns(async (CancellationToken ct) =>
             {
                 // wait for cancellation
@@ -71,7 +70,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         var result = loader.LoadAsync();
 
         // start reading result
-        var task = result.GetResultAsync(token);
+        var task = result.GetResultAsync(cts.Token);
 
         // trigger cancellation
         cts.Cancel();
@@ -80,7 +79,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         await Should.ThrowAsync<OperationCanceledException>(task).ConfigureAwait(false);
 
         // ensure that the mock function was called with the proper token (and it was cancelled while running)
-        mock.Verify(x => x.GetAllUsersAsync(token), Times.Once);
+        mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
     }
 
     [Fact]
