@@ -44,7 +44,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public async Task Operation_Can_Be_Canceled_After_Started()
+    public async Task Operation_Can_Be_Canceled()
     {
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
@@ -90,36 +90,6 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     }
 
     [Fact]
-    public async Task Operation_Can_Be_Canceled_Before_Started()
-    {
-        using var cts = new CancellationTokenSource();
-        var token = cts.Token;
-
-        var mock = new Mock<IUsersStore>(MockBehavior.Strict);
-        var users = Fake.Users.Generate(2);
-
-        // mock store method which should never run
-        mock.Setup(store => store.GetAllUsersAsync(token)).Returns(Task.FromResult<IEnumerable<User>>(users));
-
-        var usersStore = mock.Object;
-
-        // create loader
-        var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
-
-        // start the pending load operation (will wait for GetResultAsync to be called)
-        var result = loader.LoadAsync();
-
-        // trigger cancellation
-        cts.Cancel();
-
-        // ensure that GetResultAsync throws a cancellation exception
-        await Should.ThrowAsync<OperationCanceledException>(async () => await result.GetResultAsync(token).ConfigureAwait(false)).ConfigureAwait(false);
-
-        // ensure that the mock function was never called (since it was canceled early)
-        mock.Verify(x => x.GetAllUsersAsync(token), Times.Never);
-    }
-
-    [Fact]
     public async Task Operation_Cancelled_Before_Dispatch_Does_Not_Execute()
     {
         using var cts = new CancellationTokenSource();
@@ -127,7 +97,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         var users = Fake.Users.Generate(2);
 
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
-            .ReturnsAsync(users, delay: TimeSpan.FromMilliseconds(20));
+            .ReturnsAsync(users);
 
         var usersStore = mock.Object;
 
