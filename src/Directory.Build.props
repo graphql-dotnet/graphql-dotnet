@@ -4,6 +4,7 @@
     <VersionPrefix>7.4.1-preview</VersionPrefix>
     <NextVersion>8.0.0</NextVersion>
     <LangVersion>latest</LangVersion>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.64x64.png</PackageIcon>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
