@@ -50,7 +50,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         var token = cts.Token;
         var tcs = new TaskCompletionSource<bool>();
 
-        var mock = new Mock<IUsersStore>();
+        var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
 
         // mock store method to expect cancellation
@@ -95,10 +95,10 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         using var cts = new CancellationTokenSource();
         var token = cts.Token;
 
-        var mock = new Mock<IUsersStore>();
+        var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
 
-        // mock store method to expect cancellation
+        // mock store method which should never run
         mock.Setup(store => store.GetAllUsersAsync(token)).Returns(Task.FromResult<IEnumerable<User>>(users));
 
         var usersStore = mock.Object;
