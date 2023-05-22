@@ -892,6 +892,14 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 
+    /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
+    public static IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this IGraphQLBuilder builder)
+        where TConfigureSchema : class, IConfigureSchema
+    {
+        builder.Services.TryRegister<IConfigureSchema, TConfigureSchema>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
+
     /// <summary>
     /// Configures an action to configure execution options, which run prior to calls to
     /// <see cref="ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see>
@@ -927,7 +935,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
         where TConfigureExecution : class, IConfigureExecution
     {
-        builder.Services.Register<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 

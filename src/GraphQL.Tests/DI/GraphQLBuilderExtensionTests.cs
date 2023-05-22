@@ -10,7 +10,9 @@ using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.Tests.DI;
 
@@ -836,6 +838,31 @@ public class GraphQLBuilderExtensionTests
 
     #region - ConfigureSchema and ConfigureExecutionOptions -
     [Fact]
+    public void ConfigureSchema_ByType_NoDoubleRegistration()
+    {
+        MockSetupTryRegister<IConfigureSchema, TestConfigureSchema>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        _builder.ConfigureSchema<TestConfigureSchema>();
+        Verify();
+    }
+
+    [Fact]
+    public void ConfigureSchema_ByType_NoDoubleRegistration_2()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .ConfigureSchema<TestConfigureSchema>()
+            .ConfigureSchema<TestConfigureSchema>());
+        var provider = services.BuildServiceProvider();
+        var configurations = provider.GetRequiredService<IEnumerable<IConfigureSchema>>();
+        configurations.Count().ShouldBe(1);
+    }
+
+    private class TestConfigureSchema : IConfigureSchema
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider) => throw new NotImplementedException();
+    }
+
+    [Fact]
     public void ConfigureSchema()
     {
         bool ran = false;
@@ -889,6 +916,33 @@ public class GraphQLBuilderExtensionTests
     {
         Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema>)null));
         Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema, IServiceProvider>)null));
+    }
+
+    [Fact]
+    public void ConfigureExecution_ByType_NoDoubleRegistration()
+    {
+        MockSetupTryRegister<IConfigureExecution, TestConfigureExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        _builder.ConfigureExecution<TestConfigureExecution>();
+        Verify();
+    }
+
+    [Fact]
+    public void ConfigureExecution_ByType_NoDoubleRegistration_2()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .ConfigureExecution<TestConfigureExecution>()
+            .ConfigureExecution<TestConfigureExecution>());
+        var provider = services.BuildServiceProvider();
+        var configurations = provider.GetRequiredService<IEnumerable<IConfigureExecution>>();
+        configurations.Count().ShouldBe(1);
+    }
+
+    private class TestConfigureExecution : IConfigureExecution
+    {
+        public float SortOrder => throw new NotImplementedException();
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next) => throw new NotImplementedException();
     }
 
     [Fact]
