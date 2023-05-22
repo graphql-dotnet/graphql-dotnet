@@ -857,11 +857,6 @@ public class GraphQLBuilderExtensionTests
         configurations.Count().ShouldBe(1);
     }
 
-    private class TestConfigureSchema : IConfigureSchema
-    {
-        public void Configure(ISchema schema, IServiceProvider serviceProvider) => throw new NotImplementedException();
-    }
-
     [Fact]
     public void ConfigureSchema()
     {
@@ -935,14 +930,7 @@ public class GraphQLBuilderExtensionTests
             .ConfigureExecution<TestConfigureExecution>());
         var provider = services.BuildServiceProvider();
         var configurations = provider.GetRequiredService<IEnumerable<IConfigureExecution>>();
-        configurations.Count().ShouldBe(1);
-    }
-
-    private class TestConfigureExecution : IConfigureExecution
-    {
-        public float SortOrder => throw new NotImplementedException();
-
-        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next) => throw new NotImplementedException();
+        configurations.Where(x => x.GetType() == typeof(TestConfigureExecution)).Count().ShouldBe(1);
     }
 
     [Fact]
@@ -1164,11 +1152,42 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
+    #region - UseTelemetry -
+#if NET5_0_OR_GREATER
+    [Fact]
+    public void UseTelemetry()
+    {
+        MockSetupTryRegister<IConfigureExecution, Telemetry.GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        MockSetupConfigureNull<Telemetry.GraphQLTelemetryOptions>();
+        _builder.UseTelemetry();
+        Verify();
+    }
+
+    [Fact]
+    public void UseTelemetry_Options1()
+    {
+        MockSetupTryRegister<IConfigureExecution, Telemetry.GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        var options = MockSetupConfigure1<Telemetry.GraphQLTelemetryOptions>();
+        _builder.UseTelemetry(options);
+        Verify();
+    }
+
+    [Fact]
+    public void UseTelemetry_Options2()
+    {
+        MockSetupTryRegister<IConfigureExecution, Telemetry.GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        var options = MockSetupConfigure2<Telemetry.GraphQLTelemetryOptions>();
+        _builder.UseTelemetry(options);
+        Verify();
+    }
+#endif
+    #endregion
+
     #region - GraphQL.MemoryCache: UseMemoryCache / UseAutomaticPersistedQueries -
     [Fact]
     public void UseMemoryCache()
     {
-        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         MockSetupConfigureNull<MemoryDocumentCacheOptions>();
         _builder.UseMemoryCache();
         Verify();
@@ -1177,7 +1196,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void UseMemoryCache_Options1()
     {
-        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var options = MockSetupConfigure1<MemoryDocumentCacheOptions>();
         _builder.UseMemoryCache(options);
         Verify();
@@ -1186,7 +1205,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void UseMemoryCache_Options2()
     {
-        MockSetupRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, MemoryDocumentCache>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var options = MockSetupConfigure2<MemoryDocumentCacheOptions>();
         _builder.UseMemoryCache(options);
         Verify();
@@ -1195,7 +1214,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void UseAutomaticPersistedQueries()
     {
-        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         MockSetupConfigureNull<AutomaticPersistedQueriesCacheOptions>();
         _builder.UseAutomaticPersistedQueries();
         Verify();
@@ -1204,7 +1223,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void UseAutomaticPersistedQueries_Options1()
     {
-        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var options = MockSetupConfigure1<AutomaticPersistedQueriesCacheOptions>();
         _builder.UseAutomaticPersistedQueries(options);
         Verify();
@@ -1213,7 +1232,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void UseAutomaticPersistedQueries_Options2()
     {
-        MockSetupRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton);
+        MockSetupTryRegister<IConfigureExecution, AutomaticPersistedQueriesExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var options = MockSetupConfigure2<AutomaticPersistedQueriesCacheOptions>();
         _builder.UseAutomaticPersistedQueries(options);
         Verify();
@@ -1283,6 +1302,18 @@ public class GraphQLBuilderExtensionTests
         Verify();
     }
     #endregion
+
+    private class TestConfigureSchema : IConfigureSchema
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider) => throw new NotImplementedException();
+    }
+
+    private class TestConfigureExecution : IConfigureExecution
+    {
+        public float SortOrder => throw new NotImplementedException();
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next) => throw new NotImplementedException();
+    }
 
     private class Class1 : Interface1
     {
