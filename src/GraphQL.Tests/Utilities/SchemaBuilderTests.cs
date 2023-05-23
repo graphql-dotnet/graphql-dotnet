@@ -413,7 +413,7 @@ public class SchemaBuilderTests
             opt.Query = "{ kind }";
             opt.ThrowOnUnhandledException = true;
         })).ConfigureAwait(false);
-        ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the scalar type 'PetKindType'.");
+        ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the enumeration type 'PetKindType'. Enumeration does not contain such value. Available values: 'CAT' of type 'String', 'DOG' of type 'String'.");
     }
 
     [Fact]

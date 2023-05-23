@@ -64,7 +64,7 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     public void list_throws_for_invalid_type_when_conversion_returns_null()
     {
         AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [ null ]}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new object[] { "testListInvalidType2", 0 },
-            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the scalar type 'Bug1773Enum'."));
+            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 
     [Fact]
@@ -80,14 +80,14 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     {
         // in this case, the conversion returned null, and GraphQL threw an InvalidOperationException
         AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
-            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the scalar type 'Bug1773Enum'."));
+            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 
     [Fact]
     public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
     {
         AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": [null, \"HELLO\"]}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new object[] { "testListInvalidType3", 0 },
-            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the scalar type 'Bug1773Enum'."));
+            new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 }
 
