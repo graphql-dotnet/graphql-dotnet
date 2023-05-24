@@ -69,7 +69,7 @@ public class EnumGraphTypeTests
     [Fact]
     public void adds_values_from_enum_custom_casing_should_throw()
     {
-        Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' to the scalar type 'Colors'");
+        Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' value of type 'String' to the scalar type 'Colors'");
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class EnumGraphTypeTests
     public void parse_native_clr_enum_value_when_not_defined()
     {
         type.CanParseValue((Colors)100500).ShouldBeFalse();
-        Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' to the scalar type 'Colors'");
+        Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' value of type 'Colors' to the scalar type 'Colors'");
     }
 
     [Fact]
