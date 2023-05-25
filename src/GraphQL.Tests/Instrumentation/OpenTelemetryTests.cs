@@ -1,6 +1,8 @@
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
+using System.Reflection;
+using GraphQL.DI;
 using GraphQL.Telemetry;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -58,10 +60,18 @@ public sealed class OpenTelemetryTests : IDisposable
             // sample of how OpenTelemetry.AutoInstrumentation.Initializer.EnableAutoInstrumentation() is called by the OpenTelemetry framework
             // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3631 and https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/2520
             var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
-            var method = type.GetMethod("EnableAutoInstrumentation", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).ShouldNotBeNull();
+            var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Static | BindingFlags.Public).ShouldNotBeNull();
             method.Invoke(null, new object[] { null });
 
+            // verify that the initializer was called
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+
+            // verify that the telemetry service is added implicitly
+            var services = new ServiceCollection();
+            services.AddGraphQL(_ => { });
+            var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
+            serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+            serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
         }
         finally
         {
