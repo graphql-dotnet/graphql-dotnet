@@ -58,10 +58,16 @@ public sealed class OpenTelemetryTests : IDisposable
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
 
             // sample of how OpenTelemetry.AutoInstrumentation.Initializer.EnableAutoInstrumentation() is called by the OpenTelemetry framework
-            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3631 and https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/2520
+            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3631
+            // see https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/2520
+            // see https://github.com/RassK/opentelemetry-dotnet-instrumentation/pull/954 for implementation of this code
             var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
-            var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Static | BindingFlags.Public).ShouldNotBeNull();
-            method.Invoke(null, new object[] { null });
+            var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Public | BindingFlags.Static).ShouldNotBeNull();
+            var optionsType = typeof(DocumentExecuter).Assembly.GetType("GraphQL.Telemetry.GraphQLTelemetryOptions").ShouldNotBeNull();
+            var optionsInstance = Activator.CreateInstance(optionsType);
+            var recordDocumentOption = optionsType.GetProperty("RecordDocument").ShouldNotBeNull();
+            recordDocumentOption.SetValue(optionsInstance, true);
+            method.Invoke(null, new object[] { optionsInstance });
 
             // verify that the initializer was called
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
