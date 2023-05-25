@@ -50,7 +50,7 @@ public sealed class OpenTelemetryTests : IDisposable
     public void Dispose() => _host.Dispose();
 
     [Fact]
-    public void CanInitializeAutoTelemetryViaReflection()
+    public void CanInitializeTelemetryViaReflection()
     {
         //note: requires [Collection("StaticTests")] on the test class to ensure that no other tests are run concurrently
         try
