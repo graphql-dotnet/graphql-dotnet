@@ -10,6 +10,7 @@ using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
 
+[Collection("StaticTests")]
 public sealed class OpenTelemetryTests : IDisposable
 {
     private readonly List<Activity> _exportedActivities = new();
@@ -45,6 +46,24 @@ public sealed class OpenTelemetryTests : IDisposable
     }
 
     public void Dispose() => _host.Dispose();
+
+    [Fact]
+    public void CanInitializeAutoTelemetryViaReflection()
+    {
+        try
+        {
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
+            var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
+            var method = type.GetMethod("EnableAutoInstrumentation", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).ShouldNotBeNull();
+            method.Invoke(null, new object[] { null });
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+        }
+        finally
+        {
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+            OpenTelemetry.AutoInstrumentation.Initializer.Options = null;
+        }
+    }
 
     [Fact]
     public async Task BasicTest()
