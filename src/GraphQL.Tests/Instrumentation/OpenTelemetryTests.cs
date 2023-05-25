@@ -50,12 +50,17 @@ public sealed class OpenTelemetryTests : IDisposable
     [Fact]
     public void CanInitializeAutoTelemetryViaReflection()
     {
+        //note: requires [Collection("StaticTests")] on the test class to ensure that no other tests are run concurrently
         try
         {
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
+
+            // sample of how OpenTelemetry.AutoInstrumentation.Initializer.EnableAutoInstrumentation() is called by the OpenTelemetry framework
+            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3631 and https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/2520
             var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
             var method = type.GetMethod("EnableAutoInstrumentation", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public).ShouldNotBeNull();
             method.Invoke(null, new object[] { null });
+
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
         }
         finally
