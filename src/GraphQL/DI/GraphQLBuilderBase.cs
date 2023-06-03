@@ -72,6 +72,27 @@ namespace GraphQL.DI
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Services.Configure<ErrorInfoProviderOptions>();
+
+#if NET5_0_OR_GREATER
+            if (OpenTelemetry.AutoInstrumentation.Initializer.Enabled)
+            {
+                // this will run prior to any other calls to UseTelemetry
+                // it will also cause telemetry to be called first in the pipeline
+                this.UseTelemetry(OpenTelemetry.AutoInstrumentation.Initializer.Options != null
+                    ? (opts =>
+                    {
+                        var autoOpts = OpenTelemetry.AutoInstrumentation.Initializer.Options;
+                        opts.RecordDocument = autoOpts.RecordDocument;
+                        opts.SanitizeDocument = autoOpts.SanitizeDocument;
+                        opts.Filter = autoOpts.Filter;
+                        opts.EnrichWithExecutionOptions = autoOpts.EnrichWithExecutionOptions;
+                        opts.EnrichWithDocument = autoOpts.EnrichWithDocument;
+                        opts.EnrichWithExecutionResult = autoOpts.EnrichWithExecutionResult;
+                        opts.EnrichWithException = autoOpts.EnrichWithException;
+                    })
+                    : null);
+            }
+#endif
         }
 
         /// <inheritdoc />
