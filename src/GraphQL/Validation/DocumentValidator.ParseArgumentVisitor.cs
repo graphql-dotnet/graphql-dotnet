@@ -27,25 +27,15 @@ public partial class DocumentValidator
                 {
                     try
                     {
-                        var directives = ExecutionHelper.GetDirectives(hasDirectivesNode, context.Variables, context.Schema);
+                        var directives = ExecutionHelper.GetDirectives(hasDirectivesNode, context.Variables, context.Schema, context.ValidationContext.Document);
                         if (directives != null)
                         {
                             (context.DirectiveValues ??= new()).Add(node, directives);
                         }
                     }
-                    catch (Exception ex)
+                    catch (ValidationError ex)
                     {
-                        // todo: report error properly
-                        context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve {NodeDescription()}.", ex));
-
-                        string NodeDescription() => node switch
-                        {
-                            GraphQLField field => $"field '{field.Name.Value}'",
-                            GraphQLInlineFragment => $"inline fragment",
-                            GraphQLFragmentSpread fragment => $"fragment spread '{fragment.FragmentName.Name}'",
-                            GraphQLVariableDefinition varDef => $"variable definition '{varDef.Variable.Name}'",
-                            _ => "node"
-                        };
+                        context.ValidationContext.ReportError(ex);
                     }
                 }
             }
@@ -147,16 +137,15 @@ public partial class DocumentValidator
             {
                 try
                 {
-                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables);
+                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
                     if (arguments != null)
                     {
                         (context.ArgumentValues ??= new()).Add(field, arguments);
                     }
                 }
-                catch (Exception ex)
+                catch (ValidationError ex)
                 {
-                    // todo: report error properly
-                    context.ValidationContext.ReportError(new ValidationError($"Error trying to resolve field '{field.Name.Value}'.", ex));
+                    context.ValidationContext.ReportError(ex);
                 }
             }
             // if the field's type is an object, process child fields

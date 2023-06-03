@@ -13,7 +13,8 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
             }
             """;
         var res = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
-        res.Errors[0].Code.ShouldBe("VALIDATION_ERROR");
+        res.Errors[0].Code.ShouldBe("INVALID_LITERAL");
+        res.Errors[0].Message.ShouldBe("""Invalid literal for argument 'input' of field 'run'. Type 'GraphQL.Tests.Bugs.MyInputClassBase' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.""");
     }
 }
 

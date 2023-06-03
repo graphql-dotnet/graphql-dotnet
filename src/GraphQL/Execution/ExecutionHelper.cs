@@ -16,7 +16,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of directives with their arguments values for a node (field, fragment spread, inline fragment).
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static IDictionary<string, DirectiveInfo>? GetDirectives(IHasDirectivesNode node, Variables? variables, ISchema schema)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(IHasDirectivesNode node, Variables? variables, ISchema schema, GraphQLDocument document)
         {
             if (node.Directives == null || node.Directives.Count == 0)
                 return null;
@@ -33,7 +33,9 @@ namespace GraphQL.Execution
                 if (dirDefinition == null)
                     continue;
 
-                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArguments(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
+                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(
+                    dirDefinition,
+                    GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir) ?? _emptyDirectiveArguments);
             }
 
             return directives;
@@ -43,7 +45,7 @@ namespace GraphQL.Execution
         /// Returns a dictionary of arguments and their values for a field or directive.
         /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
+        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables, GraphQLDocument document, ASTNode fieldOrFragmentSpread, GraphQLDirective? directive)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
                 return null;
@@ -52,20 +54,60 @@ namespace GraphQL.Execution
 
             foreach (var arg in definitionArguments.List!)
             {
-                var value = astArguments?.ValueFor(arg.Name);
+                GraphQLArgument? argNode = null;
+                if (astArguments != null)
+                {
+                    foreach (var node in astArguments)
+                    {
+                        if (node.Name.Value.Equals(arg.Name))
+                        {
+                            argNode = node;
+                        }
+                    }
+                }
+                var value = argNode?.Value;
                 var type = arg.ResolvedType!;
 
-                values[arg.Name] = CoerceValue(type, value, variables, arg.DefaultValue);
+                values[arg.Name] = CoerceValue(type, value, new CoerceValueContext
+                {
+                    Argument = argNode,
+                    Document = document,
+                    Directive = directive,
+                    ParentNode = fieldOrFragmentSpread,
+                    Variables = variables,
+                }, arg.DefaultValue);
             }
 
             return values;
         }
 
+        internal readonly ref struct CoerceValueContext
+        {
+            public GraphQLDocument? Document { get; init; }
+            /// <summary>
+            /// This is typically either a field, a fragment spread, or variable definition.
+            /// </summary>
+            public ASTNode? ParentNode { get; init; }
+            public GraphQLDirective? Directive { get; init; }
+            public GraphQLArgument? Argument { get; init; }
+            public Variables? Variables { get; init; }
+        }
+
         /// <summary>
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
+        /// Exceptions thrown by scalars are passed through.
         /// </summary>
         public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
+            => CoerceValue(type, input, new CoerceValueContext { Variables = variables }, fieldDefault);
+
+        /// <summary>
+        /// Coerces a literal value to a compatible .NET type for the variable's graph type.
+        /// Typically this is a value for a field argument or default value for a variable.
+        /// Exceptions thrown by scalars are wrapped in <see cref="InvalidLiteralError"/>
+        /// if <see cref="CoerceValueContext.Document"/> and <see cref="CoerceValueContext.ParentNode"/> are set.
+        /// </summary>
+        internal static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, CoerceValueContext context, object? fieldDefault = null)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -74,7 +116,7 @@ namespace GraphQL.Execution
             {
                 // validation rules have verified that this is not null; if the validation rule was not executed, it
                 // is assumed that the caller does not wish this check to be executed
-                return CoerceValue(nonNull.ResolvedType!, input, variables, fieldDefault);
+                return CoerceValue(nonNull.ResolvedType!, input, context, fieldDefault);
             }
 
             if (input == null)
@@ -84,16 +126,23 @@ namespace GraphQL.Execution
 
             if (input is GraphQLVariable variable)
             {
-                if (variables == null)
+                if (context.Variables == null)
                     return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
 
-                var found = variables.ValueFor(variable.Name, out var ret);
+                var found = context.Variables.ValueFor(variable.Name, out var ret);
                 return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
             if (type is ScalarGraphType scalarType)
             {
-                return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
+                try
+                {
+                    return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
+                }
+                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
+                {
+                    throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                }
             }
 
             if (input is GraphQLNullValue)
@@ -113,12 +162,12 @@ namespace GraphQL.Execution
 
                     var values = new object?[count];
                     for (int i = 0; i < count; ++i)
-                        values[i] = CoerceValue(listItemType, list.Values![i], variables).Value;
+                        values[i] = CoerceValue(listItemType, list.Values![i], context).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
                 {
-                    return new ArgumentValue(new[] { CoerceValue(listItemType, input, variables).Value }, ArgumentSource.Literal);
+                    return new ArgumentValue(new[] { CoerceValue(listItemType, input, context).Value }, ArgumentSource.Literal);
                 }
             }
 
@@ -126,7 +175,15 @@ namespace GraphQL.Execution
             {
                 if (input is not GraphQLObjectValue objectValue)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
+                    if (context.Document != null && context.ParentNode != null)
+                    {
+                        throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input,
+                            $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
+                    }
+                    else
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
+                    }
                 }
 
                 var obj = new Dictionary<string, object?>();
@@ -149,7 +206,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, context).Value;
                     }
                     else if (field.DefaultValue != null)
                     {
@@ -164,7 +221,14 @@ namespace GraphQL.Execution
                     // thrown.
                 }
 
-                return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
+                try
+                {
+                    return new ArgumentValue(inputObjectGraphType.ParseDictionary(obj), ArgumentSource.Literal);
+                }
+                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
+                {
+                    throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                }
             }
 
             throw new ArgumentOutOfRangeException(nameof(input), $"Unknown type of input object '{type.GetType()}'");
