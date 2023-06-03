@@ -57,6 +57,8 @@ public class GraphQLTelemetryOptions
     /// </para>
     /// </summary>
     public Action<Activity, Exception> EnrichWithException { get; set; } = (_, _) => { };
+
+    // note: when adding properties, be sure corresponding changes are made in GraphQLBuilderBase.cs
 }
 
 #endif
