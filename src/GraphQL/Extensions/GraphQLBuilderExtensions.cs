@@ -1201,7 +1201,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
     {
         builder.Services.Configure(configure);
-        builder.Services.TryRegister<IConfigureExecution, GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.ConfigureExecution<GraphQLTelemetryProvider>();
         return builder;
     }
 #endif
