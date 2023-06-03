@@ -1,6 +1,8 @@
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
+using System.Reflection;
+using GraphQL.DI;
 using GraphQL.Telemetry;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +12,8 @@ using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
 
-public class OpenTelemetryTests : IDisposable
+[Collection("StaticTests")]
+public sealed class OpenTelemetryTests : IDisposable
 {
     private readonly List<Activity> _exportedActivities = new();
     private readonly IHost _host;
@@ -47,6 +50,43 @@ public class OpenTelemetryTests : IDisposable
     public void Dispose() => _host.Dispose();
 
     [Fact]
+    public void CanInitializeTelemetryViaReflection()
+    {
+        //note: requires [Collection("StaticTests")] on the test class to ensure that no other tests are run concurrently
+        try
+        {
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
+
+            // sample of how OpenTelemetry.AutoInstrumentation.Initializer.EnableAutoInstrumentation() is called by the OpenTelemetry framework
+            // see https://github.com/graphql-dotnet/graphql-dotnet/pull/3631
+            // see https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation/issues/2520
+            // see https://github.com/RassK/opentelemetry-dotnet-instrumentation/pull/954 for implementation of this code
+            var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
+            var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Public | BindingFlags.Static).ShouldNotBeNull();
+            var optionsType = typeof(DocumentExecuter).Assembly.GetType("GraphQL.Telemetry.GraphQLTelemetryOptions").ShouldNotBeNull();
+            var optionsInstance = Activator.CreateInstance(optionsType);
+            var recordDocumentOption = optionsType.GetProperty("RecordDocument").ShouldNotBeNull();
+            recordDocumentOption.SetValue(optionsInstance, true);
+            method.Invoke(null, new object[] { optionsInstance });
+
+            // verify that the initializer was called
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+
+            // verify that the telemetry service is added implicitly
+            var services = new ServiceCollection();
+            services.AddGraphQL(_ => { });
+            var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
+            serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+            serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+        }
+        finally
+        {
+            OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+            OpenTelemetry.AutoInstrumentation.Initializer.Options = null;
+        }
+    }
+
+    [Fact]
     public async Task BasicTest()
     {
         // execute GraphQL document
@@ -68,9 +108,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -95,9 +133,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "helloQuery"), // operation name pulled from document
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -124,9 +160,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -176,9 +210,7 @@ public class OpenTelemetryTests : IDisposable
             new("testresult", "test3"),
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -189,7 +221,7 @@ public class OpenTelemetryTests : IDisposable
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
         };
-        var ranFilter = false;
+        bool ranFilter = false;
         _options.Filter = options =>
         {
             options.ShouldBe(executionOptions);
@@ -230,9 +262,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "helloQuery"),
         });
         activity.DisplayName.ShouldBe("query helloQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -255,9 +285,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.document", "{"),
         });
         activity.DisplayName.ShouldBe("graphql");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -284,9 +312,7 @@ public class OpenTelemetryTests : IDisposable
 #endif
         });
         activity.DisplayName.ShouldBe("query");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Error);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
     }
 
     [Fact]
@@ -308,9 +334,7 @@ public class OpenTelemetryTests : IDisposable
             // no operation name within ExecutionOptions, and request was canceled before parsing
         });
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -333,9 +357,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.document", "query helloQuery { hello }"),
         });
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     [Fact]
@@ -360,9 +382,7 @@ public class OpenTelemetryTests : IDisposable
             new("graphql.operation.name", "cancelQuery"),
         });
         activity.DisplayName.ShouldBe("query cancelQuery");
-#if NET6_0_OR_GREATER
-        activity.Status.ShouldBe(ActivityStatusCode.Unset);
-#endif
+        activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
     private class Query

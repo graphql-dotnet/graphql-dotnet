@@ -200,7 +200,7 @@ namespace GraphQL.Utilities
             };
         }
 
-        public string PrintScalar(ScalarGraphType type)
+        public virtual string PrintScalar(ScalarGraphType type)
         {
             Schema?.Initialize();
 
@@ -212,7 +212,7 @@ namespace GraphQL.Utilities
             Schema?.Initialize();
 
             var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
-            var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
+            var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
@@ -230,7 +230,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
 
-        public string PrintUnion(UnionGraphType type)
+        public virtual string PrintUnion(UnionGraphType type)
         {
             Schema?.Initialize();
 
@@ -238,7 +238,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
-        public string PrintEnum(EnumerationGraphType type)
+        public virtual string PrintEnum(EnumerationGraphType type)
         {
             Schema?.Initialize();
 
@@ -246,7 +246,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
-        public string PrintInputObject(IInputObjectGraphType type)
+        public virtual string PrintInputObject(IInputObjectGraphType type)
         {
             Schema?.Initialize();
 
@@ -276,7 +276,7 @@ namespace GraphQL.Utilities
                     f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
-        public string PrintArgs(FieldType field)
+        public virtual string PrintArgs(FieldType field)
         {
             Schema?.Initialize();
 
@@ -356,13 +356,9 @@ namespace GraphQL.Utilities
 
         protected string FormatDescription(string? description, string indentation = "")
         {
-            if (Options.IncludeDescriptions)
-            {
-                return Options.PrintDescriptionsAsComments
-                    ? PrintComment(description, indentation)
-                    : PrintDescription(description, indentation);
-            }
-            return "";
+            return Options.IncludeDescriptions
+                ? PrintDescription(description, indentation)
+                : "";
         }
 
         public string FormatDefaultValue(object? value, IGraphType graphType)

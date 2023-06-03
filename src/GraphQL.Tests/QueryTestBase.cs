@@ -45,7 +45,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
     public TSchema Schema => (TSchema)ServiceProvider.GetService(typeof(TSchema)) ?? throw new InvalidOperationException("Schema was not specified in DI container");
 
-    public IDocumentExecuter Executer { get; private set; }
+    public IDocumentExecuter Executer { get; }
 
     public ExecutionResult AssertQuerySuccess(
         string query,

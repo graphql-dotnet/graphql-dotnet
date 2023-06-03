@@ -74,7 +74,7 @@ public class SelfActivatingServiceProviderTests
         // if this test "fails", then our documentation needs to change. It does not necessarily indicate a fault.
         MyClass1 class1 = null;
         var services = new ServiceCollection();
-        services.AddSingleton(services => class1 = new MyClass1());
+        services.AddSingleton(_ => class1 = new MyClass1());
         var provider = services.BuildServiceProvider();
         var myprovider = new SelfActivatingServiceProvider(provider);
         var class2 = myprovider.GetRequiredService<MyClass2>();
@@ -123,7 +123,7 @@ public class SelfActivatingServiceProviderTests
         }
     }
 
-    public class MyClass1 : IDisposable
+    public sealed class MyClass1 : IDisposable
     {
         public bool Disposed { get; set; }
 
@@ -133,7 +133,7 @@ public class SelfActivatingServiceProviderTests
         }
     }
 
-    public class MyClass2 : IDisposable
+    public sealed class MyClass2 : IDisposable
     {
         public bool Disposed { get; set; }
 

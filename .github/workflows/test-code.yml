@@ -42,9 +42,6 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Disable MSVS Nuget Source # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
-        if: ${{ startsWith(matrix.os, 'windows') }}
-        run: dotnet nuget disable source 'Microsoft Visual Studio Offline Packages'
       - name: Install dependencies
         working-directory: src
         run: dotnet restore

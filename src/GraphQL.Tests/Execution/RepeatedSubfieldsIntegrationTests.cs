@@ -25,7 +25,7 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
         public string State { get; set; }
     }
 
-    public ISchema build_schema()
+    public static ISchema build_schema()
     {
         var schema = new Schema();
 
@@ -47,7 +47,7 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
 
         var query = new ObjectGraphType { Name = "Query" };
         query.Field("person", person)
-            .Resolve(ctx =>
+            .Resolve(_ =>
             {
                 return new Person
                 {

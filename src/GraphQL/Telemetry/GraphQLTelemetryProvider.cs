@@ -53,7 +53,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         if (!_telemetryOptions.Filter(options))
             return await next(options).ConfigureAwait(false);
 
-        // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block 
+        // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
 
         // do not record any telemetry if there are no listeners or it decided not to sample the current request

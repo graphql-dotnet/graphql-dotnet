@@ -15,7 +15,7 @@ public class FieldMiddlewareBuilderTests
         _context = new ResolveFieldContext
         {
             FieldDefinition = new FieldType { Name = "Name" },
-            FieldAst = new GraphQLField { Name = new GraphQLName("Name") },
+            FieldAst = new GraphQLField(new GraphQLName("Name")),
             Source = new Person { Name = "Quinn" },
             Errors = new ExecutionErrors(),
             Schema = new Schema(),
@@ -39,7 +39,7 @@ public class FieldMiddlewareBuilderTests
     [Fact]
     public async Task middleware_can_override()
     {
-        _builder.Use(next => context => new ValueTask<object>("One"));
+        _builder.Use(_ => _ => new ValueTask<object>("One"));
 
         (await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false)).ShouldBe("One");
     }
@@ -91,11 +91,11 @@ public class FieldMiddlewareBuilderTests
     {
         _builder.Use(next =>
         {
-            return context =>
+            return async context =>
             {
                 using (context.Metrics.Subject("test", "testing name"))
                 {
-                    return next(context);
+                    return await next(context).ConfigureAwait(false);
                 }
             };
         });
@@ -124,7 +124,7 @@ public class FieldMiddlewareBuilderTests
     [Fact]
     public async Task can_report_errors()
     {
-        _builder.Use(next =>
+        _builder.Use(_ =>
         {
             return context =>
             {
@@ -146,7 +146,7 @@ public class FieldMiddlewareBuilderTests
             ["errorCodes"] = new[] { "one", "two" },
             ["otherErrorCodes"] = new[] { "one", "four" }
         };
-        _builder.Use(next =>
+        _builder.Use(_ =>
         {
             return context =>
             {
@@ -175,11 +175,11 @@ public class FieldMiddlewareBuilderTests
 
     public class SimpleMiddleware : IFieldMiddleware
     {
-        public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             using (context.Metrics.Subject("class", "from class"))
             {
-                return next(context);
+                return await next(context).ConfigureAwait(false);
             }
         }
     }

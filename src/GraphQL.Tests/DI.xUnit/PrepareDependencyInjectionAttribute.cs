@@ -27,7 +27,7 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
 
         _currentMethod.Value = methodUnderTest;
 
-        _diAdapters.GetOrAdd(methodUnderTest, method =>
+        _diAdapters.GetOrAdd(methodUnderTest, _ =>
         {
             var configureMethod = methodUnderTest.DeclaringType.GetMethod(nameof(QueryTestBase<Schema>.RegisterServices), BindingFlags.Public | BindingFlags.Instance);
             object temp = Activator.CreateInstance(methodUnderTest.DeclaringType);

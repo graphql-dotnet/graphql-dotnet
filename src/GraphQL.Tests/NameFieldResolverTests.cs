@@ -41,7 +41,7 @@ public class NameFieldResolverTests
             {
                 Source = person,
                 FieldDefinition = new GraphQL.Types.FieldType { Name = name },
-                FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) },
+                FieldAst = new GraphQLField(name == null ? default : new GraphQLName(name)),
                 Arguments = new Dictionary<string, ArgumentValue>()
                 {
                     { "prefix", new ArgumentValue("test ", ArgumentSource.Literal) }

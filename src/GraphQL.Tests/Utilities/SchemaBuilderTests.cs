@@ -335,6 +335,17 @@ public class SchemaBuilderTests
         Dog
     }
 
+    private enum PetKindType
+    {
+        Cat,
+        Dog
+    }
+
+    private class Query
+    {
+        public PetKindType kind() => PetKindType.Cat;
+    }
+
     [Fact]
     public void builds_case_insensitive_typed_enum()
     {
@@ -357,6 +368,72 @@ public class SchemaBuilderTests
 
         type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
         type.Values.Select(x => (PetKind)x.Value).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
+    }
+
+    [Fact]
+    public async Task builds_case_insensitive_typed_enum_with_custom_name_executed_ok()
+    {
+        const string definitions = """
+            type Query {
+              kind: PetKindType
+            }
+
+            enum PetKindType {
+              CAT
+              DOG
+            }
+            """;
+
+        var schema = Schema.For(definitions, c =>
+        {
+            c.Types.Include<PetKindType>("PetKindType");
+            c.Types.Include<Query>();
+        });
+        schema.Initialize();
+
+        var result = await schema.ExecuteAsync(opt =>
+        {
+            opt.Query = "{ kind }";
+            opt.ThrowOnUnhandledException = true;
+        }).ConfigureAwait(false);
+
+        result.ShouldBeCrossPlatJson(
+            """
+            {
+              "data": {
+                "kind": "CAT"
+              }
+            }
+            """);
+    }
+
+    [Fact]
+    public async Task builds_case_insensitive_typed_enum_without_custom_name_throws()
+    {
+        const string definitions = """
+            type Query {
+              kind: PetKindType
+            }
+
+            enum PetKindType {
+              CAT
+              DOG
+            }
+            """;
+
+        var schema = Schema.For(definitions, c =>
+        {
+            c.Types.Include<PetKindType>(); // type.GraphQLName() inside truncates 'Type' suffix from 'PetKindType'
+            c.Types.Include<Query>();
+        });
+        schema.Initialize();
+
+        var ex = await Should.ThrowAsync<InvalidOperationException>(() => schema.ExecuteAsync(opt =>
+        {
+            opt.Query = "{ kind }";
+            opt.ThrowOnUnhandledException = true;
+        })).ConfigureAwait(false);
+        ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the enumeration type 'PetKindType'. Enumeration does not contain such value. Available values: 'CAT' of type 'String', 'DOG' of type 'String'.");
     }
 
     [Fact]

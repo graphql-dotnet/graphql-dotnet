@@ -68,6 +68,7 @@ public class ScopedAttributeTests
         Class1.DisposedCount.ShouldBe(3);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
     private class TestClass
     {
         public string UnscopedField([FromServices] Class1 arg1, [FromServices] Class2 arg2)
@@ -124,9 +125,9 @@ public class ScopedAttributeTests
 
     private class Class1 : IDisposable
     {
-        public static int DisposedCount = 0;
+        public static int DisposedCount;
 
-        private bool _disposed = false;
+        private bool _disposed;
         private int _value;
 
         public int Value

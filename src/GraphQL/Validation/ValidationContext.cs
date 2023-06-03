@@ -166,7 +166,7 @@ namespace GraphQL.Validation
             {
                 foreach (var variableDef in variableDefinitions.Items)
                 {
-                    var variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
+                    string variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(Schema);
 
@@ -180,7 +180,7 @@ namespace GraphQL.Validation
                     var variable = new Variable(variableDefName);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (Variables.TryGetValue(variableDefName, out var variableValue))
+                    if (Variables.TryGetValue(variableDefName, out object? variableValue))
                     {
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
@@ -248,17 +248,16 @@ namespace GraphQL.Validation
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    var parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    object? parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
                     if (visitor != null)
                         await visitor.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
-                    if (value == null)
-                        throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.");
-
-                    return await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    return value == null
+                        ? throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.")
+                        : await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
@@ -269,7 +268,7 @@ namespace GraphQL.Validation
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
-                    var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
+                    object? parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
                     if (visitor != null)
                         await visitor.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
@@ -355,7 +354,7 @@ namespace GraphQL.Validation
                 {
                     var childFieldVariableName = new VariableName(variableName, field.Name);
 
-                    if (dic.TryGetValue(field.Name, out var fieldValue))
+                    if (dic.TryGetValue(field.Name, out object? fieldValue))
                     {
                         // RULE: If the value null was provided for an input object field, and
                         // the field’s type is not a non‐null type, an entry in the coerced
@@ -395,7 +394,7 @@ namespace GraphQL.Validation
                 // map must not contain any entries with names not defined by a field
                 // of this input object type, ***otherwise an error must be thrown.***
                 List<string>? unknownFields = null;
-                foreach (var key in dic.Keys)
+                foreach (string key in dic.Keys)
                 {
                     bool match = false;
 
@@ -434,12 +433,9 @@ namespace GraphQL.Validation
 
                 if (valueAst == null || valueAst is GraphQLNullValue)
                 {
-                    if (ofType != null)
-                    {
-                        return $"Expected '{ofType.Name}!', found null.";
-                    }
-
-                    return "Expected non-null value, found null";
+                    return ofType == null
+                        ? "Expected non-null value, found null"
+                        : $"Expected '{ofType.Name}!', found null.";
                 }
 
                 return IsValidLiteralValue(ofType, valueAst);

@@ -9,25 +9,13 @@ public class RepeatedSubfieldsTests
 {
     public RepeatedSubfieldsTests()
     {
-        FirstInnerField = new GraphQLField { Name = new GraphQLName("first") };
-        FirstFieldSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
-            {
-                FirstInnerField
-            }
-        };
-        SecondInnerField = new GraphQLField { Name = new GraphQLName("second") };
-        SecondFieldSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
-            {
-                SecondInnerField
-            }
-        };
-        FirstTestField = new GraphQLField { Name = new GraphQLName("test") };
-        SecondTestField = new GraphQLField { Name = new GraphQLName("test") };
-        AliasedTestField = new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("test") };
+        FirstInnerField = new GraphQLField(new GraphQLName("first"));
+        FirstFieldSelection = new GraphQLSelectionSet(new List<ASTNode> { FirstInnerField });
+        SecondInnerField = new GraphQLField(new GraphQLName("second"));
+        SecondFieldSelection = new GraphQLSelectionSet(new List<ASTNode> { SecondInnerField });
+        FirstTestField = new GraphQLField(new GraphQLName("test"));
+        SecondTestField = new GraphQLField(new GraphQLName("test"));
+        AliasedTestField = new GraphQLField(new GraphQLName("test")) { Alias = new GraphQLAlias(new GraphQLName("alias")) };
 
         FirstTestField.SelectionSet = FirstFieldSelection;
         SecondTestField.SelectionSet = SecondFieldSelection;
@@ -42,7 +30,7 @@ public class RepeatedSubfieldsTests
     private GraphQLField SecondTestField { get; }
     private GraphQLField AliasedTestField { get; }
 
-    private Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+    private static Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
     {
         return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
     }
@@ -56,14 +44,13 @@ public class RepeatedSubfieldsTests
     [Fact]
     public void BeMergedCorrectlyInCaseOfFields()
     {
-        var outerSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
+        var outerSelection = new GraphQLSelectionSet(
+            new List<ASTNode>
             {
                 FirstTestField,
                 SecondTestField
             }
-        };
+        );
 
         var query = new ObjectGraphType { Name = "Query" };
         query.Fields.Add(new FieldType
@@ -86,14 +73,13 @@ public class RepeatedSubfieldsTests
     [Fact]
     public void NotMergeAliasedFields()
     {
-        var outerSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
+        var outerSelection = new GraphQLSelectionSet(
+            new List<ASTNode>
             {
                 FirstTestField,
                 AliasedTestField
             }
-        };
+        );
 
         var query = new ObjectGraphType { Name = "Query" };
         query.Fields.Add(new FieldType
@@ -118,33 +104,23 @@ public class RepeatedSubfieldsTests
     [Fact]
     public void MergeFieldAndFragment()
     {
-        var fragmentSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
+        var fragmentSelection = new GraphQLSelectionSet(
+            new List<ASTNode>
             {
                 FirstTestField
             }
-        };
-        var fragment = new GraphQLFragmentDefinition
-        {
-            FragmentName = new GraphQLFragmentName { Name = new GraphQLName("fragment") },
-            TypeCondition = new GraphQLTypeCondition
-            {
-                Type = new GraphQLNamedType
-                {
-                    Name = new GraphQLName("Query")
-                }
-            },
-            SelectionSet = fragmentSelection
-        };
+        );
+        var fragment = new GraphQLFragmentDefinition(
+            new GraphQLFragmentName(new GraphQLName("fragment")),
+            new GraphQLTypeCondition(new GraphQLNamedType(new GraphQLName("Query"))),
+            fragmentSelection);
 
-        var document = new GraphQLDocument
-        {
-            Definitions = new List<ASTNode>
+        var document = new GraphQLDocument(
+            new List<ASTNode>
             {
                 fragment
             }
-        };
+        );
 
         var query = new ObjectGraphType { Name = "Query" };
         query.Fields.Add(new FieldType
@@ -160,15 +136,14 @@ public class RepeatedSubfieldsTests
             Schema = schema
         };
 
-        var fragSpread = new GraphQLFragmentSpread { FragmentName = new GraphQLFragmentName { Name = new GraphQLName("fragment") } };
-        var outerSelection = new GraphQLSelectionSet
-        {
-            Selections = new List<ASTNode>
+        var fragSpread = new GraphQLFragmentSpread(new GraphQLFragmentName(new GraphQLName("fragment")));
+        var outerSelection = new GraphQLSelectionSet(
+            new List<ASTNode>
             {
                 fragSpread,
                 SecondTestField
             }
-        };
+        );
 
         var fields = CollectFrom(context, query, outerSelection);
 

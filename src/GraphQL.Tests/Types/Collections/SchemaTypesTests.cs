@@ -3,6 +3,7 @@ using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -23,6 +24,10 @@ public class SchemaTypesTests
         services.AddSingleton<DroidType>();
         services.AddSingleton<CharacterInterface>();
         services.AddSingleton<EpisodeEnum>();
+        services.AddSingleton<PageInfoType>();
+        services.AddSingleton(typeof(ConnectionType<>));
+        services.AddSingleton(typeof(ConnectionType<,>));
+        services.AddSingleton(typeof(EdgeType<>));
         using var provider = services.BuildServiceProvider();
 
         // mock it so we can verify behavior
@@ -43,6 +48,9 @@ public class SchemaTypesTests
         mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
         mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
         mock.Verify(x => x.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(PageInfoType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(EdgeType<CharacterInterface>)), Times.Once);
         mock.VerifyNoOtherCalls();
     }
 

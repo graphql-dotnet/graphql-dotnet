@@ -97,7 +97,9 @@ public class EnumerationGraphType : ScalarGraphType
         var foundByValue = Values.FindByValue(value);
 
         return foundByValue == null
-            ? value == null ? null : ThrowSerializationError(value)
+            ? value == null
+                ? null
+                : throw new InvalidOperationException($"Unable to serialize '{value}' value of type '{value.GetType().GetFriendlyName()}' to the enumeration type '{Name}'. Enumeration does not contain such value. Available values: {string.Join(", ", Values.Select(v => $"'{v.Value}' of type '{v.Value?.GetType().GetFriendlyName()}'"))}.")
             : foundByValue.Name;
     }
 
@@ -108,7 +110,7 @@ public class EnumerationGraphType : ScalarGraphType
 
         return foundByValue == null
             ? value == null ? GraphQLValuesCache.Null : ThrowASTConversionError(value)
-            : new GraphQLEnumValue { Name = new GraphQLName(foundByValue.Name) };
+            : new GraphQLEnumValue(new GraphQLName(foundByValue.Name));
     }
 }
 
@@ -117,7 +119,7 @@ public class EnumerationGraphType : ScalarGraphType
 /// Supports <see cref="DescriptionAttribute"/> and <see cref="ObsoleteAttribute"/>.
 /// Also it can get descriptions for enum fields from the XML comments.
 /// </summary>
-/// <typeparam name="TEnum"> The enum to take values from. </typeparam>
+/// <typeparam name="TEnum">The enum to take values from.</typeparam>
 public class EnumerationGraphType<TEnum> : EnumerationGraphType
     where TEnum : Enum
 {
@@ -129,7 +131,7 @@ public class EnumerationGraphType<TEnum> : EnumerationGraphType
     public EnumerationGraphType()
     {
         var type = typeof(TEnum);
-        var names = Enum.GetNames(type);
+        string[] names = Enum.GetNames(type);
         var enumMembers = names.Select(n => (name: n, member: type
                 .GetMember(n, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
                 .First()));

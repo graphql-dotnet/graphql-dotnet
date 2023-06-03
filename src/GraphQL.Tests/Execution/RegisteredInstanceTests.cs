@@ -67,11 +67,11 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         var person = new ObjectGraphType { Name = "Person" };
         person.Field("name", new StringGraphType());
-        person.IsTypeOf = type => true;
+        person.IsTypeOf = _ => true;
 
         var robot = new ObjectGraphType { Name = "Robot" };
         robot.Field("name", new StringGraphType());
-        robot.IsTypeOf = type => true;
+        robot.IsTypeOf = _ => true;
 
         var personOrRobot = new UnionGraphType { Name = "PersonOrRobot" };
         personOrRobot.AddPossibleType(person);
@@ -151,7 +151,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
             """);
     }
 
-    private string build_schema(string propType)
+    private static string build_schema(string propType)
     {
         var nestedObjType = new ObjectGraphType
         {

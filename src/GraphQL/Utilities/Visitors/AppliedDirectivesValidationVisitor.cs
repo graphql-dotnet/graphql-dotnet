@@ -63,7 +63,7 @@ namespace GraphQL.Utilities
         public void VisitUnion(UnionGraphType type, ISchema schema) => ValidateAppliedDirectives(type, null, null, schema, DirectiveLocation.Union);
 
         /// <inheritdoc/>
-        private void ValidateAppliedDirectives(IProvideMetadata provider, object? parent1, object? parent2, ISchema schema, DirectiveLocation? location)
+        private void ValidateAppliedDirectives(IMetadataReader provider, object? parent1, object? parent2, ISchema schema, DirectiveLocation? location)
         {
             //TODO: switch to the schema coordinates?
             string GetElementDescription() => (provider, parent1, parent2) switch
@@ -94,9 +94,8 @@ namespace GraphQL.Utilities
 
                 foreach (var appliedDirective in appliedDirectives)
                 {
-                    var schemaDirective = schema.Directives.Find(appliedDirective.Name);
-                    if (schemaDirective == null)
-                        throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
+                    var schemaDirective = schema.Directives.Find(appliedDirective.Name)
+                        ?? throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
 
                     if (location != null && !schemaDirective.Locations.Contains(location.Value))
                     {

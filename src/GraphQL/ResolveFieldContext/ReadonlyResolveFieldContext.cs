@@ -93,7 +93,7 @@ namespace GraphQL
         public Variables Variables => _executionContext.Variables;
 
         /// <inheritdoc/>
-        public System.Threading.CancellationToken CancellationToken => _executionContext.CancellationToken;
+        public CancellationToken CancellationToken => _executionContext.CancellationToken;
 
         /// <inheritdoc/>
         public Metrics Metrics => _executionContext.Metrics;

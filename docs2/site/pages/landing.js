@@ -1,6 +1,8 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import logo from './logo.svg'
 import './landing.css'
+import Layout from '../../src/components/layout'
 
 const LandingPage = () => (
   <div className="landing">
@@ -9,4 +11,14 @@ const LandingPage = () => (
   </div>
 )
 
-export default LandingPage
+const LayoutWrapper = (props) => (
+  <Layout location={props.location}>
+    <LandingPage/>
+  </Layout>
+)
+
+LayoutWrapper.propTypes = {
+  location: PropTypes.object
+}
+
+export default LayoutWrapper

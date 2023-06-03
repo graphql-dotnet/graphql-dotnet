@@ -1,18 +1,10 @@
-const fs = require('fs')
-const chokidar = require('chokidar')
-const yamlParser = require('js-yaml').safeLoad
-const createNodeHelpers = require('gatsby-node-helpers').default
-const { attachUrlToNavNode } = require('./attach-urls')
+import fs from 'fs'
+import chokidar from 'chokidar'
+import { load as yamlParser } from 'js-yaml'
+import  { createNodeHelpers } from 'gatsby-node-helpers'
+import { attachUrlToNavNode } from './attach-urls.js'
 
-const {
-  createNodeFactory
-} = createNodeHelpers({
-  typePrefix: 'Docs'
-})
 
-const MenuNode = createNodeFactory('Menu', node => {
-  return node
-})
 
 const readConfigFile = filePath => {
   const fileContent = fs.readFileSync(filePath, 'utf8')
@@ -24,20 +16,30 @@ const readConfigFile = filePath => {
   return res
 }
 
-const createMenuNode = filePath => {
-  const pages = readConfigFile(filePath)
-  const menu = MenuNode(pages)
-  menu.internal.mediaType = 'application/json'
 
-  return menu
-}
 
-module.exports = ({ boundActionCreators }, options = {}) => {
+export default ({ actions, createNodeId, createContentDigest }, options = {}) => {
   if (!options.config) {
     throw new Error('A configuration file is required!')
   }
 
-  const { createNode } = boundActionCreators
+  const { createNode } = actions
+  const {
+    createNodeFactory
+  } = createNodeHelpers({
+    typePrefix: 'Docs',
+    createNodeId,
+    createContentDigest
+  })
+
+  const MenuNode = createNodeFactory('Menu')
+  const createMenuNode = filePath => {
+    const pages = readConfigFile(filePath)
+    const menu = MenuNode(pages)
+    menu.internal.mediaType = 'application/json'
+
+    return menu
+  }
 
   // watch for file changes
   chokidar.watch(options.config)

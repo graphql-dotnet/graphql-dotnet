@@ -57,9 +57,9 @@ namespace GraphQL.Resolvers
         /// 3. Then result is converted again to the object and returned from the method.
         /// </para>
         /// </summary>
-        /// <param name="target"> The type from which you want to get the value. </param>
-        /// <param name="name"> Property/method name. </param>
-        /// <returns> Compiled field resolver. </returns>
+        /// <param name="target">The type from which you want to get the value.</param>
+        /// <param name="name">Property/method name.</param>
+        /// <returns>Compiled field resolver.</returns>
         private static IFieldResolver CreateResolver(Type target, string name)
         {
             var param = Expression.Parameter(typeof(IResolveFieldContext), "context");

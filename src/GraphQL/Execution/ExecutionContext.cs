@@ -173,16 +173,16 @@ namespace GraphQL.Execution
         /// <summary>
         /// Allows for an execution strategy to reuse an instance of <see cref="ReadonlyResolveFieldContext"/>.
         /// This field may be accessed by multiple threads at the same time, so
-        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
-        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// access is restricted to <see cref="Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
         internal ReadonlyResolveFieldContext? ReusableReadonlyResolveFieldContext;
 
         /// <summary>
         /// Allows for an execution strategy to reuse an instance of <see cref="Dictionary{TKey, TValue}"/>.
         /// This field may be accessed by multiple threads at the same time, so
-        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
-        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// access is restricted to <see cref="Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
         internal Dictionary<string, (GraphQLField field, FieldType fieldType)>? ReusableFields;
     }

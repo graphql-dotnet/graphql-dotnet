@@ -128,6 +128,10 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
 
         // cannot throw an exception here
         return sourceStream
+            // Note: SelectCatchAsync also captures the System.Threading.ExecutionContext and restores it
+            // when the delegate is invoked, so resolvers run within the original subscription's context
+            // and not the context of the data event. Effectively, IHttpContextAccessor.HttpContext will
+            // now return the original subscription's HttpContext as would be expected by any field resolver.
             .SelectCatchAsync(
                 async (value, token) =>
                 {
