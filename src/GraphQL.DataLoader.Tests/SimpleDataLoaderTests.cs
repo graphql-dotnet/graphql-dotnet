@@ -48,28 +48,37 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     {
         using var cts = new CancellationTokenSource();
 
-        var mock = new Mock<IUsersStore>();
+        var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
 
+        // mock store method to expect cancellation
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
             .Returns(async (CancellationToken ct) =>
             {
+                // wait for cancellation
                 await Task.Delay(60000, ct).ConfigureAwait(false);
-                ct.ThrowIfCancellationRequested();
-
+                // should not occur
                 return users;
             });
 
         var usersStore = mock.Object;
 
+        // create loader
         var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
+        // start the pending load operation (will wait for GetResultAsync to be called)
         var result = loader.LoadAsync();
 
-        cts.CancelAfter(TimeSpan.FromMilliseconds(5));
+        // start reading result
+        var task = result.GetResultAsync(cts.Token);
 
-        await Should.ThrowAsync<OperationCanceledException>(async () => await result.GetResultAsync(cts.Token).ConfigureAwait(false)).ConfigureAwait(false);
+        // trigger cancellation
+        cts.Cancel();
 
+        // ensure that the task is cancelled
+        await Should.ThrowAsync<OperationCanceledException>(task).ConfigureAwait(false);
+
+        // ensure that the mock function was called with the proper token (and it was cancelled while running)
         mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
     }
 
@@ -81,7 +90,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         var users = Fake.Users.Generate(2);
 
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
-            .ReturnsAsync(users, delay: TimeSpan.FromMilliseconds(20));
+            .ReturnsAsync(users);
 
         var usersStore = mock.Object;
 

@@ -109,7 +109,7 @@ of type `IntGraphType`, and
 system cannot perform the conversion.
 
 Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the
-`ExecutionOptions.ThrowOnUnhandledExceptions` property to `true`. When this property is set to `false`,
+`ExecutionOptions.ThrowOnUnhandledException` property to `true`. When this property is set to `false`,
 the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
 inner exceptions of the wrapped exception and also returned along with data contained within the inner
@@ -119,7 +119,7 @@ You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
 and stack trace for debugging needs. You can also override the generic error message with a more specific
 message, wrap or replace the exception with your own `ExecutionError` class, and/or set the codes and data
-as necessary. Note that if `ThrowOnUnhandledExceptions` is `true`, the `UnhandledExceptionDelegate` will not be called.
+as necessary. Note that if `ThrowOnUnhandledException` is `true`, the `UnhandledExceptionDelegate` will not be called.
 
 Here is a sample of a typical unhandled exception delegate which logs the error to a database.
 It also returns the log id along with the error message:

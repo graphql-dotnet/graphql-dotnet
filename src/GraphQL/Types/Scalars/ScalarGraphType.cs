@@ -202,7 +202,10 @@ public abstract class ScalarGraphType : GraphType
     [DoesNotReturn]
     protected internal GraphQLValue ThrowASTConversionError(object? value)
     {
-        throw new InvalidOperationException($"Unable to convert '{value ?? "(null)"}' to its AST representation for the scalar type '{Name}'.");
+        if (value is null)
+            throw new InvalidOperationException($"Unable to convert null (nothing) to its AST representation for the scalar type '{Name}'.");
+        else
+            throw new InvalidOperationException($"Unable to convert '{value}' of type '{value.GetType().GetFriendlyName()}' to its AST representation for the scalar type '{Name}'.");
     }
 
     /// <summary>
@@ -231,7 +234,10 @@ public abstract class ScalarGraphType : GraphType
     [DoesNotReturn]
     protected object ThrowValueConversionError(object? value)
     {
-        throw new InvalidOperationException($"Unable to convert '{value ?? "(null)"}' to the scalar type '{Name}'");
+        if (value is null)
+            throw new InvalidOperationException($"Unable to convert null (nothing) to the scalar type '{Name}'");
+        else
+            throw new InvalidOperationException($"Unable to convert '{value}' value of type '{value.GetType().GetFriendlyName()}' to the scalar type '{Name}'");
     }
 
     /// <summary>
@@ -247,7 +253,10 @@ public abstract class ScalarGraphType : GraphType
     [DoesNotReturn]
     protected object ThrowSerializationError(object? value)
     {
-        throw new InvalidOperationException($"Unable to serialize '{value ?? "(null)"}' to the scalar type '{Name}'.");
+        if (value is null)
+            throw new InvalidOperationException($"Unable to serialize null (nothing) to the scalar type '{Name}'.");
+        else
+            throw new InvalidOperationException($"Unable to serialize '{value}' value of type '{value.GetType().GetFriendlyName()}' to the scalar type '{Name}'.");
     }
 
     /// <inheritdoc/>

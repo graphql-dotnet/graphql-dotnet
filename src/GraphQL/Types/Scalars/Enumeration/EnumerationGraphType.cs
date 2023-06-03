@@ -97,7 +97,9 @@ public class EnumerationGraphType : ScalarGraphType
         var foundByValue = Values.FindByValue(value);
 
         return foundByValue == null
-            ? value == null ? null : ThrowSerializationError(value)
+            ? value == null
+                ? null
+                : throw new InvalidOperationException($"Unable to serialize '{value}' value of type '{value.GetType().GetFriendlyName()}' to the enumeration type '{Name}'. Enumeration does not contain such value. Available values: {string.Join(", ", Values.Select(v => $"'{v.Value}' of type '{v.Value?.GetType().GetFriendlyName()}'"))}.")
             : foundByValue.Name;
     }
 
