@@ -114,7 +114,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
     private Dictionary<Type, IGraphType> _introspectionTypes;
 
     // Standard scalars https://spec.graphql.org/October2021/#sec-Scalars
-    private readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
+    private static readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
     {
         new StringGraphType(),
         new BooleanGraphType(),
@@ -125,7 +125,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
     .ToDictionary(t => t.GetType());
 
     // .NET custom scalars
-    private readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
+    private static readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
     {
         new DateGraphType(),
 #if NET5_0_OR_GREATER
@@ -225,7 +225,14 @@ public class SchemaTypes : IEnumerable<IGraphType>
         _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives, schema.Features.DeprecationOfInputValues);
 
         _context = new TypeCollectionContext(
-           type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
+           type => BuildGraphQLType(
+               type,
+               t => _introspectionTypes.TryGetValue(t, out var graphType)
+               ? graphType
+               : (IGraphType?)serviceProvider.GetService(t)
+               ?? (_builtInScalars.TryGetValue(t, out graphType)
+               ? graphType
+               : throw new Exception($"Invalid introspection type '{t.GetFriendlyName()}'"))),
            (name, type, ctx) =>
            {
                SetGraphType(name, type);
@@ -256,11 +263,18 @@ public class SchemaTypes : IEnumerable<IGraphType>
         _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
         var ctx = new TypeCollectionContext(
-            t => _builtInScalars.TryGetValue(t, out var graphType)
-                ? graphType
-                : _builtInCustomScalars.TryGetValue(t, out graphType)
-                ? graphType
-                : (IGraphType)serviceProvider.GetRequiredService(t),
+            serviceType =>
+            {
+                // attempt to pull the required service from the service provider
+                // if the service provider does not provide an instance, and if
+                // the type is a GraphQL.NET built-in type, create an instance of it
+                return (IGraphType?)serviceProvider.GetService(serviceType)
+                    ?? (_builtInScalars.TryGetValue(serviceType, out var graphType)
+                        ? graphType
+                        : _builtInCustomScalars.TryGetValue(serviceType, out graphType)
+                        ? graphType
+                        : throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered."));
+            },
             (name, graphType, context) =>
             {
                 if (this[name] == null)

@@ -51,6 +51,9 @@ public class SchemaTypesTests
         mock.Verify(x => x.GetService(typeof(PageInfoType)), Times.Once);
         mock.Verify(x => x.GetService(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>)), Times.Once);
         mock.Verify(x => x.GetService(typeof(EdgeType<CharacterInterface>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(IntGraphType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(StringGraphType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(BooleanGraphType)), Times.Once);
         mock.VerifyNoOtherCalls();
     }
 
@@ -186,5 +189,58 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
 
         // attempt to initialize the schema
         schema.Initialize();
+    }
+
+    [Fact]
+    public async Task can_override_built_in_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Loose);
+        mockServiceProvider.Setup(x => x.GetService(typeof(StringGraphType))).Returns(new MyStringGraphType());
+        mockServiceProvider.Setup(x => x.GetService(typeof(GuidGraphType))).Returns(new MyGuidGraphType());
+
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("string").Resolve(_ => "test");
+        query.Field<GuidGraphType>("guid").Resolve(_ => Guid.NewGuid());
+
+        var schema = new Schema(mockServiceProvider.Object)
+        {
+            Query = query
+        };
+
+        schema.Initialize();
+
+        var result = await schema.ExecuteAsync(opts => opts.Query = "{ string guid }").ConfigureAwait(false);
+
+        result.ShouldBeCrossPlatJson("""
+            {
+                "data": {
+                    "string": "test_",
+                    "guid": "00000001-0002-0003-0004-000000000005"
+                }
+            }
+            """);
+    }
+
+    private class MyStringGraphType : StringGraphType
+    {
+        public MyStringGraphType()
+        {
+            Name = "String";
+        }
+
+        public override object ParseValue(object value) => value?.ToString().TrimEnd('_');
+
+        public override object Serialize(object value) => value == null ? null : value.ToString() + "_";
+    }
+
+    private class MyGuidGraphType : GuidGraphType
+    {
+        public MyGuidGraphType()
+        {
+            Name = "Guid";
+        }
+
+        public override object Serialize(object value) => base.Serialize(new Guid("00000001-0002-0003-0004-000000000005"));
     }
 }
