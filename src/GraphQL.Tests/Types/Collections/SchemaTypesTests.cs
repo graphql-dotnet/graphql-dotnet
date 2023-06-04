@@ -116,4 +116,75 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider, null));
         }
     }
+
+    [Fact]
+    public void can_initialize_built_in_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = Mock.Of<IServiceProvider>(MockBehavior.Loose);
+
+        // create a schema for the built-in types
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("string");
+        queryType.Field<IntGraphType>("int");
+        queryType.Field<IdGraphType>("id");
+        queryType.Field<BooleanGraphType>("boolean");
+        queryType.Field<FloatGraphType>("float");
+        var schema = new Schema(mockServiceProvider)
+        {
+            Query = queryType
+        };
+
+        // attempt to initialize the schema
+        schema.Initialize();
+    }
+
+    [Fact]
+    public void can_initialize_built_in_custom_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = Mock.Of<IServiceProvider>(MockBehavior.Loose);
+
+        // create a schema for the built-in types
+        var queryType = new ObjectGraphType();
+
+        // date/time types
+        queryType.Field<DateTimeGraphType>("datetime");
+        queryType.Field<DateTimeOffsetGraphType>("datetimeoffset");
+        queryType.Field<DateGraphType>("date");
+        queryType.Field<TimeSpanSecondsGraphType>("timespanseconds");
+        queryType.Field<TimeSpanMillisecondsGraphType>("timespanmilliseconds");
+#if NET6_0_OR_GREATER
+        queryType.Field<DateOnlyGraphType>("dateonly");
+        queryType.Field<TimeOnlyGraphType>("timeonly");
+#endif
+
+        // floating-point types
+        queryType.Field<DecimalGraphType>("decimal");
+#if NET5_0_OR_GREATER
+        queryType.Field<HalfGraphType>("half");
+#endif
+
+        // integer types
+        queryType.Field<BigIntGraphType>("bigint");
+        queryType.Field<UIntGraphType>("uint");
+        queryType.Field<LongGraphType>("long");
+        queryType.Field<ULongGraphType>("ulong");
+        queryType.Field<ShortGraphType>("short");
+        queryType.Field<UShortGraphType>("ushort");
+        queryType.Field<ByteGraphType>("byte");
+        queryType.Field<SByteGraphType>("sbyte");
+
+        // other types
+        queryType.Field<UriGraphType>("uri");
+        queryType.Field<GuidGraphType>("guid");
+
+        var schema = new Schema(mockServiceProvider)
+        {
+            Query = queryType
+        };
+
+        // attempt to initialize the schema
+        schema.Initialize();
+    }
 }

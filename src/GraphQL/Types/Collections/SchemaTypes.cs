@@ -256,7 +256,11 @@ public class SchemaTypes : IEnumerable<IGraphType>
         _nameConverter = schema.NameConverter ?? CamelCaseNameConverter.Instance;
 
         var ctx = new TypeCollectionContext(
-            t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : (IGraphType)serviceProvider.GetRequiredService(t),
+            t => _builtInScalars.TryGetValue(t, out var graphType)
+                ? graphType
+                : _builtInCustomScalars.TryGetValue(t, out graphType)
+                ? graphType
+                : (IGraphType)serviceProvider.GetRequiredService(t),
             (name, graphType, context) =>
             {
                 if (this[name] == null)
@@ -739,16 +743,8 @@ Make sure that your ServiceProvider is configured correctly.");
         var foundType = FindGraphType(namedType);
         if (foundType == null)
         {
-            if (_builtInCustomScalars.TryGetValue(namedType, out var builtInCustomScalar))
-            {
-                foundType = builtInCustomScalar;
-                AddType(foundType, _context); // TODO: why _context instead of context here? See https://github.com/graphql-dotnet/graphql-dotnet/pull/3488
-            }
-            else
-            {
-                foundType = context.ResolveType(namedType);
-                AddTypeWithLoopCheck(foundType, context, namedType);
-            }
+            foundType = context.ResolveType(namedType);
+            AddTypeWithLoopCheck(foundType, context, namedType);
         }
         return foundType;
     }
