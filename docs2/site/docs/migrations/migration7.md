@@ -462,10 +462,10 @@ Field<NonNullGraphType<StringGraphType>>("name")
 
 
 // GraphQL 5.x
-FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
 
 // GraphQL 7.x
-Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3"));
 
 
 
@@ -475,13 +475,13 @@ FieldAsync<HumanType>(
   arguments: new QueryArguments(
       new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
   ),
-  resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false)
+  resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"))
 );
 
 // GraphQL 7.x
 Field<HumanType>("human")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
-  .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
+  .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"));
 
 
 
