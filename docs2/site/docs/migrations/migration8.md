@@ -26,6 +26,18 @@ Both interfaces extend `IProvideMetadata` with read/write access to the metadata
 Be sure not to write metadata during the execution of a query, as the same graph/field type instance may be used for
 multiple queries and you would run into concurrency issues.
 
+### 2. Built-in scalars may be overridden via DI registrations
+
+For GraphQL.NET built-in scalars (such as `IntGraphType` or `GuidGraphType`), a dervied class may be registered
+within the DI engine to facilitate replacement of the graph type throughout the schema versus calling `RegisterType`.
+
+```csharp
+services.AddSingleton<BooleanGraphType, MyBooleanGraphType>();
+```
+
+See https://graphql-dotnet.github.io/docs/getting-started/custom-scalars/#3-register-the-custom-scalar-within-your-schema
+for more details.
+
 ## Breaking Changes
 
 ### 1. Query type is required
