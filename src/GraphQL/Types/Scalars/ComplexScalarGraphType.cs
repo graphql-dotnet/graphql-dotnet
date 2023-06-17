@@ -35,7 +35,7 @@ public class ComplexScalarGraphType : ScalarGraphType
     public override object? ParseValue(object? value) => value;
 
     /// <inheritdoc/>
-    public override bool CanParseLiteral(GraphQLValue value) => true;
+    public override bool CanParseLiteral(GraphQLValue value) => value != null;
 
     /// <inheritdoc/>
     public override bool CanParseValue(object? value) => true;
