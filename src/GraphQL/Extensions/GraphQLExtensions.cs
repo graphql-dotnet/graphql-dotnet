@@ -572,12 +572,6 @@ namespace GraphQL
                 return longResult;
             }
 
-            // If the value doesn't fit in an long, revert to using decimal...
-            if (Decimal.TryParse(v.Value, out decimal decimalResult))
-            {
-                return decimalResult;
-            }
-
             // If the value doesn't fit in an decimal, revert to using BigInteger...
             if (BigInt.TryParse(v.Value, out var bigIntegerResult))
             {
