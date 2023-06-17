@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -33,6 +34,8 @@ namespace GraphQL.Execution
             UserContext = context.UserContext;
             Operation = context.Operation;
             Variables = context.Variables;
+            ArgumentValues = context.ArgumentValues;
+            DirectiveValues = context.DirectiveValues;
             CancellationToken = context.CancellationToken;
             Listeners = context.Listeners;
             ThrowOnUnhandledException = context.ThrowOnUnhandledException;
@@ -40,6 +43,7 @@ namespace GraphQL.Execution
             MaxParallelExecutionCount = context.MaxParallelExecutionCount;
             InputExtensions = context.InputExtensions;
             RequestServices = context.RequestServices;
+            User = context.User;
         }
 
         /// <inheritdoc/>
@@ -62,6 +66,12 @@ namespace GraphQL.Execution
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 
         /// <inheritdoc/>
         public ExecutionErrors Errors { get; set; }
@@ -95,6 +105,9 @@ namespace GraphQL.Execution
         public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
+        public ClaimsPrincipal? User { get; set; }
+
+        /// <inheritdoc/>
         public TElement[] Rent<TElement>(int minimumLength)
         {
             var array = System.Buffers.ArrayPool<TElement>.Shared.Rent(minimumLength);
@@ -103,7 +116,7 @@ namespace GraphQL.Execution
             return array;
         }
 
-        private readonly List<Array> _trackedArrays = new List<Array>();
+        private readonly List<Array> _trackedArrays = new();
 
         /// <summary>
         /// Clears all state in this context.
@@ -145,6 +158,7 @@ namespace GraphQL.Execution
             //MaxParallelExecutionCount = null;
             //Extensions = null;
             //RequestServices = null;
+            //User = null;
 
             // arrays rented after the execution context has been 'disposed' will still rent just fine, but will
             // not be returned to the pool (since Dispose has already been run) and will be garbage collected.
@@ -159,16 +173,16 @@ namespace GraphQL.Execution
         /// <summary>
         /// Allows for an execution strategy to reuse an instance of <see cref="ReadonlyResolveFieldContext"/>.
         /// This field may be accessed by multiple threads at the same time, so
-        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
-        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// access is restricted to <see cref="Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
         internal ReadonlyResolveFieldContext? ReusableReadonlyResolveFieldContext;
 
         /// <summary>
         /// Allows for an execution strategy to reuse an instance of <see cref="Dictionary{TKey, TValue}"/>.
         /// This field may be accessed by multiple threads at the same time, so
-        /// access is restricted to <see cref="System.Threading.Interlocked.Exchange{T}(ref T, T)"/>
-        /// and <see cref="System.Threading.Interlocked.CompareExchange{T}(ref T, T, T)"/>.
+        /// access is restricted to <see cref="Interlocked.Exchange{T}(ref T, T)"/>
+        /// and <see cref="Interlocked.CompareExchange{T}(ref T, T, T)"/>.
         /// </summary>
         internal Dictionary<string, (GraphQLField field, FieldType fieldType)>? ReusableFields;
     }

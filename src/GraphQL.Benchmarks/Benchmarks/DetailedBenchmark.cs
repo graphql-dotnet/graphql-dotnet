@@ -29,11 +29,11 @@ public class DetailedBenchmark : IBenchmark
 
         private class GroupbyQueryOrderer : IOrderer
         {
-            public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase) => benchmarksCase;
+            public IEnumerable<BenchmarkCase> GetExecutionOrder(ImmutableArray<BenchmarkCase> benchmarksCase, IEnumerable<BenchmarkLogicalGroupRule> order = null) => benchmarksCase;
             public IEnumerable<BenchmarkCase> GetSummaryOrder(ImmutableArray<BenchmarkCase> benchmarksCase, Summary summary) => benchmarksCase;
             public string GetHighlightGroupKey(BenchmarkCase benchmarkCase) => null;
             public string GetLogicalGroupKey(ImmutableArray<BenchmarkCase> allBenchmarksCases, BenchmarkCase benchmarkCase) => benchmarkCase.Descriptor.WorkloadMethodDisplayInfo;
-            public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups) => logicalGroups;
+            public IEnumerable<IGrouping<string, BenchmarkCase>> GetLogicalGroupOrder(IEnumerable<IGrouping<string, BenchmarkCase>> logicalGroups, IEnumerable<BenchmarkLogicalGroupRule> order = null) => logicalGroups;
             public bool SeparateLogicalGroups => true;
         }
     }
@@ -42,8 +42,8 @@ public class DetailedBenchmark : IBenchmark
     private BenchmarkInfo _bHero;
     private BenchmarkInfo _bVariable;
     private BenchmarkInfo _bLiteral;
-    private readonly DocumentExecuter _documentExecuter = new DocumentExecuter();
-    private static readonly GraphQLSerializer _serializer = new GraphQLSerializer();
+    private readonly DocumentExecuter _documentExecuter = new();
+    private static readonly GraphQLSerializer _serializer = new();
 
     [GlobalSetup]
     public void GlobalSetup()
@@ -223,10 +223,10 @@ public class DetailedBenchmark : IBenchmark
                 Schema = Schema,
                 Variables = Inputs ?? Inputs.Empty,
                 Operation = Operation,
-            }.GetVariableValues();
+            }.GetVariablesValuesAsync().Result.Variables;
         }
 
-        private static readonly DocumentValidator _documentValidator = new DocumentValidator();
+        private static readonly DocumentValidator _documentValidator = new();
         public IValidationResult Validate()
         {
             return _documentValidator.ValidateAsync(new ValidationOptions
@@ -234,10 +234,10 @@ public class DetailedBenchmark : IBenchmark
                 Schema = Schema,
                 Document = Document,
                 Variables = Inputs ?? Inputs.Empty,
-            }).Result.validationResult;
+            }).Result;
         }
 
-        private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new ParallelExecutionStrategy();
+        private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new();
         public ExecutionResult Execute()
         {
             var context = new Execution.ExecutionContext
@@ -259,7 +259,8 @@ public class DetailedBenchmark : IBenchmark
                 ThrowOnUnhandledException = true,
                 UnhandledExceptionDelegate = _ => Task.CompletedTask,
                 MaxParallelExecutionCount = int.MaxValue,
-                RequestServices = null
+                RequestServices = null,
+                User = null,
             };
             return _parallelExecutionStrategy.ExecuteAsync(context).Result;
         }

@@ -7,12 +7,14 @@ public class BugAliasedInputFieldInList : QueryTestBase<AliasedInputFieldSchema>
     [Fact]
     public void supports_aliased_fields_in_input_list()
     {
-        string query = @"mutation { mutateMyEntity(
+        const string query = """
+            mutation { mutateMyEntity(
                 singleEntity: { aField: 1 fieldAlias: 2 }
                 multipleEntities: [{ aField: 3 fieldAlias: 4 }]
-            ) }";
+            ) }
+            """;
 
-        string expected = @"{ ""mutateMyEntity"": true }";
+        const string expected = """{ "mutateMyEntity": true }""";
 
         AssertQuerySuccess(query, expected, null);
     }
@@ -22,6 +24,7 @@ public class AliasedInputFieldSchema : Schema
 {
     public AliasedInputFieldSchema()
     {
+        Query = new DummyType();
         Mutation = new AliasedInputFieldMutation();
     }
 }
@@ -30,8 +33,7 @@ public class AliasedInputFieldMutation : ObjectGraphType
 {
     public AliasedInputFieldMutation()
     {
-        Field<BooleanGraphType>()
-            .Name("mutateMyEntity")
+        Field<BooleanGraphType>("mutateMyEntity")
             .Argument<MyEntityInputType>("singleEntity")
             .Argument<ListGraphType<MyEntityInputType>>("multipleEntities")
             .Resolve(

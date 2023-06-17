@@ -8,7 +8,7 @@ public class OperationMessageTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_OperationMessage_Populated(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"id\":\"hello\",\"type\":\"hello2\",\"payload\":{{\"query\":\"hello3\",\"variables\":{ExampleJson}}}}}";
+        string test = $"{{\"id\":\"hello\",\"type\":\"hello2\",\"payload\":{{\"query\":\"hello3\",\"variables\":{ExampleJson}}}}}";
         var actual = serializer.Deserialize<OperationMessage>(test);
         actual.Id.ShouldBe("hello");
         actual.Type.ShouldBe("hello2");
@@ -22,7 +22,7 @@ public class OperationMessageTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_OperationMessage_Nulls(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"id\":null,\"type\":null,\"payload\":null}}";
+        const string test = $"{{\"id\":null,\"type\":null,\"payload\":null}}";
         var actual = serializer.Deserialize<OperationMessage>(test);
         actual.Id.ShouldBeNull();
         actual.Type.ShouldBeNull();
@@ -33,7 +33,7 @@ public class OperationMessageTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_OperationMessage_Empty(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{}}";
+        const string test = $"{{}}";
         var actual = serializer.Deserialize<OperationMessage>(test);
         actual.Id.ShouldBeNull();
         actual.Type.ShouldBeNull();
@@ -56,8 +56,8 @@ public class OperationMessageTests : DeserializationTestBase
                 }),
             }
         };
-        var actual = serializer.Serialize(message);
-        var expected = $"{{\"type\":\"hello2\",\"id\":\"hello\",\"payload\":{{\"query\":\"hello3\",\"variables\":{{\"arg\":{ExampleJson}}}}}}}";
+        string actual = serializer.Serialize(message);
+        string expected = $"{{\"type\":\"hello2\",\"id\":\"hello\",\"payload\":{{\"query\":\"hello3\",\"variables\":{{\"arg\":{ExampleJson}}}}}}}";
         actual.ShouldBeCrossPlatJson(expected);
     }
 
@@ -66,8 +66,8 @@ public class OperationMessageTests : DeserializationTestBase
     public void Writes_OperationMessage_Nulls(IGraphQLTextSerializer serializer)
     {
         var message = new OperationMessage();
-        var actual = serializer.Serialize(message);
-        var expected = @"{}";
+        string actual = serializer.Serialize(message);
+        const string expected = "{}";
         actual.ShouldBeCrossPlatJson(expected);
     }
 }

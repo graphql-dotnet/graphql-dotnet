@@ -7,19 +7,21 @@ public class ArrayOfArrayTest : QueryTestBase<ArrayOfArraySchema>
     [Fact]
     public void ArrayOfArray_Should_Return_As_Is()
     {
-        var query = @"
+        const string query = """
 mutation {
   create(input: {ints: [[1],[2,2],[3,3,3]] })
   {
     ints
   }
 }
-";
-        var expected = @"{
-  ""create"": {
-    ""ints"": [[1],[2,2],[3,3,3]]
+""";
+        const string expected = """
+{
+  "create": {
+    "ints": [[1],[2,2],[3,3,3]]
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }
@@ -28,6 +30,7 @@ public class ArrayOfArraySchema : Schema
 {
     public ArrayOfArraySchema()
     {
+        Query = new DummyType();
         Mutation = new ArrayOfArrayMutation();
     }
 }
@@ -57,10 +60,9 @@ public class ArrayOfArrayMutation : ObjectGraphType
 {
     public ArrayOfArrayMutation()
     {
-        Field<ArrayOfArrayType>(
-            "create",
-            arguments: new QueryArguments(new QueryArgument<ArrayOfArrayInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<ArrayOfArrayType>("create")
+            .Argument<ArrayOfArrayInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ArrayOfArrayModel>("input");
                 return arg;

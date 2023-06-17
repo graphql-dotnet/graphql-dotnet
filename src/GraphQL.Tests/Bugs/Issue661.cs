@@ -55,11 +55,10 @@ public class Issue661Query : ObjectGraphType
     {
         _cache = cache;
 
-        Field<StringGraphType>(
-            "get_cached",
-            resolve: ctx =>
+        Field<StringGraphType>("get_cached")
+            .Resolve(ctx =>
             {
-                var value = _cache.GetString("mykey");
+                string value = _cache.GetString("mykey");
                 value.ShouldBe("myvalue");
                 return value;
             });

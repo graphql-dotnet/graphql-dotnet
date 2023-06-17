@@ -12,7 +12,7 @@ on:
       - .github/workflows/**
 
 env:
-  NODE_VERSION: '10.x'   # Node 10 LTS
+  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
@@ -22,11 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: yarn
-        run: yarn
       - name: yarn docs2
         working-directory: docs2
         run: yarn
@@ -39,10 +37,10 @@ jobs:
           name: Documentation
           path: docs2/public/**
           if-no-files-found: error
-      - name: Setup .NET Core 6.0 SDK
-        uses: actions/setup-dotnet@v2
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '7.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

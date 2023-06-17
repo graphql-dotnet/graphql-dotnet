@@ -3,7 +3,8 @@ using GraphQL.Types;
 namespace GraphQL.Introspection
 {
     /// <summary>
-    /// The <c>__AppliedDirective</c> introspection type represents a directive applied to a schema element - type, field, argument, etc.
+    /// The <see cref="__AppliedDirective"/> introspection type represents
+    /// a directive applied to a schema element - type, field, argument, etc.
     /// </summary>
     public class __AppliedDirective : ObjectGraphType<AppliedDirective>
     {
@@ -15,15 +16,13 @@ namespace GraphQL.Introspection
             Description =
                 "Directive applied to a schema element";
 
-            Field<NonNullGraphType<StringGraphType>>(
-                "name",
-                "Directive name",
-                resolve: context => context.Source!.Name);
+            Field<NonNullGraphType<StringGraphType>>("name")
+                .Description("Directive name")
+                .Resolve(context => context.Source!.Name);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>(
-                "args",
-                "Values of explicitly specified directive arguments",
-                resolve: context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
+            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>("args")
+                .Description("Values of explicitly specified directive arguments")
+                .Resolve(context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
         }
     }
 }

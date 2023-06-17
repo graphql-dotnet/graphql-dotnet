@@ -29,8 +29,8 @@ public class Bug2839SystemTextJson
             options.Converters.Add(new MyDateTimeConverter());
         });
 
-        var str = writer.Serialize(result);
-        str.ShouldBeCrossPlatJson("{\"data\":{\"TEST\":{\"THISISASTRING\":\"String Value\",\"THISISADATETIME\":\"2022-Jan-04\"}}}");
+        string str = writer.Serialize(result);
+        str.ShouldBeCrossPlatJson("""{"data":{"TEST":{"THISISASTRING":"String Value","THISISADATETIME":"2022-Jan-04"}}}""");
     }
 
     public class TestQuery : ObjectGraphType
@@ -40,9 +40,7 @@ public class Bug2839SystemTextJson
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>(
-                name: "test",
-                resolve: context => new TestResponse());
+            Field<TestResponseType>("test").Resolve(_ => new TestResponse());
         }
     }
 

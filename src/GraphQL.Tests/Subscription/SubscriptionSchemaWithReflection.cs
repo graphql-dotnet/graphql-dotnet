@@ -5,26 +5,30 @@ namespace GraphQL.Tests.Subscription;
 
 public static class SubscriptionSchemaWithReflection
 {
-    private const string TypeDefs = @"
-            type MessageFrom {
-                id: String
-                displayName: String
-            }
+    private const string TypeDefs = """
+        type Query {
+            dummy: String
+        }
 
-            type Message {
-                from: MessageFrom
-                content: String
-                sentAt: String
-            }
+        type MessageFrom {
+            id: String
+            displayName: String
+        }
 
-            type Subscription {
-                messageAdded : Message
-                messageAddedByUser(id: String!) : Message
-                messageAddedAsync : Message
-                messageAddedByUserAsync(id: String!) : Message
-                messageGetAll : [Message]
-            }
-        ";
+        type Message {
+            from: MessageFrom
+            content: String
+            sentAt: String
+        }
+
+        type Subscription {
+            messageAdded : Message
+            messageAddedByUser(id: String!) : Message
+            messageAddedAsync : Message
+            messageAddedByUserAsync(id: String!) : Message
+            messageGetAll : [Message]
+        }
+        """;
 
     public static Chat Chat { get; set; }
     public static ISchema Schema { get; set; }

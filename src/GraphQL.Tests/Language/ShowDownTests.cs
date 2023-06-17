@@ -5,20 +5,20 @@ namespace GraphQL.Tests.Language;
 
 public class ShowDownTests
 {
-    private const string _query = @"
-       query SomeDroids {
-          r2d2: droid(id: ""3"") {
+    private const string _query = """
+        query SomeDroids {
+          r2d2: droid(id: "3") {
             ...DroidFragment
           }
 
-          c3po: droid(id: ""4"") {
+          c3po: droid(id: "4") {
             ...DroidFragment
           }
-       }
-       fragment DroidFragment on Droid {
-         name
-       }
-";
+        }
+        fragment DroidFragment on Droid {
+          name
+        }
+        """;
     //        [Fact]
     public void core_builder()
     {
@@ -28,7 +28,7 @@ public class ShowDownTests
 
     private void buildMany(IDocumentBuilder builder)
     {
-        var query = _query; // SchemaIntrospection.IntrospectionQuery;
+        const string query = _query; // SchemaIntrospection.IntrospectionQuery;
         build(query, builder, 1);
         build(query, builder, 10);
         build(query, builder, 100);
@@ -44,7 +44,7 @@ public class ShowDownTests
         var stopwatch = new Stopwatch();
         stopwatch.Start();
 
-        for (var i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
             builder.Build(query);
         }

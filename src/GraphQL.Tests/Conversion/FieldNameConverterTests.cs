@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Conversion;
 
 public class NameConverterTests : BasicQueryTestBase
 {
-    public ISchema build_schema(INameConverter converter = null, string argument = "Id")
+    public static ISchema build_schema(INameConverter converter = null, string argument = "Id")
     {
         var schema = new Schema
         {
@@ -17,11 +17,9 @@ public class NameConverterTests : BasicQueryTestBase
         person.Field("Name", new StringGraphType());
 
         var query = new ObjectGraphType { Name = "Query" };
-        query.Field(
-            "PeRsoN",
-            person,
-            arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = argument }),
-            resolve: ctx => new Person { Name = "Quinn" });
+        query.Field("PeRsoN", person)
+            .Argument<StringGraphType>(argument)
+            .Resolve(_ => new Person { Name = "Quinn" });
 
         schema.Query = query;
         return schema;
@@ -35,7 +33,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema();
             _.Query = "{ peRsoN { name } }";
         },
-        @"{ ""peRsoN"": { ""name"": ""Quinn"" } }");
+        """{ "peRsoN": { "name": "Quinn" } }""");
     }
 
     [Fact]
@@ -46,7 +44,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema();
             _.Query = "{ peRsoN { Na: name } }";
         },
-        @"{ ""peRsoN"": { ""Na"": ""Quinn"" } }");
+        """{ "peRsoN": { "Na": "Quinn" } }""");
     }
 
     [Fact]
@@ -59,7 +57,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema(converter);
             _.Query = "{ PeRsoN { naME: Name } }";
         },
-        @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
+        """{ "PeRsoN": { "naME": "Quinn" } }""");
     }
 
     [Fact]
@@ -71,7 +69,7 @@ public class NameConverterTests : BasicQueryTestBase
             _.Schema = build_schema(converter);
             _.Query = "{ PeRsoN { naME: Name } }";
         },
-        @"{ ""PeRsoN"": { ""naME"": ""Quinn"" } }");
+        """{ "PeRsoN": { "naME": "Quinn" } }""");
     }
 
     [Fact]

@@ -10,11 +10,9 @@ public class QueryType : ObjectGraphType
     {
         Name = "Query";
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("Users")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("Users")
             .Description("Get all Users")
-            .Returns<IEnumerable<User>>()
-            .ResolveAsync(ctx =>
+            .ResolveAsync(_ =>
             {
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
                     users.GetAllUsersAsync);
@@ -22,13 +20,11 @@ public class QueryType : ObjectGraphType
                 return loader.LoadAsync();
             });
 
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("UsersWithDelay")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("UsersWithDelay")
             .Description("Get all Users")
-            .Returns<IEnumerable<User>>()
-            .ResolveAsync(async ctx =>
+            .ResolveAsync(async _ =>
             {
-                await System.Threading.Tasks.Task.Delay(20).ConfigureAwait(false);
+                await Task.Delay(20).ConfigureAwait(false);
 
                 var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
                     users.GetAllUsersAsync);
@@ -51,7 +47,7 @@ public class QueryType : ObjectGraphType
         Field<ListGraphType<OrderType>, IEnumerable<Order>>()
             .Name("Orders")
             .Description("Get all Orders")
-            .ResolveAsync(ctx =>
+            .ResolveAsync(_ =>
             {
                 var loader = accessor.Context.GetOrAddLoader("GetAllOrders",
                     orders.GetAllOrdersAsync);
@@ -83,16 +79,12 @@ public class QueryType : ObjectGraphType
                     users.GetUsersByIdAsync);
 
                 var ids = ctx.GetArgument<IEnumerable<int>>("ids");
-                // note: does not work properly without ToList, because LoadAsync would not have
-                // been called, so the ids would not have been queued for execution prior to the
-                // first call to GetResultAsync
-                var ret = ids.Select(id => loader.LoadAsync(id)).ToList();
+                var ret = ids.Select(id => loader.LoadAsync(id));
                 var ret2 = ret.Then(values => values.Where(x => x != null));
                 return ret2;
             });
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>()
-            .Name("ExerciseListsOfLists")
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>>>("ExerciseListsOfLists")
             .Argument<ListGraphType<ListGraphType<IntGraphType>>>("values")
             .Resolve(ctx =>
             {
@@ -100,5 +92,14 @@ public class QueryType : ObjectGraphType
                 var ret2 = ret.Select(x => new SimpleDataLoader<IEnumerable<SimpleDataLoader<int?>>>(_ => Task.FromResult(x.Select(y => new SimpleDataLoader<int?>(_ => Task.FromResult(y))))));
                 return ret2;
             });
+    }
+}
+
+public class MutationType : QueryType
+{
+    public MutationType(IDataLoaderContextAccessor accessor, IUsersStore users, IOrdersStore orders)
+        : base(accessor, users, orders)
+    {
+        Name = "Mutation";
     }
 }

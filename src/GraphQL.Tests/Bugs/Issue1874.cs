@@ -8,43 +8,46 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
     [Fact]
     public void byte_array_should_work()
     {
-        var query = @"
-                query BytesRequest($bytesHolder: Issue1874InputBytesType) {
-                    bytes(bytesObject: $bytesHolder) {
-                        bytes
-                    }
-                }";
+        const string query = """
+            query BytesRequest($bytesHolder: Issue1874InputBytesType) {
+              bytes(bytesObject: $bytesHolder) {
+                bytes
+              }
+            }
+            """;
 
-        AssertQuerySuccess(query, @"{ ""bytes"": { ""bytes"": [1, 2, 3, 4] } }", @"{ ""bytesHolder"": { ""bytes"": [1, 2, 3, 4] } }".ToInputs());
+        AssertQuerySuccess(query, """{ "bytes": { "bytes": [1, 2, 3, 4] } }""", """{ "bytesHolder": { "bytes": [1, 2, 3, 4] } }""".ToInputs());
     }
 
     [Fact]
     public void string_should_work()
     {
-        var query = @"
-                query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
-                    bytes64(bytesObject: $bytesHolder) {
-                        bytes
-                    }
-                }";
+        const string query = """
+            query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
+              bytes64(bytesObject: $bytesHolder) {
+                bytes
+              }
+            }
+            """;
 
-        var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
-        AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }", (@"{ ""bytesHolder"": { ""bytes"": """ + str1234 + @""" } }").ToInputs());
+        string str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+        AssertQuerySuccess(query, $$"""{ "bytes64": { "bytes": "{{str1234}}" } }""", $$"""{ "bytesHolder": { "bytes": "{{str1234}}" } }""".ToInputs());
     }
 
     [Fact]
     public void string_literal_should_work()
     {
-        var str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+        string str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
 
-        var query = @"
-                query BytesRequest {
-                    bytes64(bytesObject: { bytes: """ + str1234 + @"""}) {
-                        bytes
-                    }
-                }";
+        string query = $$"""
+            query BytesRequest {
+                bytes64(bytesObject: { bytes: "{{str1234}}"}) {
+                    bytes
+                }
+            }
+            """;
 
-        AssertQuerySuccess(query, @"{ ""bytes64"": { ""bytes"": """ + str1234 + @""" } }");
+        AssertQuerySuccess(query, $$"""{ "bytes64": { "bytes": "{{str1234}}" } }""");
     }
 }
 
@@ -60,20 +63,18 @@ public class Issue1874Query : ObjectGraphType
 {
     public Issue1874Query()
     {
-        Field<Issue1874OutputBytesType>(
-            "bytes",
-            arguments: new QueryArguments(new QueryArgument<Issue1874InputBytesType> { Name = "bytesObject" }),
-            resolve: context =>
+        Field<Issue1874OutputBytesType>("bytes")
+            .Argument<Issue1874InputBytesType>("bytesObject")
+            .Resolve(context =>
             {
                 var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
                 return bytesObject;
             }
         );
 
-        Field<Issue1874Output64BytesType>(
-            "bytes64",
-            arguments: new QueryArguments(new QueryArgument<Issue1874Input64BytesType> { Name = "bytesObject" }),
-            resolve: context =>
+        Field<Issue1874Output64BytesType>("bytes64")
+            .Argument<Issue1874Input64BytesType>("bytesObject")
+            .Resolve(context =>
             {
                 var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
                 bytesObject.Bytes.ShouldBe(new byte[] { 1, 2, 3, 4 });

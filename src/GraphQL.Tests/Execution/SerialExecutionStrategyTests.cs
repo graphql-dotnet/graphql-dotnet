@@ -19,14 +19,14 @@ public class SerialExecutionStrategyTests
         {
             Name = "LoaderType"
         };
-        leaderGraphType.Field<StringGraphType>("lastName", resolve: resolver);
-        leaderGraphType.Field<StringGraphType>("name", resolve: resolver);
+        leaderGraphType.Field<StringGraphType>("lastName").Resolve(resolver);
+        leaderGraphType.Field<StringGraphType>("name").Resolve(resolver);
         var familiesGraphType = new ObjectGraphType()
         {
             Name = "FamiliesType"
         };
-        familiesGraphType.Field("leader", leaderGraphType, resolve: resolver);
-        familiesGraphType.Field("leader_dataLoader", leaderGraphType, resolve: context =>
+        familiesGraphType.Field("leader", leaderGraphType).Resolve(resolver);
+        familiesGraphType.Field("leader_dataLoader", leaderGraphType).Resolve(context =>
         {
             resolver(context);
             return new SimpleDataLoader<object>(ctx =>
@@ -36,7 +36,13 @@ public class SerialExecutionStrategyTests
             });
         });
         var queryGraphType = new ObjectGraphType();
-        queryGraphType.Field("families", new ListGraphType(familiesGraphType), resolve: context =>
+        queryGraphType.Field("families", new ListGraphType(familiesGraphType)).Resolve(context =>
+        {
+            resolver(context);
+            return new object[] { "a", "a", "a" };
+        });
+        var mutationGraphType = new ObjectGraphType { Name = "Mutation" };
+        mutationGraphType.Field("families", new ListGraphType(familiesGraphType)).Resolve(context =>
         {
             resolver(context);
             return new object[] { "a", "a", "a" };
@@ -44,7 +50,7 @@ public class SerialExecutionStrategyTests
         var schema = new Schema
         {
             Query = queryGraphType,
-            Mutation = queryGraphType,
+            Mutation = mutationGraphType,
         };
         var documentExecuter = new DocumentExecuter();
         var executionOptions = new ExecutionOptions()
@@ -53,28 +59,30 @@ public class SerialExecutionStrategyTests
             Query = "mutation { families { leader_dataLoader { lastName name } leader { lastName name } } }",
         };
         await documentExecuter.ExecuteAsync(executionOptions).ConfigureAwait(false);
-        sb.ToString().ShouldBeCrossPlat(@"families
-families.0.leader_dataLoader
-families.0.leader
-families.0.leader.lastName
-families.0.leader.name
-families.1.leader_dataLoader
-families.1.leader
-families.1.leader.lastName
-families.1.leader.name
-families.2.leader_dataLoader
-families.2.leader
-families.2.leader.lastName
-families.2.leader.name
-families.0.leader_dataLoader-completed
-families.1.leader_dataLoader-completed
-families.2.leader_dataLoader-completed
-families.0.leader_dataLoader.lastName
-families.0.leader_dataLoader.name
-families.1.leader_dataLoader.lastName
-families.1.leader_dataLoader.name
-families.2.leader_dataLoader.lastName
-families.2.leader_dataLoader.name
-");
+        sb.ToString().ShouldBeCrossPlat("""
+            families
+            families.0.leader_dataLoader
+            families.0.leader
+            families.0.leader.lastName
+            families.0.leader.name
+            families.1.leader_dataLoader
+            families.1.leader
+            families.1.leader.lastName
+            families.1.leader.name
+            families.2.leader_dataLoader
+            families.2.leader
+            families.2.leader.lastName
+            families.2.leader.name
+            families.0.leader_dataLoader-completed
+            families.1.leader_dataLoader-completed
+            families.2.leader_dataLoader-completed
+            families.0.leader_dataLoader.lastName
+            families.0.leader_dataLoader.name
+            families.1.leader_dataLoader.lastName
+            families.1.leader_dataLoader.name
+            families.2.leader_dataLoader.lastName
+            families.2.leader_dataLoader.name
+
+            """);
     }
 }

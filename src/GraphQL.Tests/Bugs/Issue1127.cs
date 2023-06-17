@@ -8,14 +8,16 @@ public class Issue1127 : QueryTestBase<Issue1127Schema>
     [Fact]
     public void Issue1127_Should_Work()
     {
-        var query = @"
-query {
-  getsome(s2: null, s3: ""aaa"" input2: null, input3: { name: ""struct""})
-}
-";
-        var expected = @"{
-  ""getsome"": ""completed""
-}";
+        const string query = """
+        query {
+          getsome(s2: null, s3: "aaa" input2: null, input3: { name: "struct"})
+        }
+        """;
+        const string expected = """
+        {
+          "getsome": "completed"
+        }
+        """;
         AssertQuerySuccess(query, expected, null);
     }
 }
@@ -32,17 +34,16 @@ public class Issue127Query : ObjectGraphType
 {
     public Issue127Query()
     {
-        Field<StringGraphType>(
-            "getsome",
-            arguments: new QueryArguments(
+        Field<StringGraphType>("getsome")
+            .Arguments(
                 new QueryArgument<StringGraphType> { Name = "s1", DefaultValue = "def1" },
                 new QueryArgument<StringGraphType> { Name = "s2", DefaultValue = "def2" },
                 new QueryArgument<StringGraphType> { Name = "s3", DefaultValue = "def3" },
                 new QueryArgument<BaseInputType> { Name = "input1", DefaultValue = 1 },
                 new QueryArgument<BaseInputType> { Name = "input2", DefaultValue = 2 },
                 new QueryArgument<BaseInputType> { Name = "input3", DefaultValue = 3 }
-            ),
-            resolve: ctx =>
+            )
+            .Resolve(ctx =>
             {
                 ctx.Arguments["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
                 ctx.Arguments["s2"].ShouldBe(ArgumentValue.NullLiteral);

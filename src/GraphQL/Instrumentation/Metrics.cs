@@ -65,6 +65,10 @@ namespace GraphQL.Instrumentation
         /// <summary>
         /// Records an performance metric.
         /// </summary>
+        /// <param name="category">The category name for recorded metric, for example, "document" or "field".</param>
+        /// <param name="subject">The subject for recorded metric, for example, "Initializing schema" or "Building document".</param>
+        /// <param name="metadata">A dictionary of additional metadata for metric.</param>
+        /// <returns><see cref="Marker"/></returns>
         public Marker Subject(string category, string? subject, Dictionary<string, object?>? metadata = null)
         {
             if (!Enabled)

@@ -3,17 +3,19 @@
 #pragma warning disable IDE0053 // Use expression body for lambda expressions
 
 using GraphQL.Execution;
-using GraphQL.MicrosoftDI;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Subscription;
 
-public class SubscriptionExecutionStrategyTests
+public class SubscriptionExecutionStrategyTests : IDisposable
 {
     private SampleObservable<string> Source { get; } = new();
     private SampleObserver? Observer { get; set; }
     private IDisposable? SubscriptionObj { get; set; }
+    private IDisposable? ServiceProviderDisposable { get; set; }
+
+    public void Dispose() => ServiceProviderDisposable?.Dispose();
 
     [Fact]
     public async Task Basic()
@@ -24,8 +26,8 @@ public class SubscriptionExecutionStrategyTests
         result.Perf.ShouldBeNull();
         Source.Next("hello");
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "testing" } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -37,7 +39,7 @@ public class SubscriptionExecutionStrategyTests
         result.Perf.ShouldNotBeNull();
         Source.Next("hello");
         var result2 = Observer.ShouldHaveResult();
-        result2.ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
+        result2.ShouldBeSimilarTo("""{ "data": { "test": "hello" } }""");
         result2.Perf.ShouldBeNull();
         Observer.ShouldHaveNoMoreResults();
     }
@@ -47,11 +49,11 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testWithInitialExtensions }").ConfigureAwait(false);
         result.ShouldBeSuccessful();
-        result.Extensions.ShouldBeSimilarTo(@"{ ""alpha"": ""beta"" }");
+        result.Extensions.ShouldBeSimilarTo("""{ "alpha": "beta" }""");
         Source.Next("hello");
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testWithInitialExtensions"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testWithInitialExtensions"": ""testing"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testWithInitialExtensions": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testWithInitialExtensions": "testing" } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -61,7 +63,7 @@ public class SubscriptionExecutionStrategyTests
         var result = await ExecuteAsync("subscription { testWithInitialError(custom: false) }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
-        result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Could not resolve source stream for field \u0027testWithInitialError\u0027."",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""APPLICATION"",""codes"":[""APPLICATION""]} }],""data"":null}");
+        result.ShouldBeSimilarTo("""{ "errors":[{ "message":"Could not resolve source stream for field \u0027testWithInitialError\u0027.","locations":[{ "line":1,"column":16}],"path":["testWithInitialError"],"extensions":{ "code":"APPLICATION","codes":["APPLICATION"]} }],"data":null}""");
     }
 
     [Fact]
@@ -70,7 +72,7 @@ public class SubscriptionExecutionStrategyTests
         var result = await ExecuteAsync("subscription { testWithInitialError(custom: true) }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
-        result.ShouldBeSimilarTo(@"{ ""errors"":[{ ""message"":""Handled custom exception: InitialException"",""locations"":[{ ""line"":1,""column"":16}],""path"":[""testWithInitialError""],""extensions"":{ ""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]} }],""data"":null}");
+        result.ShouldBeSimilarTo("""{ "errors":[{ "message":"Handled custom exception: InitialException","locations":[{ "line":1,"column":16}],"path":["testWithInitialError"],"extensions":{ "code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]} }],"data":null}""");
     }
 
     [Fact]
@@ -79,7 +81,7 @@ public class SubscriptionExecutionStrategyTests
         var result = await ExecuteAsync("subscription { testWithExecutionError }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""testWithExecutionError""]}],""data"":null}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["testWithExecutionError"]}],"data":null}""");
     }
 
     [Fact]
@@ -89,8 +91,8 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""testing"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "testing" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -101,8 +103,8 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameWithExtension"": ""hello"" } }, ""extensions"": { ""alpha"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameWithExtension"": ""testing"" } }, ""extensions"": { ""alpha"": ""testing"" }  }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameWithExtension": "hello" } }, "extensions": { "alpha": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameWithExtension": "testing" } }, "extensions": { "alpha": "testing" }  }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -118,11 +120,11 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         Source.Next("application");
         Source.Next("success");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowError"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Custom error"",""locations"":[{""line"":1,""column"":33}],""path"":[""testComplex"",""nameMayThrowError""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowError"": ""testing"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Error trying to resolve field \u0027nameMayThrowError\u0027."",""locations"":[{""line"":1,""column"":33}],""path"":[""testComplex"",""nameMayThrowError""],""extensions"":{""code"":""APPLICATION"",""codes"":[""APPLICATION""]}}],""data"":null}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowError"": ""success"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowError": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Custom error","locations":[{"line":1,"column":33}],"path":["testComplex","nameMayThrowError"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowError": "testing" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Error trying to resolve field \u0027nameMayThrowError\u0027.","locations":[{"line":1,"column":33}],"path":["testComplex","nameMayThrowError"],"extensions":{"code":"APPLICATION","codes":["APPLICATION"]}}],"data":null}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowError": "success" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -137,11 +139,11 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         Source.Next("application");
         Source.Next("success");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowErrorNullable"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Custom error"",""locations"":[{""line"":1,""column"":33}],""path"":[""testComplex"",""nameMayThrowErrorNullable""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":{""testComplex"":{""id"":""SampleId"",""nameMayThrowErrorNullable"":null}}}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowErrorNullable"": ""testing"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Error trying to resolve field \u0027nameMayThrowErrorNullable\u0027."",""locations"":[{""line"":1,""column"":33}],""path"":[""testComplex"",""nameMayThrowErrorNullable""],""extensions"":{""code"":""APPLICATION"",""codes"":[""APPLICATION""]}}],""data"":{""testComplex"":{""id"":""SampleId"",""nameMayThrowErrorNullable"":null}}}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""nameMayThrowErrorNullable"": ""success"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowErrorNullable": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Custom error","locations":[{"line":1,"column":33}],"path":["testComplex","nameMayThrowErrorNullable"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":{"testComplex":{"id":"SampleId","nameMayThrowErrorNullable":null}}}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowErrorNullable": "testing" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Error trying to resolve field \u0027nameMayThrowErrorNullable\u0027.","locations":[{"line":1,"column":33}],"path":["testComplex","nameMayThrowErrorNullable"],"extensions":{"code":"APPLICATION","codes":["APPLICATION"]}}],"data":{"testComplex":{"id":"SampleId","nameMayThrowErrorNullable":null}}}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "nameMayThrowErrorNullable": "success" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -158,11 +160,11 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         Source.Error(new InvalidOperationException("SourceError"));
         Source.Next("success");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Response stream error for field \u0027testComplex\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""APPLICATION"",""codes"":[""APPLICATION""]}}]}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""testing"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: SourceError"",""locations"":[{""line"":1,""column"":16}],""path"":[""testComplex""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}]}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""id"": ""SampleId"", ""name"": ""success"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Response stream error for field \u0027testComplex\u0027.","locations":[{"line":1,"column":16}],"path":["testComplex"],"extensions":{"code":"APPLICATION","codes":["APPLICATION"]}}]}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "testing" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: SourceError","locations":[{"line":1,"column":16}],"path":["testComplex"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}]}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "id": "SampleId", "name": "success" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -177,9 +179,9 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("hello");
         Source.Next(null!);
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testNullHandling"": { ""id"": ""SampleId"", ""name"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Cannot return null for a non-null type. Field: testNullHandling, Type: MyWidget!."",""locations"":[{""line"":1,""column"":16}],""path"":[""testNullHandling""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testNullHandling"": { ""id"": ""SampleId"", ""name"": ""testing"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testNullHandling": { "id": "SampleId", "name": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Cannot return null for a non-null type. Field: testNullHandling, Type: MyWidget!.","locations":[{"line":1,"column":16}],"path":["testNullHandling"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testNullHandling": { "id": "SampleId", "name": "testing" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -191,9 +193,9 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("hello");
         Source.Next(null!);
         Source.Next("testing");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testNullHandlingNullable"": { ""id"": ""SampleId"", ""name"": ""hello"" } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""data"":{""testNullHandlingNullable"":null}}");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testNullHandlingNullable"": { ""id"": ""SampleId"", ""name"": ""testing"" } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testNullHandlingNullable": { "id": "SampleId", "name": "hello" } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"data":{"testNullHandlingNullable":null}}""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testNullHandlingNullable": { "id": "SampleId", "name": "testing" } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -202,7 +204,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { notSubscriptionField }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""notSubscriptionField""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027.","locations":[{"line":1,"column":16}],"path":["notSubscriptionField"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
     }
 
     public int Counter = 0;
@@ -223,8 +225,8 @@ public class SubscriptionExecutionStrategyTests
         Counter.ShouldBe(22);
         Source.Next("testing");
         Counter.ShouldBe(33);
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": {""name"": ""hello"", ""getCounter"": 12 } } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": {""name"": ""testing"", ""getCounter"": 23 } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": {"name": "hello", "getCounter": 12 } } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": {"name": "testing", "getCounter": 23 } } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -246,9 +248,9 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         cts.Cancel();
         Source.Next("success");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""success"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "testing" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "success" } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -262,8 +264,8 @@ public class SubscriptionExecutionStrategyTests
         Source.Next("testing");
         SubscriptionObj!.Dispose();
         Source.Next("should not happen");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""hello"" } }");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""test"": ""testing"" } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "hello" } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "test": "testing" } }""");
         Observer.ShouldHaveNoMoreResults();
     }
 
@@ -273,7 +275,7 @@ public class SubscriptionExecutionStrategyTests
         var result = await ExecuteAsync("subscription { testComplex { validateServiceProvider } }", o => o.UserContext["provider"] = o.RequestServices).ConfigureAwait(false);
         result.ShouldBeSuccessful();
         Source.Next("hello");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{ ""data"": { ""testComplex"": { ""validateServiceProvider"": true } } }");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "validateServiceProvider": true } } }""");
     }
 
     [Fact]
@@ -287,17 +289,17 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
         {
-            o.UnhandledExceptionDelegate = async context => throw new InvalidOperationException();
+            o.UnhandledExceptionDelegate = async _ => throw new InvalidOperationException();
         }).ConfigureAwait(false);
         result.ShouldBeSuccessful();
         Source.Next("custom");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Unhandled error of type InvalidOperationException""}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Unhandled error of type InvalidOperationException"}]}""");
     }
 
     [Fact]
     public async Task CancelWithinDocumentExecuter_Returns_DoesNotHandle()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -322,7 +324,7 @@ public class SubscriptionExecutionStrategyTests
     [Fact]
     public async Task ThrowExceptionWithinListener_Before_Returns()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -338,13 +340,13 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Test exception","locations":[{"line":1,"column":16}],"path":["test"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}]}""");
     }
 
     [Fact]
     public async Task ThrowErrorWithinListener_Before_Returns()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -361,13 +363,13 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["test"]}]}""");
     }
 
     [Fact]
     public async Task ThrowExceptionWithinListener_After_ReturnsWithData()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -383,13 +385,13 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: Test exception"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Test exception","locations":[{"line":1,"column":16}],"path":["test"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":{"test":"test"}}""");
     }
 
     [Fact]
     public async Task ThrowErrorWithinListener_After_ReturnsWithData()
     {
-        var throwNow = false;
+        bool throwNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -406,13 +408,13 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error"",""locations"":[{""line"":1,""column"":16}],""path"":[""test""]}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["test"]}],"data":{"test":"test"}}""");
     }
 
     [Fact]
     public async Task ErrorWithinListener_Before_ReturnsBeforeExecuting()
     {
-        var errorNow = false;
+        bool errorNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -428,13 +430,13 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}]}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error"}]}""");
     }
 
     [Fact]
     public async Task ErrorWithinListener_After_ReturnsAsExecuted()
     {
-        var errorNow = false;
+        bool errorNow = false;
         var result = await ExecuteAsync("subscription { test }", o =>
         {
             o.Listeners.Add(new SampleListener(
@@ -450,7 +452,7 @@ public class SubscriptionExecutionStrategyTests
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
-        Observer.ShouldHaveResult().ShouldBeSimilarTo(@"{""errors"":[{""message"":""Test error""}],""data"":{""test"":""test""}}");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Test error"}],"data":{"test":"test"}}""");
     }
 
     [Fact]
@@ -469,7 +471,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { testObservableNull }").ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027."",""locations"":[{""line"":1,""column"":16}],""path"":[""testObservableNull""],""extensions"":{""code"":""INVALID_OPERATION"",""codes"":[""INVALID_OPERATION""]}}],""data"":null}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027.","locations":[{"line":1,"column":16}],"path":["testObservableNull"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
     }
 
     [Fact]
@@ -477,7 +479,7 @@ public class SubscriptionExecutionStrategyTests
     {
         var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false).ConfigureAwait(false);
         result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo(@"{""errors"":[{""message"":""Anonymous Subscription must select only one top level field."",""locations"":[{""line"":1,""column"":21}],""extensions"":{""code"":""SINGLE_ROOT_FIELD_SUBSCRIPTIONS"",""codes"":[""SINGLE_ROOT_FIELD_SUBSCRIPTIONS""],""number"":""5.2.3.1""}}]}");
+        result.ShouldBeSimilarTo("""{"errors":[{"message":"Anonymous Subscription must have exactly one root field and that field must not be an introspection field.","locations":[{"line":1,"column":21}],"extensions":{"code":"SINGLE_ROOT_FIELD_SUBSCRIPTIONS","codes":["SINGLE_ROOT_FIELD_SUBSCRIPTIONS"],"number":"5.2.3.1"}}]}""");
     }
 
     [Fact]
@@ -488,6 +490,43 @@ public class SubscriptionExecutionStrategyTests
         result.Data.ShouldBeNull();
         result.Errors.ShouldBeNull();
         result.Executed.ShouldBeTrue();
+    }
+
+    private static readonly AsyncLocal<string?> _asyncLocal = new();
+
+    [Fact]
+    public async Task NetExecutionContextIsCarriedOver()
+    {
+        // This verifies that the System.Threading.ExecutionContext is preserved during data events after the initial subscription.
+        // This means that AsyncLocal instances will contain the values they had during the initial subscription during the
+        // execution of field resolvers. As HttpContextAccessor is based on AsyncLocal, this allows subscription field resolvers
+        // that reference IHttpContextAccessor.HttpContext to access the correct HttpContext of the connected client, rather
+        // than the HttpContext of the event source, which would be unexpected. Of course, any processing before it reaches
+        // GraphQL would be run in the execution context of the event source.
+
+        // simulate the ExecutionContext of a connecting client and execute a subscription
+        _asyncLocal.Value.ShouldBeNull();
+        await ConnectClientAsync().ConfigureAwait(false);
+
+        // simulate the ExecutionContext of an event source and raise an event
+        _asyncLocal.Value.ShouldBeNull();
+        await RaiseEventAsync().ConfigureAwait(false);
+
+        // verify that the connected client has recieved an event with its own context applied during the execution of the resolvers
+        _asyncLocal.Value.ShouldBeNull();
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"data":{"testComplex":{"asyncLocalValue":"client"}}}""");
+
+        async Task ConnectClientAsync()
+        {
+            _asyncLocal.Value = "client";
+            await ExecuteAsync("subscription { testComplex { asyncLocalValue } }").ConfigureAwait(false);
+        }
+
+        async Task RaiseEventAsync()
+        {
+            _asyncLocal.Value = "source";
+            Source.Next("hello");
+        }
     }
 
     #region - Schema -
@@ -574,6 +613,11 @@ public class SubscriptionExecutionStrategyTests
             var provider = (IServiceProvider)context.UserContext["provider"]!;
             return object.ReferenceEquals(context.RequestServices, provider);
         }
+
+        public string? AsyncLocalValue()
+        {
+            return _asyncLocal.Value;
+        }
     }
     #endregion
 
@@ -609,8 +653,11 @@ public class SubscriptionExecutionStrategyTests
         services.AddGraphQL(b => b
             .AddAutoSchema<Query>(s => s.WithSubscription<Subscription>()));
         services.AddSingleton<IObservable<string>>(Source);
-        var provider = services.BuildServiceProvider(); // not disposed intentionally
-        var executer = provider.GetService<IDocumentExecuter>();
+        var provider = services.BuildServiceProvider();
+        if (ServiceProviderDisposable != null)
+            throw new InvalidOperationException("Cannot run ExecuteAsync twice within one test");
+        ServiceProviderDisposable = provider; // only disposed after execution is complete
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
         var options = new ExecutionOptions
         {
             Schema = provider.GetRequiredService<ISchema>(),

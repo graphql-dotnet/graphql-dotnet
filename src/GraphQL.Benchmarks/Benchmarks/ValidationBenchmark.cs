@@ -68,7 +68,7 @@ public class ValidationBenchmark : IBenchmark
             Schema = _schema,
             Document = document,
             Operation = document.Definitions.OfType<GraphQLOperationDefinition>().First()
-        }).GetAwaiter().GetResult().validationResult;
+        }).GetAwaiter().GetResult();
 
     void IBenchmark.RunProfiler() => Introspection();
 }

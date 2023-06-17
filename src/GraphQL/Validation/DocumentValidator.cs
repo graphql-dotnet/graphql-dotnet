@@ -4,15 +4,16 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Validates a document against a set of validation rules and returns a list of the errors found.
+    /// If the document passes validation, also returns the set of parsed variables and argument values for fields and applied directives.
     /// </summary>
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options);
+        Task<IValidationResult> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
-    public class DocumentValidator : IDocumentValidator
+    public partial class DocumentValidator : IDocumentValidator
     {
         // frequently reused objects
         private ValidationContext? _reusableValidationContext;
@@ -51,11 +52,11 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options)
+        public Task<IValidationResult> ValidateAsync(in ValidationOptions options)
         {
             options.Schema.Initialize();
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            var context = Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
             context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
@@ -63,13 +64,15 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.Metrics = options.Metrics;
             context.RequestServices = options.RequestServices;
+            context.User = options.User;
             context.CancellationToken = options.CancellationToken;
 
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
         }
 
-        private async Task<(IValidationResult validationResult, Variables variables)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        private async Task<IValidationResult> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
         {
             try
             {
@@ -116,19 +119,53 @@ namespace GraphQL.Validation
                     await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
                 }
 
-                // can report errors even without rules enabled
-                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors);
+                }
 
-                return context.HasErrors
-                    ? (new ValidationResult(context.Errors), variables)
-                    : (SuccessfullyValidatedResult.Instance, variables);
+                // can report errors even without rules enabled
+                (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
+                    ? null
+                    : variableVisitors.Count == 1
+                        ? variableVisitors[0]
+                        : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
+                }
+
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors) { Variables = variables };
+                }
+
+                // parse all field arguments
+                using var parseArgumentVisitorContext = new ParseArgumentVisitor.Context(context, variables);
+                await ParseArgumentVisitor.Instance.VisitAsync(context.Document, parseArgumentVisitorContext).ConfigureAwait(false);
+                var argumentValues = parseArgumentVisitorContext.ArgumentValues;
+                var directiveValues = parseArgumentVisitorContext.DirectiveValues;
+
+                // todo: execute validation rules that need to be able to read field arguments/directives
+
+                if (!context.HasErrors && variables == Variables.None && argumentValues == null && directiveValues == null)
+                    return SuccessfullyValidatedResult.Instance;
+
+                return new ValidationResult(context.Errors)
+                {
+                    Variables = variables,
+                    ArgumentValues = argumentValues,
+                    DirectiveValues = directiveValues,
+                };
             }
             finally
             {
                 if (!context.HasErrors)
                 {
                     context.Reset();
-                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

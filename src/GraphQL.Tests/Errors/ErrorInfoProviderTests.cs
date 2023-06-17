@@ -49,12 +49,33 @@ public class ErrorInfoProviderTests
         error.Data["test2"].ShouldBe(15);
         error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
 
-        var info = new ErrorInfoProvider().GetInfo(error);
+        var info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.Count.ShouldBe(1);
         info.Extensions.ShouldContainKey("data");
         info.Extensions["data"].ShouldBeAssignableTo<IDictionary>().ShouldBe(error.Data);
+    }
+
+    [Fact]
+    public void data_not_serialized_by_default()
+    {
+        var data = new Dictionary<string, object>()
+        {
+            { "test1", "object1" },
+            { "test2", 15 },
+            { "test3", new Dictionary<string, object>() { { "test4", "object4" } } },
+        };
+        var error = new ExecutionError(null, data);
+        error.Data.ShouldNotBeNull();
+        error.Data.Count.ShouldBe(3);
+        error.Data["test1"].ShouldBe("object1");
+        error.Data["test2"].ShouldBe(15);
+        error.Data["test3"].ShouldBe(new Dictionary<string, object>() { { "test4", "object4" } });
+
+        var info = new ErrorInfoProvider().GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions.ShouldBeNull();
     }
 
     [Fact]
@@ -111,7 +132,7 @@ public class ErrorInfoProviderTests
         error.AddLocation(new Location(5, 6));
         error.AddLocation(new Location(7, 8));
 
-        var info = new ErrorInfoProvider().GetInfo(error);
+        var info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Message.ShouldBe(error.Message);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.Count.ShouldBe(3);
@@ -124,17 +145,29 @@ public class ErrorInfoProviderTests
     }
 
     [Fact]
-    public void exposeExceptions()
+    public void exposeExceptions_in_message()
     {
         var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
         var error = new ExecutionError(innerException.Message, innerException);
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+        info.Extensions.TryGetValue("details", out _).ShouldBeFalse();
     }
 
     [Fact]
-    public void exposeExceptions_with_real_stack_trace()
+    public void exposeExceptions_in_extensions()
+    {
+        var innerException = new ArgumentNullException(null, new ArgumentOutOfRangeException());
+        var error = new ExecutionError(innerException.Message, innerException);
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["details"].ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_message()
     {
         // generate a real stack trace to serialize
         ExecutionError error;
@@ -154,8 +187,34 @@ public class ErrorInfoProviderTests
             error = e;
         }
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
+    }
+
+    [Fact]
+    public void exposeExceptions_with_real_stack_trace_in_extensions()
+    {
+        // generate a real stack trace to serialize
+        ExecutionError error;
+        try
+        {
+            try
+            {
+                throw new ArgumentNullException(null, new ArgumentOutOfRangeException());
+            }
+            catch (Exception innerException)
+            {
+                throw new ExecutionError(innerException.Message, innerException);
+            }
+        }
+        catch (ExecutionError e)
+        {
+            error = e;
+        }
+
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
+        info.Message.ShouldBe(error.Message);
+        info.Extensions["details"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -167,7 +226,7 @@ public class ErrorInfoProviderTests
         };
         error.Code.ShouldBe("");
 
-        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionStackTrace = true }).GetInfo(error);
+        var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");
@@ -205,7 +264,7 @@ public class ErrorInfoProviderTests
 
         error.Data.Add("test1", "object1");
 
-        info = new ErrorInfoProvider().GetInfo(error);
+        info = new ErrorInfoProvider(o => o.ExposeData = true).GetInfo(error);
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");

@@ -108,22 +108,40 @@ namespace GraphQL
         private static readonly char[] _separators = { '.' };
 
         /// <summary>
+        /// Method to get value by path (key1.key2.keyN) from input extensions dictionary.
+        /// </summary>
+        /// <param name="context">Context with dictionary of extra information supplied with the GraphQL request.</param>
+        /// <param name="path">Path to value in key1.key2.keyN format.</param>
+        /// <returns>Value, if any exists on the specified path, otherwise <see langword="null"/>.</returns>
+        public static object? GetInputExtension(this IResolveFieldContext context, string path)
+        {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
+            return GetByPath(context.InputExtensions, path, false);
+        }
+
+        /// <summary>
         /// Thread safe method to get value by path (key1.key2.keyN) from output extensions dictionary.
         /// </summary>
         /// <param name="context">Context with extensions response map.</param>
         /// <param name="path">Path to value in key1.key2.keyN format.</param>
-        /// <returns>Value, if any exists on the specified path, otherwise <c>null</c>.</returns>
+        /// <returns>Value, if any exists on the specified path, otherwise <see langword="null"/>.</returns>
         public static object? GetOutputExtension(this IResolveFieldContext context, string path)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            if (context.OutputExtensions == null || context.OutputExtensions.Count == 0)
-                return null;
+            // Actually Dictionary<TKey, TValue> (as a widely used class) implements IReadOnlyDictionary<TKey, TValue>
+            // so this cast should never hurt for majority of cases.
+            return GetByPath(context.OutputExtensions as IReadOnlyDictionary<string, object?>, path, true);
+        }
 
-            lock (context.OutputExtensions)
+        private static object? GetByPath(IReadOnlyDictionary<string, object?>? dictionary, string path, bool useLock)
+        {
+            object? Get()
             {
-                var values = context.OutputExtensions;
+                var values = dictionary;
 
                 if (path.IndexOf('.') != -1)
                 {
@@ -131,7 +149,7 @@ namespace GraphQL
 
                     for (int i = 0; i < keys.Length - 1; ++i)
                     {
-                        if (values.TryGetValue(keys[i], out object? v) && v is IDictionary<string, object?> d)
+                        if (values.TryGetValue(keys[i], out object? v) && v is IReadOnlyDictionary<string, object?> d)
                             values = d;
                         else
                             return null;
@@ -143,6 +161,19 @@ namespace GraphQL
                 {
                     return values.TryGetValue(path, out object? result) ? result : null;
                 }
+            }
+
+            if (dictionary == null || dictionary.Count == 0)
+                return null;
+
+            if (useLock)
+            {
+                lock (dictionary)
+                    return Get();
+            }
+            else
+            {
+                return Get();
             }
         }
 

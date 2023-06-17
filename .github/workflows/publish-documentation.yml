@@ -11,7 +11,7 @@ on:
       - .github/workflows/publish-documentation.yml
 
 env:
-  NODE_VERSION: '10.x'   # Node 10 LTS
+  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
 
 jobs:
   build-docs:
@@ -28,12 +28,9 @@ jobs:
           token: ${{ secrets.ORG_PAT_TOKEN }}
           path: published
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3.4.1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: yarn
-        run: yarn
-        working-directory: main
       - name: yarn docs2
         working-directory: main/docs2
         run: yarn

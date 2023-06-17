@@ -9,18 +9,18 @@ public class PrintTests
     [Fact]
     public void prints_int_value()
     {
-        int value = 3;
+        const int value = 3;
         var val = new GraphQLIntValue(value);
-        var result = val.Print();
+        string result = val.Print();
         result.ShouldBe("3");
     }
 
     [Fact]
     public void prints_long_value()
     {
-        long value = 3;
+        const long value = 3;
         var val = new GraphQLIntValue(value);
-        var result = val.Print();
+        string result = val.Print();
         result.ShouldBe("3");
     }
 
@@ -33,23 +33,23 @@ public class PrintTests
     [Fact]
     public void prints_float_value()
     {
-        double value = 3.33;
+        const double value = 3.33;
 
         var val = new GraphQLFloatValue(value);
-        var result = val.Print();
+        string result = val.Print();
         result.ShouldBe(value.ToString("0.0##", NumberFormatInfo.InvariantInfo));
     }
 
     [Fact]
     public void string_encodes_control_characters()
     {
-        var sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
-        var ret = new GraphQLStringValue(sample).Print();
+        string sample = new string(Enumerable.Range(0, 256).Select(x => (char)x).ToArray());
+        string ret = new GraphQLStringValue(sample).Print();
 
         foreach (char c in ret)
             c.ShouldBeGreaterThanOrEqualTo(' ');
 
-        var deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
+        string deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
         deserialized.ShouldBe(sample);
 
         var token = GraphQLParser.Lexer.Lex(ret);
@@ -57,11 +57,11 @@ public class PrintTests
         token.Value.ShouldBe(sample);
     }
 
-    [Theory]
+    [TheoryEx]
     [MemberData(nameof(NodeTests))]
     public void prints_node(ASTNode node, string expected)
     {
-        var printed = node.Print();
+        string printed = node.Print();
 
         printed.ShouldBe(expected);
 
@@ -73,7 +73,7 @@ public class PrintTests
         }
     }
 
-    [Theory]
+    [TheoryEx]
     [MemberData(nameof(NodeTests))]
     public void prints_node_cultures(ASTNode node, string expected)
     {
@@ -118,6 +118,6 @@ public class PrintTests
         new object[] { new GraphQLFloatValue(0.00000000000000001m), "0.00000000000000001"}, // decimal
         new object[] { new GraphQLFalseBooleanValue(), "false"},
         new object[] { new GraphQLTrueBooleanValue(), "true"},
-        new object[] { new GraphQLEnumValue { Name = new GraphQLName("TEST") }, "TEST"},
+        new object[] { new GraphQLEnumValue(new GraphQLName("TEST")), "TEST"},
     };
 }

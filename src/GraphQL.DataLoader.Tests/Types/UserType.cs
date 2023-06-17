@@ -15,8 +15,7 @@ public class UserType : ObjectGraphType<User>
         Field(x => x.LastName);
         Field(x => x.Email);
 
-        Field<ListGraphType<OrderType>, IEnumerable<Order>>()
-            .Name("Orders")
+        Field<ListGraphType<OrderType>, IEnumerable<Order>>("Orders")
             .ResolveAsync(ctx =>
             {
                 var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
@@ -25,8 +24,7 @@ public class UserType : ObjectGraphType<User>
                 return ordersLoader.LoadAsync(ctx.Source.UserId);
             });
 
-        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
-            .Name("OrderedItems")
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>("OrderedItems")
             .ResolveAsync(ctx =>
             {
                 //obtain a reference to the GetOrdersByUserId batch loader

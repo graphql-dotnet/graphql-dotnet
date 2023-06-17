@@ -1,7 +1,5 @@
 #nullable enable
 
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,15 +45,15 @@ public class RequestServicesTests
 
         // serialize to json to be sure no issues with a validation error without a number
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-        var resultString = serializer.Serialize(result);
-        resultString.ShouldBe(@"{""errors"":[{""message"":""Num is 1"",""extensions"":{""code"":""VALIDATION_ERROR"",""codes"":[""VALIDATION_ERROR""]}}]}");
+        string resultString = serializer.Serialize(result);
+        resultString.ShouldBe("""{"errors":[{"message":"Num is 1","extensions":{"code":"VALIDATION_ERROR","codes":["VALIDATION_ERROR"]}}]}""");
     }
 
     private class MyValidationRule : IValidationRule
     {
         public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
-            var num = context.RequestServices.GetRequiredService<Class1>().GetNum;
+            int num = context.RequestServices!.GetRequiredService<Class1>().GetNum;
             context.ReportError(new ValidationError($"Num is {num}"));
             return default;
         }

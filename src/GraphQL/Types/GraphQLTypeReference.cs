@@ -39,7 +39,7 @@ namespace GraphQL.Types
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
 
-        private InvalidOperationException Invalid() => new InvalidOperationException($"This is just a reference to '{TypeName}'. Resolve the real type first.");
+        private InvalidOperationException Invalid() => new($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
         /// <inheritdoc/>
         public override bool Equals(object? obj)
@@ -57,12 +57,19 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Output type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType
+    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType, IObjectGraphType
     {
-        internal GraphQLClrOutputTypeReference()
+        private GraphQLClrOutputTypeReference()
         {
-            throw new InvalidOperationException("Not for creation. Marker only.");
         }
+
+        Func<object, bool>? IObjectGraphType.IsTypeOf { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        Interfaces IImplementInterfaces.Interfaces => throw new NotImplementedException();
+
+        ResolvedInterfaces IImplementInterfaces.ResolvedInterfaces => throw new NotImplementedException();
+
+        void IObjectGraphType.AddResolvedInterface(IInterfaceGraphType graphType) => throw new NotImplementedException();
     }
 
     /// <summary>
@@ -71,9 +78,8 @@ namespace GraphQL.Types
     /// </summary>
     public sealed class GraphQLClrInputTypeReference<T> : InputObjectGraphType
     {
-        internal GraphQLClrInputTypeReference()
+        private GraphQLClrInputTypeReference()
         {
-            throw new InvalidOperationException("Not for creation. Marker only.");
         }
     }
 }

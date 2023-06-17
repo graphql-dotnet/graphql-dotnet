@@ -13,7 +13,7 @@ namespace GraphQL.Utilities
         /// <summary>
         /// Returns a static instance of the <see cref="SchemaValidationVisitor"/> class.
         /// </summary>
-        public static readonly SchemaValidationVisitor Instance = new SchemaValidationVisitor();
+        public static readonly SchemaValidationVisitor Instance = new();
 
         private SchemaValidationVisitor()
         {
@@ -63,6 +63,9 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
 
             ValidateFieldArgumentsUniqueness(field, type);
+
+            if (field.StreamResolver != null && type != schema.Subscription)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
         }
 
         /// <inheritdoc/>
@@ -84,6 +87,10 @@ namespace GraphQL.Utilities
 
             // validate default value
             ValidateQueryArgumentDefaultValue(argument, field, type);
+
+            // 2.4.3
+            if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
+                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
         }
 
         #endregion
@@ -125,6 +132,12 @@ namespace GraphQL.Utilities
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
 
             ValidateFieldArgumentsUniqueness(field, type);
+
+            if (field.StreamResolver != null && type != schema.Subscription)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+
+            if (field.Resolver != null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
         }
 
         /// <inheritdoc/>
@@ -146,6 +159,10 @@ namespace GraphQL.Utilities
 
             // validate default value
             ValidateQueryArgumentDefaultValue(argument, field, type);
+
+            // 2.4.3
+            if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
+                throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
         }
 
         #endregion
@@ -198,9 +215,30 @@ namespace GraphQL.Utilities
 
             if (field.Arguments?.Count > 0)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have any arguments specified.");
+
+            // 2.4
+            if (field.ResolvedType is NonNullGraphType && field.DefaultValue is null && field.DeprecationReason is not null)
+                throw new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+
+            if (field.StreamResolver != null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+
+            if (field.Resolver != null)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types.");
         }
 
         #endregion
+
+        // See https://spec.graphql.org/October2021/#sec-Root-Operation-Types
+        /// <inheritdoc/>
+        public override void VisitSchema(ISchema schema)
+        {
+            var n1 = schema.Query?.Name;
+            var n2 = schema.Mutation?.Name;
+            var n3 = schema.Subscription?.Name;
+            if (n1 == n2 && n1 != null || n1 == n3 && n1 != null || n2 == n3 && n2 != null)
+                throw new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided.");
+        }
 
         // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Unions
         // Union types have the potential to be invalid if incorrectly defined.

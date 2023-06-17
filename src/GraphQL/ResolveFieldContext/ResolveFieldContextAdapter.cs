@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -99,5 +100,8 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
+
+        /// <inheritdoc/>
+        public ClaimsPrincipal? User => _baseContext.User;
     }
 }

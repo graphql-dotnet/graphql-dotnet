@@ -11,10 +11,10 @@ namespace GraphQL.Types.Relay
             Name = "PageInfo";
             Description = "Information about pagination in a connection.";
 
-            Field<NonNullGraphType<BooleanGraphType>>("hasNextPage", "When paginating forwards, are there more items?");
-            Field<NonNullGraphType<BooleanGraphType>>("hasPreviousPage", "When paginating backwards, are there more items?");
-            Field<StringGraphType>("startCursor", "When paginating backwards, the cursor to continue.");
-            Field<StringGraphType>("endCursor", "When paginating forwards, the cursor to continue.");
+            Field<NonNullGraphType<BooleanGraphType>>("hasNextPage").Description("When paginating forwards, are there more items?");
+            Field<NonNullGraphType<BooleanGraphType>>("hasPreviousPage").Description("When paginating backwards, are there more items?");
+            Field<StringGraphType>("startCursor").Description("When paginating backwards, the cursor to continue.");
+            Field<StringGraphType>("endCursor").Description("When paginating forwards, the cursor to continue.");
         }
     }
 }

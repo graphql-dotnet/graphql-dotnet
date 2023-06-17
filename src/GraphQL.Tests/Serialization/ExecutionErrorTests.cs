@@ -12,9 +12,32 @@ public class ExecutionErrorTests
     {
         var error = new ExecutionError("some error 1");
 
-        var expected = @"{""message"": ""some error 1""}";
+        const string expected = """{"message": "some error 1"}""";
 
-        var actual = serializer.Serialize(error);
+        string actual = serializer.Serialize(error);
+
+        actual.ShouldBeCrossPlatJson(expected);
+    }
+
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersTestData))]
+    public void Extensions(IGraphQLTextSerializer serializer)
+    {
+        var error = new ExecutionError("some error 1")
+            .AddExtension("severity", "warn")
+            .AddExtension("rank", 42);
+
+        const string expected = """
+{
+  "message": "some error 1",
+  "extensions": {
+    "severity": "warn",
+    "rank": 42
+  }
+}
+""";
+
+        string actual = serializer.Serialize(error);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -23,9 +46,9 @@ public class ExecutionErrorTests
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Null(IGraphQLTextSerializer serializer)
     {
-        var expected = "null";
+        const string expected = "null";
 
-        var actual = serializer.Serialize<ExecutionError>(null);
+        string actual = serializer.Serialize<ExecutionError>(null);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -36,9 +59,9 @@ public class ExecutionErrorTests
     {
         var errors = new ExecutionError[] { new ExecutionError("some error 1"), new ExecutionError("some error 2") };
 
-        var expected = @"[{""message"": ""some error 1""}, {""message"": ""some error 2""}]";
+        const string expected = """[{"message": "some error 1"}, {"message": "some error 2"}]""";
 
-        var actual = serializer.Serialize(errors);
+        string actual = serializer.Serialize(errors);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -59,9 +82,9 @@ public class ExecutionErrorTests
         };
         executionResult.Errors.Add(executionError);
 
-        var expected = @"{ ""errors"": [{ ""message"": ""Error testing index"", ""path"": [ ""parent"", 23, ""child"" ] }] }";
+        const string expected = """{ "errors": [{ "message": "Error testing index", "path": [ "parent", 23, "child" ] }] }""";
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }

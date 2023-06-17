@@ -27,10 +27,10 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
 
         _currentMethod.Value = methodUnderTest;
 
-        _diAdapters.GetOrAdd(methodUnderTest, method =>
+        _diAdapters.GetOrAdd(methodUnderTest, _ =>
         {
             var configureMethod = methodUnderTest.DeclaringType.GetMethod(nameof(QueryTestBase<Schema>.RegisterServices), BindingFlags.Public | BindingFlags.Instance);
-            var temp = Activator.CreateInstance(methodUnderTest.DeclaringType);
+            object temp = Activator.CreateInstance(methodUnderTest.DeclaringType);
             Action<IServiceRegister> configure = register => configureMethod?.Invoke(temp, new object[] { register });
 
             var stack = new Stack<IDependencyInjectionAdapter>();

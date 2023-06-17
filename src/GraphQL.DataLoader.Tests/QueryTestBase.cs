@@ -7,7 +7,6 @@ using GraphQL.Types;
 using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Nito.AsyncEx;
 
 namespace GraphQL.DataLoader.Tests;
 
@@ -17,7 +16,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
 
     protected IServiceProvider Services { get; }
 
-    public QueryTestBase()
+    protected QueryTestBase()
     {
         var services = new ServiceCollection();
         ConfigureServices(services);
@@ -30,6 +29,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
         services.AddSingleton<DataLoaderTestSchema>();
         services.AddSingleton<SubscriptionType>();
         services.AddSingleton<QueryType>();
+        services.AddSingleton<MutationType>();
         services.AddSingleton<OrderType>();
         services.AddSingleton<UserType>();
         services.AddSingleton<OrderItemType>();
@@ -49,7 +49,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
         services.AddSingleton(productsMock.Object);
     }
 
-    public ExecutionResult AssertQuerySuccess<TSchema>(
+    public Task<ExecutionResult> AssertQuerySuccessAsync<TSchema>(
         string query,
         string expected,
         Inputs variables = null,
@@ -58,32 +58,32 @@ public abstract class QueryTestBase : DataLoaderTestBase
         where TSchema : ISchema
     {
         var queryResult = CreateQueryResult(expected);
-        return AssertQuery<TSchema>(query, queryResult, variables, userContext, cancellationToken);
+        return AssertQueryAsync<TSchema>(query, queryResult, variables, userContext, cancellationToken);
     }
 
-    public ExecutionResult AssertQuerySuccess<TSchema>(Action<ExecutionOptions> options, string expected)
+    public Task<ExecutionResult> AssertQuerySuccessAsync<TSchema>(Action<ExecutionOptions> options, string expected)
         where TSchema : ISchema
     {
         var queryResult = CreateQueryResult(expected);
-        return AssertQuery<TSchema>(options, queryResult);
+        return AssertQueryAsync<TSchema>(options, queryResult);
     }
 
-    public ExecutionResult AssertQuery<TSchema>(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
+    public async Task<ExecutionResult> AssertQueryAsync<TSchema>(Action<ExecutionOptions> options, ExecutionResult expectedExecutionResult)
         where TSchema : ISchema
     {
         var schema = Services.GetRequiredService<TSchema>();
 
         // Run the executer within an async context to make sure there are no deadlock issues
-        var runResult = AsyncContext.Run(() => executer.ExecuteAsync(opts =>
+        var runResult = await executer.ExecuteAsync(opts =>
         {
             options(opts);
             opts.Schema = schema;
-        }));
+        }).ConfigureAwait(false);
 
         foreach (var writer in GraphQLSerializersTestData.AllWriters)
         {
-            var writtenResult = writer.Serialize(runResult);
-            var expectedResult = writer.Serialize(expectedExecutionResult);
+            string writtenResult = writer.Serialize(runResult);
+            string expectedResult = writer.Serialize(expectedExecutionResult);
 
             string additionalInfo = null;
 
@@ -110,14 +110,11 @@ public abstract class QueryTestBase : DataLoaderTestBase
         {
             opts.Schema = schema;
             opts.Query = query;
-            foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
-            {
-                opts.Listeners.Add(listener);
-            }
+            opts.Listeners.AddRange(Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>());
         });
     }
 
-    public ExecutionResult AssertQuery<TSchema>(
+    public Task<ExecutionResult> AssertQueryAsync<TSchema>(
         string query,
         ExecutionResult expectedExecutionResult,
         Inputs variables = null,
@@ -125,23 +122,19 @@ public abstract class QueryTestBase : DataLoaderTestBase
         CancellationToken cancellationToken = default)
         where TSchema : ISchema
     {
-        return AssertQuery<TSchema>(
+        return AssertQueryAsync<TSchema>(
             opts =>
             {
                 opts.Query = query;
                 opts.Variables = variables;
                 opts.UserContext = userContext;
                 opts.CancellationToken = cancellationToken;
-
-                foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
-                {
-                    opts.Listeners.Add(listener);
-                }
+                opts.Listeners.AddRange(Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>());
             },
             expectedExecutionResult);
     }
 
-    public ExecutionResult CreateQueryResult(string result, bool executed = true)
+    public static ExecutionResult CreateQueryResult(string result, bool executed = true)
     {
         object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Deserialize<Inputs>(result);
         return new ExecutionResult { Data = expected, Executed = executed };

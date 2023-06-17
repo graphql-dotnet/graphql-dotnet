@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Link from 'gatsby-link'
+import {Link} from 'gatsby'
 
 const buildLinks = links => {
   return links.map(link => (

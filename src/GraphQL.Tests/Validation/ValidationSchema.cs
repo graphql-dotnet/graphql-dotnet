@@ -7,11 +7,8 @@ public class Being : InterfaceGraphType
 {
     public Being()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "surname" }
-            ));
+        Field<StringGraphType>("name")
+            .Argument<BooleanGraphType>("surname");
     }
 }
 
@@ -20,11 +17,8 @@ public class Pet : InterfaceGraphType
     public Pet()
     {
         Name = "Pet";
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "surname" }
-            ));
+        Field<StringGraphType>("name")
+            .Argument<BooleanGraphType>("surname");
     }
 }
 
@@ -32,11 +26,8 @@ public class Canine : InterfaceGraphType
 {
     public Canine()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "surname" }
-            ));
+        Field<StringGraphType>("name")
+            .Argument<BooleanGraphType>("surname");
     }
 }
 
@@ -55,24 +46,20 @@ public class Dog : ObjectGraphType
 {
     public Dog()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "surname" }));
+        Field<StringGraphType>("name")
+            .Argument<StringGraphType>("surname");
         Field<StringGraphType>("nickname");
         Field<BooleanGraphType>("barks");
         Field<IntGraphType>("barkVolume");
-        Field<BooleanGraphType>(
-            "doesKnowCommand",
-            arguments: new QueryArguments(new QueryArgument<DogCommand> { Name = "dogCommand" }));
-        Field<BooleanGraphType>(
-            "isHousetrained",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "atOtherHomes", DefaultValue = true }));
+        Field<BooleanGraphType>("doesKnowCommand")
+            .Argument<DogCommand>("dogCommand");
+        Field<BooleanGraphType>("isHousetrained")
+            .Argument<BooleanGraphType>("atOtherHomes", arg => arg.DefaultValue = true);
         Interface<Being>();
         Interface<Pet>();
         Interface<Canine>();
 
-        IsTypeOf = obj => true;
+        IsTypeOf = _ => true;
     }
 }
 
@@ -89,9 +76,8 @@ public class Cat : ObjectGraphType
 {
     public Cat()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "surname" }));
+        Field<StringGraphType>("name")
+            .Argument<StringGraphType>("surname");
         Field<StringGraphType>("nickname");
         Field<BooleanGraphType>("meows");
         Field<IntGraphType>("meowVolume");
@@ -99,7 +85,7 @@ public class Cat : ObjectGraphType
         Interface<Being>();
         Interface<Pet>();
 
-        IsTypeOf = obj => true;
+        IsTypeOf = _ => true;
     }
 }
 
@@ -125,11 +111,8 @@ public class Human : ObjectGraphType
 {
     public Human()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "surname" }
-            ));
+        Field<StringGraphType>("name")
+            .Argument<BooleanGraphType>("surname");
         Field<ListGraphType<Pet>>("pets");
         Field<ListGraphType<Human>>("relatives");
         Field<IntGraphType>("id");
@@ -137,7 +120,7 @@ public class Human : ObjectGraphType
         Interface<Being>();
         Interface<Intelligent>();
 
-        IsTypeOf = obj => true;
+        IsTypeOf = _ => true;
     }
 }
 
@@ -145,11 +128,8 @@ public class Alien : ObjectGraphType
 {
     public Alien()
     {
-        Field<StringGraphType>(
-            "name",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "surname" }
-            ));
+        Field<StringGraphType>("name")
+            .Argument<BooleanGraphType>("surname");
         Field<ListGraphType<Pet>>("pets");
         Field<ListGraphType<Human>>("relatives");
         Field<IntGraphType>("id");
@@ -158,7 +138,7 @@ public class Alien : ObjectGraphType
         Interface<Being>();
         Interface<Intelligent>();
 
-        IsTypeOf = obj => true;
+        IsTypeOf = _ => true;
     }
 }
 
@@ -187,7 +167,20 @@ public class ComplexInput : InputObjectGraphType
         Name = "ComplexInput";
         Field<NonNullGraphType<BooleanGraphType>>("requiredField");
         Field<IntGraphType>("intField");
-        Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
+        Field<StringGraphType>("stringField").Directive("length", "min", 3, "max", 7);
+        Field<BooleanGraphType>("booleanField");
+        Field<ListGraphType<StringGraphType>>("stringListField");
+    }
+}
+
+public class ComplexInput2 : InputObjectGraphType
+{
+    public ComplexInput2()
+    {
+        Name = "ComplexInput2";
+        Field<NonNullGraphType<BooleanGraphType>>("requiredField");
+        Field<IntGraphType>("intField");
+        Field<NonNullGraphType<StringGraphType>>("stringField").Directive("length", "min", 3, "max", 7);
         Field<BooleanGraphType>("booleanField");
         Field<ListGraphType<StringGraphType>>("stringListField");
     }
@@ -199,71 +192,37 @@ public class ComplicatedArgs : ObjectGraphType
     {
         Name = "ComplicatedArgs";
         Field<StringGraphType>("noArgsField");
-        Field<StringGraphType>(
-            "intArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType> { Name = "intArg" }
-            ));
-        Field<StringGraphType>(
-            "nonNullIntArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "nonNullIntArg" }
-            ));
-        Field<StringGraphType>(
-            "stringArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<StringGraphType> { Name = "stringArg" }
-            ));
-        Field<StringGraphType>(
-            "booleanArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "booleanArg" }
-            ));
-        Field<StringGraphType>(
-            "enumArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<FurColor> { Name = "enumArg" }
-            ));
-        Field<StringGraphType>(
-            "floatArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<FloatGraphType> { Name = "floatArg" }
-            ));
-        Field<StringGraphType>(
-            "idArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType> { Name = "idArg" }
-            ));
-        Field<StringGraphType>(
-            "stringListArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<ListGraphType<StringGraphType>> { Name = "stringListArg" }
-            ));
-        Field<StringGraphType>(
-            "complexArgField",
-            arguments: new QueryArguments(
-                new QueryArgument<ComplexInput> { Name = "complexArg" }
-            ));
-        Field<StringGraphType>(
-            "multipleReqs",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" }
-            ));
-        Field<StringGraphType>(
-            "multipleOpts",
-            arguments: new QueryArguments(
-                new QueryArgument<IntGraphType> { Name = "req1", DefaultValue = 0 },
-                new QueryArgument<IntGraphType> { Name = "req2", DefaultValue = 0 }
-            ));
-        Field<StringGraphType>(
-            "multipleOptAndReq",
-            arguments: new QueryArguments(
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req1" },
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "req2" },
-                new QueryArgument<IntGraphType> { Name = "req3", DefaultValue = 0 },
-                new QueryArgument<IntGraphType> { Name = "req4", DefaultValue = 0 }
-            ));
+        Field<StringGraphType>("intArgField")
+            .Argument<IntGraphType>("intArg");
+        Field<StringGraphType>("nonNullIntArgField")
+            .Argument<NonNullGraphType<IntGraphType>>("nonNullIntArg");
+        Field<StringGraphType>("stringArgField")
+            .Argument<StringGraphType>("stringArg");
+        Field<StringGraphType>("booleanArgField")
+            .Argument<BooleanGraphType>("booleanArg");
+        Field<StringGraphType>("enumArgField")
+            .Argument<FurColor>("enumArg");
+        Field<StringGraphType>("floatArgField")
+            .Argument<FloatGraphType>("floatArg");
+        Field<StringGraphType>("idArgField")
+            .Argument<IdGraphType>("idArg");
+        Field<StringGraphType>("stringListArgField")
+            .Argument<ListGraphType<StringGraphType>>("stringListArg");
+        Field<StringGraphType>("complexArgField")
+            .Argument<ComplexInput>("complexArg");
+        Field<StringGraphType>("complexArgField2")
+            .Argument<NonNullGraphType<ComplexInput2>>("complexArg");
+        Field<StringGraphType>("multipleReqs")
+            .Argument<NonNullGraphType<IntGraphType>>("req1")
+            .Argument<NonNullGraphType<IntGraphType>>("req2");
+        Field<StringGraphType>("multipleOpts")
+            .Argument<IntGraphType>("req1", arg => arg.DefaultValue = 0)
+            .Argument<IntGraphType>("req2", arg => arg.DefaultValue = 0);
+        Field<StringGraphType>("multipleOptAndReq")
+            .Argument<NonNullGraphType<IntGraphType>>("req1")
+            .Argument<NonNullGraphType<IntGraphType>>("req2")
+            .Argument<IntGraphType>("req3", arg => arg.DefaultValue = 0)
+            .Argument<IntGraphType>("req4", arg => arg.DefaultValue = 0);
     }
 }
 
@@ -271,15 +230,10 @@ public class ValidationQueryRoot : ObjectGraphType
 {
     public ValidationQueryRoot()
     {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
+        Field<Human>("human")
+            .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
+        Field<Human>("human2")
+            .Argument<NonNullGraphType<IdGraphType>>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
         Field<Dog>("dog");
         Field<Cat>("cat");
         Field<CatOrDog>("catOrDog");

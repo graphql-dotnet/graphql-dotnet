@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Serialization;
 
 public class DeserializationTestBase
 {
-    protected readonly TestData ExampleData = new TestData
+    protected readonly TestData ExampleData = new()
     {
         array = new object[]
         {

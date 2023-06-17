@@ -8,100 +8,100 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     [Fact]
     public void uses_all_variables()
     {
-        ShouldPassRule(@"
-        query ($a: String, $b: String, $c: String) {
-          field(a: $a, b: $b, c: $c)
-        }
-      ");
+        ShouldPassRule("""
+            query ($a: String, $b: String, $c: String) {
+              field(a: $a, b: $b, c: $c)
+            }
+            """);
     }
 
     [Fact]
     public void uses_all_variables_deeply()
     {
-        ShouldPassRule(@"
-        query Foo($a: String, $b: String, $c: String) {
-          field(a: $a) {
-            field(b: $b) {
-              field(c: $c)
+        ShouldPassRule("""
+            query Foo($a: String, $b: String, $c: String) {
+              field(a: $a) {
+                field(b: $b) {
+                  field(c: $c)
+                }
+              }
             }
-          }
-        }
-      ");
+            """);
     }
 
     [Fact]
     public void uses_all_variables_deeply_in_inline_fragments()
     {
-        ShouldPassRule(@"
-        query Foo($a: String, $b: String, $c: String) {
-          ... on Type {
-            field(a: $a) {
-              field(b: $b) {
-                ... on Type {
-                  field(c: $c)
+        ShouldPassRule("""
+            query Foo($a: String, $b: String, $c: String) {
+              ... on Type {
+                field(a: $a) {
+                  field(b: $b) {
+                    ... on Type {
+                      field(c: $c)
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      ");
+            """);
     }
 
     [Fact]
     public void uses_all_variables_in_fragments()
     {
-        ShouldPassRule(@"
-        query Foo($a: String, $b: String, $c: String) {
-          ...FragA
-        }
-        fragment FragA on Type {
-          field(a: $a) {
-            ...FragB
-          }
-        }
-        fragment FragB on Type {
-          field(b: $b) {
-            ...FragC
-          }
-        }
-        fragment FragC on Type {
-          field(c: $c)
-        }
-      ");
+        ShouldPassRule("""
+            query Foo($a: String, $b: String, $c: String) {
+              ...FragA
+            }
+            fragment FragA on Type {
+              field(a: $a) {
+                ...FragB
+              }
+            }
+            fragment FragB on Type {
+              field(b: $b) {
+                ...FragC
+              }
+            }
+            fragment FragC on Type {
+              field(c: $c)
+            }
+            """);
     }
 
     [Fact]
     public void variable_used_by_fragment_in_multiple_operations()
     {
-        ShouldPassRule(@"
-        query Foo($a: String) {
-          ...FragA
-        }
-        query Bar($b: String) {
-          ...FragB
-        }
-        fragment FragA on Type {
-          field(a: $a)
-        }
-        fragment FragB on Type {
-          field(b: $b)
-        }
-      ");
+        ShouldPassRule("""
+            query Foo($a: String) {
+              ...FragA
+            }
+            query Bar($b: String) {
+              ...FragB
+            }
+            fragment FragA on Type {
+              field(a: $a)
+            }
+            fragment FragB on Type {
+              field(b: $b)
+            }
+            """);
     }
 
     [Fact]
     public void variable_used_by_recursive_fragment()
     {
-        ShouldPassRule(@"
-        query Foo($a: String) {
-          ...FragA
-        }
-        fragment FragA on Type {
-          field(a: $a) {
-            ...FragA
-          }
-        }
-      ");
+        ShouldPassRule("""
+            query Foo($a: String) {
+              ...FragA
+            }
+            fragment FragA on Type {
+              field(a: $a) {
+                ...FragA
+              }
+            }
+            """);
     }
 
     [Fact]
@@ -109,12 +109,12 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query ($a: String, $b: String, $c: String) {
-            field(a: $a, b: $b)
-          }
-        ";
-            unusedVar(_, "c", null, 2, 42);
+            _.Query = """
+                query ($a: String, $b: String, $c: String) {
+                  field(a: $a, b: $b)
+                }
+                """;
+            unusedVar(_, "c", null, 1, 32);
         });
     }
 
@@ -123,13 +123,13 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query Foo($a: String, $b: String, $c: String) {
-            field(b: $b)
-          }
-        ";
-            unusedVar(_, "a", "Foo", 2, 21);
-            unusedVar(_, "c", "Foo", 2, 45);
+            _.Query = """
+                query Foo($a: String, $b: String, $c: String) {
+                  field(b: $b)
+                }
+                """;
+            unusedVar(_, "a", "Foo", 1, 11);
+            unusedVar(_, "c", "Foo", 1, 35);
         });
     }
 
@@ -138,25 +138,25 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query Foo($a: String, $b: String, $c: String) {
-            ...FragA
-          }
-          fragment FragA on Type {
-            field(a: $a) {
-              ...FragB
-            }
-          }
-          fragment FragB on Type {
-            field(b: $b) {
-              ...FragC
-            }
-          }
-          fragment FragC on Type {
-            field
-          }
-        ";
-            unusedVar(_, "c", "Foo", 2, 45);
+            _.Query = """
+                query Foo($a: String, $b: String, $c: String) {
+                  ...FragA
+                }
+                fragment FragA on Type {
+                  field(a: $a) {
+                    ...FragB
+                  }
+                }
+                fragment FragB on Type {
+                  field(b: $b) {
+                    ...FragC
+                  }
+                }
+                fragment FragC on Type {
+                  field
+                }
+                """;
+            unusedVar(_, "c", "Foo", 1, 35);
         });
     }
 
@@ -165,26 +165,26 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query Foo($a: String, $b: String, $c: String) {
-            ...FragA
-          }
-          fragment FragA on Type {
-            field {
-              ...FragB
-            }
-          }
-          fragment FragB on Type {
-            field(b: $b) {
-              ...FragC
-            }
-          }
-          fragment FragC on Type {
-            field
-          }
-        ";
-            unusedVar(_, "a", "Foo", 2, 21);
-            unusedVar(_, "c", "Foo", 2, 45);
+            _.Query = """
+                query Foo($a: String, $b: String, $c: String) {
+                  ...FragA
+                }
+                fragment FragA on Type {
+                  field {
+                    ...FragB
+                  }
+                }
+                fragment FragB on Type {
+                  field(b: $b) {
+                    ...FragC
+                  }
+                }
+                fragment FragC on Type {
+                  field
+                }
+                """;
+            unusedVar(_, "a", "Foo", 1, 11);
+            unusedVar(_, "c", "Foo", 1, 35);
         });
     }
 
@@ -193,18 +193,18 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query Foo($b: String) {
-            ...FragA
-          }
-          fragment FragA on Type {
-            field(a: $a)
-          }
-          fragment FragB on Type {
-            field(b: $b)
-          }
-        ";
-            unusedVar(_, "b", "Foo", 2, 21);
+            _.Query = """
+                query Foo($b: String) {
+                  ...FragA
+                }
+                fragment FragA on Type {
+                  field(a: $a)
+                }
+                fragment FragB on Type {
+                  field(b: $b)
+                }
+                """;
+            unusedVar(_, "b", "Foo", 1, 11);
         });
     }
 
@@ -213,22 +213,22 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          query Foo($b: String) {
-            ...FragA
-          }
-          query Bar($a: String) {
-            ...FragB
-          }
-          fragment FragA on Type {
-            field(a: $a)
-          }
-          fragment FragB on Type {
-            field(b: $b)
-          }
-        ";
-            unusedVar(_, "b", "Foo", 2, 21);
-            unusedVar(_, "a", "Bar", 5, 21);
+            _.Query = """
+                query Foo($b: String) {
+                  ...FragA
+                }
+                query Bar($a: String) {
+                  ...FragB
+                }
+                fragment FragA on Type {
+                  field(a: $a)
+                }
+                fragment FragB on Type {
+                  field(b: $b)
+                }
+                """;
+            unusedVar(_, "b", "Foo", 1, 11);
+            unusedVar(_, "a", "Bar", 4, 11);
         });
     }
 

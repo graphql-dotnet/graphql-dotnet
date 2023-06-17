@@ -37,8 +37,8 @@ public class Bug2839NewtonsoftJson
             };
         });
 
-        var str = writer.Serialize(result);
-        str.ShouldBeCrossPlatJson("{\"data\":{\"test\":{\"this-is-a-string\":\"String Value\",\"this-is-a-date-time\":\"2022-Jan-04\"}}}");
+        string str = writer.Serialize(result);
+        str.ShouldBeCrossPlatJson("""{"data":{"test":{"this-is-a-string":"String Value","this-is-a-date-time":"2022-Jan-04"}}}""");
     }
 
     public class TestQuery : ObjectGraphType
@@ -48,9 +48,7 @@ public class Bug2839NewtonsoftJson
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>(
-                name: "test",
-                resolve: context => new TestResponse());
+            Field<TestResponseType>("test").Resolve(_ => new TestResponse());
         }
     }
 

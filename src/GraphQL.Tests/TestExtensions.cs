@@ -20,9 +20,7 @@ internal static class TestExtensions
             return (IReadOnlyDictionary<string, object>)objectExecutionNode.ToValue();
 
         if (data is IReadOnlyDictionary<string, object> properties)
-        {
             return properties;
-        }
 
         throw new ArgumentException($"Unknown type {data.GetType()}. Parameter must be of type ObjectExecutionNode or IDictionary<string, object>.", nameof(data));
     }
@@ -40,7 +38,7 @@ internal static class TestExtensions
     {
         if (value is IEnumerable<KeyValuePair<string, object>> dict)
         {
-            return new ObjectExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
+            return new ObjectExecutionNode(null, null, new GraphQLField(null!) { Alias = new GraphQLAlias(new GraphQLName(name)) }, null, default)
             {
                 SubFields = dict.Select(x => CreateExecutionNode(x.Key, x.Value)).ToArray(),
             };
@@ -48,18 +46,18 @@ internal static class TestExtensions
         else if (value?.GetType() != typeof(string) && value is IEnumerable list)
         {
             var newList = new List<ExecutionNode>();
-            foreach (var item in list)
+            foreach (object item in list)
             {
                 newList.Add(CreateExecutionNode(null, item));
             }
-            return new ArrayExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
+            return new ArrayExecutionNode(null, null, new GraphQLField(null!) { Alias = new GraphQLAlias(new GraphQLName(name)) }, null, default)
             {
                 Items = newList,
             };
         }
         else
         {
-            return new ValueExecutionNode(null, null, new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName(name) } }, null, default)
+            return new ValueExecutionNode(null, null, new GraphQLField(null!) { Alias = new GraphQLAlias(new GraphQLName(name)) }, null, default)
             {
                 Result = value
             };

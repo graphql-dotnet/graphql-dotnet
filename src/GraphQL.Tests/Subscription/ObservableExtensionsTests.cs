@@ -15,7 +15,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -40,7 +40,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -58,7 +58,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     Thread.Sleep(s);
                     return new ValueTask<string>(data);
                 },
@@ -76,7 +76,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -98,7 +98,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -116,7 +116,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -135,7 +135,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -193,7 +193,7 @@ public class ObservableExtensionsTests
             .SelectCatchAsync(
                 async (data, token) =>
                 {
-                    var s = int.Parse(data);
+                    int s = int.Parse(data);
                     await Task.Delay(s).ConfigureAwait(false);
                     return data;
                 },
@@ -270,6 +270,20 @@ public class ObservableExtensionsTests
         {
             var observableFail = ((IObservable<string>)null!).SelectCatchAsync<string, string>((_, _) => default, (_, _) => default);
         });
+    }
+
+    [Fact]
+    public async Task ExceptionsDuringSubscribeProduceOnError()
+    {
+        var errorObservable = new ErrorObservable();
+        var observable = errorObservable.SelectCatchAsync<string, string>((s, _) => new(s), (ex, _) => new(new ExecutionError(ex.Message)));
+        using var subscription = observable.Subscribe(Observer);
+        await Observer.WaitForAsync("Error 'ExecutionError'. ").ConfigureAwait(false);
+    }
+
+    private class ErrorObservable : IObservable<string>
+    {
+        public IDisposable Subscribe(IObserver<string> observer) => throw new NotImplementedException("This is a test");
     }
 
     private class SampleObserver : IObserver<string>

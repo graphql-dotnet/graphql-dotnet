@@ -88,7 +88,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"{{ {field}(arg: {quotedArg}) }}", expectedResult,
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
@@ -131,7 +131,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"query ($arg: {argumentType}) {{ {field}(arg: $arg) }}", expectedResult, $"{{ \"arg\": {quotedArg} }}".ToInputs(),
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
@@ -144,24 +144,24 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     public void List_works()
     {
         // verify that within lists, custom scalars are coerced to their proper values
-        AssertQuerySuccess("{ list }", @"{ ""list"": [""hello"", null, ""externalNull"" ]}");
+        AssertQuerySuccess("{ list }", """{ "list": ["hello", null, "externalNull" ]}""");
     }
 
     [Fact]
     public void List_NonNull_works_valid()
     {
         // here we are using a custom scalar to coerce a null value to a non-null value, which is valid for a non-null type
-        AssertQuerySuccess("{ listNonNullValid }", @"{ ""listNonNullValid"": [""hello"", ""externalNull"" ]}");
+        AssertQuerySuccess("{ listNonNullValid }", """{ "listNonNullValid": ["hello", "externalNull" ]}""");
     }
 
     [Fact]
     public void List_NonNull_works_invalid()
     {
         // verify that within lists of non-null values, errors are returned properly
-        var query = "{ listNonNullInvalid }";
-        var response = @"{ ""listNonNullInvalid"": null}";
+        const string query = "{ listNonNullInvalid }";
+        const string response = """{ "listNonNullInvalid": null}""";
         var result = AssertQueryWithErrors(query, response, expectedErrorCount: 1);
-        var errorIndex = 1;
+        const int errorIndex = 1;
         // index should be 1 here because custom scalar will convert ["hello", "internalNull"] to ["hello", null]
         result.Errors.ShouldNotBeNull();
         result.Errors.Count.ShouldBe(1);
@@ -202,27 +202,27 @@ public class CustomScalarQuery : ObjectGraphType
 {
     public CustomScalarQuery()
     {
-        Field(typeof(StringGraphType), "input",
-            arguments: new QueryArguments { new QueryArgument(typeof(CustomScalar)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "output",
-            arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "inputOutput",
-            arguments: new QueryArguments { new QueryArgument(typeof(CustomScalar)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(StringGraphType), "nonNullInput",
-            arguments: new QueryArguments { new QueryArgument(typeof(NonNullGraphType<CustomScalar>)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(NonNullGraphType<CustomScalar>), "nonNullOutput",
-            arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(ListGraphType<CustomScalar>), "list",
-            resolve: context => new object[] { "hello", "internalNull", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullValid",
-            resolve: context => new object[] { "hello", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullInvalid",
-            resolve: context => new object[] { "hello", "internalNull" });
+        Field("input", typeof(StringGraphType))
+            .Argument(typeof(CustomScalar), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("output", typeof(CustomScalar))
+            .Argument(typeof(StringGraphType), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("inputOutput", typeof(CustomScalar))
+            .Argument(typeof(CustomScalar), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("nonNullInput", typeof(StringGraphType))
+            .Argument(typeof(NonNullGraphType<CustomScalar>), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("nonNullOutput", typeof(NonNullGraphType<CustomScalar>))
+            .Argument(typeof(StringGraphType), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("list", typeof(ListGraphType<CustomScalar>))
+            .Resolve(_ => new object[] { "hello", "internalNull", null });
+        Field("listNonNullValid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
+            .Resolve(_ => new object[] { "hello", null });
+        Field("listNonNullInvalid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
+            .Resolve(_ => new object[] { "hello", "internalNull" });
     }
 }
 

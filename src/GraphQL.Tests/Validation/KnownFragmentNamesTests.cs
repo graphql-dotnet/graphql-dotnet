@@ -8,7 +8,7 @@ public class KnownFragmentNamesTests : ValidationTestBase<KnownFragmentNames, Va
     [Fact]
     public void known_fragment_names_are_valid()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           human(id: 4) {
             ...HumanFields1
@@ -30,7 +30,7 @@ public class KnownFragmentNamesTests : ValidationTestBase<KnownFragmentNames, Va
         fragment HumanFields3 on Human {
           name
         }
-      ");
+      """);
     }
 
     [Fact]
@@ -38,23 +38,23 @@ public class KnownFragmentNamesTests : ValidationTestBase<KnownFragmentNames, Va
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            human(id: 4) {
-              ...UnknownFragment1
-              ... on Human {
+            _.Query = """
+            {
+              human(id: 4) {
+                ...UnknownFragment1
+                ... on Human {
                 ...UnknownFragment2
+                }
               }
             }
-          }
-          fragment HumanFields on Human {
-            name
-            ...UnknownFragment3
-          }
-        ";
-            undefFrag(_, "UnknownFragment1", 4, 15);
-            undefFrag(_, "UnknownFragment2", 6, 17);
-            undefFrag(_, "UnknownFragment3", 12, 13);
+            fragment HumanFields on Human {
+              name
+              ...UnknownFragment3
+            }
+            """;
+            undefFrag(_, "UnknownFragment1", 3, 5);
+            undefFrag(_, "UnknownFragment2", 5, 5);
+            undefFrag(_, "UnknownFragment3", 11, 3);
         });
     }
 

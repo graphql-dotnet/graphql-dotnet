@@ -133,7 +133,7 @@ public class SchemaTests
 
     private void ContainsTypeNames(ISchema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes[typeName];
             type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
@@ -142,7 +142,7 @@ public class SchemaTests
 
     private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
             type.ShouldBe(null, $"Found {typeName} in type lookup.");
@@ -158,7 +158,7 @@ public class SchemaTests
             schema.AllTypes.Count.ShouldNotBe(0);
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
@@ -184,7 +184,10 @@ public class SchemaTests
     [Fact]
     public void initialized_schema_should_throw_error_when_register_type_or_directive()
     {
-        var schema = new Schema();
+        var schema = new Schema()
+        {
+            Query = new DummyType()
+        };
 
         schema.Initialized.ShouldBeFalse();
         schema.Initialize();
@@ -200,12 +203,12 @@ public class SchemaTests
     {
         var schema = new Schema();
         var query = new ObjectGraphType();
-        var field = query.Field(typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>), "test");
+        var field = query.Field("test", typeof(ConnectionType<GraphQLClrOutputTypeReference<MyDto>>));
         schema.Query = query;
         schema.RegisterTypeMapping<MyDto, MyDtoGraphType>();
         schema.Initialize();
-        field.ResolvedType.ShouldNotBeNull();
-        field.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
+        field.FieldType.ResolvedType.ShouldNotBeNull();
+        field.FieldType.ResolvedType.ShouldBeOfType<ConnectionType<MyDtoGraphType>>();
     }
 
     [Fact]
@@ -419,11 +422,10 @@ public class DSchemaType : ObjectGraphType
 {
     public DSchemaType()
     {
-        Field<StringGraphType>("id", resolve: ctx => new { id = "id" });
-        Field<StringGraphType>(
-            "filter",
-            arguments: new QueryArguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> { Name = "input2", ResolvedType = new DInputType2() }),
-            resolve: ctx => new { id = "id" });
+        Field<StringGraphType>("id").Resolve(_ => new { id = "id" });
+        Field<StringGraphType>("filter")
+            .Arguments(new QueryArgument<DInputType> { Name = "input", ResolvedType = new DInputType() }, new QueryArgument<DInputType2> { Name = "input2", ResolvedType = new DInputType2() })
+            .Resolve(_ => new { id = "id" });
         Field<ListGraphType<DListType>>("alist");
     }
 }
@@ -503,7 +505,7 @@ public class CycleType : ObjectGraphType
 {
     public CycleType()
     {
-        Field<CycleType>();
+        Field<CycleType>("_");
     }
 }
 
@@ -519,7 +521,7 @@ public class CyclingQueryType : ObjectGraphType
 {
     public CyclingQueryType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 
@@ -527,7 +529,7 @@ public abstract class AbstractGraphType : ObjectGraphType
 {
     public AbstractGraphType()
     {
-        Field<AbstractGraphType>();
+        Field<AbstractGraphType>("_");
     }
 }
 

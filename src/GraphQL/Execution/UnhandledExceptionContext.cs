@@ -22,9 +22,9 @@ namespace GraphQL.Execution
         public IExecutionContext? Context { get; }
 
         /// <summary>
-        /// Field context whose resolver generated an error. Will be <c>null</c> if the error came from
+        /// Field context whose resolver generated an error. Will be <see langword="null"/> if the error came from
         /// <see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)"/>, for example, validation stage.
-        /// Also will be <c>null</c> between resolvers execution if <c>cancellationToken</c> is canceled.
+        /// Also will be <see langword="null"/> between resolvers execution if <c>cancellationToken</c> is canceled.
         /// </summary>
         public IResolveFieldContext? FieldContext { get; }
 

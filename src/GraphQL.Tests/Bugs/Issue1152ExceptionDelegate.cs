@@ -7,14 +7,16 @@ public class Issue1152ExceptionDelegate : QueryTestBase<Issue1152Schema>
     [Fact]
     public void Issue1152_Should_Intercept_Unhandled_Exceptions()
     {
-        var query = @"
-query {
-  somefield
-}
-";
-        var expected = @"{
-  ""somefield"": null
-}";
+        const string query = """
+        query {
+          somefield
+        }
+        """;
+        const string expected = """
+        {
+          "somefield": null
+        }
+        """;
 
         var list = new List<Exception>();
 
@@ -45,8 +47,7 @@ public class Issue1152Query : ObjectGraphType
 {
     public Issue1152Query()
     {
-        Field<StringGraphType>(
-            "somefield",
-            resolve: ctx => throw new InvalidTimeZoneException("Oops"));
+        Field<StringGraphType>("somefield")
+            .Resolve(_ => throw new InvalidTimeZoneException("Oops"));
     }
 }

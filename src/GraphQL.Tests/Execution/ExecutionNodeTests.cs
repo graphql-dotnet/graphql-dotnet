@@ -40,7 +40,7 @@ public class ExecutionNodeTests
         var node = new ValueExecutionNode(
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
-            new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
+            new GraphQLField(new GraphQLName("name")) { Alias = new GraphQLAlias(new GraphQLName("alias")) },
             objectGraphType.GetField("name"),
             indexInParentNode: null);
 
@@ -56,7 +56,7 @@ public class ExecutionNodeTests
         var node = new ValueExecutionNode(
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
-            new GraphQLField { Name = new GraphQLName("name") },
+            new GraphQLField(new GraphQLName("name")),
             objectGraphType.GetField("name"),
             indexInParentNode: null);
 
@@ -72,7 +72,7 @@ public class ExecutionNodeTests
         var node = new ValueExecutionNode(
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
-            new GraphQLField { Alias = new GraphQLAlias { Name = new GraphQLName("alias") }, Name = new GraphQLName("name") },
+            new GraphQLField(new GraphQLName("name")) { Alias = new GraphQLAlias(new GraphQLName("alias")) },
             objectGraphType.GetField("name"),
             indexInParentNode: null);
 
@@ -88,7 +88,7 @@ public class ExecutionNodeTests
         var node = new ValueExecutionNode(
             new RootExecutionNode(objectGraphType, null),
             new StringGraphType(),
-            new GraphQLField { Name = new GraphQLName("name") },
+            new GraphQLField(new GraphQLName("name")),
             objectGraphType.GetField("name"),
             indexInParentNode: null);
 
@@ -101,8 +101,7 @@ public class AliasedFieldTestObject : ObjectGraphType
 {
     public AliasedFieldTestObject()
     {
-        Field<StringGraphType>(
-            "name",
-            resolve: context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
+        Field<StringGraphType>("name")
+            .Resolve(context => context.FieldAst.Alias?.Name.Value ?? context.FieldAst.Name.Value);
     }
 }

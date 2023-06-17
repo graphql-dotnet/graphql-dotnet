@@ -12,28 +12,34 @@ public class Issue2275
         var executionResult = await documentExecuter.ExecuteAsync(_ =>
         {
             _.Schema = new Issue2275Schema();
-            _.Query = @"query($data:Input!) {
-                                request(data: $data)
-                }";
-            _.Variables = serializer.Deserialize<Inputs>(@"{
-                    ""data"": {
-                        ""clientId"": 2,
-                        ""filters"": [{
-                            ""key"": ""o"",
-                            ""value"": 25
+            _.Query = """
+                query($data:Input!) {
+                  request(data: $data)
+                }
+                """;
+            _.Variables = serializer.Deserialize<Inputs>("""
+                {
+                    "data": {
+                        "clientId": 2,
+                        "filters": [{
+                            "key": "o",
+                            "value": 25
                         }]
                     }
-                }");
+                }
+                """);
         }).ConfigureAwait(false);
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
-        json.ShouldBe(@"{
-  ""data"": {
-    ""request"": ""2: [o=25]""
-  }
-}");
+        json.ShouldBe("""
+        {
+          "data": {
+            "request": "2: [o=25]"
+          }
+        }
+        """);
     }
 
     private class Issue2275Schema : Schema
@@ -48,12 +54,9 @@ public class Issue2275
     {
         public Issue2275Query()
         {
-            Field<StringGraphType>(
-              "request",
-              arguments: new QueryArguments(
-                  new QueryArgument<NonNullGraphType<Issue2275InputType>> { Name = "data", Description = "some stuff" }
-              ),
-              resolve: context => context.GetArgument<ContainerRequest>("data").ToString()
+            Field<StringGraphType>("request")
+                .Argument<NonNullGraphType<Issue2275InputType>>("data", "some stuff")
+                .Resolve(context => context.GetArgument<ContainerRequest>("data").ToString()
           );
         }
     }

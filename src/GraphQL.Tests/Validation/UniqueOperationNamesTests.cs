@@ -8,37 +8,37 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
     [Fact]
     public void no_operations()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment fragA on Type {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void one_anon_operation()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void one_named_operation()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void multiple_operations()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   field
                 }
@@ -46,13 +46,13 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 query Bar {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void multiple_operations_of_different_types()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   field
                 }
@@ -64,13 +64,13 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 subscription Baz {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void fragment_and_operation_named_the_same()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 query Foo {
                   ...Foo
                 }
@@ -78,13 +78,13 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 fragment Foo on Type {
                   field
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void multiple_operations_of_same_name()
     {
-        var query = @"
+        const string query = """
                 query Foo {
                   fieldA
                 }
@@ -92,19 +92,19 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 query Foo {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 5, 1);
         });
     }
 
     [Fact]
     public void multiple_operations_of_same_name_of_different_types_mutation()
     {
-        var query = @"
+        const string query = """
                 query Foo {
                   fieldA
                 }
@@ -112,19 +112,19 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 mutation Foo {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 5, 1);
         });
     }
 
     [Fact]
     public void multiple_operations_of_same_name_of_different_types_subscription()
     {
-        var query = @"
+        const string query = """
                 query Foo {
                   fieldA
                 }
@@ -132,12 +132,12 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                 subscription Foo {
                   fieldB
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
-            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 6, 17);
+            _.Error(UniqueOperationNamesError.DuplicateOperationNameMessage("Foo"), 5, 1);
         });
     }
 }

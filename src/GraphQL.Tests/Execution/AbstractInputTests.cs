@@ -7,14 +7,14 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
     [Fact]
     public void throws_literals()
     {
-        var query = @"
-mutation M {
-  run(input: { id: ""123"" })
-}
-";
-        var expected = @"{ ""run"": null }";
-        var res = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
-        res.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+        const string query = """
+            mutation M {
+              run(input: { id: "123" })
+            }
+            """;
+        var res = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
+        res.Errors[0].Code.ShouldBe("INVALID_LITERAL");
+        res.Errors[0].Message.ShouldBe("""Invalid literal for argument 'input' of field 'run'. Type 'GraphQL.Tests.Bugs.MyInputClassBase' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.""");
     }
 }
 
@@ -22,6 +22,7 @@ public class AbstractInputSchema : Schema
 {
     public AbstractInputSchema()
     {
+        Query = new DummyType();
         Mutation = new AbstractInputMutation();
     }
 }
@@ -30,10 +31,9 @@ public class AbstractInputMutation : ObjectGraphType
 {
     public AbstractInputMutation()
     {
-        Field<StringGraphType>(
-            "run",
-            arguments: new QueryArguments(new QueryArgument<MyInputGraphType> { Name = "input" }),
-            resolve: ctx => ctx.GetArgument<int>("input")); // type does not matter here
+        Field<StringGraphType>("run")
+            .Argument<MyInputGraphType>("input")
+            .Resolve(ctx => ctx.GetArgument<int>("input")); // type does not matter here
     }
 }
 

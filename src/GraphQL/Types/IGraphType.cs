@@ -25,9 +25,8 @@ namespace GraphQL.Types
     }
 
     /// <summary>
-    /// A schema element that can be deprecated. Now implemented by <see cref="IFieldType"/> and
-    /// <see cref="EnumValueDefinition"/> but in case of fields only applicable to fields of output
-    /// graph types.
+    /// A schema element that can be deprecated. Now implemented by <see cref="IFieldType"/>,
+    /// <see cref="QueryArgument"/> and <see cref="EnumValueDefinition"/>.
     /// </summary>
     public interface IProvideDeprecationReason
     {
@@ -41,7 +40,11 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a graph type within the GraphQL schema.
     /// </summary>
-    public interface IGraphType : IProvideMetadata, IProvideDescription, IProvideDeprecationReason, INamedType
+    public interface IGraphType : IMetadataReader, IMetadataWriter, IProvideDescription, IProvideDeprecationReason, INamedType
     {
+        /// <summary>
+        /// Initializes the graph type.
+        /// </summary>
+        void Initialize(ISchema schema);
     }
 }

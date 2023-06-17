@@ -55,8 +55,9 @@ namespace GraphQL.Instrumentation
         public double Duration => End - Start;
 
         /// <summary>
-        /// Returns metadata for the specified key. Similar to <see cref="Metadata"/>[<paramref name="key"/>], but returns <c>default</c>
-        /// if <see cref="Metadata"/> is <c>null</c> or the specified key does not exist.
+        /// Returns metadata for the specified key. Similar to <see cref="Metadata"/>[<paramref name="key"/>],
+        /// but returns <c>default</c> if <see cref="Metadata"/> is <see langword="null"/> or the specified
+        /// key does not exist.
         /// </summary>
         public T? MetaField<T>(string key)
         {

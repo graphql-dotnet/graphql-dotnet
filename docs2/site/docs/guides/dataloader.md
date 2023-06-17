@@ -214,7 +214,7 @@ public class UserType : ObjectGraphType<User>
                 // Asynchronously authenticate
                 var valid = await users.CanViewOrders(context.Source.UserId);
                 if (!valid) return null;
-                
+
                 // Get or add a collection batch loader with the key "GetOrdersByUserId"
                 // The loader will call GetOrdersByUserIdAsync with a batch of keys
                 var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
@@ -332,7 +332,7 @@ public class MyOrderItemsDataLoader : DataLoaderBase<int, IEnumerable<OrderItem>
         _dbContext = dataContext;
     }
 
-    protected override Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<OrderItem>>> list, CancellationToken cancellationToken)
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<OrderItem>>> list, CancellationToken cancellationToken)
     {
         IEnumerable<int> ids = list.Select(pair => pair.Key);
         IEnumerable<OrderItem> data = await _dbContext.OrderItems.Where(orderItem => ids.Contains(orderItem.OrderId)).ToListAsync(cancellationToken);
@@ -458,7 +458,7 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
     private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
     private const string CACHE_PREFIX = "ORDER_";
-        
+
     public MyOrderDataLoader(IServiceProvider serviceProvider, IMemoryCache memoryCache) : base(false)
     {
         _rootServiceProvider = serviceProvider;

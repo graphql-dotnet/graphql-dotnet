@@ -1,9 +1,7 @@
-using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 
 namespace GraphQL.DI
 {
@@ -20,6 +18,7 @@ namespace GraphQL.DI
         /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // TODO: this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
         protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IGraphQLSerializer is registered
@@ -46,8 +45,6 @@ namespace GraphQL.DI
             Services.TryRegister(typeof(IDocumentExecuter<>), typeof(DocumentExecuter<>), ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentBuilder, GraphQLDocumentBuilder>(ServiceLifetime.Singleton);
             Services.TryRegister<IDocumentValidator, DocumentValidator>(ServiceLifetime.Singleton);
-            Services.TryRegister<IComplexityAnalyzer, ComplexityAnalyzer>(ServiceLifetime.Singleton);
-            Services.TryRegister<IDocumentCache>(DefaultDocumentCache.Instance);
             Services.TryRegister<IErrorInfoProvider, ErrorInfoProvider>(ServiceLifetime.Singleton);
             Services.TryRegister<IExecutionStrategySelector, DefaultExecutionStrategySelector>(ServiceLifetime.Singleton);
 
@@ -62,6 +59,7 @@ namespace GraphQL.DI
             Services.TryRegister(typeof(InputObjectGraphType<>), typeof(InputObjectGraphType<>), ServiceLifetime.Transient);
             Services.TryRegister(typeof(AutoRegisteringInputObjectGraphType<>), typeof(AutoRegisteringInputObjectGraphType<>), ServiceLifetime.Transient);
             Services.TryRegister(typeof(AutoRegisteringObjectGraphType<>), typeof(AutoRegisteringObjectGraphType<>), ServiceLifetime.Transient);
+            Services.TryRegister(typeof(AutoRegisteringInterfaceGraphType<>), typeof(AutoRegisteringInterfaceGraphType<>), ServiceLifetime.Transient);
 
             // configure execution to use the default registered schema if none specified
             this.ConfigureExecutionOptions(options =>
@@ -74,6 +72,27 @@ namespace GraphQL.DI
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Services.Configure<ErrorInfoProviderOptions>();
+
+#if NET5_0_OR_GREATER
+            if (OpenTelemetry.AutoInstrumentation.Initializer.Enabled)
+            {
+                // this will run prior to any other calls to UseTelemetry
+                // it will also cause telemetry to be called first in the pipeline
+                this.UseTelemetry(OpenTelemetry.AutoInstrumentation.Initializer.Options != null
+                    ? (opts =>
+                    {
+                        var autoOpts = OpenTelemetry.AutoInstrumentation.Initializer.Options;
+                        opts.RecordDocument = autoOpts.RecordDocument;
+                        opts.SanitizeDocument = autoOpts.SanitizeDocument;
+                        opts.Filter = autoOpts.Filter;
+                        opts.EnrichWithExecutionOptions = autoOpts.EnrichWithExecutionOptions;
+                        opts.EnrichWithDocument = autoOpts.EnrichWithDocument;
+                        opts.EnrichWithExecutionResult = autoOpts.EnrichWithExecutionResult;
+                        opts.EnrichWithException = autoOpts.EnrichWithException;
+                    })
+                    : null);
+            }
+#endif
         }
 
         /// <inheritdoc />

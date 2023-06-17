@@ -9,7 +9,7 @@ namespace GraphQL.Types.Relay
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the result data set's data type.</typeparam>
     /// <typeparam name="TEdgeType">The edge graph type of node, typically <see cref="EdgeType{TNodeType}"/>.</typeparam>
-    public class ConnectionType<TNodeType, TEdgeType> : ObjectGraphType<object>
+    public class ConnectionType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
     {
@@ -21,8 +21,7 @@ namespace GraphQL.Types.Relay
             Description =
                 $"A connection from an object to a list of objects of type `{graphQLTypeName}`.";
 
-            Field<IntGraphType>()
-                .Name("totalCount")
+            Field<IntGraphType>("totalCount")
                 .Description(
                     "A count of the total number of objects in this connection, ignoring pagination. " +
                     "This allows a client to fetch the first five objects by passing \"5\" as the argument " +
@@ -30,16 +29,13 @@ namespace GraphQL.Types.Relay
                     "In cases where we employ infinite scrolling or don't have an exact count of entries, " +
                     "this field will return `null`.");
 
-            Field<NonNullGraphType<PageInfoType>>()
-                .Name("pageInfo")
+            Field<NonNullGraphType<PageInfoType>>("pageInfo")
                 .Description("Information to aid in pagination.");
 
-            Field<ListGraphType<TEdgeType>>()
-                .Name("edges")
+            Field<ListGraphType<TEdgeType>>("edges")
                 .Description("A list of all of the edges returned in the connection.");
 
-            Field<ListGraphType<TNodeType>>()
-                .Name("items")
+            Field<ListGraphType<TNodeType>>("items")
                 .Description(
                     "A list of all of the objects returned in the connection. This is a convenience field provided " +
                     "for quickly exploring the API; rather than querying for \"{ edges { node } }\" when no edge data " +

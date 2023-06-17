@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -15,8 +16,6 @@ namespace GraphQL
         // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
         private ExecutionNode _executionNode;
         private ExecutionContext _executionContext;
-        private IDictionary<string, ArgumentValue>? _arguments;
-        private IDictionary<string, DirectiveInfo>? _directives;
         private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
         private IResolveFieldContext? _parent;
 
@@ -33,19 +32,11 @@ namespace GraphQL
         {
             _executionNode = node!;
             _executionContext = context!;
-            _arguments = null;
-            _directives = null;
             _subFields = null;
             _parent = null;
 
             return this;
         }
-
-        private IDictionary<string, ArgumentValue>? GetArguments()
-            => ExecutionHelper.GetArguments(_executionNode.FieldDefinition!.Arguments, _executionNode.Field!.Arguments, _executionContext.Variables);
-
-        private IDictionary<string, DirectiveInfo>? GetDirectives()
-            => ExecutionHelper.GetDirectives(_executionNode.Field, _executionContext.Variables, _executionContext.Schema);
 
         /// <inheritdoc/>
         public object? Source => _executionNode.Source;
@@ -70,7 +61,7 @@ namespace GraphQL
                     while (parent is ArrayExecutionNode)
                         parent = parent.Parent;
 
-                    if (parent != null && !(parent is RootExecutionNode))
+                    if (parent != null && parent is not RootExecutionNode)
                         _parent = new ReadonlyResolveFieldContext(parent, _executionContext);
                 }
 
@@ -79,10 +70,12 @@ namespace GraphQL
         }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= GetArguments();
+        public IDictionary<string, ArgumentValue>? Arguments
+            => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArgumentValues;
 
         /// <inheritdoc/>
-        public IDictionary<string, DirectiveInfo>? Directives => _directives ??= GetDirectives();
+        public IDictionary<string, DirectiveInfo>? Directives
+            => _executionContext.DirectiveValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : null;
 
         /// <inheritdoc/>
         public object? RootValue => _executionContext.RootValue;
@@ -100,7 +93,7 @@ namespace GraphQL
         public Variables Variables => _executionContext.Variables;
 
         /// <inheritdoc/>
-        public System.Threading.CancellationToken CancellationToken => _executionContext.CancellationToken;
+        public CancellationToken CancellationToken => _executionContext.CancellationToken;
 
         /// <inheritdoc/>
         public Metrics Metrics => _executionContext.Metrics;
@@ -115,7 +108,8 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields
+            => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext => _executionContext.UserContext;
@@ -133,5 +127,8 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool => _executionContext;
+
+        /// <inheritdoc/>
+        public ClaimsPrincipal? User => _executionContext.User;
     }
 }

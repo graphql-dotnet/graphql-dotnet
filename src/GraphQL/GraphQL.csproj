@@ -1,23 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net5.0;net6.0</TargetFrameworks>
     <Description>GraphQL for .NET</Description>
     <Authors>Joe McBride</Authors>
-    <Copyright>Copyright (c) 2015-2021 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>
+    <Copyright>Copyright (c) 2015-2023 Joseph T. McBride, Ivan Maximov, Shane Krueger, et al. All rights reserved.</Copyright>
     <PackageTags>GraphQL;json;api</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="8.0.0" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="NullabilityInfo" Version="1.0.7">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
+    <PackageReference Include="GraphQL-Parser" Version="9.1.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
+    <PackageReference Include="Nullability.Source" Version="2.1.0" PrivateAssets="all" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 

@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Bugs;
 public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
 {
     public int AppliedCount;
-    private readonly FieldMiddlewareBuilder overriddenBuilder = new FieldMiddlewareBuilder();
+    private readonly FieldMiddlewareBuilder overriddenBuilder = new();
 
     public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
     {
@@ -50,6 +50,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
             Query = "{ abcd }"
         };
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
+        schema.Query = new DummyType();
         schema.FieldMiddleware = mockMiddleware;
 
         docExec.ExecuteAsync(execOptions).Wait();
@@ -69,6 +70,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         };
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
         schema.FieldMiddleware = mockMiddleware;
+        schema.Query = new DummyType();
 
         docExec.ExecuteAsync(execOptions).Wait();
         docExec.ExecuteAsync(execOptions).Wait();

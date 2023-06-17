@@ -53,8 +53,12 @@ namespace GraphQL.Execution
                     codes = null;
                 var number = _options.ExposeCode && executionError is ValidationError validationError ? validationError.Number : null;
                 var data = _options.ExposeData && executionError.Data?.Count > 0 ? executionError.Data : null;
+                var details = _options.ExposeExceptionDetails && _options.ExposeExceptionDetailsMode == ExposeExceptionDetailsMode.Extensions
+                    ? executionError.ToString()
+                    : null;
+                var userExtensions = executionError.Extensions;
 
-                if (code != null || codes != null || data != null)
+                if (code != null || codes != null || data != null || details != null || userExtensions?.Count > 0)
                 {
                     extensions = new Dictionary<string, object?>();
                     if (code != null)
@@ -65,12 +69,20 @@ namespace GraphQL.Execution
                         extensions.Add("number", number);
                     if (data != null)
                         extensions.Add("data", data);
+                    if (details != null)
+                        extensions.Add("details", details);
+                    // Extensions from ExecutionError set by user have a precedence over other so they overwrite existing ones if any
+                    if (userExtensions?.Count > 0)
+                    {
+                        foreach (var item in userExtensions)
+                            extensions[item.Key] = item.Value;
+                    }
                 }
             }
 
             return new ErrorInfo
             {
-                Message = _options.ExposeExceptionStackTrace ? executionError.ToString() : executionError.Message,
+                Message = _options.ExposeExceptionDetails && _options.ExposeExceptionDetailsMode == ExposeExceptionDetailsMode.Message ? executionError.ToString() : executionError.Message,
                 Extensions = extensions,
             };
         }

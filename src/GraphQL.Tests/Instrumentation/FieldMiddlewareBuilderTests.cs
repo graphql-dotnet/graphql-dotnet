@@ -15,7 +15,7 @@ public class FieldMiddlewareBuilderTests
         _context = new ResolveFieldContext
         {
             FieldDefinition = new FieldType { Name = "Name" },
-            FieldAst = new GraphQLField { Name = new GraphQLName("Name") },
+            FieldAst = new GraphQLField(new GraphQLName("Name")),
             Source = new Person { Name = "Quinn" },
             Errors = new ExecutionErrors(),
             Schema = new Schema(),
@@ -39,7 +39,7 @@ public class FieldMiddlewareBuilderTests
     [Fact]
     public async Task middleware_can_override()
     {
-        _builder.Use(next => context => new ValueTask<object>("One"));
+        _builder.Use(_ => _ => new ValueTask<object>("One"));
 
         (await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false)).ShouldBe("One");
     }
@@ -53,7 +53,7 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
@@ -61,12 +61,12 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "Two " + res;
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("One Two Quinn");
     }
 
@@ -77,12 +77,12 @@ public class FieldMiddlewareBuilderTests
         {
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object res = await next(context).ConfigureAwait(false);
                 return "One " + res;
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("One Quinn");
     }
 
@@ -91,16 +91,16 @@ public class FieldMiddlewareBuilderTests
     {
         _builder.Use(next =>
         {
-            return context =>
+            return async context =>
             {
                 using (context.Metrics.Subject("test", "testing name"))
                 {
-                    return next(context);
+                    return await next(context).ConfigureAwait(false);
                 }
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("Quinn");
 
         var record = _context.Metrics.Finish().Skip(1).Single();
@@ -113,7 +113,7 @@ public class FieldMiddlewareBuilderTests
     {
         _builder.Use(new SimpleMiddleware());
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBe("Quinn");
 
         var record = _context.Metrics.Finish().Skip(1).Single();
@@ -124,7 +124,7 @@ public class FieldMiddlewareBuilderTests
     [Fact]
     public async Task can_report_errors()
     {
-        _builder.Use(next =>
+        _builder.Use(_ =>
         {
             return context =>
             {
@@ -133,7 +133,7 @@ public class FieldMiddlewareBuilderTests
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
         result.ShouldBeNull();
         _context.Errors.ShouldContain(x => x.Message == "Custom error");
     }
@@ -146,7 +146,7 @@ public class FieldMiddlewareBuilderTests
             ["errorCodes"] = new[] { "one", "two" },
             ["otherErrorCodes"] = new[] { "one", "four" }
         };
-        _builder.Use(next =>
+        _builder.Use(_ =>
         {
             return context =>
             {
@@ -155,7 +155,7 @@ public class FieldMiddlewareBuilderTests
             };
         });
 
-        var result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
+        object result = await _builder.BuildResolve().Invoke(_context).ConfigureAwait(false);
 
         result.ShouldBeNull();
         _context.Errors.ShouldContain(x => x.Message == "Custom error");
@@ -175,11 +175,11 @@ public class FieldMiddlewareBuilderTests
 
     public class SimpleMiddleware : IFieldMiddleware
     {
-        public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             using (context.Metrics.Subject("class", "from class"))
             {
-                return next(context);
+                return await next(context).ConfigureAwait(false);
             }
         }
     }

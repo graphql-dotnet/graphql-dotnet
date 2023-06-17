@@ -31,27 +31,20 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
-      - name: Setup .NET Core SDKs
-        uses: actions/setup-dotnet@v2
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: |
             3.1.x
             5.0.x
             6.0.x
+            7.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Disable MSVS Nuget Source # temporary step to investigate https://github.com/graphql-dotnet/graphql-dotnet/issues/2422
-        if: ${{ startsWith(matrix.os, 'windows') }}
-        run: dotnet nuget disable source 'Microsoft Visual Studio Offline Packages'
       - name: Install dependencies
         working-directory: src
         run: dotnet restore
-      - name: Check formatting
-        if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
-        run: |
-          dotnet format --no-restore --verify-no-changes --severity warn --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
@@ -59,16 +52,32 @@ jobs:
       - name: Build solution [Debug]
         working-directory: src
         run: dotnet build --no-restore -c Debug
-      - name: Test solution [Debug]
+      - name: Test solution [Debug] with code coverage
+        if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
         run: >
           dotnet test
+          --no-restore
           --no-build
           --collect "XPlat Code Coverage"
           --results-directory .coverage
           --
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
+      - name: Test solution [Debug] without code coverage
+        if: ${{ startsWith(matrix.os, 'windows') }}
+        working-directory: src
+        run: dotnet test --no-restore --no-build
+      - name: Test code-first AOT compilation
+        working-directory: src/GraphQL.AotCompilationSample.CodeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.CodeFirst
+      - name: Test type-first AOT compilation
+        working-directory: src/GraphQL.AotCompilationSample.TypeFirst
+        run: |
+          dotnet publish -c Release -o publish
+          publish/GraphQL.AotCompilationSample.TypeFirst
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         uses: codecov/codecov-action@v3

@@ -7,9 +7,9 @@ public class ScalarsInputTest : QueryTestBase<SchemaForScalars>
     [Fact]
     public void Scalars_Should_Return_As_Is()
     {
-        var query = @"
+        const string query = """
 mutation {
-  create(input: {float1: 1.3, floatFromInt: 1, id1:""8dfab389-a6f7-431d-ab4e-aa693cc53edf"", id2:""8dfab389-a6f7-431d-ab4e-aa693cc53ede"", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
+  create(input: {float1: 1.3, floatFromInt: 1, id1:"8dfab389-a6f7-431d-ab4e-aa693cc53edf", id2:"8dfab389-a6f7-431d-ab4e-aa693cc53ede", uint: 3147483647, uintArray: [3147483640], short: -21000, shortArray: [20000] ushort: 61000, ushortArray: [65000], ulong: 4000000000000, ulongArray: [1234567890123456789], byte: 50, byteArray: [1,2,3], sbyte: -60, sbyteArray: [-1,2,-3], dec: 39614081257132168796771975168, decZero: 12.10, decArray: [1,39614081257132168796771975168,3] })
   {
     float1
     floatFromInt
@@ -70,117 +70,119 @@ mutation {
     decArray
   }
 }
-";
-        var expected = @"{
-  ""data"": {
-    ""create"": {
-      ""float1"": 1.2999999523162842,
-      ""floatFromInt"": 1,
-      ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
-      ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
-      ""uint"": 3147483647,
-      ""uintArray"": [
+""";
+        const string expected = """
+{
+  "data": {
+    "create": {
+      "float1": 1.2999999523162842,
+      "floatFromInt": 1,
+      "id1": "8dfab389-a6f7-431d-ab4e-aa693cc53edf",
+      "id2": "8dfab389-a6f7-431d-ab4e-aa693cc53ede",
+      "uint": 3147483647,
+      "uintArray": [
         3147483640
       ],
-      ""short"": -21000,
-      ""shortArray"": [
+      "short": -21000,
+      "shortArray": [
         20000
       ],
-      ""ushort"": 61000,
-      ""ushortArray"": [
+      "ushort": 61000,
+      "ushortArray": [
         65000
       ],
-      ""ulong"": 4000000000000,
-      ""ulongArray"": [
+      "ulong": 4000000000000,
+      "ulongArray": [
         1234567890123456789
       ],
-      ""byte"": 50,
-      ""byteArray"": [
+      "byte": 50,
+      "byteArray": [
         1,
         2,
         3
       ],
-      ""sbyte"": -60,
-      ""sbyteArray"": [
+      "sbyte": -60,
+      "sbyteArray": [
         -1,
         2,
         -3
       ],
-      ""dec"": 39614081257132168796771975168,
-      ""decZero"": 12.10,
-      ""decArray"": [
+      "dec": 39614081257132168796771975168,
+      "decZero": 12.10,
+      "decArray": [
         1,
         39614081257132168796771975168,
         3
       ]
     },
-    ""create_with_defaults"": {
-      ""float1"": 1.2999999523162842,
-      ""floatFromInt"": 1,
-      ""id1"": ""8dfab389-a6f7-431d-ab4e-aa693cc53edf"",
-      ""id2"": ""8dfab389-a6f7-431d-ab4e-aa693cc53ede"",
-      ""uint"": 3147483647,
-      ""uintArray"": [
+    "create_with_defaults": {
+      "float1": 1.2999999523162842,
+      "floatFromInt": 1,
+      "id1": "8dfab389-a6f7-431d-ab4e-aa693cc53edf",
+      "id2": "8dfab389-a6f7-431d-ab4e-aa693cc53ede",
+      "uint": 3147483647,
+      "uintArray": [
         3147483640
       ],
-      ""short"": -21000,
-      ""shortArray"": [
+      "short": -21000,
+      "shortArray": [
         20000
       ],
-      ""ushort"": 61000,
-      ""ushortArray"": [
+      "ushort": 61000,
+      "ushortArray": [
         65000
       ],
-      ""ulong"": 4000000000000,
-      ""ulongArray"": [
+      "ulong": 4000000000000,
+      "ulongArray": [
         1234567890123456789
       ],
-      ""byte"": 50,
-      ""byteArray"": [
+      "byte": 50,
+      "byteArray": [
         1,
         2,
         3
       ],
-      ""sbyte"": -60,
-      ""sbyteArray"": [
+      "sbyte": -60,
+      "sbyteArray": [
         -1,
         2,
         -3
       ],
-      ""dec"": 39614081257132168796771975168,
-      ""decZero"": 12.10,
-      ""decArray"": [
+      "dec": 39614081257132168796771975168,
+      "decZero": 12.10,
+      "decArray": [
         1,
         39614081257132168796771975168,
         3
       ]
     }
   }
-}";
+}
+""";
         AssertQuery(query, expected, null, null);
     }
 
     [Fact]
     public void Should_Accept_Int_As_Int_In_Literal()
     {
-        var query = @"mutation { int(number: 100) }";
-        var expected = @"{ ""int"": 100 }";
+        const string query = "mutation { int(number: 100) }";
+        const string expected = """{ "int": 100 }""";
         AssertQuerySuccess(query, expected, null, null);
     }
 
     [Fact]
     public void Should_Accept_Long_As_Long_In_Literal()
     {
-        var query = @"mutation { long(number: 100) }";
-        var expected = @"{ ""long"": 100 }";
+        const string query = "mutation { long(number: 100) }";
+        const string expected = """{ "long": 100 }""";
         AssertQuerySuccess(query, expected, null, null);
     }
 
     [Fact]
     public void Should_Not_Accept_String_As_Int_In_Literal()
     {
-        var query = @"mutation { int(number: ""100"") }";
-        string expected = null;
+        const string query = """mutation { int(number: "100") }""";
+        const string expected = null;
         var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
         result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Int', found \"100\".");
     }
@@ -188,17 +190,17 @@ mutation {
     [Fact]
     public void Should_Not_Accept_String_As_Int_In_Variable()
     {
-        var query = @"mutation AAA($val : Int!) { int(number: $val) }";
-        var expected = @"{ ""int"": 100 }";
-        var result = AssertQueryWithErrors(query, expected, variables: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Int'");
+        const string query = "mutation AAA($val : Int!) { int(number: $val) }";
+        const string expected = """{ "int": 100 }""";
+        var result = AssertQueryWithErrors(query, expected, variables: """{ "val": "100" }""".ToInputs(), expectedErrorCount: 1, executed: false);
+        result.Errors[0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Int'");
     }
 
     [Fact]
     public void Should_Not_Accept_String_As_Long_In_Literal()
     {
-        var query = @"mutation { long(number: ""100"") }";
-        string expected = null;
+        const string query = """mutation { long(number: "100") }""";
+        const string expected = null;
         var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
         result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Long', found \"100\".");
     }
@@ -206,10 +208,10 @@ mutation {
     [Fact]
     public void Should_Not_Accept_String_As_Long_In_Variable()
     {
-        var query = @"mutation AAA($val : Long!) { long(number: $val) }";
-        var expected = @"{ ""long"": 100 }";
-        var result = AssertQueryWithErrors(query, expected, variables: @"{ ""val"": ""100"" }".ToInputs(), expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe(@"Variable '$val' is invalid. Unable to convert '100' to 'Long'");
+        const string query = "mutation AAA($val : Long!) { long(number: $val) }";
+        const string expected = """{ "long": 100 }""";
+        var result = AssertQueryWithErrors(query, expected, variables: """{ "val": "100" }""".ToInputs(), expectedErrorCount: 1, executed: false);
+        result.Errors[0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Long'");
     }
 }
 
@@ -217,6 +219,7 @@ public class SchemaForScalars : Schema
 {
     public SchemaForScalars()
     {
+        Query = new DummyType();
         Mutation = new ScalarsMutation();
     }
 }
@@ -347,42 +350,38 @@ public class ScalarsMutation : ObjectGraphType
     {
         Name = "ScalarsMutation";
 
-        Field<ScalarsType>(
-            "create",
-            arguments: new QueryArguments(new QueryArgument<ScalarsInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<ScalarsType>("create")
+            .Argument<ScalarsInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ScalarsModel>("input");
                 arg.decZero.ShouldBe(12.10m);
                 return arg;
             });
 
-        Field<ScalarsType>(
-            "create_with_defaults",
-            arguments: new QueryArguments(new QueryArgument<ScalarsInputWithDefaults> { Name = "input" }),
-            resolve: ctx =>
+        Field<ScalarsType>("create_with_defaults")
+            .Argument<ScalarsInputWithDefaults>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<ScalarsModel>("input");
                 arg.decZero.ShouldBe(12.10m);
                 return arg;
             });
 
-        Field<LongGraphType>(
-            "long",
-            arguments: new QueryArguments(new QueryArgument<LongGraphType> { Name = "number" }),
-            resolve: ctx =>
+        Field<LongGraphType>("long")
+            .Argument<LongGraphType>("number")
+            .Resolve(ctx =>
             {
-                var arg = ctx.GetArgument<long>("number");
+                long arg = ctx.GetArgument<long>("number");
                 arg.ShouldBe(100L);
                 return arg;
             });
 
-        Field<IntGraphType>(
-            "int",
-            arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "number" }),
-            resolve: ctx =>
+        Field<IntGraphType>("int")
+            .Argument<IntGraphType>("number")
+            .Resolve(ctx =>
             {
-                var arg = ctx.GetArgument<int>("number");
+                int arg = ctx.GetArgument<int>("number");
                 arg.ShouldBe(100);
                 return arg;
             });

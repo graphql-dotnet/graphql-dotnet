@@ -5,9 +5,9 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void provides_typename()
     {
-        var query = "{ hero { __typename name } }";
+        const string query = "{ hero { __typename name } }";
 
-        var expected = @"{ ""hero"": { ""__typename"": ""Droid"", ""name"": ""R2-D2"" } }";
+        const string expected = """{ "hero": { "__typename": "Droid", "name": "R2-D2" } }""";
 
         AssertQuerySuccess(query, expected);
     }
@@ -15,21 +15,23 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_an_object_kind()
     {
-        var query = @"
-                query IntrospectionDroidKindQuery {
-                  __type(name: ""Droid"") {
-                    name,
-                    kind
-                  }
-                }
-            ";
-
-        var expected = @"{
-              ""__type"": {
-                ""name"": ""Droid"",
-                ""kind"": ""OBJECT""
+        const string query = """
+            query IntrospectionDroidKindQuery {
+              __type(name: "Droid") {
+                name,
+                kind
               }
-            }";
+            }
+            """;
+
+        const string expected = """
+            {
+              "__type": {
+                "name": "Droid",
+                "kind": "OBJECT"
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -37,21 +39,23 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_an_interface_kind()
     {
-        var query = @"
+        const string query = """
             query IntrospectionCharacterKindQuery {
-              __type(name: ""Character"") {
+              __type(name: "Character") {
                 name
                 kind
               }
             }
-            ";
+            """;
 
-        var expected = @"{
-              ""__type"": {
-                ""name"": ""Character"",
-                ""kind"": ""INTERFACE""
+        const string expected = """
+            {
+              "__type": {
+                "name": "Character",
+                "kind": "INTERFACE"
               }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -59,29 +63,31 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_schema_for_possibleTypes_of_an_interface()
     {
-        var query = @"
+        const string query = """
             query IntrospectionCharacterKindQuery {
-              __type(name: ""Character"") {
+              __type(name: "Character") {
                 name
                 kind
-                  possibleTypes {
-                    name,
-                    kind
-                  }
+                possibleTypes {
+                  name,
+                  kind
+                }
               }
             }
-            ";
+            """;
 
-        var expected = @"{
-              ""__type"": {
-                ""name"": ""Character"",
-                ""kind"": ""INTERFACE"",
-                ""possibleTypes"": [
-                  { ""name"": ""Human"", ""kind"": ""OBJECT"" },
-                  { ""name"": ""Droid"", ""kind"": ""OBJECT"" }
+        const string expected = """
+            {
+              "__type": {
+                "name": "Character",
+                "kind": "INTERFACE",
+                "possibleTypes": [
+                  { "name": "Human", "kind": "OBJECT" },
+                  { "name": "Droid", "kind": "OBJECT" }
                 ]
               }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -89,9 +95,9 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema_for_object_fields()
     {
-        var query = @"
+        const string query = """
             query IntrospectionDroidFieldsQuery {
-              __type(name: ""Droid"") {
+              __type(name: "Droid") {
                 name
                 fields {
                     name
@@ -102,57 +108,59 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                 }
               }
             }
-            ";
+            """;
 
-        var expected = @"{
-                ""__type"": {
-                  ""name"": ""Droid"",
-                  ""fields"": [
+        const string expected = """
+            {
+                "__type": {
+                  "name": "Droid",
+                  "fields": [
                     {
-                      ""name"": ""id"",
-                      ""type"": {
-                        ""name"": null,
-                        ""kind"": ""NON_NULL""
+                      "name": "id",
+                      "type": {
+                        "name": null,
+                        "kind": "NON_NULL"
                       }
                     },
                     {
-                      ""name"": ""name"",
-                      ""type"": {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
+                      "name": "name",
+                      "type": {
+                        "name": "String",
+                        "kind": "SCALAR"
                       }
                     },
                     {
-                      ""name"": ""friends"",
-                      ""type"": {
-                        ""name"": null,
-                        ""kind"": ""LIST""
+                      "name": "friends",
+                      "type": {
+                        "name": null,
+                        "kind": "LIST"
                       }
                     },
                     {
-                      ""name"": ""friendsConnection"",
-                      ""type"": {
-                        ""name"": ""CharacterInterfaceConnection"",
-                        ""kind"": ""OBJECT""
+                      "name": "friendsConnection",
+                      "type": {
+                        "name": "CharacterInterfaceConnection",
+                        "kind": "OBJECT"
                       }
                     },
                     {
-                      ""name"": ""appearsIn"",
-                      ""type"": {
-                        ""name"": null,
-                        ""kind"": ""LIST""
+                      "name": "appearsIn",
+                      "type": {
+                        "name": null,
+                        "kind": "LIST"
                       }
                     },
                     {
-                      ""name"": ""primaryFunction"",
-                      ""type"": {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
+                      "name": "primaryFunction",
+                      "type": {
+                        "name": "String",
+                        "kind": "SCALAR"
                       }
                     }
                   ]
                 }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -160,20 +168,22 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema_for_documentation()
     {
-        var query = @"
+        const string query = """
             query IntrospectionDroidDescriptionQuery {
-              __type(name: ""Droid"") {
+              __type(name: "Droid") {
                 name
                 description
               }
             }
-            ";
-        var expected = @"{
-              ""__type"": {
-                ""name"": ""Droid"",
-                ""description"": ""A mechanical creature in the Star Wars universe.""
+            """;
+        const string expected = """
+            {
+              "__type": {
+                "name": "Droid",
+                "description": "A mechanical creature in the Star Wars universe."
               }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -181,7 +191,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_the_schema()
     {
-        var query = @"
+        const string query = """
             query SchemaIntrospectionQuery {
               __schema {
                 types { name, kind }
@@ -196,127 +206,129 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                 }
               }
             }
-            ";
-        var expected = @"{
-                ""__schema"": {
-                    ""types"": [
+            """;
+        const string expected = """
+            {
+                "__schema": {
+                    "types": [
                     {
-                        ""name"": ""__DirectiveLocation"",
-                        ""kind"": ""ENUM""
+                        "name": "__Schema",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""__TypeKind"",
-                        ""kind"": ""ENUM""
+                        "name": "String",
+                        "kind": "SCALAR"
                     },
                     {
-                        ""name"": ""__EnumValue"",
-                        ""kind"": ""OBJECT""
+                        "name": "__Type",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""String"",
-                        ""kind"": ""SCALAR""
+                        "name": "__TypeKind",
+                        "kind": "ENUM"
                     },
                     {
-                        ""name"": ""Boolean"",
-                        ""kind"": ""SCALAR""
+                        "name": "__Field",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""__Directive"",
-                        ""kind"": ""OBJECT""
+                        "name": "__InputValue",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""__InputValue"",
-                        ""kind"": ""OBJECT""
+                        "name": "Boolean",
+                        "kind": "SCALAR"
                     },
                     {
-                        ""name"": ""__Type"",
-                        ""kind"": ""OBJECT""
+                        "name": "__EnumValue",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""__Field"",
-                        ""kind"": ""OBJECT""
+                        "name": "__Directive",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""__Schema"",
-                        ""kind"": ""OBJECT""
+                        "name": "__DirectiveLocation",
+                        "kind": "ENUM"
                     },
                     {
-                        ""name"": ""Query"",
-                        ""kind"": ""OBJECT""
+                        "name": "Query",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""Character"",
-                        ""kind"": ""INTERFACE""
+                        "name": "Character",
+                        "kind": "INTERFACE"
                     },
                     {
-                        ""name"": ""CharacterInterfaceConnection"",
-                        ""kind"": ""OBJECT""
+                        "name": "CharacterInterfaceConnection",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""Int"",
-                        ""kind"": ""SCALAR""
+                        "name": "Int",
+                        "kind": "SCALAR"
                     },
                     {
-                        ""name"": ""PageInfo"",
-                        ""kind"": ""OBJECT""
+                        "name": "PageInfo",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""CharacterInterfaceEdge"",
-                        ""kind"": ""OBJECT""
+                        "name": "CharacterInterfaceEdge",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""Episode"",
-                        ""kind"": ""ENUM""
+                        "name": "Episode",
+                        "kind": "ENUM"
                     },
                     {
-                        ""name"": ""Human"",
-                        ""kind"": ""OBJECT""
+                        "name": "Human",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""Droid"",
-                        ""kind"": ""OBJECT""
+                        "name": "Droid",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""Mutation"",
-                        ""kind"": ""OBJECT""
+                        "name": "Mutation",
+                        "kind": "OBJECT"
                     },
                     {
-                        ""name"": ""HumanInput"",
-                        ""kind"": ""INPUT_OBJECT""
+                        "name": "HumanInput",
+                        "kind": "INPUT_OBJECT"
                     }
                     ],
-                    ""queryType"": {
-                      ""name"": ""Query"",
-                      ""kind"": ""OBJECT""
+                    "queryType": {
+                      "name": "Query",
+                      "kind": "OBJECT"
                     },
-                    ""mutationType"": {
-                      ""name"": ""Mutation""
+                    "mutationType": {
+                      "name": "Mutation"
                     },
-                    ""directives"": [
+                    "directives": [
                     {
-                        ""name"": ""include"",
-                        ""description"": ""Directs the executor to include this field or fragment only when the 'if' argument is true."",
-                        ""onOperation"": false,
-                        ""onFragment"": true,
-                        ""onField"": true
-                    },
-                    {
-                        ""name"": ""skip"",
-                        ""description"": ""Directs the executor to skip this field or fragment when the 'if' argument is true."",
-                        ""onOperation"": false,
-                        ""onFragment"": true,
-                        ""onField"": true
+                        "name": "include",
+                        "description": "Directs the executor to include this field or fragment only when the 'if' argument is true.",
+                        "onOperation": false,
+                        "onFragment": true,
+                        "onField": true
                     },
                     {
-                        ""name"": ""deprecated"",
-                        ""description"": ""Marks an element of a GraphQL schema as no longer supported."",
-                        ""onOperation"": false,
-                        ""onFragment"": false,
-                        ""onField"": false
+                        "name": "skip",
+                        "description": "Directs the executor to skip this field or fragment when the 'if' argument is true.",
+                        "onOperation": false,
+                        "onFragment": true,
+                        "onField": true
+                    },
+                    {
+                        "name": "deprecated",
+                        "description": "Marks an element of a GraphQL schema as no longer supported.",
+                        "onOperation": false,
+                        "onFragment": false,
+                        "onField": false
                     }
                     ]
                 }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -325,13 +337,14 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allow_querying_input_object_type_fields()
     {
-        var query = @"{
-  __type(name: ""HumanInput"") {
-    fields { name }
-    inputFields { name }
-  }
-}
-            ";
+        const string query = """
+            {
+              __type(name: "HumanInput") {
+                fields { name }
+                inputFields { name }
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, "HumanInputIntrospectionResult".ReadJsonResult());
     }
@@ -339,7 +352,7 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
     [Fact]
     public void allows_querying_field_args()
     {
-        var query = @"
+        const string query = """
             query SchemaIntrospectionQuery {
               __schema {
                 queryType {
@@ -362,55 +375,57 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
                 }
               }
             }
-            ";
-        var expected = @"{
-              ""__schema"": {
-                ""queryType"": {
-                  ""fields"": [
+            """;
+        const string expected = """
+            {
+              "__schema": {
+                "queryType": {
+                  "fields": [
                     {
-                      ""name"": ""hero"",
-                      ""args"": []
+                      "name": "hero",
+                      "args": []
                     },
                     {
-                      ""name"": ""human"",
-                      ""args"": [
+                      "name": "human",
+                      "args": [
                         {
-                          ""name"": ""id"",
-                          ""description"": ""id of the human"",
-                          ""type"": {
-                            ""name"": null,
-                            ""kind"": ""NON_NULL"",
-                            ""ofType"": {
-                              ""name"": ""String"",
-                              ""kind"": ""SCALAR""
+                          "name": "id",
+                          "description": "id of the human",
+                          "type": {
+                            "name": null,
+                            "kind": "NON_NULL",
+                            "ofType": {
+                              "name": "String",
+                              "kind": "SCALAR"
                             }
                           },
-                          ""defaultValue"": null
+                          "defaultValue": null
                         }
                       ]
                     },
                     {
-                      ""name"": ""droid"",
-                      ""args"": [
+                      "name": "droid",
+                      "args": [
                         {
-                          ""name"": ""id"",
-                          ""description"": ""id of the droid"",
-                          ""type"": {
-                            ""name"": null,
-                            ""kind"": ""NON_NULL"",
-                            ""ofType"": {
-                              ""name"": ""String"",
-                              ""kind"": ""SCALAR""
+                          "name": "id",
+                          "description": "id of the droid",
+                          "type": {
+                            "name": null,
+                            "kind": "NON_NULL",
+                            "ofType": {
+                              "name": "String",
+                              "kind": "SCALAR"
                             }
                           },
-                          ""defaultValue"": null
+                          "defaultValue": null
                         }
                       ]
                     }
                   ]
                 }
               }
-            }";
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }

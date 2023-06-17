@@ -30,10 +30,9 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
         //
         // note: this is just an example of what can be done, and does not necessarily indicate a preferred programming pattern
 
-        AssertQuerySuccess(
-            @"
+        AssertQuerySuccess("""
 {
-  example (id: 1, name: ""john doe"") {
+  example (id: 1, name: "john doe") {
     id
     name
     children
@@ -45,22 +44,22 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
     counter3: counter
   }
 }
-",
-            @"
+""",
+"""
 {
-  ""example"": {
-    ""id"": ""1"",
-    ""name"": ""john doe"",
-    ""children"": [""Happy"",""Dopey"",""Grumpy""],
-    ""service2Test"": 2,
-    ""counter1"": 0,
-    ""counter2"": 1,
-    ""scopedCounter1"": 0,
-    ""scopedCounter2"": 0,
-    ""counter3"": 2
+  "example": {
+    "id": "1",
+    "name": "john doe",
+    "children": ["Happy","Dopey","Grumpy"],
+    "service2Test": 2,
+    "counter1": 0,
+    "counter2": 1,
+    "scopedCounter1": 0,
+    "scopedCounter2": 0,
+    "counter3": 2
   }
 }
-");
+""");
     }
 
     [Fact]
@@ -82,12 +81,10 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
     {
         public QueryGraph()
         {
-            Field<NonNullGraphType<DIGraphType<SampleGraph, SampleSource>>>(
-                "example",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" }),
-                resolve: context => new SampleSource { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
+            Field<NonNullGraphType<DIGraphType<SampleGraph, SampleSource>>>("example")
+                .Argument<NonNullGraphType<IntGraphType>>("id")
+                .Argument<NonNullGraphType<StringGraphType>>("name")
+                .Resolve(context => new SampleSource { Id = context.GetArgument<int>("id"), Name = context.GetArgument<string>("name") });
         }
     }
 

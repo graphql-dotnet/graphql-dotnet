@@ -10,7 +10,7 @@ namespace GraphQL.Utilities
     /// </summary>
     internal static class XmlDocumentationExtensions
     {
-        private static readonly ConcurrentDictionary<string, XDocument?> _cachedXml = new ConcurrentDictionary<string, XDocument?>(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, XDocument?> _cachedXml = new(StringComparer.OrdinalIgnoreCase);
 
         private static string GetParameterName(this ParameterInfo parameter) => GetTypeName(parameter.ParameterType);
 

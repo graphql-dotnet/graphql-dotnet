@@ -32,7 +32,7 @@ public class Impl1 : ObjectGraphType
         IsTypeOf = _ => true;
         Interface<Interface1>();
 
-        Field<StringGraphType>("a", resolve: ctx => "");
+        Field<StringGraphType>("a").Resolve(_ => "");
     }
 }
 
@@ -51,6 +51,6 @@ public class Impl2 : ObjectGraphType
         IsTypeOf = _ => true;
         Interface<Interface2>();
 
-        Field<NonNullGraphType<StringGraphType>>("a", resolve: ctx => "");
+        Field<NonNullGraphType<StringGraphType>>("a").Resolve(_ => "");
     }
 }

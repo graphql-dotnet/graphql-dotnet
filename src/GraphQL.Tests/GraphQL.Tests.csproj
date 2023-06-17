@@ -2,15 +2,17 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,8 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.20" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.*" />
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.4.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.4.0" />
+    <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
 
 </Project>

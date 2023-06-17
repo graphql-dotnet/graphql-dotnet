@@ -55,19 +55,20 @@ public class ScopedAttributeTests
         };
         var unscopedSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.UnscopedAsyncSubscription))!.StreamResolver!;
         var scopedAsyncSubscriptionResolver = graphType.Fields.Find(nameof(TestClass.ScopedAsyncSubscription))!.StreamResolver!;
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("1 2"));
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("2 3"));
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("1 2")).Dispose();
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("2 3")).Dispose();
         Class1.DisposedCount.ShouldBe(0);
-        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
+        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
         Class1.DisposedCount.ShouldBe(1);
-        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1"));
+        (await scopedAsyncSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("0 1")).Dispose();
         Class1.DisposedCount.ShouldBe(2);
-        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("3 4"));
+        (await unscopedSubscriptionResolver.ResolveAsync(context).ConfigureAwait(false)).Subscribe(new SampleObserver("3 4")).Dispose();
         rootServiceProvider.Dispose();
         Class1.DisposedCount.ShouldBe(3);
     }
 
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
     private class TestClass
     {
         public string UnscopedField([FromServices] Class1 arg1, [FromServices] Class2 arg2)
@@ -124,9 +125,9 @@ public class ScopedAttributeTests
 
     private class Class1 : IDisposable
     {
-        public static int DisposedCount = 0;
+        public static int DisposedCount;
 
-        private bool _disposed = false;
+        private bool _disposed;
         private int _value;
 
         public int Value

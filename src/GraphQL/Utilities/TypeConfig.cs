@@ -1,4 +1,3 @@
-using System.Reflection;
 using GraphQL.Types;
 
 namespace GraphQL.Utilities
@@ -9,7 +8,7 @@ namespace GraphQL.Utilities
     public class TypeConfig : MetadataProvider
     {
         private readonly LightweightCache<string, FieldConfig> _fields =
-            new LightweightCache<string, FieldConfig>(f => new FieldConfig(f));
+            new(f => new FieldConfig(f));
 
         private Type? _type;
 
@@ -75,7 +74,7 @@ namespace GraphQL.Utilities
 
         private void ApplyMetadata(Type? type)
         {
-            var attributes = type?.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = type?.GetGraphQLAttributes();
 
             if (attributes == null)
                 return;
