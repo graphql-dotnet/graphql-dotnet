@@ -4,15 +4,16 @@ namespace GraphQL.Validation
 {
     /// <summary>
     /// Validates a document against a set of validation rules and returns a list of the errors found.
+    /// If the document passes validation, also returns the set of parsed variables and argument values for fields and applied directives.
     /// </summary>
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options);
+        Task<IValidationResult> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
-    public class DocumentValidator : IDocumentValidator
+    public partial class DocumentValidator : IDocumentValidator
     {
         // frequently reused objects
         private ValidationContext? _reusableValidationContext;
@@ -51,7 +52,7 @@ namespace GraphQL.Validation
         };
 
         /// <inheritdoc/>
-        public Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options)
+        public Task<IValidationResult> ValidateAsync(in ValidationOptions options)
         {
             options.Schema.Initialize();
 
@@ -71,7 +72,7 @@ namespace GraphQL.Validation
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
         }
 
-        private async Task<(IValidationResult validationResult, Variables variables)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        private async Task<IValidationResult> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
         {
             try
             {
@@ -118,6 +119,11 @@ namespace GraphQL.Validation
                     await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
                 }
 
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors);
+                }
+
                 // can report errors even without rules enabled
                 (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
                     ? null
@@ -131,9 +137,28 @@ namespace GraphQL.Validation
                         context.ReportError(error);
                 }
 
-                return context.HasErrors
-                    ? (new ValidationResult(context.Errors), variables)
-                    : (SuccessfullyValidatedResult.Instance, variables);
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors) { Variables = variables };
+                }
+
+                // parse all field arguments
+                using var parseArgumentVisitorContext = new ParseArgumentVisitor.Context(context, variables);
+                await ParseArgumentVisitor.Instance.VisitAsync(context.Document, parseArgumentVisitorContext).ConfigureAwait(false);
+                var argumentValues = parseArgumentVisitorContext.ArgumentValues;
+                var directiveValues = parseArgumentVisitorContext.DirectiveValues;
+
+                // todo: execute validation rules that need to be able to read field arguments/directives
+
+                if (!context.HasErrors && variables == Variables.None && argumentValues == null && directiveValues == null)
+                    return SuccessfullyValidatedResult.Instance;
+
+                return new ValidationResult(context.Errors)
+                {
+                    Variables = variables,
+                    ArgumentValues = argumentValues,
+                    DirectiveValues = directiveValues,
+                };
             }
             finally
             {

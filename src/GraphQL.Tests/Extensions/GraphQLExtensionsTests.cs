@@ -90,15 +90,15 @@ public class GraphQLExtensionsTests
             {
                 Fields = new List<GraphQLObjectField>
                 {
-                    new GraphQLObjectField { Name = new GraphQLName("Name"), Value = new GraphQLStringValue("Tom") },
-                    new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(42) }
+                    new GraphQLObjectField(new GraphQLName("Name"), new GraphQLStringValue("Tom")),
+                    new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(42))
                 }
             } };
             yield return new object[] { new PersonInputType(), new Person { }, new GraphQLObjectValue
             {
                 Fields = new List<GraphQLObjectField>
                 {
-                    new GraphQLObjectField { Name = new GraphQLName("Age"), Value = new GraphQLIntValue(0) }
+                    new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(0))
                 }
             } };
 

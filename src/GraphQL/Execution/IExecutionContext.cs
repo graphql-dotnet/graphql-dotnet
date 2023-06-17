@@ -78,6 +78,12 @@ namespace GraphQL.Execution
         /// </summary>
         Variables Variables { get; }
 
+        /// <inheritdoc cref="IValidationResult.ArgumentValues"/>
+        IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+
+        /// <inheritdoc cref="IValidationResult.DirectiveValues"/>
+        IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+
         /// <summary>
         /// A dictionary of extra information supplied with the GraphQL request.
         /// This is reserved for implementors to extend the protocol however they see fit, and

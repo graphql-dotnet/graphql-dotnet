@@ -255,7 +255,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
         const string query = """
             fragment conflictingArgs on Pet {
                 ... on Dog {
-                    name(surname: true)
+                    name(surname: "test")
                 }
                 ... on Cat {
                     name

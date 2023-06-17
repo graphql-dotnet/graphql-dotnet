@@ -118,10 +118,9 @@ namespace GraphQL
                 metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;
-                Variables variables;
                 using (metrics.Subject("document", "Validating document"))
                 {
-                    (validationResult, variables) = await _documentValidator.ValidateAsync(
+                    validationResult = await _documentValidator.ValidateAsync(
                         new ValidationOptions
                         {
                             Document = document,
@@ -138,7 +137,7 @@ namespace GraphQL
                         }).ConfigureAwait(false);
                 }
 
-                context = BuildExecutionContext(options, document, operation, variables, metrics);
+                context = BuildExecutionContext(options, document, operation, validationResult, metrics);
 
                 foreach (var listener in options.Listeners)
                 {
@@ -232,7 +231,7 @@ namespace GraphQL
         /// <summary>
         /// Builds a <see cref="ExecutionContext"/> instance from the provided values.
         /// </summary>
-        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, Variables variables, Metrics metrics)
+        protected virtual ExecutionContext BuildExecutionContext(ExecutionOptions options, GraphQLDocument document, GraphQLOperationDefinition operation, IValidationResult validationResult, Metrics metrics)
         {
             var context = new ExecutionContext
             {
@@ -242,7 +241,9 @@ namespace GraphQL
                 UserContext = options.UserContext,
 
                 Operation = operation,
-                Variables = variables,
+                Variables = validationResult.Variables ?? Variables.None,
+                ArgumentValues = validationResult.ArgumentValues,
+                DirectiveValues = validationResult.DirectiveValues,
                 Errors = new ExecutionErrors(),
                 InputExtensions = options.Extensions ?? Inputs.Empty,
                 OutputExtensions = new Dictionary<string, object?>(),

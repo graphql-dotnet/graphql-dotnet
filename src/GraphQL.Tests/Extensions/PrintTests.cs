@@ -118,6 +118,6 @@ public class PrintTests
         new object[] { new GraphQLFloatValue(0.00000000000000001m), "0.00000000000000001"}, // decimal
         new object[] { new GraphQLFalseBooleanValue(), "false"},
         new object[] { new GraphQLTrueBooleanValue(), "true"},
-        new object[] { new GraphQLEnumValue { Name = new GraphQLName("TEST") }, "TEST"},
+        new object[] { new GraphQLEnumValue(new GraphQLName("TEST")), "TEST"},
     };
 }

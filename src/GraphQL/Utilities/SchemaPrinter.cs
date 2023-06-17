@@ -212,7 +212,7 @@ namespace GraphQL.Utilities
             Schema?.Initialize();
 
             var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
-            var delimiter = Options.OldImplementsSyntax ? ", " : " & ";
+            var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
                 : "";
@@ -356,13 +356,9 @@ namespace GraphQL.Utilities
 
         protected string FormatDescription(string? description, string indentation = "")
         {
-            if (Options.IncludeDescriptions)
-            {
-                return Options.PrintDescriptionsAsComments
-                    ? PrintComment(description, indentation)
-                    : PrintDescription(description, indentation);
-            }
-            return "";
+            return Options.IncludeDescriptions
+                ? PrintDescription(description, indentation)
+                : "";
         }
 
         public string FormatDefaultValue(object? value, IGraphType graphType)

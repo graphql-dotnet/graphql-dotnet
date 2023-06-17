@@ -200,11 +200,15 @@ namespace GraphQL.Validation
                         // parse the variable literal via ParseLiteral (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
-                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, variablesObj, null).Value;
+                            variable.Value = ExecutionHelper.CoerceValue(graphType, variableDef.DefaultValue, new ExecutionHelper.CoerceValueContext()
+                            {
+                                Document = Document,
+                                ParentNode = variableDef,
+                            }).Value;
                         }
-                        catch (Exception ex)
+                        catch (ValidationError ex)
                         {
-                            (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
+                            (errors ??= new()).Add(ex);
                             continue;
                         }
                         variable.IsDefault = true;
