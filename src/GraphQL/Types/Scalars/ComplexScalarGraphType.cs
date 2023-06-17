@@ -29,83 +29,16 @@ public class ComplexScalarGraphType : ScalarGraphType
     }
 
     /// <inheritdoc/>
-    public override object? ParseLiteral(GraphQLValue value)
-    {
-        return value switch
-        {
-            GraphQLNullValue => null,
-            GraphQLIntValue intValue => ParseInteger(intValue),
-            GraphQLFloatValue floatValue => ParseFloat(floatValue),
-            GraphQLStringValue stringValue => (string)stringValue.Value,
-            GraphQLBooleanValue booleanValue => booleanValue.BoolValue,
-            GraphQLObjectValue objectValue => ParseObject(objectValue),
-            GraphQLListValue listValue => ParseList(listValue),
-            GraphQLVariable variableValue => ParseVariable(variableValue),
-            _ => ThrowLiteralConversionError(value),
-        };
-
-        // todo: need access to request variables to be able to properly support this
-        object? ParseVariable(GraphQLVariable node)
-            => throw new NotSupportedException($"Cannot read referenced variable '{node.Name.Value}' within a complex literal object.");
-
-        IDictionary<string, object?> ParseObject(GraphQLObjectValue node)
-            => node.Fields?.ToDictionary(n => (string)n.Name.Value, n => ParseLiteral(n.Value), StringComparer.Ordinal) ?? new Dictionary<string, object?>();
-
-        IEnumerable<object?> ParseList(GraphQLListValue node)
-            => node.Values?.Select(ParseLiteral) ?? Array.Empty<object?>();
-
-        object ParseInteger(GraphQLIntValue node)
-        {
-#if NETSTANDARD2_0
-            if (int.TryParse((string)node.Value, out int intValue))
-                return intValue;
-
-            if (long.TryParse((string)node.Value, out long longValue))
-                return longValue;
-#else
-            if (int.TryParse(node.Value, out int intValue))
-                return intValue;
-
-            if (long.TryParse(node.Value, out long longValue))
-                return longValue;
-#endif
-
-            return BigInt.Parse(node.Value);
-        }
-
-        object ParseFloat(GraphQLFloatValue node)
-        {
-#if NETSTANDARD2_0
-            bool isDouble = double.TryParse((string)node.Value, out double dbl);
-            bool isDecimal = decimal.TryParse((string)node.Value, out decimal dec);
-#else
-            bool isDouble = double.TryParse(node.Value, out double dbl);
-            bool isDecimal = decimal.TryParse(node.Value, out decimal dec);
-#endif
-
-            if (isDouble && !isDecimal)
-                return dbl;
-
-            if (!isDouble && isDecimal)
-                return dec;
-
-            if (isDouble && isDecimal)
-            {
-                // Cast the decimal to our struct to avoid the decimal.GetBits allocations.
-                var decBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref dec);
-                decimal temp = new(dbl);
-                var dblAsDecBits = System.Runtime.CompilerServices.Unsafe.As<decimal, DecimalData>(ref temp);
-                return decBits.Equals(dblAsDecBits)
-                    ? dbl
-                    : dec;
-            }
-
-            return ThrowLiteralConversionError(node);
-        }
-    }
+    public override object? ParseLiteral(GraphQLValue value) => value.ParseAnyLiteral();
 
     /// <inheritdoc/>
     public override object? ParseValue(object? value) => value;
+
+    /// <inheritdoc/>
+    public override bool CanParseLiteral(GraphQLValue value) => true;
+
+    /// <inheritdoc/>
+    public override bool CanParseValue(object? value) => true;
 
     /// <inheritdoc/>
     public override object? Serialize(object? value) => value;
@@ -139,37 +72,47 @@ public class ComplexScalarGraphType : ScalarGraphType
             IDictionary d => ConvertDictionary(d),
             IEnumerable l => ConvertList(l),
 
-            _ => throw new NotImplementedException($"Converting complex types ({value.GetType().Name}) to their AST representations is not supported.")
+            _ => throw new NotSupportedException($"Converting the complex type '{value.GetType().GetFriendlyName()}' to its AST representation is not supported.")
         };
 
         GraphQLObjectValue ConvertDictionary(IDictionary dictionary)
         {
+            if (dictionary.Count == 0)
+                return new();
+
             if (dictionary is IDictionary<string, object?> objectDictionary)
+            {
                 return new()
                 {
-                    Fields = objectDictionary.Select(row => new GraphQLObjectField
-                    {
-                        Name = new GraphQLName(row.Key),
-                        Value = ToAST(row.Value),
-                    }).ToList(),
+                    Fields = objectDictionary
+                        .Select(row => new GraphQLObjectField(
+                            new GraphQLName(row.Key),
+                            ToAST(row.Value)))
+                        .ToList(),
                 };
+            }
 
             var fields = new List<GraphQLObjectField>(dictionary.Count);
-            foreach (var key in dictionary.Keys)
+            var enumerator = dictionary.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                if (key is not string keyString)
+                if (enumerator.Key is not string keyString)
                     throw new InvalidOperationException("Object keys must be string values");
-                var value = dictionary[key];
-                fields.Add(new GraphQLObjectField
-                {
-                    Name = new GraphQLName(keyString),
-                    Value = ToAST(value),
-                });
+                fields.Add(new GraphQLObjectField(
+                    new GraphQLName(keyString),
+                    ToAST(enumerator.Value)));
             }
             return new() { Fields = fields };
         }
 
         GraphQLListValue ConvertList(IEnumerable list)
-            => new GraphQLListValue { Values = list.Cast<object?>().Select(v => ToAST(v)).ToList() };
+        {
+            List<GraphQLValue>? values = null;
+            foreach (var item in list)
+            {
+                (values ??= new()).Add(ToAST(item));
+            }
+            return new GraphQLListValue { Values = values };
+        }
     }
 }
