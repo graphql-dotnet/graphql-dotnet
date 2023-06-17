@@ -82,3 +82,13 @@ services.AddSingleton(typeof(EdgeType<>);
 services.AddSingleton(typeof(ConnectionType<>);
 services.AddSingleton(typeof(ConnectionType<,>);
 ```
+
+### 5. Duplicate GraphQL configuration calls with the same `Use` command is ignored
+
+Specifically, this relates to the following methods:
+
+- `UseMemoryCache()`
+- `UseAutomaticPersistedQueries()`
+- `UseConfiguration<T>()` with the same `T` type
+
+This change was made to prevent duplicate registrations of the same service within the DI container.

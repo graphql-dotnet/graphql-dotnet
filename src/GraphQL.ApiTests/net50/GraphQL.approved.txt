@@ -364,6 +364,8 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder ConfigureExecutionOptions(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema> action) { }
         public static GraphQL.DI.IGraphQLBuilder ConfigureSchema(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Types.ISchema, System.IServiceProvider> action) { }
+        public static GraphQL.DI.IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TConfigureSchema :  class, GraphQL.DI.IConfigureSchema { }
         public static GraphQL.DI.IServiceRegister Register<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TService>(this GraphQL.DI.IServiceRegister services, GraphQL.DI.ServiceLifetime serviceLifetime, bool replace = false)
             where TService :  class { }
         public static GraphQL.DI.IServiceRegister Register<TService>(this GraphQL.DI.IServiceRegister services, TService implementationInstance, bool replace = false)
