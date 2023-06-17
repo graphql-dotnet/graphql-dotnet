@@ -139,7 +139,7 @@ public class ComplexScalarGraphType : ScalarGraphType
             IDictionary d => ConvertDictionary(d),
             IEnumerable l => ConvertList(l),
 
-            _ => throw new NotImplementedException("Converting complex types to their AST representations is not supported.")
+            _ => throw new NotImplementedException($"Converting complex types ({value.GetType().Name}) to their AST representations is not supported.")
         };
 
         GraphQLObjectValue ConvertDictionary(IDictionary dictionary)
