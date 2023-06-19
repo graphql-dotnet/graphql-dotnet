@@ -2,6 +2,7 @@ using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.Visitors;
 
 namespace GraphQL
 {
@@ -94,6 +95,30 @@ namespace GraphQL
         /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
         /// </summary>
         private static void Preserve<T>() => GC.KeepAlive(typeof(T));
+
+        /// <summary>
+        /// Prints the schema to a string using the specified options.
+        /// </summary>
+        public static string Print(this ISchema schema, SDLPrinterOptions? options = null)
+        {
+            var exporter = new SchemaExporter(schema);
+            var sdl = exporter.Export();
+            // todo: sort SDL
+            var printer = new SDLPrinter(options ?? new());
+            return printer.Print(sdl);
+        }
+
+        /// <summary>
+        /// Prints the schema to a specified <see cref="TextWriter"/>.
+        /// </summary>
+        public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, SDLPrinterOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var exporter = new SchemaExporter(schema);
+            var sdl = exporter.Export();
+            // todo: sort SDL
+            var printer = new SDLPrinter(options ?? new());
+            return printer.PrintAsync(sdl, writer, cancellationToken);
+        }
 
         /// <summary>
         /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.

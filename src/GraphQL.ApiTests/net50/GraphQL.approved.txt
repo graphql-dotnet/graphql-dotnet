@@ -738,6 +738,8 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static string Print(this GraphQL.Types.ISchema schema, GraphQLParser.Visitors.SDLPrinterOptions? options = null) { }
+        public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQLParser.Visitors.SDLPrinterOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(this GraphQL.Types.ISchema schema)
@@ -2803,6 +2805,35 @@ namespace GraphQL.Utilities
         protected virtual GraphQL.Types.FieldType ToSubscriptionFieldType(string parentTypeName, GraphQLParser.AST.GraphQLFieldDefinition fieldDef) { }
         protected virtual GraphQL.Types.UnionGraphType ToUnionType(GraphQLParser.AST.GraphQLUnionTypeDefinition unionDef) { }
         protected virtual void Validate(GraphQLParser.AST.GraphQLDocument document) { }
+    }
+    public class SchemaExporter
+    {
+        public SchemaExporter(GraphQL.Types.ISchema schema) { }
+        protected GraphQL.Types.ISchema Schema { get; }
+        protected virtual T ApplyDescription<T>(T node, GraphQL.Types.IProvideDescription obj)
+            where T : GraphQLParser.AST.IHasDescriptionNode { }
+        protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IMetadataReader obj)
+            where T : GraphQLParser.AST.IHasDirectivesNode { }
+        public virtual GraphQLParser.AST.GraphQLDocument Export() { }
+        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        protected virtual GraphQLParser.AST.GraphQLDirective ExportDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
+        protected virtual GraphQLParser.AST.GraphQLArgument ExportDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
+        protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ExportDirectiveDefinition(GraphQL.Types.Directive directive) { }
+        protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ExportEnumTypeDefinition(GraphQL.Types.EnumerationGraphType enumType) { }
+        protected virtual GraphQLParser.AST.GraphQLFieldDefinition ExportFieldDefinition(GraphQL.Types.FieldType fieldType) { }
+        protected virtual GraphQLParser.AST.GraphQLInputObjectTypeDefinition ExportInputObjectTypeDefinition(GraphQL.Types.IInputObjectGraphType graphType) { }
+        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportInputValueDefinition(GraphQL.Types.FieldType fieldType) { }
+        protected virtual GraphQLParser.AST.GraphQLInterfaceTypeDefinition ExportInterfaceTypeDefinition(GraphQL.Types.IInterfaceGraphType graphType) { }
+        protected virtual GraphQLParser.AST.GraphQLObjectTypeDefinition ExportObjectTypeDefinition(GraphQL.Types.IObjectGraphType graphType) { }
+        protected virtual GraphQLParser.AST.GraphQLScalarTypeDefinition ExportScalarTypeDefinition(GraphQL.Types.ScalarGraphType scalarType) { }
+        protected virtual GraphQLParser.AST.GraphQLSchemaDefinition ExportSchemaDefinition() { }
+        protected virtual GraphQLParser.AST.GraphQLTypeDefinition ExportTypeDefinition(GraphQL.Types.IGraphType graphType) { }
+        protected virtual GraphQLParser.AST.GraphQLType ExportTypeReference(GraphQL.Types.IGraphType graphType) { }
+        protected virtual GraphQLParser.AST.GraphQLUnionTypeDefinition ExportUnionTypeDefinition(GraphQL.Types.UnionGraphType graphType) { }
+        public static GraphQLParser.AST.GraphQLDocument Export(GraphQL.Types.ISchema schema) { }
+        protected static bool IsBuiltInDirective(string directiveName) { }
+        protected static bool IsBuiltInScalar(string typeName) { }
+        protected static bool IsIntrospectionType(string typeName) { }
     }
     public class SchemaPrinter
     {
