@@ -379,7 +379,7 @@ public class SchemaExporter
     /// already set on the schema object, then the deprecation reason is added
     /// as a directive also.
     /// </summary>
-    protected virtual T ApplyDirectives<T>(T node, IMetadataReader obj)
+    protected virtual T ApplyDirectives<T>(T node, IProvideMetadata obj) // v8: IMetadataReader
         where T : IHasDirectivesNode
     {
         var deprecationReason = (obj as IProvideDeprecationReason)?.DeprecationReason;
