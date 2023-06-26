@@ -71,7 +71,7 @@ public class SchemaExporter
     /// <summary>
     /// Returns <see langword="true"/> if the specified type name is a built-in introspection type.
     /// </summary>
-    protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
+    protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.Ordinal);
 
     /// <summary>
     /// Returns <see langword="true"/> if the specified type name is a built-in scalar type.
