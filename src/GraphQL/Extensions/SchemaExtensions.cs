@@ -2,6 +2,8 @@ using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Utilities.Visitors;
+using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
 namespace GraphQL
@@ -99,23 +101,33 @@ namespace GraphQL
         /// <summary>
         /// Prints the schema to a string using the specified options.
         /// </summary>
-        public static string Print(this ISchema schema, SDLPrinterOptions? options = null)
+        public static string Print(this ISchema schema, PrintOptions? options = null)
         {
-            var exporter = new SchemaExporter(schema);
-            var sdl = exporter.Export();
-            // todo: sort SDL
-            var printer = new SDLPrinter(options ?? new());
-            return printer.Print(sdl);
+            using var writer = new StringWriter();
+#pragma warning disable CA2012 // Use ValueTasks correctly
+            schema.PrintAsync(writer, options).GetAwaiter().GetResult();
+#pragma warning restore CA2012 // Use ValueTasks correctly
+            return writer.ToString();
         }
 
         /// <summary>
         /// Prints the schema to a specified <see cref="TextWriter"/>.
         /// </summary>
-        public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, SDLPrinterOptions? options = null, CancellationToken cancellationToken = default)
+        public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, PrintOptions? options = null, CancellationToken cancellationToken = default)
         {
-            var exporter = new SchemaExporter(schema);
-            var sdl = exporter.Export();
-            // todo: sort SDL
+            var sdl = schema.ToAST();
+            if (options != null && !options.IncludeDeprecationReasons)
+            {
+                RemoveDeprecationReasonVisitor.Visit(sdl);
+            }
+            if (options != null && !options.IncludeDescriptions)
+            {
+                RemoveDescriptionVisitor.Visit(sdl);
+            }
+            if (options?.StringComparison != null)
+            {
+                SDLSorter.Sort(sdl, new(options.StringComparison.Value));
+            }
             var printer = new SDLPrinter(options ?? new());
             return printer.PrintAsync(sdl, writer, cancellationToken);
         }
@@ -379,6 +391,10 @@ namespace GraphQL
                     provider.ResolvedType = _replacement;
             }
         }
+
+        /// <inheritdoc cref="SchemaExporter.Export(ISchema)"/>
+        public static GraphQLDocument ToAST(this ISchema schema)
+            => SchemaExporter.Export(schema);
     }
 
     /// <summary>

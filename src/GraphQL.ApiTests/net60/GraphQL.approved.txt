@@ -738,8 +738,8 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
-        public static string Print(this GraphQL.Types.ISchema schema, GraphQLParser.Visitors.SDLPrinterOptions? options = null) { }
-        public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQLParser.Visitors.SDLPrinterOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
+        public static string Print(this GraphQL.Types.ISchema schema, GraphQL.Utilities.PrintOptions? options = null) { }
+        public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQL.Utilities.PrintOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T>(this GraphQL.Types.ISchema schema)
             where T : GraphQL.Types.IGraphType { }
         public static void RegisterTypeMapping<TClrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(this GraphQL.Types.ISchema schema)
@@ -761,6 +761,7 @@ namespace GraphQL
         public static TSchema ReplaceScalar<TSchema>(this TSchema schema, GraphQL.Types.ScalarGraphType scalar)
             where TSchema : GraphQL.Types.ISchema { }
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
+        public static GraphQLParser.AST.GraphQLDocument ToAST(this GraphQL.Types.ISchema schema) { }
     }
     public static class StringExtensions
     {
@@ -2793,6 +2794,13 @@ namespace GraphQL.Utilities
         EnumValue = 3,
         Directive = 4,
     }
+    public class PrintOptions : GraphQLParser.Visitors.SDLPrinterOptions
+    {
+        public PrintOptions() { }
+        public bool IncludeDeprecationReasons { get; set; }
+        public bool IncludeDescriptions { get; set; }
+        public System.StringComparison? StringComparison { get; set; }
+    }
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
@@ -2826,7 +2834,7 @@ namespace GraphQL.Utilities
         protected GraphQL.Types.ISchema Schema { get; }
         protected virtual T ApplyDescription<T>(T node, GraphQL.Types.IProvideDescription obj)
             where T : GraphQLParser.AST.IHasDescriptionNode { }
-        protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IMetadataReader obj)
+        protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IProvideMetadata obj)
             where T : GraphQLParser.AST.IHasDirectivesNode { }
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
         protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
@@ -3003,6 +3011,27 @@ namespace GraphQL.Utilities.Federation
     {
         public static void ResolveReferenceAsync(this GraphQL.Utilities.TypeConfig config, GraphQL.Utilities.Federation.IFederatedResolver resolver) { }
         public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
+    }
+}
+namespace GraphQL.Utilities.Visitors
+{
+    public class RemoveDeprecationReasonVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDeprecationReasonVisitor.Context>
+    {
+        protected override System.Threading.Tasks.ValueTask VisitDirectiveAsync(GraphQLParser.AST.GraphQLDirective directive, GraphQL.Utilities.Visitors.RemoveDeprecationReasonVisitor.Context context) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+        }
+    }
+    public class RemoveDescriptionVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDescriptionVisitor.Context>
+    {
+        public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Utilities.Visitors.RemoveDescriptionVisitor.Context context) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+        }
     }
 }
 namespace GraphQL.Validation
