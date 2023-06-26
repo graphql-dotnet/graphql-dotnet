@@ -1,0 +1,20 @@
+schema {
+  query: Query
+}
+
+type Cat {
+  name: String!
+  weight(inPounds: Boolean): Float!
+}
+
+type Dog {
+  age: Int!
+}
+
+union Pet = Cat | Dog
+
+type Query {
+  allAnimalsCount: [Int!] @deprecated
+  animal: Pet
+  catsGroups: [[Cat!]!]!
+}

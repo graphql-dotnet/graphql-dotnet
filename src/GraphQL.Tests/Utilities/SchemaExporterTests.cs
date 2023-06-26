@@ -17,7 +17,16 @@ public class SchemaExporterTests
             }
         );
 
-        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+        schema.Print()
+            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("defaults.txt"));
+        schema.Print(new() { IncludeDescriptions = true })
+            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("withdescriptions.txt"));
+        schema.Print(new() { IncludeDeprecationReasons = true })
+            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("withreasons.txt"));
+        schema.Print(new() { StringComparison = StringComparison.InvariantCultureIgnoreCase })
+            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("sorted.txt"));
+        schema.Print(new() { IncludeDescriptions = true, IncludeDeprecationReasons = true, StringComparison = StringComparison.InvariantCultureIgnoreCase })
+            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("withall.txt"));
     }
 
     [Fact]

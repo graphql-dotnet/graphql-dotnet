@@ -116,19 +116,20 @@ namespace GraphQL
         public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, PrintOptions? options = null, CancellationToken cancellationToken = default)
         {
             var sdl = schema.ToAST();
-            if (options != null && !options.IncludeDeprecationReasons)
+            options ??= new();
+            if (!options.IncludeDeprecationReasons)
             {
                 RemoveDeprecationReasonVisitor.Visit(sdl);
             }
-            if (options != null && !options.IncludeDescriptions)
+            if (!options.IncludeDescriptions)
             {
                 RemoveDescriptionVisitor.Visit(sdl);
             }
-            if (options?.StringComparison != null)
+            if (options.StringComparison != null)
             {
                 SDLSorter.Sort(sdl, new(options.StringComparison.Value));
             }
-            var printer = new SDLPrinter(options ?? new());
+            var printer = new SDLPrinter(options);
             return printer.PrintAsync(sdl, writer, cancellationToken);
         }
 

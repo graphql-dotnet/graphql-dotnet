@@ -1,4 +1,3 @@
-"Animals - cats and dogs"
 schema {
   query: Query
 }
@@ -9,20 +8,13 @@ type Query {
   catsGroups: [[Cat!]!]!
 }
 
-" A cat"
 type Cat {
-  " cat's name"
   name: String!
-  weight(
-    "comment on argument"
-    inPounds: Boolean): Float!
+  weight(inPounds: Boolean): Float!
 }
 
-" A dog"
 type Dog {
-  " dog's age"
   age: Int!
 }
 
-"Cats with dogs"
 union Pet = Cat | Dog
