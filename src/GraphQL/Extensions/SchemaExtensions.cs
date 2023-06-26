@@ -392,9 +392,12 @@ namespace GraphQL
             }
         }
 
-        /// <inheritdoc cref="SchemaExporter.Export(ISchema)"/>
+
+        /// <summary>
+        /// Exports the specified schema as a <see cref="GraphQLDocument"/>.
+        /// </summary>
         public static GraphQLDocument ToAST(this ISchema schema)
-            => SchemaExporter.Export(schema);
+            => new SchemaExporter(schema).Export();
     }
 
     /// <summary>

@@ -69,11 +69,6 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified schema as a <see cref="GraphQLDocument"/>.
-    /// </summary>
-    public static GraphQLDocument Export(ISchema schema) => new SchemaExporter(schema).Export();
-
-    /// <summary>
     /// Returns <see langword="true"/> if the specified type name is a built-in introspection type.
     /// </summary>
     protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.InvariantCulture);
