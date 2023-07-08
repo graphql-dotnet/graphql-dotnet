@@ -2978,6 +2978,7 @@ namespace GraphQL.Validation
         where TNode : GraphQLParser.AST.ASTNode
     {
         public MatchingNodeVisitor(System.Action<TNode, GraphQL.Validation.ValidationContext>? enter = null, System.Action<TNode, GraphQL.Validation.ValidationContext>? leave = null) { }
+        public MatchingNodeVisitor(System.Func<TNode, GraphQL.Validation.ValidationContext, System.Threading.Tasks.ValueTask>? enter = null, System.Func<TNode, GraphQL.Validation.ValidationContext, System.Threading.Tasks.ValueTask>? leave = null) { }
     }
     public class MatchingNodeVisitor<TNode, TState> : GraphQL.Validation.INodeVisitor
         where TNode : GraphQLParser.AST.ASTNode
