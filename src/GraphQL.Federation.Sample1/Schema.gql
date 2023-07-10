@@ -1,0 +1,8 @@
+type Query {
+  categories: [Category!]
+}
+
+type Category @key(fields: "id") {
+  id: ID!
+  name: String!
+}
