@@ -177,10 +177,9 @@ jobs:
       - name: Run GraphQL query
         working-directory: src
         run: |
-          curl -X POST -H "Content-Type: application/json" \
-          -d @federation-request.json \
-          http://127.0.0.1:4000  > response.json
+          curl -X POST -H "Content-Type: application/json" -d @federation-request.json http://127.0.0.1:4000 > response.json
       - name: Print query result
+        working-directory: src
         run: cat response.json
   buildcheck:
     needs:
