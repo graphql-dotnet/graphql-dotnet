@@ -158,7 +158,7 @@ jobs:
         run: curl -sSL https://router.apollo.dev/download/nix/latest | sh
       - name: Start router
         working-directory: src
-        run: ./router --supergraph supergraph.graphql &
+        run: ./router --dev --supergraph supergraph.graphql &
       - name: Wait for router to spin up
         run: |
           for i in {1..60}
