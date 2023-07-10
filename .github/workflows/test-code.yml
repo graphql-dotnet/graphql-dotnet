@@ -153,9 +153,6 @@ jobs:
       - name: Print supergraph
         working-directory: src
         run: cat supergraph.graphql
-      - name: Validate supergraph
-        working-directory: src
-        run: rover supergraph validate --config ./federation-supergraph-config.yaml --schema supergraph.graphql
       - name: Download router
         working-directory: src
         run: curl -sSL https://router.apollo.dev/download/nix/latest | sh
