@@ -177,7 +177,7 @@ namespace GraphQL.Validation
                     }
 
                     // create a new variable object
-                    var variable = new Variable(variableDefName);
+                    var variable = new Variable(variableDefName, variableDef);
 
                     // attempt to retrieve the variable value from the inputs
                     if (Variables.TryGetValue(variableDefName, out object? variableValue))

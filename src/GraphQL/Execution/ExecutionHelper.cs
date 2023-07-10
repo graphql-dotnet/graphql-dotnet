@@ -84,11 +84,49 @@ namespace GraphQL.Execution
 
             if (input is GraphQLVariable variable)
             {
-                if (variables == null)
-                    return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                var v = variables?.Find(variable.Name);
+                if (v != null && (v.IsDefault || v.ValueSpecified))
+                {
+                    // get the variable value
+                    var value = v.Value;
 
-                var found = variables.ValueFor(variable.Name, out var ret);
-                return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                    // wrap list if necessary
+                    // todo: v.Definition != null for backwards compatibility for 7.x; remove in 8.x
+                    if (v.Definition != null && v.Definition.Type is not GraphQLListType)
+                    {
+                        //---THE FOLLOWING CODE CRASHES THE .NET 7.0.304 COMPILER
+                        //
+                        //while (type is ListGraphType listType2)
+                        //{
+                        //    value = new object?[] { value };
+                        //    type = listType2.ResolvedType!;
+                        //}
+                        //
+                        //---SO INSTEAD WE HAVE:
+                        while (WrapType(ref type, ref value))
+                        {
+                        }
+
+                        static bool WrapType(ref IGraphType type, ref object? value)
+                        {
+                            if (type is ListGraphType listType)
+                            {
+                                value = new object?[] { value };
+                                type = listType.ResolvedType!;
+                                return true;
+                            }
+                            return false;
+                        }
+                        //-----
+                    }
+
+                    // return the variable
+                    return new ArgumentValue(value, v.IsDefault ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+                }
+                else
+                {
+                    return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                }
             }
 
             if (type is ScalarGraphType scalarType)

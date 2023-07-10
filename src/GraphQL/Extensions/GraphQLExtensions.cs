@@ -270,6 +270,16 @@ namespace GraphQL
         /// equal or a subset of the second super type (covariant).
         /// </summary>
         public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType)
+            => IsSubtypeOf(maybeSubType, superType, false);
+
+        /// <summary>
+        /// Provided a type and a super type, return <see langword="true"/> if the first type is either
+        /// equal or a subset of the second super type (covariant).
+        /// When <paramref name="allowScalarsForLists"/> is <see langword="true"/>, it will allow
+        /// scalar types to match list types, as long as the inner types match, pursuant to the
+        /// GraphQL June 2018 Specification, section 3.11 "List: Input Coercion".
+        /// </summary>
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, bool allowScalarsForLists)
         {
             if (maybeSubType.Equals(superType))
             {
@@ -281,22 +291,26 @@ namespace GraphQL
             {
                 if (maybeSubType is NonNullGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!);
+                    return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!, allowScalarsForLists);
                 }
 
                 return false;
             }
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType!, superType);
+                return IsSubtypeOf(sub.ResolvedType!, superType, allowScalarsForLists);
             }
 
-            // If superType type is a list, maybeSubType type must also be a list.
+            // If superType type is a list, maybeSubType type must also be a list, unless allowScalarsForLists is true.
             if (superType is ListGraphType sup)
             {
                 if (maybeSubType is ListGraphType sub)
                 {
-                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!);
+                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!, allowScalarsForLists);
+                }
+                if (allowScalarsForLists)
+                {
+                    return IsSubtypeOf(maybeSubType, sup.ResolvedType!, allowScalarsForLists);
                 }
 
                 return false;

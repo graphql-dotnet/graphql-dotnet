@@ -49,7 +49,7 @@ namespace GraphQL.Validation.Rules
                             if (varDef != null && usage.Type != null)
                             {
                                 var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                                if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
+                                if (varType != null && !EffectiveType(varType, varDef).IsSubtypeOf(usage.Type, true))
                                 {
                                     context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
                                 }
@@ -63,7 +63,7 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// if a variable definition has a default value, it is effectively non-null.
         /// </summary>
-        private static GraphType effectiveType(IGraphType varType, GraphQLVariableDefinition varDef)
+        private static GraphType EffectiveType(IGraphType varType, GraphQLVariableDefinition varDef)
         {
             if (varDef.DefaultValue == null || varType is NonNullGraphType)
             {
