@@ -158,13 +158,13 @@ jobs:
         run: curl -sSL https://router.apollo.dev/download/nix/latest | sh
       - name: Start router
         working-directory: src
-        run: ./router --supergraph supergraph.graphql --port 5600 &
+        run: ./router --supergraph supergraph.graphql &
       - name: Wait for router to spin up
         run: |
           for i in {1..60}
           do
             echo "Request $i to the URL..."
-            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5600)
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000)
             if [ $response -eq 200 ]; then
               echo "Received 200 response, step completed."
               exit 0
