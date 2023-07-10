@@ -138,6 +138,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSample.CodeFirst", "GraphQL.AotCompilationSample.CodeFirst\GraphQL.AotCompilationSample.CodeFirst.csproj", "{AF935624-E6BC-4C61-99A7-DC0A829DB933}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Federation", "Federation", "{AC187761-BF5E-49A9-85A0-8747FD9EAA57}"
+	ProjectSection(SolutionItems) = preProject
+		federation-supergraph-config.yaml = federation-supergraph-config.yaml
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Sample1", "GraphQL.Federation.Sample1\GraphQL.Federation.Sample1.csproj", "{DADDBD33-5BC3-4C12-A3E6-8891C8A23827}"
 EndProject
