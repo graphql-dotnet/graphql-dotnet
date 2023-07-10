@@ -1,10 +1,10 @@
 extend type Query {
-  products: [Product!]
+  products: [Product!]!
 }
 
 extend type Category @key(fields: "id") {
   id: ID!
-  products: [Product!]
+  products: [Product!]!
 }
 
 type Product @key(fields: "id") {

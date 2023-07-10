@@ -1,5 +1,5 @@
 type Query {
-  categories: [Category!]
+  categories: [Category!]!
 }
 
 type Category @key(fields: "id") {
