@@ -106,6 +106,9 @@ jobs:
       - name: Install Apollo Rover CLI
         run: |
           curl -sSL https://rover.apollo.dev/nix/latest | sh
+          echo "/home/runner/.rover/bin" >> $GITHUB_PATH
+      - name: Test rover
+        run: |
           rover config --help
           rover --version
           rover
