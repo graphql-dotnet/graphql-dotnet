@@ -150,7 +150,7 @@ jobs:
       - name: Build supergraph
         working-directory: src
         run: |
-          rover supergraph compose --config ./federation-supergraph-config.yaml
+          rover supergraph compose --config ./federation-supergraph-config.yaml --elv2-license=accept
   buildcheck:
     needs:
       - test
