@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "GraphQL.Federation.Sample1": {
+    "GraphQL.Federation.Sample2": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

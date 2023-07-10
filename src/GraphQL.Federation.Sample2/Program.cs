@@ -28,6 +28,7 @@ Func<IServiceProvider, ISchema> schemaBuilder = (serviceProvider) =>
 // Configure services
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<Data>();
+builder.Services.AddSingleton<Query>();
 builder.Services.AddGraphQL(b => b
     .AddSchema(schemaBuilder)
     .AddSystemTextJson());
