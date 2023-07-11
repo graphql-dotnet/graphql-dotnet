@@ -1,76 +1,78 @@
 using System.Reflection;
-using GraphQL;
-using GraphQL.Federation.Sample2;
 using GraphQL.Federation.Sample2.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities.Federation;
 
-// Create the schema builder delegate
-Func<IServiceProvider, ISchema> schemaBuilder = (serviceProvider) =>
+namespace GraphQL.Federation.Sample2;
+
+public static class Program
 {
-    var data = serviceProvider.GetRequiredService<Data>();
-    var filename = "GraphQL.Federation.Sample2.Schema.gql";
-    var assembly = Assembly.GetExecutingAssembly();
-    var stream = assembly.GetManifestResourceStream(filename)
-        ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
-    var reader = new StreamReader(stream);
-    var schemaString = reader.ReadToEnd();
-    var schemaBuilder = new FederatedSchemaBuilder();
-    schemaBuilder.Types.Include<Query>();
-    schemaBuilder.Types.Include<Category>();
-    schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(data.GetResolver<Category>());
-    schemaBuilder.Types.Include<Product>();
-    schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(data.GetResolver<Product>());
-    return schemaBuilder.Build(schemaString);
-};
-
-// Configure services
-var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<Data>();
-builder.Services.AddSingleton<Query>();
-builder.Services.AddGraphQL(b => b
-    .AddSchema(schemaBuilder)
-    .AddSystemTextJson());
-
-// Build the web application
-var app = builder.Build();
-
-// Some simple GraphQL middleware
-app.MapPost("/graphql", async (HttpContext context) =>
-{
-    var serializer = context.RequestServices.GetRequiredService<IGraphQLSerializer>();
-    var executer = context.RequestServices.GetRequiredService<IDocumentExecuter>();
-    var request = await serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false);
-
-    if (request == null)
+    public static async Task Main(string[] args)
     {
-        context.Response.StatusCode = 500;
-        return;
+        // Configure services
+        var builder = WebApplication.CreateBuilder(args);
+        builder.Services.AddSingleton<Data>();
+        builder.Services.AddSingleton<Query>();
+        builder.Services.AddGraphQL(b => b
+            .AddSchema(BuildSchema)
+            .AddSystemTextJson());
+
+        // Build the web application
+        var app = builder.Build();
+
+        // Some simple GraphQL middleware
+        app.MapPost("/graphql", GraphQLHttpMiddlewareAsync);
+
+        // Add a UI package for testing
+        app.UseGraphQLPlayground("/");
+
+        // Optional: ensure that the schema builds and initializes
+        {
+            var schema = app.Services.GetRequiredService<ISchema>();
+            schema.Initialize();
+        }
+
+        // Start the application
+        await app.RunAsync().ConfigureAwait(false);
     }
 
-    var result = await executer.ExecuteAsync(options =>
+    private static ISchema BuildSchema(IServiceProvider serviceProvider)
     {
-        options.Query = request.Query;
-        options.OperationName = request.OperationName;
-        options.Variables = request.Variables;
-        options.RequestServices = context.RequestServices;
-        options.CancellationToken = context.RequestAborted;
-    }).ConfigureAwait(false);
+        var data = serviceProvider.GetRequiredService<Data>();
+        var filename = "GraphQL.Federation.Sample2.Schema.gql";
+        var assembly = Assembly.GetExecutingAssembly();
+        var stream = assembly.GetManifestResourceStream(filename)
+            ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
+        var reader = new StreamReader(stream);
+        var schemaString = reader.ReadToEnd();
+        var schemaBuilder = new FederatedSchemaBuilder();
+        schemaBuilder.Types.Include<Query>();
+        schemaBuilder.Types.Include<Category>();
+        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(data.GetResolver<Category>());
+        schemaBuilder.Types.Include<Product>();
+        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(data.GetResolver<Product>());
+        return schemaBuilder.Build(schemaString);
+    }
 
-    context.Response.StatusCode = 200;
-    context.Response.ContentType = "application/json";
-    await serializer.WriteAsync(context.Response.Body, result, context.RequestAborted).ConfigureAwait(false);
-});
+    private static async Task GraphQLHttpMiddlewareAsync(HttpContext context)
+    {
+        var serializer = context.RequestServices.GetRequiredService<IGraphQLSerializer>();
+        var executer = context.RequestServices.GetRequiredService<IDocumentExecuter>();
+        var request = await serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false)
+            ?? throw new InvalidOperationException("Could not read request");
 
-// Add a UI package for testing
-app.UseGraphQLPlayground("/");
+        var result = await executer.ExecuteAsync(options =>
+        {
+            options.Query = request.Query;
+            options.OperationName = request.OperationName;
+            options.Variables = request.Variables;
+            options.RequestServices = context.RequestServices;
+            options.CancellationToken = context.RequestAborted;
+        }).ConfigureAwait(false);
 
-// Optional: ensure that the schema builds and initializes
-{
-    var schema = app.Services.GetRequiredService<ISchema>();
-    schema.Initialize();
+        context.Response.StatusCode = 200;
+        context.Response.ContentType = "application/json";
+        await serializer.WriteAsync(context.Response.Body, result, context.RequestAborted).ConfigureAwait(false);
+    }
 }
-
-// Start the application
-await app.RunAsync().ConfigureAwait(false);

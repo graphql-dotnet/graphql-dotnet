@@ -1,4 +1,4 @@
-federation_version: 2
+federation_version: 1
 subgraphs:
   sample1:
     routing_url: http://localhost:5601/graphql
