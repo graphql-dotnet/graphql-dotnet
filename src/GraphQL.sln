@@ -139,11 +139,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSampl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Federation", "Federation", "{AC187761-BF5E-49A9-85A0-8747FD9EAA57}"
 	ProjectSection(SolutionItems) = preProject
-		federation-request.json = federation-request.json
+		federation-request-2.json = federation-request-2.json
+		federation-request-3.json = federation-request-3.json
 		federation-supergraph-config.yaml = federation-supergraph-config.yaml
+		federation-request-1.json = federation-request-1.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Sample1", "GraphQL.Federation.Sample1\GraphQL.Federation.Sample1.csproj", "{DADDBD33-5BC3-4C12-A3E6-8891C8A23827}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Sample1", "GraphQL.Federation.Sample1\GraphQL.Federation.Sample1.csproj", "{DADDBD33-5BC3-4C12-A3E6-8891C8A23827}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Sample2", "GraphQL.Federation.Sample2\GraphQL.Federation.Sample2.csproj", "{456260BC-111A-4891-887E-2FFE7ED102DB}"
 EndProject
