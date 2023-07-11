@@ -1,10 +1,10 @@
 using System.Reflection;
-using GraphQL.Utilities.Federation;
 using GraphQL;
-using GraphQL.Transport;
-using GraphQL.Federation.Sample1.Schema;
 using GraphQL.Federation.Sample1;
+using GraphQL.Federation.Sample1.Schema;
+using GraphQL.Transport;
 using GraphQL.Types;
+using GraphQL.Utilities.Federation;
 
 // Create the schema builder delegate
 Func<IServiceProvider, ISchema> schemaBuilder = (serviceProvider) =>
