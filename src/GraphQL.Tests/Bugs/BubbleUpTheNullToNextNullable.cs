@@ -1,3 +1,5 @@
+#nullable disable
+
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;

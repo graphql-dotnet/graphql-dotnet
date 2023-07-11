@@ -21,7 +21,7 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         {
             Executed = true,
             Errors = new ExecutionErrors { error },
-            Data = new { @int = (object)null }
+            Data = new { @int = (object?)null }
         };
 
         AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);
@@ -81,7 +81,7 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         {
             Executed = true,
             Errors = new ExecutionErrors { error },
-            Data = new { long_return_bigint = (object)null }
+            Data = new { long_return_bigint = (object?)null }
         };
 
         AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);

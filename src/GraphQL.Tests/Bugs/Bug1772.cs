@@ -8,7 +8,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
 {
     [Theory]
     [InlineData("")]
-    [InlineData((string)null)]
+    [InlineData((string?)null)]
     [InlineData("firstQuery")]
     [InlineData("secondQuery")]
     public async Task DocumentExecuter_works_for_valid_operation(string operationName)

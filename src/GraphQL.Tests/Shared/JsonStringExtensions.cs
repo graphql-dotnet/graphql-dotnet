@@ -23,14 +23,13 @@ public static class JsonStringExtensions
             Executed = executed
         };
 
+    [return: NotNullIfNotNull("json")]
     public static Dictionary<string, object?>? ToDictionary(this string? json)
     {
         if (json == null)
             return null;
 
         var ret = json.ToInputs();
-        if (ret == null)
-            return null;
 
         return new Dictionary<string, object?>(ret);
     }
@@ -38,7 +37,7 @@ public static class JsonStringExtensions
     private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer(indent: true);
     private static readonly IDocumentExecuter _executer = new DocumentExecuter();
 
-    public static Inputs? ToInputs(this string? json)
+    public static Inputs ToInputs(this string? json)
         => _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
 
     public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)

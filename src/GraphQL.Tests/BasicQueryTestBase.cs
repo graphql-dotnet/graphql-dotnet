@@ -14,11 +14,11 @@ public class BasicQueryTestBase
         ISchema schema,
         string query,
         string expected,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null)
+        IEnumerable<IValidationRule>? rules = null)
     {
         var queryResult = CreateQueryResult(expected);
         return AssertQuery(schema, query, queryResult, variables, root, userContext, cancellationToken, rules);
@@ -41,13 +41,13 @@ public class BasicQueryTestBase
         //            Console.WriteLine(writtenResult);
         //#endif
 
-        string additionalInfo = null;
+        string? additionalInfo = null;
 
         if (runResult.Errors?.Any() == true)
         {
             additionalInfo = string.Join(Environment.NewLine, runResult.Errors
                 .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                .Select(x => x.InnerException.Message));
+                .Select(x => x.InnerException!.Message));
         }
 
         writtenResult.ShouldBe(expectedResult, additionalInfo);
@@ -59,11 +59,11 @@ public class BasicQueryTestBase
         ISchema schema,
         string query,
         ExecutionResult expectedExecutionResult,
-        Inputs variables,
-        object root,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables,
+        object? root,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null)
+        IEnumerable<IValidationRule>? rules = null)
     {
         var runResult = Executer.ExecuteAsync(_ =>
         {
@@ -71,7 +71,7 @@ public class BasicQueryTestBase
             _.Query = query;
             _.Root = root;
             _.Variables = variables;
-            _.UserContext = userContext;
+            _.UserContext = userContext ?? new Dictionary<string, object?>();
             _.CancellationToken = cancellationToken;
             _.ValidationRules = rules;
         }).GetAwaiter().GetResult();
@@ -83,13 +83,13 @@ public class BasicQueryTestBase
         //            Console.WriteLine(writtenResult);
         //#endif
 
-        string additionalInfo = null;
+        string? additionalInfo = null;
 
         if (runResult.Errors?.Any() == true)
         {
             additionalInfo = string.Join(Environment.NewLine, runResult.Errors
                 .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                .Select(x => x.InnerException.Message));
+                .Select(x => x.InnerException!.Message));
         }
 
         writtenResult.ShouldBe(expectedResult, additionalInfo);
