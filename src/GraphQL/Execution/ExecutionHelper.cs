@@ -92,7 +92,7 @@ namespace GraphQL.Execution
 
                     // wrap list if necessary
                     // todo: v.Definition != null for backwards compatibility for 7.x; remove in 8.x
-                    if (v.Definition != null && v.Definition.Type is not GraphQLListType)
+                    if (v.Definition != null && !IsASTListType(v.Definition.Type))
                     {
                         //---THE FOLLOWING CODE CRASHES THE .NET 7.0.304 COMPILER
                         //
@@ -122,6 +122,9 @@ namespace GraphQL.Execution
 
                     // return the variable
                     return new ArgumentValue(value, v.IsDefault ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+
+                    static bool IsASTListType(GraphQLType type)
+                        => type is GraphQLListType || (type is GraphQLNonNullType nonNullType && nonNullType.Type is GraphQLListType);
                 }
                 else
                 {
