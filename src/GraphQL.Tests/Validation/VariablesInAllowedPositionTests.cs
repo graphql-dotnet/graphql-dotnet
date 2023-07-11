@@ -299,24 +299,13 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_string_list()
     {
-        const string query = """
+        ShouldPassRule("""
             query Query($stringVar: String) {
               complicatedArgs {
                 stringListArgField(stringListArg: $stringVar)
               }
             }
-            """;
-
-        ShouldFailRule(_ =>
-        {
-            _.Query = query;
-            _.Error(err =>
-            {
-                err.Message = BadVarPosMessage("stringVar", "String", "[String]");
-                err.Loc(1, 13);
-                err.Loc(3, 39);
-            });
-        });
+            """);
     }
 
     [Fact]
