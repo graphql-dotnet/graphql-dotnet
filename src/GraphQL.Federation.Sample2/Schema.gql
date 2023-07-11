@@ -1,9 +1,9 @@
-type Query {
+extend type Query {
   products: [Product!]!
 }
 
 extend type Category @key(fields: "id") {
-  id: ID!
+  id: ID! @external
   products: [Product!]!
 }
 
