@@ -35,9 +35,9 @@ public class Data
 
         public Task<object?> Resolve(FederatedResolveContext context)
         {
-            if (context.Arguments.TryGetValue("id", out var idValue) && idValue is int id)
+            if (context.Arguments.TryGetValue("id", out var idValue))
             {
-                return Task.FromResult<object?>(_list.FirstOrDefault(x => x.Id == id));
+                return Task.FromResult<object?>(_list.FirstOrDefault(x => x.Id == (int)Convert.ChangeType(idValue, typeof(int))!));
             }
             return Task.FromResult<object?>(null);
         }
