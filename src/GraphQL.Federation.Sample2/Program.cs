@@ -6,7 +6,7 @@ using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Federation.Sample2;
 
-public static class Program
+public class Program
 {
     public static async Task Main(string[] args)
     {

@@ -139,15 +139,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSampl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Federation", "Federation", "{AC187761-BF5E-49A9-85A0-8747FD9EAA57}"
 	ProjectSection(SolutionItems) = preProject
+		federation-request-1.json = federation-request-1.json
 		federation-request-2.json = federation-request-2.json
 		federation-request-3.json = federation-request-3.json
 		federation-supergraph-config.yaml = federation-supergraph-config.yaml
-		federation-request-1.json = federation-request-1.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Sample1", "GraphQL.Federation.Sample1\GraphQL.Federation.Sample1.csproj", "{DADDBD33-5BC3-4C12-A3E6-8891C8A23827}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Sample2", "GraphQL.Federation.Sample2\GraphQL.Federation.Sample2.csproj", "{456260BC-111A-4891-887E-2FFE7ED102DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Tests", "GraphQL.Federation.Tests\GraphQL.Federation.Tests.csproj", "{75326CF3-9C2A-447E-9D5A-6B0200A23035}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -239,6 +241,10 @@ Global
 		{456260BC-111A-4891-887E-2FFE7ED102DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{456260BC-111A-4891-887E-2FFE7ED102DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{456260BC-111A-4891-887E-2FFE7ED102DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75326CF3-9C2A-447E-9D5A-6B0200A23035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75326CF3-9C2A-447E-9D5A-6B0200A23035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75326CF3-9C2A-447E-9D5A-6B0200A23035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75326CF3-9C2A-447E-9D5A-6B0200A23035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -262,6 +268,7 @@ Global
 		{AF935624-E6BC-4C61-99A7-DC0A829DB933} = {EA03E3DA-9FCC-40CA-BD23-642B297EA3F4}
 		{DADDBD33-5BC3-4C12-A3E6-8891C8A23827} = {AC187761-BF5E-49A9-85A0-8747FD9EAA57}
 		{456260BC-111A-4891-887E-2FFE7ED102DB} = {AC187761-BF5E-49A9-85A0-8747FD9EAA57}
+		{75326CF3-9C2A-447E-9D5A-6B0200A23035} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}
