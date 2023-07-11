@@ -279,6 +279,7 @@ namespace GraphQL
         /// scalar types to match list types, as long as the inner types match, pursuant to the
         /// GraphQL June 2018 Specification, section 3.11 "List: Input Coercion".
         /// </summary>
+        // TODO: roll this into IsSubtypeOf and remove the allowScalarsForLists parameter
         public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, bool allowScalarsForLists)
         {
             if (maybeSubType.Equals(superType))
