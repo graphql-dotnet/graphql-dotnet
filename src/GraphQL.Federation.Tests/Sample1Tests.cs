@@ -1,7 +1,7 @@
 using GraphQL.Federation.Sample1;
 using Microsoft.AspNetCore.Mvc.Testing;
 
-namespace GraphQL.Federation.Tests.Sample1Tests;
+namespace GraphQL.Federation.Tests;
 
 public class Sample1Tests
 {
@@ -29,12 +29,5 @@ public class Sample1Tests
         var variables = """{ "arg": [{ "__typename": "Category", "id": "1" }] }""";
         var cat = await webApp.Server.ExecuteGraphQLRequest("/graphql", query, variables).ConfigureAwait(false);
         cat.ShouldMatchApproved(o => o.NoDiff());
-    }
-
-    private class Category
-    {
-        public string __typename { get; set; } = null!;
-        public string Id { get; set; } = null!;
-        public string Name { get; set; } = null!;
     }
 }
