@@ -216,12 +216,13 @@ jobs:
   buildcheck:
     needs:
       - test
+      - testfederation
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Pass build check
-        if: ${{ needs.test.result == 'success' }}
+        if: ${{ needs.test.result == 'success' && needs.testfederation.result == 'success' }}
         run: exit 0
       - name: Fail build check
-        if: ${{ needs.test.result != 'success' }}
+        if: ${{ needs.test.result != 'success' || needs.testfederation.result != 'success' }}
         run: exit 1
