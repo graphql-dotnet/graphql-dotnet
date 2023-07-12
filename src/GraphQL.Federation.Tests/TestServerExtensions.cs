@@ -10,6 +10,7 @@ namespace GraphQL.Federation.Tests;
 public static class TestServerExtensions
 {
     private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer();
+    private static readonly JsonSerializerOptions _formattedOptions = new JsonSerializerOptions { WriteIndented = true };
 
     public static Task<string> ExecuteGraphQLRequest(this TestServer server, string url, string query, object? variables = null)
     {
@@ -57,6 +58,6 @@ public static class TestServerExtensions
         }
         using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         var ret = await JsonSerializer.DeserializeAsync<JsonElement>(stream).ConfigureAwait(false);
-        return JsonSerializer.Serialize(ret, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(ret, _formattedOptions);
     }
 }
