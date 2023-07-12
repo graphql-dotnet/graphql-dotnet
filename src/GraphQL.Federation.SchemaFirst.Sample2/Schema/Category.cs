@@ -1,4 +1,4 @@
-namespace GraphQL.Federation.Sample2.Schema;
+namespace GraphQL.Federation.SchemaFirst.Sample2.Schema;
 
 public class Category : IHasId
 {

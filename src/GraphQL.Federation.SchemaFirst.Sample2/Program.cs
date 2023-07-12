@@ -1,10 +1,10 @@
 using System.Reflection;
-using GraphQL.Federation.Sample1.Schema;
+using GraphQL.Federation.SchemaFirst.Sample2.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities.Federation;
 
-namespace GraphQL.Federation.Sample1;
+namespace GraphQL.Federation.SchemaFirst.Sample2;
 
 public class Program
 {
@@ -40,7 +40,7 @@ public class Program
     private static ISchema BuildSchema(IServiceProvider serviceProvider)
     {
         var data = serviceProvider.GetRequiredService<Data>();
-        var filename = "GraphQL.Federation.Sample1.Schema.gql";
+        var filename = "GraphQL.Federation.SchemaFirst.Sample2.Schema.gql";
         var assembly = Assembly.GetExecutingAssembly();
         var stream = assembly.GetManifestResourceStream(filename)
             ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
@@ -50,6 +50,8 @@ public class Program
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
         schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(data.GetResolver<Category>());
+        schemaBuilder.Types.Include<Product>();
+        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(data.GetResolver<Product>());
         return schemaBuilder.Build(schemaString);
     }
 

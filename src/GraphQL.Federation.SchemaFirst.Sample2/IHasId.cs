@@ -1,4 +1,4 @@
-namespace GraphQL.Federation.Sample2;
+namespace GraphQL.Federation.SchemaFirst.Sample2;
 
 public interface IHasId
 {

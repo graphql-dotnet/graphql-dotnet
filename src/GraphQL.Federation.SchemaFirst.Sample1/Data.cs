@@ -1,7 +1,7 @@
-using GraphQL.Federation.Sample1.Schema;
+using GraphQL.Federation.SchemaFirst.Sample1.Schema;
 using GraphQL.Utilities.Federation;
 
-namespace GraphQL.Federation.Sample1;
+namespace GraphQL.Federation.SchemaFirst.Sample1;
 
 public class Data
 {

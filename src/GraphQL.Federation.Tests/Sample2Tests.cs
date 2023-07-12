@@ -1,4 +1,4 @@
-using GraphQL.Federation.Sample2;
+using GraphQL.Federation.SchemaFirst.Sample2;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace GraphQL.Federation.Tests;

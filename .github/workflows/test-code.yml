@@ -102,19 +102,19 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Install dependencies
         working-directory: src
-        run: dotnet restore GraphQL.Federation.Sample1
+        run: dotnet restore GraphQL.Federation.SchemaFirst.Sample1
       - name: Build Sample1
         working-directory: src
-        run: dotnet build --no-restore GraphQL.Federation.Sample1
+        run: dotnet build --no-restore GraphQL.Federation.SchemaFirst.Sample1
       - name: Build Sample2
         working-directory: src
-        run: dotnet build GraphQL.Federation.Sample2
+        run: dotnet build GraphQL.Federation.SchemaFirst.Sample2
       - name: Start Sample1 on port 5601
         working-directory: src
-        run: dotnet run --no-build --project GraphQL.Federation.Sample1 &
+        run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample1 &
       - name: Start Sample2 on port 5602
         working-directory: src
-        run: dotnet run --no-build --project GraphQL.Federation.Sample2 &
+        run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample2 &
       - name: Install Apollo Rover CLI
         run: |
           curl -sSL https://rover.apollo.dev/nix/latest | sh

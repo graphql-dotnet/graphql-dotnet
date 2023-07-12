@@ -1,4 +1,4 @@
-namespace GraphQL.Federation.Sample1.Schema;
+namespace GraphQL.Federation.SchemaFirst.Sample1.Schema;
 
 public class Query
 {
