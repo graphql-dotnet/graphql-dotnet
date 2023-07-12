@@ -9,8 +9,8 @@ namespace GraphQL.Federation.Tests;
 
 public static class TestServerExtensions
 {
-    private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer();
-    private static readonly JsonSerializerOptions _formattedOptions = new JsonSerializerOptions { WriteIndented = true };
+    private static readonly GraphQLSerializer _serializer = new();
+    private static readonly JsonSerializerOptions _formattedOptions = new() { WriteIndented = true };
 
     public static Task<string> ExecuteGraphQLRequest(this TestServer server, string url, string query, object? variables = null)
     {
@@ -21,20 +21,16 @@ public static class TestServerExtensions
         };
         return server.ExecuteGraphQLRequest(url, request);
 
-        Inputs? GetVariables(object? variables)
+        static Inputs? GetVariables(object? variables)
         {
             if (variables is null)
-            {
                 return null;
-            }
 
             if (variables is string str)
-            {
                 return _serializer.Deserialize<Inputs>(str);
-            }
 
-            var json = _serializer.Serialize(variables);
-            return _serializer.Deserialize<Inputs>(json);
+            // convert anonymous object to Inputs dictionary
+            return _serializer.Deserialize<Inputs>(_serializer.Serialize(variables));
         }
     }
 
@@ -46,7 +42,7 @@ public static class TestServerExtensions
         };
         url = uriBuilder.Uri.ToString();
 
-        var json = _serializer.Serialize(request);
+        string json = _serializer.Serialize(request);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         using var client = server.CreateClient();
         using var response = await client
