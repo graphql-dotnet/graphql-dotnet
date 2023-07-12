@@ -51,6 +51,9 @@ public class Program
         var schemaBuilder = new FederatedSchemaBuilder();
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
+        // categories do not actually exist in the data, so we use a pseudo-resolver
+        // which always returns a Category instance for the given ID, so that the product
+        // list can be resolved from it
         schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
             new MyPseudoFederatedResolver<Category>());
         schemaBuilder.Types.Include<Product>();
