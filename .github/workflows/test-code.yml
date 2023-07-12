@@ -117,6 +117,8 @@ jobs:
           curl -sSL https://rover.apollo.dev/nix/latest | sh
           echo "/home/runner/.rover/bin" >> $GITHUB_PATH
           /home/runner/.rover/bin/rover --version
+      - name: Install jq
+        run: sudo apt-get install -y jq
       - name: Wait for Sample1 to spin up
         run: |
           for i in {1..60}
@@ -189,6 +191,24 @@ jobs:
       - name: Print query result 3
         working-directory: src
         run: cat response-3.json
+      - name: Compare query result 1 to expected response
+        working-directory: src
+        run: |
+          jq . response-1.json > actual-response-1.json
+          jq . federation-response-1.json > expected-response-1.json
+          diff -q -b actual-response-1.json expected-response-1.json
+      - name: Compare query result 2 to expected response
+        working-directory: src
+        run: |
+          jq . response-2.json > actual-response-2.json
+          jq . federation-response-2.json > expected-response-2.json
+          diff -q -b actual-response-2.json expected-response-2.json
+      - name: Compare query result 3 to expected response
+        working-directory: src
+        run: |
+          jq . response-3.json > actual-response-3.json
+          jq . federation-response-3.json > expected-response-3.json
+          diff -q -b actual-response-3.json expected-response-3.json
   buildcheck:
     needs:
       - test
