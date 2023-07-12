@@ -21,7 +21,7 @@ public class Program
         // Build the web application
         var app = builder.Build();
 
-        // Some simple GraphQL middleware
+        // Some simple GraphQL middleware (NOTE: it is suggested to use the GraphQL.Server.Transports.AspNetCore package instead)
         app.MapPost("/graphql", GraphQLHttpMiddlewareAsync);
 
         // Add a UI package for testing
@@ -39,27 +39,40 @@ public class Program
 
     private static ISchema BuildSchema(IServiceProvider serviceProvider)
     {
-        var data = serviceProvider.GetRequiredService<Data>();
+        // load the schema-first SDL from an embedded resource
         var filename = "GraphQL.Federation.SchemaFirst.Sample1.Schema.gql";
         var assembly = Assembly.GetExecutingAssembly();
         var stream = assembly.GetManifestResourceStream(filename)
             ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
+
+        // pull the data source from the DI container (assumes it was registered as a singleton)
+        var data = serviceProvider.GetRequiredService<Data>();
+
+        // define the known types and their resolvers
         var schemaBuilder = new FederatedSchemaBuilder();
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
         schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(data.GetResolver<Category>());
+
+        // build the schema
         return schemaBuilder.Build(schemaString);
     }
 
     private static async Task GraphQLHttpMiddlewareAsync(HttpContext context)
     {
+        // NOTE: it is suggested to use the GraphQL.Server.Transports.AspNetCore package instead
+
+        // pull the serializer and executer from the DI container
         var serializer = context.RequestServices.GetRequiredService<IGraphQLSerializer>();
         var executer = context.RequestServices.GetRequiredService<IDocumentExecuter>();
+
+        // read the request (ignores the content-type header)
         var request = await serializer.ReadAsync<GraphQLRequest>(context.Request.Body, context.RequestAborted).ConfigureAwait(false)
             ?? throw new InvalidOperationException("Could not read request");
 
+        // execute the request
         var result = await executer.ExecuteAsync(options =>
         {
             options.Query = request.Query;
@@ -69,7 +82,8 @@ public class Program
             options.CancellationToken = context.RequestAborted;
         }).ConfigureAwait(false);
 
-        context.Response.StatusCode = 200;
+        // write the response
+        context.Response.StatusCode = 200; // always OK even for errors
         context.Response.ContentType = "application/json";
         await serializer.WriteAsync(context.Response.Body, result, context.RequestAborted).ConfigureAwait(false);
     }

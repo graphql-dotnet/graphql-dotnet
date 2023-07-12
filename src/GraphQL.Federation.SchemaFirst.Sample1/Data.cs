@@ -5,7 +5,7 @@ namespace GraphQL.Federation.SchemaFirst.Sample1;
 
 public class Data
 {
-    private readonly List<Category> _categories = new List<Category>() {
+    private readonly List<Category> _categories = new() {
         new Category { Id = 1, Name = "Category 1" },
         new Category { Id = 2, Name = "Category 2" },
     };
@@ -15,6 +15,9 @@ public class Data
         return Task.FromResult(_categories.AsEnumerable());
     }
 
+    /// <summary>
+    /// Gets the proper resolver for the requested type.
+    /// </summary>
     public IFederatedResolver GetResolver<T>()
         where T : IHasId
         => typeof(T).Name switch
@@ -23,6 +26,9 @@ public class Data
             _ => throw new InvalidOperationException("Invalid type")
         };
 
+    /// <summary>
+    /// Retrieves the local instance of <typeparamref name="T"/> from the repository.
+    /// </summary>
     private class MyFederatedResolver<T> : IFederatedResolver
         where T : IHasId
     {
