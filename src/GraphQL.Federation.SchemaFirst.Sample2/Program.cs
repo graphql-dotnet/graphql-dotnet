@@ -47,16 +47,15 @@ public class Program
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
 
-        // pull the data source from the DI container (assumes it was registered as a singleton)
-        var data = serviceProvider.GetRequiredService<Data>();
-
         // define the known types and their resolvers
         var schemaBuilder = new FederatedSchemaBuilder();
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
-        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(data.GetResolver<Category>());
+        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
+            new MyPseudoFederatedResolver<Category>());
         schemaBuilder.Types.Include<Product>();
-        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(data.GetResolver<Product>());
+        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(
+            new MyFederatedResolver<Product>((data, id) => data.GetProductById(id)));
 
         // build the schema
         return schemaBuilder.Build(schemaString);
