@@ -212,6 +212,7 @@ jobs:
           jq . response-3.json > actual-response-3.json
           jq . federation-response-3.json > expected-response-3.json
           diff -b actual-response-3.json expected-response-3.json
+
   buildcheck:
     needs:
       - test
