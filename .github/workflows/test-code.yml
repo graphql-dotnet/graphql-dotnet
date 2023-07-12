@@ -85,7 +85,10 @@ jobs:
           files: 'src/.coverage/**/coverage.opencover.xml'
 
   testfederation:
-    name: Test federation
+    strategy:
+      matrix:
+        federationversion: [1, 2]
+    name: Test federation ${{ matrix.federationversion }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -149,9 +152,9 @@ jobs:
           done
           echo "Timed out after 30 seconds, step failed."
           exit 1
-      - name: Build supergraph
+      - name: Build supergraph with federation-${{ matrix.federationversion }}-supergraph-config.yaml
         working-directory: src/Federation
-        run: rover supergraph compose --config ./federation-supergraph-config.yaml --elv2-license=accept > supergraph.graphql
+        run: rover supergraph compose --config ./federation-${{ matrix.federationversion }}-supergraph-config.yaml --elv2-license=accept > supergraph.graphql
       - name: Print supergraph
         working-directory: src/Federation
         run: cat supergraph.graphql

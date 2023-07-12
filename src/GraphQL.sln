@@ -139,13 +139,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.AotCompilationSampl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Federation", "Federation", "{AC187761-BF5E-49A9-85A0-8747FD9EAA57}"
 	ProjectSection(SolutionItems) = preProject
+		Federation\federation-2-supergraph-config.yaml = Federation\federation-2-supergraph-config.yaml
 		Federation\federation-request-1.json = Federation\federation-request-1.json
+		Federation\federation-1-supergraph-config.yaml = Federation\federation-1-supergraph-config.yaml
 		Federation\federation-request-2.json = Federation\federation-request-2.json
 		Federation\federation-request-3.json = Federation\federation-request-3.json
 		Federation\federation-response-1.json = Federation\federation-response-1.json
 		Federation\federation-response-2.json = Federation\federation-response-2.json
 		Federation\federation-response-3.json = Federation\federation-response-3.json
-		Federation\federation-supergraph-config.yaml = Federation\federation-supergraph-config.yaml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Sample1", "GraphQL.Federation.Sample1\GraphQL.Federation.Sample1.csproj", "{DADDBD33-5BC3-4C12-A3E6-8891C8A23827}"
