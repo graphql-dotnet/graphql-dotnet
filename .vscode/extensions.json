@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-dotnettools.csharp",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "ms-vscode-remote.remote-containers",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

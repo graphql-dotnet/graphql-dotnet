@@ -134,7 +134,7 @@ public class SchemaPrinterTests
             Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
         };
         string result = new SchemaPrinter(null).PrintDirective(d);
-        result.ShouldBe("""
+        result.ShouldBeCrossPlat("""
             directive @my(
               max: Int
             ) repeatable on FIELD | QUERY

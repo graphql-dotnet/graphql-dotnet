@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>GraphQL Federation implementation</Description>
+    <PackageTags>GraphQL;Federation</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
+  </ItemGroup>
+
+</Project>

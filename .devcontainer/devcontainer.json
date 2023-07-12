@@ -1,0 +1,24 @@
+// For format details, see https://aka.ms/devcontainer.json
+{
+  "name": "graphql-dotnet-dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      // BUG: remove after https://github.com/microsoft/vscode-remote-release/issues/7958 is fixed
+      "BUILDKIT_INLINE_CACHE": "0"
+    }
+  },
+  "features": {
+    // https://containers.dev/features
+    "ghcr.io/devcontainers/features/git": {}
+  },
+  "settings": {
+    "omnisharp.useModernNet": true
+  },
+  "extensions": [
+    "ms-dotnettools.csharp",
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}

@@ -33,7 +33,7 @@ public class Issue2275
         string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
-        json.ShouldBe("""
+        json.ShouldBeCrossPlat("""
         {
           "data": {
             "request": "2: [o=25]"
