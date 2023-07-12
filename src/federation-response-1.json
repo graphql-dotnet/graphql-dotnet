@@ -65,7 +65,7 @@
       },
       {
         "id": "3",
-        "name": "Product 3a",
+        "name": "Product 3",
         "category": {
           "id": "2",
           "name": "Category 2"
