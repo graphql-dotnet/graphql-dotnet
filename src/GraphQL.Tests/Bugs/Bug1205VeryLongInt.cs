@@ -148,7 +148,7 @@ public class Bug1205VeryLongIntQuery : ObjectGraphType
             .Argument<IntGraphType>("in")
             .Resolve(_ =>
             {
-                Assert.True(false, "Never goes here");
+                Assert.Fail("Never goes here");
                 return 1;
             });
 
