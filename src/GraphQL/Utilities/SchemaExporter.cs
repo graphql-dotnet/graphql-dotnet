@@ -72,7 +72,11 @@ public class SchemaExporter
         return new GraphQLDocument(definitions);
     }
 
-    private bool IsDefaultSchemaConfiguration(GraphQLSchemaDefinition schemaDefinition)
+    /// <summary>
+    /// Returns <see langword="true"/> if the schema definition uses the default type names of
+    /// <c>Query</c>, <c>Mutation</c> and <c>Subscription</c>, and has no directives or description.
+    /// </summary>
+    protected virtual bool IsDefaultSchemaConfiguration(GraphQLSchemaDefinition schemaDefinition)
     {
         // if any directives are specified on the schema definition, or if the description
         // is set, return false
@@ -126,7 +130,7 @@ public class SchemaExporter
         => _builtInDirectives.Contains(directiveName);
 
     /// <summary>
-    /// Exports the specified <see cref="IGraphType"/>.
+    /// Exports the specified <see cref="IGraphType"/> as a <see cref="GraphQLTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLTypeDefinition ExportTypeDefinition(IGraphType graphType) => graphType switch
     {
@@ -140,7 +144,7 @@ public class SchemaExporter
     };
 
     /// <summary>
-    /// Exports the specified <see cref="IInputObjectGraphType"/>.
+    /// Exports the specified <see cref="IInputObjectGraphType"/> as a <see cref="GraphQLInputObjectTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLInputObjectTypeDefinition ExportInputObjectTypeDefinition(IInputObjectGraphType graphType)
     {
@@ -162,7 +166,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="FieldType"/> as an input object's field definition.
+    /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputValueDefinition"/>.
     /// </summary>
     protected virtual GraphQLInputValueDefinition ExportInputValueDefinition(FieldType fieldType)
     {
@@ -176,7 +180,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="IInterfaceGraphType"/>.
+    /// Exports the specified <see cref="IInterfaceGraphType"/> as a <see cref="GraphQLInterfaceTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLInterfaceTypeDefinition ExportInterfaceTypeDefinition(IInterfaceGraphType graphType)
     {
@@ -199,7 +203,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="IObjectGraphType"/>.
+    /// Exports the specified <see cref="IObjectGraphType"/> as a <see cref="GraphQLObjectTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLObjectTypeDefinition ExportObjectTypeDefinition(IObjectGraphType graphType)
     {
@@ -233,7 +237,7 @@ public class SchemaExporter
 
     /// <summary>
     /// Converts the specified type definition to an extension definition
-    /// if it was defined as such by the <see cref="Federation.FederatedSchemaBuilder"/>.
+    /// if it was defined as such by the <see cref="SchemaBuilder"/>.
     /// </summary>
     protected virtual ASTNode ApplyExtend(ASTNode node, IProvideMetadata graphType)
     {
@@ -294,7 +298,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="FieldType"/>.
+    /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLFieldDefinition"/>.
     /// </summary>
     protected virtual GraphQLFieldDefinition ExportFieldDefinition(FieldType fieldType)
     {
@@ -306,7 +310,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports a <see cref="UnionGraphType"/>.
+    /// Exports a <see cref="UnionGraphType"/> as a <see cref="GraphQLUnionTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLUnionTypeDefinition ExportUnionTypeDefinition(UnionGraphType graphType)
     {
@@ -328,7 +332,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="ScalarGraphType"/>.
+    /// Exports the specified <see cref="ScalarGraphType"/> as a <see cref="GraphQLScalarTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLScalarTypeDefinition ExportScalarTypeDefinition(ScalarGraphType scalarType)
     {
@@ -337,7 +341,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="EnumerationGraphType"/>.
+    /// Exports the specified <see cref="EnumerationGraphType"/> as a <see cref="GraphQLEnumTypeDefinition"/>.
     /// </summary>
     protected virtual GraphQLEnumTypeDefinition ExportEnumTypeDefinition(EnumerationGraphType enumType)
     {
@@ -363,7 +367,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the schema definition.
+    /// Exports the schema definition as a <see cref="GraphQLSchemaDefinition"/>.
     /// </summary>
     protected virtual GraphQLSchemaDefinition ExportSchemaDefinition()
     {
@@ -394,7 +398,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="Directive"/> definition.
+    /// Exports the specified <see cref="Directive"/> as a <see cref="GraphQLDirectiveDefinition"/>.
     /// </summary>
     protected virtual GraphQLDirectiveDefinition ExportDirectiveDefinition(Directive directive)
     {
@@ -422,7 +426,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="QueryArgument"/> definition as a <see cref="GraphQLInputValueDefinition"/>.
+    /// Exports the specified <see cref="QueryArgument"/> as a <see cref="GraphQLInputValueDefinition"/>.
     /// </summary>
     protected virtual GraphQLInputValueDefinition ExportArgumentDefinition(QueryArgument argument)
     {
@@ -440,7 +444,9 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="IGraphType"/> as a <see cref="GraphQLType"/> reference.
+    /// Exports the specified <see cref="IGraphType"/> as a <see cref="GraphQLType"/>.
+    /// This will return a <see cref="GraphQLNamedType"/>, wrapped if necessary within
+    /// <see cref="GraphQLNonNullType"/> or <see cref="GraphQLListType"/> instances.
     /// </summary>
     protected virtual GraphQLType ExportTypeReference(IGraphType graphType)
     {
@@ -510,7 +516,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="AppliedDirective"/>.
+    /// Exports the specified <see cref="AppliedDirective"/> as a <see cref="GraphQLDirective"/>.
     /// </summary>
     protected virtual GraphQLDirective ExportAppliedDirective(AppliedDirective appliedDirective)
     {
@@ -530,7 +536,9 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="DirectiveArgument"/>.
+    /// Exports the specified <see cref="DirectiveArgument"/> as a <see cref="GraphQLArgument"/>.
+    /// This requires a reference to the <see cref="Directive"/> that the argument is defined on
+    /// in order to convert the value to an AST.
     /// </summary>
     protected virtual GraphQLArgument ExportAppliedDirectiveArgument(Directive directive, DirectiveArgument argument)
     {

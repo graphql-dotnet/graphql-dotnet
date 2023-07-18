@@ -2785,6 +2785,7 @@ namespace GraphQL.Utilities
         protected virtual GraphQLParser.AST.GraphQLTypeDefinition ExportTypeDefinition(GraphQL.Types.IGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLType ExportTypeReference(GraphQL.Types.IGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLUnionTypeDefinition ExportUnionTypeDefinition(GraphQL.Types.UnionGraphType graphType) { }
+        protected virtual bool IsDefaultSchemaConfiguration(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition) { }
         protected static bool IsBuiltInDirective(string directiveName) { }
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
