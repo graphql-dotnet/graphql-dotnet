@@ -234,7 +234,7 @@ public class SchemaExporter
     /// </summary>
     protected virtual ASTNode ApplyExtend(ASTNode node, IProvideMetadata graphType)
     {
-        if (graphType.HasExtensionAstTypes())
+        if (graphType.HasExtensionAstTypes() && graphType.GetAstType<ASTNode>() == null)
         {
             return node switch
             {
