@@ -1,13 +1,19 @@
 using GraphQL.Types;
 using GraphQL.Utilities.Federation;
+using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
+using SchemaExporter = GraphQL.Utilities.SchemaExporter;
 
 namespace GraphQL.Tests.Utilities;
 
 public class SchemaExporterTests
 {
-    [Fact]
-    public void PetComplex()
+    [Theory]
+    [InlineData(SampleVariation.Defaults)]
+    [InlineData(SampleVariation.NoReasons)]
+    [InlineData(SampleVariation.NoDescriptions)]
+    [InlineData(SampleVariation.Sorted)]
+    public void PetComplex(SampleVariation variation)
     {
         var schema = Schema.For(
             "PetComplex".ReadSDL(),
@@ -18,14 +24,23 @@ public class SchemaExporterTests
             }
         );
 
-        schema.Print()
-            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("defaults.txt"));
-        schema.Print(new() { IncludeDeprecationReasons = false })
-            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("noreasons.txt"));
-        schema.Print(new() { IncludeDescriptions = false })
-            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("nodescriptions.txt"));
-        schema.Print(new() { StringComparison = StringComparison.InvariantCultureIgnoreCase })
-            .ShouldMatchApproved(o => o.NoDiff().WithFileExtension("sorted.txt"));
+        var opts = new GraphQL.Utilities.PrintOptions();
+        if (variation == SampleVariation.NoDescriptions)
+            opts.IncludeDescriptions = false;
+        if (variation == SampleVariation.NoReasons)
+            opts.IncludeDeprecationReasons = false;
+        if (variation == SampleVariation.Sorted)
+            opts.StringComparison = StringComparison.InvariantCultureIgnoreCase;
+        schema.Print(opts)
+            .ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(variation.ToString()));
+    }
+
+    public enum SampleVariation
+    {
+        Defaults,
+        NoReasons,
+        NoDescriptions,
+        Sorted,
     }
 
     [Fact]
@@ -56,5 +71,104 @@ public class SchemaExporterTests
         var schema = new FederatedSchemaBuilder()
             .Build("Federated".ReadSDL());
         schema.Print().ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void DoesntPrintSchema()
+    {
+        var schema = Schema.For("""
+            schema {
+              query: Query
+            }
+            type Query {
+              hello: String
+            }
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(0);
+    }
+
+    [Fact]
+    public void DoesntPrintSchema2()
+    {
+        var schema = Schema.For("""
+            schema {
+              query: Query
+              mutation: Mutation
+            }
+            type Query {
+              hello: String
+            }
+            type Mutation {
+              hello: String
+            }
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(0);
+    }
+
+    [Fact]
+    public void PrintsSchemaWithDescription()
+    {
+        var schema = Schema.For("""
+            "sample"
+            schema {
+              query: Query
+            }
+            type Query {
+              hello: String
+            }
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(1);
+    }
+
+    [Fact]
+    public void PrintsSchemaWithDirective()
+    {
+        var schema = Schema.For("""
+            schema @test {
+              query: Query
+            }
+            type Query {
+              hello: String
+            }
+            directive @test on SCHEMA
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(1);
+    }
+
+    [Fact]
+    public void PrintsSchemaWithAltType()
+    {
+        var schema = Schema.For("""
+            schema {
+              query: Query2
+            }
+            type Query2 {
+              hello: String
+            }
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(1);
+    }
+
+    [Fact]
+    public void PrintsSchemaWhenMutationNotSpecified()
+    {
+        var schema = Schema.For("""
+            schema {
+              query: Query
+            }
+            type Query {
+              hello: String
+            }
+            type Mutation {
+              hello: String
+            }
+            """);
+        var exported = new SchemaExporter(schema).Export();
+        exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(1);
     }
 }

@@ -45,10 +45,14 @@ public class SchemaExporter
         // initialize the schema, so all the ResolvedType properties are set
         Schema.Initialize();
 
+        var schemaDefinition = ApplyExtend(ExportSchemaDefinition(), Schema);
+
         // export the schema definition
-        var definitions = new List<ASTNode>
+        var definitions = new List<ASTNode>();
+
+        if (schemaDefinition is GraphQLSchemaDefinition schemaDef && !IsDefaultSchemaConfiguration(schemaDef))
         {
-            ApplyExtend(ExportSchemaDefinition(), Schema)
+            definitions.Add(schemaDef);
         };
 
         // export directives
@@ -66,6 +70,41 @@ public class SchemaExporter
         }
 
         return new GraphQLDocument(definitions);
+    }
+
+    private bool IsDefaultSchemaConfiguration(GraphQLSchemaDefinition schemaDefinition)
+    {
+        // if any directives are specified on the schema definition, or if the description
+        // is set, return false
+        if (schemaDefinition.Directives?.Count > 0 || schemaDefinition.Description != null)
+            return false;
+
+        // if any of the operation types are the not the default type names, return false
+        if (!schemaDefinition.OperationTypes.All(
+            ot => ot.Type?.Name.Value == ot.Operation switch
+            {
+                OperationType.Query => "Query",
+                OperationType.Mutation => "Mutation",
+                OperationType.Subscription => "Subscription",
+                _ => throw new InvalidOperationException("Could not identify the type of operation.")
+            }))
+            return false;
+
+        var hasQueryOperation = schemaDefinition.OperationTypes.Any(ot => ot.Operation == OperationType.Query);
+        var hasMutationOperation = schemaDefinition.OperationTypes.Any(ot => ot.Operation == OperationType.Mutation);
+        var hasSubscriptionOperation = schemaDefinition.OperationTypes.Any(ot => ot.Operation == OperationType.Subscription);
+
+        var schemaHasQueryType = Schema.AllTypes["Query"] != null;
+        var schemaHasMutationType = Schema.AllTypes["Mutation"] != null;
+        var schemaHasSubscriptionType = Schema.AllTypes["Subscription"] != null;
+
+        // ensure that the schema has the same operation types as the schema definition
+        if (schemaHasQueryType != hasQueryOperation ||
+            schemaHasMutationType != hasMutationOperation ||
+            schemaHasSubscriptionType != hasSubscriptionOperation)
+            return false;
+
+        return true;
     }
 
     /// <summary>

@@ -3,7 +3,6 @@ using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
-using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 

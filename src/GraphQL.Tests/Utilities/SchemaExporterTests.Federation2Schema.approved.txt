@@ -1,7 +1,3 @@
-schema {
-  query: Query
-}
-
 directive @external on FIELD_DEFINITION
 
 directive @requires(fields: String!) on FIELD_DEFINITION

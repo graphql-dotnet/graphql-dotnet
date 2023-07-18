@@ -1,7 +1,3 @@
-schema {
-  query: Query
-}
-
 extend type Category @key(fields: "id") {
   id: ID! @external
   products: [Product!]!
