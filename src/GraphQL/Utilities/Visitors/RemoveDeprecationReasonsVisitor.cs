@@ -4,7 +4,7 @@ using GraphQLParser.Visitors;
 namespace GraphQL.Utilities.Visitors;
 
 /// <summary>
-/// Removes the reason from @deprecated directives within an AST.
+/// Removes the reason from <c>@deprecated</c> directives within an AST.
 /// </summary>
 public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecationReasonsVisitor.Context>
 {
@@ -14,9 +14,7 @@ public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecati
     {
     }
 
-    /// <summary>
-    /// Removes the reason from @deprecated directives within an AST.
-    /// </summary>
+    /// <inheritdoc cref="RemoveDeprecationReasonsVisitor"/>
     public static void Visit(ASTNode node)
     {
         _instance.VisitAsync(node, default).GetAwaiter().GetResult();

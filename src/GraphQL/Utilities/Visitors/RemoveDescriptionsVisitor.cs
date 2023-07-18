@@ -14,9 +14,7 @@ public sealed class RemoveDescriptionsVisitor : ASTVisitor<RemoveDescriptionsVis
     {
     }
 
-    /// <summary>
-    /// Removes all descriptions from an AST.
-    /// </summary>
+    /// <inheritdoc cref="RemoveDescriptionsVisitor"/>
     public static void Visit(ASTNode node)
     {
         _instance.VisitAsync(node, default).GetAwaiter().GetResult();
