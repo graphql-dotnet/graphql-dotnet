@@ -285,6 +285,11 @@ types and fields from the printed SDL and is compatible with Apollo Federation v
 schemas. Note that Apollo Federation v2 does not require these types to be removed from the SDL.
 This replaces the need for the `FederatedSchemaPrinter` class.
 
+Please note that the `SchemaExporter` class will export type defintions as type extensions
+(e.g. `extend type MyType { ... }`) only when it was read as such by the `SchemaBuilder`.
+
+Please see the `SchemaExtensions.PrintAsync` source code implementation specifics.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
