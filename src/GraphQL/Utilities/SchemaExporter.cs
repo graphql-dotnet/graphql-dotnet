@@ -48,7 +48,7 @@ public class SchemaExporter
         // export the schema definition
         var definitions = new List<ASTNode>
         {
-            ExportSchemaDefinition()
+            ApplyExtend(ExportSchemaDefinition(), Schema)
         };
 
         // export directives
@@ -62,7 +62,7 @@ public class SchemaExporter
         foreach (var type in Schema.AllTypes)
         {
             if (!IsIntrospectionType(type.Name) && !IsBuiltInScalar(type.Name))
-                definitions.Add(ExportTypeDefinition(type));
+                definitions.Add(ApplyExtend(ExportTypeDefinition(type), type));
         }
 
         return new GraphQLDocument(definitions);
@@ -187,6 +187,68 @@ public class SchemaExporter
             Fields = fields,
         };
         return ApplyDescription(ApplyDirectives(ret, graphType), graphType);
+    }
+
+    /// <summary>
+    /// Converts the specified type definition to an extension definition
+    /// if it was defined as such by the <see cref="Federation.FederatedSchemaBuilder"/>.
+    /// </summary>
+    protected virtual ASTNode ApplyExtend(ASTNode node, IProvideMetadata graphType)
+    {
+        if (graphType.HasExtensionAstTypes())
+        {
+            return node switch
+            {
+                GraphQLObjectTypeDefinition otd => new GraphQLObjectTypeExtension(otd.Name)
+                {
+                    Interfaces = otd.Interfaces,
+                    Fields = otd.Fields,
+                    Directives = otd.Directives,
+                    Comments = otd.Comments,
+                },
+                GraphQLInterfaceTypeDefinition itd => new GraphQLInterfaceTypeExtension(itd.Name)
+                {
+                    Interfaces = itd.Interfaces,
+                    Fields = itd.Fields,
+                    Directives = itd.Directives,
+                    Comments = itd.Comments,
+                },
+                GraphQLUnionTypeDefinition utd => new GraphQLUnionTypeExtension(utd.Name)
+                {
+                    Types = utd.Types,
+                    Directives = utd.Directives,
+                    Comments = utd.Comments,
+                },
+                GraphQLScalarTypeDefinition std => new GraphQLScalarTypeExtension(std.Name)
+                {
+                    Directives = std.Directives,
+                    Comments = std.Comments,
+                },
+                GraphQLEnumTypeDefinition etd => new GraphQLEnumTypeExtension(etd.Name)
+                {
+                    Values = etd.Values,
+                    Directives = etd.Directives,
+                    Comments = etd.Comments,
+                },
+                GraphQLInputObjectTypeDefinition iotd => new GraphQLInputObjectTypeExtension(iotd.Name)
+                {
+                    Fields = iotd.Fields,
+                    Directives = iotd.Directives,
+                    Comments = iotd.Comments,
+                },
+                GraphQLSchemaDefinition sd => new GraphQLSchemaExtension
+                {
+                    OperationTypes = sd.OperationTypes,
+                    Directives = sd.Directives,
+                    Comments = sd.Comments,
+                },
+                _ => throw new InvalidOperationException($"Invalid node type of '{node.GetType().GetFriendlyName()}'.")
+            };
+        }
+        else
+        {
+            return node;
+        }
     }
 
     /// <summary>

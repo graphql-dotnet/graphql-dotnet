@@ -2767,6 +2767,7 @@ namespace GraphQL.Utilities
             where T : GraphQLParser.AST.IHasDescriptionNode { }
         protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IProvideMetadata obj)
             where T : GraphQLParser.AST.IHasDirectivesNode { }
+        protected virtual GraphQLParser.AST.ASTNode ApplyExtend(GraphQLParser.AST.ASTNode node, GraphQL.Types.IGraphType graphType) { }
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
         protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
         protected virtual GraphQLParser.AST.GraphQLDirective ExportDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
