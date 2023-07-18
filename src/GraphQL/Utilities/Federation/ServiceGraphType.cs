@@ -12,9 +12,7 @@ namespace GraphQL.Utilities.Federation
 
             Field<StringGraphType>("sdl").Resolve(context =>
             {
-#pragma warning disable CS0618 // Type or member is obsolete
                 var printer = new FederatedSchemaPrinter(context.Schema);
-#pragma warning restore CS0618 // Type or member is obsolete
                 return printer.PrintFederatedSchema();
             });
         }
