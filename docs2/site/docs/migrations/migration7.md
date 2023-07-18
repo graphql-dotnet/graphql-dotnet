@@ -263,6 +263,7 @@ via `SchemaPrinter` are still available, but the default values have changed as 
 |-|-|-|
 | IncludeDescriptions | `false` | `true` |
 | IncludeDeprecationReasons | `false` | `true` |
+| IncludeFederationTypes | n/a | `true` |
 | OldImplementsSyntax | `false` | n/a |
 | PrintDescriptionsAsComments | `false` | n/a |
 
