@@ -780,6 +780,29 @@ public class SchemaBuilderTests
     }
 
     [Fact]
+    public void reads_directives_from_types_or_extension_types()
+    {
+        var schema = Schema.For("""
+            extend type Query @directiveA {
+              field1: String
+            }
+
+            type Query @directiveB {
+              field2: String
+            }
+
+            directive @directiveA on OBJECT
+            directive @directiveB on OBJECT
+            """);
+
+        schema.Initialize();
+        var type = schema.AllTypes["Query"].ShouldNotBeNull();
+        var directives = type.GetAppliedDirectives()?.List.ShouldNotBeNull();
+        directives.Where(x => x.Name == "directiveA").ShouldHaveSingleItem();
+        directives.Where(x => x.Name == "directiveB").ShouldHaveSingleItem();
+    }
+
+    [Fact]
     public async Task builds_with_customized_clr_type()
     {
         const string definitions = """
