@@ -19,14 +19,14 @@ public class SchemaExporter
         "Boolean",
         "Int",
         "Float",
-        "ID"
+        "ID",
     };
 
     private static readonly HashSet<string> _builtInDirectives = new()
     {
         "skip",
         "include",
-        "deprecated"
+        "deprecated",
     };
 
     /// <summary>
@@ -110,17 +110,20 @@ public class SchemaExporter
     /// <summary>
     /// Returns <see langword="true"/> if the specified type name is a built-in introspection type.
     /// </summary>
-    protected static bool IsIntrospectionType(string typeName) => typeName.StartsWith("__", StringComparison.Ordinal);
+    protected static bool IsIntrospectionType(string typeName)
+        => typeName.StartsWith("__", StringComparison.Ordinal);
 
     /// <summary>
     /// Returns <see langword="true"/> if the specified type name is a built-in scalar type.
     /// </summary>
-    protected static bool IsBuiltInScalar(string typeName) => _builtInScalars.Contains(typeName);
+    protected static bool IsBuiltInScalar(string typeName)
+        => _builtInScalars.Contains(typeName);
 
     /// <summary>
     /// Returns <see langword="true"/> if the specified directive name is a built-in directive.
     /// </summary>
-    protected static bool IsBuiltInDirective(string directiveName) => _builtInDirectives.Contains(directiveName);
+    protected static bool IsBuiltInDirective(string directiveName)
+        => _builtInDirectives.Contains(directiveName);
 
     /// <summary>
     /// Exports the specified <see cref="IGraphType"/>.
@@ -486,7 +489,7 @@ public class SchemaExporter
             directives = new(appliedDirectives.Count + (deprecationReason != null ? 1 : 0));
             foreach (var appliedDirective in appliedDirectives)
             {
-                directives.Add(ExportDirective(appliedDirective));
+                directives.Add(ExportAppliedDirective(appliedDirective));
                 // do not add the @deprecated directive twice; give preference to the directive
                 // set within the metadata rather than the DeprecationReason property
                 if (appliedDirective.Name == "deprecated")
@@ -509,17 +512,17 @@ public class SchemaExporter
     /// <summary>
     /// Exports the specified <see cref="AppliedDirective"/>.
     /// </summary>
-    protected virtual GraphQLDirective ExportDirective(AppliedDirective appliedDirective)
+    protected virtual GraphQLDirective ExportAppliedDirective(AppliedDirective appliedDirective)
     {
         var directive = Schema.Directives.Find(appliedDirective.Name)
-            ?? throw new InvalidOperationException($"Could not find an applied directive named '{appliedDirective.Name}' within the schema.");
+            ?? throw new InvalidOperationException($"Could not find a directive named '{appliedDirective.Name}' defined within the schema.");
         var ret = new GraphQLDirective(new(appliedDirective.Name));
         if (appliedDirective.ArgumentsCount > 0)
         {
             var arguments = new List<GraphQLArgument>(appliedDirective.ArgumentsCount);
             foreach (var argument in appliedDirective)
             {
-                arguments.Add(ExportDirectiveArgument(directive, argument));
+                arguments.Add(ExportAppliedDirectiveArgument(directive, argument));
             }
             ret.Arguments = new GraphQLArguments(arguments);
         }
@@ -529,7 +532,7 @@ public class SchemaExporter
     /// <summary>
     /// Exports the specified <see cref="DirectiveArgument"/>.
     /// </summary>
-    protected virtual GraphQLArgument ExportDirectiveArgument(Directive directive, DirectiveArgument argument)
+    protected virtual GraphQLArgument ExportAppliedDirectiveArgument(Directive directive, DirectiveArgument argument)
     {
         var directiveArgument = directive.Arguments?.Find(argument.Name)
             ?? throw new InvalidOperationException($"Unable to find argument '{argument.Name}' on directive '{directive.Name}'.");

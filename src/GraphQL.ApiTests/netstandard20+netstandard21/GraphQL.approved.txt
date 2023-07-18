@@ -2770,9 +2770,9 @@ namespace GraphQL.Utilities
             where T : GraphQLParser.AST.IHasDirectivesNode { }
         protected virtual GraphQLParser.AST.ASTNode ApplyExtend(GraphQLParser.AST.ASTNode node, GraphQL.Types.IProvideMetadata graphType) { }
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
+        protected virtual GraphQLParser.AST.GraphQLDirective ExportAppliedDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
+        protected virtual GraphQLParser.AST.GraphQLArgument ExportAppliedDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
         protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
-        protected virtual GraphQLParser.AST.GraphQLDirective ExportDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
-        protected virtual GraphQLParser.AST.GraphQLArgument ExportDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
         protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ExportDirectiveDefinition(GraphQL.Types.Directive directive) { }
         protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ExportEnumTypeDefinition(GraphQL.Types.EnumerationGraphType enumType) { }
         protected virtual GraphQLParser.AST.GraphQLFieldDefinition ExportFieldDefinition(GraphQL.Types.FieldType fieldType) { }
