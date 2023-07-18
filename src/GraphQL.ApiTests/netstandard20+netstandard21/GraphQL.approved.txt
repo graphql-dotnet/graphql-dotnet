@@ -2947,18 +2947,18 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Utilities.Visitors
 {
-    public sealed class RemoveDeprecationReasonVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDeprecationReasonVisitor.Context>
+    public sealed class RemoveDeprecationReasonsVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDeprecationReasonsVisitor.Context>
     {
-        protected override System.Threading.Tasks.ValueTask VisitDirectiveAsync(GraphQLParser.AST.GraphQLDirective directive, GraphQL.Utilities.Visitors.RemoveDeprecationReasonVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitDirectiveAsync(GraphQLParser.AST.GraphQLDirective directive, GraphQL.Utilities.Visitors.RemoveDeprecationReasonsVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {
             public System.Threading.CancellationToken CancellationToken { get; }
         }
     }
-    public sealed class RemoveDescriptionVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDescriptionVisitor.Context>
+    public sealed class RemoveDescriptionsVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveDescriptionsVisitor.Context>
     {
-        public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Utilities.Visitors.RemoveDescriptionVisitor.Context context) { }
+        public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQL.Utilities.Visitors.RemoveDescriptionsVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {

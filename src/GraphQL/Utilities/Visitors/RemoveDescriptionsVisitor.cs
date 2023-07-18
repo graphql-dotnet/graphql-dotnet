@@ -6,11 +6,11 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes all descriptions from an AST.
 /// </summary>
-public sealed class RemoveDescriptionVisitor : ASTVisitor<RemoveDescriptionVisitor.Context>
+public sealed class RemoveDescriptionsVisitor : ASTVisitor<RemoveDescriptionsVisitor.Context>
 {
-    private static readonly RemoveDescriptionVisitor _instance = new();
+    private static readonly RemoveDescriptionsVisitor _instance = new();
 
-    private RemoveDescriptionVisitor()
+    private RemoveDescriptionsVisitor()
     {
     }
 

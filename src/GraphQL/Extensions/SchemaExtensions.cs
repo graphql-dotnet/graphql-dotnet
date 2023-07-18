@@ -119,11 +119,11 @@ namespace GraphQL
             options ??= new();
             if (!options.IncludeDeprecationReasons)
             {
-                RemoveDeprecationReasonVisitor.Visit(sdl);
+                RemoveDeprecationReasonsVisitor.Visit(sdl);
             }
             if (!options.IncludeDescriptions)
             {
-                RemoveDescriptionVisitor.Visit(sdl);
+                RemoveDescriptionsVisitor.Visit(sdl);
             }
             if (!options.IncludeFederationTypes)
             {

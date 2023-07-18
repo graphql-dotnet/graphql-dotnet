@@ -6,11 +6,11 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes the reason from @deprecated directives within an AST.
 /// </summary>
-public sealed class RemoveDeprecationReasonVisitor : ASTVisitor<RemoveDeprecationReasonVisitor.Context>
+public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecationReasonsVisitor.Context>
 {
-    private static readonly RemoveDeprecationReasonVisitor _instance = new();
+    private static readonly RemoveDeprecationReasonsVisitor _instance = new();
 
-    private RemoveDeprecationReasonVisitor()
+    private RemoveDeprecationReasonsVisitor()
     {
     }
 
