@@ -22,6 +22,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Files\GraphQL\Schema.gql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Files\GraphQL\Schema.gql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Files\SDL\Federated.graphql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL.Dummy\GraphQL.Dummy.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />

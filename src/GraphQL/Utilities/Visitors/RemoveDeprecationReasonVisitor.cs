@@ -6,7 +6,7 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes the reason from @deprecated directives within an AST.
 /// </summary>
-public class RemoveDeprecationReasonVisitor : ASTVisitor<RemoveDeprecationReasonVisitor.Context>
+public sealed class RemoveDeprecationReasonVisitor : ASTVisitor<RemoveDeprecationReasonVisitor.Context>
 {
     private static readonly RemoveDeprecationReasonVisitor _instance = new();
 
@@ -19,7 +19,7 @@ public class RemoveDeprecationReasonVisitor : ASTVisitor<RemoveDeprecationReason
     /// </summary>
     public static void Visit(ASTNode node)
     {
-        _ = _instance.VisitAsync(node, default);
+        _instance.VisitAsync(node, default).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc/>

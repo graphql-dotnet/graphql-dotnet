@@ -6,7 +6,7 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes all descriptions from an AST.
 /// </summary>
-public class RemoveDescriptionVisitor : ASTVisitor<RemoveDescriptionVisitor.Context>
+public sealed class RemoveDescriptionVisitor : ASTVisitor<RemoveDescriptionVisitor.Context>
 {
     private static readonly RemoveDescriptionVisitor _instance = new();
 
@@ -19,7 +19,7 @@ public class RemoveDescriptionVisitor : ASTVisitor<RemoveDescriptionVisitor.Cont
     /// </summary>
     public static void Visit(ASTNode node)
     {
-        _ = _instance.VisitAsync(node, default);
+        _instance.VisitAsync(node, default).GetAwaiter().GetResult();
     }
 
     /// <inheritdoc/>

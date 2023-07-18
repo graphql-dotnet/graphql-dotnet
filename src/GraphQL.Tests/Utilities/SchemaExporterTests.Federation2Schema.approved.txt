@@ -1,0 +1,39 @@
+schema {
+  query: Query
+}
+
+directive @external on FIELD_DEFINITION
+
+directive @requires(fields: String!) on FIELD_DEFINITION
+
+directive @provides(fields: String!) on FIELD_DEFINITION
+
+directive @key(fields: String!) on OBJECT | INTERFACE
+
+directive @extends on OBJECT | INTERFACE
+
+scalar _Any
+
+extend type Category @key(fields: "id") {
+  id: ID! @external
+  products: [Product!]!
+}
+
+type Product @key(fields: "id") {
+  id: ID!
+  name: String!
+  category: Category!
+}
+
+extend type Query {
+  products: [Product!]!
+  _service: _Service!
+  _entities(representations: [_Any!]!): [_Entity]!
+}
+
+"A union of all types that use the @key directive"
+union _Entity = Category | Product
+
+type _Service {
+  sdl: String
+}

@@ -1,20 +1,28 @@
+"Animals - cats and dogs"
 schema {
   query: Query
 }
 
+" A cat"
 type Cat {
+  " cat's name"
   name: String!
-  weight(inPounds: Boolean): Float!
+  weight(
+    "comment on argument"
+    inPounds: Boolean): Float!
 }
 
+" A dog"
 type Dog {
+  " dog's age"
   age: Int!
 }
 
+"Cats with dogs"
 union Pet = Cat | Dog
 
 type Query {
-  allAnimalsCount: [Int!] @deprecated
+  allAnimalsCount: [Int!] @deprecated(reason: "do not touch!")
   animal: Pet
   catsGroups: [[Cat!]!]!
 }

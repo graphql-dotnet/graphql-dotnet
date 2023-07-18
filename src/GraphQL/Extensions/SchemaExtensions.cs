@@ -3,6 +3,7 @@ using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
+using GraphQLParser;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
@@ -124,6 +125,10 @@ namespace GraphQL
             if (!options.IncludeDescriptions)
             {
                 RemoveDescriptionVisitor.Visit(sdl);
+            }
+            if (!options.IncludeFederationTypes)
+            {
+                RemoveFederationTypesVisitor.Visit(sdl);
             }
             if (options.StringComparison != null)
             {
