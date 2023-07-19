@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="8.3.0" />
+    <PackageReference Include="GraphQL-Parser" Version="9.0.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="Nullability.Source" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
