@@ -6,7 +6,7 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes all descriptions from an AST.
 /// </summary>
-public sealed class RemoveDescriptionsVisitor : ASTVisitor<RemoveDescriptionsVisitor.Context>
+public sealed class RemoveDescriptionsVisitor : ASTVisitor<NullVisitorContext>
 {
     private static readonly RemoveDescriptionsVisitor _instance = new();
 
@@ -21,21 +21,12 @@ public sealed class RemoveDescriptionsVisitor : ASTVisitor<RemoveDescriptionsVis
     }
 
     /// <inheritdoc/>
-    public override ValueTask VisitAsync(ASTNode? node, Context context)
+    public override ValueTask VisitAsync(ASTNode? node, NullVisitorContext context)
     {
         if (node is IHasDescriptionNode descriptionNode)
         {
             descriptionNode.Description = null;
         }
         return base.VisitAsync(node, context);
-    }
-
-    /// <summary>
-    /// An <see cref="IASTVisitorContext"/> implementation that does nothing.
-    /// </summary>
-    public struct Context : IASTVisitorContext
-    {
-        /// <inheritdoc/>
-        public CancellationToken CancellationToken => default;
     }
 }

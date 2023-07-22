@@ -6,7 +6,7 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes the reason from <c>@deprecated</c> directives within an AST.
 /// </summary>
-public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecationReasonsVisitor.Context>
+public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<NullVisitorContext>
 {
     private static readonly RemoveDeprecationReasonsVisitor _instance = new();
 
@@ -21,7 +21,7 @@ public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecati
     }
 
     /// <inheritdoc/>
-    protected override ValueTask VisitDirectiveAsync(GraphQLDirective directive, Context context)
+    protected override ValueTask VisitDirectiveAsync(GraphQLDirective directive, NullVisitorContext context)
     {
         if (directive.Name.Value == "deprecated")
         {
@@ -35,14 +35,5 @@ public sealed class RemoveDeprecationReasonsVisitor : ASTVisitor<RemoveDeprecati
             }
         }
         return base.VisitDirectiveAsync(directive, context);
-    }
-
-    /// <summary>
-    /// An <see cref="IASTVisitorContext"/> implementation that does nothing.
-    /// </summary>
-    public struct Context : IASTVisitorContext
-    {
-        /// <inheritdoc/>
-        public CancellationToken CancellationToken => default;
     }
 }

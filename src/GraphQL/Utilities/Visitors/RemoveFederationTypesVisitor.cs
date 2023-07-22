@@ -7,7 +7,7 @@ namespace GraphQL.Utilities.Visitors;
 /// Remove all Apollo Federation types and fields from an AST.
 /// Not necessary for Apollo Federation v2.
 /// </summary>
-public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTypesVisitor.Context>
+public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext>
 {
     private static readonly HashSet<string> _federatedDirectives = new()
     {
@@ -48,7 +48,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
     }
 
     /// <inheritdoc/>
-    protected override ValueTask VisitDocumentAsync(GraphQLDocument document, Context context)
+    protected override ValueTask VisitDocumentAsync(GraphQLDocument document, NullVisitorContext context)
     {
         document.Definitions.RemoveAll(node => node switch
         {
@@ -60,7 +60,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
     }
 
     /// <inheritdoc/>
-    protected override ValueTask VisitObjectTypeDefinitionAsync(GraphQLObjectTypeDefinition objectTypeDefinition, Context context)
+    protected override ValueTask VisitObjectTypeDefinitionAsync(GraphQLObjectTypeDefinition objectTypeDefinition, NullVisitorContext context)
     {
         if (objectTypeDefinition.Name.Value == "Query")
         {
@@ -71,7 +71,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
     }
 
     /// <inheritdoc/>
-    protected override ValueTask VisitObjectTypeExtensionAsync(GraphQLObjectTypeExtension objectTypeExtension, Context context)
+    protected override ValueTask VisitObjectTypeExtensionAsync(GraphQLObjectTypeExtension objectTypeExtension, NullVisitorContext context)
     {
         if (objectTypeExtension.Name.Value == "Query")
         {
@@ -79,14 +79,5 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
                 field => field.Name.Value == "_service" || field.Name.Value == "_entities");
         }
         return base.VisitObjectTypeExtensionAsync(objectTypeExtension, context);
-    }
-
-    /// <summary>
-    /// An <see cref="IASTVisitorContext"/> implementation that does nothing.
-    /// </summary>
-    public struct Context : IASTVisitorContext
-    {
-        /// <inheritdoc/>
-        public CancellationToken CancellationToken => default;
     }
 }
