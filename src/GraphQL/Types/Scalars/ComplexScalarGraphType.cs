@@ -48,10 +48,10 @@ public class ComplexScalarGraphType : ScalarGraphType
     {
         return value switch
         {
-            null => new GraphQLNullValue(),
+            null => GraphQLValuesCache.Null,
 
-            true => new GraphQLTrueBooleanValue(),
-            false => new GraphQLFalseBooleanValue(),
+            true => GraphQLValuesCache.True,
+            false => GraphQLValuesCache.False,
 
             byte n => new GraphQLIntValue(n),
             sbyte n => new GraphQLIntValue(n),
