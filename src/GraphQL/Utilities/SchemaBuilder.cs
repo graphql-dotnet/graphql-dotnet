@@ -167,7 +167,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.MergeComments();
+                schema.Description = _schemaDef.Description?.Value.ToString() ?? _schemaDef.MergeComments();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {

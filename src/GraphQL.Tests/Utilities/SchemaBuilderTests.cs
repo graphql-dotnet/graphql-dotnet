@@ -6,6 +6,49 @@ namespace GraphQL.Tests.Utilities;
 
 public class SchemaBuilderTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void should_read_schema_description(bool ignoreComments)
+    {
+        const string definitions = """
+            #test
+            "Sample schema"
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = ignoreComments);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("Sample schema");
+    }
+
+    [Fact]
+    public void should_read_schema_description_from_comments()
+    {
+        const string definitions = """
+            #test
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = false);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("test");
+    }
+
     [Fact]
     public void should_set_query_by_name()
     {
