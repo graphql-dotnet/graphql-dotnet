@@ -22,7 +22,7 @@ namespace GraphQL.Instrumentation
                 { "typeName", context.ParentType.Name },
                 { "fieldName", name },
                 { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
-                { "path", context.Path },
+                { "path", context.ResponsePath },
             };
 
             using (context.Metrics.Subject("field", name, metadata))
