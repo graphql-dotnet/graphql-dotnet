@@ -1,3 +1,5 @@
+using GraphQL.DataLoader;
+
 namespace GraphQL.Instrumentation
 {
     /// <summary>
@@ -25,8 +27,36 @@ namespace GraphQL.Instrumentation
                 { "path", context.ResponsePath },
             };
 
-            using (context.Metrics.Subject("field", name, metadata))
-                return await next(context).ConfigureAwait(false);
+            var marker = context.Metrics.Subject("field", name, metadata);
+            var ret = await next(context).ConfigureAwait(false);
+            if (ret is IDataLoaderResult dataLoaderResult)
+            {
+                return new CompleteDataLoaderResult(dataLoaderResult, marker);
+            }
+            else
+            {
+                marker.Dispose();
+                return ret;
+            }
+        }
+
+        private class CompleteDataLoaderResult : IDataLoaderResult
+        {
+            private readonly IDataLoaderResult _baseDataLoaderResult;
+            private readonly Metrics.Marker _marker;
+
+            public CompleteDataLoaderResult(IDataLoaderResult baseDataLoaderResult, Metrics.Marker marker)
+            {
+                _baseDataLoaderResult = baseDataLoaderResult;
+                _marker = marker;
+            }
+
+            public async Task<object?> GetResultAsync(CancellationToken cancellationToken = default)
+            {
+                var ret = await _baseDataLoaderResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
+                _marker.Dispose();
+                return ret;
+            }
         }
     }
 }
