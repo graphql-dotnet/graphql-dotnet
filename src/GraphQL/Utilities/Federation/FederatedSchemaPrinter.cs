@@ -5,6 +5,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
+    //todo: [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
     public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
     {
         private readonly List<string> _federatedDirectives = new()
