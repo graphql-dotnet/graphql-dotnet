@@ -42,7 +42,7 @@ namespace GraphQL.Utilities
         }
 
         public static TMetadataProvider CopyDirectivesFrom<TMetadataProvider>(this TMetadataProvider provider, IHasDirectivesNode node)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataWriter
         {
             if (node.Directives?.Count > 0)
             {

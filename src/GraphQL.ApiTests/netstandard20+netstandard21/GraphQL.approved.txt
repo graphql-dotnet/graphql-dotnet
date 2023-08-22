@@ -2774,9 +2774,9 @@ namespace GraphQL.Utilities
         protected GraphQL.Types.ISchema Schema { get; }
         protected virtual T ApplyDescription<T>(T node, GraphQL.Types.IProvideDescription obj)
             where T : GraphQLParser.AST.IHasDescriptionNode { }
-        protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IProvideMetadata obj)
+        protected virtual T ApplyDirectives<T>(T node, GraphQL.Types.IMetadataReader obj)
             where T : GraphQLParser.AST.IHasDirectivesNode { }
-        protected virtual GraphQLParser.AST.ASTNode ApplyExtend(GraphQLParser.AST.ASTNode node, GraphQL.Types.IProvideMetadata graphType) { }
+        protected virtual GraphQLParser.AST.ASTNode ApplyExtend(GraphQLParser.AST.ASTNode node, GraphQL.Types.IMetadataReader graphType) { }
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
         protected virtual GraphQLParser.AST.GraphQLDirective ExportAppliedDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
         protected virtual GraphQLParser.AST.GraphQLArgument ExportAppliedDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
