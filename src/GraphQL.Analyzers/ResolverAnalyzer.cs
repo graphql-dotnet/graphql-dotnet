@@ -9,7 +9,7 @@ namespace GraphQL.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class ResolverAnalyzer : DiagnosticAnalyzer
 {
-    // Violation: any of ForbiddenMethodNames used on type that doesn't implement AllowedInterfaces
+    // Violation: any of _forbiddenMethodNames used on type that doesn't implement _allowedInterfaces
     // Fixed:     remove the illegal method
     public static readonly DiagnosticDescriptor IllegalResolverUsage = new(
         id: "GQL005",

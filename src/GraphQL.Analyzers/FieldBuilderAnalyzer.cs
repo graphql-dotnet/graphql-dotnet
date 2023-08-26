@@ -13,8 +13,8 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
     // Fixed:     Field<T>("name").Description("description")...
     public static readonly DiagnosticDescriptor DoNotUseObsoleteFieldMethods = new(
         id: "GQL004",
-        title: "Don't use obsolete Field methods",
-        messageFormat: "Use correct Field method overload",
+        title: "Don't use obsolete 'Field' methods",
+        messageFormat: "Use correct 'Field' method overload",
         category: "FieldBuilder",
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);

@@ -9,6 +9,8 @@ namespace GraphQL.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class FieldNameAnalyzer : DiagnosticAnalyzer
 {
+    private const string CATEGORY = "FieldNameDefinition";
+
     // Violation: Field<T>().Name("xxx") or Field<T>(x => x.Prop).Name("xxx")
     // Fixed:     Field<T>("xxx")        or Field<T>("xxx", x => x.Prop)
     public static readonly DiagnosticDescriptor DefineTheNameInFieldMethod = new(
@@ -38,8 +40,6 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         category: CATEGORY,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true);
-
-    private const string CATEGORY = "FieldNameDefinition";
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
         DefineTheNameInFieldMethod,
