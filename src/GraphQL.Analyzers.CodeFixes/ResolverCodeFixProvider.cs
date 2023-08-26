@@ -20,11 +20,12 @@ public class ResolverCodeFixProvider : CodeFixProvider
 
     public override async Task RegisterCodeFixesAsync(CodeFixContext context)
     {
+        var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
             var resolveInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
             var resolveMemberAccess = (MemberAccessExpressionSyntax)resolveInvocationExpression.Expression;
 

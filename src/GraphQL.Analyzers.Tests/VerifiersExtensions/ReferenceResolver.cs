@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -17,10 +16,7 @@ public class ReferenceResolver
         string dir = Path.GetFileName(Path.GetDirectoryName(assemblyLocation));
         var targetFramework = NuGetFramework.Parse(dir);
 
-        return CreateReferenceAssemblies(targetFramework)
-            .AddPackages(ImmutableArray.Create(
-                new PackageIdentity("GraphQL", "7.3.0"),
-                new PackageIdentity("GraphQL.MicrosoftDI", "7.3.0")));
+        return CreateReferenceAssemblies(targetFramework);
     }
 
     public static ReferenceAssemblies CreateReferenceAssemblies(NuGetFramework targetFramework)
