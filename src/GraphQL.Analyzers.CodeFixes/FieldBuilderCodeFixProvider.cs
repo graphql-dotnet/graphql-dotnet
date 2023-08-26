@@ -37,7 +37,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
             var fieldInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
 
-            const string codeFixTitle = "Rewrite obsolete Field method";
+            const string codeFixTitle = "Rewrite obsolete 'Field' method";
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: codeFixTitle,
