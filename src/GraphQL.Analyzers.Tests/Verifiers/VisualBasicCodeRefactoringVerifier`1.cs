@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CodeRefactorings;
+using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace GraphQL.Analyzers.Tests.Verifiers;
