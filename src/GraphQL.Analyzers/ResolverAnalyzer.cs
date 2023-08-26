@@ -49,7 +49,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
     private void AnalyzeMemberAccessExpression(SyntaxNodeAnalysisContext context)
     {
         var resolveMemberAccessExpression = (MemberAccessExpressionSyntax)context.Node;
-        var methodName = resolveMemberAccessExpression.Name.Identifier.Text;
+        string methodName = resolveMemberAccessExpression.Name.Identifier.Text;
 
         if (!_forbiddenMethodNames.Contains(methodName))
         {
@@ -92,7 +92,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var implementsAllowedInterfaces = typeSymbol.AllInterfaces
+        bool implementsAllowedInterfaces = typeSymbol.AllInterfaces
             .Any(i => _allowedInterfaces.Contains(i.Name) && i.IsGraphQLSymbol());
 
         if (!implementsAllowedInterfaces)

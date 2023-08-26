@@ -63,7 +63,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 
     private void AnalyzeExpressionSyntax(SyntaxNodeAnalysisContext context, SimpleNameSyntax genericNameSyntax)
     {
-        var name = genericNameSyntax.Identifier.Text;
+        string name = genericNameSyntax.Identifier.Text;
         if (!_supportedNames.Contains(name))
         {
             return;

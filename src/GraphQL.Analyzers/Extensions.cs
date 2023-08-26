@@ -98,9 +98,9 @@ public static class Extensions
     {
         var config = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
 
-        if (config.TryGetValue(name, out var configValue))
+        if (config.TryGetValue(name, out string configValue))
         {
-            if (bool.TryParse(configValue, out var value))
+            if (bool.TryParse(configValue, out bool value))
             {
                 return value;
             }
@@ -129,7 +129,7 @@ public static class Extensions
             return msgArg;
         }
 
-        var paramIndex = GetParamIndex(argumentName, methodSymbol);
+        int paramIndex = GetParamIndex(argumentName, methodSymbol);
         return paramIndex != -1
             ? invocation.ArgumentList.Arguments[paramIndex]
             : null;
