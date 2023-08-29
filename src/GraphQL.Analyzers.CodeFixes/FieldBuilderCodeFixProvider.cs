@@ -167,14 +167,14 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
                             GetIdentifier(memberAccess.Name, newName))),
                 _ => exp
             };
+        }
 
-            static SyntaxToken GetIdentifier(SimpleNameSyntax simpleNameSyntax, string name)
-            {
-                return Identifier(
-                    simpleNameSyntax.Identifier.LeadingTrivia,
-                    name,
-                    simpleNameSyntax.Identifier.TrailingTrivia);
-            }
+        static SyntaxToken GetIdentifier(SimpleNameSyntax simpleNameSyntax, string name)
+        {
+            return Identifier(
+                simpleNameSyntax.Identifier.LeadingTrivia,
+                name,
+                simpleNameSyntax.Identifier.TrailingTrivia);
         }
     }
 
