@@ -165,6 +165,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Package",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Tests", "GraphQL.Analyzers.Tests\GraphQL.Analyzers.Tests.csproj", "{754A684B-A13A-4A48-8C87-53FF84617B62}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B}"
+	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\analyzers\GQL001_DefineTheNameInFieldMethod.md = ..\docs2\site\docs\analyzers\GQL001_DefineTheNameInFieldMethod.md
+		..\docs2\site\docs\analyzers\GQL002_NameMethodInvocationCanBeRemoved.md = ..\docs2\site\docs\analyzers\GQL002_NameMethodInvocationCanBeRemoved.md
+		..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md = ..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
+		..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md = ..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md
+		..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md = ..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -303,6 +312,7 @@ Global
 		{DF91353F-1212-4938-AF04-69492910BCE1} = {53446652-CE87-43A4-A9FA-10F8A4BB441C}
 		{05145332-BE71-460A-A63E-51931D8F7F67} = {53446652-CE87-43A4-A9FA-10F8A4BB441C}
 		{754A684B-A13A-4A48-8C87-53FF84617B62} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

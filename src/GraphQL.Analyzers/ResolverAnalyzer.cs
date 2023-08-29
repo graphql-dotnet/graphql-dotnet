@@ -17,7 +17,8 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
         messageFormat: "Resolve methods are not allowed on non-output graph types",
         category: "Resolver",
         defaultSeverity: DiagnosticSeverity.Error,
-        isEnabledByDefault: true);
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.GQL005);
 
     private static readonly HashSet<string> _allowedInterfaces = new()
     {

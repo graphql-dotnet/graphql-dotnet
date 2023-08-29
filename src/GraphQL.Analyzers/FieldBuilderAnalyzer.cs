@@ -17,7 +17,8 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         messageFormat: "Use correct 'Field' method overload",
         category: "FieldBuilder",
         defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.GQL004);
 
     private static readonly HashSet<string> _supportedNames = new()
     {

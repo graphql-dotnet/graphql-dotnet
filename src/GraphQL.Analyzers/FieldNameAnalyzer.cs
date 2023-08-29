@@ -19,7 +19,8 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         messageFormat: "Field name should be provided via 'Field' method",
         category: CATEGORY,
         defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.GQL001);
 
     // Violation: Field<T>("xxx").Name("xxx")
     // Fixed:     Field<T>("xxx")
@@ -29,7 +30,8 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         messageFormat: "The name is provided in both 'Field' and 'Name' methods",
         category: CATEGORY,
         defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.GQL002);
 
     // Violation: Field<T>("xxx").Name("yyy")
     // Fixed:     Field<T>("xxx") or Field<T>("yyy")
@@ -39,7 +41,8 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         messageFormat: "Different names defined by 'Field' and 'Name' methods",
         category: CATEGORY,
         defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true);
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.GQL003);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
         DefineTheNameInFieldMethod,
