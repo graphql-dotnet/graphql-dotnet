@@ -84,7 +84,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         }
 
         // Field(x => x.CompanyName).Name("xxx")
-        var fieldName = fieldInvocation.GetArgument(Constants.ArgumentNames.Name, context.SemanticModel);
+        var fieldName = fieldInvocation.GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel);
         if (fieldName == null)
         {
             ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, DiagnosticSeverity.Info);
