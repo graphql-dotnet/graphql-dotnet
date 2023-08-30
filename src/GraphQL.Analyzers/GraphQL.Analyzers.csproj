@@ -6,6 +6,7 @@
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>GraphQL.Analyzers_Internal</PackageId>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

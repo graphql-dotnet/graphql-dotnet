@@ -8,13 +8,13 @@ namespace GraphQL.Analyzers;
 
 public static class Extensions
 {
-    public static InvocationExpressionSyntax FindFieldInvocationExpression(this ExpressionSyntax expression)
+    public static InvocationExpressionSyntax? FindFieldInvocationExpression(this ExpressionSyntax expression)
     {
         var fieldNameSyntax = expression.FindFieldSimpleNameSyntax();
-        return fieldNameSyntax.FindFieldInvocationExpression();
+        return fieldNameSyntax?.FindFieldInvocationExpression();
     }
 
-    public static SimpleNameSyntax FindFieldSimpleNameSyntax(this ExpressionSyntax expression)
+    public static SimpleNameSyntax? FindFieldSimpleNameSyntax(this ExpressionSyntax expression)
     {
         while (true)
         {
@@ -30,7 +30,7 @@ public static class Extensions
                     continue;
 
                 case MemberAccessExpressionSyntax memberAccessExpression:
-                    var findFieldSimpleNameSyntax = FindFieldSimpleNameSyntax(memberAccessExpression.Expression);
+                    var findFieldSimpleNameSyntax = memberAccessExpression.Expression.FindFieldSimpleNameSyntax();
                     if (findFieldSimpleNameSyntax != null)
                     {
                         return findFieldSimpleNameSyntax;
@@ -45,13 +45,8 @@ public static class Extensions
         }
     }
 
-    public static InvocationExpressionSyntax FindFieldInvocationExpression(this SimpleNameSyntax fieldSimpleName)
+    public static InvocationExpressionSyntax? FindFieldInvocationExpression(this SimpleNameSyntax fieldSimpleName)
     {
-        if (fieldSimpleName == null)
-        {
-            return null;
-        }
-
         return fieldSimpleName.Parent switch
         {
             InvocationExpressionSyntax findFieldInvocation => findFieldInvocation,
@@ -75,30 +70,34 @@ public static class Extensions
         return symbol.ContainingAssembly.Name.StartsWith(Constants.GraphQL);
     }
 
-    public static IMethodSymbol GetMethodSymbol(this ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
+    public static IMethodSymbol? GetMethodSymbol(this ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
     {
         return context.SemanticModel.GetSymbolInfo(expression).Symbol as IMethodSymbol;
     }
 
-    public static ArgumentSyntax GetArgument(this InvocationExpressionSyntax invocation, string argumentName, SemanticModel semanticModel)
+    public static ArgumentSyntax? GetMethodArgument(this InvocationExpressionSyntax invocation, string argumentName, SemanticModel semanticModel)
     {
-        var methodSymbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation).Symbol;
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
+        {
+            return null;
+        }
+
         var namedArguments = GetNamedArguments(invocation);
         return GetArgument(argumentName, namedArguments, invocation, methodSymbol);
     }
 
     public static Dictionary<string, ArgumentSyntax> GetNamedArguments(InvocationExpressionSyntax invocation)
     {
-        return invocation!.ArgumentList.Arguments
+        return invocation.ArgumentList.Arguments
             .Where(arg => arg.NameColon != null)
-            .ToDictionary(arg => arg.NameColon.Name.Identifier.Text);
+            .ToDictionary(arg => arg.NameColon!.Name.Identifier.Text);
     }
 
     public static bool GetBoolOption(this AnalyzerOptions analyzerOptions, string name, SyntaxTree tree, bool defaultValue = default)
     {
         var config = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
 
-        if (config.TryGetValue(name, out string configValue))
+        if (config.TryGetValue(name, out string? configValue))
         {
             if (bool.TryParse(configValue, out bool value))
             {
@@ -112,13 +111,13 @@ public static class Extensions
     public static Location GetMethodInvocationLocation(this MemberAccessExpressionSyntax memberAccessExpressionSyntax)
     {
         var methodNameLocation = memberAccessExpressionSyntax.Name.GetLocation();
-        var argsLocation = ((InvocationExpressionSyntax)memberAccessExpressionSyntax.Parent)!.ArgumentList.GetLocation();
+        var argsLocation = ((InvocationExpressionSyntax)memberAccessExpressionSyntax.Parent!).ArgumentList.GetLocation();
         return Location.Create(
             methodNameLocation.SourceTree!,
             TextSpan.FromBounds(methodNameLocation.SourceSpan.Start, argsLocation.SourceSpan.End));
     }
 
-    private static ArgumentSyntax GetArgument(
+    private static ArgumentSyntax? GetArgument(
         string argumentName,
         IDictionary<string, ArgumentSyntax> namedArguments,
         InvocationExpressionSyntax invocation,

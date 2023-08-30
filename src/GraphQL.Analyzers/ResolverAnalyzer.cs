@@ -71,7 +71,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        ITypeSymbol typeSymbol = null;
+        ITypeSymbol? typeSymbol = null;
 
         switch (fieldInvocationExpression.Expression)
         {
@@ -83,7 +83,11 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
             case SimpleNameSyntax:
             {
                 var enclosingClass = FindEnclosingClassDeclarationSyntax(fieldInvocationExpression);
-                typeSymbol = context.SemanticModel.GetDeclaredSymbol(enclosingClass);
+                if (enclosingClass != null)
+                {
+                    typeSymbol = context.SemanticModel.GetDeclaredSymbol(enclosingClass);
+                }
+
                 break;
             }
         }
@@ -102,7 +106,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private ClassDeclarationSyntax FindEnclosingClassDeclarationSyntax(SyntaxNode syntaxNode)
+    private static ClassDeclarationSyntax? FindEnclosingClassDeclarationSyntax(SyntaxNode syntaxNode)
     {
         var potentialEnclosingClass = syntaxNode.Parent;
 
@@ -114,7 +118,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
         return potentialEnclosingClass as ClassDeclarationSyntax;
     }
 
-    private void ReportFieldTypeDiagnostic(
+    private static void ReportFieldTypeDiagnostic(
         SyntaxNodeAnalysisContext context,
         MemberAccessExpressionSyntax memberAccessExpressionSyntax,
         DiagnosticDescriptor diagnosticDescriptor)

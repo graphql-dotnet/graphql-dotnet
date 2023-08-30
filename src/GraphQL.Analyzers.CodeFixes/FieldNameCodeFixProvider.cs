@@ -84,9 +84,9 @@ public class FieldNameCodeFixProvider : CodeFixProvider
         CancellationToken cancellationToken)
     {
         var docEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-        var fieldInvocationExpression = nameMemberAccess.FindFieldInvocationExpression();
+        var fieldInvocationExpression = nameMemberAccess.FindFieldInvocationExpression()!;
 
-        var fieldNameArg = fieldInvocationExpression.GetArgument(Constants.ArgumentNames.Name, docEditor.SemanticModel);
+        var fieldNameArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Name, docEditor.SemanticModel);
         var nameArgList = ((InvocationExpressionSyntax)nameMemberAccess.Parent!).ArgumentList;
 
         MemberAccessExpressionSyntax newNameMemberAccess;

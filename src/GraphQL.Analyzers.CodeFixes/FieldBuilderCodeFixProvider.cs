@@ -56,9 +56,9 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         CancellationToken cancellationToken)
     {
         var docEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-        var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
+        var semanticModel = (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false))!;
 
-        var tree = await document.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false);
+        var tree = (await document.GetSyntaxTreeAsync(cancellationToken).ConfigureAwait(false))!;
         bool reformat = document.Project.AnalyzerOptions.GetBoolOption(
             ReformatOption,
             tree);
@@ -68,12 +68,12 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             tree);
 
         // first handle field name and type
-        var nameArg = fieldInvocationExpression.GetArgument(Constants.ArgumentNames.Name, semanticModel);
-        var typeArg = fieldInvocationExpression.GetArgument(Constants.ArgumentNames.Type, semanticModel);
+        var nameArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Name, semanticModel);
+        var typeArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Type, semanticModel);
 
         var newFieldInvocationExpression = CreateFieldInvocationExpression(
             fieldInvocationExpression,
-            nameArg.Expression,
+            nameArg!.Expression,
             typeArg?.Expression);
 
         // now handle rest of the arguments
@@ -81,7 +81,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
         foreach ((string name, var arg, bool newLine) in args)
         {
-            string invocationName = null;
+            string? invocationName = null;
             switch (name)
             {
                 case Constants.ArgumentNames.Name:
@@ -132,7 +132,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
     private static InvocationExpressionSyntax CreateFieldInvocationExpression(
         InvocationExpressionSyntax originalFieldInvocationExpression,
         ExpressionSyntax nameArgumentExpression,
-        ExpressionSyntax typeArgumentExpression)
+        ExpressionSyntax? typeArgumentExpression)
     {
         // replace FieldAsync, FieldSubscribe(Async) and FieldDelegate with Field
         var newExpression = OverrideName(originalFieldInvocationExpression.Expression, Constants.MethodNames.Field);
@@ -239,7 +239,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             .WithArgumentList(
                 ArgumentList(
                         SingletonSeparatedList(
-                            Argument(argumentExpression!))));
+                            Argument(argumentExpression))));
 
         return exp;
     }

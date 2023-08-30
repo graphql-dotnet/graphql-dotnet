@@ -86,7 +86,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var fieldInvocation = genericNameSyntax.FindFieldInvocationExpression();
+        var fieldInvocation = genericNameSyntax.FindFieldInvocationExpression()!;
 
         ReportFieldTypeDiagnostic(
             context,
@@ -103,7 +103,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         bool isAsyncField,
         bool isDelegate)
     {
-        var props = ImmutableDictionary<string, string>.Empty;
+        var props = ImmutableDictionary<string, string?>.Empty;
 
         if (isAsyncField)
         {

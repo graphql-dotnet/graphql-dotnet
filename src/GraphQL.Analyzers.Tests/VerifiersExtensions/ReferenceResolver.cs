@@ -13,7 +13,7 @@ public class ReferenceResolver
             .GetCallingAssembly()
             .GetAssemblyLocation();
 
-        string dir = Path.GetFileName(Path.GetDirectoryName(assemblyLocation));
+        string dir = Path.GetFileName(Path.GetDirectoryName(assemblyLocation)!);
         var targetFramework = NuGetFramework.Parse(dir);
 
         return CreateReferenceAssemblies(targetFramework);

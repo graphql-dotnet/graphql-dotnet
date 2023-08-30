@@ -91,7 +91,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var nameName = ((InvocationExpressionSyntax)nameMemberAccessExpression.Parent)!.ArgumentList.Arguments.First();
+        var nameName = ((InvocationExpressionSyntax)nameMemberAccessExpression.Parent!).ArgumentList.Arguments.First();
 
         if (fieldName.Expression.IsEquivalentTo(nameName.Expression))
         {
