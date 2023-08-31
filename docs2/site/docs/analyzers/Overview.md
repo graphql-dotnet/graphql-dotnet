@@ -4,7 +4,7 @@ This documentation provides an overview of the analyzers that have been included
 
 ## Introduction
 
-Analyzers in GraphQL.NET are tools that help you identify and address potential issues or improvements in your GraphQL code. This documentation covers the three main analyzers that have been introduced in the recent update.
+Analyzers in GraphQL.NET are tools that help you identify and address potential issues or improvements in your GraphQL code. This documentation covers currently available analyzers and code fixes, along with the methods to configure them.
 
 ## Included Analyzers
 
@@ -26,7 +26,7 @@ Field("name").Description(...).Resolve(...)
 
 ### 2. FieldNameAnalyzer
 
-The `FieldNameAnalyzer` is designed to improve the naming conventions for field definitions. It simplifies the way field names are assigned to enhance code readability.
+The `FieldNameAnalyzer` is designed to improve the field name definition method. It simplifies the way field names are assigned to enhance code consistency.
 
 Replace:
 
@@ -46,22 +46,34 @@ The `ResolverAnalyzer` focuses on identifying incorrect usage of resolver method
 
 ## Configuration in .editorconfig
 
-You can configure the behavior of these analyzers using the `.editorconfig` file in your project. Two configuration keys are available for customization:
+Certain analyzers and code fixes offer configuration options that control when the rule is applied and how the automatic code fix executes code adjustments. Refer to the specific documentation page for each analyzer to understand the available configuration options and their application methods.
 
-- `dotnet_diagnostic.GQL004.reformat`: This key controls whether the code should be reformatted based on the analyzer's suggestions. Set it to `true` to enable reformatting.
-- `dotnet_diagnostic.GQL004.skip_nulls`: This key controls whether null values should be skipped during the code transformation. Set it to `true` to skip null values.
+### Set rule severity
 
-Example `.editorconfig` configuration:
+You can set the severity for analyzer rules in `.editorconfig` file with the following syntax:
 
 ```ini
-# .editorconfig
-
-dotnet_diagnostic.GQL004.reformat = true
-dotnet_diagnostic.GQL004.skip_nulls = true
+dotnet_diagnostic.<rule ID>.severity = <severity>
 ```
 
-With these configuration settings, the analyzers will perform code transformations according to the specified preferences. This helps maintain consistent formatting and reduces unnecessary null values in the code.
+For example
 
-## Conclusion
+```ini
+dotnet_diagnostic.GQL001.severity = none
+```
 
-GraphQL.NET analyzers are powerful tools that can enhance your GraphQL codebase by identifying and addressing issues related to field building, naming conventions, and resolver usage. By configuring these analyzers in your project's `.editorconfig`, you can ensure that your code remains clean, readable, and aligned with best practices.
+You can set the severity for all rules in a specific category with the following syntax (**TODO: currently doesn't work**):
+
+```ini
+dotnet_analyzer_diagnostic.category-<rule category>.severity = <severity>
+```
+
+For example
+
+```ini
+dotnet_analyzer_diagnostic.category-deprecations.severity = error
+```
+
+> Note: configuration keys are case insensitive
+
+For more information about analyzers configuration see [Code Analysis Configuration Overview](https://learn.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2022)
