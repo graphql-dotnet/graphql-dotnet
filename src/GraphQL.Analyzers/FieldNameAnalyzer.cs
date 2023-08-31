@@ -9,40 +9,38 @@ namespace GraphQL.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class FieldNameAnalyzer : DiagnosticAnalyzer
 {
-    private const string CATEGORY = "FieldNameDefinition";
-
     // Violation: Field<T>().Name("xxx") or Field<T>(x => x.Prop).Name("xxx")
     // Fixed:     Field<T>("xxx")        or Field<T>("xxx", x => x.Prop)
     public static readonly DiagnosticDescriptor DefineTheNameInFieldMethod = new(
-        id: "GQL001",
+        id: DiagnosticIds.DEFINE_THE_NAME_IN_FIELD_METHOD,
         title: "Define the name in 'Field' method",
         messageFormat: "Field name should be provided via 'Field' method",
-        category: CATEGORY,
+        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.GQL001);
+        helpLinkUri: HelpLinks.DEFINE_THE_NAME_IN_FIELD_METHOD);
 
     // Violation: Field<T>("xxx").Name("xxx")
     // Fixed:     Field<T>("xxx")
     public static readonly DiagnosticDescriptor NameMethodInvocationCanBeRemoved = new(
-        id: "GQL002",
+        id: DiagnosticIds.NAME_METHOD_INVOCATION_CAN_BE_REMOVED,
         title: "'Name' method invocation can be removed",
-        messageFormat: "The name is provided in both 'Field' and 'Name' methods",
-        category: CATEGORY,
+        messageFormat: "Field name should be provided via 'Field' method. 'Name' method invocation can be removed.",
+        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.GQL002);
+        helpLinkUri: HelpLinks.NAME_METHOD_INVOCATION_CAN_BE_REMOVED);
 
     // Violation: Field<T>("xxx").Name("yyy")
     // Fixed:     Field<T>("xxx") or Field<T>("yyy")
     public static readonly DiagnosticDescriptor DifferentNamesDefinedByFieldAndNameMethods = new(
-        id: "GQL003",
+        id: DiagnosticIds.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS,
         title: "Different names defined by 'Field' and 'Name' methods",
-        messageFormat: "Different names defined by 'Field' and 'Name' methods",
-        category: CATEGORY,
+        messageFormat: "Field name should be provided via 'Field' method. Different names defined by 'Field' and 'Name' methods.",
+        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.GQL003);
+        helpLinkUri: HelpLinks.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
         DefineTheNameInFieldMethod,

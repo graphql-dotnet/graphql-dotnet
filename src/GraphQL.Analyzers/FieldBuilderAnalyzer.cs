@@ -12,13 +12,13 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
     // Violation: Field<T>("name", "description", ...)
     // Fixed:     Field<T>("name").Description("description")...
     public static readonly DiagnosticDescriptor DoNotUseObsoleteFieldMethods = new(
-        id: "GQL004",
+        id: DiagnosticIds.DO_NOT_USE_OBSOLETE_FIELD_METHODS,
         title: "Don't use obsolete 'Field' methods",
-        messageFormat: "Use correct 'Field' method overload",
-        category: "FieldBuilder",
+        messageFormat: "Don't use obsolete 'Field' methods",
+        category: DiagnosticCategories.FIELD_BUILDER,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.GQL004);
+        helpLinkUri: HelpLinks.DO_NOT_USE_OBSOLETE_FIELD_METHODS);
 
     private static readonly HashSet<string> _supportedNames = new()
     {

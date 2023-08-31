@@ -12,13 +12,13 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
     // Violation: any of _forbiddenMethodNames used on type that doesn't implement _allowedInterfaces
     // Fixed:     remove the illegal method
     public static readonly DiagnosticDescriptor IllegalResolverUsage = new(
-        id: "GQL005",
+        id: DiagnosticIds.ILLEGAL_RESOLVER_USAGE,
         title: "Illegal resolver usage",
-        messageFormat: "Resolve methods are not allowed on non-output graph types",
-        category: "Resolver",
+        messageFormat: "Resolvers are not allowed on non-output graph types",
+        category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.GQL005);
+        helpLinkUri: HelpLinks.ILLEGAL_RESOLVER_USAGE);
 
     private static readonly HashSet<string> _allowedInterfaces = new()
     {
