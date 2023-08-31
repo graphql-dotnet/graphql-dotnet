@@ -15,7 +15,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         id: DiagnosticIds.DO_NOT_USE_OBSOLETE_FIELD_METHODS,
         title: "Don't use obsolete 'Field' methods",
         messageFormat: "Don't use obsolete 'Field' methods",
-        category: DiagnosticCategories.FIELD_BUILDER,
+        category: DiagnosticCategories.DEPRECATIONS,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DO_NOT_USE_OBSOLETE_FIELD_METHODS);
