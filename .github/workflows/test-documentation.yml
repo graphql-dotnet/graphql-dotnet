@@ -30,3 +30,9 @@ jobs:
       - name: yarn gatsby build
         working-directory: docs2
         run: yarn gatsby build
+      - name: Upload docs as workflow artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Documentation
+          path: docs2/public/**
+          if-no-files-found: error
