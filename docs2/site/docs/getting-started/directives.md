@@ -236,7 +236,7 @@ Note that a schema visitor, unlike a directive, can be registered not only as an
 a type. In this case, when initializing the schema, schema visitor will be created according to how
 you configure the DI container. In other words, schema visitors support dependency injection. The
 library resolves a schema visitor only once and caches it for the lifetime of the `Schema`. For more
-information about lifetimes see [Schema Service Lifetime](dependency-injection#schema-service-lifetime). 
+information about lifetimes see [Schema Service Lifetime](dependency-injection.md#schema-service-lifetime). 
 
 # Is it mandatory to create a schema visitor in addition to the directive
 

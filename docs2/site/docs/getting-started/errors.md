@@ -171,7 +171,7 @@ object tree into json. The `IGraphQLSerializer` implementations provided by the 
 and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
 `IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
 the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
-automatically. Please review the [serialization](../guides/serialization) documentation for more details.
+automatically. Please review the [serialization](../guides/serialization.md) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list
 
