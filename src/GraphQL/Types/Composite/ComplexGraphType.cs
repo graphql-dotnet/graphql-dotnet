@@ -108,6 +108,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
+        [Obsolete("Use the overload that accepts the 'name' argument")]
         protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
@@ -116,9 +117,26 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type, string name)
+        {
+            return FieldBuilder<TSourceType, TReturnType>.Create(type, name);
+        }
+
+        /// <summary>
+        /// Creates a field builder used by Field() methods.
+        /// </summary>
+        [Obsolete("Use the overload that accepts the 'name' argument")]
         protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
+        }
+
+        /// <summary>
+        /// Creates a field builder used by Field() methods.
+        /// </summary>
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type, string name)
+        {
+            return FieldBuilder<TSourceType, TReturnType>.Create(type, name);
         }
 
         /// <summary>
@@ -408,10 +426,11 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(string name)
             where TGraphType : IGraphType
         {
-            var builder = CreateBuilder<TReturnType>(typeof(TGraphType)).Name(name);
+            var builder = CreateBuilder<TReturnType>(typeof(TGraphType), name);
             AddField(builder.FieldType);
             return builder;
         }
+
 
         /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
         [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
@@ -450,8 +469,7 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from type '{typeof(TReturnType).Name}'. " + exp.Message, exp);
             }
 
-            var builder = CreateBuilder<TReturnType>(type)
-                .Name(name);
+            var builder = CreateBuilder<TReturnType>(type, name);
 
             AddField(builder.FieldType);
             return builder;
@@ -464,7 +482,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
-            var builder = CreateBuilder<object>(type).Name(name);
+            var builder = CreateBuilder<object>(type, name);
             AddField(builder.FieldType);
             return builder;
         }
@@ -476,7 +494,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field(string name, IGraphType type)
         {
-            var builder = CreateBuilder<object>(type).Name(name);
+            var builder = CreateBuilder<object>(type, name);
             AddField(builder.FieldType);
             return builder;
         }
@@ -508,8 +526,7 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'. " + exp.Message, exp);
             }
 
-            var builder = CreateBuilder<TProperty>(type)
-                .Name(name)
+            var builder = CreateBuilder<TProperty>(type, name)
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
