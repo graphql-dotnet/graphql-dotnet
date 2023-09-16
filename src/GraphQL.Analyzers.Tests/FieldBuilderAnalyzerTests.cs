@@ -552,7 +552,7 @@ public class FieldBuilderAnalyzerTests
     }
 
     [Fact]
-    public async Task SkipNullsOptionIsTrue_SourceReformatted()
+    public async Task SkipNullsOptionIsTrue_NullArgumentsRemoved()
     {
         const string source = """
             using GraphQL.Types;
