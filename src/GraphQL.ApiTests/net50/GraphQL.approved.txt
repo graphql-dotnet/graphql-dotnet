@@ -3446,6 +3446,10 @@ namespace GraphQL.Validation.Errors.Custom
     {
         public ComplexityError(string message) { }
     }
+    public class NoIntrospectionError : GraphQL.Validation.ValidationError
+    {
+        public NoIntrospectionError(GraphQLParser.ROM source, GraphQLParser.AST.ASTNode node) { }
+    }
 }
 namespace GraphQL.Validation.Rules
 {
@@ -3640,6 +3644,11 @@ namespace GraphQL.Validation.Rules.Custom
         [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This constructor " +
             "will be removed in v8.")]
         public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+    }
+    public class NoIntrospectionValidationRule : GraphQL.Validation.IValidationRule
+    {
+        public NoIntrospectionValidationRule() { }
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
 }
