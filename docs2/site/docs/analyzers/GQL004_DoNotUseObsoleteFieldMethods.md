@@ -1,12 +1,12 @@
 # GQL004: Don't use obsolete `Field` methods
 
-|                        | Value        |
-| ---------------------- | ------------ |
-| **Rule ID**            | GQL004       |
-| **Category**           | Deprecations |
-| **Default severity**   | Warning      |
-| **Enabled by default** | Yes          |
-| **Code fix provided**  | Yes          |
+|                        | Value   |
+| ---------------------- | ------- |
+| **Rule ID**            | GQL004  |
+| **Category**           | Usage   |
+| **Default severity**   | Warning |
+| **Enabled by default** | Yes     |
+| **Code fix provided**  | Yes     |
 
 ## Cause
 
@@ -113,7 +113,7 @@ Field<StringGraphType>("name")
 
 ### Configure `null` values handling
 
-The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value if `true`:
+The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value if `true`.
 
 ```ini
 [*.cs]

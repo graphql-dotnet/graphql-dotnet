@@ -1,12 +1,12 @@
 # GQL002: `Name` method invocation can be removed
 
-|                        | Value               |
-| ---------------------- | ------------------- |
-| **Rule ID**            | GQL002              |
-| **Category**           | FieldNameDefinition |
-| **Default severity**   | Warning             |
-| **Enabled by default** | Yes                 |
-| **Code fix provided**  | Yes                 |
+|                        | Value   |
+| ---------------------- | ------- |
+| **Rule ID**            | GQL002  |
+| **Category**           | Usage   |
+| **Default severity**   | Warning |
+| **Enabled by default** | Yes     |
+| **Code fix provided**  | Yes     |
 
 ## Cause
 

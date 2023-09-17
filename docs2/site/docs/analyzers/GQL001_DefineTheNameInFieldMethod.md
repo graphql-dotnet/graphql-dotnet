@@ -1,12 +1,12 @@
 # GQL001: Define the name in `Field` method
 
-|                        | Value               |
-| ---------------------- | ------------------- |
-| **Rule ID**            | GQL001              |
-| **Category**           | FieldNameDefinition |
-| **Default severity**   | Warning             |
-| **Enabled by default** | Yes                 |
-| **Code fix provided**  | Yes                 |
+|                        | Value   |
+| ---------------------- | ------- |
+| **Rule ID**            | GQL001  |
+| **Category**           | Usage   |
+| **Default severity**   | Warning |
+| **Enabled by default** | Yes     |
+| **Code fix provided**  | Yes     |
 
 ## Cause
 

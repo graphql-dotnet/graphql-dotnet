@@ -62,18 +62,6 @@ For example
 dotnet_diagnostic.GQL001.severity = none
 ```
 
-You can set the severity for all rules in a specific category with the following syntax (**TODO: currently doesn't work**):
-
-```ini
-dotnet_analyzer_diagnostic.category-<rule category>.severity = <severity>
-```
-
-For example
-
-```ini
-dotnet_analyzer_diagnostic.category-deprecations.severity = error
-```
-
 > Note: configuration keys are case insensitive
 
 For more information about analyzers configuration see [Code Analysis Configuration Overview](https://learn.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2022)
