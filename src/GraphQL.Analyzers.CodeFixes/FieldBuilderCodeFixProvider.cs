@@ -65,7 +65,8 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
         bool skipNulls = document.Project.AnalyzerOptions.GetBoolOption(
             SkipNullsOption,
-            tree);
+            tree,
+            defaultValue: true);
 
         // first handle field name and type
         var nameArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Name, semanticModel);

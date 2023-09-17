@@ -432,7 +432,7 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name").Description("description").Arguments(null)
+                    Field<StringGraphType>("name").Description("description")
                         .Resolve(context => "text");
                 }
             }
@@ -476,12 +476,12 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
 
-                    Field<StringGraphType>("name1").Description("description1").Arguments(null)
+                    Field<StringGraphType>("name1").Description("description1")
                         .Resolve(context => "text1");
 
                     var str = "string";
 
-                    Field<StringGraphType>("name2").Description("description2").Arguments(null)
+                    Field<StringGraphType>("name2").Description("description2")
                         .Resolve(context => "text2");
                 }
             }
@@ -521,7 +521,6 @@ public class FieldBuilderAnalyzerTests
                 {
                     Field<StringGraphType>("name")
                         .Description("description")
-                        .Arguments(null)
                         .Resolve(context => "text");
                 }
             }
@@ -552,7 +551,7 @@ public class FieldBuilderAnalyzerTests
     }
 
     [Fact]
-    public async Task SkipNullsOptionIsTrue_NullArgumentsRemoved()
+    public async Task SkipNullsOptionIsFalse_NullArgumentsPreserved()
     {
         const string source = """
             using GraphQL.Types;
@@ -583,6 +582,7 @@ public class FieldBuilderAnalyzerTests
                 {
                     Field<StringGraphType>("name")
                         .Description("description")
+                        .Arguments(null)
                         .Resolve(context => "text");
                 }
             }
@@ -602,7 +602,7 @@ public class FieldBuilderAnalyzerTests
                         root = true
 
                         [*]
-                        {FieldBuilderCodeFixProvider.SkipNullsOption} = true
+                        {FieldBuilderCodeFixProvider.SkipNullsOption} = false
                         ")
                         """)
                 }

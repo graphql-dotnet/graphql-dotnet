@@ -80,7 +80,7 @@ For more information, see [How to suppress code analysis warnings](https://learn
 
 ## Configure code fix
 
-The given diagnostic rule offers an automatic code fix. By default, it attempts to retain the original user code formatting as much as possible. For instance, consider the subsequent code snippet:
+The given diagnostic rule offers an automatic code fix. By default, it attempts to retain the original user code formatting as much as possible but it will remove unnecessary `null` values. For instance, consider the subsequent code snippet:
 
 ```c#
 Field<StringGraphType>("name", "description", null,
@@ -90,13 +90,13 @@ Field<StringGraphType>("name", "description", null,
 This will be transformed into:
 
 ```c#
-Field<StringGraphType>("name").Description("description").Arguments(null)
+Field<StringGraphType>("name").Description("description")
     .Resolve(context => "text");
 ```
 
 ### Configure formatting
 
-The `reformat` configuration option will guide the code fix to apply code reformatting:
+The `reformat` configuration option will guide the code fix to apply code reformatting. The default value is `false`.
 
 ```ini
 [*.cs]
@@ -108,23 +108,22 @@ The earlier code snippet will undergo the following reformatting:
 ```c#
 Field<StringGraphType>("name")
     .Description("description")
-    .Arguments(null)
     .Resolve(context => "text");
 ```
 
 ### Configure `null` values handling
 
-The `skip_nulls` option can be used to remove unnecessary `null` values assignments
+The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value if `true`:
 
 ```ini
 [*.cs]
-dotnet_diagnostic.GQL004.skip_nulls = true
+dotnet_diagnostic.GQL004.skip_nulls = false
 ```
 
 The earlier code snippet will undergo the following reformatting:
 
 ```c#
-Field<StringGraphType>("name").Description("description")
+Field<StringGraphType>("name").Description("description").Arguments(null)
     .Resolve(context => "text");
 ```
 
