@@ -799,12 +799,24 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
             where TNodeType : GraphQL.Types.IGraphType { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
+            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
@@ -830,6 +842,8 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
+        [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
+            "\'Connection\' method.")]
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
         public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object?> resolver) { }
@@ -863,6 +877,8 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
+        [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
+            "\'Connection\' method.")]
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize) { }
         public virtual void Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType?> resolver) { }
@@ -928,7 +944,11 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
+        [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
+        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, System.Type? type = null) { }
+        [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(System.Type? type = null, string name = "default") { }
     }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
@@ -1841,21 +1861,33 @@ namespace GraphQL.Types
         protected ComplexGraphType() { }
         public GraphQL.Types.TypeFields Fields { get; }
         public virtual GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : GraphQL.Types.IGraphType { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
-        [System.Obsolete("Use the overload that accepts the \'name\' argument")]
+        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
+            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
+        [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
-        [System.Obsolete("Use the overload that accepts the \'name\' argument")]
+        [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(System.Type type) { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type, string name) { }
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(System.Type type, string name) { }
+        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, GraphQL.Types.IGraphType type) { }
+        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, System.Type type) { }
         [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +

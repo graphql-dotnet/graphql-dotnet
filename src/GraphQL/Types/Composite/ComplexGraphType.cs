@@ -108,7 +108,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        [Obsolete("Use the overload that accepts the 'name' argument")]
+        [Obsolete("Please use the overload that accepts the name as the first argument.")]
         protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
@@ -117,15 +117,15 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type, string name)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
-            return FieldBuilder<TSourceType, TReturnType>.Create(type, name);
+            return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
         }
 
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        [Obsolete("Use the overload that accepts the 'name' argument")]
+        [Obsolete("Please use the overload that accepts the name as the first argument.")]
         protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
@@ -134,9 +134,9 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type, string name)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, IGraphType type)
         {
-            return FieldBuilder<TSourceType, TReturnType>.Create(type, name);
+            return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
         }
 
         /// <summary>
@@ -426,7 +426,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(string name)
             where TGraphType : IGraphType
         {
-            var builder = CreateBuilder<TReturnType>(typeof(TGraphType), name);
+            var builder = CreateBuilder<TReturnType>(name, typeof(TGraphType));
             AddField(builder.FieldType);
             return builder;
         }
@@ -469,7 +469,7 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from type '{typeof(TReturnType).Name}'. " + exp.Message, exp);
             }
 
-            var builder = CreateBuilder<TReturnType>(type, name);
+            var builder = CreateBuilder<TReturnType>(name, type);
 
             AddField(builder.FieldType);
             return builder;
@@ -482,7 +482,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
-            var builder = CreateBuilder<object>(type, name);
+            var builder = CreateBuilder<object>(name, type);
             AddField(builder.FieldType);
             return builder;
         }
@@ -494,7 +494,7 @@ namespace GraphQL.Types
         /// <param name="name">The name of the field.</param>
         public virtual FieldBuilder<TSourceType, object> Field(string name, IGraphType type)
         {
-            var builder = CreateBuilder<object>(type, name);
+            var builder = CreateBuilder<object>(name, type);
             AddField(builder.FieldType);
             return builder;
         }
@@ -526,7 +526,7 @@ namespace GraphQL.Types
                 throw new ArgumentException($"The GraphQL type for field '{Name ?? GetType().Name}.{name}' could not be derived implicitly from expression '{expression}'. " + exp.Message, exp);
             }
 
-            var builder = CreateBuilder<TProperty>(type, name)
+            var builder = CreateBuilder<TProperty>(name, type)
                 .Description(expression.DescriptionOf())
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
@@ -574,6 +574,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public ConnectionBuilder<TSourceType> Connection<TNodeType>()
             where TNodeType : IGraphType
         {
@@ -582,7 +583,17 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
+        public ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
+            where TNodeType : IGraphType
+        {
+            var builder = ConnectionBuilder.Create<TNodeType, TSourceType>(name);
+            AddField(builder.FieldType);
+            return builder;
+        }
+
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
@@ -592,13 +603,35 @@ namespace GraphQL.Types
             return builder;
         }
 
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
+        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+        {
+            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>(name);
+            AddField(builder.FieldType);
+            return builder;
+        }
+
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
         {
             var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TConnectionType, TSourceType>();
+            AddField(builder.FieldType);
+            return builder;
+        }
+
+        /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
+        public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+        {
+            var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TConnectionType, TSourceType>(name);
             AddField(builder.FieldType);
             return builder;
         }

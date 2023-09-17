@@ -23,12 +23,12 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         // race condition with does_not_throw_with_filtering_nameconverter test
         try
         {
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName));
         }
         catch (ShouldAssertException)
         {
             System.Threading.Thread.Sleep(100); // wait a bit and retry
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
+            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName));
         }
 
         exception.Message.ShouldStartWith("A field name can not be null or empty.");
@@ -138,8 +138,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         var type = new ObjectGraphType();
 
-        type.Connection<ObjectGraphType>()
-            .Name("testConnection")
+        type.Connection<ObjectGraphType>("testConnection")
             .Resolve(_ =>
                 new Connection<Child>
                 {
@@ -212,8 +211,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 },
             },
         };
-        type.Connection<ObjectGraphType>()
-            .Name("testConnection")
+        type.Connection<ObjectGraphType>("testConnection")
             .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
@@ -266,8 +264,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 },
             },
         };
-        type.Connection<ChildType, ParentChildrenEdgeType>()
-            .Name("testConnection")
+        type.Connection<ChildType, ParentChildrenEdgeType>("testConnection")
             .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
@@ -343,8 +340,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             },
             ConnectionField1 = ConnectionField1Value
         };
-        type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>()
-            .Name("testConnection")
+        type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>("testConnection")
             .ResolveAsync(_ => Task.FromResult<object>(connection));
 
         var field = type.Fields.Single();
@@ -397,8 +393,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     public void bidirectional_called_twice_creates_proper_arguments()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .Description("RandomDescription")
             .Bidirectional()
             .Bidirectional();
@@ -411,8 +406,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     public async Task should_use_pagesize()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .PageSize(10)
             .Resolve(context => context.First);
         (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
@@ -422,8 +416,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     public async Task should_use_pagesize_async()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .PageSize(10)
             .ResolveAsync(context => Task.FromResult<object>(context.First));
         (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
@@ -471,13 +464,11 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Parent";
 
-            Connection<ChildType>()
-                .Name("connection1")
+            Connection<ChildType>("connection1")
                 .DeprecationReason("Deprecated")
                 .Resolve(context => context.Source.Connection1);
 
-            Connection<ChildType>()
-                .Name("connection2")
+            Connection<ChildType>("connection2")
                 .Description("RandomDescription")
                 .Bidirectional()
                 .Resolve(context => context.Source.Connection2);
