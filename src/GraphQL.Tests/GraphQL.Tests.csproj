@@ -33,7 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.*" />
-    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.5.1" />
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.6.0" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.5.1" />
     <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
