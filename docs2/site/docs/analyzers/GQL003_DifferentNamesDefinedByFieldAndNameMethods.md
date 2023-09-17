@@ -1,12 +1,12 @@
 # GQL003: Different names defined by `Field` and `Name` methods
 
-|                        | Value               |
-| ---------------------- | ------------------- |
-| **Rule ID**            | GQL003              |
-| **Category**           | FieldNameDefinition |
-| **Default severity**   | Warning             |
-| **Enabled by default** | Yes                 |
-| **Code fix provided**  | Yes                 |
+|                        | Value        |
+| ---------------------- | ------------ |
+| **Rule ID**            | GQL003       |
+| **Category**           | Deprecations |
+| **Default severity**   | Warning      |
+| **Enabled by default** | Yes          |
+| **Code fix provided**  | Yes          |
 
 ## Cause
 

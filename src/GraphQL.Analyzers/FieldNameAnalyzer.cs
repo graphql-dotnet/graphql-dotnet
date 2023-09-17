@@ -37,7 +37,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         id: DiagnosticIds.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS,
         title: "Different names defined by 'Field' and 'Name' methods",
         messageFormat: "Field name should be provided via 'Field' method. Different names defined by 'Field' and 'Name' methods.",
-        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
+        category: DiagnosticCategories.DEPRECATIONS,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS);
