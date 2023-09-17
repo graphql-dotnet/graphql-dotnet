@@ -15,7 +15,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         id: DiagnosticIds.DEFINE_THE_NAME_IN_FIELD_METHOD,
         title: "Define the name in 'Field' method",
         messageFormat: "Field name should be provided via 'Field' method",
-        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
+        category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DEFINE_THE_NAME_IN_FIELD_METHOD);
@@ -26,7 +26,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         id: DiagnosticIds.NAME_METHOD_INVOCATION_CAN_BE_REMOVED,
         title: "'Name' method invocation can be removed",
         messageFormat: "Field name should be provided via 'Field' method. 'Name' method invocation can be removed.",
-        category: DiagnosticCategories.FIELD_NAME_DEFINITION,
+        category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.NAME_METHOD_INVOCATION_CAN_BE_REMOVED);
@@ -37,7 +37,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         id: DiagnosticIds.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS,
         title: "Different names defined by 'Field' and 'Name' methods",
         messageFormat: "Field name should be provided via 'Field' method. Different names defined by 'Field' and 'Name' methods.",
-        category: DiagnosticCategories.DEPRECATIONS,
+        category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS);
