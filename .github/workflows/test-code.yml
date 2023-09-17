@@ -80,7 +80,7 @@ jobs:
           publish/GraphQL.AotCompilationSample.TypeFirst
       - name: Upload coverage to codecov
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         with:
           files: 'src/.coverage/**/coverage.opencover.xml'
 
