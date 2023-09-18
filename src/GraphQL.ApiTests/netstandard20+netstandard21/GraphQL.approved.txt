@@ -850,12 +850,24 @@ namespace GraphQL.Builders
         public virtual void ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>()
             where TNodeType : GraphQL.Types.IGraphType { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>()
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
+        [System.Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>()
+            where TNodeType : GraphQL.Types.IGraphType
+            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
+            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
+        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
