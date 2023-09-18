@@ -431,7 +431,6 @@ namespace GraphQL.Types
             return builder;
         }
 
-
         /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
         [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
         public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
