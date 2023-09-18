@@ -17,6 +17,12 @@
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj" />
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj" />

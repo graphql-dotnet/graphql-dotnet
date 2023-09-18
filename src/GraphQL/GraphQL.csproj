@@ -18,4 +18,12 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- We don't consume the analyzers in this library itself,
+         but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
+    <ProjectReference Include="..\GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj"
+                      PrivateAssets="none"
+                      Condition="'$(ExcludeRestorePackageImports)' != ''"  />
+  </ItemGroup>
+
 </Project>
