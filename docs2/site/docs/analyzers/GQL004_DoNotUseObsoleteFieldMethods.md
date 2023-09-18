@@ -113,7 +113,7 @@ Field<StringGraphType>("name")
 
 ### Configure `null` values handling
 
-The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value if `true`.
+The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value is `true`.
 
 ```ini
 [*.cs]
