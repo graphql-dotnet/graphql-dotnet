@@ -114,7 +114,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the name of the field.
         /// </summary>
-        [Obsolete("Please configure the filed name by providing the name as an argument to the 'Field' method.")]
+        [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method.")]
         public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;
