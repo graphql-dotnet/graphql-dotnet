@@ -125,7 +125,8 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source, VerifyCS.Diagnostic().WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic().WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Fact]
@@ -258,9 +259,8 @@ public class InputGraphTypeAnalyzerTests
 
         const int startColumn = 32;
         int endColumn = startColumn + fieldName.Length;
-        await VerifyCS.VerifyAnalyzerAsync(
-            source,
-            VerifyCS.Diagnostic().WithSpan(11, startColumn, 11, endColumn).WithArguments("Email", "MySourceType")).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic().WithSpan(11, startColumn, 11, endColumn).WithArguments("Email", "MySourceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Fact]
@@ -286,9 +286,8 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(
-            source,
-            VerifyCS.Diagnostic().WithSpan(9, 15, 9, 22).WithArguments("Email", "MySourceType")).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic().WithSpan(9, 15, 9, 22).WithArguments("Email", "MySourceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Fact]
@@ -314,9 +313,8 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(
-            source,
-            VerifyCS.Diagnostic().WithSpan(9, 37, 9, 44).WithArguments("Email", "MySourceType")).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic().WithSpan(9, 37, 9, 44).WithArguments("Email", "MySourceType");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Fact]
@@ -371,10 +369,12 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(
-            source,
+        var expected = new[]
+        {
             VerifyCS.Diagnostic().WithSpan(10, 32, 10, 39).WithArguments("Email", "MySourceType"),
-            VerifyCS.Diagnostic().WithSpan(12, 32, 12, 41).WithArguments("Address", "MySourceType")).ConfigureAwait(false);
+            VerifyCS.Diagnostic().WithSpan(12, 32, 12, 41).WithArguments("Address", "MySourceType")
+        };
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Fact]
@@ -432,9 +432,8 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(
-            source,
-            VerifyCS.Diagnostic().WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource")).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic().WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
     }
 
     [Theory]
