@@ -10,6 +10,7 @@ public static class Constants
         public const string Arguments = "arguments";
         public const string DeprecationReason = "deprecationReason";
         public const string Description = "description";
+        public const string Expression = "expression";
         public const string Name = "name";
         public const string Resolve = "resolve";
         public const string Subscribe = "subscribe";

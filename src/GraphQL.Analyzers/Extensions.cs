@@ -16,33 +16,9 @@ public static class Extensions
 
     public static SimpleNameSyntax? FindFieldSimpleNameSyntax(this ExpressionSyntax expression)
     {
-        while (true)
-        {
-            if (expression is SimpleNameSyntax { Identifier.Text: Constants.MethodNames.Field } simpleNameSyntax)
-            {
-                return simpleNameSyntax;
-            }
-
-            switch (expression)
-            {
-                case InvocationExpressionSyntax invocationExpression:
-                    expression = invocationExpression.Expression;
-                    continue;
-
-                case MemberAccessExpressionSyntax memberAccessExpression:
-                    var findFieldSimpleNameSyntax = memberAccessExpression.Expression.FindFieldSimpleNameSyntax();
-                    if (findFieldSimpleNameSyntax != null)
-                    {
-                        return findFieldSimpleNameSyntax;
-                    }
-
-                    expression = memberAccessExpression.Name;
-                    continue;
-
-                default:
-                    return null;
-            }
-        }
+        return expression.DescendantNodes()
+            .OfType<SimpleNameSyntax>()
+            .FirstOrDefault(simpleNameSyntax => simpleNameSyntax.Identifier.Text == Constants.MethodNames.Field);
     }
 
     public static InvocationExpressionSyntax? FindFieldInvocationExpression(this SimpleNameSyntax fieldSimpleName)
