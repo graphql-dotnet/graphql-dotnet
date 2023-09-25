@@ -14,8 +14,7 @@ public class OrderItemType : ObjectGraphType<OrderItem>
         Field(x => x.Quantity);
         Field(x => x.UnitPrice);
 
-        Field<ProductType, Product>()
-            .Name("Product")
+        Field<ProductType, Product>("Product")
             .ResolveAsync(ctx =>
             {
                 var loader = accessor.Context.GetOrAddBatchLoader<int, Product>("GetProductById",
