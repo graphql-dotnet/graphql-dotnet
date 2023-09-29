@@ -50,6 +50,7 @@ public static class Constants
 
     public static class Interfaces
     {
+        public const string IInputObjectGraphType = "IInputObjectGraphType";
         public const string IObjectGraphType = "IObjectGraphType";
     }
 }

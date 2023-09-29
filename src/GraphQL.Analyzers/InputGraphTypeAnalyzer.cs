@@ -140,6 +140,12 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         INamedTypeSymbol? typeSymbol,
         SyntaxNodeAnalysisContext context)
     {
+        // quick check for interface implementation before iterating on base classes
+        if (typeSymbol?.AllInterfaces.Any(i => i.Name == Constants.Interfaces.IInputObjectGraphType) != true)
+        {
+            return false;
+        }
+
         var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName("GraphQL.Types.InputObjectGraphType`1");
 
         while (typeSymbol != null)
