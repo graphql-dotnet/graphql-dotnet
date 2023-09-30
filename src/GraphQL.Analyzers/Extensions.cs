@@ -93,6 +93,11 @@ public static class Extensions
             TextSpan.FromBounds(methodNameLocation.SourceSpan.Start, argsLocation.SourceSpan.End));
     }
 
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new(source);
+
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer)
+        => new(source, comparer);
+
     private static ArgumentSyntax? GetArgument(
         string argumentName,
         IDictionary<string, ArgumentSyntax> namedArguments,

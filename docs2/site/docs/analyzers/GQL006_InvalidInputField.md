@@ -28,12 +28,6 @@ This diagnostic is reported when the input field name cannot be mapped to any fi
 - Must have the exact same name (case-insensitive)
 - Constructor must be public
 
-### Limitations
-
-- The input type is derived directly or indirectly from the generic `InputObjectGraphType<TSourceType>` class
-- The `TSourceType` is a closed type
-- The `TSourceType` is not a `System.Object`
-
 ## How to fix violations
 
 Follow the mapping rules described in the [Rule description](#rule-description) section or remove the invalid input field.

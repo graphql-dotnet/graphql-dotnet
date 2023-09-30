@@ -12,7 +12,9 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor InvalidInputField = new(
         id: DiagnosticIds.INVALID_INPUT_FIELD,
         title: "Invalid input field",
-        messageFormat: "No instance property with public setter, public field or public constructor parameter called '{0}' was found on the '{1}' source type. This field will be ignored during the input deserialization.",
+        messageFormat: "No instance property with public setter, public field or public constructor parameter " +
+                       "called '{0}' was found on the source type(s) {1}. " +
+                       "This field will be ignored during the input deserialization.",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
@@ -23,8 +25,8 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 
     public override void Initialize(AnalysisContext context)
     {
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.EnableConcurrentExecution();
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
     }
 
@@ -32,15 +34,17 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
         var sourceTypeSymbol = GetSourceTypeSymbol(classDeclaration, context);
-        if (sourceTypeSymbol == null)
+        if (sourceTypeSymbol == null || sourceTypeSymbol.SpecialType == SpecialType.System_Object)
         {
             return;
         }
 
-        var allowedFieldNames = GetAllowedFieldNames(sourceTypeSymbol);
-        var declaredFields = GetDeclaredFields(classDeclaration);
+        var allowedFieldNames = (sourceTypeSymbol is ITypeParameterSymbol parameterSymbol
+                ? GetAllowedFieldNames(parameterSymbol.ConstraintTypes)
+                : GetAllowedFieldNames(sourceTypeSymbol))
+            .ToHashSet(StringComparer.InvariantCultureIgnoreCase);
 
-        foreach (var fieldInvocationExpression in declaredFields)
+        foreach (var fieldInvocationExpression in GetDeclaredFields(classDeclaration))
         {
             var expressionArg = fieldInvocationExpression
                 .GetMethodArgument(Constants.ArgumentNames.Expression, context.SemanticModel)
@@ -79,15 +83,24 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 
         void ReportDiagnostic(ExpressionSyntax nameExpression, string fieldName)
         {
-            if (!allowedFieldNames.Contains(fieldName))
+            if (allowedFieldNames.Contains(fieldName))
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        InvalidInputField,
-                        nameExpression.GetLocation(),
-                        fieldName,
-                        sourceTypeSymbol.Name));
+                return;
             }
+
+            string names = sourceTypeSymbol.Name;
+
+            if (sourceTypeSymbol is ITypeParameterSymbol p && p.ConstraintTypes.Any())
+            {
+                names = string.Join(" or ", p.ConstraintTypes.Select(t => t.Name));
+            }
+
+            context.ReportDiagnostic(
+                Diagnostic.Create(
+                    InvalidInputField,
+                    nameExpression.GetLocation(),
+                    fieldName,
+                    names));
         }
     }
 
@@ -101,67 +114,36 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return null;
         }
 
-        if (!IsInputObjectGraphType(typeSymbol.BaseType, context))
+        // quick test for interface implementation before iterating on base types
+        if (!typeSymbol.AllInterfaces.Any(i => i.Name == Constants.Interfaces.IInputObjectGraphType))
         {
             return null;
-        }
-
-        var baseType = typeSymbol.BaseType;
-        ITypeSymbol? sourceTypeSymbol = null;
-
-        while (baseType != null)
-        {
-            if (!baseType.IsGenericType)
-            {
-                baseType = baseType.BaseType;
-            }
-            else
-            {
-                sourceTypeSymbol = baseType.TypeArguments.FirstOrDefault();
-                break;
-            }
-        }
-
-        // we currently don't support constructs like MyInputType<TSource> : InputObjectGraphType<TSource>
-        if (sourceTypeSymbol is ITypeParameterSymbol)
-        {
-            return null;
-        }
-
-        if (sourceTypeSymbol?.SpecialType == SpecialType.System_Object)
-        {
-            return null;
-        }
-
-        return sourceTypeSymbol;
-    }
-
-    private static bool IsInputObjectGraphType(
-        INamedTypeSymbol? typeSymbol,
-        SyntaxNodeAnalysisContext context)
-    {
-        // quick check for interface implementation before iterating on base classes
-        if (typeSymbol?.AllInterfaces.Any(i => i.Name == Constants.Interfaces.IInputObjectGraphType) != true)
-        {
-            return false;
         }
 
         var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName("GraphQL.Types.InputObjectGraphType`1");
-
-        while (typeSymbol != null)
+        if (genericInputObjectGraphType == null)
         {
-            if (SymbolEqualityComparer.Default.Equals(typeSymbol.OriginalDefinition, genericInputObjectGraphType))
-            {
-                return true;
-            }
-
-            typeSymbol = typeSymbol.BaseType;
+            return null;
         }
 
-        return false;
+        var sourceTypeSymbol = typeSymbol;
+        while (sourceTypeSymbol != null)
+        {
+            if (SymbolEqualityComparer.Default.Equals(sourceTypeSymbol.OriginalDefinition, genericInputObjectGraphType))
+            {
+                return sourceTypeSymbol.TypeArguments.Single(); // <TSourceType>
+            }
+
+            sourceTypeSymbol = sourceTypeSymbol.BaseType;
+        }
+
+        return null;
     }
 
-    private static ImmutableHashSet<string> GetAllowedFieldNames(ITypeSymbol sourceTypeSymbol)
+    private static IEnumerable<string> GetAllowedFieldNames(IEnumerable<ITypeSymbol> sourceTypeSymbols) =>
+        sourceTypeSymbols.SelectMany(GetAllowedFieldNames);
+
+    private static IEnumerable<string> GetAllowedFieldNames(ITypeSymbol sourceTypeSymbol)
     {
         // consider ctor params on the type itself but not base classes
         var names = sourceTypeSymbol
@@ -203,7 +185,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             nullableSourceTypeSymbol = nullableSourceTypeSymbol.BaseType;
         }
 
-        return names.ToImmutableHashSet(StringComparer.InvariantCultureIgnoreCase);
+        return names;
     }
 
     private static IEnumerable<InvocationExpressionSyntax> GetDeclaredFields(ClassDeclarationSyntax classDeclaration)
@@ -211,9 +193,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         return classDeclaration
             .DescendantNodes()
             .OfType<InvocationExpressionSyntax>()
-            .Where(IsFieldInvocation)
-            .Where(exp => !IsDeprecated(exp))
-            .ToList();
+            .Where(IsFieldInvocation);
 
         static bool IsFieldInvocation(InvocationExpressionSyntax exp)
         {
@@ -232,9 +212,4 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         static bool IsField(SimpleNameSyntax simpleNameSyntax) =>
             simpleNameSyntax.Identifier.Text == Constants.MethodNames.Field;
     }
-
-    private static bool IsDeprecated(SyntaxNode fieldExpression) =>
-        fieldExpression.Ancestors()
-            .OfType<MemberAccessExpressionSyntax>()
-            .Any(m => m.Name.Identifier.Text == Constants.MethodNames.DeprecationReason);
 }
