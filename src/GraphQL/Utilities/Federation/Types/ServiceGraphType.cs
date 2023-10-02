@@ -2,7 +2,7 @@
 
 using GraphQL.Types;
 
-namespace GraphQL.Utilities.Federation
+namespace GraphQL.Utilities.Federation.Types
 {
     public class ServiceGraphType : ObjectGraphType
     {

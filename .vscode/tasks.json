@@ -1,21 +1,31 @@
 {
-    "version": "2.0.0",
-    "command": "dotnet",
-    "args": [],
-    "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            "command": "dotnet",
-            "args": [
-                "build",
-                "${workspaceRoot}/src/GraphQL.Harness/GraphQL.Harness.csproj"
-            ],
-            "problemMatcher": "$msCompile",
-            "group": {
-                "_id": "build",
-                "isDefault": false
-            }
-        }
-    ]
+  "version": "2.0.0",
+  "command": "dotnet",
+  "args": [],
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceRoot}/src/GraphQL.Harness/GraphQL.Harness.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "_id": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "schema-first-build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/GraphQL.Federation.SchemaFirst/GraphQL.Federation.SchemaFirst.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
 }

@@ -4,6 +4,9 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
+using GraphQL.Utilities.Federation.Types;
+using GraphQL.Utilities.Federation.Visitors;
+using static GraphQL.Utilities.Federation.FederationHelper;
 
 namespace GraphQL.Utilities.Federation
 {
@@ -11,42 +14,30 @@ namespace GraphQL.Utilities.Federation
     {
         internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
 
-        private const string FEDERATED_SDL = @"
-            scalar _Any
-            # scalar _FieldSet
-
-            # a union of all types that use the @key directive
-            # union _Entity
-
-            #type _Service {
-            #    sdl: String
-            #}
-
-            #extend type Query {
-            #    _entities(representations: [_Any!]!): [_Entity]!
-            #    _service: _Service!
-            #}
-
-            directive @external on FIELD_DEFINITION
-            directive @requires(fields: String!) on FIELD_DEFINITION
-            directive @provides(fields: String!) on FIELD_DEFINITION
-            directive @key(fields: String!) on OBJECT | INTERFACE
-
-            # this is an optional directive
-            directive @extends on OBJECT | INTERFACE
-        ";
-
         public override Schema Build(string typeDefinitions)
         {
-            var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
+            Schema schema;
+            if (typeDefinitions.Contains("@link"))
+            {
+                schema = base.Build($"{FEDERATED_V2_SDL}{Environment.NewLine}{typeDefinitions}");
+                schema.RegisterVisitor<FederationLinkNodeVisitor>();
+                // schema.Metadata[LINK_SCHEMA_EXTENSION_METADATA] = linkSchemaExtension;
+            }
+            else
+            {
+                schema = base.Build($"{FEDERATED_V1_SDL}{Environment.NewLine}{typeDefinitions}");
+            }
+
             schema.RegisterType(BuildEntityGraphType());
             AddRootEntityFields(schema);
+
             return schema;
         }
 
         protected override void PreConfigure(Schema schema)
         {
             schema.RegisterType<AnyScalarGraphType>();
+            schema.RegisterType<FieldSetScalarGraphType>();
             schema.RegisterType<ServiceGraphType>();
         }
 

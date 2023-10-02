@@ -1,6 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-namespace GraphQL.Utilities.Federation
+namespace GraphQL.Utilities.Federation.Extensions
 {
     public static class TypeConfigExtensions
     {

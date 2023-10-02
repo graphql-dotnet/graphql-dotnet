@@ -1,0 +1,58 @@
+extend schema
+  @link(
+    url: "https://specs.apollo.dev/federation/v2.2"
+    import: ["@key", "@provides", "@requires", "@external"]
+  )
+
+type Product @key(fields: "id") {
+  id: ID!
+  sku: String
+  package: String
+  variation: ProductVariation
+  dimensions: ProductDimension
+  createdBy: User @provides(fields: "totalProductsCreated")
+  notes: String
+  research: [ProductResearch!]!
+}
+
+type DeprecatedProduct @key(fields: "sku package") {
+  sku: String!
+  package: String!
+  reason: String
+  createdBy: User
+}
+
+type ProductVariation {
+  id: ID!
+}
+
+type ProductResearch @key(fields: "study { caseNumber }") {
+  study: CaseStudy!
+  outcome: String
+}
+
+type CaseStudy {
+  caseNumber: ID!
+  description: String
+}
+
+type ProductDimension {
+  size: String
+  weight: Float
+  unit: String
+}
+
+extend type Query {
+  product(id: ID!): Product
+  deprecatedProduct(sku: String!, package: String!): DeprecatedProduct
+    @deprecated(reason: "Use product query instead")
+}
+
+extend type User @key(fields: "email") {
+  averageProductsCreatedPerYear: Int
+    @requires(fields: "totalProductsCreated yearsOfEmployment")
+  email: ID! @external
+  name: String
+  totalProductsCreated: Int @external
+  yearsOfEmployment: Int! @external
+}

@@ -1,0 +1,5 @@
+services:
+  products:
+    build: src/GraphQL.Federation.SchemaFirst
+    ports:
+      - 5000:5000
