@@ -78,10 +78,10 @@ namespace GraphQL.Utilities.Federation
         {
             var linkSchemaExtension = new GraphQLSchemaExtension
             {
-                Directives = new GraphQLDirectives([
+                Directives = new GraphQLDirectives(new List<GraphQLDirective> {
                     new GraphQLDirective(new GraphQLName("link"))
                     {
-                        Arguments = new GraphQLArguments([
+                        Arguments = new GraphQLArguments(new List<GraphQLArgument> {
                             new GraphQLArgument(new GraphQLName("url"), new GraphQLStringValue("https://specs.apollo.dev/federation/v" + federationVersion)),
                             new GraphQLArgument(new GraphQLName("import"), new GraphQLListValue()
                             {
@@ -92,9 +92,9 @@ namespace GraphQL.Utilities.Federation
                                                     .Cast<GraphQLValue>()
                                                     .ToList()
                             }),
-                        ])
+                        })
                     }
-                ])
+                })
             };
             schema.Metadata[LINK_SCHEMA_EXTENSION_METADATA] = linkSchemaExtension;
         }
@@ -103,7 +103,7 @@ namespace GraphQL.Utilities.Federation
         {
             var astMetadata = type.GetMetadata<IHasDirectivesNode>(AST_METAFIELD, () => new GraphQLObjectTypeDefinition(new GraphQLName(AST_METAFIELD))
             {
-                Directives = new GraphQLDirectives([])
+                Directives = new GraphQLDirectives(new List<GraphQLDirective>())
             });
             type.Metadata[AST_METAFIELD] = astMetadata;
             return astMetadata;
@@ -111,19 +111,19 @@ namespace GraphQL.Utilities.Federation
 
         public static void AddFieldsArgument(this GraphQLDirective directive, string fields)
         {
-            ((directive.Arguments ??= new GraphQLArguments([])).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(FIELDS_ARGUMENT), new GraphQLStringValue(fields)));
+            ((directive.Arguments ??= new GraphQLArguments(new List<GraphQLArgument>())).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(FIELDS_ARGUMENT), new GraphQLStringValue(fields)));
         }
 
         public static void AddFromArgument(this GraphQLDirective directive, string from)
         {
-            ((directive.Arguments ??= new GraphQLArguments([])).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(FROM_ARGUMENT), new GraphQLStringValue(from)));
+            ((directive.Arguments ??= new GraphQLArguments(new List<GraphQLArgument>())).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(FROM_ARGUMENT), new GraphQLStringValue(from)));
         }
 
         public static void AddResolvableArgument(this GraphQLDirective directive, bool resolvable)
         {
             if (!resolvable)
             {
-                ((directive.Arguments ??= new GraphQLArguments([])).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(RESOLVABLE_ARGUMENT), new GraphQLFalseBooleanValue()));
+                ((directive.Arguments ??= new GraphQLArguments(new List<GraphQLArgument>())).Items ??= new()).Add(new GraphQLArgument(new GraphQLName(RESOLVABLE_ARGUMENT), new GraphQLFalseBooleanValue()));
             }
         }
     }

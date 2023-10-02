@@ -3,6 +3,7 @@ using GraphQL.Federation.SchemaFirst.Sample2.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities.Federation;
+using GraphQL.Utilities.Federation.Extensions;
 
 namespace GraphQL.Federation.SchemaFirst.Sample2;
 
