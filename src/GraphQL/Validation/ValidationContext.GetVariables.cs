@@ -94,7 +94,7 @@ namespace GraphQL.Validation
             {
                 // GraphQLVariable AST node represents both variable definition and variable usage so check parent node
                 if (context.Info.GetAncestor(1) is not GraphQLVariableDefinition)
-                    context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!));
+                    context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!, ));
                 return default;
             }
         }

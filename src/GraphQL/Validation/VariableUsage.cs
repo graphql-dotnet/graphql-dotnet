@@ -19,6 +19,11 @@ namespace GraphQL.Validation
         public IGraphType Type { get; }
 
         /// <summary>
+        /// Indicates if the variable usage has a default field value.
+        /// </summary>
+        public bool HasDefault { get; }
+
+        /// <summary>
         /// Initializes a new instance with the specified parameters.
         /// </summary>
         /// <param name="node">A variable reference node.</param>
@@ -27,6 +32,19 @@ namespace GraphQL.Validation
         {
             Node = node;
             Type = type;
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified parameters.
+        /// </summary>
+        /// <param name="node">A variable reference node.</param>
+        /// <param name="type">A graph type.</param>
+        /// <param name="hasDefault">Indicates if the field has a default value.</param>
+        public VariableUsage(GraphQLVariable node, IGraphType type, bool hasDefault)
+        {
+            Node = node;
+            Type = type;
+            HasDefault = hasDefault;
         }
     }
 }
