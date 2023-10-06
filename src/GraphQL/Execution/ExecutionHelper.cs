@@ -92,7 +92,7 @@ namespace GraphQL.Execution
 
                     // wrap list if necessary
                     // todo: v.Definition != null for backwards compatibility for 7.x; remove in 8.x
-                    if (v.Definition != null && !IsASTListType(v.Definition.Type))
+                    if (value != null && v.Definition != null && !IsASTListType(v.Definition.Type))
                     {
                         //---THE FOLLOWING CODE CRASHES THE .NET 7.0.304 COMPILER
                         //
