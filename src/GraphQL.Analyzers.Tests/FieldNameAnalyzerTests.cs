@@ -1,4 +1,3 @@
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
     GraphQL.Analyzers.FieldNameAnalyzer,
@@ -11,8 +10,7 @@ public class FieldNameAnalyzerTests
     [Fact]
     public async Task Sanity_NoDiagnostics()
     {
-        const string source = @"";
-
+        const string source = "";
         await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
     }
 
@@ -526,7 +524,7 @@ public class FieldNameAnalyzerTests
     }
 
     [Fact]
-    public async Task GenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod_InfoSeverity()
+    public async Task GenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod()
     {
         const string source = """
             using GraphQL.Types;
@@ -566,12 +564,12 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 40, 9, 52).WithSeverity(DiagnosticSeverity.Info);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 40, 9, 52);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
     }
 
     [Fact]
-    public async Task NonGenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod_InfoSeverity()
+    public async Task NonGenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod()
     {
         const string source = """
             using GraphQL.Types;
@@ -611,7 +609,7 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 32, 9, 44).WithSeverity(DiagnosticSeverity.Info);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 32, 9, 44);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
     }
 

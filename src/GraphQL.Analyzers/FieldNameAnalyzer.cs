@@ -85,7 +85,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         var fieldName = fieldInvocation.GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel);
         if (fieldName == null)
         {
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, DiagnosticSeverity.Info);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod);
             return;
         }
 
@@ -106,16 +106,12 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     private void ReportNameDiagnostic(
         SyntaxNodeAnalysisContext context,
         MemberAccessExpressionSyntax nameMemberAccessExpression,
-        DiagnosticDescriptor diagnosticDescriptor,
-        DiagnosticSeverity? overrideSeverity = null)
+        DiagnosticDescriptor diagnosticDescriptor)
     {
         var location = nameMemberAccessExpression.GetMethodInvocationLocation();
         var diagnostic = Diagnostic.Create(
             diagnosticDescriptor,
-            location,
-            effectiveSeverity: overrideSeverity ?? diagnosticDescriptor.DefaultSeverity,
-            additionalLocations: null,
-            properties: null);
+            location);
         context.ReportDiagnostic(diagnostic);
     }
 }
