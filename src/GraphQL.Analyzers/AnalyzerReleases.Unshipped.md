@@ -11,3 +11,4 @@ GQL003 | Usage | Warning | FieldNameAnalyzer, [Documentation](https://graphql-do
 GQL004 | Usage | Warning | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL004_DoNotUseObsoleteFieldMethods)
 GQL005 | Usage | Error | ResolverAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL005_IllegalResolverUsage)
 GQL006 | Usage | Warning | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL006_InvalidInputField)
+GQL007 | Usage | Warning | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL007_InvalidInputField)

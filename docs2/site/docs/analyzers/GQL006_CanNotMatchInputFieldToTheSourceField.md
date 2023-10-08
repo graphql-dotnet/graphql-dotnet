@@ -1,4 +1,4 @@
-# GQL006: Invalid input field
+# GQL006: Can not match input field to the source field
 
 |                        | Value   |
 | ---------------------- | ------- |
@@ -14,23 +14,11 @@ This rule triggers when a field defined on a type deriving from `InputObjectGrap
 
 ## Rule description
 
-This diagnostic is reported when the input field name cannot be mapped to any field, property, or constructor parameter of the `TSourceType` type. The name comparison is case-insensitive. The input field can be mapped when all the following rules are respected:
-
-### Mapping rules for property/field
-
-- Must have the exact same name (case-insensitive)
-- Must be public
-- Must not be static
-- Must be settable (have a public setter / not a constant)
-
-### Mapping rules for constructor parameter
-
-- Must have the exact same name (case-insensitive)
-- Constructor must be public
+This diagnostic is reported when the input field name cannot be mapped to any field, property, or public constructor parameter of the `TSourceType` type. The name comparison is case-insensitive.
 
 ## How to fix violations
 
-Follow the mapping rules described in the [Rule description](#rule-description) section or remove the invalid input field.
+Match the input field name to one the public properties, fields or constructor parameter names of the source type or remove the invalid input field.
 
 ## Example of a violation
 
