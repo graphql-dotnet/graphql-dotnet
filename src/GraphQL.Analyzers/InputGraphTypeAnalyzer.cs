@@ -100,12 +100,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            if (nameArg == null)
-            {
-                continue;
-            }
-
-            if (fieldName != null)
+            if (nameArg != null && fieldName != null)
             {
                 AnalyzeFieldName(context, nameArg, fieldName, allowedSymbols, sourceTypeSymbol);
             }
