@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
@@ -5,6 +6,11 @@ using System.Reflection;
 
 namespace GraphQL.Types
 {
+    internal static class AutoRegisteringObjectGraphType
+    {
+        public static ConcurrentDictionary<Type, ObjectGraphType> ReflectionCache { get; } = new();
+    }
+
     /// <summary>
     /// Allows you to automatically register the necessary fields for the specified type.
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
@@ -25,12 +31,25 @@ namespace GraphQL.Types
         /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
         {
+            if (GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringObjectGraphType.ReflectionCache.TryGetValue(GetType(), out var cacheEntry))
+            {
+                // restore the cached properties and skip all reflection and dynamic compilation otherwise necessary
+                RestoreCacheEntry(cacheEntry);
+                return;
+            }
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
+            }
+            if (GlobalSwitches.EnableReflectionCaching && excludedProperties == null)
+            {
+                // cache the constructed object
+                var entry = CreateCacheEntry();
+                if (entry != null)
+                    AutoRegisteringObjectGraphType.ReflectionCache[GetType()] = entry;
             }
         }
 
@@ -114,5 +133,149 @@ namespace GraphQL.Types
         /// <inheritdoc cref="AutoRegisteringHelper.GetTypeInformation(ParameterInfo)"/>
         protected virtual TypeInformation GetTypeInformation(ParameterInfo parameterInfo)
             => AutoRegisteringHelper.GetTypeInformation(parameterInfo);
+
+        /// <summary>
+        /// Creates a cache entry by deep-copying the current instance's properties.
+        /// </summary>
+        /// <remarks>
+        /// This method performs a deep copy of the current object, including interfaces, fields, and metadata.
+        /// However, it skips any resolved types, as they are incompatible with caching.
+        /// </remarks>
+        /// <returns>
+        /// An <see cref="ObjectGraphType"/> representing the cache entry, or null if the instance has any properties 
+        /// set that are incompatible with caching (e.g., resolved types).
+        /// </returns>
+        private ObjectGraphType? CreateCacheEntry()
+        {
+            // check for any ResolvedType properties set, which would be incompatible with caching
+            if (ResolvedInterfaces.Count > 0)
+                return null;
+
+            foreach (var f in Fields.List)
+            {
+                if (f.ResolvedType != null)
+                    return null;
+
+                if (f.Arguments?.List != null)
+                {
+                    foreach (var a in f.Arguments.List)
+                    {
+                        if (a.ResolvedType != null || a.Type == null)
+                            return null;
+                    }
+                }
+            }
+
+            // create cache entry and copy basic props
+            var entry = new ObjectGraphType
+            {
+                Name = Name,
+                Description = Description,
+                DeprecationReason = DeprecationReason,
+                IsTypeOf = IsTypeOf,
+            };
+            // copy metadata
+            CopyMetadataTo(entry);
+
+            // copy interfaces (better to reference the entire Interfaces class, but for now it is only get)
+            foreach (var i in Interfaces.List)
+            {
+                entry.Interfaces.Add(i);
+            }
+
+            // copy fields
+            foreach (var f in Fields.List)
+            {
+                var field = new FieldType()
+                {
+                    Name = f.Name,
+                    DeprecationReason = f.DeprecationReason,
+                    DefaultValue = f.DefaultValue,
+                    Description = f.Description,
+                    Resolver = f.Resolver,
+                    StreamResolver = f.StreamResolver,
+                    Type = f.Type,
+                };
+                f.CopyMetadataTo(field);
+                if (f.Arguments?.List != null && f.Arguments.List.Count > 0)
+                {
+                    var args = new QueryArguments();
+                    foreach (var a in f.Arguments.List)
+                    {
+                        var arg = new QueryArgument(a.Type!)
+                        {
+                            Name = a.Name,
+                            Description = a.Description,
+                            DefaultValue = a.DefaultValue,
+                            DeprecationReason = a.DeprecationReason,
+                        };
+                        a.CopyMetadataTo(arg);
+                        args.Add(arg);
+                    }
+                    field.Arguments = args;
+                }
+                entry.Fields.Add(field);
+            }
+
+            return entry;
+        }
+
+        /// <summary>
+        /// Restores properties from a cache entry into the current instance.
+        /// </summary>
+        /// <param name="cacheEntry">The cache entry from which to restore properties.</param>
+        private void RestoreCacheEntry(ObjectGraphType cacheEntry)
+        {
+            // Restore basic props
+            Name = cacheEntry.Name;
+            Description = cacheEntry.Description;
+            DeprecationReason = cacheEntry.DeprecationReason;
+            IsTypeOf = cacheEntry.IsTypeOf;
+
+            // Restore metadata
+            cacheEntry.CopyMetadataTo(this);
+
+            // Restore interfaces
+            foreach (var i in cacheEntry.Interfaces.List)
+            {
+                Interfaces.Add(i);
+            }
+
+            // Restore fields
+            foreach (var f in cacheEntry.Fields.List)
+            {
+                var field = new FieldType()
+                {
+                    Name = f.Name,
+                    DeprecationReason = f.DeprecationReason,
+                    DefaultValue = f.DefaultValue,
+                    Description = f.Description,
+                    Resolver = f.Resolver,
+                    StreamResolver = f.StreamResolver,
+                    Type = f.Type,
+                };
+                f.CopyMetadataTo(field);
+
+                if (f.Arguments?.List != null && f.Arguments.List.Count > 0)
+                {
+                    var args = new QueryArguments();
+                    foreach (var a in f.Arguments.List)
+                    {
+                        var arg = new QueryArgument(a.Type!)
+                        {
+                            Name = a.Name,
+                            Description = a.Description,
+                            DefaultValue = a.DefaultValue,
+                            DeprecationReason = a.DeprecationReason,
+                        };
+                        a.CopyMetadataTo(arg);
+                        args.Add(arg);
+                    }
+                    field.Arguments = args;
+                }
+
+                Fields.Add(field);
+            }
+        }
     }
 }

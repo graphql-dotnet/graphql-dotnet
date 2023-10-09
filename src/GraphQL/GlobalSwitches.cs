@@ -83,4 +83,13 @@ public static class GlobalSwitches
     /// The collection is not thread-safe; instances should be added prior to schema initialization.
     /// </summary>
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
+
+    /// <summary>
+    /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
+    /// useful for scoped schemas.
+    /// <br/><br/>
+    /// By default disabled. <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
+    /// this value to <see langword="true"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
+    /// </summary>
+    public static bool EnableReflectionCaching { get; set; }
 }
