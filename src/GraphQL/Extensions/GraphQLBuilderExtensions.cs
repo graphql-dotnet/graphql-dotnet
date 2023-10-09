@@ -239,7 +239,7 @@ public static class GraphQLBuilderExtensions // TODO: split
 
         return builder;
     }
-#endregion
+    #endregion
 
     #region - AddGraphTypeMappingProvider -
     /// <summary>
@@ -1211,5 +1211,5 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 #endif
-#endregion
+    #endregion
 }
