@@ -182,7 +182,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
 
-#if !DEBUG
+#if !DEBUG // otherwise any scoped service test would change the global switches
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
@@ -230,7 +230,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
 
-#if !DEBUG
+#if !DEBUG // otherwise any scoped service test would change the global switches
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
