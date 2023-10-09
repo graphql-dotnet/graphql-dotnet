@@ -28,7 +28,7 @@ namespace GraphQL.Validation
         /// </summary>
         /// <param name="node">A variable reference node.</param>
         /// <param name="type">A graph type.</param>
-        [Obsolete("This constructor will be removed in a future version of GraphQL.NET.")]
+        [Obsolete("Please specify whether the field has a default value when constructing this variable usage.")]
         public VariableUsage(GraphQLVariable node, IGraphType type)
         {
             Node = node;

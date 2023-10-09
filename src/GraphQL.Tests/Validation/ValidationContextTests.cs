@@ -14,6 +14,10 @@ public class ValidationContextTests
     // then the result of input coercion is a list of size one, where the single item value
     // is the result of input coercion for the list’s item type on the provided value (note
     // this may apply recursively for nested lists).
+
+    // it also tests to be sure that when a variable is used for a input object field, and
+    // the variable is not supplied, that the input object field default value is used
+
     [Theory]
     [InlineData("query q01 { dummy }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
     [InlineData("query q02 { dummy(arg: null) }", null, ArgumentSource.Literal, @"{""data"":{""dummy"":null}}")]
@@ -21,7 +25,7 @@ public class ValidationContextTests
     [InlineData("query q04 ($arg: String){ dummy(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
     [InlineData("query q05 ($arg: String){ dummy(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
     [InlineData("query q06 ($arg: String){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
-    [InlineData("query q07($arg: String){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
+    [InlineData("query q07 ($arg: String){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
     [InlineData("query q08 ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
     [InlineData("query q09 ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
     [InlineData("query q10 ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
@@ -134,55 +138,34 @@ public class ValidationContextTests
 
     [Theory]
     [InlineData("{ dummy }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("{ dummy(arg: null) }", null, ArgumentSource.Literal, @"{""data"":{""dummy"":null}}")]
     [InlineData("{ dummy(arg: \"test\") }", null, ArgumentSource.Literal, @"{""data"":{""dummy"":""test""}}")]
     [InlineData("query ($arg: String){ dummy(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
     [InlineData("query ($arg: String){ dummy(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("query ($arg: String){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
     [InlineData("query ($arg: String){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
     [InlineData("query ($arg: String!){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummy(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummy(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummy"":""varDefault""}}")]
-    //[InlineData("query ($arg: String! = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummy"":""test""}}")]
 
-    //[InlineData("{ dummyNoDefault }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("{ dummyNoDefault(arg: null) }", null, ArgumentSource.Literal, @"{""data"":{""dummyNoDefault"":null}}")]
     [InlineData("{ dummyNoDefault(arg: \"test\") }", null, ArgumentSource.Literal, @"{""data"":{""dummyNoDefault"":""test""}}")]
-    //[InlineData("query ($arg: String){ dummyNoDefault(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("query ($arg: String){ dummyNoDefault(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("query ($arg: String){ dummyNoDefault(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("query ($arg: String){ dummyNoDefault(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":""test""}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNoDefault(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummyNoDefault"":""varDefault""}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummyNoDefault"":""varDefault""}}")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":null}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":""test""}}")]
-    //[InlineData("query ($arg: String!){ dummyNoDefault(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("query ($arg: String!){ dummyNoDefault(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummyNoDefault"":null}}")]
-    //[InlineData("query ($arg: String!){ dummyNoDefault(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":null}}")]
     [InlineData("query ($arg: String!){ dummyNoDefault(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":""test""}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummyNoDefault(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummyNoDefault"":""varDefault""}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummyNoDefault"":""varDefault""}}")]
-    //[InlineData("query ($arg: String! = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":null}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummyNoDefault(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNoDefault"":""test""}}")]
 
     [InlineData("{ dummyList }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyList"":[""argDefault""]}}")]
-    //[InlineData("{ dummyList(arg: null) }", null, ArgumentSource.Literal, @"{""data"":{""dummyList"":null}}")]
     [InlineData("{ dummyList(arg: \"test\") }", null, ArgumentSource.Literal, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("query ($arg: String){ dummyList(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyList"":[""argDefault""]}}")]
     [InlineData("query ($arg: String){ dummyList(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummyList"":[""argDefault""]}}")]
-    //[InlineData("query ($arg: String){ dummyList(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyList"":null}}")]
     [InlineData("query ($arg: String){ dummyList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyList(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummyList"":[""varDefault""]}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyList(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummyList"":[""varDefault""]}}")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummyList(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyList"":null}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("query ($arg: String!){ dummyList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("query ($arg: String! = \"varDefault\"){ dummyList(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummyList"":[""varDefault""]}}")]
@@ -191,15 +174,12 @@ public class ValidationContextTests
     [InlineData("query ($arg: [String]!){ dummyList(arg: $arg) }", "{\"arg\":[\"test\"]}", ArgumentSource.Variable, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("query ($arg: [String]!){ dummyList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyList"":[""test""]}}")]
     [InlineData("{ dummyNestedList }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyNestedList"":[[""argDefault""]]}}")]
-    //[InlineData("{ dummyNestedList(arg: null) }", null, ArgumentSource.Literal, @"{""data"":{""dummyNestedList"":null}}")]
     [InlineData("{ dummyNestedList(arg: \"test\") }", null, ArgumentSource.Literal, @"{""data"":{""dummyNestedList"":[[""test""]]}}")]
     [InlineData("query ($arg: String){ dummyNestedList(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummyNestedList"":[[""argDefault""]]}}")]
     [InlineData("query ($arg: String){ dummyNestedList(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummyNestedList"":[[""argDefault""]]}}")]
-    //[InlineData("query ($arg: String){ dummyNestedList(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNestedList"":null}}")]
     [InlineData("query ($arg: String){ dummyNestedList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNestedList"":[[""test""]]}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNestedList(arg: $arg) }", null, ArgumentSource.VariableDefault, @"{""data"":{""dummyNestedList"":[[""varDefault""]]}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNestedList(arg: $arg) }", "{}", ArgumentSource.VariableDefault, @"{""data"":{""dummyNestedList"":[[""varDefault""]]}}")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummyNestedList(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummyNestedList"":null}}")]
     [InlineData("query ($arg: String = \"varDefault\"){ dummyNestedList(arg: $arg) }", "{\"arg\":\"test\"}", ArgumentSource.Variable, @"{""data"":{""dummyNestedList"":[[""test""]]}}")]
     public async Task VariablesParseCorrectly_NonNull(string query, string? variables, ArgumentSource expectedSource, string expectedResponse)
     {
@@ -259,24 +239,18 @@ public class ValidationContextTests
     }
 
     [Theory]
-    [InlineData("{ dummy(arg: null) }")]
-    //[InlineData("query ($arg: String){ dummy(arg: $arg) }")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummy(arg: $arg) }")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", null, ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", "{}", ArgumentSource.FieldDefault, @"{""data"":{""dummy"":""argDefault""}}")]
-    //[InlineData("query ($arg: String!){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
-    //[InlineData("query ($arg: String! = \"varDefault\"){ dummy(arg: $arg) }", "{\"arg\":null}", ArgumentSource.Variable, @"{""data"":{""dummy"":null}}")]
-    [InlineData("{ dummyList(arg: null) }")]
-    //[InlineData("query ($arg: String){ dummyList(arg: $arg) }")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummyList(arg: $arg) }")]
-    [InlineData("{ dummyNestedList(arg: null) }")]
-    //[InlineData("query ($arg: String){ dummyNestedList(arg: $arg) }")]
-    //[InlineData("query ($arg: String = \"varDefault\"){ dummyNestedList(arg: $arg) }")]
-
-    [InlineData("{ dummyNoDefault }")]
-    [InlineData("{ dummyNoDefault(arg: null) }")]
-    [InlineData("query ($arg: String){ dummyNoDefault(arg: $arg) }")]
-    public async Task ScenariosThatFailBasicValidation(string query)
+    [InlineData("query q01 { dummy(arg: null) }", null)]
+    [InlineData("query q02 { dummyNoDefault }", null)]
+    [InlineData("query q03 { dummyNoDefault(arg: null) }", null)]
+    [InlineData("query q04 ($arg: String) { dummyNoDefault(arg: $arg) }", null)]
+    [InlineData("query q05 ($arg: String) { dummyNoDefault(arg: $arg) }", "{}")]
+    [InlineData("query q06 ($arg: String) { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
+    //todo: 09 should fail because null was explicitly passed to a non-null argument,
+    //  regardless of whether there is a variable default
+    [InlineData("query q09 ($arg: String = \"varDefault\") { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
+    [InlineData("query q10 { dummyList(arg: null) }", null)]
+    [InlineData("query q11 { dummyNestedList(arg: null) }", null)]
+    public async Task ScenariosThatFailValidationOrCoercion(string query, string? variables)
     {
         var queryType = new ObjectGraphType { Name = "Query" };
         queryType.Field<string>("dummy", true)
@@ -297,7 +271,7 @@ public class ValidationContextTests
             Document = document,
             Schema = schema,
             Operation = document.Operation(),
-            Variables = Inputs.Empty,
+            Variables = variables.ToInputs(),
         }).ConfigureAwait(false);
         ret.validationResult.IsValid.ShouldBeFalse();
     }

@@ -1,4 +1,3 @@
-using GraphQL.Types;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
