@@ -189,8 +189,12 @@ namespace GraphQL.Execution
                         // If the variable definition does not provide a default value, the input object field definition’s
                         // default value should be used.
 
-                        // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
+                        var value = CoerceValue(field.ResolvedType!, objectField.Value, variables, field.DefaultValue);
+                        // when a optional variable is specified for the input field, and the variable is not defined, and
+                        //   when there is no default value specified for the input field, then do not add the entry to the
+                        //   unordered map.
+                        if (value.Source != ArgumentSource.FieldDefault || value.Value != null)
+                            obj[field.Name] = value.Value;
                     }
                     else if (field.DefaultValue != null)
                     {

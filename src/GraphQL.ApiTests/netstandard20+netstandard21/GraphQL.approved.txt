@@ -184,6 +184,7 @@ namespace GraphQL
     public class ExperimentalFeatures
     {
         public ExperimentalFeatures() { }
+        public bool AllowScalarVariablesForListTypes { get; set; }
         public bool AppliedDirectives { get; set; }
         public bool DeprecationOfInputValues { get; set; }
         public bool RepeatableDirectives { get; set; }
@@ -3088,7 +3089,10 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
+        [System.Obsolete("This constructor will be removed in a future version of GraphQL.NET.")]
         public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type) { }
+        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault) { }
+        public bool HasDefault { get; }
         public GraphQLParser.AST.GraphQLVariable Node { get; }
         public GraphQL.Types.IGraphType Type { get; }
     }
