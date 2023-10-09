@@ -32,6 +32,12 @@ namespace GraphQL.Types
                 IsTypeOf = instance => instance is TSourceType;
         }
 
+        internal ObjectGraphType(string? name, bool validate, string? description, string? deprecationReason, Func<object, bool>? isTypeOf)
+            : base(name, validate, description, deprecationReason)
+        {
+            IsTypeOf = isTypeOf;
+        }
+
         /// <inheritdoc/>
         public void AddResolvedInterface(IInterfaceGraphType graphType)
         {
@@ -66,5 +72,14 @@ namespace GraphQL.Types
     /// </summary>
     public class ObjectGraphType : ObjectGraphType<object?>
     {
+        /// <inheritdoc cref="ObjectGraphType{TSourceType}.ObjectGraphType()"/>
+        public ObjectGraphType()
+        {
+        }
+
+        internal ObjectGraphType(string? name, bool validate, string? description, string? deprecationReason, Func<object, bool>? isTypeOf)
+            : base(name, validate, description, deprecationReason, isTypeOf)
+        {
+        }
     }
 }

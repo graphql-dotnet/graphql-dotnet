@@ -26,6 +26,13 @@ namespace GraphQL.Types
             }
         }
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        internal GraphType(string? name, bool validate)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        {
+            SetName(name!, validate);
+        }
+
         /// <inheritdoc/>
         public virtual void Initialize(ISchema schema)
         {
@@ -36,7 +43,7 @@ namespace GraphQL.Types
 
         private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
 
-        private string GetDefaultName()
+        internal string GetDefaultName()
         {
             var type = GetType();
 

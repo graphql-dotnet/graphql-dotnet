@@ -30,12 +30,22 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+            : base(null, false, null, null, null)
         {
             if (GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringObjectGraphType.ReflectionCache.TryGetValue(GetType(), out var cacheEntry))
             {
                 // restore the cached properties and skip all reflection and dynamic compilation otherwise necessary
                 RestoreCacheEntry(cacheEntry);
                 return;
+            }
+            else
+            {
+                // set default props (see constructors for ObjectGraphType, ComplexGraphType, and GraphType)
+                SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                Description ??= typeof(TSourceType).Description();
+                DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
+                if (typeof(TSourceType) != typeof(object))
+                    IsTypeOf = instance => instance is TSourceType;
             }
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
@@ -167,13 +177,7 @@ namespace GraphQL.Types
             }
 
             // create cache entry and copy basic props
-            var entry = new ObjectGraphType
-            {
-                Name = Name,
-                Description = Description,
-                DeprecationReason = DeprecationReason,
-                IsTypeOf = IsTypeOf,
-            };
+            var entry = new ObjectGraphType(Name, false, Description, DeprecationReason, IsTypeOf);
             // copy metadata
             CopyMetadataTo(entry);
 
@@ -227,7 +231,7 @@ namespace GraphQL.Types
         private void RestoreCacheEntry(ObjectGraphType cacheEntry)
         {
             // Restore basic props
-            Name = cacheEntry.Name;
+            SetName(cacheEntry.Name, false);
             Description = cacheEntry.Description;
             DeprecationReason = cacheEntry.DeprecationReason;
             IsTypeOf = cacheEntry.IsTypeOf;

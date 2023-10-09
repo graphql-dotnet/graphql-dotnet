@@ -24,6 +24,13 @@ namespace GraphQL.Types
             DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }
 
+        internal ComplexGraphType(string? name, bool validate, string? description, string? deprecationReason)
+            : base(name, validate)
+        {
+            Description = description;
+            DeprecationReason = deprecationReason;
+        }
+
         /// <inheritdoc/>
         public TypeFields Fields { get; } = new();
 
