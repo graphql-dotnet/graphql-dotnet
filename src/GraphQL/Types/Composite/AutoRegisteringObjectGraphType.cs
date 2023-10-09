@@ -42,6 +42,8 @@ namespace GraphQL.Types
             {
                 // set default props (see constructors for ObjectGraphType, ComplexGraphType, and GraphType)
                 SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                if (typeof(IGraphType).IsAssignableFrom(typeof(TSourceType)) && GetType() != typeof(Introspection.__Type))
+                    throw new InvalidOperationException($"Cannot use graph type '{typeof(TSourceType).Name}' as a model for graph type '{GetType().Name}'. Please use a model rather than a graph type for {nameof(TSourceType)}.");
                 Description ??= typeof(TSourceType).Description();
                 DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
                 if (typeof(TSourceType) != typeof(object))
