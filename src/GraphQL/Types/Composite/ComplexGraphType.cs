@@ -16,19 +16,60 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         protected ComplexGraphType()
+            : this(null)
         {
-            if (typeof(IGraphType).IsAssignableFrom(typeof(TSourceType)) && GetType() != typeof(Introspection.__Type))
-                throw new InvalidOperationException($"Cannot use graph type '{typeof(TSourceType).Name}' as a model for graph type '{GetType().Name}'. Please use a model rather than a graph type for {nameof(TSourceType)}.");
-
-            Description ??= typeof(TSourceType).Description();
-            DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
         }
 
-        internal ComplexGraphType(string? name, bool validate, string? description, string? deprecationReason)
-            : base(name, validate)
+        internal ComplexGraphType(ComplexGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
         {
-            Description = description;
-            DeprecationReason = deprecationReason;
+            if (cloneFrom == null)
+            {
+                if (typeof(IGraphType).IsAssignableFrom(typeof(TSourceType)) && GetType() != typeof(Introspection.__Type))
+                    throw new InvalidOperationException($"Cannot use graph type '{typeof(TSourceType).Name}' as a model for graph type '{GetType().Name}'. Please use a model rather than a graph type for {nameof(TSourceType)}.");
+
+                Description ??= typeof(TSourceType).Description();
+                DeprecationReason ??= typeof(TSourceType).ObsoleteMessage();
+                return;
+            }
+
+            Description = cloneFrom.Description;
+            DeprecationReason = cloneFrom.DeprecationReason;
+
+            foreach (var f in cloneFrom.Fields.List)
+            {
+                var field = new FieldType()
+                {
+                    Name = f.Name,
+                    DeprecationReason = f.DeprecationReason,
+                    DefaultValue = f.DefaultValue,
+                    Description = f.Description,
+                    Resolver = f.Resolver,
+                    StreamResolver = f.StreamResolver,
+                    Type = f.Type,
+                };
+                f.CopyMetadataTo(field);
+
+                if (f.Arguments?.List != null && f.Arguments.List.Count > 0)
+                {
+                    var args = new QueryArguments();
+                    foreach (var a in f.Arguments.List)
+                    {
+                        var arg = new QueryArgument(a.Type!)
+                        {
+                            Name = a.Name,
+                            Description = a.Description,
+                            DefaultValue = a.DefaultValue,
+                            DeprecationReason = a.DeprecationReason,
+                        };
+                        a.CopyMetadataTo(arg);
+                        args.Add(arg);
+                    }
+                    field.Arguments = args;
+                }
+
+                Fields.Add(field);
+            }
         }
 
         /// <inheritdoc/>

@@ -182,10 +182,12 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
 
+#if !DEBUG
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
         }
+#endif
 
         return builder;
     }
@@ -228,14 +230,16 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
 
+#if !DEBUG
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
         }
+#endif
 
         return builder;
     }
-    #endregion
+#endregion
 
     #region - AddGraphTypeMappingProvider -
     /// <summary>
@@ -1207,5 +1211,5 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 #endif
-    #endregion
+#endregion
 }

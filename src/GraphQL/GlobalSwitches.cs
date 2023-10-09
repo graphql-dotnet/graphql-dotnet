@@ -90,6 +90,9 @@ public static class GlobalSwitches
     /// <br/><br/>
     /// By default disabled. <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
     /// this value to <see langword="true"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
+    /// <br/><br/>
+    /// Note that with reflection caching enabled, if there are two different classes derived from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>
+    /// that have the same TSourceType, one instance will incorrectly pull cached information stored by the other instance.
     /// </summary>
     public static bool EnableReflectionCaching { get; set; }
 }

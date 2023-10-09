@@ -27,15 +27,22 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public ObjectGraphType()
+            : this(null)
         {
-            if (typeof(TSourceType) != typeof(object))
-                IsTypeOf = instance => instance is TSourceType;
         }
 
-        internal ObjectGraphType(string? name, bool validate, string? description, string? deprecationReason, Func<object, bool>? isTypeOf)
-            : base(name, validate, description, deprecationReason)
+        internal ObjectGraphType(ObjectGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
         {
-            IsTypeOf = isTypeOf;
+            if (cloneFrom == null)
+            {
+                if (typeof(TSourceType) != typeof(object))
+                    IsTypeOf = instance => instance is TSourceType;
+                Interfaces = new Interfaces();
+                return;
+            }
+            IsTypeOf = cloneFrom.IsTypeOf;
+            Interfaces = cloneFrom.Interfaces;
         }
 
         /// <inheritdoc/>
@@ -49,7 +56,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public Interfaces Interfaces { get; } = new Interfaces();
+        public Interfaces Interfaces { get; }
 
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
@@ -72,14 +79,5 @@ namespace GraphQL.Types
     /// </summary>
     public class ObjectGraphType : ObjectGraphType<object?>
     {
-        /// <inheritdoc cref="ObjectGraphType{TSourceType}.ObjectGraphType()"/>
-        public ObjectGraphType()
-        {
-        }
-
-        internal ObjectGraphType(string? name, bool validate, string? description, string? deprecationReason, Func<object, bool>? isTypeOf)
-            : base(name, validate, description, deprecationReason, isTypeOf)
-        {
-        }
     }
 }
