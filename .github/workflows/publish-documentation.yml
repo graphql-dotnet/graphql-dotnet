@@ -18,11 +18,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: main
       - name: Checkout publish target
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: graphql-dotnet/graphql-dotnet.github.io
           token: ${{ secrets.ORG_PAT_TOKEN }}

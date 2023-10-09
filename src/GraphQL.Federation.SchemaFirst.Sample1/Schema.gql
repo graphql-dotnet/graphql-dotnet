@@ -1,0 +1,8 @@
+type Category @key(fields: "id") {
+  id: ID!
+  name: String!
+}
+
+extend type Query {
+  categories: [Category!]!
+}

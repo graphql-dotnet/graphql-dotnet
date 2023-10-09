@@ -6,6 +6,49 @@ namespace GraphQL.Tests.Utilities;
 
 public class SchemaBuilderTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void should_read_schema_description(bool ignoreComments)
+    {
+        const string definitions = """
+            #test
+            "Sample schema"
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = ignoreComments);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("Sample schema");
+    }
+
+    [Fact]
+    public void should_read_schema_description_from_comments()
+    {
+        const string definitions = """
+            #test
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = false);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("test");
+    }
+
     [Fact]
     public void should_set_query_by_name()
     {
@@ -777,6 +820,29 @@ public class SchemaBuilderTests
         schema.Initialize();
         var type = (IObjectGraphType)schema.AllTypes["Query"];
         type.Fields.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void reads_directives_from_types_or_extension_types()
+    {
+        var schema = Schema.For("""
+            extend type Query @directiveA {
+              field1: String
+            }
+
+            type Query @directiveB {
+              field2: String
+            }
+
+            directive @directiveA on OBJECT
+            directive @directiveB on OBJECT
+            """);
+
+        schema.Initialize();
+        var type = schema.AllTypes["Query"].ShouldNotBeNull();
+        var directives = type.GetAppliedDirectives()?.List.ShouldNotBeNull();
+        directives.Where(x => x.Name == "directiveA").ShouldHaveSingleItem();
+        directives.Where(x => x.Name == "directiveB").ShouldHaveSingleItem();
     }
 
     [Fact]

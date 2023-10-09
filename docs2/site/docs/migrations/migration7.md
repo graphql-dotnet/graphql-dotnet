@@ -250,6 +250,46 @@ Since this feature may be potentially breaking for your app, clients or tooling 
 Either set `schema.Features.DeprecationOfInputValues = true;` or call `schema.EnableExperimentalIntrospectionFeatures()`
 method before initializing a schema.
 
+### 13. Add `SchemaExporter` to export schema to SDL with new `schema.ToAST()` and `schema.Print()` methods
+
+Since 7.6 you can use `schema.ToAST()` to export a schema to a `GraphQLDocument` instance
+containing a SDL representation of the schema. You can also use `schema.Print()` and
+`schema.PrintAsync()` to print a schema to a string or `TextWriter`. These methods use the
+new `SchemaExporter` class along with the GraphQLParser library's `SDLPrinter` class to
+write the SDL representation of the schema. Some of the prior options for printing a schema
+via `SchemaPrinter` are still available, but the default values have changed as follows:
+
+| Option | Old Default Value | New Default Value |
+|-|-|-|
+| IncludeDescriptions | `false` | `true` |
+| IncludeDeprecationReasons | `false` | `true` |
+| IncludeFederationTypes | n/a | `true` |
+| OldImplementsSyntax | `false` | n/a |
+| PrintDescriptionsAsComments | `false` | n/a |
+
+In addition, the `Comparer` property has been removed and replaced with the `StringComparison`
+property to sort the schema. This is performed by the GraphQLParser library's `SDLSorter` class.
+Any custom sorting logic can be implemented by creating a custom AST vistior.
+
+The new defaults will ensure a more accurate SDL representation of the schema, but may
+not be desired when using the schema printer to check for breaking schema changes. For those
+purposes, you may wish to set `IncludeDescriptions` and `IncludeDeprecationReasons` to `false`,
+and set the `StringComparison` property to sort the SDL.
+
+With the removal of the `OldImplementsSyntax` and `PrintDescriptionsAsComments` properties, the
+new SDL printer is only compatible with the GraphQL June 2018 or newer specification.
+
+Finally, federated schema subgraphs can be printed in Federation v1 format by setting the
+`IncludeFederationTypes` to `false` (defaults to `true`). This removes federation-specific
+types and fields from the printed SDL and is compatible with Apollo Federation v1 or v2
+schemas. Note that Apollo Federation v2 does not require these types to be removed from the SDL.
+This replaces the need for the `FederatedSchemaPrinter` class.
+
+Please note that the `SchemaExporter` class will export type defintions as type extensions
+(e.g. `extend type MyType { ... }`) only when it was read as such by the `SchemaBuilder`.
+
+Please see the `SchemaExtensions.PrintAsync` source code implementation specifics.
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed

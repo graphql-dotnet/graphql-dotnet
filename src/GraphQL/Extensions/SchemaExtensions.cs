@@ -2,6 +2,9 @@ using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Utilities.Visitors;
+using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL
 {
@@ -94,6 +97,45 @@ namespace GraphQL
         /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
         /// </summary>
         private static void Preserve<T>() => GC.KeepAlive(typeof(T));
+
+        /// <summary>
+        /// Prints the schema to a string using the specified options.
+        /// </summary>
+        public static string Print(this ISchema schema, PrintOptions? options = null)
+        {
+            using var writer = new StringWriter();
+#pragma warning disable CA2012 // Use ValueTasks correctly
+            schema.PrintAsync(writer, options).GetAwaiter().GetResult();
+#pragma warning restore CA2012 // Use ValueTasks correctly
+            return writer.ToString();
+        }
+
+        /// <summary>
+        /// Prints the schema to a specified <see cref="TextWriter"/>.
+        /// </summary>
+        public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, PrintOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var sdl = schema.ToAST();
+            options ??= new();
+            if (!options.IncludeDeprecationReasons)
+            {
+                RemoveDeprecationReasonsVisitor.Visit(sdl);
+            }
+            if (!options.IncludeDescriptions)
+            {
+                RemoveDescriptionsVisitor.Visit(sdl);
+            }
+            if (!options.IncludeFederationTypes)
+            {
+                RemoveFederationTypesVisitor.Visit(sdl);
+            }
+            if (options.StringComparison != null)
+            {
+                SDLSorter.Sort(sdl, new(options.StringComparison.Value));
+            }
+            var printer = new SDLPrinter(options);
+            return printer.PrintAsync(sdl, writer, cancellationToken);
+        }
 
         /// <summary>
         /// Registers type mapping from CLR type to <see cref="AutoRegisteringObjectGraphType{T}"/> and/or <see cref="AutoRegisteringInputObjectGraphType{T}"/>.
@@ -354,6 +396,13 @@ namespace GraphQL
                     provider.ResolvedType = _replacement;
             }
         }
+
+
+        /// <summary>
+        /// Exports the specified schema as a <see cref="GraphQLDocument"/>.
+        /// </summary>
+        public static GraphQLDocument ToAST(this ISchema schema)
+            => new SchemaExporter(schema).Export();
     }
 
     /// <summary>
