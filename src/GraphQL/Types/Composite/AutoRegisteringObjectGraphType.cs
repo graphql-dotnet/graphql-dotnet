@@ -30,7 +30,12 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
         public AutoRegisteringObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
-            : this(GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry) ? (AutoRegisteringObjectGraphType<TSourceType>?)cacheEntry : null, excludedProperties, true)
+            : this(
+                  GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
+                    ? (AutoRegisteringObjectGraphType<TSourceType>?)cacheEntry
+                    : null,
+                  excludedProperties,
+                  GlobalSwitches.EnableReflectionCaching)
         {
         }
 
@@ -50,8 +55,7 @@ namespace GraphQL.Types
             }
 
             // cache the instance if reflection caching is enabled
-            if (GlobalSwitches.EnableReflectionCaching &&
-                excludedProperties == null &&
+            if (excludedProperties == null &&
                 cache &&
                 ResolvedInterfaces.Count == 0)
             {
