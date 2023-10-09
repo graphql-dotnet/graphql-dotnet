@@ -245,7 +245,7 @@ public class ValidationContextTests
     [InlineData("query q04 ($arg: String) { dummyNoDefault(arg: $arg) }", null)]
     [InlineData("query q05 ($arg: String) { dummyNoDefault(arg: $arg) }", "{}")]
     [InlineData("query q06 ($arg: String) { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
-    //todo: 09 should fail because null was explicitly passed to a non-null argument,
+    //todo: q09 should fail because null was explicitly passed to a non-null argument,
     //  regardless of whether there is a variable default
     [InlineData("query q09 ($arg: String = \"varDefault\") { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
     [InlineData("query q10 { dummyList(arg: null) }", null)]
