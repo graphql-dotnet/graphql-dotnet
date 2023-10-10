@@ -43,6 +43,8 @@ namespace GraphQL.Types
             }
             IsTypeOf = cloneFrom.IsTypeOf;
             Interfaces = cloneFrom.Interfaces;
+            if (cloneFrom.ResolvedInterfaces.Count > 0)
+                throw new InvalidOperationException("Cannot clone ObjectGraphType when ResolvedInterfaces contains items.");
         }
 
         /// <inheritdoc/>

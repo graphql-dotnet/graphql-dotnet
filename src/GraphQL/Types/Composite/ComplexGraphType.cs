@@ -49,6 +49,8 @@ namespace GraphQL.Types
                     Type = f.Type,
                 };
                 f.CopyMetadataTo(field);
+                if (f.ResolvedType != null)
+                    throw new InvalidOperationException("Cannot clone field when ResolvedType is set.");
 
                 if (f.Arguments?.List != null && f.Arguments.List.Count > 0)
                 {
