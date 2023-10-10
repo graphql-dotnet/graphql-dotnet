@@ -22,6 +22,11 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
+        /// <br/><br/>
+        /// When <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled (typically for scoped schemas),
+        /// be sure to place any custom initialization code within <see cref="ConfigureGraph"/> or <see cref="ProvideFields"/>
+        /// so that the instance will be cached with the customizations. Also note that <see cref="ObjectGraphType{TSourceType}.Interfaces"/>
+        /// will reference a shared instance of <see cref="Interfaces"/> when restored from the cache and must not be modified further.
         /// </summary>
         public AutoRegisteringObjectGraphType() : this(null) { }
 
@@ -55,8 +60,8 @@ namespace GraphQL.Types
             }
 
             // cache the instance if reflection caching is enabled
-            if (excludedProperties == null &&
-                cache &&
+            if (cache &&
+                excludedProperties == null &&
                 ResolvedInterfaces.Count == 0)
             {
                 foreach (var f in Fields.List)
