@@ -3270,7 +3270,8 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
-        [System.Obsolete("This constructor will be removed in a future version of GraphQL.NET.")]
+        [System.Obsolete("Please specify whether the field has a default value when constructing this varia" +
+            "ble usage.")]
         public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type) { }
         public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault) { }
         public bool HasDefault { get; }
