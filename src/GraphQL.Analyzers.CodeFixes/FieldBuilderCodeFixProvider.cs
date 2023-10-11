@@ -84,9 +84,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             .Sum(trivia => trivia.FullSpan.Length);
 
         var whitespaceTrivia = Whitespace(new string(' ', fieldInvocationIndentation + oneLevelIndentation));
-        var newLineTrivia = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-            ? CarriageReturnLineFeed
-            : LineFeed;
+        var newLineTrivia = EndOfLine(Environment.NewLine);
 
         // now handle rest of the arguments
         var args = GetArgumentsWithNames(fieldInvocationExpression, semanticModel);
