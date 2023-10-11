@@ -418,14 +418,14 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name", "description", null,
-                        resolve: context => GetName(
+                        resolve: context => Resolve(
                             "s1",
                               "s2",
                                 "s3"
                         ));
                 }
 
-                public string GetName(string s1, string s2, string s3) => "text";
+                public string Resolve(string s1, string s2, string s3) => "text";
             }
             """;
 
@@ -439,14 +439,14 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name").Description("description")
-                        .Resolve(context => GetName(
+                        .Resolve(context => Resolve(
                             "s1",
                               "s2",
                                 "s3"
                         ));
                 }
 
-                public string GetName(string s1, string s2, string s3) => "text";
+                public string Resolve(string s1, string s2, string s3) => "text";
             }
             """;
 
