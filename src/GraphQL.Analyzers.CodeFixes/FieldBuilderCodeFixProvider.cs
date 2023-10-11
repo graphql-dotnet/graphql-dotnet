@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Composition;
+using System.Runtime.InteropServices;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -82,7 +83,10 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             .Where(trivia => trivia.IsKind(SyntaxKind.WhitespaceTrivia))
             .Sum(trivia => trivia.FullSpan.Length);
 
-        var whitespace = Whitespace(new string(' ', fieldInvocationIndentation + oneLevelIndentation));
+        var whitespaceTrivia = Whitespace(new string(' ', fieldInvocationIndentation + oneLevelIndentation));
+        var newLineTrivia = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? CarriageReturnLineFeed
+            : LineFeed;
 
         // now handle rest of the arguments
         var args = GetArgumentsWithNames(fieldInvocationExpression, semanticModel);
@@ -122,8 +126,8 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             if (invocationName != null)
             {
                 var leadingTrivia = reformat || newLine
-                    ? TriviaList(LineFeed, whitespace)
-                    : TriviaList(whitespace);
+                    ? TriviaList(newLineTrivia, whitespaceTrivia)
+                    : TriviaList(whitespaceTrivia);
 
                 newFieldInvocationExpression = CreateInvocationExpression(
                     newFieldInvocationExpression,
