@@ -1,8 +1,6 @@
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace GraphQL.Analyzers;
 
@@ -28,15 +26,4 @@ public static class Extensions
 
         docEditor.ReplaceNode(invocationExpression, updatedInvocationExpression);
     }
-
-    public static MemberAccessExpressionSyntax WithNewLine(this MemberAccessExpressionSyntax syntax, bool condition) =>
-        !condition
-            ? syntax
-            : syntax.WithOperatorToken(
-                Token(
-                    TriviaList(
-                        CarriageReturnLineFeed,
-                        Whitespace("    ")),
-                    SyntaxKind.DotToken,
-                    TriviaList()));
 }
