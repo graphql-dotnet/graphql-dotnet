@@ -172,6 +172,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md = ..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
 		..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md = ..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md
 		..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md = ..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md
+		..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md = ..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md
+		..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md = ..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md
+		..\docs2\site\docs\analyzers\Overview.md = ..\docs2\site\docs\analyzers\Overview.md
 	EndProjectSection
 EndProject
 Global

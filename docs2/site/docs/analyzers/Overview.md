@@ -44,6 +44,10 @@ Field("name")
 
 The `ResolverAnalyzer` focuses on identifying incorrect usage of resolver methods. It ensures that resolver methods are used only on output graph types and flags usage on other types as errors. Additionally, it offers a code fix that removes these incorrect usages.
 
+### 4. InputGraphTypeAnalyzer
+
+The analyzer detects input graph type fields that can't be mapped to the source type during deserialization process.
+
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when the rule is applied and how the automatic code fix executes code adjustments. Refer to the specific documentation page for each analyzer to understand the available configuration options and their application methods.
