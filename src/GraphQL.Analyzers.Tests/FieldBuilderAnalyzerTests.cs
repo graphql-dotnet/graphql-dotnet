@@ -418,8 +418,14 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name", "description", null,
-                        context => "text");
+                        resolve: context => GetName(
+                            "s1",
+                              "s2",
+                                "s3"
+                        ));
                 }
+
+                public string GetName(string s1, string s2, string s3) => "text";
             }
             """;
 
@@ -433,12 +439,18 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name").Description("description")
-                        .Resolve(context => "text");
+                        .Resolve(context => GetName(
+                            "s1",
+                              "s2",
+                                "s3"
+                        ));
                 }
+
+                public string GetName(string s1, string s2, string s3) => "text";
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 10, 31);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 15);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
     }
 
