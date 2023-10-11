@@ -299,15 +299,18 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_string_list()
     {
+        const string query =
+            """
+            query Query($stringVar: String) {
+              complicatedArgs {
+                stringListArgField(stringListArg: $stringVar)
+              }
+            }
+            """;
+
         ShouldFailRule(_ =>
         {
-            _.Query = """
-                query Query($stringVar: String) {
-                  complicatedArgs {
-                    stringListArgField(stringListArg: $stringVar)
-                  }
-                }
-                """;
+            _.Query = query;
             _.Error(err =>
             {
                 err.Message = BadVarPosMessage("stringVar", "String", "[String]");
@@ -317,13 +320,7 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
         });
 
         Schema.Features.AllowScalarVariablesForListTypes = true;
-        ShouldPassRule("""
-            query Query($stringVar: String) {
-              complicatedArgs {
-                stringListArgField(stringListArg: $stringVar)
-              }
-            }
-            """);
+        ShouldPassRule(query);
     }
 
     [Fact]
