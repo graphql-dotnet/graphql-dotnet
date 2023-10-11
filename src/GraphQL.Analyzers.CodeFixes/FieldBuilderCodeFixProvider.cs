@@ -122,7 +122,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             if (invocationName != null)
             {
                 var leadingTrivia = reformat || newLine
-                    ? TriviaList(CarriageReturnLineFeed, whitespace)
+                    ? TriviaList(LineFeed, whitespace)
                     : TriviaList(whitespace);
 
                 newFieldInvocationExpression = CreateInvocationExpression(
