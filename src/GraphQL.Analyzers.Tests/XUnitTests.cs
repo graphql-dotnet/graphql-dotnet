@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis.Testing.Verifiers;
+using GraphQL.Analyzers.Tests.Verifiers.XUnit;
 using VerifyCS = GraphQL.Analyzers.Tests.Verifiers.CSharpCodeFixVerifier<
     Microsoft.CodeAnalysis.Testing.EmptyDiagnosticAnalyzer,
     Microsoft.CodeAnalysis.Testing.EmptyCodeFixProvider>;
