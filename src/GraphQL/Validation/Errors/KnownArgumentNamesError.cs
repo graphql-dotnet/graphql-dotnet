@@ -1,8 +1,6 @@
-using System;
-using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -15,13 +13,13 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownArgumentNamesError(ValidationContext context, Argument node, FieldType fieldDef, IGraphType parentType)
-            : base(context.Document.OriginalQuery, NUMBER,
+        public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, FieldType fieldDef, IGraphType parentType)
+            : base(context.Document.Source, NUMBER,
                 UnknownArgMessage(
-                    node.Name,
+                    node.Name.StringValue,
                     fieldDef.Name,
-                    parentType.ToString(),
-                    StringUtils.SuggestionList(node.Name, fieldDef.Arguments?.List?.Select(q => q.Name))),
+                    parentType.ToString()!,
+                    StringUtils.SuggestionList(node.Name.StringValue, fieldDef.Arguments?.List?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }
@@ -29,12 +27,12 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public KnownArgumentNamesError(ValidationContext context, Argument node, DirectiveGraphType directive)
-            : base(context.Document.OriginalQuery, NUMBER,
+        public KnownArgumentNamesError(ValidationContext context, GraphQLArgument node, Directive directive)
+            : base(context.Document.Source, NUMBER,
                 UnknownDirectiveArgMessage(
-                    node.Name,
+                    node.Name.StringValue,
                     directive.Name,
-                    StringUtils.SuggestionList(node.Name, directive.Arguments?.Select(q => q.Name))),
+                    StringUtils.SuggestionList(node.Name.StringValue, directive.Arguments?.Select(q => q.Name))), //ISSUE:allocation
                 node)
         {
         }

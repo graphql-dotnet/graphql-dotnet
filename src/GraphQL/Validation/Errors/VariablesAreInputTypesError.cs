@@ -1,6 +1,5 @@
-using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,8 +12,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public VariablesAreInputTypesError(ValidationContext context, VariableDefinition node, IGraphType type)
-            : base(context.Document.OriginalQuery, NUMBER, UndefinedVarMessage(node.Name, type?.ToString() ?? node.Type.Name()), node)
+        public VariablesAreInputTypesError(ValidationContext context, GraphQLVariableDefinition node, IGraphType type)
+            : base(context.Document.Source, NUMBER, UndefinedVarMessage(node.Variable.Name.StringValue, type?.ToString() ?? node.Type.Name()), node)
         {
         }
 

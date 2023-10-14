@@ -1,7 +1,5 @@
-using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
-using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -14,8 +12,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public DefaultValuesOfCorrectTypeError(ValidationContext context, VariableDefinition varDefAst, IGraphType inputType, string verboseErrors)
-            : base(context.Document.OriginalQuery, NUMBER, BadValueForDefaultArgMessage(varDefAst.Name, inputType.ToString(), AstPrinter.Print(varDefAst.DefaultValue), verboseErrors), varDefAst.DefaultValue)
+        public DefaultValuesOfCorrectTypeError(ValidationContext context, GraphQLVariableDefinition varDefAst, IGraphType inputType, string verboseErrors)
+            : base(context.Document.Source, NUMBER, BadValueForDefaultArgMessage(varDefAst.Variable.Name.StringValue, inputType.ToString()!, varDefAst.DefaultValue!.Print(), verboseErrors), varDefAst.DefaultValue!)
         {
         }
 

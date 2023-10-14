@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GraphQL.Instrumentation
 {
     /// <summary>
@@ -16,7 +13,9 @@ namespace GraphQL.Instrumentation
         public ApolloTrace(DateTime start, double durationMs)
         {
             StartTime = start.ToUniversalTime();
-            EndTime = StartTime.AddMilliseconds(durationMs);
+            // https://github.com/dotnet/runtime/pull/73198 fixes AddMilliseconds, but it is only available NET7+
+            // Use AddTicks instead to fix it for all frameworks
+            EndTime = StartTime.AddTicks((long)(durationMs * TimeSpan.TicksPerMillisecond));
             Duration = ConvertTime(durationMs);
         }
 
@@ -95,22 +94,22 @@ namespace GraphQL.Instrumentation
             /// <summary>
             /// Gets or sets the path of the field.
             /// </summary>
-            public List<object> Path { get; set; }
+            public List<object>? Path { get; set; }
 
             /// <summary>
             /// Gets or sets the parent graph type name.
             /// </summary>
-            public string ParentType { get; set; }
+            public string? ParentType { get; set; }
 
             /// <summary>
             /// Gets or sets the field name.
             /// </summary>
-            public string FieldName { get; set; }
+            public string? FieldName { get; set; }
 
             /// <summary>
             /// Gets or sets the returned graph type name.
             /// </summary>
-            public string ReturnType { get; set; }
+            public string? ReturnType { get; set; }
         }
     }
 }

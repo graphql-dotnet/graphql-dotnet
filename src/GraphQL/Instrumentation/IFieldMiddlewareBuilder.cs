@@ -1,4 +1,3 @@
-using System;
 using GraphQL.Types;
 
 namespace GraphQL.Instrumentation
@@ -21,6 +20,6 @@ namespace GraphQL.Instrumentation
         /// Returns a transform for field resolvers, or <see langword="null"/> if no middleware is defined.
         /// The transform is a cumulation of all middlewares configured within this builder.
         /// </summary>
-        Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build();
+        Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build();
     }
 }

@@ -8,6 +8,6 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the default value of this argument or field.
         /// </summary>
-        object DefaultValue { get; }
+        object? DefaultValue { get; }
     }
 }

@@ -8,17 +8,17 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a literal.
         /// </summary>
-        public static ArgumentValue NullLiteral => new ArgumentValue(null, ArgumentSource.Literal);
+        public static ArgumentValue NullLiteral => new(null, ArgumentSource.Literal);
 
         /// <summary>
         /// Returns an instance of this struct containing a <see langword="null"/> value supplied as a variable.
         /// </summary>
-        public static ArgumentValue NullVariable => new ArgumentValue(null, ArgumentSource.Variable);
+        public static ArgumentValue NullVariable => new(null, ArgumentSource.Variable);
 
         /// <summary>
         /// Initializes a new instance with the specified values.
         /// </summary>
-        public ArgumentValue(object value, ArgumentSource source)
+        public ArgumentValue(object? value, ArgumentSource source)
         {
             Value = value;
             Source = source;
@@ -27,7 +27,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns the value of the argument.
         /// </summary>
-        public object Value { get; }
+        public object? Value { get; }
 
         /// <summary>
         /// Returns a value indicating the source of the argument's value.

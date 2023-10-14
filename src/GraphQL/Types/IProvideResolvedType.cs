@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -11,11 +9,6 @@ namespace GraphQL.Types
         /// Returns the graph type of this argument or field.
         /// In case of <see cref="ListGraphType"/> or <see cref="NonNullGraphType"/>, returns an instance of the inner (wrapped) graph type.
         /// </summary>
-        IGraphType ResolvedType { get; }
-
-        /// <summary>
-        /// Returns the graph type of this argument or field.
-        /// </summary>
-        Type Type { get; }
+        IGraphType? ResolvedType { get; set; }
     }
 }

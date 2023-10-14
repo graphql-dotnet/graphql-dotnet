@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
-using GraphQL.Language.AST;
+using System.Collections.ObjectModel;
 using GraphQL.Types;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -10,23 +10,50 @@ namespace GraphQL.Execution
     /// </summary>
     public static class ExecutionHelper
     {
+        private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+
         /// <summary>
-        /// Returns a dictionary of arguments and their values for a field or directive. Values will be retrieved from literals
-        /// or variables as specified by the document.
+        /// Returns a dictionary of directives with their arguments values for a field.
+        /// Values will be retrieved from literals or variables as specified by the document.
         /// </summary>
-        public static Dictionary<string, ArgumentValue> GetArgumentValues(QueryArguments definitionArguments, Arguments astArguments, Variables variables)
+        public static IDictionary<string, DirectiveInfo>? GetDirectives(GraphQLField field, Variables? variables, ISchema schema)
+        {
+            if (field.Directives == null || field.Directives.Count == 0)
+                return null;
+
+            Dictionary<string, DirectiveInfo>? directives = null;
+
+            foreach (var dir in field.Directives.Items)
+            {
+                var dirDefinition = schema.Directives.Find(dir.Name);
+
+                // KnownDirectivesInAllowedLocations validation rule should handle unknown directives, so
+                // if someone purposely removed the validation rule, it would ignore unknown directives
+                // while executing the request
+                if (dirDefinition == null)
+                    continue;
+
+                (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(dirDefinition, GetArguments(dirDefinition.Arguments, dir.Arguments, variables) ?? _emptyDirectiveArguments);
+            }
+
+            return directives;
+        }
+
+        /// <summary>
+        /// Returns a dictionary of arguments and their values for a field or directive.
+        /// Values will be retrieved from literals or variables as specified by the document.
+        /// </summary>
+        public static Dictionary<string, ArgumentValue>? GetArguments(QueryArguments? definitionArguments, GraphQLArguments? astArguments, Variables? variables)
         {
             if (definitionArguments == null || definitionArguments.Count == 0)
-            {
                 return null;
-            }
 
             var values = new Dictionary<string, ArgumentValue>(definitionArguments.Count);
 
-            foreach (var arg in definitionArguments.List)
+            foreach (var arg in definitionArguments.List!)
             {
                 var value = astArguments?.ValueFor(arg.Name);
-                var type = arg.ResolvedType;
+                var type = arg.ResolvedType!;
 
                 values[arg.Name] = CoerceValue(type, value, variables, arg.DefaultValue);
             }
@@ -38,7 +65,7 @@ namespace GraphQL.Execution
         /// Coerces a literal value to a compatible .NET type for the variable's graph type.
         /// Typically this is a value for a field argument or default value for a variable.
         /// </summary>
-        public static ArgumentValue CoerceValue(IGraphType type, IValue input, Variables variables = null, object fieldDefault = null)
+        public static ArgumentValue CoerceValue(IGraphType type, GraphQLValue? input, Variables? variables = null, object? fieldDefault = null)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
@@ -47,7 +74,7 @@ namespace GraphQL.Execution
             {
                 // validation rules have verified that this is not null; if the validation rule was not executed, it
                 // is assumed that the caller does not wish this check to be executed
-                return CoerceValue(nonNull.ResolvedType, input, variables, fieldDefault);
+                return CoerceValue(nonNull.ResolvedType!, input, variables, fieldDefault);
             }
 
             if (input == null)
@@ -55,7 +82,7 @@ namespace GraphQL.Execution
                 return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
             }
 
-            if (input is VariableReference variable)
+            if (input is GraphQLVariable variable)
             {
                 if (variables == null)
                     return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
@@ -69,24 +96,24 @@ namespace GraphQL.Execution
                 return new ArgumentValue(scalarType.ParseLiteral(input), ArgumentSource.Literal);
             }
 
-            if (input is NullValue)
+            if (input is GraphQLNullValue)
             {
                 return ArgumentValue.NullLiteral;
             }
 
             if (type is ListGraphType listType)
             {
-                var listItemType = listType.ResolvedType;
+                var listItemType = listType.ResolvedType!;
 
-                if (input is ListValue list)
+                if (input is GraphQLListValue list)
                 {
-                    var count = list.ValuesList.Count;
+                    var count = list.Values?.Count ?? 0;
                     if (count == 0)
                         return new ArgumentValue(Array.Empty<object>(), ArgumentSource.Literal);
 
-                    var values = new object[count];
+                    var values = new object?[count];
                     for (int i = 0; i < count; ++i)
-                        values[i] = CoerceValue(listItemType, list.ValuesList[i], variables).Value;
+                        values[i] = CoerceValue(listItemType, list.Values![i], variables).Value;
                     return new ArgumentValue(values, ArgumentSource.Literal);
                 }
                 else
@@ -97,16 +124,16 @@ namespace GraphQL.Execution
 
             if (type is IInputObjectGraphType inputObjectGraphType)
             {
-                if (!(input is ObjectValue objectValue))
+                if (input is not GraphQLObjectValue objectValue)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input}'.");
+                    throw new ArgumentOutOfRangeException(nameof(input), $"Expected object value for '{inputObjectGraphType.Name}', found not an object '{input.Print()}'.");
                 }
 
-                var obj = new Dictionary<string, object>();
+                var obj = new Dictionary<string, object?>();
 
                 foreach (var field in inputObjectGraphType.Fields.List)
                 {
-                    // https://spec.graphql.org/June2018/#sec-Input-Objects
+                    // https://spec.graphql.org/October2021/#sec-Input-Objects
                     var objectField = objectValue.Field(field.Name);
                     if (objectField != null)
                     {
@@ -122,7 +149,7 @@ namespace GraphQL.Execution
                         // default value should be used.
 
                         // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType, objectField.Value, variables).Value;
+                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
                     }
                     else if (field.DefaultValue != null)
                     {

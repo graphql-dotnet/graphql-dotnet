@@ -1,5 +1,5 @@
-﻿using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation
 {
@@ -11,7 +11,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns a variable reference node.
         /// </summary>
-        public VariableReference Node { get; }
+        public GraphQLVariable Node { get; }
 
         /// <summary>
         /// Returns a graph type.
@@ -23,7 +23,7 @@ namespace GraphQL.Validation
         /// </summary>
         /// <param name="node">A variable reference node.</param>
         /// <param name="type">A graph type.</param>
-        public VariableUsage(VariableReference node, IGraphType type)
+        public VariableUsage(GraphQLVariable node, IGraphType type)
         {
             Node = node;
             Type = type;

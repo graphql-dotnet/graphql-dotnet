@@ -1,11 +1,8 @@
-using System;
+namespace GraphQL.DataLoader.Tests.Models;
 
-namespace GraphQL.DataLoader.Tests.Models
+public class Order
 {
-    public class Order
-    {
-        public int OrderId { get; set; }
-        public DateTime OrderedOn { get; set; }
-        public int UserId { get; set; }
-    }
+    public int OrderId { get; set; }
+    public DateTime OrderedOn { get; set; }
+    public int UserId { get; set; }
 }

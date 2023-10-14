@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using GraphQL.Resolvers;
 
 namespace GraphQL.Types
@@ -7,6 +5,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Provides methods to add fields to output graph types.
     /// </summary>
+    [Obsolete("This class will be removed in v8.")]
     public static class ObjectGraphTypeExtensions
     {
         /// <summary>
@@ -18,13 +17,14 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public static void Field(
             this IObjectGraphType obj,
             string name,
             IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext, object> resolve = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext, object?>? resolve = null)
         {
             var field = new FieldType
             {
@@ -46,13 +46,14 @@ namespace GraphQL.Types
         /// <param name="description">The description of the field.</param>
         /// <param name="arguments">A list of arguments for the field.</param>
         /// <param name="resolve">A field resolver delegate. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
+        [Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods defined on it or just use AddField() method directly. This method will be removed in v8.")]
         public static void FieldAsync(
             this IObjectGraphType obj,
             string name,
             IGraphType type,
-            string description = null,
-            QueryArguments arguments = null,
-            Func<IResolveFieldContext, Task<object>> resolve = null)
+            string? description = null,
+            QueryArguments? arguments = null,
+            Func<IResolveFieldContext, Task<object?>>? resolve = null)
         {
             var field = new FieldType
             {
@@ -61,7 +62,7 @@ namespace GraphQL.Types
                 Arguments = arguments,
                 ResolvedType = type,
                 Resolver = resolve != null
-                    ? new AsyncFieldResolver<object>(resolve)
+                    ? new FuncFieldResolver<object>(context => new ValueTask<object?>(resolve(context)))
                     : null
             };
             obj.AddField(field);

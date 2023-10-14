@@ -1,6 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace GraphQL.DataLoader
 {
     /// <summary>
@@ -25,6 +22,6 @@ namespace GraphQL.DataLoader
         /// Asynchronously executes the loader if it has not yet been executed; then returns the result
         /// </summary>
         /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to fetch delegate</param>
-        Task<object> GetResultAsync(CancellationToken cancellationToken = default);
+        Task<object?> GetResultAsync(CancellationToken cancellationToken = default);
     }
 }

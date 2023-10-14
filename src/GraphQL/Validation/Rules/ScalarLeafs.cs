@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,17 +15,16 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly ScalarLeafs Instance = new ScalarLeafs();
+        public static readonly ScalarLeafs Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="ScalarLeafsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor =
-            new MatchingNodeVisitor<Field>((f, context) => Field(context.TypeInfo.GetLastType(), f, context))
-                .ToTask();
+        private static readonly INodeVisitor _nodeVisitor =
+            new MatchingNodeVisitor<GraphQLField>((f, context) => Field(context.TypeInfo.GetLastType(), f, context));
 
-        private static void Field(IGraphType type, Field field, ValidationContext context)
+        private static void Field(IGraphType? type, GraphQLField field, ValidationContext context)
         {
             if (type == null)
             {

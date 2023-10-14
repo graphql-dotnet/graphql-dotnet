@@ -1,7 +1,5 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,33 +14,37 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly NoUndefinedVariables Instance = new NoUndefinedVariables();
+        public static readonly NoUndefinedVariables Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="NoUndefinedVariablesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new NodeVisitors(
-            new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
+            new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
             {
-                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new HashSet<string>();
-                varNameDef.Add(varDef.Name);
+                var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new();
+                varNameDef.Add(varDef.Variable.Name);
             }),
 
-            new MatchingNodeVisitor<Operation>(
+            new MatchingNodeVisitor<GraphQLOperationDefinition>(
                 enter: (op, context) => context.TypeInfo.NoUndefinedVariables_VariableNameDefined?.Clear(),
                 leave: (op, context) =>
                 {
                     var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined;
-                    foreach (var usage in context.GetRecursiveVariables(op))
+                    var usages = context.GetRecursiveVariables(op);
+                    if (usages != null)
                     {
-                        var varName = usage.Node.Name;
-                        if (varNameDef == null || !varNameDef.Contains(varName))
+                        foreach (var usage in usages)
                         {
-                            context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
+                            var varName = usage.Node.Name;
+                            if (varNameDef == null || !varNameDef.Contains(varName))
+                            {
+                                context.ReportError(new NoUndefinedVariablesError(context, op, usage.Node));
+                            }
                         }
                     }
                 })
-        ).ToTask();
+        );
     }
 }

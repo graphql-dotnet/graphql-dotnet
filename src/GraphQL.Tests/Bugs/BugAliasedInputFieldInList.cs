@@ -1,71 +1,68 @@
-using System.Collections.Generic;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class BugAliasedInputFieldInList : QueryTestBase<AliasedInputFieldSchema>
 {
-    public class BugAliasedInputFieldInList : QueryTestBase<AliasedInputFieldSchema>
+    [Fact]
+    public void supports_aliased_fields_in_input_list()
     {
-        [Fact]
-        public void supports_aliased_fields_in_input_list()
-        {
-            string query = @"mutation { mutateMyEntity(
+        const string query = """
+            mutation { mutateMyEntity(
                 singleEntity: { aField: 1 fieldAlias: 2 }
                 multipleEntities: [{ aField: 3 fieldAlias: 4 }]
-            ) }";
+            ) }
+            """;
 
-            string expected = @"{ ""mutateMyEntity"": true }";
+        const string expected = """{ "mutateMyEntity": true }""";
 
-            AssertQuerySuccess(query, expected, null);
-        }
+        AssertQuerySuccess(query, expected, null);
     }
+}
 
-    public class AliasedInputFieldSchema : Schema
+public class AliasedInputFieldSchema : Schema
+{
+    public AliasedInputFieldSchema()
     {
-        public AliasedInputFieldSchema()
-        {
-            Mutation = new AliasedInputFieldMutation();
-        }
+        Mutation = new AliasedInputFieldMutation();
     }
+}
 
-    public class AliasedInputFieldMutation : ObjectGraphType
+public class AliasedInputFieldMutation : ObjectGraphType
+{
+    public AliasedInputFieldMutation()
     {
-        public AliasedInputFieldMutation()
-        {
-            Field<BooleanGraphType>()
-                .Name("mutateMyEntity")
-                .Argument<MyEntityInputType>("singleEntity")
-                .Argument<ListGraphType<MyEntityInputType>>("multipleEntities")
-                .Resolve(
-                    context =>
-                    {
-                        var singleEntity = context.GetArgument<MyEntity>("singleEntity");
-                        singleEntity.AField.ShouldBe(1); // <<<<<< This is OK
-                        singleEntity.BField.ShouldBe(2); // <<<<<< This is OK
+        Field<BooleanGraphType>("mutateMyEntity")
+            .Argument<MyEntityInputType>("singleEntity")
+            .Argument<ListGraphType<MyEntityInputType>>("multipleEntities")
+            .Resolve(
+                context =>
+                {
+                    var singleEntity = context.GetArgument<MyEntity>("singleEntity");
+                    singleEntity.AField.ShouldBe(1); // <<<<<< This is OK
+                    singleEntity.BField.ShouldBe(2); // <<<<<< This is OK
 
-                        var multipleEntities = context.GetArgument<List<MyEntity>>("multipleEntities");
-                        multipleEntities[0].AField.ShouldBe(3); // <<<<< This is OK
-                        multipleEntities[0].BField.ShouldBe(4); // <<<<< This is fails [BEFORE FIX]
+                    var multipleEntities = context.GetArgument<List<MyEntity>>("multipleEntities");
+                    multipleEntities[0].AField.ShouldBe(3); // <<<<< This is OK
+                    multipleEntities[0].BField.ShouldBe(4); // <<<<< This is fails [BEFORE FIX]
 
-                        return true;
-                    }
-                );
-        }
+                    return true;
+                }
+            );
     }
+}
 
-    public class MyEntityInputType : InputObjectGraphType<MyEntity>
+public class MyEntityInputType : InputObjectGraphType<MyEntity>
+{
+    public MyEntityInputType()
     {
-        public MyEntityInputType()
-        {
-            Field(x => x.AField);
-            Field("fieldAlias", x => x.BField);
-        }
+        Field(x => x.AField);
+        Field("fieldAlias", x => x.BField);
     }
+}
 
-    public class MyEntity
-    {
-        public int AField { get; set; }
-        public int BField { get; set; }
-    }
+public class MyEntity
+{
+    public int AField { get; set; }
+    public int BField { get; set; }
 }

@@ -9,7 +9,7 @@ exceptions occurring during the execution of a field resolver, such as a timeout
 
 Input errors and processing errors are returned from the `DocumentExecuter` within the `ExecutionResult.Errors`
 property as a list of `ExecutionError` objects. `ExecutionError` is derived from `Exception`, and the `Message`
-property is serialized [according to the spec](https://graphql.github.io/graphql-spec/June2018/#sec-Errors)
+property is serialized [according to the spec](https://spec.graphql.org/October2021/#sec-Errors)
 with location and path information. In addition, by default three additional pieces of information are serialized
 to the `extensions` property of the GraphQL error which contain:
 
@@ -72,10 +72,9 @@ Any other thrown error is treated as a processing error (see [Processing Errors]
 Here is an example of typical validation within a field resolver that returns an input error:
 
 ```csharp
-Field<NonNullGraphType<OrderGraph>>("order",
-    arguments: new QueryArguments(
-        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }),
-    resolve: context =>
+Field<NonNullGraphType<OrderGraph>>("order")
+    .Argument<NonNullGraphType<IntGraphType>>("id")
+    .Resolve(context =>
     {
         var order = _orderService.GetById(context.GetArgument<int>("id"));
         if (order == null)
@@ -86,9 +85,12 @@ Field<NonNullGraphType<OrderGraph>>("order",
 You can also add errors to the `IResolveFieldContext.Errors` property directly.
 
 ```csharp
-Field<DroidType>(
-  "hero",
-  resolve: context => context.Errors.Add(new ExecutionError("Error Message"))
+Field<DroidType>("hero")
+    .Resolve(context =>
+    {
+        context.Errors.Add(new ExecutionError("Error Message"));
+        return ...;
+    });
 );
 ```
 
@@ -107,7 +109,7 @@ of type `IntGraphType`, and
 system cannot perform the conversion.
 
 Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the
-`ExecutionOptions.ThrowOnUnhandledExceptions` property to `true`. When this property is set to `false`,
+`ExecutionOptions.ThrowOnUnhandledException` property to `true`. When this property is set to `false`,
 the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
 inner exceptions of the wrapped exception and also returned along with data contained within the inner
@@ -117,7 +119,7 @@ You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
 and stack trace for debugging needs. You can also override the generic error message with a more specific
 message, wrap or replace the exception with your own `ExecutionError` class, and/or set the codes and data
-as necessary. Note that if `ThrowOnUnhandledExceptions` is `true`, the `UnhandledExceptionDelegate` will not be called.
+as necessary. Note that if `ThrowOnUnhandledException` is `true`, the `UnhandledExceptionDelegate` will not be called.
 
 Here is a sample of a typical unhandled exception delegate which logs the error to a database.
 It also returns the log id along with the error message:
@@ -129,7 +131,7 @@ var result = executer.ExecuteAsync(options =>
 
     ...
 
-    options.UnhandledExceptionDelegate = context =>
+    options.UnhandledExceptionDelegate = async context =>
     {
         try
         {
@@ -140,7 +142,7 @@ var result = executer.ExecuteAsync(options =>
                 Details = context.Exception.ToString()
             };
             db.ErrorLogs.Add(errorLog);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
             context.Exception.Data["errorLogId"] = errorLog.Id;
         }
         catch
@@ -164,55 +166,12 @@ options.UnhandledExecutionDelegate = ctx =>
 ## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
-typically you will pass this object to an implementation of `IDocumentWriter` to convert the
-object tree into json. The GraphQL spec allows for four properties to be returned within each
-error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations
-provided for the [`Newtonsoft.Json`](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) and
-[`System.Text.Json`](https://www.nuget.org/packages/GraphQL.SystemTextJson) packages allow you to control the
-serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider`
-to the constructor of the document writer. The `ErrorInfoProvider` class (default implementation of
-`IErrorInfoProvider`) contains 5 properties to control serialization behavior:
-
-* `ExposeExceptionStackTrace` when enabled sets the `message` property for errors to equal the
-exception's `.ToString()` method, which includes a stack trace. This property defaults to `false`.
-* `ExposeCode` when enabled sets the `extensions`'s `code` property to equal the error's `Code`
-property. This property defaults to `true`.
-* `ExposeCodes` when enabled sets the `extensions`'s `codes` property to equal a list containing both
-the error's `Code` property, if any, and the type name of inner exceptions (after being converted to
-UPPER_CASE and removing the "Extension" suffix). So an `ExecutionError` with a code of `INVALID_FORMAT`
-that has an inner exception of type `ArgumentNullException` would contain a `codes` property
-of `["INVALID_FORMAT", "ARGUMENT_NULL"]`. This property defaults to `true`.
-* `ExposeData` when enabled sets the `extension`'s `data` property to equal the data within the error's
-`Data` property. This property defaults to `true`.
-* `ExposeExtensions` when disabled hides the entire `extensions` property, including `code`, `codes`,
-and `data` (if enabled). This property defaults to `true`.
-
-For example, to show the stack traces for unhandled errors during development, you might write code like this:
-
-```csharp
-#if DEBUG
-    var documentWriter = new DocumentWriter(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
-#else
-    var documentWriter = new DocumentWriter();
-#endif
-```
-
-You can also write your own implementation of `IErrorInfoProvider`. For instance, you might want to override
-the numerical codes provided by GraphQL.NET for validation errors, reveal stack traces
-only to logged-in administrators, or simply add information to the returned error object. Below is a sample
-of a custom `IErrorInfoProvider` that adds a date stamp to returned error objects:
-
-```csharp
-public class MyErrorInfoProvider : GraphQL.Execution.ErrorInfoProvider
-{
-    public override ErrorInfo GetInfo(ExecutionError executionError)
-    {
-        var info = base.GetInfo(executionError);
-        info.Extensions["timestamp"] = DateTime.Now.ToString("u");
-        return info;
-    }
-}
-```
+typically you will pass this object to an implementation of `IGraphQLSerializer` to convert the
+object tree into json. The `IGraphQLSerializer` implementations provided by the `GraphQL.SystemTextJson`
+and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
+`IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
+the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
+automatically. Please review the [serialization](../../guides/serialization) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list
 

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -26,7 +24,7 @@ namespace GraphQL.Utilities
             };
         }
 
-        public static T GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
+        public static T? GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
         {
             return type.GetMetadata<T>(AST_METAFIELD);
         }
@@ -37,45 +35,57 @@ namespace GraphQL.Utilities
         {
             provider.WithMetadata(AST_METAFIELD, node); //TODO: remove?
 
-            if (node is IHasDirectivesNode ast && ast.Directives?.Count > 0)
+            if (node is IHasDirectivesNode ast)
+                provider.CopyDirectivesFrom(ast);
+
+            return provider;
+        }
+
+        public static TMetadataProvider CopyDirectivesFrom<TMetadataProvider>(this TMetadataProvider provider, IHasDirectivesNode node)
+            where TMetadataProvider : IProvideMetadata
+        {
+            if (node.Directives?.Count > 0)
             {
-                foreach (var directive in ast.Directives)
+                foreach (var directive in node.Directives)
                 {
-                    provider.ApplyDirective((string)directive.Name.Value, d =>
+                    provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
                     {
                         if (directive.Arguments?.Count > 0)
                         {
                             foreach (var arg in directive.Arguments)
-                                d.AddArgument(new DirectiveArgument((string)arg.Name.Value) { Value = arg.Value.ToValue() });
+                                d.AddArgument(new DirectiveArgument(arg.Name.StringValue) { Value = arg.Value.ParseAnyLiteral() }); //ISSUE:allocation
                         }
                     });
                 }
             }
-
             return provider;
         }
 
         public static bool HasExtensionAstTypes(this IProvideMetadata type)
         {
-            return GetExtensionAstTypes(type).Count > 0;
+            return type.HasMetadata(EXTENSION_AST_METAFIELD) && GetExtensionAstTypes(type).Count > 0;
         }
 
-        public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType) where T : ASTNode
+        public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType)
+            where T : ASTNode
         {
             var types = GetExtensionAstTypes(type);
             types.Add(astType);
             type.Metadata[EXTENSION_AST_METAFIELD] = types;
+
+            if (astType is IHasDirectivesNode ast)
+                type.CopyDirectivesFrom(ast);
         }
 
         public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
         {
-            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>());
+            return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>())!;
         }
 
         public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
         {
             var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
-            return types.SelectMany(x => x.Directives);
+            return types.SelectMany(x => x.Directives!);
         }
     }
 }

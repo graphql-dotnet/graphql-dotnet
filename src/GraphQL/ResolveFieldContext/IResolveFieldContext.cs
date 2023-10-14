@@ -1,13 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Security.Claims;
 using GraphQL.Conversion;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using Field = GraphQL.Language.AST.Field;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
@@ -19,8 +17,8 @@ namespace GraphQL
     /// </summary>
     public interface IResolveFieldContext : IProvideUserContext
     {
-        /// <summary>The <see cref="Field"/> AST as derived from the query request.</summary>
-        Field FieldAst { get; }
+        /// <summary>The <see cref="GraphQLField"/> AST as derived from the query request.</summary>
+        GraphQLField FieldAst { get; }
 
         /// <summary>The <see cref="FieldType"/> definition specified in the parent graph type.</summary>
         FieldType FieldDefinition { get; }
@@ -32,30 +30,38 @@ namespace GraphQL
         /// Provides access to the parent context (up to the root). This may be needed to get the parameters of parent nodes.
         /// Returns <see langword="null"/> when called on the root.
         /// </summary>
-        IResolveFieldContext Parent { get; }
+        IResolveFieldContext? Parent { get; }
 
         /// <summary>
-        /// A dictionary of arguments passed to the field. It is recommended to use the
-        /// <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
+        /// A dictionary of arguments passed to the field, or <see langword="null"/> if no arguments were defined for the field.
+        /// It is recommended to use the <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)">GetArgument</see>
         /// and <see cref="ResolveFieldContextExtensions.HasArgument(IResolveFieldContext, string)">HasArgument</see> extension
         /// methods rather than this dictionary, so the names can be converted by the selected <see cref="INameConverter"/>.
         /// </summary>
-        IDictionary<string, ArgumentValue> Arguments { get; }
+        IDictionary<string, ArgumentValue>? Arguments { get; }
+
+        /// <summary>
+        /// A dictionary of directives with their arguments passed to the field, or <see langword="null"/> if no directives were defined for the field.
+        /// It is recommended to use the <see cref="ResolveFieldContextExtensions.GetDirective(IResolveFieldContext, string)">GetDirective</see>
+        /// and <see cref="ResolveFieldContextExtensions.HasDirective(IResolveFieldContext, string)">HasDirective</see> extension
+        /// methods rather than this dictionary directly.
+        /// </summary>
+        IDictionary<string, DirectiveInfo>? Directives { get; }
 
         /// <summary>The root value of the graph, as defined by <see cref="ExecutionOptions.Root"/>.</summary>
-        object RootValue { get; }
+        object? RootValue { get; }
 
         /// <summary>The value of the parent object in the graph.</summary>
-        object Source { get; }
+        object? Source { get; }
 
         /// <summary>The graph schema.</summary>
         ISchema Schema { get; }
 
         /// <summary>The current GraphQL request, parsed into an AST document.</summary>
-        Document Document { get; }
+        GraphQLDocument Document { get; }
 
         /// <summary>The operation type (i.e. query, mutation, or subscription) of the current GraphQL request.</summary>
-        Operation Operation { get; }
+        GraphQLOperationDefinition Operation { get; }
 
         /// <summary>The input variables of the current GraphQL request.</summary>
         Variables Variables { get; }
@@ -75,26 +81,43 @@ namespace GraphQL
         /// <summary>The path to the current executing field from the request root as it would appear in the response.</summary>
         IEnumerable<object> ResponsePath { get; }
 
-        /// <summary>Returns a list of child fields requested for the current field.</summary>
-        Dictionary<string, Field> SubFields { get; }
+        /// <summary>
+        /// Returns a set of child fields requested for the current field. Note that this set will be completely defined
+        /// (when called from field resolver) only for fields of a concrete type (i.e. not interface or union field). For
+        /// interface field this method returns requested fields in terms of this interface. For union field this method
+        /// returns empty set since we don't know the concrete union member until we get a concrete runtime value from
+        /// the resolver.
+        /// </summary>
+        Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; }
+
+        /// <summary>
+        /// A dictionary of extra information supplied with the GraphQL request.
+        /// This is reserved for implementors to extend the protocol however they see fit,
+        /// and hence there are no additional restrictions on its contents. Also you may use
+        /// <see cref="ResolveFieldContextExtensions.GetInputExtension(IResolveFieldContext, string)">GetInputExtension</see> method.
+        /// </summary>
+        IReadOnlyDictionary<string, object?> InputExtensions { get; }
 
         /// <summary>
         /// The response map may also contain an entry with key extensions. This entry is reserved for implementors to extend the
         /// protocol however they see fit, and hence there are no additional restrictions on its contents. This dictionary is shared
-        /// by all running resolvers and is not thread safe. Also you may use <see cref="ResolveFieldContextExtensions.GetExtension(IResolveFieldContext, string)">GetExtension</see>
-        /// and <see cref="ResolveFieldContextExtensions.SetExtension(IResolveFieldContext, string, object)">SetExtension</see>
+        /// by all running resolvers and is not thread safe. Also you may use <see cref="ResolveFieldContextExtensions.GetOutputExtension(IResolveFieldContext, string)">GetOutputExtension</see>
+        /// and <see cref="ResolveFieldContextExtensions.SetOutputExtension(IResolveFieldContext, string, object)">SetOutputExtension</see>
         /// methods.
         /// </summary>
-        IDictionary<string, object> Extensions { get; }
+        IDictionary<string, object?> OutputExtensions { get; }
 
         /// <summary>The service provider for the executing request.</summary>
-        IServiceProvider RequestServices { get; }
+        IServiceProvider? RequestServices { get; }
 
         /// <summary>
         /// Returns a resource pool from which arrays can be rented during the current execution.
         /// Can be used to return lists of data from field resolvers.
         /// </summary>
         IExecutionArrayPool ArrayPool { get; }
+
+        /// <inheritdoc cref="IExecutionContext.User"/>
+        ClaimsPrincipal? User { get; }
     }
 
     /// <inheritdoc cref="IResolveFieldContext"/>

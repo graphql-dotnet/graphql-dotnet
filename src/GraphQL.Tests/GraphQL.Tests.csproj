@@ -2,15 +2,17 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net5;netcoreapp3.1;netcoreapp2.1;net48</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net5;netcoreapp3.1;netcoreapp2.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,16 +23,19 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Dummy\GraphQL.Dummy.csproj" />
+    <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL.StarWars\GraphQL.StarWars.csproj" />
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
-    <ProjectReference Include="..\GraphQL.SystemReactive\GraphQL.SystemReactive.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
     <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.*" />
+    <PackageReference Include="OpenTelemetry.Exporter.InMemory" Version="1.6.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
+    <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
 
 </Project>

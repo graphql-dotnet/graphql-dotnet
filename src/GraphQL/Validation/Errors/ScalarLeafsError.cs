@@ -1,6 +1,5 @@
-using System;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -13,16 +12,16 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ScalarLeafsError(ValidationContext context, SelectionSet node, Field field, IGraphType type)
-            : base(context.Document.OriginalQuery, NUMBER, NoSubselectionAllowedMessage(field.Name, type.ToString()), node)
+        public ScalarLeafsError(ValidationContext context, GraphQLSelectionSet node, GraphQLField field, IGraphType type)
+            : base(context.Document.Source, NUMBER, NoSubselectionAllowedMessage(field.Name.StringValue, type.ToString()!), node)
         {
         }
 
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ScalarLeafsError(ValidationContext context, Field node, IGraphType type)
-            : base(context.Document.OriginalQuery, NUMBER, RequiredSubselectionMessage(node.Name, type.ToString()), node)
+        public ScalarLeafsError(ValidationContext context, GraphQLField node, IGraphType type)
+            : base(context.Document.Source, NUMBER, RequiredSubselectionMessage(node.Name.StringValue, type.ToString()!), node)
         {
         }
 

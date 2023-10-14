@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -10,7 +8,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets a delegate that determines if the specified object is valid for this graph type.
         /// </summary>
-        Func<object, bool> IsTypeOf { get; set; }
+        Func<object, bool>? IsTypeOf { get; set; }
 
         /// <summary>
         /// Adds an instance of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
@@ -25,13 +23,28 @@ namespace GraphQL.Types
     public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         /// <inheritdoc/>
-        public Func<object, bool> IsTypeOf { get; set; }
+        public Func<object, bool>? IsTypeOf { get; set; }
 
         /// <inheritdoc/>
         public ObjectGraphType()
+            : this(null)
         {
-            if (typeof(TSourceType) != typeof(object))
-                IsTypeOf = instance => instance is TSourceType;
+        }
+
+        internal ObjectGraphType(ObjectGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
+        {
+            if (cloneFrom == null)
+            {
+                if (typeof(TSourceType) != typeof(object))
+                    IsTypeOf = instance => instance is TSourceType;
+                Interfaces = new Interfaces();
+                return;
+            }
+            IsTypeOf = cloneFrom.IsTypeOf;
+            Interfaces = cloneFrom.Interfaces;
+            if (cloneFrom.ResolvedInterfaces.Count > 0)
+                throw new InvalidOperationException("Cannot clone ObjectGraphType when ResolvedInterfaces contains items.");
         }
 
         /// <inheritdoc/>
@@ -45,7 +58,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public Interfaces Interfaces { get; } = new Interfaces();
+        public Interfaces Interfaces { get; }
 
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
@@ -66,7 +79,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
-    public class ObjectGraphType : ObjectGraphType<object>
+    public class ObjectGraphType : ObjectGraphType<object?>
     {
     }
 }

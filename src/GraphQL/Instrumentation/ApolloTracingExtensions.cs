@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL.Instrumentation
 {
     /// <summary>
@@ -22,7 +18,7 @@ namespace GraphQL.Instrumentation
         {
             var perf = result?.Perf;
             if (perf != null)
-                (result.Extensions ??= new Dictionary<string, object>())["tracing"] = CreateTrace(perf, start);
+                (result!.Extensions ??= new())["tracing"] = CreateTrace(perf, start);
         }
 
         /// <summary>
@@ -59,7 +55,7 @@ namespace GraphQL.Instrumentation
                     new ApolloTrace.ResolverTrace
                     {
                         FieldName = fieldStat.MetaField<string>("fieldName"),
-                        Path = fieldStat.MetaField<IEnumerable<object>>("path").ToList(),
+                        Path = fieldStat.MetaField<IEnumerable<object>>("path")!.ToList(),
                         ParentType = fieldStat.MetaField<string>("typeName"),
                         ReturnType = fieldStat.MetaField<string>("returnTypeName"),
                         StartOffset = ApolloTrace.ConvertTime(fieldStat.Start),

@@ -1,40 +1,106 @@
 namespace GraphQL.NewtonsoftJson
 {
-    public class DocumentWriter : GraphQL.IDocumentWriter
+    public class ExecutionErrorJsonConverter : Newtonsoft.Json.JsonConverter
     {
-        public DocumentWriter() { }
-        public DocumentWriter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings) { }
-        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings) { }
-        public DocumentWriter(bool indent) { }
-        public DocumentWriter(Newtonsoft.Json.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(System.Action<Newtonsoft.Json.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public DocumentWriter(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T value, System.Threading.CancellationToken cancellationToken = default) { }
-    }
-    public class ExecutionResultContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
-    {
-        public ExecutionResultContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
-        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
-        protected override Newtonsoft.Json.JsonConverter ResolveContractConverter(System.Type objectType) { }
+        public ExecutionErrorJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public override bool CanRead { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
     public class ExecutionResultJsonConverter : Newtonsoft.Json.JsonConverter
     {
-        public ExecutionResultJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public ExecutionResultJsonConverter() { }
+        public ExecutionResultJsonConverter(Newtonsoft.Json.Serialization.NamingStrategy? namingStrategy) { }
         public override bool CanRead { get; }
         public override bool CanConvert(System.Type objectType) { }
-        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
-        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class FixPrecisionConverter : Newtonsoft.Json.JsonConverter
+    {
+        public FixPrecisionConverter(bool forDecimal, bool forDouble, bool forFloat) { }
+        public override bool CanRead { get; }
+        public override bool CanConvert(System.Type objType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter jWriter, object? value, Newtonsoft.Json.JsonSerializer jSerializer) { }
+    }
+    public class GraphQLContractResolver : Newtonsoft.Json.Serialization.DefaultContractResolver
+    {
+        public GraphQLContractResolver(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        protected override Newtonsoft.Json.Serialization.JsonProperty CreateProperty(System.Reflection.MemberInfo member, Newtonsoft.Json.MemberSerialization memberSerialization) { }
+        protected override Newtonsoft.Json.JsonConverter? ResolveContractConverter(System.Type objectType) { }
+    }
+    public class GraphQLRequestJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public GraphQLRequestJsonConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object? ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class GraphQLRequestListJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public GraphQLRequestListJsonConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class GraphQLSerializer : GraphQL.IGraphQLSerializer, GraphQL.IGraphQLTextSerializer
+    {
+        public GraphQLSerializer() { }
+        public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(GraphQL.NewtonsoftJson.JsonSerializerSettings serializerSettings) { }
+        protected GraphQLSerializer(Newtonsoft.Json.JsonSerializer jsonSerializer) { }
+        public GraphQLSerializer(System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings> configureSerializerSettings) { }
+        public GraphQLSerializer(bool indent) { }
+        public GraphQLSerializer(GraphQL.NewtonsoftJson.JsonSerializerSettings serializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings> configureSerializerSettings, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public bool IsNativelyAsync { get; }
+        protected Newtonsoft.Json.JsonSerializer Serializer { get; }
+        public T? Deserialize<T>(string? json) { }
+        public T? Read<T>(System.IO.TextReader json) { }
+        public System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
+        public T? ReadNode<T>(object? value) { }
+        public string Serialize<T>(T? value) { }
+        public void Write<T>(System.IO.TextWriter textWriter, T value) { }
+        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T? value, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+    public class InputsJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public InputsJsonConverter() { }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object? ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
+    }
+    public class JsonSerializerSettings : Newtonsoft.Json.JsonSerializerSettings
+    {
+        public JsonSerializerSettings() { }
+    }
+    public class OperationMessageJsonConverter : Newtonsoft.Json.JsonConverter
+    {
+        public OperationMessageJsonConverter() { }
+        public override bool CanRead { get; }
+        public override bool CanWrite { get; }
+        public override bool CanConvert(System.Type objectType) { }
+        public override object ReadJson(Newtonsoft.Json.JsonReader reader, System.Type objectType, object? existingValue, Newtonsoft.Json.JsonSerializer serializer) { }
+        public override void WriteJson(Newtonsoft.Json.JsonWriter writer, object? value, Newtonsoft.Json.JsonSerializer serializer) { }
     }
     public static class SchemaExtensions
     {
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
-    public static class StringExtensions
+}
+namespace GraphQL
+{
+    public static class NewtonsoftJsonGraphQLBuilderExtensions
     {
-        public static object GetValue(this object value) { }
-        public static System.Collections.Generic.Dictionary<string, object> ToDictionary(this string json) { }
-        public static GraphQL.Inputs ToInputs(this Newtonsoft.Json.Linq.JObject obj) { }
-        public static GraphQL.Inputs ToInputs(this string json) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddNewtonsoftJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.NewtonsoftJson.JsonSerializerSettings, System.IServiceProvider>? action) { }
     }
 }

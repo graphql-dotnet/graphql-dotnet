@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 
 namespace GraphQL.Types
 {
@@ -10,7 +8,7 @@ namespace GraphQL.Types
     /// </summary>
     public class AppliedDirectives : IEnumerable<AppliedDirective>
     {
-        internal List<AppliedDirective> List { get; private set; }
+        internal List<AppliedDirective>? List { get; private set; }
 
         /// <summary>
         /// Gets the count of applied directives.
@@ -29,14 +27,14 @@ namespace GraphQL.Types
             if (List != null && List.Contains(directive))
                 throw new InvalidOperationException("Already exists");
 
-            (List ??= new List<AppliedDirective>()).Add(directive);
+            (List ??= new()).Add(directive);
         }
 
         /// <summary>
         /// Finds a directive by its name from the list. If the list contains several
         /// directives with the given name, then the first one is returned.
         /// </summary>
-        public AppliedDirective Find(string name)
+        public AppliedDirective? Find(string name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)
@@ -49,8 +47,14 @@ namespace GraphQL.Types
             }
 
             return null;
-
         }
+
+        /// <summary>
+        /// Removes a directive by its name from the list. If the list contains several
+        /// directives with the given name, then all such directives will be removed.
+        /// </summary>
+        public int Remove(string name) => List?.RemoveAll(d => d.Name == name) ?? 0;
+
         /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
         public IEnumerator<AppliedDirective> GetEnumerator() => (List ?? System.Linq.Enumerable.Empty<AppliedDirective>()).GetEnumerator();
 

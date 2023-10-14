@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -14,12 +11,12 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns a list of child execution nodes.
         /// </summary>
-        public List<ExecutionNode> Items { get; set; }
+        public List<ExecutionNode>? Items { get; set; }
 
         /// <summary>
         /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
         /// </summary>
-        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
         }
@@ -28,12 +25,12 @@ namespace GraphQL.Execution
         /// Returns an object array containing the results of the child execution nodes.
         /// <see cref="PropagateNull"/> must be called prior to calling this method.
         /// </summary>
-        public override object ToValue()
+        public override object? ToValue()
         {
             if (Items == null)
                 return null;
 
-            var items = new object[Items.Count];
+            var items = new object?[Items.Count];
             for (int i = 0; i < Items.Count; ++i)
             {
                 items[i] = Items[i].ToValue();
@@ -60,7 +57,7 @@ namespace GraphQL.Execution
 
                 if (valueIsNull && !isNullableType)
                 {
-                    if (((ListGraphType)GraphType).ResolvedType is NonNullGraphType)
+                    if (((ListGraphType)GraphType!).ResolvedType is NonNullGraphType)
                     {
                         Items = null;
                         return true;
@@ -68,7 +65,7 @@ namespace GraphQL.Execution
                     else
                     {
                         isNullableType = true;
-                    } 
+                    }
                 }
             }
 

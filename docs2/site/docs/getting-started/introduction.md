@@ -133,6 +133,7 @@ using System;
 using System.Threading.Tasks;
 using GraphQL;
 using GraphQL.Types;
+using GraphQL.SystemTextJson;
 
 public class Droid
 {
@@ -153,10 +154,8 @@ public class StarWarsQuery : ObjectGraphType
 {
   public StarWarsQuery()
   {
-    Field<DroidType>(
-      "hero",
-      resolve: context => new Droid { Id = "1", Name = "R2-D2" }
-    );
+    Field<DroidType>("hero")
+        .Resolve(context => new Droid { Id = "1", Name = "R2-D2" });
   }
 }
 
@@ -216,12 +215,12 @@ public class Query
 [GraphQLMetadata("Droid", IsTypeOf=typeof(Droid))]
 public class DroidType
 {
-  public string Id(Droid droid) => droid.Id;
-  public string Name(Droid droid) => droid.Name;
+  public string Id([FromSource] Droid droid) => droid.Id;
+  public string Name([FromSource] Droid droid) => droid.Name;
 
   // these two parameters are optional
   // IResolveFieldContext provides contextual information about the field
-  public Character Friend(IResolveFieldContext context, Droid source)
+  public Character Friend(IResolveFieldContext context, [FromSource] Droid source)
   {
     return new Character { Name = "C3-PO" };
   }

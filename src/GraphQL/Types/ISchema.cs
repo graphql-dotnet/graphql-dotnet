@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Conversion;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
@@ -54,12 +52,12 @@ namespace GraphQL.Types
         /// <summary>
         /// The 'mutation' base graph type; optional.
         /// </summary>
-        IObjectGraphType Mutation { get; set; }
+        IObjectGraphType? Mutation { get; set; }
 
         /// <summary>
         /// The 'subscription' base graph type; optional.
         /// </summary>
-        IObjectGraphType Subscription { get; set; }
+        IObjectGraphType? Subscription { get; set; }
 
         /// <summary>
         /// Returns a list of directives supported by the schema.
@@ -67,7 +65,7 @@ namespace GraphQL.Types
         /// Directives are used by the GraphQL runtime as a way of modifying execution
         /// behavior. Type system creators do not usually create them directly.
         /// <br/><br/>
-        /// <see cref="Schema"/> initializes the list to include <see cref="DirectiveGraphType.Include"/>, <see cref="DirectiveGraphType.Skip"/> and <see cref="DirectiveGraphType.Deprecated"/> by default.
+        /// <see cref="Schema"/> initializes the list to include <see cref="SchemaDirectives.Include"/>, <see cref="SchemaDirectives.Skip"/> and <see cref="SchemaDirectives.Deprecated"/> by default.
         /// </summary>
         SchemaDirectives Directives { get; }
 
@@ -113,7 +111,7 @@ namespace GraphQL.Types
         /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
         /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        void RegisterType(Type type);
+        void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type);
 
         /// <summary>
         /// Registers type mapping from CLR type to GraphType.
@@ -126,7 +124,7 @@ namespace GraphQL.Types
         /// </summary>
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="graphType">Inferred GraphType.</param>
-        void RegisterTypeMapping(Type clrType, Type graphType);
+        void RegisterTypeMapping(Type clrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType);
 
         /// <summary>
         /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.

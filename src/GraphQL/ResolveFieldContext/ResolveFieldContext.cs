@@ -1,21 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
 using GraphQL.Types;
-using Field = GraphQL.Language.AST.Field;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL
 {
     /// <summary>
     /// A mutable implementation of <see cref="IResolveFieldContext"/>
     /// </summary>
-    public class ResolveFieldContext : IResolveFieldContext<object>
+    public class ResolveFieldContext : IResolveFieldContext<object?>
     {
         /// <inheritdoc/>
-        public Field FieldAst { get; set; }
+        public GraphQLField FieldAst { get; set; }
 
         /// <inheritdoc/>
         public FieldType FieldDefinition { get; set; }
@@ -24,28 +22,31 @@ namespace GraphQL
         public IObjectGraphType ParentType { get; set; }
 
         /// <inheritdoc/>
-        public IResolveFieldContext Parent { get; set; }
+        public IResolveFieldContext? Parent { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, ArgumentValue> Arguments { get; set; }
+        public IDictionary<string, ArgumentValue>? Arguments { get; set; }
 
         /// <inheritdoc/>
-        public object RootValue { get; set; }
+        public IDictionary<string, DirectiveInfo>? Directives { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> UserContext { get; set; }
+        public object? RootValue { get; set; }
 
         /// <inheritdoc/>
-        public object Source { get; set; }
+        public IDictionary<string, object?> UserContext { get; set; }
+
+        /// <inheritdoc/>
+        public object? Source { get; set; }
 
         /// <inheritdoc/>
         public ISchema Schema { get; set; }
 
         /// <inheritdoc/>
-        public Document Document { get; set; }
+        public GraphQLDocument Document { get; set; }
 
         /// <inheritdoc/>
-        public Operation Operation { get; set; }
+        public GraphQLOperationDefinition Operation { get; set; }
 
         /// <inheritdoc/>
         public Variables Variables { get; set; }
@@ -66,21 +67,29 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath { get; set; }
 
         /// <inheritdoc/>
-        public Dictionary<string, Field> SubFields { get; set; }
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields { get; set; }
 
         /// <inheritdoc/>
-        public IServiceProvider RequestServices { get; set; }
+        public IServiceProvider? RequestServices { get; set; }
 
         /// <inheritdoc/>
-        public IDictionary<string, object> Extensions { get; set; }
+        public IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
+
+        /// <inheritdoc/>
+        public IDictionary<string, object?> OutputExtensions { get; set; }
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool { get; set; }
 
+        /// <inheritdoc/>
+        public ClaimsPrincipal? User { get; set; }
+
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
         /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public ResolveFieldContext() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         /// <summary>
         /// Clone the specified <see cref="IResolveFieldContext"/>.
@@ -93,10 +102,12 @@ namespace GraphQL
             ParentType = context.ParentType;
             Parent = context.Parent;
             Arguments = context.Arguments;
+            Directives = context.Directives;
             Schema = context.Schema;
             Document = context.Document;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
+            User = context.User;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
@@ -106,7 +117,8 @@ namespace GraphQL
             Path = context.Path;
             ResponsePath = context.ResponsePath;
             RequestServices = context.RequestServices;
-            Extensions = context.Extensions;
+            InputExtensions = context.InputExtensions;
+            OutputExtensions = context.OutputExtensions;
             ArrayPool = context.ArrayPool;
         }
     }
@@ -125,14 +137,14 @@ namespace GraphQL
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <typeparamref name="TSource"/></exception>
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
-            if (context.Source != null && !(context.Source is TSource))
+            if (context.Source != null && context.Source is not TSource)
                 throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 
         /// <inheritdoc cref="ResolveFieldContext.Source"/>
         public new TSource Source
         {
-            get => (TSource)base.Source;
+            get => (TSource)base.Source!;
             set => base.Source = value;
         }
     }

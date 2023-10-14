@@ -1,7 +1,6 @@
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,20 +15,20 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly VariablesAreInputTypes Instance = new VariablesAreInputTypes();
+        public static readonly VariablesAreInputTypes Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="VariablesAreInputTypesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<VariableDefinition>((varDef, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
         {
             var type = varDef.Type.NamedGraphTypeFromType(context.Schema);
 
-            if (!type.IsInputType())
+            if (type == null || !type.IsInputType())
             {
-                context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)));
+                context.ReportError(new VariablesAreInputTypesError(context, varDef, varDef.Type.GraphTypeFromType(context.Schema)!));
             }
-        }).ToTask();
+        });
     }
 }

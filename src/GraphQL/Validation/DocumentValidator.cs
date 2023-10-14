@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
-using GraphQL.Types;
 using GraphQL.Validation.Rules;
 
 namespace GraphQL.Validation
@@ -13,23 +8,17 @@ namespace GraphQL.Validation
     public interface IDocumentValidator
     {
         /// <inheritdoc cref="IDocumentValidator"/>
-        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions variableDefinitions,
-            IEnumerable<IValidationRule> rules = null,
-            IDictionary<string, object> userContext = null,
-            Inputs inputs = null);
+        Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options);
     }
 
     /// <inheritdoc/>
     public class DocumentValidator : IDocumentValidator
     {
         // frequently reused objects
-        private ValidationContext _reusableValidationContext;
+        private ValidationContext? _reusableValidationContext;
 
         /// <summary>
-        /// Returns the default set of validation rules: all except <see cref="OverlappingFieldsCanBeMerged"/>.
+        /// Returns the default set of validation rules.
         /// </summary>
         public static readonly IEnumerable<IValidationRule> CoreRules = new List<IValidationRule>
         {
@@ -57,76 +46,89 @@ namespace GraphQL.Validation
             ProvidedNonNullArguments.Instance,
             DefaultValuesOfCorrectType.Instance,
             VariablesInAllowedPosition.Instance,
-            UniqueInputFieldNames.Instance
+            UniqueInputFieldNames.Instance,
+            OverlappingFieldsCanBeMerged.Instance,
         };
 
         /// <inheritdoc/>
-        public async Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(
-            ISchema schema,
-            Document document,
-            VariableDefinitions variableDefinitions,
-            IEnumerable<IValidationRule> rules = null,
-            IDictionary<string, object> userContext = null,
-            Inputs inputs = null)
+        public Task<(IValidationResult validationResult, Variables variables)> ValidateAsync(in ValidationOptions options)
         {
-            schema.Initialize();
+            options.Schema.Initialize();
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
-            context.Schema = schema;
-            context.Document = document;
-            context.TypeInfo = new TypeInfo(schema);
-            context.UserContext = userContext;
-            context.Inputs = inputs;
+            var context = Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            context.TypeInfo = new TypeInfo(options.Schema);
+            context.Schema = options.Schema;
+            context.Document = options.Document;
+            context.UserContext = options.UserContext;
+            context.Variables = options.Variables;
+            context.Extensions = options.Extensions;
+            context.Operation = options.Operation;
+            context.Metrics = options.Metrics;
+            context.RequestServices = options.RequestServices;
+            context.User = options.User;
+            context.CancellationToken = options.CancellationToken;
 
+            return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
+        }
+
+        private async Task<(IValidationResult validationResult, Variables variables)> ValidateAsyncCoreAsync(ValidationContext context, IEnumerable<IValidationRule> rules)
+        {
             try
             {
-                Variables variables = null;
-                bool useOnlyStandardRules = rules == null;
+                Variables? variables = null;
+                List<IVariableVisitor>? variableVisitors = null;
 
-                if (useOnlyStandardRules)
-                    rules = CoreRules;
-
-                if (!rules.Any())
+                if (rules.Any())
                 {
-                    variables = context.GetVariableValues(schema, variableDefinitions, inputs); // can report errors even without rules enabled
-                }
-                else
-                {
-                    List<INodeVisitor> visitors;
-                    List<IVariableVisitor> variableVisitors = null;
-
-                    if (useOnlyStandardRules) // standard rules don't validate variables
+                    var visitors = new List<INodeVisitor>
                     {
-                        // No async/await related allocations since all standard rules return completed tasks from ValidateAsync.
-                        visitors = new List<INodeVisitor>();
-                        foreach (var rule in (List<IValidationRule>)rules) // no iterator boxing
+                        context.TypeInfo
+                    };
+
+                    if (rules is List<IValidationRule> list) //TODO:allocation - optimization for List+Enumerator<IvalidationRule>
+                    {
+                        foreach (var rule in list)
                         {
-                            var visitor = rule.ValidateAsync(context)?.Result;
+                            if (rule is IVariableVisitorProvider provider)
+                            {
+                                var variableVisitor = provider.GetVisitor(context);
+                                if (variableVisitor != null)
+                                    (variableVisitors ??= new()).Add(variableVisitor);
+                            }
+                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
                             if (visitor != null)
                                 visitors.Add(visitor);
                         }
                     }
                     else
                     {
-                        var awaitedVisitors = rules.Select(rule =>
+                        foreach (var rule in rules)
                         {
                             if (rule is IVariableVisitorProvider provider)
                             {
                                 var variableVisitor = provider.GetVisitor(context);
                                 if (variableVisitor != null)
-                                    (variableVisitors ??= new List<IVariableVisitor>()).Add(variableVisitor);
+                                    (variableVisitors ??= new()).Add(variableVisitor);
                             }
-                            return rule.ValidateAsync(context);
-                        }).Where(x => x != null);
-                        visitors = (await Task.WhenAll(awaitedVisitors)).ToList();
+                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
+                            if (visitor != null)
+                                visitors.Add(visitor);
+                        }
                     }
+                    await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
+                }
 
-                    visitors.Insert(0, context.TypeInfo);
+                // can report errors even without rules enabled
+                (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
+                    ? null
+                    : variableVisitors.Count == 1
+                        ? variableVisitors[0]
+                        : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
 
-                    new BasicVisitor(visitors).Visit(document, context);
-
-                    variables = context.GetVariableValues(schema, variableDefinitions, inputs ?? Inputs.Empty,
-                        variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
                 }
 
                 return context.HasErrors
@@ -138,7 +140,7 @@ namespace GraphQL.Validation
                 if (!context.HasErrors)
                 {
                     context.Reset();
-                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

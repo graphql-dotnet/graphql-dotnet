@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
 namespace GraphQL.Utilities
 {
     /// <summary>
@@ -10,14 +6,14 @@ namespace GraphQL.Utilities
     public static class StringUtils
     {
         /// <summary>
-        /// Given [ A, B, C ] return '"A", "B", or "C"'.
+        /// Given array of strings [ "A", "B", "C" ] return one string "'A', 'B' or 'C'".
         /// </summary>
-        public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5)
+        public static string QuotedOrList(IEnumerable<string> items, int maxLength = 5) //TODO: make internal in v5 and change items type
         {
             string[] itemsArray = items.Take(maxLength).ToArray();
             int index = 0;
             return itemsArray
-                .Select(x => $"\"{x}\"")
+                .Select(x => $"'{x}'")
                 .Aggregate((list, quoted) =>
                     list +
                     (itemsArray.Length > 2 ? ", " : " ") +
@@ -29,7 +25,7 @@ namespace GraphQL.Utilities
         /// Given an invalid input string and a list of valid options, returns a filtered
         /// list of valid options sorted based on their similarity with the input.
         /// </summary>
-        public static string[] SuggestionList(string input, IEnumerable<string> options)
+        public static string[] SuggestionList(string input, IEnumerable<string>? options)
         {
             if (options == null)
             {
@@ -88,7 +84,7 @@ namespace GraphQL.Utilities
             for (int i = 0; i <= maxi; i++)
                 dCurrent[i] = i;
 
-            int jm1 = 0, im1 = 0, im2 = -1;
+            int jm1 = 0, im1, im2;
 
             for (int j = 1; j <= maxj; j++)
             {
@@ -106,7 +102,6 @@ namespace GraphQL.Utilities
 
                 for (int i = 1; i <= maxi; i++)
                 {
-
                     int cost = source[im1] == target[jm1] ? 0 : 1;
 
                     int del = dCurrent[im1] + 1;

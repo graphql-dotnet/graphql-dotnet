@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +11,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UniqueDirectivesPerLocationError(ValidationContext context, Directive node)
-            : base(context.Document.OriginalQuery, NUMBER, $"The directive '{node.Name}' can only be used once at this location.", node)
+        public UniqueDirectivesPerLocationError(ValidationContext context, GraphQLDirective node)
+            : base(context.Document.Source, NUMBER, $"The directive '{node.Name}' can only be used once at this location.", node)
         {
         }
     }

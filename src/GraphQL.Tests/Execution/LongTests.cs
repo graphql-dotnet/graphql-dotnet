@@ -1,47 +1,45 @@
-using System.Threading.Tasks;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.Execution
+namespace GraphQL.Tests.Execution;
+
+public class LongTests
 {
-    public class LongTests
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersTestData))]
+    public async Task LongMaxValueShouldBeSerialized(IGraphQLTextSerializer serializer)
     {
-        [Theory]
-        [ClassData(typeof(DocumentWritersTestData))]
-        public async Task LongMaxValueShouldBeSerialized(IDocumentWriter documentWriter)
+        var documentExecuter = new DocumentExecuter();
+        var executionResult = await documentExecuter.ExecuteAsync(_ =>
         {
-            var documentExecuter = new DocumentExecuter();
-            var executionResult = await documentExecuter.ExecuteAsync(_ =>
+            _.Schema = new LongSchema();
+            _.Query = "{ testField }";
+        }).ConfigureAwait(false);
+
+        string json = serializer.Serialize(executionResult);
+        executionResult.Errors.ShouldBeNull();
+
+        json.ShouldBe("""
             {
-                _.Schema = new LongSchema();
-                _.Query = "{ testField }";
-            });
-
-            var json = await documentWriter.WriteToStringAsync(executionResult);
-            executionResult.Errors.ShouldBeNull();
-
-            json.ShouldBe(@"{
-  ""data"": {
-    ""testField"": 9223372036854775807
-  }
-}");
-        }
-
-        private class LongSchema : Schema
-        {
-            public LongSchema()
-            {
-                Query = new Query();
+              "data": {
+                "testField": 9223372036854775807
+              }
             }
-        }
+            """);
+    }
 
-        private class Query : ObjectGraphType<object>
+    private class LongSchema : Schema
+    {
+        public LongSchema()
         {
-            public Query()
-            {
-                Field<NonNullGraphType<LongGraphType>>("TestField", resolve: _ => long.MaxValue);
-            }
+            Query = new Query();
+        }
+    }
+
+    private class Query : ObjectGraphType<object>
+    {
+        public Query()
+        {
+            Field<NonNullGraphType<LongGraphType>>("TestField").Resolve(_ => long.MaxValue);
         }
     }
 }

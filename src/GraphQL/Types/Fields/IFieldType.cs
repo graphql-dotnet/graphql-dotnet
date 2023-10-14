@@ -13,6 +13,6 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets a list of arguments for the field.
         /// </summary>
-        QueryArguments Arguments { get; set; }
+        QueryArguments? Arguments { get; set; }
     }
 }

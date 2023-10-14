@@ -13,21 +13,28 @@ The following example is how Metrics are captured. You write a class that implem
 ```csharp
 public class InstrumentFieldsMiddleware : IFieldMiddleware
 {
-  public async Task<object> Resolve(
-    IResolveFieldContext context,
-    FieldMiddlewareDelegate next)
-  {
-    var metadata = new Dictionary<string, object>
+    public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
     {
-      {"typeName", context.ParentType.Name},
-      {"fieldName", context.FieldName}
-    };
-
-    using (context.Metrics.Subject("field", context.FieldName, metadata))
-    {
-      return await next(context);
+        return context.Metrics.Enabled
+            ? ResolveWhenMetricsEnabledAsync(context, next)
+            : next(context);
     }
-  }
+
+    private async ValueTask<object?> ResolveWhenMetricsEnabledAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+    {
+        var name = context.FieldAst.Name.StringValue;
+
+        var metadata = new Dictionary<string, object?>
+        {
+            { "typeName", context.ParentType.Name },
+            { "fieldName", name },
+            { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
+            { "path", context.Path },
+        };
+
+        using (context.Metrics.Subject("field", name, metadata))
+            return await next(context).ConfigureAwait(false);
+    }
 }
 ```
 
@@ -59,19 +66,19 @@ The middleware interface is defined as:
 ```csharp
 public interface IFieldMiddleware
 {
-  Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next);
+  ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next);
 }
 ```
 
 The middleware delegate is defined as:
 
 ```csharp
-public delegate Task<object> FieldMiddlewareDelegate(IResolveFieldContext context);
+public delegate ValueTask<object?> FieldMiddlewareDelegate(IResolveFieldContext context);
 ```
 
 ## Field Middleware and Dependency Injection
 
-First, you are advised to read the article about [Dependency Injection](Dependency-Injection).
+First, you are advised to read the article about [Dependency Injection](../dependency-injection).
 
 Typically you will want to set the middleware within the schema constructor.
 
@@ -163,7 +170,7 @@ public class MyFieldMiddleware : IFieldMiddleware
     _service = service;
   }
 
-  public Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+  public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
   {
     var scopedDependency1 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService1>();
     var scopedDependency2 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService2>();
@@ -180,4 +187,4 @@ Options are also possible using transient lifetime, but are not given here (not 
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about directives see [Directives](directives).
+For more information about directives see [Directives](https://graphql-dotnet.github.io/docs/getting-started/directives).

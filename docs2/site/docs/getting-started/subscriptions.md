@@ -31,21 +31,15 @@ public class ChatSubscriptions : ObjectGraphType
   {
     _chat = chat;
 
-    AddField(new EventStreamFieldType
+    AddField(new FieldType
     {
       Name = "messageAdded",
       Type = typeof(MessageType),
-      Resolver = new FuncFieldResolver<Message>(ResolveMessage),
-      Subscriber = new EventStreamResolver<Message>(Subscribe)
+      StreamResolver = new SourceStreamResolver<Message>(ResolveStream)
     });
   }
 
-  private Message ResolveMessage(IResolveFieldContext context)
-  {
-    return context.Source as Message;
-  }
-
-  private IObservable<Message> Subscribe(IResolveEventStreamContext context)
+  private IObservable<Message> ResolveStream(IResolveFieldContext context)
   {
     return _chat.Messages();
   }

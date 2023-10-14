@@ -1,3 +1,4 @@
 {
-  "name": "internal-docs"
+  "name": "internal-docs",
+  "type": "module"
 }

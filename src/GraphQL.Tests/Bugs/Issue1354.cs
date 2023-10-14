@@ -1,38 +1,34 @@
-using System;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public sealed class Issue1354 : QueryTestBase<ValueTypeSchema>
 {
-    public sealed class Issue1354 : QueryTestBase<ValueTypeSchema>
+    [Fact]
+    public void can_resolve_property_on_value_type()
     {
-        [Fact]
-        public void can_resolve_property_on_value_type()
-        {
-            var query = "query { seconds }";
-            var expected = @"{ ""seconds"": 42 }";
-            AssertQuerySuccess(query, expected, root: TimeSpan.FromSeconds(42));
-        }
-
-        [Fact]
-        public void should_throw_on_unknown_property()
-        {
-            var query = "query { seconds1 }";
-            var expected = @"{ ""seconds1"": null }";
-            var result = AssertQueryWithErrors(query, expected, root: TimeSpan.FromSeconds(42), renderErrors: false, expectedErrorCount: 1);
-            result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>();
-        }
+        const string query = "query { seconds }";
+        const string expected = """{ "seconds": 42 }""";
+        AssertQuerySuccess(query, expected, root: TimeSpan.FromSeconds(42));
     }
 
-    public sealed class ValueTypeSchema : Schema
+    [Fact]
+    public void should_throw_on_unknown_property()
     {
-        public ValueTypeSchema()
-        {
-            var query = new ObjectGraphType<TimeSpan>();
-            query.Field<IntGraphType>(name: "seconds");
-            query.Field<IntGraphType>(name: "seconds1");
-            Query = query;
-        }
+        const string query = "query { seconds1 }";
+        const string expected = """{ "seconds1": null }""";
+        var result = AssertQueryWithErrors(query, expected, root: TimeSpan.FromSeconds(42), renderErrors: false, expectedErrorCount: 1);
+        result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>();
+    }
+}
+
+public sealed class ValueTypeSchema : Schema
+{
+    public ValueTypeSchema()
+    {
+        var query = new ObjectGraphType<TimeSpan>();
+        query.Field<IntGraphType>(name: "seconds");
+        query.Field<IntGraphType>(name: "seconds1");
+        Query = query;
     }
 }

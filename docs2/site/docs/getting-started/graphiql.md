@@ -12,7 +12,7 @@ All you need to do after installing nuget is to append one extra line in your `S
 ```csharp
 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 {
-    app.UseGraphiQLServer();
+    app.UseGraphQLGraphiQL();
 }
 ```
 

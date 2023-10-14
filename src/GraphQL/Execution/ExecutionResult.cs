@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
-using GraphQL.Language.AST;
+using GraphQLParser;
+using GraphQLParser.AST;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
 namespace GraphQL
 {
@@ -20,38 +20,47 @@ namespace GraphQL
 
         /// <summary>
         /// Returns the data from the graph resolvers. This property is serialized as part of the GraphQL json response.
+        /// Should be set to <see langword="null"/> for subscription results.
         /// </summary>
-        public object Data { get; set; }
+        public object? Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets a dictionary of returned subscription fields along with their
+        /// response streams as <see cref="IObservable{T}"/> implementations.
+        /// Should be set to <see langword="null"/> for query or mutation results.
+        /// According to the GraphQL specification this dictionary should have exactly one item.
+        /// </summary>
+        public IDictionary<string, IObservable<ExecutionResult>>? Streams { get; set; }
 
         /// <summary>
         /// Returns a set of errors that occurred during any stage of processing (parsing, validating, executing, etc.). This property is serialized as part of the GraphQL json response.
         /// </summary>
-        public ExecutionErrors Errors { get; set; }
+        public ExecutionErrors? Errors { get; set; }
 
         /// <summary>
         /// Returns the original GraphQL query.
         /// </summary>
-        public string Query { get; set; }
+        public ROM Query { get; set; }
 
         /// <summary>
         /// Returns the parsed GraphQL request.
         /// </summary>
-        public Document Document { get; set; }
+        public GraphQLDocument? Document { get; set; }
 
         /// <summary>
         /// Returns the GraphQL operation that is being executed.
         /// </summary>
-        public Operation Operation { get; set; }
+        public GraphQLOperationDefinition? Operation { get; set; }
 
         /// <summary>
         /// Returns the performance metrics (Apollo Tracing) when enabled by <see cref="ExecutionOptions.EnableMetrics"/>.
         /// </summary>
-        public PerfRecord[] Perf { get; set; }
+        public PerfRecord[]? Perf { get; set; }
 
         /// <summary>
-        /// Returns additional user-defined data; see <see cref="IExecutionContext.Extensions"/> and <see cref="IResolveFieldContext.Extensions"/>. This property is serialized as part of the GraphQL json response.
+        /// Returns additional user-defined data; see <see cref="IExecutionContext.OutputExtensions"/> and <see cref="IResolveFieldContext.OutputExtensions"/>. This property is serialized as part of the GraphQL json response.
         /// </summary>
-        public Dictionary<string, object> Extensions { get; set; }
+        public Dictionary<string, object?>? Extensions { get; set; }
 
         /// <summary>
         /// Initializes a new instance with all properties set to their defaults.
@@ -68,13 +77,28 @@ namespace GraphQL
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 
+            Executed = result.Executed;
             Data = result.Data;
+            Streams = result.Streams;
             Errors = result.Errors;
             Query = result.Query;
-            Operation = result.Operation;
             Document = result.Document;
+            Operation = result.Operation;
             Perf = result.Perf;
             Extensions = result.Extensions;
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the <see cref="Query"/>, <see cref="Document"/>,
+        /// <see cref="Operation"/> and <see cref="Extensions"/> properties set from the
+        /// specified <see cref="ExecutionContext"/>.
+        /// </summary>
+        internal ExecutionResult(ExecutionContext context)
+        {
+            Query = context.Document.Source;
+            Document = context.Document;
+            Operation = context.Operation;
+            Extensions = context.OutputExtensions;
         }
 
         /// <summary>
@@ -83,7 +107,7 @@ namespace GraphQL
         /// <returns>Reference to this.</returns>
         public ExecutionResult AddError(ExecutionError error)
         {
-            (Errors ??= new ExecutionErrors()).Add(error);
+            (Errors ??= new()).Add(error);
             return this;
         }
 
@@ -96,9 +120,9 @@ namespace GraphQL
         {
             if (errors?.Count > 0)
             {
-                Errors ??= new ExecutionErrors(errors.Count);
+                Errors ??= new(errors.Count);
 
-                foreach (var error in errors.List)
+                foreach (var error in errors.List!)
                     Errors.Add(error);
             }
 

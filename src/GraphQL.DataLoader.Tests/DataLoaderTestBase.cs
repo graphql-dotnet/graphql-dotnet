@@ -1,9 +1,8 @@
 using GraphQL.DataLoader.Tests.Models;
 
-namespace GraphQL.DataLoader.Tests
+namespace GraphQL.DataLoader.Tests;
+
+public abstract class DataLoaderTestBase
 {
-    public abstract class DataLoaderTestBase
-    {
-        protected Fake Fake { get; } = new Fake();
-    }
+    protected Fake Fake { get; } = new Fake();
 }

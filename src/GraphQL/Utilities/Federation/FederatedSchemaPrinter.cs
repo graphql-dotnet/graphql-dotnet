@@ -1,15 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language;
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 using GraphQL.Types;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation
 {
-    public class FederatedSchemaPrinter : SchemaPrinter
+    //todo: [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
+    public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
     {
-        private readonly List<string> _federatedDirectives = new List<string>
+        private readonly List<string> _federatedDirectives = new()
         {
             "external",
             "provides",
@@ -18,22 +17,29 @@ namespace GraphQL.Utilities.Federation
             "extends"
         };
 
-        private readonly List<string> _federatedTypes = new List<string>
+        private readonly List<string> _federatedTypes = new()
         {
             "_Service",
             "_Entity",
             "_Any"
         };
 
-        public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions options = null)
+        public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions? options = null)
             : base(schema, options)
         {
         }
 
-        public string PrintFederatedDirectives(IGraphType type) => type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
+        public string PrintFederatedDirectives(IGraphType type)
+        {
+            Schema?.Initialize();
+
+            return type.IsInputObjectType() ? "" : PrintFederatedDirectivesFromAst(type);
+        }
 
         public string PrintFederatedDirectivesFromAst(IProvideMetadata type)
         {
+            Schema?.Initialize();
+
             var astDirectives = type.GetAstType<IHasDirectivesNode>()?.Directives ?? type.GetExtensionDirectives<GraphQLDirective>();
             if (astDirectives == null)
                 return "";
@@ -41,20 +47,27 @@ namespace GraphQL.Utilities.Federation
             var dirs = string.Join(
                 " ",
                 astDirectives
-                    .Where(x => IsFederatedDirective((string)x.Name.Value))
+                    .Where(x => IsFederatedDirective((string)x.Name)) //TODO:alloc
                     .Select(PrintAstDirective)
             );
 
             return string.IsNullOrWhiteSpace(dirs) ? "" : $" {dirs}";
         }
 
-        public string PrintAstDirective(GraphQLDirective directive) => AstPrinter.Print(CoreToVanillaConverter.Directive(directive));
+        public string PrintAstDirective(GraphQLDirective directive)
+        {
+            Schema?.Initialize();
+
+            return directive.Print();
+        }
 
         public override string PrintObject(IObjectGraphType type)
         {
-            var isExtension = type.IsExtensionType();
+            Schema?.Initialize();
 
-            var interfaces = type.ResolvedInterfaces.List.Select(x => x.Name).ToList();
+            var isExtension = type!.IsExtensionType();
+
+            var interfaces = type!.ResolvedInterfaces.List.Select(x => x.Name).ToList();
             var delimiter = " & ";
             var implementedInterfaces = interfaces.Count > 0
                 ? " implements {0}".ToFormat(string.Join(delimiter, interfaces))
@@ -64,11 +77,16 @@ namespace GraphQL.Utilities.Federation
 
             var extended = isExtension ? "extend " : "";
 
-            return FormatDescription(type.Description) + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
+            if (type.Fields.Any(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name)))
+                return FormatDescription(type.Description) + "{1}type {2}{3}{4} {{{0}{5}{0}}}".ToFormat(Environment.NewLine, extended, type.Name, implementedInterfaces, federatedDirectives, PrintFields(type));
+            else
+                return FormatDescription(type.Description) + "{0}type {1}{2}{3}".ToFormat(extended, type.Name, implementedInterfaces, federatedDirectives);
         }
 
         public override string PrintInterface(IInterfaceGraphType type)
         {
+            Schema?.Initialize();
+
             var isExtension = type.IsExtensionType();
             var extended = isExtension ? "extend " : "";
 
@@ -77,8 +95,10 @@ namespace GraphQL.Utilities.Federation
 
         public override string PrintFields(IComplexGraphType type)
         {
+            Schema?.Initialize();
+
             var fields = type?.Fields
-                .Where(x => !IsFederatedType(x.ResolvedType.GetNamedType().Name))
+                .Where(x => !IsFederatedType(x.ResolvedType!.GetNamedType().Name))
                 .Select(x =>
                 new
                 {
@@ -90,12 +110,14 @@ namespace GraphQL.Utilities.Federation
                     FederatedDirectives = PrintFederatedDirectivesFromAst(x)
                 }).ToList();
 
-            return string.Join(Environment.NewLine, fields?.Select(
+            return fields == null ? "" : string.Join(Environment.NewLine, fields.Select(
                 f => "{3}  {0}{1}: {2}{4}{5}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation, f.FederatedDirectives)));
         }
 
         public string PrintFederatedSchema()
         {
+            Schema?.Initialize();
+
             return PrintFilteredSchema(
                 directiveName => !IsBuiltInDirective(directiveName) && !IsFederatedDirective(directiveName),
                 typeName => !IsFederatedType(typeName) && IsDefinedType(typeName));

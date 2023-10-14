@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,15 +11,15 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public SingleRootFieldSubscriptionsError(ValidationContext context, Operation operation, params ISelection[] nodes)
-            : base(context.Document.OriginalQuery, NUMBER, InvalidNumberOfRootFieldMessage(operation.Name), nodes)
+        public SingleRootFieldSubscriptionsError(ValidationContext context, GraphQLOperationDefinition operation, params ASTNode[] nodes)
+            : base(context.Document.Source, NUMBER, InvalidNumberOfRootFieldMessage(operation.Name), nodes)
         {
         }
 
-        internal static string InvalidNumberOfRootFieldMessage(string name)
+        internal static string InvalidNumberOfRootFieldMessage(GraphQLName? name)
         {
-            string prefix = name != null ? $"Subscription '{name}'" : "Anonymous Subscription";
-            return $"{prefix} must select only one top level field.";
+            string prefix = name is null ? "Anonymous Subscription" : $"Subscription '{name}'";
+            return $"{prefix} must have exactly one root field and that field must not be an introspection field.";
         }
     }
 }

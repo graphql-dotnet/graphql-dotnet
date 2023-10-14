@@ -1,5 +1,3 @@
-using System;
-
 namespace GraphQL.Types
 {
     /// <summary>
@@ -11,7 +9,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance for the specified inner graph type.
         /// </summary>
-        public NonNullGraphType(IGraphType type)
+        public NonNullGraphType(IGraphType? type)
         {
             ResolvedType = type;
         }
@@ -19,21 +17,21 @@ namespace GraphQL.Types
         /// <summary>
         /// Returns the .NET type of the inner (wrapped) graph type.
         /// </summary>
-        public virtual Type Type => null;
+        public virtual Type? Type => null;
 
-        private IGraphType _resolvedType;
+        private IGraphType? _resolvedType;
 
         /// <summary>
         /// Gets or sets the instance of the inner (wrapped) graph type.
         /// </summary>
-        public IGraphType ResolvedType
+        public IGraphType? ResolvedType
         {
             get => _resolvedType;
             set
             {
                 if (value is NonNullGraphType) //TODO: null check here or in ctor
                 {
-                    // http://spec.graphql.org/draft/#sec-Type-System.Non-Null.Type-Validation
+                    // https://spec.graphql.org/October2021/#sec-Non-Null.Type-Validation
                     throw new ArgumentOutOfRangeException("ResolvedType", "Cannot nest NonNull inside NonNull.");
                 }
 
@@ -45,14 +43,14 @@ namespace GraphQL.Types
             }
         }
 
-        private string _cachedString; // note, than Name always null for type wrappers
+        private string? _cachedString; // note, than Name always null for type wrappers
 
         /// <inheritdoc/>
         public override string ToString() => _cachedString ??= $"{ResolvedType}!";
     }
 
     /// <inheritdoc cref="NonNullGraphType"/>
-    public sealed class NonNullGraphType<T> : NonNullGraphType
+    public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : NonNullGraphType
         where T : IGraphType
     {
         /// <summary>

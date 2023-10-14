@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +11,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public ArgumentsOfCorrectTypeError(ValidationContext context, Argument node, string verboseErrors)
-            : base(context.Document.OriginalQuery, NUMBER, BadValueMessage(node.Name, verboseErrors), node)
+        public ArgumentsOfCorrectTypeError(ValidationContext context, GraphQLArgument node, string verboseErrors)
+            : base(context.Document.Source, NUMBER, BadValueMessage(node.Name.StringValue, verboseErrors), node)
         {
         }
 

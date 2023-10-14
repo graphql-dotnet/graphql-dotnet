@@ -1,7 +1,5 @@
-using System;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -16,16 +14,16 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly KnownArgumentNames Instance = new KnownArgumentNames();
+        public static readonly KnownArgumentNames Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="KnownArgumentNamesError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Argument>((node, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((node, context) =>
         {
             var argumentOf = context.TypeInfo.GetAncestor(2);
-            if (argumentOf is Field)
+            if (argumentOf is GraphQLField)
             {
                 var fieldDef = context.TypeInfo.GetFieldDef();
                 if (fieldDef != null)
@@ -38,7 +36,7 @@ namespace GraphQL.Validation.Rules
                     }
                 }
             }
-            else if (argumentOf is Directive)
+            else if (argumentOf is GraphQLDirective)
             {
                 var directive = context.TypeInfo.GetDirective();
                 if (directive != null)
@@ -50,6 +48,6 @@ namespace GraphQL.Validation.Rules
                     }
                 }
             }
-        }).ToTask();
+        });
     }
 }

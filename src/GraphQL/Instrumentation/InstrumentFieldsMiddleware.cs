@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace GraphQL.Instrumentation
 {
     /// <summary>
@@ -9,17 +6,26 @@ namespace GraphQL.Instrumentation
     public class InstrumentFieldsMiddleware : IFieldMiddleware
     {
         /// <inheritdoc/>
-        public async Task<object> Resolve(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
-            var metadata = new Dictionary<string, object>
+            return context.Metrics.Enabled
+                ? ResolveWhenMetricsEnabledAsync(context, next)
+                : next(context);
+        }
+
+        private async ValueTask<object?> ResolveWhenMetricsEnabledAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        {
+            var name = context.FieldAst.Name.StringValue; //ISSUE:allocation
+
+            var metadata = new Dictionary<string, object?>
             {
                 { "typeName", context.ParentType.Name },
-                { "fieldName", context.FieldAst.Name },
-                { "returnTypeName", context.FieldDefinition.ResolvedType.ToString() },
-                { "path", context.Path },
+                { "fieldName", name },
+                { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
+                { "path", context.ResponsePath },
             };
 
-            using (context.Metrics.Subject("field", context.FieldAst.Name, metadata))
+            using (context.Metrics.Subject("field", name, metadata))
                 return await next(context).ConfigureAwait(false);
         }
     }

@@ -1,0 +1,3 @@
+{
+  "query": "{ categories { id name products { id name category { id name } } } products { id name category { id name } } }"
+}

@@ -1,5 +1,5 @@
-using GraphQL.Language.AST;
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Execution
 {
@@ -11,7 +11,7 @@ namespace GraphQL.Execution
         /// <summary>
         /// Initializes an instance of <see cref="NullExecutionNode"/> with the specified values.
         /// </summary>
-        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, Field field, FieldType fieldDefinition, int? indexInParentNode)
+        public NullExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
             : base(parent, graphType, field, fieldDefinition, indexInParentNode)
         {
             Result = null;
@@ -20,6 +20,6 @@ namespace GraphQL.Execution
         /// <summary>
         /// Returns <see langword="null"/>.
         /// </summary>
-        public override object ToValue() => null;
+        public override object? ToValue() => null;
     }
 }

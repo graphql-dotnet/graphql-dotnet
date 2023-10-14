@@ -1,9 +1,11 @@
-﻿namespace GraphQL.Types
+using GraphQLParser.AST;
+
+namespace GraphQL.Types
 {
     /// <summary>
     /// Used to conditionally include fields or fragments.
     /// </summary>
-    public class IncludeDirective : DirectiveGraphType
+    public class IncludeDirective : Directive
     {
         /// <summary>
         /// Initializes a new instance of the 'include' directive.

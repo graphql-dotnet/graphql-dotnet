@@ -1,7 +1,6 @@
-using System.Linq;
-using System.Threading.Tasks;
-using GraphQL.Language.AST;
 using GraphQL.Validation.Errors;
+using GraphQLParser;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
@@ -13,53 +12,47 @@ namespace GraphQL.Validation.Rules
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>
-        public static readonly SingleRootFieldSubscriptions Instance = new SingleRootFieldSubscriptions();
+        public static readonly SingleRootFieldSubscriptions Instance = new();
 
         /// <inheritdoc/>
         /// <exception cref="SingleRootFieldSubscriptionsError"/>
-        public Task<INodeVisitor> ValidateAsync(ValidationContext context) => _nodeVisitor;
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
 
-        private static readonly Task<INodeVisitor> _nodeVisitor = new MatchingNodeVisitor<Operation>((operation, context) =>
+        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((operation, context) =>
         {
-            if (!IsSubscription(operation))
-            {
+            if (operation.Operation != OperationType.Subscription)
                 return;
-            }
 
-            int rootFields = operation.SelectionSet.Selections.Count;
+            var rootFields = operation.SelectionSet.Selections;
 
-            if (rootFields != 1)
-            {
-                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation,
-                    operation.SelectionSet.SelectionsList.Skip(1).ToArray()));
-            }
+            if (rootFields.Count != 1)
+                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, rootFields.Skip(1).ToArray()));
 
-            var fragment = operation.SelectionSet.SelectionsList.FirstOrDefault(IsFragment);
+            if (rootFields[0] is GraphQLField field && IsIntrospectionField(field))
+                context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, field));
+
+            var fragment = operation.SelectionSet.Selections.Find(node => node is GraphQLFragmentSpread || node is GraphQLInlineFragment);
 
             if (fragment == null)
-            {
                 return;
+
+            if (fragment is GraphQLFragmentSpread fragmentSpread)
+            {
+                var fragmentDefinition = context.Document.FindFragmentDefinition(fragmentSpread.FragmentName.Name);
+                if (fragmentDefinition == null)
+                    return;
+
+                rootFields = fragmentDefinition.SelectionSet.Selections;
+            }
+            else if (fragment is GraphQLInlineFragment inlineFragment)
+            {
+                rootFields = inlineFragment.SelectionSet.Selections;
             }
 
-            if (fragment is FragmentSpread fragmentSpread)
-            {
-                var fragmentDefinition = context.GetFragment(fragmentSpread.Name);
-                rootFields = fragmentDefinition.SelectionSet.Selections.Count;
-            }
-            else if (fragment is InlineFragment fragmentSelectionSet)
-            {
-                rootFields = fragmentSelectionSet.SelectionSet.Selections.Count;
-            }
-
-            if (rootFields != 1)
-            {
+            if (rootFields.Count != 1 || (rootFields[0] is GraphQLField field2 && IsIntrospectionField(field2)))
                 context.ReportError(new SingleRootFieldSubscriptionsError(context, operation, fragment));
-            }
+        });
 
-        }).ToTask();
-
-        private static bool IsSubscription(Operation operation) => operation.OperationType == OperationType.Subscription;
-
-        private static bool IsFragment(ISelection selection) => selection is FragmentSpread || selection is InlineFragment;
+        private static bool IsIntrospectionField(GraphQLField field) => field.Name.Value.Length >= 2 && field.Name.Value.Span[0] == '_' && field.Name.Value.Span[1] == '_';
     }
 }

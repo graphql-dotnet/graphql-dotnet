@@ -2,18 +2,18 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup>
-    <TargetFramework>net5</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
+    <PackageReference Include="PublicApiGenerator" Version="11.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.Federation2\GraphQL.Federation2.csproj" />
     <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
-    <ProjectReference Include="..\GraphQL.SystemReactive\GraphQL.SystemReactive.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj" />
     <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />

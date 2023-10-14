@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace GraphQL
 {
     /// <summary>
@@ -12,7 +10,7 @@ namespace GraphQL
         /// </summary>
         /// <param name="dictionary">A dictionary.</param>
         /// <returns>Inputs.</returns>
-        public static Inputs ToInputs(this Dictionary<string, object> dictionary)
+        public static Inputs ToInputs(this Dictionary<string, object?> dictionary)
             => dictionary?.Count > 0 ? new Inputs(dictionary) : Inputs.Empty;
     }
 }

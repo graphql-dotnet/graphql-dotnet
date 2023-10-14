@@ -1,12 +1,13 @@
 # Directives
 
 A directive can be attached to almost every part of the schema - field, query, enum, fragment inclusion etc. and can affect execution
-of the query in any way the server desires. The core GraphQL [specification](https://graphql.github.io/graphql-spec/June2018/#sec-Type-System.Directives)
-includes exactly three directives.
+of the query in any way the server desires. The core GraphQL [specification](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
+includes exactly four directives.
 
 * `@include(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Only include this field in the result if the argument is true.
 * `@skip(if: Boolean!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT` Skip this field if the argument is true.
 * `@deprecated(reason: String = "No longer supported") on FIELD_DEFINITION | ENUM_VALUE` Indicates deprecated portions of a GraphQL service’s schema, such as deprecated fields on a type or deprecated enum values.
+* `@specifiedBy(url: String!) on SCALAR` Provides a scalar specification URL for specifying the behavior of custom scalar types.
 
 ```graphql
 query HeroQuery($id: ID, $withFriends: Boolean!) {
@@ -22,15 +23,16 @@ query HeroQuery($id: ID, $withFriends: Boolean!) {
 # Executable Directives and Type System Directives
 
 There are two types of directives - those that are applied on incoming requests (so called client directives) and applied
-on the schema (so called server directives). This is determined by the specified [locations](http://spec.graphql.org/June2018/#sec-Type-System.Directives)
+on the schema (so called server directives). This is determined by the specified [locations](https://spec.graphql.org/October2021/#sec-Type-System.Directives)
 when defining the directive. Also it is acceptable to define a directive that will be both client-side and server-side.
 
 Server-side examples:
-- [@deprecated](http://spec.graphql.org/June2018/#sec--deprecated)
+- [@deprecated](https://spec.graphql.org/October2021/#sec--deprecated)
+- [@specifiedBy](https://spec.graphql.org/October2021/#sec--specifiedBy)
 
 Client-side examples:
-- [@skip](http://spec.graphql.org/June2018/#sec--skip)
-- [@include](http://spec.graphql.org/June2018/#sec--include)
+- [@skip](https://spec.graphql.org/October2021/#sec--skip)
+- [@include](https://spec.graphql.org/October2021/#sec--include)
 
 # Repeatable Directives
 
@@ -38,7 +40,7 @@ In GraphQL language a directive may be defined as repeatable by including the `r
 Repeatable directives are often useful when the same directive should be used with different arguments
 at a single location, especially in cases where additional information needs to be provided to a type
 or schema extension via a directive. GraphQL.NET v4 supports repeatable directives. To make your directive
-repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`.
+repeatable in GraphQL.NET set `Directive.Repeatable` property to `true`.
 
 # Basic steps when adding a directive
 
@@ -48,10 +50,10 @@ repeatable in GraphQL.NET set `DirectiveGraphType.Repeatable` property to `true`
 
 # Defining your custom directive
 
-To define your custom directive create a directive class inherited from `DirectiveGraphType`.
+To define your custom directive create a directive class inherited from `Directive`.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
@@ -64,6 +66,12 @@ public class MyDirective : DirectiveGraphType
         });
     }
 }
+```
+
+In SDL this definition will look like the following:
+
+```graphql
+directive @my(secret: String!) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 ```
 
 Then register an instance of this class within your schema.
@@ -89,7 +97,7 @@ will be checked.
 The following is an example of using the server-side `@length` directive.
 
 ```csharp
-public class LengthDirective : DirectiveGraphType
+public class LengthDirective : Directive
 {
     // The meaning of this property will be explained below in the 'Directives and introspection' paragraph. 
     public override bool? Introspectable => true;
@@ -114,6 +122,12 @@ public class LengthDirective : DirectiveGraphType
 }
 ```
 
+In SDL this definition will look like the following:
+
+```graphql
+directive @length(min: Int, max: Int) on INPUT_FIELD_DEFINITION | ARGUMENT_DEFINITION
+```
+
 Applying `@length` directive to an input field.
 
 ```csharp
@@ -135,15 +149,8 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
+        Field<Human>("human")
+            .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
     }
 }
 ```
@@ -151,8 +158,8 @@ public class Query : ObjectGraphType
 Above was an example of how to create and how to apply the `@length` directive. Also, for the directive
 to work, additional code is required that would use the requirements specified by the directive. The
 implementation of this code for `@length` directive is intentionally omitted, due to the complexity,
-those who interested can look at it in the [sources](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Validation/Rules/InputFieldsAndArgumentsOfCorrectLength.cs).
-For a much simpler example of such an implementation, see [How do directives work](#How-do-directives-work)
+those who interested can look at it in the [sources](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/src/GraphQL/Validation/Rules.Custom/InputFieldsAndArgumentsOfCorrectLength.cs).
+For a much simpler example of such an implementation, see [How do directives work](#how-do-directives-work)
 paragraph below describing the `@upper` directive.
 
 # How do directives work
@@ -166,7 +173,7 @@ provided by the applied directive. This class should implement `ISchemaNodeVisit
 Let's imagine an `@upper` directive.
 
 ```csharp
-public class UpperDirective : DirectiveGraphType
+public class UpperDirective : Directive
 {
     public UpperDirective()
         : base("upper", DirectiveLocation.FieldDefinition)
@@ -174,6 +181,12 @@ public class UpperDirective : DirectiveGraphType
         Description = "Converts the value of string fields to uppercase.";
     }
 }
+```
+
+In SDL this definition will look like the following:
+
+```graphql
+directive @upper on FIELD_DEFINITION
 ```
 
 To make this directive work, you need to write a class like the following by implementing the necessary
@@ -223,7 +236,7 @@ Note that a schema visitor, unlike a directive, can be registered not only as an
 a type. In this case, when initializing the schema, schema visitor will be created according to how
 you configure the DI container. In other words, schema visitors support dependency injection. The
 library resolves a schema visitor only once and caches it for the lifetime of the `Schema`. For more
-information about lifetimes see [Schema Service Lifetime](dependency-injection#schema-service-lifetime). 
+information about lifetimes see [Schema Service Lifetime](../dependency-injection#schema-service-lifetime). 
 
 # Is it mandatory to create a schema visitor in addition to the directive
 
@@ -232,7 +245,7 @@ schema visitors. In this case, the directive is usually set to provide additiona
 means of introspection. For example, consider such server-side `@author` directive:
 
 ```csharp
-public class AuthorDirective : DirectiveGraphType
+public class AuthorDirective : Directive
 {
     public AuthorDirective()
         : base("author", DirectiveLocation.FieldDefinition)
@@ -254,6 +267,12 @@ public class AuthorDirective : DirectiveGraphType
 }
 ```
 
+In SDL this definition will look like the following:
+
+```graphql
+directive @author(name: String, email: String!) on FIELD_DEFINITION
+```
+
 Then the directive can be applied like this:
 
 ```csharp
@@ -261,8 +280,9 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>("human", resolve: context => GetHuman(context))
-            .ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
+        Field<Human>("human")
+            .Resolve(context => GetHuman(context))
+            .Directive("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
     }
 }
 ```
@@ -438,7 +458,7 @@ type __AppliedDirective {                     <--- NEW INTROSPECTION TYPE
 
 type __DirectiveArgument {                    <--- NEW INTROSPECTION TYPE
   name: String!
-  value: String
+  value: String!
 }
 ```
 
@@ -446,7 +466,7 @@ To make your defined directive and all its applications to the schema elements a
 introspection, override the `Introspectable` property of your directive.
 
 ```csharp
-public class MyDirective : DirectiveGraphType
+public class MyDirective : Directive
 {
     public MyDirective()
         : base("my", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
@@ -466,7 +486,7 @@ public class MyDirective : DirectiveGraphType
 If you do not explicitly set this property (either to `true` or `false`) then by default your
 directive definition along with all applications of this directive to the schema elements will
 be present in the introspection response if and only if directive definition has all its locations
-of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#ExecutableDirectiveLocation)
+of type [`ExecutableDirectiveLocation`](https://spec.graphql.org/October2021/#ExecutableDirectiveLocation)
 (so called client-side directive).
 
 # Directive vs Field Middleware 
@@ -474,7 +494,7 @@ of type [`ExecutableDirectiveLocation`](http://spec.graphql.org/June2018/#Execut
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about field middlewares see [Field Middleware](field-middleware).
+For more information about field middlewares see [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware).
 
 # Existing implementations
 

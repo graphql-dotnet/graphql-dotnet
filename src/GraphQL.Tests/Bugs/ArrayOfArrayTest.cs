@@ -1,71 +1,70 @@
 using GraphQL.Types;
-using Xunit;
 
-namespace GraphQL.Tests.Bugs
+namespace GraphQL.Tests.Bugs;
+
+public class ArrayOfArrayTest : QueryTestBase<ArrayOfArraySchema>
 {
-    public class ArrayOfArrayTest : QueryTestBase<ArrayOfArraySchema>
+    [Fact]
+    public void ArrayOfArray_Should_Return_As_Is()
     {
-        [Fact]
-        public void ArrayOfArray_Should_Return_As_Is()
-        {
-            var query = @"
+        const string query = """
 mutation {
   create(input: {ints: [[1],[2,2],[3,3,3]] })
   {
     ints
   }
 }
-";
-            var expected = @"{
-  ""create"": {
-    ""ints"": [[1],[2,2],[3,3,3]]
+""";
+        const string expected = """
+{
+  "create": {
+    "ints": [[1],[2,2],[3,3,3]]
   }
-}";
-            AssertQuerySuccess(query, expected, null);
-        }
+}
+""";
+        AssertQuerySuccess(query, expected, null);
     }
+}
 
-    public class ArrayOfArraySchema : Schema
+public class ArrayOfArraySchema : Schema
+{
+    public ArrayOfArraySchema()
     {
-        public ArrayOfArraySchema()
-        {
-            Mutation = new ArrayOfArrayMutation();
-        }
+        Mutation = new ArrayOfArrayMutation();
     }
+}
 
-    public class ArrayOfArrayModel
+public class ArrayOfArrayModel
+{
+    public int[][] ints { get; set; }
+}
+
+public class ArrayOfArrayInput : InputObjectGraphType<ArrayOfArrayModel>
+{
+    public ArrayOfArrayInput()
     {
-        public int[][] ints { get; set; }
+        Field(o => o.ints);
     }
+}
 
-    public class ArrayOfArrayInput : InputObjectGraphType<ArrayOfArrayModel>
+public class ArrayOfArrayType : ObjectGraphType<ArrayOfArrayModel>
+{
+    public ArrayOfArrayType()
     {
-        public ArrayOfArrayInput()
-        {
-            Field(o => o.ints);
-        }
+        Field(o => o.ints);
     }
+}
 
-    public class ArrayOfArrayType : ObjectGraphType<ArrayOfArrayModel>
+public class ArrayOfArrayMutation : ObjectGraphType
+{
+    public ArrayOfArrayMutation()
     {
-        public ArrayOfArrayType()
-        {
-            Field(o => o.ints);
-        }
-    }
-
-    public class ArrayOfArrayMutation : ObjectGraphType
-    {
-        public ArrayOfArrayMutation()
-        {
-            Field<ArrayOfArrayType>(
-                "create",
-                arguments: new QueryArguments(new QueryArgument<ArrayOfArrayInput> { Name = "input" }),
-                resolve: ctx =>
-                {
-                    var arg = ctx.GetArgument<ArrayOfArrayModel>("input");
-                    return arg;
-                });
-        }
+        Field<ArrayOfArrayType>("create")
+            .Argument<ArrayOfArrayInput>("input")
+            .Resolve(ctx =>
+            {
+                var arg = ctx.GetArgument<ArrayOfArrayModel>("input");
+                return arg;
+            });
     }
 }

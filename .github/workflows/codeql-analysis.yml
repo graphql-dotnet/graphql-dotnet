@@ -1,3 +1,5 @@
+# https://github.com/github/codeql
+# https://github.com/github/codeql-action
 name: CodeQL analysis
 
 on:
@@ -9,12 +11,34 @@ on:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
       with:
-        fetch-depth: 2
-    - uses: github/codeql-action/init@v1
+        dotnet-version: '7.0.x'
+        source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
       with:
+        queries: security-and-quality
         languages: csharp
-    - uses: github/codeql-action/autobuild@v1
-    - uses: github/codeql-action/analyze@v1
+        config-file: ./.github/codeql-config.yml
+
+    - name: Install dependencies
+      working-directory: src
+      run: dotnet restore
+
+    - name: Build CodeQL solution
+      # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/troubleshooting-the-codeql-workflow#reduce-the-amount-of-code-being-analyzed-in-a-single-workflow
+      working-directory: codeql
+      run: dotnet build --no-restore
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2

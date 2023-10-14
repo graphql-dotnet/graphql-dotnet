@@ -1,332 +1,324 @@
-using System.Collections.Generic;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
-using Shouldly;
-using Xunit;
 
-namespace GraphQL.Tests.StarWars
+namespace GraphQL.Tests.StarWars;
+
+public class StarWarsSubFieldsTests : StarWarsTestBase
 {
-    public class StarWarsSubFieldsTests : StarWarsTestBase
+    public StarWarsQuery RootQuery => (StarWarsQuery)Schema.Query;
+
+    [Fact]
+    public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
     {
-        public StarWarsSubFieldsTests() : base()
+        RootQuery.Field<ListGraphType<HumanType>>("listOfHumans").Resolve(ctx =>
         {
-            RootQuery = (StarWarsQuery)Schema.Query;
-        }
-
-        public StarWarsQuery RootQuery;
-
-        [Fact]
-        public void subfields_is_not_null_for_ListGraphType_of_ObjectGraphType()
-        {
-            RootQuery.Field<ListGraphType<HumanType>>("listOfHumans", resolve: ctx =>
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return new List<Human>();
+        });
+        const string query = """
             {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return new List<Human>();
-            });
-            var query = @"
-                {
-                    listOfHumans {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+              listOfHumans {
+                id
+                friends {
+                  name
                 }
-            ";
+              }
+            }
+            """;
 
-            var expected = @"
-                {
-                    ""listOfHumans"": []
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_is_not_null_for_single_ObjectGraphType()
-        {
-            RootQuery.Field<HumanType>("singleHuman", resolve: ctx =>
+        const string expected = """
             {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return null;
-            });
+              "listOfHumans": []
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
 
-            var query = @"
-                {
-                    singleHuman {
-                        id
-                        friends {
-                            name
-                        }
-                    }
-                }
-            ";
-            var expected = @"
-                {
-                    ""singleHuman"": null
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
+    [Fact]
+    public void subfields_is_not_null_for_single_ObjectGraphType()
+    {
+        RootQuery.Field<HumanType>("singleHuman").Resolve(ctx =>
         {
-            RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters", resolve: ctx =>
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return null;
+        });
+
+        const string query = """
             {
-                ctx.SubFields.ShouldNotBeNull();
-                ctx.SubFields.Keys.ShouldContain("id");
-                ctx.SubFields.Keys.ShouldContain("friends");
-                return new List<Human>();
-            });
-            var query = @"
-                {
-                    listOfCharacters {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+              singleHuman {
+                id
+                friends {
+                  name
                 }
-            ";
-
-            var expected = @"
-                {
-                    ""listOfCharacters"": []
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_is_not_null_for_single_InterfaceGraphType()
-        {
-            RootQuery.FieldAsync<CharacterInterface>("singleCharacter", resolve: ctx =>
-           {
-               ctx.SubFields.ShouldNotBeNull();
-               ctx.SubFields.Keys.ShouldContain("id");
-               ctx.SubFields.Keys.ShouldContain("friends");
-               return null;
-           });
-            var query = @"
-                {
-                    singleCharacter {
-                        id
-                        friends {
-                            name
-                        }
-                    }
-                }
-            ";
-
-            var expected = @"
-                {
-                    ""singleCharacter"": null
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
-
-
-        [Fact]
-        public void subfields_does_not_throw_for_primitive()
-        {
-            RootQuery.Field<IntGraphType>("someNumber", resolve: ctx =>
+              }
+            }
+            """;
+        const string expected = """
             {
-                ctx.SubFields.ShouldBeNull();
-                return 1;
-            });
+              "singleHuman": null
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
 
-            var query = @"
-                {
-                    someNumber
-                }
-            ";
-            var expected = @"
-                {
-                    ""someNumber"": 1
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_does_not_throw_for_list_of_primitive()
+    [Fact]
+    public void subfields_is_not_null_for_ListGraphType_of_InterfaceGraphType()
+    {
+        RootQuery.Field<ListGraphType<CharacterInterface>>("listOfCharacters").Resolve(ctx =>
         {
-            RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers", resolve: ctx =>
+            ctx.SubFields.ShouldNotBeNull();
+            ctx.SubFields.Keys.ShouldContain("id");
+            ctx.SubFields.Keys.ShouldContain("friends");
+            return new List<Human>();
+        });
+        const string query = """
             {
-                ctx.SubFields.ShouldBeNull();
-                return new[] { 1, 2 };
-            });
-
-            var query = @"
-                {
-                    someNumbers
+              listOfCharacters {
+                id
+                friends {
+                  name
                 }
-            ";
-            var expected = @"
-                {
-                    ""someNumbers"": [1,2]
-                }
-            ";
-            AssertQuerySuccess(query, expected);
-        }
+              }
+            }
+            """;
 
-        [Fact]
-        public void subfields_contains_keys_from_fragment_spread_on_non_null_fields()
+        const string expected = """
+            {
+              "listOfCharacters": []
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
+
+    [Fact]
+    public void subfields_is_not_null_for_single_InterfaceGraphType()
+    {
+        RootQuery.Field<CharacterInterface>("singleCharacter").ResolveAsync(ctx =>
+       {
+           ctx.SubFields.ShouldNotBeNull();
+           ctx.SubFields.Keys.ShouldContain("id");
+           ctx.SubFields.Keys.ShouldContain("friends");
+           return Task.FromResult<object>(null);
+       });
+        const string query = """
+            {
+              singleCharacter {
+                id
+                friends {
+                  name
+                }
+              }
+            }
+            """;
+
+        const string expected = """
+            {
+              "singleCharacter": null
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
+
+    [Fact]
+    public void subfields_does_not_throw_for_primitive()
+    {
+        RootQuery.Field<IntGraphType>("someNumber").Resolve(ctx =>
         {
-            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
+            ctx.SubFields.ShouldBeNull();
+            return 1;
+        });
+
+        const string query = """
             {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new Human { Id = "1", Name = "Luke" };
-            });
+              someNumber
+            }
+            """;
+        const string expected = """
+            {
+              "someNumber": 1
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
 
-            var query = @"
-                query Luke {
-                    luke {
-                        ...HumanData
-                    }
-                }
-
-                fragment HumanData on Human {
-                    id
-                    name
-                }
-            ";
-
-            var expected = @"
-                {
-                    ""luke"": {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    }
-                }
-            ";
-
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_contains_keys_from_inline_fragment_on_non_null_fields()
+    [Fact]
+    public void subfields_does_not_throw_for_list_of_primitive()
+    {
+        RootQuery.Field<ListGraphType<IntGraphType>>("someNumbers").Resolve(ctx =>
         {
-            RootQuery.Field<NonNullGraphType<HumanType>>("luke", resolve: context =>
+            ctx.SubFields.ShouldBeNull();
+            return new[] { 1, 2 };
+        });
+
+        const string query = """
             {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new Human { Id = "1", Name = "Luke" };
-            });
+              someNumbers
+            }
+            """;
+        const string expected = """
+            {
+              "someNumbers": [1,2]
+            }
+            """;
+        AssertQuerySuccess(query, expected);
+    }
 
-            var query = @"
-                query Luke {
-                    luke {
-                        ...on Human
-                        {
-                            id
-                            name
-                        }
-                    }
-                }
-            ";
-
-            var expected = @"
-                {
-                    ""luke"": {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    }
-                }
-            ";
-
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_contains_keys_from_fragment_spread_on_list_fields()
+    [Fact]
+    public void subfields_contains_keys_from_fragment_spread_on_non_null_fields()
+    {
+        RootQuery.Field<NonNullGraphType<HumanType>>("luke").Resolve(context =>
         {
-            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new Human { Id = "1", Name = "Luke" };
+        });
+
+        const string query = """
+            query Luke {
+              luke {
+                ...HumanData
+              }
+            }
+
+            fragment HumanData on Human {
+              id
+              name
+            }
+            """;
+
+        const string expected = """
             {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
-            });
+              "luke": {
+                "id": "1",
+                "name": "Luke"
+              }
+            }
+            """;
 
-            var query = @"
-                query Luke {
-                    lukes {
-                        ...HumanData
-                    }
-                }
+        AssertQuerySuccess(query, expected);
+    }
 
-                fragment HumanData on Human {
-                    id
-                    name
-                }
-            ";
-
-            var expected = @"
-                {
-                    ""lukes"": [
-                    {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    },
-                    {
-                        ""id"": ""2"",
-                        ""name"": ""Luke Copy""
-                    }
-                ]}
-            ";
-
-            AssertQuerySuccess(query, expected);
-        }
-
-        [Fact]
-        public void subfields_contains_keys_from_inline_fragment_on_list_fields()
+    [Fact]
+    public void subfields_contains_keys_from_inline_fragment_on_non_null_fields()
+    {
+        RootQuery.Field<NonNullGraphType<HumanType>>("luke").Resolve(context =>
         {
-            RootQuery.Field<ListGraphType<HumanType>>("lukes", resolve: context =>
-            {
-                context.SubFields.ShouldNotBeNull();
-                context.SubFields.Keys.ShouldContain("id");
-                context.SubFields.Keys.ShouldContain("name");
-                return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
-            });
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new Human { Id = "1", Name = "Luke" };
+        });
 
-            var query = @"
-                query Luke {
-                    lukes {
-                        ... on Human
-                        {
-                            id
-                            name
-                        }
-                    }
-                }
-            ";
-
-            var expected = @"
+        const string query = """
+            query Luke {
+              luke {
+                ...on Human
                 {
-                    ""lukes"": [
-                    {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    },
-                    {
-                        ""id"": ""2"",
-                        ""name"": ""Luke Copy""
-                    }
-                ]}
-            ";
+                  id
+                  name
+                }
+              }
+            }
+            """;
 
-            AssertQuerySuccess(query, expected);
-        }
+        const string expected = """
+            {
+              "luke": {
+                "id": "1",
+                "name": "Luke"
+              }
+            }
+            """;
+
+        AssertQuerySuccess(query, expected);
+    }
+
+    [Fact]
+    public void subfields_contains_keys_from_fragment_spread_on_list_fields()
+    {
+        RootQuery.Field<ListGraphType<HumanType>>("lukes").Resolve(context =>
+        {
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+        });
+
+        const string query = """
+            query Luke {
+              lukes {
+                ...HumanData
+              }
+            }
+
+            fragment HumanData on Human {
+              id
+              name
+            }
+            """;
+
+        const string expected = """
+            {
+              "lukes": [
+                {
+                  "id": "1",
+                  "name": "Luke"
+                },
+                {
+                  "id": "2",
+                  "name": "Luke Copy"
+                }
+              ]
+            }
+            """;
+
+        AssertQuerySuccess(query, expected);
+    }
+
+    [Fact]
+    public void subfields_contains_keys_from_inline_fragment_on_list_fields()
+    {
+        RootQuery.Field<ListGraphType<HumanType>>("lukes").Resolve(context =>
+        {
+            context.SubFields.ShouldNotBeNull();
+            context.SubFields.Keys.ShouldContain("id");
+            context.SubFields.Keys.ShouldContain("name");
+            return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
+        });
+
+        const string query = """
+            query Luke {
+              lukes {
+                ... on Human
+                {
+                  id
+                  name
+                }
+              }
+            }
+            """;
+
+        const string expected = """
+            {
+              "lukes": [
+                {
+                  "id": "1",
+                  "name": "Luke"
+                },
+                {
+                  "id": "2",
+                  "name": "Luke Copy"
+                }
+              ]
+            }
+            """;
+
+        AssertQuerySuccess(query, expected);
     }
 }

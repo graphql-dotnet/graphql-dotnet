@@ -1,7 +1,6 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using GraphQL.Utilities;
+using GraphQLParser;
 
 namespace GraphQL.Types
 {
@@ -11,7 +10,7 @@ namespace GraphQL.Types
     /// </summary>
     public class QueryArguments : IEnumerable<QueryArgument>
     {
-        internal List<QueryArgument> List { get; private set; }
+        internal List<QueryArgument>? List { get; private set; }
 
         /// <summary>
         /// Initializes a new instance containing the specified arguments.
@@ -51,7 +50,7 @@ namespace GraphQL.Types
                 if (List == null)
                     throw new IndexOutOfRangeException();
 
-                List[index] = value;
+                List[index] = value!;
             }
         }
 
@@ -70,13 +69,13 @@ namespace GraphQL.Types
 
             NameValidator.ValidateName(argument.Name, NamedElement.Argument);
 
-            (List ??= new List<QueryArgument>()).Add(argument);
+            (List ??= new()).Add(argument);
         }
 
         /// <summary>
         /// Finds an argument by its name from the list.
         /// </summary>
-        public QueryArgument Find(string name)
+        public QueryArgument? Find(ROM name)
         {
             // DO NOT USE LINQ ON HOT PATH
             if (List != null)

@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using GraphQL.Language.AST;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -16,8 +13,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public FieldsOnCorrectTypeError(ValidationContext context, Field node, IGraphType type, IEnumerable<string> suggestedTypeNames, IEnumerable<string> suggestedFieldNames)
-            : base(context.Document.OriginalQuery, NUMBER, UndefinedFieldMessage(node.Name, type.Name, suggestedTypeNames, suggestedFieldNames), node)
+        public FieldsOnCorrectTypeError(ValidationContext context, GraphQLField node, IGraphType type, IEnumerable<string> suggestedTypeNames, IEnumerable<string> suggestedFieldNames)
+            : base(context.Document.Source, NUMBER, UndefinedFieldMessage(node.Name.StringValue, type.Name, suggestedTypeNames, suggestedFieldNames), node)
         {
         }
 

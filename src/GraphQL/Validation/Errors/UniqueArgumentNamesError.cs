@@ -1,5 +1,4 @@
-using System;
-using GraphQL.Language.AST;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Errors
 {
@@ -12,8 +11,8 @@ namespace GraphQL.Validation.Errors
         /// <summary>
         /// Initializes a new instance with the specified properties.
         /// </summary>
-        public UniqueArgumentNamesError(ValidationContext context, Argument node, Argument otherNode)
-            : base(context.Document.OriginalQuery, NUMBER, DuplicateArgMessage(node.Name), node, otherNode)
+        public UniqueArgumentNamesError(ValidationContext context, GraphQLArgument node, GraphQLArgument otherNode)
+            : base(context.Document.Source, NUMBER, DuplicateArgMessage(node.Name.StringValue), node, otherNode)
         {
         }
 

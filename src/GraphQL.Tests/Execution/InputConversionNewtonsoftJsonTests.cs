@@ -1,9 +1,6 @@
-using GraphQL.NewtonsoftJson;
+namespace GraphQL.Tests.Execution;
 
-namespace GraphQL.Tests.Execution
+public class InputConversionNewtonsoftJsonTests : InputConversionTestsBase
 {
-    public class InputConversionNewtonsoftJsonTests : InputConversionTestsBase
-    {
-        protected override Inputs VariablesToInputs(string variables) => variables.ToInputs();
-    }
+    protected override Inputs VariablesToInputs(string variables) => variables.ToInputs();
 }

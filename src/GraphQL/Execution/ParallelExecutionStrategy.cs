@@ -1,17 +1,15 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using GraphQL.DataLoader;
 
 namespace GraphQL.Execution
 {
-    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
+    /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ExecutionNode)"/>
     public class ParallelExecutionStrategy : ExecutionStrategy
     {
         // frequently reused objects
-        private Queue<ExecutionNode> _reusablePendingNodes;
-        private Queue<ExecutionNode> _reusablePendingDataLoaders;
-        private List<Task> _reusableCurrentTasks;
-        private List<ExecutionNode> _reusableCurrentNodes;
+        private Queue<ExecutionNode>? _reusablePendingNodes;
+        private Queue<ExecutionNode>? _reusablePendingDataLoaders;
+        private List<Task>? _reusableCurrentTasks;
+        private List<ExecutionNode>? _reusableCurrentNodes;
 
         /// <summary>
         /// Gets a static instance of <see cref="ParallelExecutionStrategy"/> strategy.
@@ -23,17 +21,14 @@ namespace GraphQL.Execution
         /// Nodes that return a <see cref="IDataLoaderResult"/> will execute once all other pending nodes
         /// have been completed.
         /// </summary>
-        protected override Task ExecuteNodeTreeAsync(ExecutionContext context, ObjectExecutionNode rootNode) => ExecuteNodeTreeAsync(context, rootNode);
-
-        /// <inheritdoc cref="ExecuteNodeTreeAsync(ExecutionContext, ObjectExecutionNode)"/>
-        protected async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
+        public override async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
-            var pendingNodes = System.Threading.Interlocked.Exchange(ref _reusablePendingNodes, null) ?? new Queue<ExecutionNode>();
+            var pendingNodes = Interlocked.Exchange(ref _reusablePendingNodes, null) ?? new Queue<ExecutionNode>();
             pendingNodes.Enqueue(rootNode);
-            var pendingDataLoaders = System.Threading.Interlocked.Exchange(ref _reusablePendingDataLoaders, null) ?? new Queue<ExecutionNode>();
+            var pendingDataLoaders = Interlocked.Exchange(ref _reusablePendingDataLoaders, null) ?? new Queue<ExecutionNode>();
 
-            var currentTasks = System.Threading.Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? new List<Task>();
-            var currentNodes = System.Threading.Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? new List<ExecutionNode>();
+            var currentTasks = Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? new List<Task>();
+            var currentNodes = Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? new List<ExecutionNode>();
 
             try
             {
@@ -51,7 +46,7 @@ namespace GraphQL.Execution
                             if (pendingNodeTask.IsCompleted)
                             {
                                 // Throw any caught exceptions
-                                await pendingNodeTask;
+                                await pendingNodeTask.ConfigureAwait(false);
 
                                 // Node completed synchronously, so no need to add it to the list of currently executing nodes
                                 // instead add any child nodes to the pendingNodes queue directly here
@@ -70,13 +65,7 @@ namespace GraphQL.Execution
                                 currentTasks.Add(pendingNodeTask);
                                 currentNodes.Add(pendingNode);
                             }
-
                         }
-
-#pragma warning disable CS0612 // Type or member is obsolete
-                        await OnBeforeExecutionStepAwaitedAsync(context)
-#pragma warning restore CS0612 // Type or member is obsolete
-                        .ConfigureAwait(false);
 
                         // Await tasks for this execution step
                         await Task.WhenAll(currentTasks)
@@ -108,6 +97,22 @@ namespace GraphQL.Execution
                     }
                 }
             }
+            catch (Exception original)
+            {
+                if (currentTasks.Count > 0)
+                {
+                    try
+                    {
+                        await Task.WhenAll(currentTasks).ConfigureAwait(false);
+                    }
+                    catch (Exception awaited)
+                    {
+                        if (original.Data?.IsReadOnly == false)
+                            original.Data["GRAPHQL_ALL_TASKS_AWAITED_EXCEPTION"] = awaited;
+                    }
+                }
+                throw;
+            }
             finally
             {
                 pendingNodes.Clear();
@@ -115,10 +120,10 @@ namespace GraphQL.Execution
                 currentTasks.Clear();
                 currentNodes.Clear();
 
-                System.Threading.Interlocked.CompareExchange(ref _reusablePendingNodes, pendingNodes, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusablePendingDataLoaders, pendingDataLoaders, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusableCurrentTasks, currentTasks, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusableCurrentNodes, currentNodes, null);
+                _ = Interlocked.CompareExchange(ref _reusablePendingNodes, pendingNodes, null);
+                _ = Interlocked.CompareExchange(ref _reusablePendingDataLoaders, pendingDataLoaders, null);
+                _ = Interlocked.CompareExchange(ref _reusableCurrentTasks, currentTasks, null);
+                _ = Interlocked.CompareExchange(ref _reusableCurrentNodes, currentNodes, null);
             }
         }
     }
