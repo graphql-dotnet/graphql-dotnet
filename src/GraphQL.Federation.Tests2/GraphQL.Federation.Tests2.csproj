@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.Federation\GraphQL.Federation.csproj" />
+    <ProjectReference Include="..\GraphQL.Federation2\GraphQL.Federation2.csproj" />
     <ProjectReference Include="..\GraphQL.Tests\GraphQL.Tests.csproj" />
   </ItemGroup>
 
