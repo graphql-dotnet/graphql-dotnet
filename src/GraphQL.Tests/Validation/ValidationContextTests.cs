@@ -271,23 +271,36 @@ public class ValidationContextTests
 
     [Theory]
     // arg is non-null although it has a default value
-    [InlineData("query q01 { dummy(arg: null) }", null, "Argument 'arg' has invalid value. Expected 'String!', found null.")]
+    [InlineData("query q01 { dummy(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected 'String!', found null.")]
     // q02 should fail because null was explicitly passed to a non-null argument
-    [InlineData("query q02 ($arg: String) { dummy(arg: $arg) }", "{\"arg\":null}", "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
-    [InlineData("query q03 { dummyNoDefault }", null, "Argument 'arg' of type 'String!' is required for field 'dummyNoDefault' but not provided.")]
-    [InlineData("query q04 { dummyNoDefault(arg: null) }", null, "Argument 'arg' has invalid value. Expected 'String!', found null.")]
-    [InlineData("query q05 ($arg: String) { dummyNoDefault(arg: $arg) }", null, "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
-    [InlineData("query q06 ($arg: String) { dummyNoDefault(arg: $arg) }", "{}", "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
-    [InlineData("query q07 ($arg: String) { dummyNoDefault(arg: $arg) }", null, "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
-    [InlineData("query q08 ($arg: String!) { dummyNoDefault(arg: $arg) }", "{\"arg\":null}", "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
-    //note: q09 should fail (passing test) because null was explicitly passed to a non-null argument,
-    //  regardless of whether there is a variable default
-    [InlineData("query q09 ($arg: String = \"varDefault\") { dummyNoDefault(arg: $arg) }", "{\"arg\":null}", "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
-    [InlineData("query q10 { dummyList(arg: null) }", null, "Argument 'arg' has invalid value. Expected '!', found null.")]
-    [InlineData("query q11 { dummyNestedList(arg: null) }", null, "Argument 'arg' has invalid value. Expected '!', found null.")]
-    [InlineData("query q12 { dummyObj (arg: { item1: null }) }", null, "Argument 'arg' has invalid value. In field 'item1': [Expected 'String!', found null.]")]
-    //note: q13 should also fail (passing test) because null was explicitly passed to a non-null object field
-    [InlineData("query q13 ($arg: String) { dummyObj (arg: { item1: $arg }) }", "{\"arg\":null}", "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q02 ($arg: String) { dummy(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q03 { dummyNoDefault }", null,
+        "Argument 'arg' of type 'String!' is required for field 'dummyNoDefault' but not provided.")]
+    [InlineData("query q04 { dummyNoDefault(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected 'String!', found null.")]
+    [InlineData("query q05 ($arg: String) { dummyNoDefault(arg: $arg) }", null,
+        "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
+    [InlineData("query q06 ($arg: String) { dummyNoDefault(arg: $arg) }", "{}",
+        "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
+    [InlineData("query q07 ($arg: String) { dummyNoDefault(arg: $arg) }", null,
+        "Variable '$arg' of type 'String' used in position expecting type 'String!'.")]
+    [InlineData("query q08 ($arg: String!) { dummyNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    // q09 should fail (passing test) because null was explicitly passed to a non-null argument,
+    //   regardless of whether there is a variable default
+    [InlineData("query q09 ($arg: String = \"varDefault\") { dummyNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q10 { dummyList(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected '!', found null.")]
+    [InlineData("query q11 { dummyNestedList(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected '!', found null.")]
+    [InlineData("query q12 { dummyObj (arg: { item1: null }) }", null,
+        "Argument 'arg' has invalid value. In field 'item1': [Expected 'String!', found null.]")]
+    // q13 should also fail (passing test) because null was explicitly passed to a non-null object field
+    [InlineData("query q13 ($arg: String) { dummyObj (arg: { item1: $arg }) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
     public async Task ScenariosThatFailValidationOrCoercion(string query, string? variables, string errorMessage)
     {
         var dummyInputType = new InputObjectGraphType<DummyInput>
