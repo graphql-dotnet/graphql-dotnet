@@ -276,13 +276,13 @@ public class ValidationContextTests
     [InlineData("query q04 ($arg: String) { dummyNoDefault(arg: $arg) }", null)]
     [InlineData("query q05 ($arg: String) { dummyNoDefault(arg: $arg) }", "{}")]
     [InlineData("query q06 ($arg: String) { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
-    //todo: q09 should fail because null was explicitly passed to a non-null argument,
+    //note: q09 should fail (passing test) because null was explicitly passed to a non-null argument,
     //  regardless of whether there is a variable default
     [InlineData("query q09 ($arg: String = \"varDefault\") { dummyNoDefault(arg: $arg) }", "{\"arg\":null}")]
     [InlineData("query q10 { dummyList(arg: null) }", null)]
     [InlineData("query q11 { dummyNestedList(arg: null) }", null)]
     [InlineData("query q12 { dummyObj (arg: { item1: null }) }", null)]
-    //todo: q13 should also fail
+    //note: q13 should also fail (passing test) because null was explicitly passed to a non-null object field
     [InlineData("query q13 ($arg: String) { dummyObj (arg: { item1: $arg }) }", "{\"arg\":null}")]
     public async Task ScenariosThatFailValidationOrCoercion(string query, string? variables)
     {
