@@ -301,6 +301,23 @@ public class ValidationContextTests
     // q13 should also fail (passing test) because null was explicitly passed to a non-null object field
     [InlineData("query q13 ($arg: String) { dummyObj (arg: { item1: $arg }) }", "{\"arg\":null}",
         "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+
+    [InlineData("query q31 { dummyList(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected '!', found null.")]
+    // note for all of these that the fact that the only error generated is the invalid variable
+    //   error, indicating that it passed the rule that validates variable types (which it should)
+    [InlineData("query q32 ($arg: String) { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q33 ($arg: String = \"varDefault\") { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q34 ($arg: String!) { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q35 ($arg: [String] = [\"varDefault\"]) { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q36 ($arg: [String]) { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q37 ($arg: [String]!) { dummyList(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
     public async Task ScenariosThatFailValidationOrCoercion(string query, string? variables, string errorMessage)
     {
         var dummyInputType = new InputObjectGraphType<DummyInput>
