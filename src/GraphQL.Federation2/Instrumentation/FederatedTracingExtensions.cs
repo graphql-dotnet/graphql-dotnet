@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace GraphQL.Federation.Instrumentation
 {
     /// <summary>
@@ -21,9 +18,11 @@ namespace GraphQL.Federation.Instrumentation
         /// <param name="start">The UTC date and time that the GraphQL document began execution.</param>
         public static void EnrichWithApolloFederatedTracing(this ExecutionResult executionResult, DateTime start)
         {
-            var perf = executionResult?.Perf;
-            var errors = executionResult?.Errors;
-            (executionResult.Extensions ??= new Dictionary<string, object>())[EXTENSION_KEY] = new FederatedTraceBuilder(perf, errors, start).ToProtoBase64();
+            var perf = executionResult.Perf;
+            if (perf == null)
+                return;
+            var errors = executionResult.Errors;
+            (executionResult.Extensions ??= new Dictionary<string, object?>())[EXTENSION_KEY] = new FederatedTraceBuilder(perf, errors, start).ToProtoBase64();
         }
     }
 }

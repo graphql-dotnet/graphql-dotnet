@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using GraphQL.Execution;
@@ -18,7 +15,7 @@ namespace GraphQL.Federation.Instrumentation
     public class FederatedTraceBuilder
     {
         private readonly PerfRecord[] _records;
-        private readonly ExecutionErrors _errors;
+        private readonly ExecutionErrors? _errors;
         private readonly DateTime _start;
 
         /// <summary>
@@ -27,7 +24,7 @@ namespace GraphQL.Federation.Instrumentation
         /// <param name="records">tracing data captured at parse/validate/execute steps</param>
         /// <param name="errors">errors if occurred during parse and validate step</param>
         /// <param name="start">process start time in UTC</param>
-        public FederatedTraceBuilder(PerfRecord[] records, ExecutionErrors errors, DateTime start)
+        public FederatedTraceBuilder(PerfRecord[] records, ExecutionErrors? errors, DateTime start)
         {
             _records = records;
             _errors = errors;
@@ -45,7 +42,7 @@ namespace GraphQL.Federation.Instrumentation
             tree.StartTime = _start.ToTimestamp();
             tree.EndTime = _start.AddMilliseconds(operationStat.Duration).ToTimestamp();
             tree.DurationNs = (ulong)operationStat.Duration * 1000000;
-          
+
             var root = new ProtoTreeBuilder();
             AddRootErrors(root);
             AddFields(root);
@@ -129,14 +126,17 @@ namespace GraphQL.Federation.Instrumentation
                     Message = error.Message
                 };
 
-                foreach (var location in error.Locations)
+                if (error.Locations != null)
                 {
-                    var l = new Location
+                    foreach (var location in error.Locations)
                     {
-                        Column = (uint)location.Column,
-                        Line = (uint)location.Line
-                    };
-                    protoError.Location.Add(l);
+                        var l = new Location
+                        {
+                            Column = (uint)location.Column,
+                            Line = (uint)location.Line
+                        };
+                        protoError.Location.Add(l);
+                    }
                 }
                 root.Error.Add(protoError);
             }
@@ -155,7 +155,7 @@ namespace GraphQL.Federation.Instrumentation
                 var parentType = record.MetaField<string>("parentType");
                 var responseName = record.MetaField<string>("responseName");
                 var errors = record.MetaField<ExecutionErrors>("errors").ToArray();
-       
+
                 node.StartTime = (ulong)record.Start * 1000000;
                 node.EndTime = (ulong)record.End * 1000000;
                 node.ResponseName = responseName;
@@ -170,15 +170,18 @@ namespace GraphQL.Federation.Instrumentation
                         Message = error.Message
                     };
 
-                    foreach (var location in error.Locations)
+                    if (error.Locations != null)
                     {
-                        var tempLocation = new Location
+                        foreach (var location in error.Locations)
                         {
-                            Column = (uint)location.Column,
-                            Line = (uint)location.Line
-                        };
+                            var tempLocation = new Location
+                            {
+                                Column = (uint)location.Column,
+                                Line = (uint)location.Line
+                            };
 
-                        protoError.Location.Add(tempLocation);
+                            protoError.Location.Add(tempLocation);
+                        }
                     }
 
                     node.Error.Add(protoError);
