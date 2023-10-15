@@ -1,5 +1,4 @@
 using Example;
-using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
 using Microsoft.Extensions.Options;
