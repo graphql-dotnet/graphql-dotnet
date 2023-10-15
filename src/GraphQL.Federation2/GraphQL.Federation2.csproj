@@ -7,7 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="reports.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" />
     <PackageReference Include="Google.Protobuf" Version="3.24.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.58.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="reports.proto" GrpcServices="None" Access="Internal" />
+  </ItemGroup>
+
 </Project>
