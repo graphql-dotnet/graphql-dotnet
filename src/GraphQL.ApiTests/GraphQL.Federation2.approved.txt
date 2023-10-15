@@ -21,6 +21,14 @@ namespace GraphQL.Federation.Instrumentation
         public static GraphQL.Federation.Instrumentation.ResultPath FromList(System.Collections.Generic.List<object> objects) { }
     }
 }
+namespace GraphQL
+{
+    public static class FederationGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder UseApolloFederatedTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
+        public static GraphQL.DI.IGraphQLBuilder UseApolloFederatedTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enableMetricsPredicate) { }
+    }
+}
 namespace Mdg.Engine.Proto
 {
     public sealed class ContextualizedQueryLatencyStats : Google.Protobuf.IBufferMessage, Google.Protobuf.IDeepCloneable<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>, Google.Protobuf.IMessage, Google.Protobuf.IMessage<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>, System.IEquatable<Mdg.Engine.Proto.ContextualizedQueryLatencyStats>
