@@ -1,5 +1,4 @@
-The following license applies to the reports.proto file. The file was sourced from
-https://github.com/apollographql/apollo-server/blob/main/packages/usage-reporting-protobuf/src/reports.proto
+The following license applies to the reports.proto file:
 
 ===============================================================================
 

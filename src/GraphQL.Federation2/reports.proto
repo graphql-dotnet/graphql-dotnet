@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+// source: https://github.com/apollographql/apollo-server/blob/main/packages/usage-reporting-protobuf/src/reports.proto
 // see reports.proto.license.txt
 // last updated: 2023-03-02
 // ========== added so it compiles ========
