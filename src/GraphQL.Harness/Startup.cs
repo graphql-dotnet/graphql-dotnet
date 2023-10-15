@@ -30,7 +30,6 @@ public class Startup
             .AddGraphTypes(typeof(StarWarsQuery).Assembly)
             .UseMiddleware<CountFieldMiddleware>(false) // do not auto-install middleware
             .UseMiddleware<InstrumentFieldsMiddleware>(false) // do not auto-install middleware
-            .UseMiddleware<FederatedInstrumentFieldMiddleware>()
             .ConfigureSchema((schema, serviceProvider) =>
             {
                 // install middleware only when the custom EnableMetrics option is set

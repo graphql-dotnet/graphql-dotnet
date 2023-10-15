@@ -11,7 +11,7 @@ namespace GraphQL.Federation.Instrumentation
         /// Adds Apollo federated tracing metrics to an <see cref="ExecutionResult"/> instance,
         /// stored within <see cref="ExecutionResult.Extensions"/>["tracing"].
         /// Requires that the GraphQL document was executed with metrics enabled;
-        /// see <see cref="ExecutionOptions.EnableMetrics"/>. With <see cref="FederatedInstrumentFieldMiddleware"/>
+        /// see <see cref="ExecutionOptions.EnableMetrics"/>. With <see cref="GraphQL.Instrumentation.InstrumentFieldsMiddleware"/>
         /// installed, also includes metrics from field resolvers.
         /// </summary>
         /// <param name="executionResult">An <see cref="ExecutionResult"/> instance.</param>

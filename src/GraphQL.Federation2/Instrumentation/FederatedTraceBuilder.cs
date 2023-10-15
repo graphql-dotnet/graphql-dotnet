@@ -77,11 +77,11 @@ namespace GraphQL.Federation.Instrumentation
         /// <param name="tree">Proto tree to add error to</param>
         private void AddFields(ProtoTreeBuilder tree)
         {
-            var fieldStats = _records.Where(x => x.Category == "federatedfield");
+            var fieldStats = _records.Where(x => x.Category == "field");
 
             foreach (var field in fieldStats)
             {
-                tree.AddField(field);
+                tree.AddField(field, _errors);
             }
         }
 
@@ -144,17 +144,15 @@ namespace GraphQL.Federation.Instrumentation
             /// <summary>
             /// Adds field trace record to proto tree. 
             /// </summary>
-            /// <param name="record">Record to add</param>
-            public void AddField(PerfRecord record)
+            public void AddField(PerfRecord record, ExecutionErrors? errors)
             {
                 var path = record.MetaField<IEnumerable<object>>("path").ToList();
 
                 var p = ResultPath.FromList(path);
                 var node = GetOrCreateNode(p);
-                var type = record.MetaField<string>("type");
-                var parentType = record.MetaField<string>("parentType");
-                var responseName = record.MetaField<string>("responseName");
-                var errors = record.MetaField<ExecutionErrors>("errors").ToArray();
+                var type = record.MetaField<string>("returnTypeName");
+                var parentType = record.MetaField<string>("typeName");
+                var responseName = record.MetaField<string>("fieldName");
 
                 node.StartTime = (ulong)record.Start * 1000000;
                 node.EndTime = (ulong)record.End * 1000000;
@@ -165,6 +163,10 @@ namespace GraphQL.Federation.Instrumentation
                     return;
                 foreach (var error in errors)
                 {
+                    if (!error.Path.SequenceEqual(path))
+                    {
+                        continue;
+                    }
                     var protoError = new Error
                     {
                         Message = error.Message

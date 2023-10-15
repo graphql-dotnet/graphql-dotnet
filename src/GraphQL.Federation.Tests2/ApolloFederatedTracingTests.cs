@@ -1,10 +1,7 @@
-using System;
-using Xunit;
-using GraphQL.Tests.StarWars;
 using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
+using GraphQL.Tests.StarWars;
 using Mdg.Engine.Proto;
-using Shouldly;
 
 namespace GraphQL.Federation.Tests
 {
@@ -13,18 +10,19 @@ namespace GraphQL.Federation.Tests
         [Fact]
         public void extension_has_expected_format()
         {
-            var query = @"
-query {
-  hero {
-    name
-    friends {
-      name
-    }
-  }
-}";
+            var query = """
+                query {
+                  hero {
+                    name
+                    friends {
+                      name
+                    }
+                  }
+                }
+                """;
 
             var start = DateTime.UtcNow;
-            Schema.FieldMiddleware.Use(new FederatedInstrumentFieldMiddleware());
+            Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
             var result = Executer.ExecuteAsync(_ =>
             {
                 _.Schema = Schema;
