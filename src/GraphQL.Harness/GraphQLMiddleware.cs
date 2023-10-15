@@ -1,7 +1,7 @@
 using GraphQL;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
 using GraphQL.Transport;
-using GraphQL.Federation.Instrumentation;
 using GraphQL.Types;
 using Microsoft.Extensions.Options;
 
