@@ -4,7 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Apollo Federation for GraphQL.NET</Description>
     <PackageTags>GraphQL;Federation</PackageTags>
-    <NoWarn>$(NoWarn);NU1605</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

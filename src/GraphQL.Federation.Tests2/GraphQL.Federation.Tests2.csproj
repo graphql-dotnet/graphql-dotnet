@@ -3,7 +3,6 @@
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
     <TargetFramework>net7.0</TargetFramework>
-    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">

@@ -3,7 +3,7 @@ using GraphQL.Instrumentation;
 using GraphQL.Tests.StarWars;
 using Mdg.Engine.Proto;
 
-namespace GraphQL.Federation.Tests
+namespace GraphQL.Federation.Tests2
 {
     public class ApolloFederatedTracingTests : StarWarsTestBase
     {
