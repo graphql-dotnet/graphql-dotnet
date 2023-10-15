@@ -3,7 +3,7 @@ namespace GraphQL.Federation.Instrumentation;
 /// <summary>
 /// Represents hierarchical path from parent field to child field as a series of segments
 /// </summary>
-public class ResultPath
+internal class ResultPath
 {
     /// <summary>
     /// Root path. All paths start from here.

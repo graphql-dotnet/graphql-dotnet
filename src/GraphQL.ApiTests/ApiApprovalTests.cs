@@ -18,7 +18,7 @@ public class ApiApprovalTests
     [InlineData(typeof(MicrosoftDI.ScopedFieldBuilderExtensions))]
     [InlineData(typeof(Caching.MemoryDocumentCache))]
     [InlineData(typeof(DataLoader.DataLoaderContext))]
-    [InlineData(typeof(GraphQL.Federation.Instrumentation.FederatedTraceBuilder))]
+    [InlineData(typeof(GraphQL.Federation.Instrumentation.FederatedTracingExtensions))]
     public void PublicApi(Type type)
     {
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;

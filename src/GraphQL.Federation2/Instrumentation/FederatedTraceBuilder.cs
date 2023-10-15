@@ -12,7 +12,7 @@ namespace GraphQL.Federation.Instrumentation;
 /// Builds a proto tree structure with the tracing data based on the parent-child relationship
 /// among fields.
 /// </summary>
-public class FederatedTraceBuilder
+internal class FederatedTraceBuilder
 {
     private readonly PerfRecord[] _records;
     private readonly ExecutionErrors? _errors;

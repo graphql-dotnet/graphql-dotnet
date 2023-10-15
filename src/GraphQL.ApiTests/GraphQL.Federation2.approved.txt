@@ -1,24 +1,8 @@
 namespace GraphQL.Federation.Instrumentation
 {
-    public class FederatedTraceBuilder
-    {
-        public FederatedTraceBuilder(GraphQL.Instrumentation.PerfRecord[] records, GraphQL.ExecutionErrors? errors, System.DateTime start) { }
-        public string ToProtoBase64() { }
-    }
     public static class FederatedTracingExtensions
     {
         public static void EnrichWithApolloFederatedTracing(this GraphQL.ExecutionResult executionResult, System.DateTime start) { }
-    }
-    public class ResultPath
-    {
-        public static GraphQL.Federation.Instrumentation.ResultPath ROOT_PATH { get; }
-        public override bool Equals(object obj) { }
-        public override int GetHashCode() { }
-        public bool IsRootPath() { }
-        public GraphQL.Federation.Instrumentation.ResultPath Segment(int segment) { }
-        public GraphQL.Federation.Instrumentation.ResultPath Segment(string segment) { }
-        public System.Collections.Generic.IEnumerable<object> ToList() { }
-        public static GraphQL.Federation.Instrumentation.ResultPath FromList(System.Collections.Generic.List<object> objects) { }
     }
 }
 namespace GraphQL
