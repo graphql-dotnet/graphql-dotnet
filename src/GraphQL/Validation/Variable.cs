@@ -8,9 +8,20 @@ namespace GraphQL.Validation
         /// <summary>
         /// Initializes a new instance with the specified name.
         /// </summary>
+        [Obsolete("Please specify the variable definition when constructing a variable.")]
         public Variable(string name)
         {
             Name = name;
+            Definition = null!;
+        }
+
+        /// <summary>
+        /// Initializes a new instance with the specified name and definition.
+        /// </summary>
+        public Variable(string name, GraphQLParser.AST.GraphQLVariableDefinition definition)
+        {
+            Name = name;
+            Definition = definition;
         }
 
         /// <summary>
@@ -31,6 +42,11 @@ namespace GraphQL.Validation
                 ValueSpecified = true;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the definition of the variable.
+        /// </summary>
+        public GraphQLParser.AST.GraphQLVariableDefinition Definition { get; set; }
 
         /// <summary>
         /// Indicates if the variable value has been set.

@@ -84,11 +84,52 @@ namespace GraphQL.Execution
 
             if (input is GraphQLVariable variable)
             {
-                if (variables == null)
-                    return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                var v = variables?.Find(variable.Name);
+                if (v != null && (v.IsDefault || v.ValueSpecified))
+                {
+                    // get the variable value
+                    var value = v.Value;
 
-                var found = variables.ValueFor(variable.Name, out var ret);
-                return found ? ret : new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                    // wrap list if necessary
+                    // todo: v.Definition != null for backwards compatibility for 7.x; remove in 8.x
+                    if (value != null && v.Definition != null && !IsASTListType(v.Definition.Type))
+                    {
+                        //---THE FOLLOWING CODE CRASHES THE .NET 7.0.304 COMPILER
+                        //
+                        //while (type is ListGraphType listType2)
+                        //{
+                        //    value = new object?[] { value };
+                        //    type = listType2.ResolvedType!;
+                        //}
+                        //
+                        //---SO INSTEAD WE HAVE:
+                        while (WrapType(ref type, ref value))
+                        {
+                        }
+
+                        static bool WrapType(ref IGraphType type, ref object? value)
+                        {
+                            if (type is ListGraphType listType)
+                            {
+                                value = new object?[] { value };
+                                type = listType.ResolvedType!;
+                                return true;
+                            }
+                            return false;
+                        }
+                        //-----
+                    }
+
+                    // return the variable
+                    return new ArgumentValue(value, v.IsDefault ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+
+                    static bool IsASTListType(GraphQLType type)
+                        => type is GraphQLListType || (type is GraphQLNonNullType nonNullType && nonNullType.Type is GraphQLListType);
+                }
+                else
+                {
+                    return new ArgumentValue(fieldDefault, ArgumentSource.FieldDefault);
+                }
             }
 
             if (type is ScalarGraphType scalarType)
@@ -148,8 +189,12 @@ namespace GraphQL.Execution
                         // If the variable definition does not provide a default value, the input object field definition’s
                         // default value should be used.
 
-                        // so: do not pass the field's default value to this method, since the field was specified
-                        obj[field.Name] = CoerceValue(field.ResolvedType!, objectField.Value, variables).Value;
+                        var value = CoerceValue(field.ResolvedType!, objectField.Value, variables, field.DefaultValue);
+                        // when a optional variable is specified for the input field, and the variable is not defined, and
+                        //   when there is no default value specified for the input field, then do not add the entry to the
+                        //   unordered map.
+                        if (value.Source != ArgumentSource.FieldDefault || value.Value != null)
+                            obj[field.Name] = value.Value;
                     }
                     else if (field.DefaultValue != null)
                     {
