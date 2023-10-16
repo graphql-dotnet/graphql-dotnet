@@ -321,8 +321,6 @@ public class ValidationContextTests
 
     [InlineData("query q41 { dummyListNoDefault(arg: null) }", null,
         "Argument 'arg' has invalid value. Expected '!', found null.")]
-    // note for all of these that the fact that the only error generated is the invalid variable
-    //   error, indicating that it passed the rule that validates variable types (which it should)
     [InlineData("query q42 ($arg: String) { dummyListNoDefault(arg: $arg) }", "{\"arg\":\"abc\"}",
         "Variable '$arg' of type 'String' used in position expecting type '[String]!'.")]
     [InlineData("query q43 ($arg: String = \"varDefault\") { dummyListNoDefault(arg: $arg) }", "{\"arg\":null}",
