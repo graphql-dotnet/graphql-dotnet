@@ -28,7 +28,7 @@ namespace GraphQL
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// Can use any constructor of the indicated type, provided that there are keys in the
-        /// dictionary that correspond (case sensitive) to the names of the constructor parameters.
+        /// dictionary that correspond (case insensitive) to the names of the constructor parameters.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>

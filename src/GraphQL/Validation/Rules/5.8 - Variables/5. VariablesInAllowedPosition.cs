@@ -41,18 +41,16 @@ namespace GraphQL.Validation.Rules
                         foreach (var usage in usages)
                         {
                             var varName = usage.Node.Name;
-                            if (!varDefMap.TryGetValue(varName, out var varDef))
+                            if (!varDefMap.TryGetValue(varName, out var varDef) || varDef == null)
                             {
                                 return;
                             }
 
-                            if (varDef != null && usage.Type != null)
+                            var varType = varDef.Type.GraphTypeFromType(context.Schema);
+
+                            if (varType != null && usage.Type != null && !IsVariableUsageAllowed(varDef, varType, usage, context.Schema.Features.AllowScalarVariablesForListTypes))
                             {
-                                var varType = varDef.Type.GraphTypeFromType(context.Schema);
-                                if (varType != null && !effectiveType(varType, varDef).IsSubtypeOf(usage.Type))
-                                {
-                                    context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
-                                }
+                                context.ReportError(new VariablesInAllowedPositionError(context, varDef, varType, usage));
                             }
                         }
                     }
@@ -60,22 +58,27 @@ namespace GraphQL.Validation.Rules
             )
         );
 
-        /// <summary>
-        /// if a variable definition has a default value, it is effectively non-null.
-        /// </summary>
-        private static GraphType effectiveType(IGraphType varType, GraphQLVariableDefinition varDef)
+        private static bool IsVariableUsageAllowed(GraphQLVariableDefinition variableDefinition, IGraphType variableType, VariableUsage variableUsage, bool allowScalarsForLists)
         {
-            if (varDef.DefaultValue == null || varType is NonNullGraphType)
+            // >> If locationType is a non-null type AND variableType is NOT a non-null type:
+            if (variableUsage.Type is NonNullGraphType nonNullUsageType && variableType is not NonNullGraphType)
             {
-                return (GraphType)varType;
+                // >> Let hasNonNullVariableDefaultValue be true if a default value exists for variableDefinition and is not the value null
+                var hasNonNullVariableDefaultValue = variableDefinition.DefaultValue != null;
+                // >> Let hasLocationDefaultValue be true if a default value exists for the Argument or ObjectField where variableUsage is located.
+                var hasLocationDefaultValue = variableUsage.HasDefault;
+                // >> If hasNonNullVariableDefaultValue is NOT true AND hasLocationDefaultValue is NOT true, return false.
+                if (!hasNonNullVariableDefaultValue && !hasLocationDefaultValue)
+                {
+                    return false;
+                }
+                // >> Let nullableLocationType be the unwrapped nullable type of locationType.
+                var nullableLocationType = nonNullUsageType.ResolvedType!;
+                // >> Return AreTypesCompatible(variableType, nullableLocationType).
+                return variableType.IsSubtypeOf(nullableLocationType, allowScalarsForLists);
             }
-
-            var type = varType.GetType();
-            var genericType = typeof(NonNullGraphType<>).MakeGenericType(type);
-
-            var nonNull = (NonNullGraphType)Activator.CreateInstance(genericType)!;
-            nonNull.ResolvedType = varType;
-            return nonNull;
+            // >> Return AreTypesCompatible(variableType, locationType).
+            return variableType.IsSubtypeOf(variableUsage.Type, allowScalarsForLists);
         }
     }
 }

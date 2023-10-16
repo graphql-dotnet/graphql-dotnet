@@ -179,8 +179,7 @@ public class ComplexGraphTypeTests
     public void allows_custom_name()
     {
         var type = new ComplexType<Droid>();
-        _ = type.Field(d => d.Name)
-            .Name("droid");
+        _ = type.Field("droid", d => d.Name);
 
         type.Fields.Last().Name.ShouldBe("droid");
     }

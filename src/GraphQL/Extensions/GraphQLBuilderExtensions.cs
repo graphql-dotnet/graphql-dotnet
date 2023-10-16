@@ -159,7 +159,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
     /// registered if it is not already registered within the dependency injection framework. Singleton and scoped
-    /// lifetimes are supported.
+    /// lifetimes are supported. For scoped lifetimes, enables <see cref="GlobalSwitches.EnableReflectionCaching"/>.
     /// </summary>
     /// <remarks>
     /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
@@ -181,6 +181,13 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Register the service with the DI provider as TSchema, overwriting any existing registration
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
+
+#if !DEBUG // otherwise any scoped service test would change the global switches
+        if (serviceLifetime != ServiceLifetime.Singleton)
+        {
+            GlobalSwitches.EnableReflectionCaching = true;
+        }
+#endif
 
         return builder;
     }
@@ -222,6 +229,13 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Register the service with the DI provider as TSchema, overwriting any existing registration
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
+
+#if !DEBUG // otherwise any scoped service test would change the global switches
+        if (serviceLifetime != ServiceLifetime.Singleton)
+        {
+            GlobalSwitches.EnableReflectionCaching = true;
+        }
+#endif
 
         return builder;
     }

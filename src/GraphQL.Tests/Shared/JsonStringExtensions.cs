@@ -38,7 +38,7 @@ public static class JsonStringExtensions
     private static readonly IGraphQLTextSerializer _serializer = new GraphQLSerializer(indent: true);
     private static readonly IDocumentExecuter _executer = new DocumentExecuter();
 
-    public static Inputs? ToInputs(this string? json)
+    public static Inputs ToInputs(this string? json)
         => _serializer.Deserialize<Inputs>(json) ?? Inputs.Empty;
 
     public static async Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)

@@ -20,8 +20,7 @@ public class HumanType : ObjectGraphType<Human>
         Field<ListGraphType<CharacterInterface>>("friends")
             .Resolve(context => data.GetFriends(context.Source));
 
-        Connection<CharacterInterface>()
-            .Name("friendsConnection")
+        Connection<CharacterInterface>("friendsConnection")
             .Description("A list of a character's friends.")
             .Bidirectional()
             .Resolve(context => context.GetPagedResults<Human, StarWarsCharacter>(data, context.Source.Friends));

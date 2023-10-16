@@ -35,7 +35,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -49,7 +49,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder.ResolveScoped(_ => "hello");
         field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
@@ -60,7 +60,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope1()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -75,7 +75,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope2()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -91,7 +91,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope3()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -108,7 +108,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope4()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -126,7 +126,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope5()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -145,7 +145,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope2Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -160,7 +160,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope3Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -175,7 +175,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope4Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -190,7 +190,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope5Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -205,7 +205,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope0()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -218,7 +218,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope1()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -232,7 +232,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope2()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -247,7 +247,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope3()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -263,7 +263,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope4()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -280,7 +280,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope5()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -298,7 +298,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -312,7 +312,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0AsyncAlt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder.ResolveScopedAsync(_ => Task.FromResult<object>("hello"));
         field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
@@ -323,7 +323,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope1Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -338,7 +338,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope2Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -354,7 +354,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope3Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -371,7 +371,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope4Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -389,7 +389,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope5Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -408,7 +408,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope0Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -421,7 +421,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope1Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -435,7 +435,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope2Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -450,7 +450,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope3Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -466,7 +466,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope4Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -483,7 +483,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope5Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()

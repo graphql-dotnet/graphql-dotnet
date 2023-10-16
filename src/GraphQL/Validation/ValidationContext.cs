@@ -159,6 +159,8 @@ namespace GraphQL.Validation
                 return (Validation.Variables.None, null);
             }
 
+            var usages = GetRecursiveVariables(Operation!);
+
             List<ValidationError>? errors = null;
             var variablesObj = new Variables(variableDefinitions!.Count);
 
@@ -177,11 +179,33 @@ namespace GraphQL.Validation
                     }
 
                     // create a new variable object
-                    var variable = new Variable(variableDefName);
+                    var variable = new Variable(variableDefName, variableDef);
 
                     // attempt to retrieve the variable value from the inputs
                     if (Variables.TryGetValue(variableDefName, out object? variableValue))
                     {
+                        // for nullable variable types that are supplied (not default value),
+                        if (graphType is not NonNullGraphType)
+                        {
+                            // determine if a non-null value is required
+                            //   (it may have passed validation for a nullable type if the variable definition,
+                            //    argument definition, or input object field definition includes a default value)
+                            bool requiresNonNull = false;
+                            if (usages != null)
+                            {
+                                foreach (var usage in usages)
+                                {
+                                    if (usage.Node.Name == variableDef.Variable.Name && usage.Type is NonNullGraphType)
+                                    {
+                                        requiresNonNull = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (requiresNonNull)
+                                graphType = new NonNullGraphType(graphType);
+                        }
+
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {

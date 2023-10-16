@@ -1,9 +1,15 @@
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace GraphQL.Types;
+
+internal static class AutoRegisteringInterfaceGraphType
+{
+    public static ConcurrentDictionary<Type, IInterfaceGraphType> ReflectionCache { get; } = new();
+}
 
 /// <summary>
 /// Allows you to automatically register the necessary fields for the specified type.
@@ -16,6 +22,11 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
 
     /// <summary>
     /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
+    /// <br/><br/>
+    /// When <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled (typically for scoped schemas),
+    /// be sure to place any custom initialization code within <see cref="ConfigureGraph"/> or <see cref="ProvideFields"/>
+    /// so that the instance will be cached with the customizations, except when using <see cref="InterfaceGraphType{TSource}.AddPossibleType(IObjectGraphType)">AddPossibleType</see>,
+    /// <see cref="InterfaceGraphType{TSource}.PossibleTypes">PossibleTypes</see> or <see cref="InterfaceGraphType{TSource}.ResolveType">ResolveType</see> as these values cannot be cached.
     /// </summary>
     public AutoRegisteringInterfaceGraphType() : this(null) { }
 
@@ -24,13 +35,54 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
     /// </summary>
     /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
     public AutoRegisteringInterfaceGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+        : this(
+            GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringInterfaceGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
+                ? (AutoRegisteringInterfaceGraphType<TSourceType>?)cacheEntry
+                : null,
+            excludedProperties,
+            GlobalSwitches.EnableReflectionCaching)
     {
+    }
+
+    internal AutoRegisteringInterfaceGraphType(AutoRegisteringInterfaceGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+        : base(cloneFrom)
+    {
+        // if copying a cached instance, just return the instance
+        if (cloneFrom != null)
+            return;
+
         _excludedProperties = excludedProperties;
         Name = typeof(TSourceType).GraphQLName();
         ConfigureGraph();
         foreach (var fieldType in ProvideFields())
         {
             _ = AddField(fieldType);
+        }
+
+        // cache the instance if reflection caching is enabled
+        if (cache &&
+            excludedProperties == null &&
+            PossibleTypes.Count == 0 &&
+            ResolveType == null)
+        {
+            foreach (var f in Fields.List)
+            {
+                if (f.ResolvedType != null)
+                    cache = false;
+
+                if (f.Arguments?.List != null)
+                {
+                    foreach (var a in f.Arguments.List)
+                    {
+                        if (a.ResolvedType != null || a.Type == null)
+                            cache = false;
+                    }
+                }
+            }
+
+            // cache the constructed object
+            if (cache)
+                AutoRegisteringInterfaceGraphType.ReflectionCache[typeof(TSourceType)] = new AutoRegisteringInterfaceGraphType<TSourceType>(this, null, false);
         }
     }
 
