@@ -318,6 +318,23 @@ public class ValidationContextTests
         "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
     [InlineData("query q37 ($arg: [String]!) { dummyList(arg: $arg) }", "{\"arg\":null}",
         "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+
+    [InlineData("query q41 { dummyListNoDefault(arg: null) }", null,
+        "Argument 'arg' has invalid value. Expected '!', found null.")]
+    // note for all of these that the fact that the only error generated is the invalid variable
+    //   error, indicating that it passed the rule that validates variable types (which it should)
+    [InlineData("query q42 ($arg: String) { dummyListNoDefault(arg: $arg) }", "{\"arg\":\"abc\"}",
+        "Variable '$arg' of type 'String' used in position expecting type '[String]!'.")]
+    [InlineData("query q43 ($arg: String = \"varDefault\") { dummyListNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q44 ($arg: String!) { dummyListNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q45 ($arg: [String] = [\"varDefault\"]) { dummyListNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q46 ($arg: [String]) { dummyListNoDefault(arg: $arg) }", "{\"arg\":[]}",
+        "Variable '$arg' of type '[String]' used in position expecting type '[String]!'.")]
+    [InlineData("query q47 ($arg: [String]!) { dummyListNoDefault(arg: $arg) }", "{\"arg\":null}",
+        "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
     public async Task ScenariosThatFailValidationOrCoercion(string query, string? variables, string errorMessage)
     {
         var dummyInputType = new InputObjectGraphType<DummyInput>
@@ -336,6 +353,8 @@ public class ValidationContextTests
             .Argument<string>("arg", false);
         queryType.Field<IEnumerable<string>>("dummyList", true)
             .Argument<IEnumerable<string>>("arg", false, a => a.DefaultValue = new[] { "argDefault" });
+        queryType.Field<IEnumerable<string>>("dummyListNoDefault", true)
+            .Argument<IEnumerable<string>>("arg", false);
         queryType.Field<IEnumerable<IEnumerable<string>?>>("dummyNestedList", true)
             .Argument<IEnumerable<IEnumerable<string>>>("arg", false, a => a.DefaultValue = new[] { new[] { "argDefault" } });
         var schema = new Schema { Query = queryType };
