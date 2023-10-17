@@ -455,6 +455,55 @@ public class FieldBuilderAnalyzerTests
     }
 
     [Fact]
+    public async Task EmptyLineWithWhiteSpacesBeforeField_ArgumentsFormattingPreservedAsync()
+    {
+        const string source = """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // next line contains whitespaces
+                    
+                    Field<StringGraphType>("name", "description", null,
+                        resolve: context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        const string fix = """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // next line contains whitespaces
+                    
+                    Field<StringGraphType>("name").Description("description")
+                        .Resolve(context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+    }
+
+    [Fact]
     public async Task ArgumentsFormattingPreserved_PreserveNewLines()
     {
         const string source = """
