@@ -79,8 +79,8 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         const int oneLevelIndentation = 4;
         int fieldInvocationIndentation = newFieldInvocationExpression
             .GetLeadingTrivia()
-            .Where(trivia => trivia.IsKind(SyntaxKind.WhitespaceTrivia))
-            .Sum(trivia => trivia.FullSpan.Length);
+            .LastOrDefault(trivia => trivia.IsKind(SyntaxKind.WhitespaceTrivia))
+            .FullSpan.Length;
 
         var whitespaceTrivia = Whitespace(new string(' ', fieldInvocationIndentation + oneLevelIndentation));
         var newLineTrivia = EndOfLine(Environment.NewLine);
