@@ -1,6 +1,6 @@
-using Microsoft.CodeAnalysis.Testing;
-using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
 using Xunit.Sdk;
 
 namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;

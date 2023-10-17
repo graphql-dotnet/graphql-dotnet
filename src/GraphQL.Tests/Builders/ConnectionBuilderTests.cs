@@ -167,7 +167,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext())as Connection<Child>;
+        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
