@@ -136,7 +136,7 @@ public class ApolloTracingTests : StarWarsTestBase
         {
             Query = "{ hero { name } }",
             RequestServices = provider,
-        }).ConfigureAwait(false);
+        });
         string resultString = serializer.Serialize(result);
         if (enable || enableAfter || enableBefore)
         {

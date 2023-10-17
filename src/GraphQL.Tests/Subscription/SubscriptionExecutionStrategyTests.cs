@@ -20,7 +20,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task Basic()
     {
-        var result = await ExecuteAsync("subscription { test }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test }");
         result.ShouldBeSuccessful();
         SubscriptionObj.ShouldNotBeNull();
         result.Perf.ShouldBeNull();
@@ -34,7 +34,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task NoMetricsForDataEvents()
     {
-        var result = await ExecuteAsync("subscription { test }", o => o.EnableMetrics = true).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test }", o => o.EnableMetrics = true);
         result.ShouldBeSuccessful();
         result.Perf.ShouldNotBeNull();
         Source.Next("hello");
@@ -47,7 +47,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task InitialExtensions()
     {
-        var result = await ExecuteAsync("subscription { testWithInitialExtensions }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testWithInitialExtensions }");
         result.ShouldBeSuccessful();
         result.Extensions.ShouldBeSimilarTo("""{ "alpha": "beta" }""");
         Source.Next("hello");
@@ -60,7 +60,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task InitialError()
     {
-        var result = await ExecuteAsync("subscription { testWithInitialError(custom: false) }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testWithInitialError(custom: false) }");
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo("""{ "errors":[{ "message":"Could not resolve source stream for field \u0027testWithInitialError\u0027.","locations":[{ "line":1,"column":16}],"path":["testWithInitialError"],"extensions":{ "code":"APPLICATION","codes":["APPLICATION"]} }],"data":null}""");
@@ -69,7 +69,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task InitialCustomError()
     {
-        var result = await ExecuteAsync("subscription { testWithInitialError(custom: true) }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testWithInitialError(custom: true) }");
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo("""{ "errors":[{ "message":"Handled custom exception: InitialException","locations":[{ "line":1,"column":16}],"path":["testWithInitialError"],"extensions":{ "code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]} }],"data":null}""");
@@ -78,7 +78,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task InitialExecutionError()
     {
-        var result = await ExecuteAsync("subscription { testWithExecutionError }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testWithExecutionError }");
         result.ShouldNotBeSuccessful();
         result.Executed.ShouldBeTrue();
         result.ShouldBeSimilarTo("""{"errors":[{"message":"Test error","locations":[{"line":1,"column":16}],"path":["testWithExecutionError"]}],"data":null}""");
@@ -87,7 +87,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task Widget()
     {
-        var result = await ExecuteAsync("subscription { testComplex { id name } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { id name } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
@@ -99,7 +99,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task Widget_WithExtension()
     {
-        var result = await ExecuteAsync("subscription { testComplex { id nameWithExtension } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { id nameWithExtension } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
@@ -113,7 +113,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     {
         // a field error has occurred on a non-null child field of a non-null subscription field,
         // so the null value gets propogated all the way up to "data"
-        var result = await ExecuteAsync("subscription { testComplex { id nameMayThrowError } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { id nameMayThrowError } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("custom");
@@ -132,7 +132,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     public async Task Widget_WithErrors_Nullable()
     {
         // a field error has occurred on a nullable field, so just that field is null
-        var result = await ExecuteAsync("subscription { testComplex { id nameMayThrowErrorNullable } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { id nameMayThrowErrorNullable } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("custom");
@@ -153,7 +153,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         // during handling of the `Source.Error` events below,
         // in this case the graphql execution has not started, so executed should be false
         // and "data" should not exist in the map of error events
-        var result = await ExecuteAsync("subscription { testComplex { id name } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { id name } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Error(new ApplicationException("SourceError"));
@@ -174,7 +174,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         // verify that if a non-null subscription field returns null during a data event,
         // then "data" is "null", and DOES exist in the resulting map (along with the
         // descriptive error)
-        var result = await ExecuteAsync("subscription { testNullHandling { id name } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testNullHandling { id name } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next(null!);
@@ -188,7 +188,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task Widget_Null_Nullable()
     {
-        var result = await ExecuteAsync("subscription { testNullHandlingNullable { id name } }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testNullHandlingNullable { id name } }");
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next(null!);
@@ -202,7 +202,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task NotSubscriptionField()
     {
-        var result = await ExecuteAsync("subscription { notSubscriptionField }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { notSubscriptionField }");
         result.ShouldNotBeSuccessful();
         result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027.","locations":[{"line":1,"column":16}],"path":["notSubscriptionField"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
     }
@@ -218,7 +218,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         {
             o.Listeners.Add(listener);
             o.UserContext["testClass"] = this;
-        }).ConfigureAwait(false);
+        });
         Counter.ShouldBe(11);
         result.ShouldBeSuccessful();
         Source.Next("hello");
@@ -235,14 +235,14 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     {
         using var cts = new CancellationTokenSource();
         cts.Cancel();
-        await Should.ThrowAsync<OperationCanceledException>(async () => await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token).ConfigureAwait(false)).ConfigureAwait(false);
+        await Should.ThrowAsync<OperationCanceledException>(async () => await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token));
     }
 
     [Fact]
     public async Task RootCancellationDoesNotAffectSubscriptions()
     {
         using var cts = new CancellationTokenSource();
-        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
@@ -258,7 +258,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     public async Task NoEventsAfterSourceDisconnected()
     {
         using var cts = new CancellationTokenSource();
-        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test }", o => o.CancellationToken = cts.Token);
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Source.Next("testing");
@@ -272,7 +272,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task CheckServiceProvider()
     {
-        var result = await ExecuteAsync("subscription { testComplex { validateServiceProvider } }", o => o.UserContext["provider"] = o.RequestServices).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testComplex { validateServiceProvider } }", o => o.UserContext["provider"] = o.RequestServices);
         result.ShouldBeSuccessful();
         Source.Next("hello");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testComplex": { "validateServiceProvider": true } } }""");
@@ -290,7 +290,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         var result = await ExecuteAsync("subscription { testComplex { nameMayThrowError } }", o =>
         {
             o.UnhandledExceptionDelegate = async _ => throw new InvalidOperationException();
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         Source.Next("custom");
         Observer.ShouldHaveResult().ShouldBeSimilarTo("""{"errors":[{"message":"Unhandled error of type InvalidOperationException"}]}""");
@@ -314,7 +314,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                 },
                 _ => { }));
             o.UnhandledExceptionDelegate = context => throw new NotSupportedException("Should not happen");
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
@@ -336,7 +336,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                     }
                 },
                 _ => { }));
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
@@ -359,7 +359,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                 },
                 _ => { }));
             o.UnhandledExceptionDelegate = async context => context.Exception = new ExecutionError("Should not happen");
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
@@ -381,7 +381,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                         throw new InvalidOperationException("Test exception");
                     }
                 }));
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
@@ -404,7 +404,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                     }
                 }));
             o.UnhandledExceptionDelegate = async context => context.Exception = new ExecutionError("Should not happen");
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         throwNow = true;
         Source.Next("test");
@@ -426,7 +426,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                     }
                 },
                 _ => { }));
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
@@ -448,7 +448,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
                         context.Errors.Add(new ExecutionError("Test error"));
                     }
                 }));
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSuccessful();
         errorNow = true;
         Source.Next("test");
@@ -463,13 +463,13 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         {
             o.CancellationToken = cts.Token;
             o.UserContext["cts"] = cts;
-        }).ConfigureAwait(false)).ConfigureAwait(false);
+        }));
     }
 
     [Fact]
     public async Task SubscriptionMethodNullShouldThrow()
     {
-        var result = await ExecuteAsync("subscription { testObservableNull }").ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { testObservableNull }");
         result.ShouldNotBeSuccessful();
         result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: No event stream returned for field \u0027testObservableNull\u0027.","locations":[{"line":1,"column":16}],"path":["testObservableNull"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
     }
@@ -477,7 +477,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task MultipleSubscriptionsShouldThrow()
     {
-        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", null, false);
         result.ShouldNotBeSuccessful();
         result.ShouldBeSimilarTo("""{"errors":[{"message":"Anonymous Subscription must have exactly one root field and that field must not be an introspection field.","locations":[{"line":1,"column":21}],"extensions":{"code":"SINGLE_ROOT_FIELD_SUBSCRIPTIONS","codes":["SINGLE_ROOT_FIELD_SUBSCRIPTIONS"],"number":"5.2.3.1"}}]}""");
     }
@@ -485,7 +485,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task MultipleSubscriptions_NoValidation()
     {
-        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { }, false).ConfigureAwait(false);
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { }, false);
         result.Streams.ShouldNotBeNull().Count.ShouldBe(2);
         result.Data.ShouldBeNull();
         result.Errors.ShouldBeNull();
@@ -506,11 +506,11 @@ public class SubscriptionExecutionStrategyTests : IDisposable
 
         // simulate the ExecutionContext of a connecting client and execute a subscription
         _asyncLocal.Value.ShouldBeNull();
-        await ConnectClientAsync().ConfigureAwait(false);
+        await ConnectClientAsync();
 
         // simulate the ExecutionContext of an event source and raise an event
         _asyncLocal.Value.ShouldBeNull();
-        await RaiseEventAsync().ConfigureAwait(false);
+        await RaiseEventAsync();
 
         // verify that the connected client has recieved an event with its own context applied during the execution of the resolvers
         _asyncLocal.Value.ShouldBeNull();
@@ -519,7 +519,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
         async Task ConnectClientAsync()
         {
             _asyncLocal.Value = "client";
-            await ExecuteAsync("subscription { testComplex { asyncLocalValue } }").ConfigureAwait(false);
+            await ExecuteAsync("subscription { testComplex { asyncLocalValue } }");
         }
 
         async Task RaiseEventAsync()

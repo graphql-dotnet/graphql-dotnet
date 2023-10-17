@@ -11,7 +11,7 @@ public class FieldNameAnalyzerTests
     public async Task Sanity_NoDiagnostics()
     {
         const string source = "";
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 34, 9, 46);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 61, 9, 73);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -167,7 +167,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(9, 40, 9, 52);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -202,7 +202,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(9, 54, 9, 66);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(9, 43, 9, 58);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
@@ -301,7 +301,7 @@ public class FieldNameAnalyzerTests
             CodeActionIndex = codeActionIndex,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Theory]
@@ -364,7 +364,7 @@ public class FieldNameAnalyzerTests
             CodeActionIndex = codeActionIndex,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Theory]
@@ -425,7 +425,7 @@ public class FieldNameAnalyzerTests
             CodeActionIndex = codeActionIndex,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Theory]
@@ -485,7 +485,7 @@ public class FieldNameAnalyzerTests
             CodeActionIndex = codeActionIndex,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Fact]
@@ -520,7 +520,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 44, 9, 56);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -565,7 +565,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 40, 9, 52);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -610,7 +610,7 @@ public class FieldNameAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 32, 9, 44);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -652,6 +652,6 @@ public class FieldNameAnalyzerTests
             CompilerDiagnostics = CompilerDiagnostics.None,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 }

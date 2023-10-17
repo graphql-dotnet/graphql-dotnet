@@ -306,7 +306,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
         var last = result.Errors.Last();
         last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
@@ -403,7 +403,7 @@ public class MutationTests : QueryTestBase<MutationSchema>
             }
             """;
 
-        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2).ConfigureAwait(false);
+        var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
         result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
         var last = result.Errors.Last();
         last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");

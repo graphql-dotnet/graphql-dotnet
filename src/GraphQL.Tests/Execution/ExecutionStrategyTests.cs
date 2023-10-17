@@ -17,7 +17,7 @@ public class ExecutionStrategyTests
         {
             Query = query,
             Schema = schema,
-        }).ConfigureAwait(false);
+        });
         result.Data.ShouldBeNull();
         //TODO: the document should fail validation and Executed should return false
         //see: https://github.com/graphql/graphql-spec/pull/955

@@ -34,7 +34,7 @@ public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
                     }
                 }
             }
-            """).ConfigureAwait(false);
+            """);
 
         result.Complexity.ShouldBe(60);
         result.TotalQueryDepth.ShouldBe(4);
@@ -70,7 +70,7 @@ public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
                     name #3
                 }
             }
-            """).ConfigureAwait(false);
+            """);
 
         result.Complexity.ShouldBe(136);
         result.TotalQueryDepth.ShouldBe(5);

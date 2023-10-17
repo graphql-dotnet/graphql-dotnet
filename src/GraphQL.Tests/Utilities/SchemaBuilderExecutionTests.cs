@@ -44,7 +44,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             options.Schema = schema;
             options.Query = "{ method }";
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("OVERFLOW");
@@ -76,7 +76,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             options.Schema = schema;
             options.Query = "{ property }";
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
@@ -112,7 +112,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             options.Schema = schema;
             options.Query = "{ test { id name } }";
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("INVALID_OPERATION");
@@ -140,7 +140,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             options.Schema = schema;
             options.Query = "{ test { id name } }";
             options.Root = new QueryEx();
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.ShouldBeNull();
         var data = result.Data.ShouldBeAssignableTo<RootExecutionNode>();
@@ -436,7 +436,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ hello }";
             _.Root = root;
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "hello": "Hello World!" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -457,7 +457,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ source }";
             _.Root = new { Hello = "World" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "source": true }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -474,7 +474,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        string result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = "{ resolve }");
 
         var expectedResult = CreateQueryResult("""{ "resolve": "Resolved" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -491,7 +491,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             }
             """, _ => _.Types.Include<ParametersType>());
 
-        string result = await ExecuteAsync(schema, _ => _.Query = """{ resolveWithParam(id: "abcd") }""").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = """{ resolveWithParam(id: "abcd") }""");
 
         var expectedResult = CreateQueryResult("""{ "resolveWithParam": "Resolved abcd" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -512,7 +512,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ userContext }";
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -533,7 +533,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = "{ userContext }";
             _.UserContext = new ChildMyUserContext { Name = "Quinn" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "userContext": "Quinn" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -576,7 +576,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         {
             _.Query = """{ userContextWithParam(id: "abcd") }""";
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "userContextWithParam": "Quinn abcd" }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -598,7 +598,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Query = "{ three }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "three": true }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -620,7 +620,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Query = "{ four(id: 123) }";
             _.Root = new { Hello = "World" };
             _.UserContext = new MyUserContext { Name = "Quinn" };
-        }).ConfigureAwait(false);
+        });
 
         var expectedResult = CreateQueryResult("""{ "four": true }""");
         string serializedExpectedResult = Serializer.Serialize(expectedResult);
@@ -717,7 +717,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
                 _.Types.Include<PetQueryType>();
             });
 
-        string result = await ExecuteAsync(schema, _ => _.Query = "{ pet { ... on Dog { name } } }").ConfigureAwait(false);
+        string result = await ExecuteAsync(schema, _ => _.Query = "{ pet { ... on Dog { name } } }");
 
         const string expected = """{ "pet": { "name" : "Eli" } }""";
         var expectedResult = CreateQueryResult(expected);

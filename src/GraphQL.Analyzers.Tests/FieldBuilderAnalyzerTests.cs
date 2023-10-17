@@ -11,7 +11,7 @@ public class FieldBuilderAnalyzerTests
     {
         const string source = @"";
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 33);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 100);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 26);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 65);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -267,7 +267,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 15, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -306,7 +306,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 52);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -402,7 +402,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 11, 33);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -451,7 +451,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 15);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -501,7 +501,7 @@ public class FieldBuilderAnalyzerTests
 
         var expected1 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 11, 32);
         var expected2 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(15, 9, 16, 32);
-        await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix);
     }
 
     [Fact]
@@ -559,7 +559,7 @@ public class FieldBuilderAnalyzerTests
                 }
             }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Fact]
@@ -620,6 +620,6 @@ public class FieldBuilderAnalyzerTests
                 }
             }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;
+namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;
 
 internal static class ExceptionUtilities
 {

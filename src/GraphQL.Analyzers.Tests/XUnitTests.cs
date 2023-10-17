@@ -23,7 +23,6 @@ public class XUnitTests
 
         // error CS0246: The type or namespace name 'ObjectGraphType' could not be found (are you missing a using directive or an assembly reference?)
         await Assert
-            .ThrowsAsync<EqualWithMessageException>(async () => await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false))
-            .ConfigureAwait(false);
+            .ThrowsAsync<EqualWithMessageException>(async () => await VerifyCS.VerifyAnalyzerAsync(source));
     }
 }

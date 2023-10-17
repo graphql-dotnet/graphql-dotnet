@@ -60,7 +60,7 @@ public class FieldBuilderTests
         fields[0].Type.ShouldBe(typeof(StringGraphType));
 
         var context = new ResolveFieldContext();
-        object result = await fields[0].Resolver.ResolveAsync(context).ConfigureAwait(false);
+        object result = await fields[0].Resolver.ResolveAsync(context);
         result.GetType().ShouldBe(typeof(string));
         result.ShouldBe("SomeString");
     }
@@ -157,7 +157,7 @@ public class FieldBuilderTests
             {
                 { "arg1", new ArgumentValue("abc", ArgumentSource.Literal) }
             }
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public class FieldBuilderTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class FieldBuilderTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -220,7 +220,7 @@ public class FieldBuilderTests
                 { "skip", new ArgumentValue(1, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -265,7 +265,7 @@ public class FieldBuilderTests
                 { "skip", ArgumentValue.NullLiteral }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class FieldBuilderTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -308,7 +308,7 @@ public class FieldBuilderTests
                 {"episode", new ArgumentValue("JEDI", ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -328,7 +328,7 @@ public class FieldBuilderTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -351,7 +351,7 @@ public class FieldBuilderTests
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -374,7 +374,7 @@ public class FieldBuilderTests
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -397,7 +397,7 @@ public class FieldBuilderTests
                 { "arg1", new ArgumentValue("arg1value", ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -416,6 +416,6 @@ public class FieldBuilderTests
         await field.Resolver.ResolveAsync(new ResolveFieldContext
         {
             Source = 12345
-        }).ConfigureAwait(false);
+        });
     }
 }
