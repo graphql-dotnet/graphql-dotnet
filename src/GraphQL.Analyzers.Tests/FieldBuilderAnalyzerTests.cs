@@ -503,7 +503,7 @@ public class FieldBuilderAnalyzerTests
         source.Replace("\r", "").ShouldContain("// next line contains whitespaces\n    ");
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -550,7 +550,7 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 15);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
