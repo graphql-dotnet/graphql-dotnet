@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Instrumentation;
 public class ApolloTracingTests : StarWarsTestBase
 {
     [Fact]
-    public void extension_has_expected_format()
+    public async Task extension_has_expected_format()
     {
         const string query = """
             query {
@@ -25,12 +25,12 @@ public class ApolloTracingTests : StarWarsTestBase
 
         var start = DateTime.UtcNow;
         Schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
-        var result = Executer.ExecuteAsync(_ =>
+        var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
             _.Query = query;
             _.EnableMetrics = true;
-        }).Result;
+        });
         result.EnrichWithApolloTracing(start);
         var trace = (ApolloTrace)result.Extensions["tracing"];
 

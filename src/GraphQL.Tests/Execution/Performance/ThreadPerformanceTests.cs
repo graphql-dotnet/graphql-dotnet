@@ -63,7 +63,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
 
     [Fact(Skip = "May fail on a single processor machine.")]
     // [Fact]
-    public void Executes_IsQuickerThanTotalTaskTime()
+    public async Task Executes_IsQuickerThanTotalTaskTime()
     {
         const string query = """
             query HeroNameAndFriendsQuery {
@@ -75,12 +75,12 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
         var smallListTimer = new Stopwatch();
         smallListTimer.Start();
 
-        var runResult2 = Executer.ExecuteAsync(_ =>
+        var runResult2 = await Executer.ExecuteAsync(_ =>
         {
             _.EnableMetrics = false;
             _.Schema = Schema;
             _.Query = query;
-        }).GetAwaiter().GetResult();
+        });
 
         smallListTimer.Stop();
 

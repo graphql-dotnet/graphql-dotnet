@@ -2,7 +2,7 @@
   <Import Project="$(MSBuildThisFileDirectory)Tests.local.props" Condition="Exists('$(MSBuildThisFileDirectory)Tests.local.props')" />
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);IDE1006;IDE0022;IDE0058;CS0618;RCS1090;xUnit1031</NoWarn>
+    <NoWarn>$(NoWarn);IDE1006;IDE0022;IDE0058;CS0618;RCS1090</NoWarn>
     <SingleTestPlatform Condition="'$(SingleTestPlatform)' == ''">false</SingleTestPlatform>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
