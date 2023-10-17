@@ -1,29 +1,17 @@
-﻿using Xunit.Sdk;
+using Xunit.Sdk;
 
 namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;
 
-public class EqualWithMessageException : EqualException
+[SuppressMessage("Roslynator", "RCS1194:Implement exception constructors.", Justification = "Copied from EqualException")]
+public sealed class EqualWithMessageException : XunitException
 {
-    public EqualWithMessageException(object? expected, object? actual, string userMessage)
-        : base(expected, actual)
-    {
-        UserMessage = userMessage;
-    }
+    private EqualWithMessageException(string message) :
+        base(message)
+    { }
 
-    public EqualWithMessageException(string? expected, string? actual, int expectedIndex, int actualIndex, string userMessage)
-        : base(expected, actual, expectedIndex, actualIndex)
-    {
-        UserMessage = userMessage;
-    }
-
-    public override string Message
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(UserMessage))
-                return base.Message;
-
-            return UserMessage + Environment.NewLine + base.Message;
-        }
-    }
+    public static EqualWithMessageException ForMismatchedValues(
+        object? expected,
+        object? actual,
+        string userMessage) =>
+        new(userMessage + Environment.NewLine + EqualException.ForMismatchedValues(expected, actual).Message);
 }

@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.Testing;
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using Xunit.Sdk;
 
 namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;
 
@@ -20,26 +21,37 @@ public class XUnitVerifier : IVerifier
 
     public virtual void Empty<T>(string collectionName, IEnumerable<T> collection)
     {
-        using var enumerator = collection.GetEnumerator();
+        ArgumentNullException.ThrowIfNull(collection);
+
+        using var tracker = collection.AsTracker();
+        using var enumerator = tracker.GetEnumerator();
         if (enumerator.MoveNext())
-            throw new EmptyWithMessageException(collection, CreateMessage($"'{collectionName}' is not empty"));
+        {
+            throw EmptyWithMessageException.ForNonEmptyCollection(
+                CreateMessage($"'{collectionName}' is not empty"),
+                tracker.FormatStart());
+        }
     }
 
     public virtual void Equal<T>(T expected, T actual, string? message = null)
     {
         if (message is null && Context.IsEmpty)
+        {
             Assert.Equal(expected, actual);
+        }
         else
         {
             if (!EqualityComparer<T>.Default.Equals(expected, actual))
-                throw new EqualWithMessageException(expected, actual, CreateMessage(message));
+                throw EqualWithMessageException.ForMismatchedValues(expected, actual, CreateMessage(message));
         }
     }
 
     public virtual void True([DoesNotReturnIf(false)] bool assert, string? message = null)
     {
         if (message is null && Context.IsEmpty)
+        {
             Assert.True(assert);
+        }
         else
         {
             Assert.True(assert, CreateMessage(message));
@@ -49,7 +61,9 @@ public class XUnitVerifier : IVerifier
     public virtual void False([DoesNotReturnIf(true)] bool assert, string? message = null)
     {
         if (message is null && Context.IsEmpty)
+        {
             Assert.False(assert);
+        }
         else
         {
             Assert.False(assert, CreateMessage(message));
@@ -60,10 +74,12 @@ public class XUnitVerifier : IVerifier
     public virtual void Fail(string? message = null)
     {
         if (message is null && Context.IsEmpty)
+        {
             Assert.True(false);
+        }
         else
         {
-            Assert.True(false, CreateMessage(message));
+            Assert.Fail(CreateMessage(message));
         }
 
         throw ExceptionUtilities.Unreachable;
@@ -74,17 +90,20 @@ public class XUnitVerifier : IVerifier
 
     public virtual void NotEmpty<T>(string collectionName, IEnumerable<T> collection)
     {
+        ArgumentNullException.ThrowIfNull(collection);
+
         using var enumerator = collection.GetEnumerator();
         if (!enumerator.MoveNext())
-            throw new NotEmptyWithMessageException(CreateMessage($"'{collectionName}' is empty"));
+            throw NotEmptyWithMessageException.ForNonEmptyCollection(CreateMessage($"'{collectionName}' is empty"));
+
     }
 
     public virtual void SequenceEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T>? equalityComparer = null, string? message = null)
     {
         var comparer = new SequenceEqualEnumerableEqualityComparer<T>(equalityComparer);
-        var areEqual = comparer.Equals(expected, actual);
+        bool areEqual = comparer.Equals(expected, actual);
         if (!areEqual)
-            throw new EqualWithMessageException(expected, actual, CreateMessage(message));
+            throw EqualWithMessageException.ForMismatchedValues(expected, actual, CreateMessage(message));
     }
 
     public virtual IVerifier PushContext(string context)
@@ -95,7 +114,7 @@ public class XUnitVerifier : IVerifier
 
     protected virtual string CreateMessage(string? message)
     {
-        foreach (var frame in Context)
+        foreach (string frame in Context)
         {
             message = "Context: " + frame + Environment.NewLine + message;
         }

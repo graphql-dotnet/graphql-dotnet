@@ -1,22 +1,14 @@
-﻿using Xunit.Sdk;
+using Xunit.Sdk;
 
 namespace GraphQL.Analyzers.Tests.Verifiers.XUnit;
 
-public class NotEmptyWithMessageException : NotEmptyException
+[SuppressMessage("Roslynator", "RCS1194:Implement exception constructors.", Justification = "Copied from NotEmptyException")]
+public sealed class NotEmptyWithMessageException : XunitException
 {
-    public NotEmptyWithMessageException(string userMessage)
-    {
-        UserMessage = userMessage;
-    }
+    private NotEmptyWithMessageException(string message) :
+        base(message)
+    { }
 
-    public override string Message
-    {
-        get
-        {
-            if (string.IsNullOrEmpty(UserMessage))
-                return base.Message;
-
-            return UserMessage + Environment.NewLine + base.Message;
-        }
-    }
+    public static NotEmptyWithMessageException ForNonEmptyCollection(string userMessage) =>
+        new(userMessage + Environment.NewLine + NotEmptyException.ForNonEmptyCollection().Message);
 }
