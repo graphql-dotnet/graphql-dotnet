@@ -184,6 +184,7 @@ namespace GraphQL
     public class ExperimentalFeatures
     {
         public ExperimentalFeatures() { }
+        public bool AllowScalarVariablesForListTypes { get; set; }
         public bool AppliedDirectives { get; set; }
         public bool DeprecationOfInputValues { get; set; }
         public bool RepeatableDirectives { get; set; }
@@ -224,6 +225,7 @@ namespace GraphQL
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
+        public static bool EnableReflectionCaching { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
@@ -422,6 +424,7 @@ namespace GraphQL
         public static bool IsOutputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsOutputType(this System.Type type) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
+        public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, bool allowScalarsForLists) { }
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
         public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
@@ -3257,7 +3260,10 @@ namespace GraphQL.Validation
     }
     public class Variable
     {
+        [System.Obsolete("Please specify the variable definition when constructing a variable.")]
         public Variable(string name) { }
+        public Variable(string name, GraphQLParser.AST.GraphQLVariableDefinition definition) { }
+        public GraphQLParser.AST.GraphQLVariableDefinition Definition { get; set; }
         public bool IsDefault { get; set; }
         public string Name { get; }
         public object? Value { get; set; }
@@ -3265,7 +3271,11 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
+        [System.Obsolete("Please specify whether the field has a default value when constructing this varia" +
+            "ble usage.")]
         public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type) { }
+        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault) { }
+        public bool HasDefault { get; }
         public GraphQLParser.AST.GraphQLVariable Node { get; }
         public GraphQL.Types.IGraphType Type { get; }
     }
@@ -3274,6 +3284,7 @@ namespace GraphQL.Validation
         public Variables() { }
         public static GraphQL.Validation.Variables None { get; }
         public virtual void Add(GraphQL.Validation.Variable variable) { }
+        public GraphQL.Validation.Variable? Find(GraphQLParser.ROM name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Validation.Variable> GetEnumerator() { }
         public bool ValueFor(GraphQLParser.ROM name, out GraphQL.Execution.ArgumentValue value) { }
         public object? ValueFor(string name, object? defaultValue = null) { }

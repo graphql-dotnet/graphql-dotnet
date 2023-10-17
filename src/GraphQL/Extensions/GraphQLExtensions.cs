@@ -270,43 +270,93 @@ namespace GraphQL
         /// equal or a subset of the second super type (covariant).
         /// </summary>
         public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType)
+            => IsSubtypeOf(maybeSubType, superType, false);
+
+        /// <summary>
+        /// Provided a type and a super type, return <see langword="true"/> if the first type is either
+        /// equal or a subset of the second super type (covariant).
+        /// When <paramref name="allowScalarsForLists"/> is <see langword="true"/>, it will allow
+        /// scalar types to match list types, as long as the inner types match, pursuant to the
+        /// GraphQL June 2018 Specification, section 3.11 "List: Input Coercion".
+        /// </summary>
+        // TODO: roll this into IsSubtypeOf and remove the allowScalarsForLists parameter
+        public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType, bool allowScalarsForLists)
         {
+            //maybeSubType = variableType
+            //superType = locationType
+
+            // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
             if (maybeSubType.Equals(superType))
             {
                 return true;
             }
 
+            // >> If {locationType} is a non-null type
             // If superType is non-null, maybeSubType must also be nullable.
             if (superType is NonNullGraphType sup1)
             {
-                if (maybeSubType is NonNullGraphType sub)
-                {
-                    return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!);
-                }
+                // >> - If {variableType} is NOT a non-null type, return {false}.
+                if (maybeSubType is not NonNullGraphType sub)
+                    return false;
 
-                return false;
+                // >> - Let {nullableLocationType} be the unwrapped nullable type of {locationType}.
+                // >> - Let {nullableVariableType} be the unwrapped nullable type of {variableType}.
+                // >> - Return {AreTypesCompatible(nullableVariableType, nullableLocationType)}.
+                return IsSubtypeOf(sub.ResolvedType!, sup1.ResolvedType!, allowScalarsForLists);
             }
+            // >> - Otherwise, if {variableType} is a non-null type:
             else if (maybeSubType is NonNullGraphType sub)
             {
-                return IsSubtypeOf(sub.ResolvedType!, superType);
+                // >> - Let {nullableVariableType} be the nullable type of {variableType}.
+                // >> - Return {AreTypesCompatible(nullableVariableType, locationType)}.
+                return IsSubtypeOf(sub.ResolvedType!, superType, allowScalarsForLists);
             }
 
-            // If superType type is a list, maybeSubType type must also be a list.
+            // If superType type is a list, maybeSubType type must also be a list, unless allowScalarsForLists is true.
+            // >> Otherwise, if {locationType} is a list type:
             if (superType is ListGraphType sup)
             {
-                if (maybeSubType is ListGraphType sub)
-                {
-                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!);
-                }
+                // >> Let {itemLocationType} be the unwrapped item type of {locationType}.
+                //var itemLocationType = sup.ResolvedType!;
 
-                return false;
+                // >> If {variableType} is NOT a list type:
+                if (maybeSubType is not ListGraphType sub)
+                {
+                    if (allowScalarsForLists)
+                    {
+                        // >> - If {itemLocationType} is a non-null type:
+                        if (sup.ResolvedType is NonNullGraphType sup2)
+                        {
+                            // >>   - Let {nullableItemLocationType} be the unwrapped nullable type of {itemLocationType}.
+                            // >>   - Return {AreTypesCompatible(variableType, nullableItemLocationType)}.
+                            return IsSubtypeOf(maybeSubType, sup2);
+                        }
+                        else
+                        {
+                            // >> - Otherwise, return {AreTypesCompatible(variableType, itemLocationType)}.
+                            return IsSubtypeOf(maybeSubType, sup.ResolvedType!, allowScalarsForLists);
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    // >> - Let {itemVariableType} be the unwrapped item type of {variableType}.
+                    // >> - Return {AreTypesCompatible(itemVariableType, itemLocationType)}.
+                    return IsSubtypeOf(sub.ResolvedType!, sup.ResolvedType!, allowScalarsForLists);
+                }
             }
+            // >> - Otherwise, if {variableType} is a list type, return {false}.
             else if (maybeSubType is ListGraphType)
             {
                 // If superType is not a list, maybeSubType must also be not a list.
                 return false;
             }
 
+            // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
             // If superType type is an abstract type, maybeSubType type may be a currently
             // possible object type.
             if (superType is IAbstractGraphType type && maybeSubType is IObjectGraphType)

@@ -27,9 +27,24 @@ namespace GraphQL.Types
 
         /// <inheritdoc/>
         public ObjectGraphType()
+            : this(null)
         {
-            if (typeof(TSourceType) != typeof(object))
-                IsTypeOf = instance => instance is TSourceType;
+        }
+
+        internal ObjectGraphType(ObjectGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
+        {
+            if (cloneFrom == null)
+            {
+                if (typeof(TSourceType) != typeof(object))
+                    IsTypeOf = instance => instance is TSourceType;
+                Interfaces = new Interfaces();
+                return;
+            }
+            IsTypeOf = cloneFrom.IsTypeOf;
+            Interfaces = cloneFrom.Interfaces;
+            if (cloneFrom.ResolvedInterfaces.Count > 0)
+                throw new InvalidOperationException("Cannot clone ObjectGraphType when ResolvedInterfaces contains items.");
         }
 
         /// <inheritdoc/>
@@ -43,7 +58,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public Interfaces Interfaces { get; } = new Interfaces();
+        public Interfaces Interfaces { get; }
 
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();

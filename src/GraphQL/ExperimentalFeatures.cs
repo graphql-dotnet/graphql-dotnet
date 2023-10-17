@@ -29,4 +29,10 @@ public class ExperimentalFeatures
     /// This feature is from a working draft of the specification (not experimental, just not released yet).
     /// </summary>
     public bool DeprecationOfInputValues { get; set; } = false;
+
+    /// <summary>
+    /// Specifies whether scalar or object variable types can be used where list types are defined.
+    /// For instance, if this switch is enabled, a variable of type Int can be used for an [Int] argument.
+    /// </summary>
+    public bool AllowScalarVariablesForListTypes { get; set; }
 }

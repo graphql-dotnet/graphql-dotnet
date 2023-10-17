@@ -185,15 +185,17 @@ namespace GraphQL.Validation
             {
                 var objectType = GetInputType()?.GetNamedType();
                 IGraphType? fieldType = null;
+                FieldType? inputField = null;
 
                 if (objectType is IInputObjectGraphType complexType)
                 {
-                    var inputField = complexType.GetField(objectField.Name);
+                    inputField = complexType.GetField(objectField.Name);
 
                     fieldType = inputField?.ResolvedType;
                 }
 
                 _inputTypeStack.Push(fieldType);
+                _fieldDefStack.Push(inputField);
             }
 
             return default;
@@ -230,9 +232,14 @@ namespace GraphQL.Validation
                 _argument = null;
                 _inputTypeStack.Pop();
             }
-            else if (node is GraphQLListValue || node is GraphQLObjectField)
+            else if (node is GraphQLListValue)
             {
                 _inputTypeStack.Pop();
+            }
+            else if (node is GraphQLObjectField)
+            {
+                _inputTypeStack.Pop();
+                _fieldDefStack.Pop();
             }
 
             return default;
