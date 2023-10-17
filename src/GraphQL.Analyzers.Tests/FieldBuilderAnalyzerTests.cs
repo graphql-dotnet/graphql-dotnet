@@ -468,7 +468,7 @@ public class FieldBuilderAnalyzerTests
                 {
                     // next line contains whitespaces
                     
-                    Field<StringGraphType>("name", "description", null,
+                    Field<StringGraphType>("name",
                         resolve: context => Resolve(
                             "text"
                         ));
@@ -489,7 +489,7 @@ public class FieldBuilderAnalyzerTests
                 {
                     // next line contains whitespaces
                     
-                    Field<StringGraphType>("name").Description("description")
+                    Field<StringGraphType>("name")
                         .Resolve(context => Resolve(
                             "text"
                         ));
@@ -503,6 +503,53 @@ public class FieldBuilderAnalyzerTests
         source.Replace("\r", "").ShouldContain("// next line contains whitespaces\n    ");
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+    }
+
+    [Fact]
+    public async Task CommentBeforeField_ArgumentsFormattingPreservedAsync()
+    {
+        const string source = """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // comment
+                    Field<StringGraphType>("name",
+                        resolve: context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        const string fix = """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // comment
+                    Field<StringGraphType>("name")
+                        .Resolve(context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 15);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
     }
 
