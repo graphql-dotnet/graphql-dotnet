@@ -499,6 +499,9 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
+        // ensure whitespace was not removed from input sample
+        source.Replace("\r", "").ShouldContain("// next line contains whitespaces\n    ");
+
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
     }
