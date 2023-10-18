@@ -21,7 +21,7 @@ public sealed class TheoryExDiscoverer : IXunitTestCaseDiscoverer
     public IEnumerable<IXunitTestCase> Discover(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
         => _discoverer.Discover(discoveryOptions, testMethod, factAttribute);
 
-    private sealed class MessageSinkWrapper : IMessageSink
+    private sealed class MessageSinkWrapper : LongLivedMarshalByRefObject, IMessageSink
     {
         private readonly IMessageSink _sink;
 

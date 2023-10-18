@@ -27,7 +27,9 @@ public class GraphQLBuilderTests
                 {
                     RequestServices = mockServiceProvider.Object
                 };
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
                 action.ExecuteAsync(options, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
                 options.Listeners.ShouldContain(instance);
                 return register;
             }).Verifiable();

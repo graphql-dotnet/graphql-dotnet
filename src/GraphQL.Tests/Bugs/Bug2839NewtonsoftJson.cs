@@ -9,19 +9,18 @@ namespace GraphQL.Tests.Bugs;
 public class Bug2839NewtonsoftJson
 {
     [Fact]
-    public void Bug2839Test()
+    public async Task Bug2839Test()
     {
         var schema = new Schema { Query = new TestQuery() };
         schema.ReplaceScalar(new MyDateTimeGraphType());
 
         var exec = new DocumentExecuter();
 
-        var result = exec.ExecuteAsync(options =>
+        var result = await exec.ExecuteAsync(options =>
         {
             options.Schema = schema;
             options.Query = "{ test { thisIsAString, thisIsADateTime } }";
-        }
-        ).Result;
+        });
 
         var writer = new GraphQLSerializer(options =>
         {

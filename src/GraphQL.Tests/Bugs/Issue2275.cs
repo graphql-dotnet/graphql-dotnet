@@ -28,7 +28,7 @@ public class Issue2275
                     }
                 }
                 """);
-        }).ConfigureAwait(false);
+        });
 
         string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();

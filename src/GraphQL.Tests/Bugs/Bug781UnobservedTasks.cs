@@ -22,7 +22,7 @@ public class Bug781UnobservedTasks
                 options.Query = query;
                 options.CancellationToken = cts.Token;
                 options.ThrowOnUnhandledException = true; // required
-            }).ConfigureAwait(false);
+            });
         }
         catch (Exception ex)
         {
@@ -30,7 +30,7 @@ public class Bug781UnobservedTasks
         }
 
         GC.Collect(); // GC causes UnobservedTaskException event
-        await Task.Delay(1000).ConfigureAwait(false); // Wait some time for GC to complete
+        await Task.Delay(1000); // Wait some time for GC to complete
 
         TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
 
