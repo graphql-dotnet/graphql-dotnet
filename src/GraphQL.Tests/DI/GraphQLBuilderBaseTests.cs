@@ -1,3 +1,4 @@
+using System;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Types;
@@ -10,7 +11,7 @@ namespace GraphQL.Tests.DI;
 public class GraphQLBuilderBaseTests
 {
     [Fact]
-    public void Initialize()
+    public async Task Initialize()
     {
         var builder = new TestBuilder();
         var mock = builder.ServiceRegister.MockBuilder;
@@ -33,28 +34,10 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IExecutionStrategySelector), typeof(DefaultExecutionStrategySelector), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder.ServiceRegister).Verifiable();
+        var actions = new List<IConfigureExecution>();
         mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false)).Returns<Type, IConfigureExecution, bool>((_, action, _) =>
         {
-            var schema = Mock.Of<ISchema>(MockBehavior.Strict);
-
-            //verify no action if schema is set
-#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
-            action.ExecuteAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
-#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
-
-            //verify schema is pulled from service provider if schema is not set
-            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-            mockServiceProvider.Setup(s => s.GetService(typeof(ISchema))).Returns(schema).Verifiable();
-            var opts = new ExecutionOptions()
-            {
-                RequestServices = mockServiceProvider.Object,
-            };
-#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
-            action.ExecuteAsync(opts, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
-#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
-            opts.Schema.ShouldBe(schema);
-            mockServiceProvider.Verify();
-
+            actions.Add(action);
             return builder.ServiceRegister;
         }).Verifiable();
 
@@ -69,6 +52,26 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(AutoRegisteringInterfaceGraphType<>), typeof(AutoRegisteringInterfaceGraphType<>), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
 
         builder.CallInitialize();
+
+        foreach (var action in actions)
+        {
+            var schema = Mock.Of<ISchema>(MockBehavior.Strict);
+
+            //verify no action if schema is set
+            await action.ExecuteAsync(new ExecutionOptions { Schema = schema, RequestServices = Mock.Of<IServiceProvider>(MockBehavior.Strict) }, _ => Task.FromResult<ExecutionResult>(null!));
+
+            //verify schema is pulled from service provider if schema is not set
+            var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+            mockServiceProvider.Setup(s => s.GetService(typeof(ISchema))).Returns(schema).Verifiable();
+            var opts = new ExecutionOptions()
+            {
+                RequestServices = mockServiceProvider.Object,
+            };
+            await action.ExecuteAsync(opts, _ => Task.FromResult<ExecutionResult>(null!));
+            opts.Schema.ShouldBe(schema);
+            mockServiceProvider.Verify();
+        }
+
         mock.Verify();
         mock.VerifyNoOtherCalls();
     }
