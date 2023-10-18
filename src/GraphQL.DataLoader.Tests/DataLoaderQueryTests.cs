@@ -29,7 +29,7 @@ public class DataLoaderQueryTests : QueryTestBase
         "firstName": "{{users[1].FirstName}}"
     }
 ] }
-""");
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
@@ -57,7 +57,7 @@ public class DataLoaderQueryTests : QueryTestBase
         "firstName": "{{users[1].FirstName}}"
     }
 ] }
-""");
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
@@ -101,7 +101,7 @@ public class DataLoaderQueryTests : QueryTestBase
                     }
                 }
             }
-            """);
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -155,7 +155,7 @@ public class DataLoaderQueryTests : QueryTestBase
                     }
                 }]
             }
-            """);
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -209,7 +209,7 @@ public class DataLoaderQueryTests : QueryTestBase
                     }
                 }]
             }
-            """);
+            """).ConfigureAwait(false);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -281,7 +281,7 @@ public class DataLoaderQueryTests : QueryTestBase
                     }]
                 }]
             }
-            """);
+            """).ConfigureAwait(false);
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         usersMock.VerifyNoOtherCalls();
 
@@ -340,7 +340,7 @@ public class DataLoaderQueryTests : QueryTestBase
                     }
                 }
             }
-            """);
+            """).ConfigureAwait(false);
 
         result.Errors.ShouldBeNull();
     }
@@ -369,7 +369,7 @@ public class DataLoaderQueryTests : QueryTestBase
     },
     null
 ] }
-""");
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
@@ -397,7 +397,7 @@ public class DataLoaderQueryTests : QueryTestBase
         "firstName": "{{users[1].FirstName}}"
     }
 ] }
-""");
+""").ConfigureAwait(false);
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
@@ -414,6 +414,6 @@ public class DataLoaderQueryTests : QueryTestBase
     {
         await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ exerciseListsOfLists (values:[[1, 2], [3, 4, 5]]) }",
-            expected: """{ "exerciseListsOfLists": [[1, 2], [3, 4, 5]] }""");
+            expected: """{ "exerciseListsOfLists": [[1, 2], [3, 4, 5]] }""").ConfigureAwait(false);
     }
 }

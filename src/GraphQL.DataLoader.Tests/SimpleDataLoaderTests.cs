@@ -22,9 +22,9 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var delayResult = loader.LoadAsync();
 
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-        var result1 = await delayResult.GetResultAsync();
+        var result1 = await delayResult.GetResultAsync().ConfigureAwait(false);
 
         result1.ShouldNotBeNull();
         result1.Count().ShouldBe(2);
@@ -35,7 +35,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         task2.Status.ShouldBe(TaskStatus.RanToCompletion);
 
-        var result2 = await task2;
+        var result2 = await task2.ConfigureAwait(false);
 
         // Results should be the same instance
         result2.ShouldBeSameAs(result1);
@@ -56,7 +56,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
             .Returns(async (CancellationToken ct) =>
             {
                 // wait for cancellation
-                await Task.Delay(60000, ct);
+                await Task.Delay(60000, ct).ConfigureAwait(false);
                 // should not occur
                 return users;
             });
@@ -76,7 +76,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         cts.Cancel();
 
         // ensure that the task is cancelled
-        await Should.ThrowAsync<OperationCanceledException>(task);
+        await Should.ThrowAsync<OperationCanceledException>(task).ConfigureAwait(false);
 
         // ensure that the mock function was called with the proper token (and it was cancelled while running)
         mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
@@ -100,7 +100,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         cts.Cancel();
 
-        await Should.ThrowAsync<OperationCanceledException>(() => result.GetResultAsync(cts.Token));
+        await Should.ThrowAsync<OperationCanceledException>(() => result.GetResultAsync(cts.Token)).ConfigureAwait(false);
 
         // Fetch delegate should not be called
         mock.VerifyNoOtherCalls();
@@ -126,7 +126,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var task = result.GetResultAsync();
 
-        var ex = await Should.ThrowAsync<Exception>(task);
+        var ex = await Should.ThrowAsync<Exception>(task).ConfigureAwait(false);
 
         ex.Message.ShouldBe("Deferred");
     }
@@ -145,7 +145,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var result = loader.LoadAsync();
 
-        var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync());
+        var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync()).ConfigureAwait(false);
 
         ex.Message.ShouldBe("Immediate");
     }

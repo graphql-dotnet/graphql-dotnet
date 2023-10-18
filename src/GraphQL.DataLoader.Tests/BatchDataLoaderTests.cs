@@ -27,14 +27,14 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(2);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
         // Now await tasks
-        user1 = await task1;
-        user2 = await task2;
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();
@@ -73,7 +73,7 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result5 = loader.LoadAsync(5);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
@@ -82,11 +82,11 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var task5 = result5.GetResultAsync();
 
         // Now await tasks
-        user1 = await task1;
-        user2 = await task2;
-        user3 = await task3;
-        user4 = await task4;
-        user5 = await task5;
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
+        user3 = await task3.ConfigureAwait(false);
+        user4 = await task4.ConfigureAwait(false);
+        user5 = await task5.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();
@@ -128,14 +128,14 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(2);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
         // Now await tasks
-        user1 = await task1;
-        user2 = await task2;
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
 
         var result3 = loader.LoadAsync(1);
 
@@ -145,9 +145,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
             "Task should already be complete because value comes from cache");
 
         // This should not actually run the fetch delegate again
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-        user3 = await task3;
+        user3 = await task3.ConfigureAwait(false);
 
         user3.ShouldBeSameAs(user1);
 
@@ -180,16 +180,16 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result3 = loader.LoadAsync(3);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
         var task3 = result3.GetResultAsync();
 
         // Now await tasks
-        user1 = await task1;
-        user2 = await task2;
-        user3 = await task3;
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
+        user3 = await task3.ConfigureAwait(false);
 
         user1.ShouldNotBeNull();
         user2.ShouldNotBeNull();
@@ -227,16 +227,16 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result3 = loader.LoadAsync(3);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
         var task3 = result3.GetResultAsync();
 
         // Now await tasks
-        user1 = await task1;
-        user2 = await task2;
-        user3 = await task3;
+        user1 = await task1.ConfigureAwait(false);
+        user2 = await task2.ConfigureAwait(false);
+        user3 = await task3.ConfigureAwait(false);
 
         // Load key 3 again.
         var result3b = loader.LoadAsync(3);
@@ -246,9 +246,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         task3b.Status.ShouldBe(TaskStatus.RanToCompletion,
             "Should be cached because it was requested in the first batch even though it wasn't in the result dictionary");
 
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
-        var user3b = await task3b;
+        var user3b = await task3b.ConfigureAwait(false);
 
         user3.ShouldBeSameAs(nullObjectUser, "The DataLoader should use the supplied default value");
 
@@ -284,9 +284,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         Exception ex = await Should.ThrowAsync<ArgumentException>(async () =>
         {
             // Now await tasks
-            var user1 = await task1.GetResultAsync();
-            var user2 = await task2.GetResultAsync();
-        });
+            var user1 = await task1.GetResultAsync().ConfigureAwait(false);
+            var user2 = await task2.GetResultAsync().ConfigureAwait(false);
+        }).ConfigureAwait(false);
 
         var actualException = Should.Throw<ArgumentException>(() =>
         {
@@ -323,14 +323,14 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         Exception ex = await Should.ThrowAsync<ApplicationException>(async () =>
         {
             // Now await tasks
-            var user1 = await task1.GetResultAsync();
-        });
+            var user1 = await task1.GetResultAsync().ConfigureAwait(false);
+        }).ConfigureAwait(false);
 
         Exception ex2 = await Should.ThrowAsync<ApplicationException>(async () =>
         {
             // Now await tasks
-            var user2 = await task2.GetResultAsync();
-        });
+            var user2 = await task2.GetResultAsync().ConfigureAwait(false);
+        }).ConfigureAwait(false);
 
         mock.Verify(x => x.GetUsersByIdAsync(new[] { 1, 2 }, default));
         mock.VerifyNoOtherCalls();
@@ -354,14 +354,14 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(1);
 
         // Dispatch loading
-        await loader.DispatchAsync();
+        await loader.DispatchAsync().ConfigureAwait(false);
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
         // Now await tasks
-        var user1 = await task1;
-        var user1b = await task2;
+        var user1 = await task1.ConfigureAwait(false);
+        var user1b = await task2.ConfigureAwait(false);
 
         user1.ShouldBeSameAs(users[0]);
         user1b.ShouldBeSameAs(users[0]);
@@ -374,13 +374,13 @@ public class BatchDataLoaderTests : DataLoaderTestBase
     public async Task Returns_Null_For_Null_Reference_Types()
     {
         var loader = new BatchDataLoader<object, string>((_, _) => throw new Exception());
-        (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
+        (await loader.LoadAsync(null).GetResultAsync().ConfigureAwait(false)).ShouldBeNull();
     }
 
     [Fact]
     public async Task Returns_Null_For_Null_Value_Types()
     {
         var loader = new BatchDataLoader<int?, string>((_, _) => throw new Exception());
-        (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
+        (await loader.LoadAsync(null).GetResultAsync().ConfigureAwait(false)).ShouldBeNull();
     }
 }
