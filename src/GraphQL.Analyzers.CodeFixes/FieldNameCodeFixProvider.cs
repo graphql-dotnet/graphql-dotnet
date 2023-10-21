@@ -28,6 +28,7 @@ public class FieldNameCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
+            string builderMethodName = diagnostic.Properties[Constants.Properties.BuilderMethodName]!;
 
             var nameInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
             var nameMemberAccess = (MemberAccessExpressionSyntax)nameInvocationExpression.Expression;
@@ -40,7 +41,7 @@ public class FieldNameCodeFixProvider : CodeFixProvider
                     CodeAction.Create(
                         title: codeFixTitle,
                         createChangedDocument: ct =>
-                            CopyNameArgumentAsync(context.Document, nameMemberAccess, ct),
+                            CopyNameArgumentAsync(context.Document, nameMemberAccess, builderMethodName, ct),
                         equivalenceKey: codeFixTitle),
                     diagnostic);
             }
@@ -50,8 +51,8 @@ public class FieldNameCodeFixProvider : CodeFixProvider
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: codeFixTitle,
-                        createChangedDocument: c =>
-                            RemoveRedundantNameInvocationAsync(context.Document, nameMemberAccess, c),
+                        createChangedDocument: ct =>
+                            RemoveRedundantNameInvocationAsync(context.Document, nameMemberAccess, ct),
                         equivalenceKey: codeFixTitle),
                     diagnostic);
             }
@@ -61,8 +62,8 @@ public class FieldNameCodeFixProvider : CodeFixProvider
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: codeFixTitle1,
-                        createChangedDocument: c =>
-                            RemoveRedundantNameInvocationAsync(context.Document, nameMemberAccess, c),
+                        createChangedDocument: ct =>
+                            RemoveRedundantNameInvocationAsync(context.Document, nameMemberAccess, ct),
                         equivalenceKey: codeFixTitle1),
                     diagnostic);
 
@@ -70,8 +71,8 @@ public class FieldNameCodeFixProvider : CodeFixProvider
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         title: codeFixTitle2,
-                        createChangedDocument: c =>
-                            CopyNameArgumentAsync(context.Document, nameMemberAccess, c),
+                        createChangedDocument: ct =>
+                            CopyNameArgumentAsync(context.Document, nameMemberAccess, builderMethodName, ct),
                         equivalenceKey: codeFixTitle2),
                     diagnostic);
             }
@@ -81,10 +82,11 @@ public class FieldNameCodeFixProvider : CodeFixProvider
     private static async Task<Document> CopyNameArgumentAsync(
         Document document,
         MemberAccessExpressionSyntax nameMemberAccess,
+        string builderMethodName,
         CancellationToken cancellationToken)
     {
         var docEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-        var fieldInvocationExpression = nameMemberAccess.FindFieldInvocationExpression()!;
+        var fieldInvocationExpression = nameMemberAccess.FindMethodInvocationExpression(builderMethodName)!;
 
         var fieldNameArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Name, docEditor.SemanticModel);
         var nameArgList = ((InvocationExpressionSyntax)nameMemberAccess.Parent!).ArgumentList;

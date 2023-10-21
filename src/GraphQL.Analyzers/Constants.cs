@@ -20,6 +20,8 @@ public static class Constants
     public static class MethodNames
     {
         public const string Arguments = "Arguments";
+        public const string Connection = "Connection";
+        public const string Create = "Create";
         public const string DeprecationReason = "DeprecationReason";
         public const string Description = "Description";
         public const string Field = "Field";
@@ -39,6 +41,7 @@ public static class Constants
 
     public static class Properties
     {
+        public const string BuilderMethodName = "BuilderMethodName";
         public const string IsAsync = "IsAsync";
         public const string IsDelegate = "IsDelegate";
     }

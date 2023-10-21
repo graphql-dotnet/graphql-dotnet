@@ -62,7 +62,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var fieldInvocationExpression = resolveMemberAccessExpression.FindFieldInvocationExpression();
+        var fieldInvocationExpression = resolveMemberAccessExpression.FindMethodInvocationExpression(Constants.MethodNames.Field);
 
         // without Field() invocation we know nothing about the source type
         // where FieldBuilder was created
