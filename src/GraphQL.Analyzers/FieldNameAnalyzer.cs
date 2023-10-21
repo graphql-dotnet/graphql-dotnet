@@ -36,7 +36,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor DifferentNamesDefinedByFieldAndNameMethods = new(
         id: DiagnosticIds.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS,
         title: "Different names defined by 'Field', 'Connection' or 'ConnectionBuilder.Create' and 'Name' methods",
-        messageFormat: "The name should be provided via '{0}' method. Different names defined by '{1}' and 'Name' methods.",
+        messageFormat: "The name should be provided via '{0}' method. Different names defined by '{0}' and 'Name' methods.",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
@@ -79,7 +79,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         // Field().Name("xxx")
         if (!builderMethodInvocation.ArgumentList.Arguments.Any())
         {
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName, builderName);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName);
             return;
         }
 
@@ -87,7 +87,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         var fieldName = builderMethodInvocation.GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel);
         if (fieldName == null)
         {
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName, builderName);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName);
             return;
         }
 
@@ -96,12 +96,12 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         if (fieldName.Expression.IsEquivalentTo(nameName.Expression))
         {
             // Field("xxx").Name("xxx")
-            ReportNameDiagnostic(context, nameMemberAccessExpression, NameMethodInvocationCanBeRemoved, builderName, builderName);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, NameMethodInvocationCanBeRemoved, builderName);
         }
         else
         {
             // Field("xxx").Name("yyy")
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DifferentNamesDefinedByFieldAndNameMethods, builderName, builderName, builderName);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DifferentNamesDefinedByFieldAndNameMethods, builderName);
         }
     }
 
@@ -140,8 +140,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         SyntaxNodeAnalysisContext context,
         MemberAccessExpressionSyntax nameMemberAccessExpression,
         DiagnosticDescriptor diagnosticDescriptor,
-        string builderMethodName,
-        params object[] messageArgs)
+        string builderMethodName)
     {
         var props = new Dictionary<string, string?>
         {
@@ -153,7 +152,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
             diagnosticDescriptor,
             location,
             props,
-            messageArgs);
+            messageArgs: builderMethodName);
         context.ReportDiagnostic(diagnostic);
     }
 }

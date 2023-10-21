@@ -371,7 +371,7 @@ public class FieldNameAnalyzerTests
 
         string[] fixes = new[] { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName, methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -445,7 +445,7 @@ public class FieldNameAnalyzerTests
 
         string[] fixes = new[] { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName, methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -517,7 +517,7 @@ public class FieldNameAnalyzerTests
 
         string[] fixes = new[] { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(11, startColumn, 11, endColumn).WithArguments(methodName, methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(11, startColumn, 11, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -588,7 +588,7 @@ public class FieldNameAnalyzerTests
 
         string[] fixes = new[] { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName, methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -649,7 +649,7 @@ public class FieldNameAnalyzerTests
         string[] fixes = new[] { fix0, fix1 };
         string methodName = Constants.MethodNames.Field;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(9, 54, 9, 67).WithArguments(methodName, methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(9, 54, 9, 67).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
