@@ -78,7 +78,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>().Name("Text").Description("description");
+                    {{builderName}}<StringGraphType>().Name("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -93,7 +93,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text").Description("description");
+                    {{builderName}}<StringGraphType>("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -166,7 +166,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text").Description("description");
+                    {{builderName}}<StringGraphType>("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -190,7 +190,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text").Name("Text").Description("description");
+                    {{builderName}}<StringGraphType>("Text").Name("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -205,7 +205,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text").Description("description");
+                    {{builderName}}<StringGraphType>("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -279,7 +279,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>(GetName()).Name(GetName()).Description("description");
+                    {{builderName}}<StringGraphType>(GetName()).Name(GetName()).Resolve(context => "Test");
                 }
 
                 private string GetName() => "Text";
@@ -296,7 +296,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>(GetName()).Description("description");
+                    {{builderName}}<StringGraphType>(GetName()).Resolve(context => "Test");
                 }
 
                 private string GetName() => "Text";
@@ -330,7 +330,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text1").Name("Text2").Description("description");
+                    {{builderName}}<StringGraphType>("Text1").Name("Text2").Resolve(context => "Test");
                 }
             }
             """;
@@ -345,7 +345,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text1").Description("description");
+                    {{builderName}}<StringGraphType>("Text1").Resolve(context => "Test");
                 }
             }
             """;
@@ -360,7 +360,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>("Text2").Description("description");
+                    {{builderName}}<StringGraphType>("Text2").Resolve(context => "Test");
                 }
             }
             """;
@@ -402,7 +402,7 @@ public class FieldNameAnalyzerTests
                 public MyGraphType()
                 {
                     {{builderName}}<StringGraphType>("Text1").Name("Text2")
-                        .Description("description");
+                        .Resolve(context => "Test");
                 }
             }
             """;
@@ -418,7 +418,7 @@ public class FieldNameAnalyzerTests
                 public MyGraphType()
                 {
                     {{builderName}}<StringGraphType>("Text1")
-                        .Description("description");
+                        .Resolve(context => "Test");
                 }
             }
             """;
@@ -434,7 +434,7 @@ public class FieldNameAnalyzerTests
                 public MyGraphType()
                 {
                     {{builderName}}<StringGraphType>("Text2")
-                        .Description("description");
+                        .Resolve(context => "Test");
                 }
             }
             """;
@@ -547,7 +547,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>(name: "Text1").Name("Text2").Description("description");
+                    {{builderName}}<StringGraphType>(name: "Text1").Name("Text2").Resolve(context => "Test");
                 }
             }
             """;
@@ -562,7 +562,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>(name: "Text1").Description("description");
+                    {{builderName}}<StringGraphType>(name: "Text1").Resolve(context => "Test");
                 }
             }
             """;
@@ -577,7 +577,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    {{builderName}}<StringGraphType>(name: "Text2").Description("description");
+                    {{builderName}}<StringGraphType>(name: "Text2").Resolve(context => "Test");
                 }
             }
             """;
@@ -613,7 +613,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<string>(name: "Text1", nullable: true).Name("Text2").Description("description");
+                    Field<string>(name: "Text1", nullable: true).Name("Text2").Resolve(context => "Test");
                 }
             }
             """;
@@ -627,7 +627,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<string>(name: "Text1", nullable: true).Description("description");
+                    Field<string>(name: "Text1", nullable: true).Resolve(context => "Test");
                 }
             }
             """;
@@ -641,7 +641,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<string>(name: "Text2", nullable: true).Description("description");
+                    Field<string>(name: "Text2", nullable: true).Resolve(context => "Test");
                 }
             }
             """;
@@ -859,7 +859,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    ConnectionBuilder.Create<StringGraphType, string>().Name("Text").Description("description");
+                    ConnectionBuilder.Create<StringGraphType, string>().Name("Text").Resolve(context => "Test");
                 }
             }
             """;
@@ -874,7 +874,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    ConnectionBuilder.Create<StringGraphType, string>("Text").Description("description");
+                    ConnectionBuilder.Create<StringGraphType, string>("Text").Resolve(context => "Test");
                 }
             }
             """;
