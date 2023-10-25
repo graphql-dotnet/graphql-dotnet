@@ -86,7 +86,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var fieldInvocation = genericNameSyntax.FindFieldInvocationExpression()!;
+        var fieldInvocation = genericNameSyntax.FindMethodInvocationExpression()!;
 
         ReportFieldTypeDiagnostic(
             context,

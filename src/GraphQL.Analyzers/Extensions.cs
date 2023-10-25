@@ -8,20 +8,20 @@ namespace GraphQL.Analyzers;
 
 public static class Extensions
 {
-    public static InvocationExpressionSyntax? FindFieldInvocationExpression(this ExpressionSyntax expression)
+    public static InvocationExpressionSyntax? FindMethodInvocationExpression(this ExpressionSyntax expression, string methodName)
     {
-        var fieldNameSyntax = expression.FindFieldSimpleNameSyntax();
-        return fieldNameSyntax?.FindFieldInvocationExpression();
+        var simpleNameSyntax = expression.FindSimpleNameSyntax(methodName);
+        return simpleNameSyntax?.FindMethodInvocationExpression();
     }
 
-    public static SimpleNameSyntax? FindFieldSimpleNameSyntax(this ExpressionSyntax expression)
+    public static SimpleNameSyntax? FindSimpleNameSyntax(this ExpressionSyntax expression, string builderName)
     {
         return expression.DescendantNodes()
             .OfType<SimpleNameSyntax>()
-            .FirstOrDefault(simpleNameSyntax => simpleNameSyntax.Identifier.Text == Constants.MethodNames.Field);
+            .FirstOrDefault(simpleNameSyntax => simpleNameSyntax.Identifier.Text == builderName);
     }
 
-    public static InvocationExpressionSyntax? FindFieldInvocationExpression(this SimpleNameSyntax fieldSimpleName)
+    public static InvocationExpressionSyntax? FindMethodInvocationExpression(this SimpleNameSyntax fieldSimpleName)
     {
         return fieldSimpleName.Parent switch
         {
