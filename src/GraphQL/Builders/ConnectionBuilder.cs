@@ -405,7 +405,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
+        public virtual ConnectionBuilder<TSourceType> Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -415,12 +415,14 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
+        public virtual ConnectionBuilder<TSourceType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -430,6 +432,8 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return new ValueTask<object?>(resolver(connectionContext));
             });
+
+            return this;
         }
 
         private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
