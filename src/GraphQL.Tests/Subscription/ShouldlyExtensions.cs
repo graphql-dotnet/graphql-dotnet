@@ -22,7 +22,7 @@ public static class ShouldlyExtensions
         observer.ShouldNotBeNull();
         observer.Events.ShouldNotBeNull();
         observer.Events.TryDequeue(out var result).ShouldBeTrue("Observable sequence should have another result but did not");
-        return result;
+        return result!;
     }
 
     public static void ShouldHaveNoMoreResults(this SampleObserver? observer)

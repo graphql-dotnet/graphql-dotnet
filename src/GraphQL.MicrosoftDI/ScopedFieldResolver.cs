@@ -25,7 +25,7 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
         };
     }
 
-    /// <inheritdoc cref="ScopedFieldResolver{TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+    /// <inheritdoc cref="ScopedFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
     public ScopedFieldResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
 
     private static Func<IResolveFieldContext, ValueTask<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
@@ -41,7 +41,7 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
 /// <inheritdoc cref="ScopedFieldResolver{TReturnType}"/>
 public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<TReturnType>
 {
-    /// <inheritdoc cref="ScopedFieldResolver{TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+    /// <inheritdoc cref="ScopedFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
     public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver) : base(GetScopedResolver(resolver)) { }
 
     private static Func<IResolveFieldContext, TReturnType?> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
@@ -53,7 +53,7 @@ public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<T
         };
     }
 
-    /// <inheritdoc cref="ScopedFieldResolver{TSourceType, TReturnType}.ScopedFieldResolver(Func{IResolveFieldContext{TSourceType}, TReturnType})" />
+    /// <inheritdoc cref="ScopedFieldResolver{TSourceType, TReturnType}(Func{IResolveFieldContext{TSourceType}, TReturnType})" />
     public ScopedFieldResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver) : base(GetScopedResolver(resolver)) { }
 
     private static Func<IResolveFieldContext, ValueTask<TReturnType?>> GetScopedResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver)

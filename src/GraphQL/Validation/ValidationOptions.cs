@@ -6,7 +6,7 @@ using GraphQLParser.AST;
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// Options used by <see cref="IDocumentValidator.ValidateAsync(in ValidationOptions)"/>.
+    /// Options used by <see cref="IDocumentValidator.ValidateAsync"/>.
     /// </summary>
     public readonly struct ValidationOptions
     {

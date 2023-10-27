@@ -1,7 +1,6 @@
 #pragma warning disable IDE0039 // Use local function
 
 using GraphQL.Builders;
-using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI;
@@ -85,7 +84,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -140,7 +139,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -197,7 +196,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -256,7 +255,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -317,7 +316,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4,
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;

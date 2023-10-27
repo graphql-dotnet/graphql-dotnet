@@ -33,7 +33,7 @@ namespace GraphQL.Validation
             };
         }
 
-        /// <inheritdoc cref="MatchingNodeVisitor{TNode}.MatchingNodeVisitor(Action{TNode, ValidationContext}?, Action{TNode, ValidationContext}?)"/>
+        /// <inheritdoc cref="MatchingNodeVisitor{TNode}(Action{TNode, ValidationContext}?, Action{TNode, ValidationContext}?)"/>
         public MatchingNodeVisitor(Func<TNode, ValidationContext, ValueTask>? enter = null, Func<TNode, ValidationContext, ValueTask>? leave = null)
         {
             if (enter == null && leave == null)
