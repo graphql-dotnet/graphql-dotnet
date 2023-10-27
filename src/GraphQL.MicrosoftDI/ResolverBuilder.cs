@@ -1,5 +1,4 @@
 using GraphQL.Builders;
-using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI;
@@ -73,7 +72,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -122,7 +121,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -173,7 +172,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -226,7 +225,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -281,7 +280,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
