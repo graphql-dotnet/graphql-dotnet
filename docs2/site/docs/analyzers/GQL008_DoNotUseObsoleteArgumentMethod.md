@@ -23,7 +23,6 @@ Use `Argument<TArgumentGraphType>()` method overload with a single generic type 
 ## Example of a violation
 
 ```c#
-
 Field<StringGraphType>("Text").Argument<StringGraphType, string>(
     "arg",
     "description",
@@ -34,8 +33,6 @@ Field<StringGraphType>("Text").Argument<StringGraphType, string>(
     "description",
     "MyDefault",
     argument => argument.DeprecationReason = "Deprecation Reason");
-
-
 ```
 
 ## Example of how to fix
@@ -56,7 +53,6 @@ Field<StringGraphType>("Text").Argument<StringGraphType>(
         argument.DeprecationReason = "Deprecation Reason";
         argument.DefaultValue = "MyDefault";
     });
-
 ```
 
 ## Suppress a warning
