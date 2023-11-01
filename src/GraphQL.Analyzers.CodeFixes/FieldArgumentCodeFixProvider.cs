@@ -66,13 +66,14 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
             .WithTypeArgumentList(
                 RewriteTypeArgumentList(genericName));
 
+        docEditor.ReplaceNode(argumentMemberAccess.Name, newMethodName);
+
         var semanticModel = (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false))!;
         var defaultValueArg = argumentInvocation.GetMethodArgument(Constants.ArgumentNames.DefaultValue, semanticModel);
 
         // .Argument<T>(x, y) or .Argument<T>(x, y, configure: arg => ...)
         if (defaultValueArg == null)
         {
-            docEditor.ReplaceNode(argumentMemberAccess.Name, newMethodName);
             return docEditor.GetChangedDocument();
         }
 
@@ -81,19 +82,19 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
         // .Argument<T>(x, y, defaultValue)
         if (configureArg == null)
         {
-            var newArgumentInvocation = ConvertDefaultValueToConfigureLambda();
-            docEditor.ReplaceNode(argumentInvocation, newArgumentInvocation);
+            var configureLambdaArg = CreateConfigureLambdaArgument(defaultValueArg);
+            docEditor.ReplaceNode(defaultValueArg, configureLambdaArg);
             return docEditor.GetChangedDocument();
         }
 
-        // .Argument<,>(x, y, defaultValue, arg => ...)
-        // .Argument<,>(x, y, arg => ...)
-        // .Argument<>(x, y, arg => ...)
         if (configureArg.Expression is not SimpleLambdaExpressionSyntax configureLambda)
         {
             return document;
         }
 
+        // .Argument<,>(x, y, defaultValue, arg => ...)
+        // .Argument<,>(x, y, arg => ...)
+        // .Argument<>(x, y, arg => ...)
         SimpleLambdaExpressionSyntax? newConfigureLambda;
 
         // arg => { arg.Prop = val; }
@@ -104,7 +105,7 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
         // arg => arg.Prop = val
         else if (configureLambda.ExpressionBody != null)
         {
-            newConfigureLambda = ConvertBodyLambdaToBlock(configureLambda);
+            newConfigureLambda = ConvertBodyConfigureLambdaToBlockLambda(configureLambda);
         }
         else
         {
@@ -115,26 +116,13 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
         var newMethodArgumentList = argumentInvocation.ArgumentList
             .Arguments
             .Insert(2, Argument(newConfigureLambda))
-            .RemoveAt(4)    // todo
+            .RemoveAt(4)
             .RemoveAt(3);
 
         var newArgumentsList = argumentInvocation.ArgumentList.WithArguments(newMethodArgumentList);
         docEditor.ReplaceNode(argumentInvocation.ArgumentList, newArgumentsList);
-        docEditor.ReplaceNode(argumentMemberAccess.Name, newMethodName);
 
         return docEditor.GetChangedDocument();
-
-        InvocationExpressionSyntax ConvertDefaultValueToConfigureLambda()
-        {
-            var configureLambdaArg = CreateConfigureLambdaArgument(defaultValueArg);
-            var argumentListSyntax = argumentInvocation.ArgumentList
-                .ReplaceNode(defaultValueArg, configureLambdaArg);
-
-            // .Argument<T>(x, y, defaultValue) or .Argument<T>(x, y, defaultValue, configure)
-            return argumentInvocation
-                .ReplaceNode(argumentMemberAccess.Name, newMethodName)
-                .WithArgumentList(argumentListSyntax);
-        }
 
         SimpleLambdaExpressionSyntax AddDefaultValueToConfigureLambdaBlock(SimpleLambdaExpressionSyntax lambda)
         {
@@ -145,7 +133,7 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
                 lambda.Block!.AddStatements(defaultValueStatement));
         }
 
-        SimpleLambdaExpressionSyntax ConvertBodyLambdaToBlock(SimpleLambdaExpressionSyntax lambda)
+        SimpleLambdaExpressionSyntax ConvertBodyConfigureLambdaToBlockLambda(SimpleLambdaExpressionSyntax lambda)
         {
             var whitespace = Whitespace(" ");
             var block = SyntaxFactory
