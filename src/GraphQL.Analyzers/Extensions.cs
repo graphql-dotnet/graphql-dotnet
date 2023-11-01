@@ -110,8 +110,15 @@ public static class Extensions
         }
 
         int paramIndex = GetParamIndex(argumentName, methodSymbol);
-        return paramIndex != -1
+        var argument = paramIndex != -1 && invocation.ArgumentList.Arguments.Count > paramIndex
             ? invocation.ArgumentList.Arguments[paramIndex]
+            : null;
+
+        // if requested argument is a named argument we should find it in 'namedArguments' dict
+        // if we got here and found named argument - it's another argument placed an the requested
+        // argument index, and requested argument has a default value (optional)
+        return argument is { NameColon: null }
+            ? argument
             : null;
     }
 

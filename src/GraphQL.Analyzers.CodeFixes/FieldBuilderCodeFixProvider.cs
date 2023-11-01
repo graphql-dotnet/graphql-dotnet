@@ -31,8 +31,8 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            bool isAsyncField = diagnostic.Properties.ContainsKey(Constants.Properties.IsAsync);
-            bool isDelegate = diagnostic.Properties.ContainsKey(Constants.Properties.IsDelegate);
+            bool isAsyncField = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsAsync);
+            bool isDelegate = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsDelegate);
 
             var fieldInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
 

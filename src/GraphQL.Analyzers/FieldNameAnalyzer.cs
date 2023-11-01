@@ -144,7 +144,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     {
         var props = new Dictionary<string, string?>
         {
-            [Constants.Properties.BuilderMethodName] = builderMethodName
+            [Constants.AnalyzerProperties.BuilderMethodName] = builderMethodName
         }.ToImmutableDictionary();
 
         var location = nameMemberAccessExpression.GetMethodInvocationLocation();
