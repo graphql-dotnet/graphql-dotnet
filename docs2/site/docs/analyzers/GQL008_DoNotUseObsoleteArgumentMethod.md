@@ -37,8 +37,6 @@ Field<StringGraphType>("Text").Argument<StringGraphType, string>(
 
 ## Example of how to fix
 
-Make the source type fields and properties settable
-
 ```c#
 Field<StringGraphType>("Text").Argument<StringGraphType>(
     "arg",
