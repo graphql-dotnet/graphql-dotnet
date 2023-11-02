@@ -28,7 +28,7 @@ public class FieldNameCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            string builderMethodName = diagnostic.Properties[Constants.Properties.BuilderMethodName]!;
+            string builderMethodName = diagnostic.Properties[Constants.AnalyzerProperties.BuilderMethodName]!;
 
             var nameInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
             var nameMemberAccess = (MemberAccessExpressionSyntax)nameInvocationExpression.Expression;

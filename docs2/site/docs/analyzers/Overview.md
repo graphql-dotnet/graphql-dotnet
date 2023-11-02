@@ -50,6 +50,10 @@ The `ResolverAnalyzer` focuses on identifying incorrect usage of resolver method
 
 The analyzer detects input graph type fields that can't be mapped to the source type during deserialization process.
 
+### 5. FieldArgumentAnalyzer
+
+The analyzer detects an obsolete `Argument` method usage and offers a code fix to automatically replace it with with another `Argument` overload.
+
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when the rule is applied and how the automatic code fix executes code adjustments. Refer to the specific documentation page for each analyzer to understand the available configuration options and their application methods.
