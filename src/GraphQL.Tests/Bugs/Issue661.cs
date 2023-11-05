@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Bugs;
 public class Issue661
 {
     [Fact]
-    public void Cache_Injection_Should_Work()
+    public async Task Cache_Injection_Should_Work()
     {
         var services = new ServiceCollection();
 
@@ -26,11 +26,11 @@ public class Issue661
         cache.GetString("mykey").ShouldBe("myvalue");
 
         var executer = provider.GetRequiredService<IDocumentExecuter>();
-        var result = executer.ExecuteAsync(options =>
+        var result = await executer.ExecuteAsync(options =>
         {
             options.Schema = provider.GetRequiredService<ISchema>();
             options.Query = "{ get_cached }";
-        }).GetAwaiter().GetResult();
+        });
 
         result.Errors.ShouldBeNull();
         var data = result.Data.ToDict();

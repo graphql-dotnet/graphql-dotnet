@@ -18,17 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: main
       - name: Checkout publish target
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: graphql-dotnet/graphql-dotnet.github.io
           token: ${{ secrets.ORG_PAT_TOKEN }}
           path: published
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2

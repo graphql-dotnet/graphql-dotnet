@@ -23,7 +23,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [Fact]
     public async Task Ordinary_Request_Should_Work()
     {
-        var result = await _fixture.ExecuteAsync(opt => opt.Query = "query { ping }").ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Query = "query { ping }");
 
         result.Errors.ShouldBeNull();
         _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
@@ -40,7 +40,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [Fact]
     public async Task Without_Query_And_Hash_Should_Throw_Error()
     {
-        var result = await _fixture.ExecuteAsync().ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync();
         AssertError(result, "QUERY_MISSING", "GraphQL query is missing.");
     }
 
@@ -58,7 +58,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
             }
         });
 
-        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
         AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "PersistedQueryNotSupported");
         result.Errors.Single().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
@@ -79,7 +79,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
             }
         });
 
-        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
         AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "PersistedQueryNotFound");
         result.Errors.Single().ShouldBeOfType<PersistedQueryNotFoundError>()
@@ -103,7 +103,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             opt.Query = "query { ping }";
             opt.Extensions = extentions;
-        }).ConfigureAwait(false);
+        });
 
         AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The hash 'badHash' doesn't correspond to the provided query.");
     }
@@ -126,11 +126,11 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             opt.Query = "query { ping }";
             opt.Extensions = extentions;
-        }).ConfigureAwait(false);
+        });
         result.Errors.ShouldBeNull();
         _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
 
-        result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
         result.Errors.ShouldBeNull();
         _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
     }

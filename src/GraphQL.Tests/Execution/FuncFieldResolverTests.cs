@@ -34,7 +34,7 @@ public class FuncFieldResolverTests
             rfc1 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldBeSameAs(_context);
     }
@@ -54,8 +54,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -78,8 +78,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -105,10 +105,10 @@ public class FuncFieldResolverTests
         });
         try
         {
-            await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+            await ffr1.ResolveAsync(_context);
         }
         catch { }
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -133,10 +133,10 @@ public class FuncFieldResolverTests
         });
         try
         {
-            await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+            await ffr1.ResolveAsync(_context);
         }
         catch { }
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -159,8 +159,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return _okDataLoader;
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -183,8 +183,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return _okDataLoader;
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -207,8 +207,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return new[] { 1, 2 };
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -231,8 +231,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return new[] { 1, 2 };
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();

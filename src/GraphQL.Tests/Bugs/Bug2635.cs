@@ -22,7 +22,7 @@ public class Bug2635 : QueryTestBase<Bug2635.MySchema>
                 Schema = new MySchema(),
                 Root = this,
                 CancellationToken = CancellationTokenSource.Token,
-            }).ConfigureAwait(false);
+            });
         }
         catch (OperationCanceledException)
         {
