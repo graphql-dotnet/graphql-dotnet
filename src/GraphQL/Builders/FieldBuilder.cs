@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Reflection;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation.Complexity;
@@ -107,8 +108,37 @@ namespace GraphQL.Builders
         /// <param name="type">The graph type of the field.</param>
         public virtual FieldBuilder<TSourceType, TReturnType> Type(IGraphType type)
         {
+            FieldType.Type = null;
             FieldType.ResolvedType = type;
             return this;
+        }
+
+        /// <summary>
+        /// Sets the graph type of the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> Type<TGraphType>()
+            where TGraphType : IGraphType
+        {
+            FieldType.Type = typeof(TGraphType);
+            FieldType.ResolvedType = null;
+            return this;
+        }
+
+        /// <summary>
+        /// For input object fields, sets the mapping of the field to the source type's member.
+        /// </summary>
+        [Obsolete("Please configure the field mapping by providing an expression as an argument to the 'Field' method.")]
+        public virtual FieldBuilder<TSourceType, T> Map<T>(Expression<Func<TSourceType, T>> expression)
+        {
+            if (expression.Body is MemberExpression expr)
+            {
+                FieldType.Metadata[ComplexGraphType<T>.ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+            }
+            else
+            {
+                throw new ArgumentException("Expression must directly reference a member on the source type.", nameof(expression));
+            }
+            return Returns<T>();
         }
 
         /// <summary>

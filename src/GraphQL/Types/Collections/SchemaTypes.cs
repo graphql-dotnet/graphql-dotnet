@@ -226,7 +226,8 @@ public class SchemaTypes : IEnumerable<IGraphType>
         _introspectionTypes = CreateIntrospectionTypes(schema.Features.AppliedDirectives, schema.Features.RepeatableDirectives, schema.Features.DeprecationOfInputValues);
 
         _context = new TypeCollectionContext(
-           type => BuildGraphQLType(type, t => _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
+           type => BuildGraphQLType(type, t =>
+           _builtInScalars.TryGetValue(t, out var graphType) ? graphType : _introspectionTypes.TryGetValue(t, out graphType) ? graphType : (IGraphType)Activator.CreateInstance(t)!),
            (name, type, ctx) =>
            {
                SetGraphType(name, type);
