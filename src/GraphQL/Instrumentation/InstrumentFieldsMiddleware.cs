@@ -28,15 +28,21 @@ namespace GraphQL.Instrumentation
             };
 
             var marker = context.Metrics.Subject("field", name, metadata);
-            var ret = await next(context).ConfigureAwait(false);
-            if (ret is IDataLoaderResult dataLoaderResult)
+            var disposeMarker = true;
+            try
             {
-                return new CompleteDataLoaderResult(dataLoaderResult, marker);
-            }
-            else
-            {
-                marker.Dispose();
+                var ret = await next(context).ConfigureAwait(false);
+                if (ret is IDataLoaderResult dataLoaderResult)
+                {
+                    disposeMarker = false;
+                    return new CompleteDataLoaderResult(dataLoaderResult, marker);
+                }
                 return ret;
+            }
+            finally
+            {
+                if (disposeMarker)
+                    marker.Dispose();
             }
         }
 
@@ -53,9 +59,8 @@ namespace GraphQL.Instrumentation
 
             public async Task<object?> GetResultAsync(CancellationToken cancellationToken = default)
             {
-                var ret = await _baseDataLoaderResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
-                _marker.Dispose();
-                return ret;
+                using (_marker)
+                    return await _baseDataLoaderResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
             }
         }
     }
