@@ -91,5 +91,12 @@ namespace GraphQL.Types
         /// Gets or sets a subscription resolver for the field. Only applicable to the root fields of subscription.
         /// </summary>
         public ISourceStreamResolver? StreamResolver { get; set; }
+
+        /// <summary>
+        /// Validates and/or parses the value received from the client.
+        /// Throw an exception if necessary to indicate a problem.
+        /// Only applicable to fields of input graph types.
+        /// </summary>
+        public Func<object?, object?> ParseValue { get; set; } = static value => value;
     }
 }

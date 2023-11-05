@@ -133,6 +133,15 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
+        /// Sets the input resolver for the field.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object?, object?> parseValue)
+        {
+            FieldType.ParseValue = parseValue;
+            return this;
+        }
+
+        /// <summary>
         /// Sets the resolver for the field.
         /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver? resolver)

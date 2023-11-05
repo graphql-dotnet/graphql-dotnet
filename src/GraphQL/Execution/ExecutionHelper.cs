@@ -250,7 +250,20 @@ namespace GraphQL.Execution
                         // when a optional variable is specified for the input field, and the variable is not defined, and
                         //   when there is no default value specified for the input field, then do not add the entry to the
                         //   unordered map.
-                        if (value.Source != ArgumentSource.FieldDefault || value.Value != null)
+                        if (value.Source != ArgumentSource.FieldDefault)
+                        {
+                            var parsedValue = value.Value;
+                            try
+                            {
+                                parsedValue = field.ParseValue(parsedValue);
+                            }
+                            catch (Exception ex) when (context.Document != null && context.ParentNode != null)
+                            {
+                                throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                            }
+                            obj[field.Name] = parsedValue;
+                        }
+                        else if (value.Value != null)
                             obj[field.Name] = value.Value;
                     }
                     else if (field.DefaultValue != null)
