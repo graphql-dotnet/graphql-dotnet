@@ -9,4 +9,5 @@ public static class DiagnosticIds
     public const string ILLEGAL_RESOLVER_USAGE = "GQL005";
     public const string CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD = "GQL006";
     public const string CAN_NOT_SET_SOURCE_FIELD = "GQL007";
+    public const string DO_NOT_USE_OBSOLETE_ARGUMENT_METHOD = "GQL008";
 }

@@ -10,11 +10,11 @@
 
 ## Cause
 
-The same name is provided in `Field` and `Name` methods.
+The same name is provided in `Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods.
 
 ## Rule description
 
-Field name should be provided in the `Field` method. The `Name` method call is unnecessary and can be removed.
+Field name should be provided in the `Field`, `Connection` or `ConnectionBuilder.Create` method. The `Name` method call is unnecessary and can be removed.
 
 ## How to fix violations
 
@@ -24,12 +24,18 @@ Remove the `Name` method call.
 
 ```c#
 Field<StringGraphType>("Name").Name("Name");
+Connection<StringGraphType>("Name").Name("Name");
+ConnectionBuilder<string>.Create<StringGraphType>("Name").Name("Name");
+ConnectionBuilder.Create<StringGraphType, string>("Name").Name("Name");
 ```
 
 ## Example of how to fix
 
 ```c#
 Field<StringGraphType>("Name");
+Connection<StringGraphType>("Name");
+ConnectionBuilder<string>.Create<StringGraphType>("Name");
+ConnectionBuilder.Create<StringGraphType, string>("Name");
 ```
 
 ## Suppress a warning
@@ -53,5 +59,5 @@ For more information, see [How to suppress code analysis warnings](https://learn
 
 ## Related rules
 
-[GQL001: Define the name in `Field` method](/GQL001_DefineTheNameInFieldMethod)  
-[GQL003: Different names defined by `Field` and `Name` methods](/GQL003_DifferentNamesDefinedByFieldAndNameMethods)
+[GQL001: Define the name in `Field`, `Connection` or `ConnectionBuilder.Create` method](/GQL001_DefineTheNameInFieldMethod)  
+[GQL003: Different names defined by `Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods](/GQL003_DifferentNamesDefinedByFieldAndNameMethods)

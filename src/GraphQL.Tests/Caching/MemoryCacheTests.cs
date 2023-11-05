@@ -21,10 +21,10 @@ public class MemoryCacheTests
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
-        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBeNull();
+        (await memoryCache.GetAsyncPublic(options)).ShouldBeNull();
 
-        await memoryCache.SetAsyncPublic(options, doc).ConfigureAwait(false);
-        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBe(doc);
+        await memoryCache.SetAsyncPublic(options, doc);
+        (await memoryCache.GetAsyncPublic(options)).ShouldBe(doc);
     }
 
     [Fact]
@@ -34,10 +34,10 @@ public class MemoryCacheTests
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
-        await memoryCache.SetAsyncPublic(options, doc).ConfigureAwait(false);
+        await memoryCache.SetAsyncPublic(options, doc);
 
-        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsyncPublic(options, null!).ConfigureAwait(false)).ConfigureAwait(false);
+        await Should.ThrowAsync<ArgumentNullException>(async () => await memoryCache.SetAsyncPublic(options, null!));
 
-        (await memoryCache.GetAsyncPublic(options).ConfigureAwait(false)).ShouldBe(doc);
+        (await memoryCache.GetAsyncPublic(options)).ShouldBe(doc);
     }
 }

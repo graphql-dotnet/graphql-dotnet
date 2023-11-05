@@ -69,7 +69,7 @@ public class UnionGraphTypeTests
         schema.RegisterType<Type2>();
         schema.Initialize();
 
-        string str1 = await schema.ExecuteAsync(o => o.Query = "{ union1 { ...frag } union2 { ...frag } } fragment frag on UnionType { ... on Type1 { field1 } ... on Type2 { field2 } }").ConfigureAwait(false);
+        string str1 = await schema.ExecuteAsync(o => o.Query = "{ union1 { ...frag } union2 { ...frag } } fragment frag on UnionType { ... on Type1 { field1 } ... on Type2 { field2 } }");
         str1.ShouldBeCrossPlatJson("""{"data":{"union1":{"field1":1},"union2":{"field2":2}}}""");
     }
 

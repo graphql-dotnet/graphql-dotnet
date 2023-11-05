@@ -21,7 +21,7 @@ namespace GraphQL.Resolvers
             _sourceStreamResolver = context => new ValueTask<IObservable<object?>>((IObservable<object?>)sourceStreamResolver(context));
         }
 
-        /// <inheritdoc cref="SourceStreamResolver{TReturnType}.SourceStreamResolver(Func{IResolveFieldContext, IObservable{TReturnType}})"/>
+        /// <inheritdoc cref="SourceStreamResolver{TReturnType}(Func{IResolveFieldContext, IObservable{TReturnType}})"/>
         public SourceStreamResolver(Func<IResolveFieldContext, ValueTask<IObservable<TReturnType?>>> sourceStreamResolver)
         {
             if (sourceStreamResolver == null)
@@ -43,7 +43,7 @@ namespace GraphQL.Resolvers
     {
         private readonly Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _sourceStreamResolver;
 
-        /// <inheritdoc cref="SourceStreamResolver{TReturnType}.SourceStreamResolver(Func{IResolveFieldContext, IObservable{TReturnType}})"/>
+        /// <inheritdoc cref="SourceStreamResolver{TReturnType}(Func{IResolveFieldContext, IObservable{TReturnType}})"/>
         public SourceStreamResolver(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
         {
             if (sourceStreamResolver == null)
@@ -55,7 +55,7 @@ namespace GraphQL.Resolvers
             _sourceStreamResolver = context => new ValueTask<IObservable<object?>>((IObservable<object?>)sourceStreamResolver(context.As<TSourceType>()));
         }
 
-        /// <inheritdoc cref="SourceStreamResolver{TSourceType, TReturnType}.SourceStreamResolver(Func{IResolveFieldContext{TSourceType}, IObservable{TReturnType}})"/>
+        /// <inheritdoc cref="SourceStreamResolver{TSourceType, TReturnType}(Func{IResolveFieldContext{TSourceType}, IObservable{TReturnType}})"/>
         public SourceStreamResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<IObservable<TReturnType?>>> sourceStreamResolver)
         {
             if (sourceStreamResolver == null)

@@ -52,7 +52,7 @@ public class GraphQLSerializerTests
         {
             Schema = new Schema { Query = new AutoRegisteringObjectGraphType<Query>() },
             Query = "{hero}"
-        }).ConfigureAwait(false);
+        });
 
         // typically a value of 1.0000m would be serialized as 1.0000
         new GraphQLSerializer().Serialize(result).ShouldBe("""{"data":{"hero":1.0000}}""");

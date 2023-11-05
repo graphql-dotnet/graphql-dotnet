@@ -469,7 +469,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         {
             Query = query,
             RequestServices = provider,
-        }).ConfigureAwait(false);
+        });
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         string actual = serializer.Serialize(result);
         actual.ShouldBeCrossPlatJson(expected);
@@ -494,7 +494,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
             Query = query,
             RequestServices = provider,
             ThrowOnUnhandledException = true,
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery2.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
     }
 
@@ -521,7 +521,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
             Query = query,
             RequestServices = provider,
             ThrowOnUnhandledException = true,
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery3.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
     }
 

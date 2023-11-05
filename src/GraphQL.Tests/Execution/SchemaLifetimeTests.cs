@@ -22,7 +22,7 @@ public class SchemaLifetimeTests
         {
             _.Schema = schema;
             _.Query = "{noop}";
-        }).ConfigureAwait(false);
+        });
 
         Should.NotThrow(() => schema.Dispose());
     }

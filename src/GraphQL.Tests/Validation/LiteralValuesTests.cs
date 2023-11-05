@@ -39,7 +39,7 @@ public class LiteralValuesTests
             Operation = document.Operation(),
             Rules = useRules ? null : Array.Empty<IValidationRule>(),
             Variables = variables?.ToInputs() ?? Inputs.Empty,
-        }).ConfigureAwait(false);
+        });
         var err = ret.Errors.ShouldHaveSingleItem();
         err.Code.ShouldBe(code);
         err.Message.ShouldBe(message);

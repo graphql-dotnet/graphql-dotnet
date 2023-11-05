@@ -15,7 +15,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
 
     [Fact(Skip = "Benchmarks only, these numbers are machine dependent.")]
     // [Fact]
-    public void Executes_StarWarsBasicQuery_Performant()
+    public async Task Executes_StarWarsBasicQuery_Performant()
     {
         const string query = """
             query HeroNameAndFriendsQuery {
@@ -38,7 +38,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
         //Note: Implementing a custom IDocumentValidator would increase speeds 600%
         for (int x = 0; x < 10000; x++)
         {
-            runResult2 = Executer.ExecuteAsync(_ =>
+            runResult2 = await Executer.ExecuteAsync(_ =>
             {
                 _.EnableMetrics = false;
                 _.Schema = Schema;
@@ -48,7 +48,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
                 _.UserContext = null;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
-            }).GetAwaiter().GetResult();
+            });
         }
 
         smallListTimer.Stop();

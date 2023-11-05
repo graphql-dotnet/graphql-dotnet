@@ -24,12 +24,12 @@ type Query {
 
         var fieldType = queryType.Fields.Find("hello").ShouldNotBeNull();
         var resolver = fieldType.Resolver.ShouldNotBeNull();
-        object result = await resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object result = await resolver.ResolveAsync(new ResolveFieldContext());
         result.ShouldBe("World");
 
         var fieldType2 = queryType.Fields.Find("hello2").ShouldNotBeNull();
         var resolver2 = fieldType2.Resolver.ShouldNotBeNull();
-        object result2 = await resolver2.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object result2 = await resolver2.ResolveAsync(new ResolveFieldContext());
         result2.ShouldBe("World");
     }
 
