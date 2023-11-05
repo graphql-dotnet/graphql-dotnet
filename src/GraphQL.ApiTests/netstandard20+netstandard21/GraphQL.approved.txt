@@ -942,6 +942,7 @@ namespace GraphQL.Builders
         [System.Obsolete("Please configure the field name by providing the name as an argument to the \'Fiel" +
             "d\' method.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ParseValue(System.Func<object?, object?> parseValue) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
@@ -2094,6 +2095,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
+        public System.Func<object?, object?> ParseValue { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
