@@ -83,7 +83,7 @@ internal static class ObservableExtensions
 
             public Observer(IObserver<TOut> observer, Func<TIn, CancellationToken, ValueTask<TOut>> transformNext, Func<Exception, CancellationToken, ValueTask<Exception>> transformError, Action disposeAction)
             {
-                _token = _cancellationTokenSource.Token;
+                _token = _cancellationTokenSource!.Token;
                 _observer = observer;
                 _disposeAction = disposeAction;
                 // ensure that the transform cannot directly throw an exception without it being wrapped in a Task<Exception>

@@ -25,7 +25,7 @@ namespace GraphQL.Resolvers
             _resolver = context => new ValueTask<object?>(resolver(context));
         }
 
-        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext, ValueTask<TReturnType?>> resolver)
         {
             if (resolver == null)
@@ -50,7 +50,7 @@ namespace GraphQL.Resolvers
         private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
         private static ResolveFieldContextAdapter<TSourceType>? _sharedAdapter;
 
-        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
         {
             if (resolver == null)
@@ -59,7 +59,7 @@ namespace GraphQL.Resolvers
             _resolver = GetResolverFor(resolver);
         }
 
-        /// <inheritdoc cref="FuncFieldResolver{TReturnType}.FuncFieldResolver(Func{IResolveFieldContext, TReturnType})"/>
+        /// <inheritdoc cref="FuncFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
         public FuncFieldResolver(Func<IResolveFieldContext<TSourceType>, ValueTask<TReturnType?>> resolver)
         {
             if (resolver == null)

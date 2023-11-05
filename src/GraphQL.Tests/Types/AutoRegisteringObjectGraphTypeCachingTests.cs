@@ -19,7 +19,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
         try
         {
             var graph1 = new TestGraphType();
-            await ValidateAsync(graph1).ConfigureAwait(false);
+            await ValidateAsync(graph1);
 
             if (!withCaching)
             {
@@ -27,7 +27,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 TestGraphType.Configured = false;
             }
             var graph2 = new TestGraphType();
-            await ValidateAsync(graph2).ConfigureAwait(false);
+            await ValidateAsync(graph2);
 
             async Task ValidateAsync(TestGraphType graph)
             {
@@ -44,7 +44,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 field.Description.ShouldBeNull();
                 field.DeprecationReason.ShouldBeNull();
                 field.Metadata.Count.ShouldBe(0);
-                var ret = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext { Source = new Class1() }).ConfigureAwait(false);
+                var ret = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext { Source = new Class1() });
                 ret.ShouldBeOfType<int>().ShouldBe(5);
 
                 field = graph.GetField("Print").ShouldNotBeNull();
@@ -66,7 +66,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                     Source = new Class1(),
                     Arguments = new Dictionary<string, ArgumentValue> { { "id", new(10, ArgumentSource.Literal) } },
                 };
-                var printRet = await field.Resolver.ShouldNotBeNull().ResolveAsync(resolveContext).ConfigureAwait(false);
+                var printRet = await field.Resolver.ShouldNotBeNull().ResolveAsync(resolveContext);
                 printRet.ShouldBeOfType<string>().ShouldBe("10");
 
                 field = graph.GetField("Value").ShouldNotBeNull();
@@ -76,7 +76,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 field.DeprecationReason.ShouldBe("Dep2");
                 field.Metadata.Count.ShouldBe(1); // deprecation directive
 
-                var valueRet = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext { Source = new Class1() }).ConfigureAwait(false);
+                var valueRet = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext { Source = new Class1() });
                 valueRet.ShouldBeOfType<int>().ShouldBe(3);
             }
         }

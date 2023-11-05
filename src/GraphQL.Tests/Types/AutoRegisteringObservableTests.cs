@@ -31,7 +31,7 @@ public class AutoRegisteringObservableTests
     public async Task Observable_Basic(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         observable.ToEnumerable().ShouldBe(new string[] { "a", "b", "c" });
     }
 
@@ -45,7 +45,7 @@ public class AutoRegisteringObservableTests
     public async Task Observable_Value(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         observable.ToEnumerable().ShouldBe(new object[] { 1, 2, 3 });
     }
 
@@ -56,7 +56,7 @@ public class AutoRegisteringObservableTests
     public async Task Observable_WithError(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("sample error");
     }
 
@@ -67,7 +67,7 @@ public class AutoRegisteringObservableTests
     public async Task Observable_InitialError(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ConfigureAwait(false);
+        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()));
         e.Message.ShouldBe("initial error");
     }
 
@@ -78,7 +78,7 @@ public class AutoRegisteringObservableTests
     public async Task AsyncEnumerable_Basic(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         observable.ToEnumerable().ShouldBe(new string[] { "d", "e", "f" });
     }
 
@@ -89,7 +89,7 @@ public class AutoRegisteringObservableTests
     public async Task AsyncEnumerable_Value(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         observable.ToEnumerable().ShouldBe(new object[] { 4, 5, 6 });
     }
 
@@ -100,7 +100,7 @@ public class AutoRegisteringObservableTests
     public async Task AsyncEnumerable_WithError(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
         Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("sample error 2");
     }
 
@@ -111,7 +111,7 @@ public class AutoRegisteringObservableTests
     public async Task AsyncEnumerable_InitialError(string fieldName)
     {
         var streamResolver = GetResolver(fieldName);
-        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ConfigureAwait(false);
+        var e = await Should.ThrowAsync<Exception>(async () => await streamResolver.ResolveAsync(new ResolveFieldContext()));
         e.Message.ShouldBe("initial error 2");
     }
 
@@ -121,7 +121,7 @@ public class AutoRegisteringObservableTests
         var streamResolver = GetResolver(nameof(TestClass.AsyncWithToken1));
         var context = new ResolveFieldContext();
         context.CancellationToken.CanBeCanceled.ShouldBeFalse();
-        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(context);
         observable.ToEnumerable().ShouldBe(new string[] { "ok1" });
     }
 
@@ -131,7 +131,7 @@ public class AutoRegisteringObservableTests
         var streamResolver = GetResolver(nameof(TestClass.AsyncWithToken2));
         var context = new ResolveFieldContext();
         context.CancellationToken.CanBeCanceled.ShouldBeFalse();
-        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(context);
         observable.ToEnumerable().ShouldBe(new string[] { "ok2" });
     }
 
@@ -145,17 +145,17 @@ public class AutoRegisteringObservableTests
         var streamResolver = GetResolver(fieldName);
         var cts = new CancellationTokenSource();
         var context = new ResolveFieldContext() { CancellationToken = cts.Token };
-        var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+        var observable = await streamResolver.ResolveAsync(context);
         var mockObserver = new Mock<IObserver<object>>(MockBehavior.Strict);
         var tcs = new TaskCompletionSource<bool>();
         mockObserver.Setup(x => x.OnNext("canceled")).Callback(() => tcs.SetResult(true)).Verifiable();
         var disposer = observable.Subscribe(mockObserver.Object);
-        await Task.Delay(500).ConfigureAwait(false);
+        await Task.Delay(500);
         if (cancelViaDispose)
             disposer.Dispose();
         else
             cts.Cancel();
-        await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30))).ConfigureAwait(false);
+        await Task.WhenAny(tcs.Task, Task.Delay(TimeSpan.FromSeconds(30)));
         mockObserver.Verify();
         mockObserver.VerifyNoOtherCalls();
     }
@@ -175,7 +175,7 @@ public class AutoRegisteringObservableTests
                 OutputExtensions = new Dictionary<string, object>(),
             };
             // the ServiceTestClass will be created during the call to ResolveAsync
-            var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+            var observable = await streamResolver.ResolveAsync(context);
             // verify that the ServiceTestClass is not disposed while it is being iterated
             observable.ToEnumerable().ShouldBe(new string[] { "1", "2" });
             // verify that the ServiceTestClass is disposed after the iteration is complete
@@ -201,7 +201,7 @@ public class AutoRegisteringObservableTests
                 OutputExtensions = new Dictionary<string, object>(),
             };
             // the ServiceTestClass will be created during the call to ResolveAsync
-            var observable = await streamResolver.ResolveAsync(context).ConfigureAwait(false);
+            var observable = await streamResolver.ResolveAsync(context);
             // verify that the ServiceTestClass is not disposed while it is being iterated
             Should.Throw<Exception>(() => observable.ToEnumerable().ToList()).Message.ShouldBe("something");
             // verify that the finalizer has run within the async iterator
@@ -232,7 +232,7 @@ public class AutoRegisteringObservableTests
             ThrowOnUnhandledException = true,
         };
         options.UserContext["key1"] = "value1";
-        var ret = await new DocumentExecuter().ExecuteAsync(options).ConfigureAwait(false);
+        var ret = await new DocumentExecuter().ExecuteAsync(options);
         ret.Executed.ShouldBeTrue();
         var stream = ret.Streams.ShouldHaveSingleItem();
         stream.Key.ShouldBe("resolveFieldContextPassThrough");

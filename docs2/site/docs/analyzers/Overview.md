@@ -26,18 +26,20 @@ Field("name").Description(...).Resolve(...)
 
 ### 2. FieldNameAnalyzer
 
-The `FieldNameAnalyzer` is designed to improve the field name definition method. It simplifies the way field names are assigned to enhance code consistency.
+The `FieldNameAnalyzer` detects the usage of the obsolete `Name` method on the field and connection builders and helps to rewrite the code to use builder creating methods that accept the name as an argument.
 
 Replace:
 
 ```csharp
-Field().Name("name")
+Field<TGraphType>().Name("name")
+Connection<TGraphType, TSourceType>().Name("name")
 ```
 
 With:
 
 ```csharp
-Field("name")
+Field<TGraphType>("name")
+Connection<TGraphType, TSourceType>("name")
 ```
 
 ### 3. ResolverAnalyzer
@@ -47,6 +49,10 @@ The `ResolverAnalyzer` focuses on identifying incorrect usage of resolver method
 ### 4. InputGraphTypeAnalyzer
 
 The analyzer detects input graph type fields that can't be mapped to the source type during deserialization process.
+
+### 5. FieldArgumentAnalyzer
+
+The analyzer detects an obsolete `Argument` method usage and offers a code fix to automatically replace it with with another `Argument` overload.
 
 ## Configuration in .editorconfig
 

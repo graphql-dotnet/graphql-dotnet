@@ -86,7 +86,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var fieldInvocation = genericNameSyntax.FindFieldInvocationExpression()!;
+        var fieldInvocation = genericNameSyntax.FindMethodInvocationExpression()!;
 
         ReportFieldTypeDiagnostic(
             context,
@@ -107,12 +107,12 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 
         if (isAsyncField)
         {
-            props = props.Add(Constants.Properties.IsAsync, "true");
+            props = props.Add(Constants.AnalyzerProperties.IsAsync, "true");
         }
 
         if (isDelegate)
         {
-            props = props.Add(Constants.Properties.IsDelegate, "true");
+            props = props.Add(Constants.AnalyzerProperties.IsDelegate, "true");
         }
 
         var location = invocationExpressionSyntax.GetLocation();

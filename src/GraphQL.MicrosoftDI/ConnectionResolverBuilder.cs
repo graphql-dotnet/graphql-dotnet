@@ -1,7 +1,6 @@
 #pragma warning disable IDE0039 // Use local function
 
 using GraphQL.Builders;
-using GraphQL.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI;
@@ -59,21 +58,15 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType>
     /// <summary>
     /// Specifies the delegate to execute when the field is being resolved.
     /// </summary>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
     {
-        if (_scoped)
-            _builder.ResolveScoped(resolver);
-        else
-            _builder.Resolve(resolver);
+        return _scoped ? _builder.ResolveScoped(resolver) : _builder.Resolve(resolver);
     }
 
     /// <inheritdoc cref="Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
     {
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver);
-        else
-            _builder.ResolveAsync(resolver);
+        return _scoped ? _builder.ResolveScopedAsync(resolver) : _builder.ResolveAsync(resolver);
     }
 }
 
@@ -85,7 +78,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -104,31 +97,25 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1>
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, T1, TReturnType?> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
                 context,
                 context.RequestServices.GetRequiredService<T1>());
 
-        if (_scoped)
-            _builder.ResolveScoped(resolver2);
-        else
-            _builder.Resolve(resolver2);
+        return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, Task<TReturnType?>> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
                 context,
                 context.RequestServices.GetRequiredService<T1>());
 
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver2);
-        else
-            _builder.ResolveAsync(resolver2);
+        return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 }
 
@@ -140,7 +127,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -159,7 +146,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, TReturnType?> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -167,14 +154,11 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
                 context.RequestServices.GetRequiredService<T1>(),
                 context.RequestServices.GetRequiredService<T2>());
 
-        if (_scoped)
-            _builder.ResolveScoped(resolver2);
-        else
-            _builder.Resolve(resolver2);
+        return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, Task<TReturnType?>> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -182,10 +166,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2>
                 context.RequestServices.GetRequiredService<T1>(),
                 context.RequestServices.GetRequiredService<T2>());
 
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver2);
-        else
-            _builder.ResolveAsync(resolver2);
+        return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 }
 
@@ -197,7 +178,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -216,7 +197,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, TReturnType?> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -225,14 +206,11 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
                 context.RequestServices.GetRequiredService<T2>(),
                 context.RequestServices.GetRequiredService<T3>());
 
-        if (_scoped)
-            _builder.ResolveScoped(resolver2);
-        else
-            _builder.Resolve(resolver2);
+        return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, Task<TReturnType?>> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -241,10 +219,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
                 context.RequestServices.GetRequiredService<T2>(),
                 context.RequestServices.GetRequiredService<T3>());
 
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver2);
-        else
-            _builder.ResolveAsync(resolver2);
+        return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 }
 
@@ -256,7 +231,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -275,7 +250,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, TReturnType?> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -285,14 +260,11 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
                 context.RequestServices.GetRequiredService<T3>(),
                 context.RequestServices.GetRequiredService<T4>());
 
-        if (_scoped)
-            _builder.ResolveScoped(resolver2);
-        else
-            _builder.Resolve(resolver2);
+        return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, Task<TReturnType?>> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -302,10 +274,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
                 context.RequestServices.GetRequiredService<T3>(),
                 context.RequestServices.GetRequiredService<T4>());
 
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver2);
-        else
-            _builder.ResolveAsync(resolver2);
+        return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 }
 
@@ -317,7 +286,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4,
     private readonly ConnectionBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ConnectionResolverBuilder(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}(ConnectionBuilder{TSourceType, TReturnType}, bool)"/>
     public ConnectionResolverBuilder(ConnectionBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -332,7 +301,7 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4,
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.Resolve(Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public void Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType?> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, TReturnType?> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver2 =
             context => resolver(
@@ -343,14 +312,11 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4,
                 context.RequestServices.GetRequiredService<T4>(),
                 context.RequestServices.GetRequiredService<T5>());
 
-        if (_scoped)
-            _builder.ResolveScoped(resolver2);
-        else
-            _builder.Resolve(resolver2);
+        return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
     /// <inheritdoc cref="ConnectionResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType?>> resolver)
+    public ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, T1, T2, T3, T4, T5, Task<TReturnType?>> resolver)
     {
         Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver2 =
             context => resolver(
@@ -361,9 +327,6 @@ public class ConnectionResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4,
                 context.RequestServices.GetRequiredService<T4>(),
                 context.RequestServices.GetRequiredService<T5>());
 
-        if (_scoped)
-            _builder.ResolveScopedAsync(resolver2);
-        else
-            _builder.ResolveAsync(resolver2);
+        return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 }

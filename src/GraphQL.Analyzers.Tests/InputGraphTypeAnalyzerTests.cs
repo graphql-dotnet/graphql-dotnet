@@ -10,7 +10,7 @@ public class InputGraphTypeAnalyzerTests
     public async Task Sanity_NoDiagnostics()
     {
         const string source = "";
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -61,7 +61,7 @@ public class InputGraphTypeAnalyzerTests
                     .WithSpan(9, 32, 9, 38).WithArguments("Name", symbolType, "Name", "MySourceType", reason)
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -108,7 +108,7 @@ public class InputGraphTypeAnalyzerTests
                     .WithSpan(9, 32, 9, 38).WithArguments("Name", "property", "Name", "MySourceType", "not 'public' and doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -151,7 +151,7 @@ public class InputGraphTypeAnalyzerTests
                     .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -216,7 +216,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -241,7 +241,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -261,7 +261,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
@@ -281,7 +281,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -321,7 +321,7 @@ public class InputGraphTypeAnalyzerTests
         int endColumn = startColumn + fieldName.Length;
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(11, startColumn, 11, endColumn).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -349,7 +349,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(9, 15, 9, 22).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -377,7 +377,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(9, 37, 9, 44).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class InputGraphTypeAnalyzerTests
             VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
                 .WithSpan(12, 32, 12, 41).WithArguments("Address", "MySourceType")
         };
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -442,7 +442,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -477,7 +477,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource or IBaseSource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -506,7 +506,7 @@ public class InputGraphTypeAnalyzerTests
                 .WithSpan(10, 32, 10, 39).WithArguments("Email", "TSourceType"),
         };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -534,7 +534,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -572,7 +572,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD).WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -612,7 +612,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
@@ -655,7 +655,7 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
             .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -690,7 +690,7 @@ public class InputGraphTypeAnalyzerTests
                     .WithSpan(9, 25, 9, 36).WithArguments("Name", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -725,6 +725,6 @@ public class InputGraphTypeAnalyzerTests
                     .WithSpan(9, 15, 9, 26).WithArguments("FirstName", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 }

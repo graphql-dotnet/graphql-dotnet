@@ -11,7 +11,7 @@ public class ResolverAnalyzerTests
     public async Task Sanity_NoDiagnostics()
     {
         const string source = @"";
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -62,7 +62,7 @@ public class ResolverAnalyzerTests
             """
         ;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -89,7 +89,7 @@ public class ResolverAnalyzerTests
             public class CustomObjectGraphType : ObjectGraphType { }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -118,7 +118,7 @@ public class ResolverAnalyzerTests
             public class CustomObjectGraphType : ObjectGraphType { }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -220,7 +220,7 @@ public class ResolverAnalyzerTests
         int endColumn = startColumn + $"{method}({resolver})".Length;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(12, startColumn, 12, endColumn);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
@@ -273,7 +273,7 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 58, 10, 74);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
@@ -330,7 +330,7 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 63, 10, 79);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -396,7 +396,7 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -429,7 +429,7 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(8, 48, 8, 74);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
@@ -469,6 +469,6 @@ public class ResolverAnalyzerTests
             CompilerDiagnostics = CompilerDiagnostics.None,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 }

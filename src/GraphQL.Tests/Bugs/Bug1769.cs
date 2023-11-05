@@ -29,13 +29,13 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
         {
             Query = "{test}",
             Schema = Schema,
-        }).ConfigureAwait(false);
+        });
         valid.Data.ShouldNotBeNull();
         var result = await de.ExecuteAsync(new ExecutionOptions()
         {
             Query = null,
             Schema = Schema,
-        }).ConfigureAwait(false);
+        });
         result.Errors.Single().ShouldBeOfType(typeof(QueryMissingError));
         result.Errors.Single().Locations.ShouldBeNull();
         result.Errors.Single().Path.ShouldBeNull();
@@ -45,8 +45,8 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             {
                 Query = "{test}",
                 Schema = null,
-            }).ConfigureAwait(false);
-        }).ConfigureAwait(false);
+            });
+        });
     }
 
     [Fact]

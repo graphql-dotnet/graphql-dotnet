@@ -128,7 +128,7 @@ public class ValidationContextTests
             Schema = schema,
             Variables = serializer.Deserialize<Inputs>(variables),
             ThrowOnUnhandledException = true,
-        }).ConfigureAwait(false);
+        });
         var responseJson = serializer.Serialize(response);
         responseJson.ShouldBeCrossPlatJson(expectedResponse);
     }
@@ -264,7 +264,7 @@ public class ValidationContextTests
             Schema = schema,
             Variables = serializer.Deserialize<Inputs>(variables),
             ThrowOnUnhandledException = true,
-        }).ConfigureAwait(false);
+        });
         var responseJson = serializer.Serialize(response);
         responseJson.ShouldBeCrossPlatJson(expectedResponse);
     }
@@ -366,7 +366,7 @@ public class ValidationContextTests
             Schema = schema,
             Operation = document.Operation(),
             Variables = variables.ToInputs(),
-        }).ConfigureAwait(false);
+        });
         ret.IsValid.ShouldBeFalse();
         ret.Errors.Count.ShouldBe(1);
         ret.Errors[0].Message.ShouldBe(errorMessage);

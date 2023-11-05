@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!-- Must verify that analzyers are recognized by VS after upgrading, as 4.7.0 was not working with VS 2022 -->
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0" />
   </ItemGroup>
 
