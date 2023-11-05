@@ -40,7 +40,7 @@ public class ApolloTracingTests
         {
             Query = "{test}",
             RequestServices = services,
-        }).ConfigureAwait(false);
+        });
         var apolloTrace = ret.Extensions["tracing"].ShouldBeOfType<ApolloTrace>();
         var resolverData = apolloTrace.Execution.Resolvers.Single();
         resolverData.Path.ShouldBe(new object[] { "test" });
