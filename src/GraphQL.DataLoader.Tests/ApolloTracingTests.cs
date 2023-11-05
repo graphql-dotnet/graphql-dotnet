@@ -24,7 +24,7 @@ public class ApolloTracingTests
         query.Field<StringGraphType>("test")
             .Resolve(_ => new SimpleDataLoader<string>(async _ =>
             {
-                await Task.Delay(2000).ConfigureAwait(false);
+                await Task.Delay(2000);
                 return "Ok";
             }));
 
