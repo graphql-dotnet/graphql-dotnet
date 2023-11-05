@@ -57,14 +57,14 @@ public class InputObjectGraphTypeTests
         {
             _.Schema = schema;
             _.Query = """{ test(input: { url: "http://www.google.com" }) }""";
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSimilarTo("""{"data":{"test":"http://www.google.com/"}}""");
         // check with invalid url
         result = await new DocumentExecuter().ExecuteAsync(_ =>
         {
             _.Schema = schema;
             _.Query = """{ test(input: { url: "abcd" }) }""";
-        }).ConfigureAwait(false);
+        });
         result.ShouldBeSimilarTo("""{"errors":[{"message":"Invalid literal for argument \u0027input\u0027 of field \u0027test\u0027. Invalid URI: The format of the URI could not be determined.","locations":[{"line":1,"column":15}],"extensions":{"code":"INVALID_LITERAL","codes":["INVALID_LITERAL","URI_FORMAT"],"number":"5.6"}}]}""");
     }
 
