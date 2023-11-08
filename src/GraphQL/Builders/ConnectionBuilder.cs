@@ -16,9 +16,22 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
             where TNodeType : IGraphType
             => ConnectionBuilder<TSourceType>.Create<TNodeType>();
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node type.
+        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>(string name)
+            where TNodeType : IGraphType
+            => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
 
         /// <summary>
         /// Returns a builder for new connection field for the specified node and edge type.
@@ -27,10 +40,24 @@ namespace GraphQL.Builders
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node and edge type.
+        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>(string name)
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
 
         /// <summary>
         /// Returns a builder for new connection field for the specified node, edge and connection type.
@@ -39,11 +66,26 @@ namespace GraphQL.Builders
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
         public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
             => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node, edge and connection type.
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>(string name)
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>(name);
     }
 
     /// <summary>
@@ -81,7 +123,18 @@ namespace GraphQL.Builders
         /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
         /// </summary>
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name = "default")
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static ConnectionBuilder<TSourceType> Create<TNodeType>()
+            where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>();
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node type.
+        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
             where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
 
         /// <summary>
@@ -90,7 +143,20 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name = "default")
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>();
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node and edge type.
+        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
@@ -101,7 +167,21 @@ namespace GraphQL.Builders
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name = "default")
+        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>()
+            where TNodeType : IGraphType
+            where TEdgeType : EdgeType<TNodeType>
+            where TConnectionType : ConnectionType<TNodeType, TEdgeType> =>
+            Create<TNodeType, TEdgeType, TConnectionType>("default");
+
+        /// <summary>
+        /// Returns a builder for new connection field for the specified node, edge and connection type.
+        /// </summary>
+        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+        /// <param name="name">The name of the connection.</param>
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -144,6 +224,7 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
+        [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
         public virtual ConnectionBuilder<TSourceType> Name(string name)
         {
             FieldType.Name = name;
@@ -324,7 +405,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
+        public virtual ConnectionBuilder<TSourceType> Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -334,12 +415,14 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
+        public virtual ConnectionBuilder<TSourceType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -349,6 +432,8 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return new ValueTask<object?>(resolver(connectionContext));
             });
+
+            return this;
         }
 
         private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)

@@ -27,7 +27,7 @@ public class Bug3100
         {
             Query = "{class2{id}}",
             RequestServices = provider,
-        }).ConfigureAwait(false);
+        });
         string actual = serializer.Serialize(result);
 
         // verify the result

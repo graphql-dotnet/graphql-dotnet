@@ -35,9 +35,18 @@ namespace GraphQL.Utilities
         {
             provider.WithMetadata(AST_METAFIELD, node); //TODO: remove?
 
-            if (node is IHasDirectivesNode ast && ast.Directives?.Count > 0)
+            if (node is IHasDirectivesNode ast)
+                provider.CopyDirectivesFrom(ast);
+
+            return provider;
+        }
+
+        public static TMetadataProvider CopyDirectivesFrom<TMetadataProvider>(this TMetadataProvider provider, IHasDirectivesNode node)
+            where TMetadataProvider : IMetadataWriter
+        {
+            if (node.Directives?.Count > 0)
             {
-                foreach (var directive in ast.Directives!)
+                foreach (var directive in node.Directives)
                 {
                     provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
                     {
@@ -49,13 +58,12 @@ namespace GraphQL.Utilities
                     });
                 }
             }
-
             return provider;
         }
 
         public static bool HasExtensionAstTypes(this IMetadataReader type)
         {
-            return GetExtensionAstTypes(type).Count > 0;
+            return type.HasMetadata(EXTENSION_AST_METAFIELD) && GetExtensionAstTypes(type).Count > 0;
         }
 
         public static void AddExtensionAstType<T>(this IMetadataWriter type, T astType) where T : ASTNode
@@ -63,6 +71,9 @@ namespace GraphQL.Utilities
             var types = GetExtensionAstTypes(type.MetadataReader);
             types.Add(astType);
             type.Metadata[EXTENSION_AST_METAFIELD] = types;
+
+            if (astType is IHasDirectivesNode ast)
+                type.CopyDirectivesFrom(ast);
         }
 
         public static List<ASTNode> GetExtensionAstTypes(this IMetadataReader type)

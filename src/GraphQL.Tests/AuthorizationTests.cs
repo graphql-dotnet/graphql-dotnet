@@ -78,8 +78,7 @@ public class AuthorizationTests
     public void ConnectionBuilder()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<StringGraphType>()
-            .Name("Field")
+        graph.Connection<StringGraphType>("Field")
             .AuthorizeWithPolicy("Policy1")
             .AuthorizeWithPolicy("Policy2")
             .AuthorizeWithPolicy("Policy2")

@@ -98,6 +98,7 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
+        [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
         public virtual ConnectionBuilder<TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;
@@ -236,7 +237,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -246,13 +247,15 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -262,6 +265,8 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return new ValueTask<TReturnType?>(resolver(connectionContext));
             });
+
+            return this;
         }
 
         private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)

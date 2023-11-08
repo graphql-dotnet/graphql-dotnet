@@ -37,21 +37,33 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
-        /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
+        /// Gets the first variable with a matching name.
         /// </summary>
-        public bool ValueFor(ROM name, out ArgumentValue value)
+        public Variable? Find(ROM name)
         {
-            // DO NOT USE LINQ ON HOT PATH
             if (_variables != null)
             {
                 foreach (var v in _variables)
                 {
                     if (v.Name == name)
                     {
-                        value = new ArgumentValue(v.Value, v.IsDefault || !v.ValueSpecified ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
-                        return v.ValueSpecified;
+                        return v;
                     }
                 }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the first variable with a matching name. Returns <see langword="true"/> if a match is found.
+        /// </summary>
+        public bool ValueFor(ROM name, out ArgumentValue value)
+        {
+            var v = Find(name);
+            if (v != null)
+            {
+                value = new ArgumentValue(v.Value, v.IsDefault || !v.ValueSpecified ? ArgumentSource.VariableDefault : ArgumentSource.Variable);
+                return v.ValueSpecified;
             }
 
             value = default;

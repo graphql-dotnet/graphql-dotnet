@@ -91,4 +91,16 @@ public static class GlobalSwitches
     /// </summary>
     [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
     public static bool RequireRootQueryType { get; set; } = true;
+
+    /// <summary>
+    /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
+    /// useful for scoped schemas.
+    /// <br/><br/>
+    /// By default disabled. <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
+    /// this value to <see langword="true"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
+    /// <br/><br/>
+    /// Note that with reflection caching enabled, if there are two different classes derived from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>
+    /// that have the same TSourceType, one instance will incorrectly pull cached information stored by the other instance.
+    /// </summary>
+    public static bool EnableReflectionCaching { get; set; }
 }

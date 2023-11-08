@@ -140,7 +140,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     }
 
     [Fact]
-    public void input_types_and_types_without_key_directive_are_not_added_to_entities_union()
+    public async Task input_types_and_types_without_key_directive_are_not_added_to_entities_union()
     {
         const string definitions = """
             input UserInput {
@@ -159,11 +159,11 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         const string query = "{ __schema { types { name kind possibleTypes { name } } } }";
 
-        var executionResult = Executer.ExecuteAsync(_ =>
+        var executionResult = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Builder.Build(definitions);
             _.Query = query;
-        }).GetAwaiter().GetResult();
+        });
 
         var data = executionResult.Data.ToDict();
         var schema = data["__schema"].ToDict();

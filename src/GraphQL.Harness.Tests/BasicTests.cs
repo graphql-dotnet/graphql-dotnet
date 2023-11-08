@@ -17,6 +17,6 @@ public class BasicTests : SystemTestBase<Startup>
             scenario.Post.Json(input).ToUrl("/graphql");
             scenario.StatusCodeShouldBe(HttpStatusCode.OK);
             scenario.GraphQL().ShouldBeSuccess("""{ "hero": { "name": "R2-D2" }}""");
-        }).ConfigureAwait(false);
+        });
     }
 }

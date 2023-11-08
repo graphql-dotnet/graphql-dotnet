@@ -40,7 +40,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
     }
 
     [Fact]
-    public void apply_to_called_once()
+    public async Task apply_to_called_once()
     {
         var docExec = new DocumentExecuter();
         var schema = new Schema();
@@ -53,13 +53,13 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         schema.Query = new DummyType();
         schema.FieldMiddleware = mockMiddleware;
 
-        docExec.ExecuteAsync(execOptions).Wait();
+        await docExec.ExecuteAsync(execOptions);
 
         mockMiddleware.AppliedCount.ShouldBe(1);
     }
 
     [Fact]
-    public void apply_to_called_once_with_multiple_execute()
+    public async Task apply_to_called_once_with_multiple_execute()
     {
         var docExec = new DocumentExecuter();
         var schema = new Schema();
@@ -72,8 +72,8 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         schema.FieldMiddleware = mockMiddleware;
         schema.Query = new DummyType();
 
-        docExec.ExecuteAsync(execOptions).Wait();
-        docExec.ExecuteAsync(execOptions).Wait();
+        await docExec.ExecuteAsync(execOptions);
+        await docExec.ExecuteAsync(execOptions);
 
         mockMiddleware.AppliedCount.ShouldBe(1);
     }

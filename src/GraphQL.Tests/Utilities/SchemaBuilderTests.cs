@@ -6,6 +6,49 @@ namespace GraphQL.Tests.Utilities;
 
 public class SchemaBuilderTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void should_read_schema_description(bool ignoreComments)
+    {
+        const string definitions = """
+            #test
+            "Sample schema"
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = ignoreComments);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("Sample schema");
+    }
+
+    [Fact]
+    public void should_read_schema_description_from_comments()
+    {
+        const string definitions = """
+            #test
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = false);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("test");
+    }
+
     [Fact]
     public void should_set_query_by_name()
     {
@@ -395,7 +438,7 @@ public class SchemaBuilderTests
         {
             opt.Query = "{ kind }";
             opt.ThrowOnUnhandledException = true;
-        }).ConfigureAwait(false);
+        });
 
         result.ShouldBeCrossPlatJson(
             """
@@ -432,7 +475,7 @@ public class SchemaBuilderTests
         {
             opt.Query = "{ kind }";
             opt.ThrowOnUnhandledException = true;
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the enumeration type 'PetKindType'. Enumeration does not contain such value. Available values: 'CAT' of type 'String', 'DOG' of type 'String'.");
     }
 
@@ -836,6 +879,29 @@ public class SchemaBuilderTests
     }
 
     [Fact]
+    public void reads_directives_from_types_or_extension_types()
+    {
+        var schema = Schema.For("""
+            extend type Query @directiveA {
+              field1: String
+            }
+
+            type Query @directiveB {
+              field2: String
+            }
+
+            directive @directiveA on OBJECT
+            directive @directiveB on OBJECT
+            """);
+
+        schema.Initialize();
+        var type = schema.AllTypes["Query"].ShouldNotBeNull();
+        var directives = type.GetAppliedDirectives()?.List.ShouldNotBeNull();
+        directives.Where(x => x.Name == "directiveA").ShouldHaveSingleItem();
+        directives.Where(x => x.Name == "directiveB").ShouldHaveSingleItem();
+    }
+
+    [Fact]
     public async Task builds_with_customized_clr_type()
     {
         const string definitions = """
@@ -859,7 +925,7 @@ public class SchemaBuilderTests
         fieldType.DeprecationReason.ShouldBe("Test4");
         fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
         var context = new ResolveFieldContext() { Source = new TestType() };
-        (await fieldType.Resolver.ResolveAsync(context).ConfigureAwait(false)).ShouldBeOfType<string>().ShouldBe("value");
+        (await fieldType.Resolver.ResolveAsync(context)).ShouldBeOfType<string>().ShouldBe("value");
     }
 
     [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]

@@ -1,0 +1,11 @@
+{
+  "data": {
+    "_entities": [
+      {
+        "__typename": "Category",
+        "id": "1",
+        "name": "Category 1"
+      }
+    ]
+  }
+}

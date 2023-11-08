@@ -30,6 +30,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <param name="type">The graph type of the field.</param>
         /// <param name="name">The name of the field.</param>
+        [Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
         {
             var fieldType = new FieldType
@@ -40,8 +41,35 @@ namespace GraphQL.Builders
             return new FieldBuilder<TSourceType, TReturnType>(fieldType);
         }
 
+        /// <summary>
+        /// Returns a builder for a new field.
+        /// </summary>
+        /// <param name="name">The name of the field.</param>
+        /// <param name="type">The graph type of the field.</param>
+        public static FieldBuilder<TSourceType, TReturnType> Create(string name, IGraphType type)
+        {
+            var fieldType = new FieldType
+            {
+                Name = name,
+                ResolvedType = type,
+            };
+            return new FieldBuilder<TSourceType, TReturnType>(fieldType);
+        }
+
         /// <inheritdoc cref="Create(IGraphType, string)"/>
+        [Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static FieldBuilder<TSourceType, TReturnType> Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null, string name = "default")
+        {
+            var fieldType = new FieldType
+            {
+                Name = name,
+                Type = type,
+            };
+            return new FieldBuilder<TSourceType, TReturnType>(fieldType);
+        }
+
+        /// <inheritdoc cref="Create(string, IGraphType)"/>
+        public static FieldBuilder<TSourceType, TReturnType> Create(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
         {
             var fieldType = new FieldType
             {
@@ -64,6 +92,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the name of the field.
         /// </summary>
+        [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method.")]
         public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
         {
             FieldType.Name = name;

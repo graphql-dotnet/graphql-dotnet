@@ -210,7 +210,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
 
         schema.Initialize();
 
-        var result = await schema.ExecuteAsync(opts => opts.Query = "{ string guid }").ConfigureAwait(false);
+        var result = await schema.ExecuteAsync(opts => opts.Query = "{ string guid }");
 
         result.ShouldBeCrossPlatJson("""
             {
