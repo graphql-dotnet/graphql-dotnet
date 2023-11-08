@@ -108,6 +108,8 @@ public class ComplexScalarGraphType : ScalarGraphType
         GraphQLListValue ConvertList(IEnumerable list)
         {
             List<GraphQLValue>? values = null;
+            if (list is ICollection collection)
+                values = new(collection.Count);
             foreach (var item in list)
             {
                 (values ??= new()).Add(ToAST(item));
