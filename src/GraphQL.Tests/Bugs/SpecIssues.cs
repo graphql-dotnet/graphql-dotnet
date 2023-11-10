@@ -1,6 +1,5 @@
 #nullable enable
 
-using GraphQL.SystemTextJson;
 using GraphQL.Tests.Subscription;
 using GraphQL.Types;
 
@@ -33,6 +32,7 @@ public class SpecIssues
             """);
     }
 
+    // https://github.com/graphql/graphql-spec/pull/1057
     [Fact]
     public async Task Issue1057_CoerceListValues_ListList()
     {
@@ -57,6 +57,7 @@ public class SpecIssues
             """);
     }
 
+    // https://github.com/graphql/graphql-spec/pull/1057
     [Fact]
     public async Task Issue1057_CoerceListValues_List()
     {
@@ -81,6 +82,7 @@ public class SpecIssues
             """);
     }
 
+    // https://github.com/graphql/graphql-spec/pull/1057
     [Fact]
     public async Task Issue1057_CoerceListValues_ListWithNull()
     {
@@ -105,6 +107,7 @@ public class SpecIssues
             """);
     }
 
+    // https://github.com/graphql/graphql-spec/pull/1057
     [Fact]
     public async Task Issue1057_CoerceListValues_ListScalar()
     {
@@ -129,6 +132,7 @@ public class SpecIssues
             """);
     }
 
+    // https://github.com/graphql/graphql-spec/pull/1057
     [Fact]
     public async Task Issue1057_CoerceListValues_Scalar()
     {
