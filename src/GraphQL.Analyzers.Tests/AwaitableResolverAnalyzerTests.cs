@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.Testing;
-using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerifier<
-    GraphQL.Analyzers.AwaitableResolverAnalyzer>;
+using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
+    GraphQL.Analyzers.AwaitableResolverAnalyzer,
+    GraphQL.Analyzers.AwaitableResolverCodeFixProvider>;
 
 namespace GraphQL.Analyzers.Tests;
 
@@ -133,31 +134,16 @@ public class AwaitableResolverAnalyzerTests
     }
 
     [Theory]
-    [InlineData("Resolve", "Task", "dynamic")]
-    [InlineData("Resolve", "Task", "object")]
-    [InlineData("Resolve", "Task", "System.Object")]
-    [InlineData("Resolve", "Task", "Task<string>")]
-    [InlineData("Resolve", "ValueTask", "dynamic")]
-    [InlineData("Resolve", "ValueTask", "object")]
-    [InlineData("Resolve", "ValueTask", "System.Object")]
-    [InlineData("Resolve", "ValueTask", "ValueTask<string>")]
-    [InlineData("Resolve", "CustomAwaitable", "dynamic")]
-    [InlineData("Resolve", "CustomAwaitable", "object")]
-    [InlineData("Resolve", "CustomAwaitable", "System.Object")]
-    [InlineData("Resolve", "CustomAwaitable", "CustomAwaitable<string>")]
-    [InlineData("ResolveScoped", "Task", "dynamic")]
-    [InlineData("ResolveScoped", "Task", "object")]
-    [InlineData("ResolveScoped", "Task", "System.Object")]
-    [InlineData("ResolveScoped", "Task", "Task<string>")]
-    [InlineData("ResolveScoped", "ValueTask", "dynamic")]
-    [InlineData("ResolveScoped", "ValueTask", "object")]
-    [InlineData("ResolveScoped", "ValueTask", "System.Object")]
-    [InlineData("ResolveScoped", "ValueTask", "ValueTask<string>")]
-    [InlineData("ResolveScoped", "CustomAwaitable", "dynamic")]
-    [InlineData("ResolveScoped", "CustomAwaitable", "object")]
-    [InlineData("ResolveScoped", "CustomAwaitable", "System.Object")]
-    [InlineData("ResolveScoped", "CustomAwaitable", "CustomAwaitable<string>")]
-    public async Task SyncResolve_AwaitableResolver_GQL009(string resolveMethod, string awaitableType, string returnType)
+    [InlineData("Task", "dynamic")]
+    [InlineData("Task", "object")]
+    [InlineData("Task", "System.Object")]
+    [InlineData("ValueTask", "dynamic")]
+    [InlineData("ValueTask", "object")]
+    [InlineData("ValueTask", "System.Object")]
+    [InlineData("CustomAwaitable", "dynamic")]
+    [InlineData("CustomAwaitable", "object")]
+    [InlineData("CustomAwaitable", "System.Object")]
+    public async Task SyncResolve_AwaitableResolver_NotAwaitableReturnType_GQL009_Fixed(string awaitableType, string returnType)
     {
         string source =
             $$"""
@@ -173,26 +159,149 @@ public class AwaitableResolverAnalyzerTests
                   public MyGraphType()
                   {
                       Field<StringGraphType, {{returnType}}>("Test")
-                          .{{resolveMethod}}(ctx => {{awaitableType}}.FromResult("text"));
+                          .Resolve(ctx => {{awaitableType}}.FromResult("text"));
                   }
               }
 
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        const int startCol = 14;
-        int endCol = startCol + resolveMethod.Length;
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, startCol, 13, endCol).WithArguments(resolveMethod + "Async");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType, {{returnType}}>("Test")
+                          .ResolveAsync(async ctx => await {{awaitableType}}.FromResult("text"));
+                  }
+              }
+
+              {{CUSTOM_AWAITABLE_SOURCE}}
+              """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments("ResolveAsync");
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
-    [InlineData("ctx => \"text\"", false)]
-    [InlineData("ctx => Resolve(ctx)", false)]
-    [InlineData("ctx => Task.FromResult(\"text\")", true)]
-    [InlineData("ctx => ResolveAsync(ctx)", true)]
-    public async Task SyncResolve_AwaitableLambdaResolver_GQL009(string resolver, bool report)
+    [InlineData("Task", "Task<string>")]
+    [InlineData("ValueTask", "ValueTask<string>")]
+    [InlineData("CustomAwaitable", "CustomAwaitable<string>")]
+    public async Task SyncResolve_AwaitableResolver_AwaitableReturnType_GQL009(string awaitableType, string returnType)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType, {{returnType}}>("Test")
+                          .Resolve(ctx => {{awaitableType}}.FromResult("text"));
+                  }
+              }
+
+              {{CUSTOM_AWAITABLE_SOURCE}}
+              """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments("ResolveAsync");
+        await VerifyCS.VerifyCodeFixAsync(source, expected, source);
+    }
+
+    [Theory]
+    [InlineData("Task", "dynamic")]
+    [InlineData("Task", "object")]
+    [InlineData("Task", "System.Object")]
+    [InlineData("ValueTask", "dynamic")]
+    [InlineData("ValueTask", "object")]
+    [InlineData("ValueTask", "System.Object")]
+    [InlineData("CustomAwaitable", "dynamic")]
+    [InlineData("CustomAwaitable", "object")]
+    [InlineData("CustomAwaitable", "System.Object")]
+    public async Task SyncResolveScoped_AwaitableResolver_NotAwaitableReturnType_GQL009(string awaitableType, string returnType)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType<MySource>
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType, {{returnType}}>("Test")
+                          .ResolveScoped(ctx => {{awaitableType}}.FromResult("text"));
+                  }
+              }
+
+              public class MySource { }
+
+              {{CUSTOM_AWAITABLE_SOURCE}}
+              """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments("ResolveScopedAsync");
+        await VerifyCS.VerifyCodeFixAsync(source, expected, source);
+    }
+
+    [Theory]
+    [InlineData("Task", "Task<string>")]
+    [InlineData("ValueTask", "ValueTask<string>")]
+    [InlineData("CustomAwaitable", "CustomAwaitable<string>")]
+    public async Task SyncResolveScoped_AwaitableResolver_AwaitableReturnType_GQL009(string awaitableType, string returnType)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType<MySource>
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType, {{returnType}}>("Test")
+                          .ResolveScoped(ctx => {{awaitableType}}.FromResult("text"));
+                  }
+              }
+
+              public class MySource { }
+
+              {{CUSTOM_AWAITABLE_SOURCE}}
+              """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments("ResolveScopedAsync");
+        await VerifyCS.VerifyCodeFixAsync(source, expected, source);
+    }
+
+    [Theory]
+    [InlineData("\"text\"", false)]
+    [InlineData("Resolve(ctx)", false)]
+    [InlineData("Task.FromResult(\"text\")", true)]
+    [InlineData("ValueTask.FromResult(\"text\")", true)]
+    [InlineData("ResolveAsync(ctx)", true)]
+    [InlineData("ResolveValueAsync(ctx)", true)]
+    public async Task SyncResolve_AwaitableLambdaResolver_GQL009_Fixed(string resolver, bool report)
     {
         string source =
             $$"""
@@ -207,11 +316,34 @@ public class AwaitableResolverAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      Field<StringGraphType>("Test").Resolve({{resolver}});
+                      Field<StringGraphType>("Test").Resolve(ctx => {{resolver}});
                   }
 
                   private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
                   private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+              }
+              """;
+
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType>("Test").ResolveAsync(async ctx => await {{resolver}});
+                  }
+
+                  private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
               }
               """;
 
@@ -219,15 +351,19 @@ public class AwaitableResolverAnalyzerTests
             ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
             : DiagnosticResult.EmptyDiagnosticResults;
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+        string expectedFix = report ? fix : source;
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, expectedFix);
     }
 
     [Theory]
     [InlineData("\"text\"", false)]
     [InlineData("Resolve(ctx)", false)]
     [InlineData("Task.FromResult(\"text\")", true)]
+    [InlineData("ValueTask.FromResult(\"text\")", true)]
     [InlineData("ResolveAsync(ctx)", true)]
-    public async Task SyncResolve_AwaitableBlockResolver_GQL009(string resolver, bool report)
+    [InlineData("ResolveValueAsync(ctx)", true)]
+    public async Task SyncResolve_AwaitableBlockResolver_GQL009_Fixed(string resolver, bool report)
     {
         string source =
             $$"""
@@ -244,12 +380,44 @@ public class AwaitableResolverAnalyzerTests
                   {
                       Field<StringGraphType>("Test").Resolve(ctx =>
                       {
-                          return {{resolver}};
+                          if (true)
+                              return {{resolver}};
+                          else
+                              return {{resolver}};
                       });
                   }
 
                   private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
                   private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+              }
+              """;
+
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType>("Test").ResolveAsync(async ctx =>
+                      {
+                          if (true)
+                              return await {{resolver}};
+                          else
+                              return await {{resolver}};
+                      });
+                  }
+
+                  private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private ValueTask<string> ResolveValueAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
               }
               """;
 
@@ -257,12 +425,15 @@ public class AwaitableResolverAnalyzerTests
             ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
             : DiagnosticResult.EmptyDiagnosticResults;
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+        string expectedFix = report ? fix : source;
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, expectedFix);
     }
+
     [Theory]
     [InlineData("Resolve", false)]
     [InlineData("ResolveAsync", true)]
-    public async Task SyncResolve_AwaitableMethodGroupResolver_GQL009(string resolver, bool report)
+    public async Task SyncResolve_AwaitableMethodGroupResolver_GQL009_Fixed(string resolver, bool report)
     {
         string source =
             $$"""
@@ -285,10 +456,33 @@ public class AwaitableResolverAnalyzerTests
               }
               """;
 
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<StringGraphType>("Test").ResolveAsync(async context => await {{resolver}}(context));
+                  }
+
+                  private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
+              }
+              """;
+
         var expected = report
             ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
             : DiagnosticResult.EmptyDiagnosticResults;
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+        string expectedFix = report ? fix : source;
+
+        await VerifyCS.VerifyCodeFixAsync(source, expected, expectedFix);
     }
 }

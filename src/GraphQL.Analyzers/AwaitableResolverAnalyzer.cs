@@ -50,7 +50,7 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var returnType = GetReturnTypeSymbol(context, resolveMemberAccessExpression);
+        var returnType = resolveMemberAccessExpression.GetFieldBuilderReturnTypeSymbol(context.SemanticModel);
         if (returnType == null)
         {
             return;
@@ -95,7 +95,8 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
             // })
             case SimpleLambdaExpressionSyntax { Block: not null } lambda:
             {
-                bool hasAwaitableStatements = lambda.Block.Statements
+                bool hasAwaitableStatements = lambda.Block
+                    .DescendantNodesAndSelf()
                     .OfType<ReturnStatementSyntax>()
                     .Where(returnStatement => returnStatement.Expression != null)
                     .Any(returnStatement =>
@@ -125,19 +126,6 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static ISymbol? GetReturnTypeSymbol(
-        SyntaxNodeAnalysisContext context,
-        ExpressionSyntax expression)
-    {
-        var resolveMethodInfo = context.SemanticModel.GetSymbolInfo(expression);
-        if (resolveMethodInfo.Symbol is IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "FieldBuilder`2" } namedType })
-        {
-            return namedType.TypeArguments[1];
-        }
-
-        return null;
-    }
-
     private static void ReportDiagnostic(
         SyntaxNodeAnalysisContext context,
         MemberAccessExpressionSyntax resolveMemberAccessExpression,
@@ -147,41 +135,5 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
         var diagnostic = Diagnostic.Create(UseAsyncResolver, location, _supportedMethodsMap[syncResolverName]);
 
         context.ReportDiagnostic(diagnostic);
-    }
-
-    // TODO: remove
-    private static ISymbol? GetReturnTypeSymbol2(
-        SyntaxNodeAnalysisContext context,
-        ExpressionSyntax expression)
-    {
-        // Returns<TReturnType>
-        var returnsGenericName = expression.FindGenericNameSyntax(Constants.MethodNames.Returns);
-        if (returnsGenericName != null)
-        {
-            if (returnsGenericName.TypeArgumentList.Arguments.Count != 1)
-            {
-                return null;
-            }
-
-            var returnType = returnsGenericName.TypeArgumentList.Arguments[0];
-            var symbolInfo = context.SemanticModel.GetSymbolInfo(returnType);
-            return symbolInfo.Symbol;
-        }
-
-        // Field<TSourceType, TReturnType>
-        var fieldGenericName = expression.FindGenericNameSyntax(Constants.MethodNames.Field);
-        if (fieldGenericName == null)
-        {
-            return null;
-        }
-
-        if (fieldGenericName.TypeArgumentList.Arguments.Count == 2)
-        {
-            var returnType = fieldGenericName.TypeArgumentList.Arguments[1];
-            var symbolInfo = context.SemanticModel.GetSymbolInfo(returnType);
-            return symbolInfo.Symbol;
-        }
-
-        return context.Compilation.GetSpecialType(SpecialType.System_Object);
     }
 }

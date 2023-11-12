@@ -109,6 +109,19 @@ public static class Extensions
     public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer)
         => new(source, comparer);
 
+    public static ISymbol? GetFieldBuilderReturnTypeSymbol(
+        this ExpressionSyntax expression,
+        SemanticModel semanticModel)
+    {
+        var resolveMethodInfo = semanticModel.GetSymbolInfo(expression);
+        if (resolveMethodInfo.Symbol is IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "FieldBuilder`2" } namedType })
+        {
+            return namedType.TypeArguments[1];
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// If the <paramref name="symbol"/> is a method symbol, returns <see langword="true"/> if the method's return type is "awaitable", but not if it's <see langword="dynamic"/>.
     /// If the <paramref name="symbol"/> is a type symbol, returns <see langword="true"/> if that type is "awaitable".
