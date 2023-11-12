@@ -1,10 +1,10 @@
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis;
-using System.Composition;
 using System.Collections.Immutable;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Composition;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
