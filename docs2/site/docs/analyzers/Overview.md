@@ -54,6 +54,12 @@ The analyzer detects input graph type fields that can't be mapped to the source 
 
 The analyzer detects an obsolete `Argument` method usage and offers a code fix to automatically replace it with with another `Argument` overload.
 
+### 6. AwaitableResolverAnalyzer
+
+The analyzer detects awaitable resolver delegates used in sync `Resolve` or
+`ResolveScoped` methods and provides a code fix to replace them with an
+appropriate async version.
+
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when the rule is applied and how the automatic code fix executes code adjustments. Refer to the specific documentation page for each analyzer to understand the available configuration options and their application methods.
