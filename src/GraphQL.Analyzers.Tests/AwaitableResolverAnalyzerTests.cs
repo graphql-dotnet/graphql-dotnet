@@ -16,7 +16,6 @@ public class AwaitableResolverAnalyzerTests
 
         public class CustomAwaitable<TResult>
         {
-            public static CustomAwaitable<TResult> FromResult(TResult result) => throw new NotImplementedException();
             public CustomAwaiter<TResult> GetAwaiter() => throw new NotImplementedException();
         }
 
@@ -89,24 +88,24 @@ public class AwaitableResolverAnalyzerTests
     [Theory]
     // Resolve - no return type
     [InlineData("Resolve", "Field<StringGraphType>(\"Test\")")]
-    // Resolve - no return type defined by Field method
+    // Resolve - return type defined by Field method
     [InlineData("Resolve", "Field<StringGraphType, string>(\"Test\")")]
     [InlineData("Resolve", "Field<StringGraphType, dynamic>(\"Test\")")]
     [InlineData("Resolve", "Field<StringGraphType, object>(\"Test\")")]
     [InlineData("Resolve", "Field<StringGraphType, System.Object>(\"Test\")")]
-    // Resolve - no return type defined by Returns method
+    // Resolve - return type defined by Returns method
     [InlineData("Resolve", "Field<StringGraphType>(\"Test\").Returns<string>()")]
     [InlineData("Resolve", "Field<StringGraphType>(\"Test\").Returns<dynamic>()")]
     [InlineData("Resolve", "Field<StringGraphType>(\"Test\").Returns<object>()")]
     [InlineData("Resolve", "Field<StringGraphType>(\"Test\").Returns<System.Object>()")]
     // ResolveScoped - no return type
     [InlineData("ResolveScoped", "Field<StringGraphType>(\"Test\")")]
-    // ResolveScoped - no return type defined by Field method
+    // ResolveScoped - return type defined by Field method
     [InlineData("ResolveScoped", "Field<StringGraphType, string>(\"Test\")")]
     [InlineData("ResolveScoped", "Field<StringGraphType, dynamic>(\"Test\")")]
     [InlineData("ResolveScoped", "Field<StringGraphType, object>(\"Test\")")]
     [InlineData("ResolveScoped", "Field<StringGraphType, System.Object>(\"Test\")")]
-    // ResolveScoped - no return type defined by Returns method
+    // ResolveScoped - return type defined by Returns method
     [InlineData("ResolveScoped", "Field<StringGraphType>(\"Test\").Returns<string>()")]
     [InlineData("ResolveScoped", "Field<StringGraphType>(\"Test\").Returns<dynamic>()")]
     [InlineData("ResolveScoped", "Field<StringGraphType>(\"Test\").Returns<object>()")]

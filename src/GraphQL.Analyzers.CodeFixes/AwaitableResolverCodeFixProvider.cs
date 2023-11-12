@@ -36,7 +36,7 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 continue;
             }
 
-            const string codeFixTitle = "Rewrite obsolete 'Argument' method";
+            const string codeFixTitle = "Replace with async method";
 
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -100,7 +100,7 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 docEditor.ReplaceNode(lambda, newLambda);
                 break;
             }
-            // Resolve(MethodGroup)
+            // ResolveAsync(MethodGroup)
             case IdentifierNameSyntax methodGroupName:
             {
                 // Resolve(async context => await MethodGroup(context))
@@ -127,6 +127,7 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 return document;
         }
 
+        // Resolve(...) => ResolveAsync(...)
         var newResolverNameSyntax = IdentifierName(resolverNameSyntax.Identifier.Text + ASYNC_SUFFIX);
         docEditor.ReplaceNode(resolverNameSyntax, newResolverNameSyntax);
 
@@ -149,7 +150,6 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
         if (returnType.IsAwaitableNonDynamic(semanticModel!, root!.SpanStart))
         {
             // Field<T, Task<K>> or .Return<Task<K>>
-            // currently not supported
             return false;
         }
 
@@ -181,7 +181,7 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 : returnStatement.WithExpression(
                     AwaitExpression(
                         Token(SyntaxKind.AwaitKeyword).WithTrailingTrivia(Space),
-                        returnStatement.Expression!));
+                        returnStatement.Expression));
         }
     }
 }
