@@ -123,9 +123,11 @@ public static class Extensions
     }
 
     /// <summary>
-    /// If the <paramref name="symbol"/> is a method symbol, returns <see langword="true"/> if the method's return type is "awaitable", but not if it's <see langword="dynamic"/>.
+    /// If the <paramref name="symbol"/> is a method symbol, returns <see langword="true"/> if the method's return type is "awaitable",
+    /// but not if it's <see langword="dynamic"/>.
     /// If the <paramref name="symbol"/> is a type symbol, returns <see langword="true"/> if that type is "awaitable".
-    /// An "awaitable" is any type that exposes a GetAwaiter method which returns a valid "awaiter". This GetAwaiter method may be an instance method or an extension method.
+    /// An "awaitable" is any type that exposes a GetAwaiter method which returns a valid "awaiter".
+    /// This GetAwaiter method may be an instance method or an extension method.
     /// </summary>
     /// https://github.com/dotnet/roslyn/blob/342787a7e6906de95080654e28e8db5dd9116b9a/src/Workspaces/SharedUtilitiesAndExtensions/Compiler/Core/Extensions/ISymbolExtensions.cs#L577
     public static bool IsAwaitableNonDynamic([NotNullWhen(true)] this ISymbol? symbol, SemanticModel semanticModel, int position)
