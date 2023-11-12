@@ -187,7 +187,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments("ResolveAsync");
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -218,7 +218,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments("ResolveAsync");
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -257,7 +257,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments("ResolveScopedAsync");
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments(Constants.MethodNames.ResolveScopedAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -290,7 +290,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments("ResolveScopedAsync");
+        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments(Constants.MethodNames.ResolveScopedAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -348,7 +348,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
+            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -422,7 +422,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
+            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -478,7 +478,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments("ResolveAsync") }
+            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
