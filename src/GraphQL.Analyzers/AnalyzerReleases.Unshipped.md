@@ -13,3 +13,4 @@ GQL005 | Usage | Error | ResolverAnalyzer, [Documentation](https://graphql-dotne
 GQL006 | Usage | Warning | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL006_CanNotMatchInputFieldToTheSourceField)
 GQL007 | Usage | Warning | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL007_CanNotSetSourceField)
 GQL008 | Usage | Warning | FieldArgumentAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL008_DoNotUseObsoleteArgumentMethod)
+GQL009 | Usage | Error | AwaitableResolverAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL009_UseAsyncResolver)

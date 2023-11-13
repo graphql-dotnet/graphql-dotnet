@@ -40,6 +40,7 @@ public static class Constants
         public const string ResolveScopedAsync = "ResolveScopedAsync";
         public const string ResolveStream = "ResolveStream";
         public const string ResolveStreamAsync = "ResolveStreamAsync";
+        public const string Returns = "Returns";
     }
 
     public static class ObjectProperties
