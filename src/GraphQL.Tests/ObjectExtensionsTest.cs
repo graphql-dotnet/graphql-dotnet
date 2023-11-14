@@ -259,4 +259,40 @@ public class ObjectExtensionsTests
         // Assert
         actual.ShouldBe(strings);
     }
+
+    [Fact]
+    public void toobject_uses_public_default_constructor_when_available()
+    {
+        var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
+        var person = inputs.ToObject<MyInput1>();
+        person.Name.ShouldBe("tom");
+        person.Age.ShouldBe(10);
+    }
+
+    private class MyInput1
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        // carefully selected ordering of constructors
+        public MyInput1(string name) { throw new InvalidOperationException(); }
+        public MyInput1() { }
+        public MyInput1(string name, int age) { throw new InvalidOperationException(); }
+    }
+
+    [Fact]
+    public void toobject_ignores_private_constructors()
+    {
+        var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
+        var person = inputs.ToObject<MyInput2>();
+        person.Name.ShouldBe("tom");
+        person.Age.ShouldBe(10);
+    }
+
+    private class MyInput2
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        private MyInput2() { throw new InvalidOperationException(); }
+        public MyInput2(string name, int age) { Name = name; Age = age; }
+    }
 }
