@@ -59,7 +59,7 @@ public class Issue1285Query : ObjectGraphType
 
 public class ArrayInput
 {
-    private ArrayInput(int readOnlyProP)
+    public ArrayInput(int readOnlyProP)
     {
         ReadOnlyProp = readOnlyProP;
     }
