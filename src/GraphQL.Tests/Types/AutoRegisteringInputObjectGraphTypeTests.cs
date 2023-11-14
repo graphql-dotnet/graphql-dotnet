@@ -184,10 +184,10 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NotNullEnumerableNotNullIntField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>>))]
     [InlineData(nameof(FieldTests.NullableEnumerableNullableIntField), typeof(ListGraphType<GraphQLClrInputTypeReference<int>>))]
     [InlineData(nameof(FieldTests.NullableEnumerableNotNullIntField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>))]
-    [InlineData(nameof(FieldTests.NotNullArrayNullableTupleField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>))]
-    [InlineData(nameof(FieldTests.NotNullArrayNotNullTupleField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>>))]
-    [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>))]
-    [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>))]
+    [InlineData(nameof(FieldTests.NotNullArrayNullableTupleField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>))]
+    [InlineData(nameof(FieldTests.NotNullArrayNotNullTupleField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>>))]
+    [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>))]
+    [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>))]
     [InlineData(nameof(FieldTests.IdField), typeof(NonNullGraphType<IdGraphType>))]
     [InlineData(nameof(FieldTests.NullableIdField), typeof(IdGraphType))]
     [InlineData(nameof(FieldTests.EnumerableField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<object>>>))]
@@ -195,7 +195,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrInputTypeReference<object>>))]
     [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrInputTypeReference<object>>))]
     [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrInputTypeReference<int>>>))]
-    public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
+    public void Field_DetectsProperType(string fieldName, Type expectedGraphType)
     {
         var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
