@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <!-- 
-      The PackageReference to GraphQL.Analyzers is automatically included when referencing
+      The reference to GraphQL.Analyzers is indirectly referenced when referencing
       the GraphQL NuGet package. There is no need to manually add this reference in your
       .csproj file if you are using the GraphQL NuGet package.
 
