@@ -264,11 +264,14 @@ public class AutoRegisteringInputObjectGraphTypeTests
             { "field6AltName", 16 },
         };
         var graph = new TestFieldSupport<TestClass>();
+
+        // initialize schema
         var queryType = new ObjectGraphType();
         queryType.Field<StringGraphType>("test");
         var schema = new Schema() { Query = queryType };
         schema.RegisterType(graph);
         schema.Initialize();
+
         var actual = graph.ParseDictionary(dic).ShouldBeOfType<TestClass>();
         actual.Field1.ShouldBe(11);
         actual.Field3Value.ShouldBe(13);

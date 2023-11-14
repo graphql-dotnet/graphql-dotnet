@@ -12,7 +12,7 @@ internal static class ObjectExtensions
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
             .AddAutoSchema<QueryT<T>>());
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.Initialize();
         var type = schema.Query.Fields.Find("test")!.Arguments!.Single().ResolvedType!;

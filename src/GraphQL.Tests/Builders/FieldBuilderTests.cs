@@ -205,7 +205,8 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType>("skip", "desc1", arg => {
+            .Argument<IntGraphType>("skip", "desc1", arg =>
+            {
                 arg.DefaultValue = 1;
                 arg.ResolvedType = new IntGraphType();
             })
