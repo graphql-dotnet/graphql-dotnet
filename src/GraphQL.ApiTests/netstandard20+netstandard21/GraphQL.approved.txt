@@ -603,11 +603,9 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType? mappedType = null) { }
+        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
-        public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
-            where T :  class { }
+        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute

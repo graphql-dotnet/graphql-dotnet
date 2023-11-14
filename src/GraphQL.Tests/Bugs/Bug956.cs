@@ -25,9 +25,6 @@ public sealed class Bug956QueryType : ObjectGraphType
                 string asString = ctx.GetArgument<string>("base64");
                 asString.ShouldBe("R3JhcGhRTCE="); // GraphQL!
 
-                var asList = ctx.GetArgument<List<byte>>("base64");
-                asList.Count.ShouldBe(12);
-
                 byte[] asBinary = ctx.GetArgument<byte[]>("base64");
                 Encoding.UTF8.GetString(asBinary).ShouldBe("GraphQL!");
 

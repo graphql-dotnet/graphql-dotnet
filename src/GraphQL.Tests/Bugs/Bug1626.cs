@@ -1,4 +1,5 @@
 using GraphQL.Execution;
+using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
@@ -7,6 +8,11 @@ public class Bug1626
     [Fact]
     public void GetArgument_Should_Not_Throw_AmbiguousMatchException()
     {
+        var myChildGraphType = new InputObjectGraphType<MyChildDerivedType>();
+        myChildGraphType.Field(x => x.MyProperty).Type(new StringGraphType());
+        var myDerivedGraphType = new InputObjectGraphType<MyDerivedType>();
+        myDerivedGraphType.Field(x => x.MyChildProperty).Type(myChildGraphType);
+
         var context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
@@ -18,7 +24,11 @@ public class Bug1626
                         ["MyProperty"] = "graphql"
                     }
                 }, ArgumentSource.Literal)
-            }
+            },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments(new QueryArgument(myDerivedGraphType) { Name = "root" }),
+            },
         };
 
         var arg = context.GetArgument<MyDerivedType>("root");
