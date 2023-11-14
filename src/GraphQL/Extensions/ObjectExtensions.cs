@@ -130,7 +130,7 @@ namespace GraphQL
                 if (fieldName is not null)
                 {
                     var fieldType = inputGraphType.Fields.Find(fieldName)?.ResolvedType
-                        ?? throw new InvalidOperationException($"Could not find resolved type for field '{fieldName}' of type '{inputGraphType}'.");
+                        ?? throw new InvalidOperationException($"Could not find ResolvedType for field '{fieldName}' of type '{inputGraphType}'.");
                     object? arg = GetPropertyValue(values[i], ctorParameters[i].ParameterType, fieldType);
                     ctorArguments[i] = arg;
                 }
