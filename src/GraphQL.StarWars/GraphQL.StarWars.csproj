@@ -11,6 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- 
+      The PackageReference to GraphQL.Analyzers is automatically included when referencing
+      the GraphQL NuGet package. There is no need to manually add this reference in your
+      .csproj file if you are using the GraphQL NuGet package.
+
+      Note: The GraphQL.Analyzers.CodeFixes project will never be published to NuGet.
+    -->
     <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj"
                       ReferenceOutputAssembly="false"
                       OutputItemType="Analyzer" />
