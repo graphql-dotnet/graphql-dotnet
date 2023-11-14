@@ -41,15 +41,21 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 var field = graph.GetField("Id").ShouldNotBeNull();
                 field.Name.ShouldBe("Id");
                 field.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+                field.ResolvedType = new NonNullGraphType(new IdGraphType()); // simulate initialization
                 field.Description.ShouldBeNull();
                 field.DeprecationReason.ShouldBeNull();
                 field.Metadata.Count.ShouldBe(0);
-                var ret = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext { Source = new Class1() });
+                var ret = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
+                {
+                    Source = new Class1(),
+                    FieldDefinition = field,
+                });
                 ret.ShouldBeOfType<int>().ShouldBe(5);
 
                 field = graph.GetField("Print").ShouldNotBeNull();
                 field.Name.ShouldBe("Print");
                 field.Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<string>));
+                field.ResolvedType = new StringGraphType(); // simulate initialization
                 field.Description.ShouldBe("Desc2");
                 field.DeprecationReason.ShouldBeNull();
                 field.Metadata.Count.ShouldBe(1);
@@ -58,6 +64,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 var arg = field.Arguments[0];
                 arg.Name.ShouldBe("id");
                 arg.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+                arg.ResolvedType = new NonNullGraphType(new IdGraphType()); // simulate initialization
                 arg.Description.ShouldBe("IdDesc");
                 arg.DeprecationReason.ShouldBeNull();
                 arg.Metadata.Count.ShouldBe(0);
@@ -65,6 +72,7 @@ public class AutoRegisteringObjectGraphTypeCachingTests
                 {
                     Source = new Class1(),
                     Arguments = new Dictionary<string, ArgumentValue> { { "id", new(10, ArgumentSource.Literal) } },
+                    FieldDefinition = field,
                 };
                 var printRet = await field.Resolver.ShouldNotBeNull().ResolveAsync(resolveContext);
                 printRet.ShouldBeOfType<string>().ShouldBe("10");

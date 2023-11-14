@@ -92,3 +92,7 @@ Specifically, this relates to the following methods:
 - `UseConfiguration<T>()` with the same `T` type
 
 This change was made to prevent duplicate registrations of the same service within the DI container.
+
+### 6. `ObjectExtensions.ToObject<T>` was removed.
+
+This was only used by internal tests.

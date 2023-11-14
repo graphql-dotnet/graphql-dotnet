@@ -11,11 +11,24 @@ public class ResolveFieldContextTests
 
     public ResolveFieldContextTests()
     {
+        var fieldDef = new FieldType()
+        {
+            Arguments = new QueryArguments
+            {
+                new QueryArgument(new IntGraphType()) { Name = "int" },
+                new QueryArgument(new LongGraphType()) { Name = "long" },
+                new QueryArgument(new FloatGraphType()) { Name = "float" },
+                new QueryArgument(new StringGraphType()) { Name = "string" },
+                new QueryArgument(new ListGraphType(new StringGraphType())) { Name = "stringlist" },
+                new QueryArgument(new EnumerationGraphType<SomeEnum>()) { Name = "enum" },
+            },
+        };
         _context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             Errors = new ExecutionErrors(),
             OutputExtensions = new Dictionary<string, object>(),
+            FieldDefinition = fieldDef,
         };
     }
 
@@ -23,8 +36,8 @@ public class ResolveFieldContextTests
     public void argument_converts_int_to_long()
     {
         const int val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        long result = _context.GetArgument<long>("a");
+        _context.Arguments["int"] = new ArgumentValue(val, ArgumentSource.Literal);
+        long result = _context.GetArgument<long>("int");
         result.ShouldBe(1);
     }
 
@@ -32,8 +45,8 @@ public class ResolveFieldContextTests
     public void argument_converts_long_to_int()
     {
         const long val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        int result = _context.GetArgument<int>("a");
+        _context.Arguments["long"] = new ArgumentValue(val, ArgumentSource.Literal);
+        int result = _context.GetArgument<int>("long");
         result.ShouldBe(1);
     }
 
@@ -41,16 +54,16 @@ public class ResolveFieldContextTests
     public void long_to_int_should_throw_for_out_of_range()
     {
         const long val = 89429901947254093;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
+        _context.Arguments["long"] = new ArgumentValue(val, ArgumentSource.Literal);
+        Should.Throw<OverflowException>(() => _context.GetArgument<int>("long"));
     }
 
     [Fact]
     public void argument_returns_boxed_string_uncast()
     {
         const string val = "one";
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        object result = _context.GetArgument<object>("a");
+        _context.Arguments["string"] = new ArgumentValue(val, ArgumentSource.Literal);
+        object result = _context.GetArgument<object>("string");
         result.ShouldBe("one");
     }
 
@@ -58,8 +71,8 @@ public class ResolveFieldContextTests
     public void argument_returns_long()
     {
         const long val = 1000000000000001;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        long result = _context.GetArgument<long>("a");
+        _context.Arguments["long"] = new ArgumentValue(val, ArgumentSource.Literal);
+        long result = _context.GetArgument<long>("long");
         result.ShouldBe(1000000000000001);
     }
 
@@ -67,8 +80,8 @@ public class ResolveFieldContextTests
     public void argument_returns_enum()
     {
         const SomeEnum val = SomeEnum.Two;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<SomeEnum>("a");
+        _context.Arguments["enum"] = new ArgumentValue(val, ArgumentSource.Literal);
+        var result = _context.GetArgument<SomeEnum>("enum");
         result.ShouldBe(SomeEnum.Two);
     }
 
@@ -76,8 +89,8 @@ public class ResolveFieldContextTests
     public void argument_returns_enum_from_string()
     {
         const string val = "two";
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<SomeEnum>("a");
+        _context.Arguments["enum"] = new ArgumentValue(val, ArgumentSource.Literal);
+        var result = _context.GetArgument<SomeEnum>("enum");
         result.ShouldBe(SomeEnum.Two);
     }
 
@@ -85,21 +98,21 @@ public class ResolveFieldContextTests
     public void argument_returns_enum_from_number()
     {
         const int val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<SomeEnum>("a");
+        _context.Arguments["enum"] = new ArgumentValue(val, ArgumentSource.Literal);
+        var result = _context.GetArgument<SomeEnum>("enum");
         result.ShouldBe(SomeEnum.Two);
     }
 
     [Fact]
     public void argument_returns_default_when_missing()
     {
-        _context.GetArgument<string>("wat").ShouldBeNull();
+        _context.GetArgument<string>("string").ShouldBeNull();
     }
 
     [Fact]
     public void argument_returns_provided_default_when_missing()
     {
-        _context.GetArgument("wat", "foo").ShouldBe("foo");
+        _context.GetArgument("string", "foo").ShouldBe("foo");
     }
 
     [Fact]
@@ -107,9 +120,9 @@ public class ResolveFieldContextTests
     {
         _context.Arguments = new Dictionary<string, ArgumentValue>
         {
-            { "a", new ArgumentValue(new string[] { "one", "two"}, ArgumentSource.Literal) }
+            { "stringlist", new ArgumentValue(new string[] { "one", "two"}, ArgumentSource.Literal) }
         };
-        var result = _context.GetArgument<List<string>>("a");
+        var result = _context.GetArgument<List<string>>("stringlist");
         result.ShouldNotBeNull();
         result.Count.ShouldBe(2);
         result[0].ShouldBe("one");

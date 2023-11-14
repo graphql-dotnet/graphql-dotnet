@@ -13,16 +13,6 @@ namespace GraphQL
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new();
 
-        /// <summary>
-        /// Creates a new instance of the indicated type, populating it with the dictionary.
-        /// </summary>
-        /// <typeparam name="T">The type to create.</typeparam>
-        /// <param name="source">The source of values.</param>
-        /// <returns>T.</returns>
-        public static T ToObject<T>(this IDictionary<string, object?> source)
-            where T : class
-            => (T)ToObject(source, typeof(T));
-
         private static readonly List<object?> _emptyValues = new();
 
         /// <summary>
@@ -38,20 +28,24 @@ namespace GraphQL
         /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
-        public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType? mappedType = null)
+        public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType mappedType)
         {
-            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
-            string GetPropertyName(string key, out FieldType? field)
-            {
-                var complexType = mappedType?.GetNamedType() as IComplexGraphType;
+            var inputGraphType = (mappedType is NonNullGraphType nonNullGraphType
+                ? nonNullGraphType.ResolvedType as IInputObjectGraphType
+                : mappedType as IInputObjectGraphType)
+                ?? throw new InvalidOperationException($"Graph type supplied is not an input object graph type.");
 
+            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
+            string GetPropertyName(string key, out FieldType field)
+            {
                 // type may not contain mapping information
-                field = complexType?.GetField(key);
-                return field?.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
+                field = inputGraphType.GetField(key)
+                    ?? throw new InvalidOperationException($"Could not find field '{key}' on type '{inputGraphType}'.");
+                return field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
             }
 
             // Returns values (from source or defaults) that match constructor signature + used keys from source
-            (List<object?>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
+            (List<object?>?, List<string?>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
             {
                 // parameterless constructors are the most common use case
                 if (parameters.Length == 0)
@@ -59,7 +53,7 @@ namespace GraphQL
 
                 // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
                 List<object?>? values = null;
-                List<string>? keys = null;
+                List<string?>? keys = null;
 
                 if (parameters.All(p =>
                 {
@@ -82,6 +76,7 @@ namespace GraphQL
                     if (p.HasDefaultValue)
                     {
                         (values ??= new()).Add(p.DefaultValue);
+                        (keys ??= new()).Add(null);
                         return true;
                     }
 
@@ -110,7 +105,7 @@ namespace GraphQL
             ConstructorInfo? targetCtor = null;
             ParameterInfo[]? ctorParameters = null;
             List<object?>? values = null;
-            List<string>? usedKeys = null;
+            List<string?>? usedKeys = null;
 
             foreach (var ctor in ctorCandidates)
             {
@@ -131,8 +126,18 @@ namespace GraphQL
 
             for (int i = 0; i < ctorParameters.Length; ++i)
             {
-                object? arg = GetPropertyValue(values[i], ctorParameters[i].ParameterType);
-                ctorArguments[i] = arg;
+                var fieldName = usedKeys![i];
+                if (fieldName is not null)
+                {
+                    var fieldType = inputGraphType.Fields.Find(fieldName)?.ResolvedType
+                        ?? throw new InvalidOperationException($"Could not find resolved type for field '{fieldName}' of type '{inputGraphType}'.");
+                    object? arg = GetPropertyValue(values[i], ctorParameters[i].ParameterType, fieldType);
+                    ctorArguments[i] = arg;
+                }
+                else
+                {
+                    ctorArguments[i] = values[i]; // default constructor argument
+                }
             }
 
             object obj;
@@ -166,7 +171,8 @@ namespace GraphQL
 
                 if (propertyInfo != null && propertyInfo.CanWrite)
                 {
-                    object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field?.ResolvedType);
+                    object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field.ResolvedType
+                        ?? throw new InvalidOperationException($"Could not get ResolvedType for field '{field.Name}' of type '{inputGraphType}'."));
                     propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
                 }
                 else
@@ -184,7 +190,7 @@ namespace GraphQL
 
                     if (fieldInfo != null)
                     {
-                        object? value = GetPropertyValue(item.Value, fieldInfo.FieldType, field?.ResolvedType);
+                        object? value = GetPropertyValue(item.Value, fieldInfo.FieldType, field.ResolvedType!);
                         fieldInfo.SetValue(obj, value);
                     }
                 }
@@ -205,8 +211,19 @@ namespace GraphQL
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
-        public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType? mappedType = null)
+        public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
         {
+            if (mappedType == null)
+            {
+                throw new ArgumentNullException(nameof(mappedType));
+            }
+
+            if (mappedType is NonNullGraphType nonNullGraphType)
+            {
+                mappedType = nonNullGraphType.ResolvedType
+                    ?? throw new InvalidOperationException("ResolvedType not set for non-null graph type.");
+            }
+
             // Short-circuit conversion if the property value already of the right type
             if (propertyValue == null || fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
             {
@@ -220,8 +237,10 @@ namespace GraphQL
               ? fieldType
               : fieldType.GetInterface("IEnumerable`1");
 
-            if (fieldType != typeof(string) && enumerableInterface != null)
+            if (mappedType is ListGraphType listGraphType && fieldType != typeof(string) && enumerableInterface != null)
             {
+                var itemGraphType = listGraphType.ResolvedType
+                    ?? throw new InvalidOperationException("Graph type is not a list graph type or ResolvedType not set.");
                 IList newCollection;
                 var elementType = enumerableInterface.GetGenericArguments()[0];
                 var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
@@ -255,7 +274,7 @@ namespace GraphQL
                     for (int i = 0; i < propertyValueAsIList.Count; ++i)
                     {
                         var listItem = propertyValueAsIList[i];
-                        newCollection[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType);
+                        newCollection[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
                     }
                 }
                 // Array of unknown size is created only after populating list
@@ -263,7 +282,7 @@ namespace GraphQL
                 {
                     foreach (var listItem in valueList)
                     {
-                        newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, mappedType));
+                        newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType));
                     }
 
                     if (fieldType.IsArray)

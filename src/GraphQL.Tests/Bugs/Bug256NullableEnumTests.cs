@@ -1,4 +1,5 @@
 using GraphQL.Execution;
+using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
@@ -15,7 +16,11 @@ public class Bug256NullableEnumTests
     {
         var ctx = new ResolveFieldContext
         {
-            Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } }
+            Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments(new QueryArgument(new EnumerationGraphType<EnumType>()) { Name = "value" }),
+            },
         };
 
         var result = ctx.GetArgument<EnumType?>("value");
@@ -27,7 +32,11 @@ public class Bug256NullableEnumTests
     {
         var ctx = new ResolveFieldContext
         {
-            Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
+            Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments(new QueryArgument(new EnumerationGraphType<EnumType>()) { Name = "value" }),
+            },
         };
 
         var result = ctx.GetArgument<EnumType?>("value");
@@ -39,7 +48,11 @@ public class Bug256NullableEnumTests
     {
         var ctx = new ResolveFieldContext
         {
-            Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } }
+            Arguments = new Dictionary<string, ArgumentValue> { { "value", ArgumentValue.NullLiteral } },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments(new QueryArgument(new EnumerationGraphType<EnumType>()) { Name = "value" }),
+            },
         };
 
         var result = ctx.GetArgument<EnumType>("value");
@@ -55,7 +68,11 @@ public class Bug256NullableEnumTests
     {
         var ctx = new ResolveFieldContext
         {
-            Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } }
+            Arguments = new Dictionary<string, ArgumentValue> { { "value", new ArgumentValue(EnumType.B, ArgumentSource.Literal) } },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments(new QueryArgument(new EnumerationGraphType<EnumType>()) { Name = "value" }),
+            },
         };
 
         var result = ctx.GetArgument<EnumType>("value");

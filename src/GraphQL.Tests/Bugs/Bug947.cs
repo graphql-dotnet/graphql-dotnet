@@ -1,5 +1,7 @@
 using System.Numerics;
 using GraphQL.Execution;
+using GraphQL.Types;
+using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Tests.Bugs;
 
@@ -8,6 +10,10 @@ public class Bug947
     [Fact]
     public void GetArgument_Should_Return_Properly_Converted_Values()
     {
+        var inputObjectGraphType = new InputObjectGraphType<SomeObject>();
+        inputObjectGraphType.Field(x => x.inner_int).Type(new IntGraphType());
+        inputObjectGraphType.Field(x => x.inner_string).Type(new StringGraphType());
+
         var context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
@@ -21,7 +27,17 @@ public class Bug947
                                 { "inner_string", "ok" }
                             }, ArgumentSource.Literal)
                 }
-            }
+            },
+            FieldDefinition = new FieldType
+            {
+                Arguments = new QueryArguments
+                {
+                    new QueryArgument(new IntGraphType()) { Name = "int" },
+                    new QueryArgument(new StringGraphType()) { Name = "string" },
+                    new QueryArgument(new AnyScalarGraphType()) { Name = "vector" },
+                    new QueryArgument(inputObjectGraphType) { Name = "object" },
+                },
+            },
         };
 
         // int arg
