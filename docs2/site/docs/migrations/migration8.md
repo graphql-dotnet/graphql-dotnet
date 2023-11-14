@@ -93,6 +93,7 @@ Specifically, this relates to the following methods:
 
 This change was made to prevent duplicate registrations of the same service within the DI container.
 
-### 6. `ObjectExtensions.ToObject<T>` was removed.
+### 6. `ObjectExtensions.ToObject` changes
 
-This was only used by internal tests.
+- `ObjectExtensions.ToObject<T>` was removed; it was only used by internal tests.
+- `ObjectExtensions.ToObject` requires input object graph type for conversion.
