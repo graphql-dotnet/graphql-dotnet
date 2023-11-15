@@ -394,6 +394,11 @@ namespace GraphQL
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Constructor, AllowMultiple=false)]
+    public class GraphQLConstructorAttribute : System.Attribute
+    {
+        public GraphQLConstructorAttribute() { }
+    }
     public static class GraphQLExtensions
     {
         public static object? DefaultValueOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }

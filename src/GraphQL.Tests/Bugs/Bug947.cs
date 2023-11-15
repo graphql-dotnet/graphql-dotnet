@@ -59,9 +59,9 @@ public class Bug947
         // object arg
         context.GetArgument<object>("object").ShouldBeOfType<Dictionary<string, object>>();
         context.GetArgument<SomeObject>("object").inner_int.ShouldBe(15);
-        Should.Throw<ArgumentException>(() => context.GetArgument<int>("object"));
-        Should.Throw<ArgumentException>(() => context.GetArgument<string>("object"));
-        Should.Throw<ArgumentException>(() => context.GetArgument<DateTime>("object"));
+        Should.Throw<InvalidOperationException>(() => context.GetArgument<int>("object"));
+        Should.Throw<InvalidOperationException>(() => context.GetArgument<string>("object"));
+        Should.Throw<InvalidOperationException>(() => context.GetArgument<DateTime>("object"));
 
         var otherObject = context.GetArgument<SomeOtherObject>("object");
         otherObject.unknown.ShouldBe(0);
