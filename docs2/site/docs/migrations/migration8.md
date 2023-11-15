@@ -98,7 +98,7 @@ This change was made to prevent duplicate registrations of the same service with
 - `ObjectExtensions.ToObject<T>` was removed; it was only used by internal tests.
 - `ObjectExtensions.ToObject` requires input object graph type for conversion.
 - Only public constructors are eligible candidates while selecting a constructor.
-- The public default constructor is used when available.
+- The public parameterless constructor is used when available.
 - If only a single public constructor is available, it is used.
 - If a public constructor is marked with `[GraphQLConstructor]`, it is used.
 - Otherwise an exception is thrown during deserialization.
