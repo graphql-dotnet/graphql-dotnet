@@ -295,4 +295,37 @@ public class ObjectExtensionsTests
         private MyInput2() { throw new InvalidOperationException(); }
         public MyInput2(string name, int age) { Name = name; Age = age; }
     }
+
+    [Fact]
+    public void toobject_throws_for_multiple_constructors()
+    {
+        var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
+        Should.Throw<InvalidOperationException>(inputs.ToObject<MyInput3>);
+    }
+
+    private class MyInput3
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public MyInput3(string name) { Name = name; }
+        public MyInput3(string name, int age) { Name = name; Age = age; }
+    }
+
+    [Fact]
+    public void toobject_honors_marked_constructor()
+    {
+        var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
+        var person = inputs.ToObject<MyInput4>();
+        person.Name.ShouldBe("tom");
+        person.Age.ShouldBe(10);
+    }
+
+    private class MyInput4
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public MyInput4(string name, int age) { throw new InvalidOperationException(); }
+        [GraphQLConstructor]
+        public MyInput4(string name) { Name = name; }
+    }
 }

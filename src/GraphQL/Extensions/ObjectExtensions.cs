@@ -11,7 +11,7 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, ConstructorInfo[]> _types = new();
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo> _types = new();
 
         private static readonly List<object?> _emptyValues = new();
 
@@ -99,13 +99,19 @@ namespace GraphQL
             if (type.IsAbstract)
                 throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.");
 
-            // attempt to use the most specific constructor sorting in decreasing order of parameters number
-            var ctorCandidates = _types.GetOrAdd(type, t =>
+            // attempt to use:
+            //   1. the only constructor
+            //   2. a constructor marked with GraphQLConstructorAttribute
+            //   3. the parameterless constructor
+            //   otherwise, throw
+            var ctor = _types.GetOrAdd(type, t =>
             {
-                var defaultConstructor = t.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Array.Empty<Type>(), null);
-                if (defaultConstructor != null)
-                    return new[] { defaultConstructor };
-                return t.GetConstructors(BindingFlags.Public | BindingFlags.Instance).OrderByDescending(ctor => ctor.GetParameters().Length).ToArray();
+                var allConstructors = t.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+                return allConstructors.Length == 1
+                    ? allConstructors[0]
+                    : Array.Find(allConstructors, x => x.GetCustomAttribute<GraphQLConstructorAttribute>() != null)
+                        ?? Array.Find(allConstructors, x => x.GetParameters().Length == 0)
+                        ?? throw new InvalidOperationException($"Multiple constructors available for type '{t.GetFriendlyName()}'; please indicate preferred constructor to use via GraphQLConstructorAttribute.");
             });
 
             ConstructorInfo? targetCtor = null;
@@ -113,16 +119,12 @@ namespace GraphQL
             List<object?>? values = null;
             List<string?>? usedKeys = null;
 
-            foreach (var ctor in ctorCandidates)
+            var parameters = ctor.GetParameters();
+            (values, usedKeys) = GetValuesAndUsedKeys(parameters);
+            if (values != null)
             {
-                var parameters = ctor.GetParameters();
-                (values, usedKeys) = GetValuesAndUsedKeys(parameters);
-                if (values != null)
-                {
-                    targetCtor = ctor;
-                    ctorParameters = parameters;
-                    break;
-                }
+                targetCtor = ctor;
+                ctorParameters = parameters;
             }
 
             if (targetCtor == null || ctorParameters == null || values == null)
