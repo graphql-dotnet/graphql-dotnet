@@ -727,4 +727,149 @@ public class InputGraphTypeAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
+
+    [Fact]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_NotDefinedByTheInputObjectGraphType_GQL007()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                    Field<StringGraphType>("Address");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : BaseBaseInputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class BaseBaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                // hide the original method
+                public new virtual object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData("Sample.Server.BaseInputObjectGraphType", false)]
+    [InlineData("Sample.Server.BaseInputObjectGraphType, Sample.Server.BaseInputObjectGraphType2", true)]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_ForceTypesAnalysis_GQL007(string forceTypes, bool report)
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                    Field<StringGraphType>("Address");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : BaseInputObjectGraphType2<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class BaseInputObjectGraphType2<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+
+        var test = new VerifyCS.Test
+        {
+            TestCode = source,
+            TestState =
+            {
+                AnalyzerConfigFiles =
+                {
+                    ("/.editorconfig",
+                        $$"""
+                         root = true
+
+                         [*]
+                         {{InputGraphTypeAnalyzer.ForceTypesAnalysisOption}} = {{forceTypes}}
+                         ")
+                         """)
+                }
+            }
+        };
+
+        if (report)
+        {
+            test.ExpectedDiagnostics.Add(expected);
+        }
+
+        await test.RunAsync();
+    }
 }
