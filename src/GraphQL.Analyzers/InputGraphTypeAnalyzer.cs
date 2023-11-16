@@ -237,7 +237,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         }
 
         var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName("GraphQL.Types.InputObjectGraphType`1");
-        var methodSymbol = genericInputObjectGraphType?.GetMembers(Constants.MethodNames.ParseDictionary)
+        var parseDictionaryBaseMethod = genericInputObjectGraphType?.GetMembers(Constants.MethodNames.ParseDictionary)
             .OfType<IMethodSymbol>()
             .Single(); // analyzers are not supposed to throw exceptions but we expect this to fail in tests if the base type changes
 
@@ -258,7 +258,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             bool overridesParseDictionary = sourceTypeSymbol
                 .GetMembers("ParseDictionary")
                 .OfType<IMethodSymbol>()
-                .Any(m => SymbolEqualityComparer.Default.Equals(m.OverriddenMethod?.OriginalDefinition, methodSymbol));
+                .Any(m => SymbolEqualityComparer.Default.Equals(m.OverriddenMethod?.OriginalDefinition, parseDictionaryBaseMethod));
 
             if (overridesParseDictionary && forceTypesAnalysis?.Contains($"{sourceTypeSymbol.ContainingNamespace}.{sourceTypeSymbol.Name}") != true)
             {
