@@ -10,7 +10,10 @@
 
 ## Cause
 
-This rule triggers when a field defined on a type deriving from `InputObjectGraphType<TSourceType>` cannot be mapped to the `TSourceType` type.
+This rule triggers when a field defined on a type deriving from
+`InputObjectGraphType<TSourceType>` cannot be mapped to the `TSourceType` type.
+If the type or one of its base types override the `ParseDictionary` method the
+validation is skipped.
 
 ## Rule description
 
@@ -75,6 +78,23 @@ public class MySourceType
 }
 ```
 
+## Configure the analyzer
+
+If the `ParseDictionary` method of the analyzed type or any of its base types
+is overridden, the type analysis is skipped. However, you can manually force
+the analysis by specifying a comma-delimited list of full type names in the
+`.editorconfig` file using the
+`dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis`
+configuration key.
+
+For instance, to enforce the analysis check for both
+`MyServer.BaseInputObjectGraphType` and `MyServer.BaseInputObjectGraphType2`,
+include the following configuration in your `.editorconfig` file:
+
+```ini
+dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis = MyServer.BaseInputObjectGraphType,MyServer.BaseInputObjectGraphType2
+```
+
 ## Suppress a warning
 
 If you just want to suppress a single violation, add preprocessor directives to your source file to disable and then re-enable the rule.
@@ -95,3 +115,5 @@ dotnet_diagnostic.GQL006.severity = none
 For more information, see [How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
 
 ## Related rules
+
+[# GQL007: Can not set source field](/GQL007_CanNotSetSourceField)

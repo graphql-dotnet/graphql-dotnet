@@ -95,6 +95,12 @@ public static class Extensions
         return defaultValue;
     }
 
+    public static string? GetStringOption(this AnalyzerOptions analyzerOptions, string name, SyntaxTree tree, string? defaultValue = default)
+    {
+        var config = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
+        return config.TryGetValue(name, out string? configValue) ? configValue : defaultValue;
+    }
+
     public static Location GetMethodInvocationLocation(this MemberAccessExpressionSyntax memberAccessExpressionSyntax)
     {
         var methodNameLocation = memberAccessExpressionSyntax.Name.GetLocation();

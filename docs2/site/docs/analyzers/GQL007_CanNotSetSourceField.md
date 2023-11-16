@@ -10,7 +10,10 @@
 
 ## Cause
 
-This rule triggers when a field defined on a type deriving from `InputObjectGraphType<TSourceType>` has a matching field or property on the `TSourceType` type but it's not not settable.
+This rule triggers when a field defined on a type deriving from
+`InputObjectGraphType<TSourceType>` has a matching field or property on the
+`TSourceType` type but it's not not settable. If the type or one of its base
+types override the `ParseDictionary` method the validation is skipped.
 
 ## Rule description
 
@@ -79,6 +82,23 @@ public class MySourceType
     public string Title;
     public string Age;
 }
+```
+
+## Configure the analyzer
+
+If the `ParseDictionary` method of the analyzed type or any of its base types
+is overridden, the type analysis is skipped. However, you can manually force
+the analysis by specifying a comma-delimited list of full type names in the
+`.editorconfig` file using the
+`dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis`
+configuration key.
+
+For instance, to enforce the analysis check for both
+`MyServer.BaseInputObjectGraphType` and `MyServer.BaseInputObjectGraphType2`,
+include the following configuration in your `.editorconfig` file:
+
+```ini
+dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis = MyServer.BaseInputObjectGraphType,MyServer.BaseInputObjectGraphType2
 ```
 
 ## Suppress a warning
