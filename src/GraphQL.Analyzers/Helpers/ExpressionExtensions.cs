@@ -106,7 +106,7 @@ public static class ExpressionExtensions
             .ToDictionary(arg => arg.NameColon!.Name.Identifier.Text);
 
     /// <summary>
-    /// Gets the location of a method invocation within a <see cref="MemberAccessExpressionSyntax"/>.
+    /// Gets the location of a method invocation including the method name and arguments.
     /// </summary>
     /// <param name="memberAccessExpressionSyntax">The <see cref="MemberAccessExpressionSyntax"/> representing the method invocation.</param>
     /// <returns>The <see cref="Location"/> of the method invocation.</returns>
@@ -137,12 +137,16 @@ public static class ExpressionExtensions
         {
             typeSymbol = symbol as ITypeSymbol;
             if (typeSymbol == null)
+            {
                 return false;
+            }
         }
         else
         {
             if (methodSymbol.ReturnType == null)
+            {
                 return false;
+            }
         }
 
         // otherwise: needs valid GetAwaiter
@@ -164,11 +168,19 @@ public static class ExpressionExtensions
     {
         var returnType = getAwaiter.ReturnType;
         if (returnType == null)
+        {
             return false;
+        }
 
         // bool IsCompleted { get }
-        if (!returnType.GetMembers().OfType<IPropertySymbol>().Any(p => p.Name == WellKnownMemberNames.IsCompleted && p.Type.SpecialType == SpecialType.System_Boolean && p.GetMethod != null))
+        if (!returnType.GetMembers()
+                .OfType<IPropertySymbol>()
+                .Any(p => p.Name == WellKnownMemberNames.IsCompleted &&
+                          p.Type.SpecialType == SpecialType.System_Boolean &&
+                          p.GetMethod != null))
+        {
             return false;
+        }
 
         var methods = returnType.GetMembers().OfType<IMethodSymbol>();
 
@@ -179,7 +191,8 @@ public static class ExpressionExtensions
 
         // void OnCompleted(Action)
         // Actions are delegates, so we'll just check for delegates.
-        if (!methods.Any(x => x.Name == WellKnownMemberNames.OnCompleted && x.ReturnsVoid && x.Parameters is [{ Type.TypeKind: TypeKind.Delegate }]))
+        if (!methods.Any(x => x.Name == WellKnownMemberNames.OnCompleted &&
+                              x is { ReturnsVoid: true, Parameters: [{ Type.TypeKind: TypeKind.Delegate }] }))
             return false;
 
         // void GetResult() || T GetResult()
