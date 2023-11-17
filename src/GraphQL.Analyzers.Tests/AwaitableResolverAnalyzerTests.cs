@@ -1,3 +1,4 @@
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
     GraphQL.Analyzers.AwaitableResolverAnalyzer,

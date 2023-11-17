@@ -10,11 +10,14 @@
 
 ## Cause
 
-The same name is provided in `Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods.
+The same name is provided in `Field`, `Connection` or `ConnectionBuilder.Create`
+and `Name` methods.
 
 ## Rule description
 
-Field name should be provided in the `Field`, `Connection` or `ConnectionBuilder.Create` method. The `Name` method call is unnecessary and can be removed.
+Field name should be provided in the `Field`, `Connection` or
+`ConnectionBuilder.Create` method. The `Name` method call is unnecessary and can
+be removed.
 
 ## How to fix violations
 
@@ -40,7 +43,8 @@ ConnectionBuilder.Create<StringGraphType, string>("Name");
 
 ## Suppress a warning
 
-If you just want to suppress a single violation, add preprocessor directives to your source file to disable and then re-enable the rule.
+If you just want to suppress a single violation, add preprocessor directives to
+your source file to disable and then re-enable the rule.
 
 ```csharp
 #pragma warning disable GQL002
@@ -48,14 +52,17 @@ If you just want to suppress a single violation, add preprocessor directives to 
 #pragma warning restore GQL002
 ```
 
-To disable the rule for a file, folder, or project, set its severity to `none` in the [configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
+To disable the rule for a file, folder, or project, set its severity to `none`
+in the
+[configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
 
 ```ini
 [*.cs]
 dotnet_diagnostic.GQL002.severity = none
 ```
 
-For more information, see [How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+For more information, see
+[How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
 
 ## Related rules
 

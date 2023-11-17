@@ -4,64 +4,86 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 
-namespace GraphQL.Analyzers;
+namespace GraphQL.Analyzers.Helpers;
 
-public static class Extensions
+public static class ExpressionExtensions
 {
+    /// <summary>
+    /// Finds the <see cref="InvocationExpressionSyntax"/> for a method with the specified name
+    /// within the given <see cref="ExpressionSyntax"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> to search within.</param>
+    /// <param name="methodName">The name of the method to find.</param>
+    /// <returns>The <see cref="InvocationExpressionSyntax"/> if found; otherwise, <see langword="null" />.</returns>
     public static InvocationExpressionSyntax? FindMethodInvocationExpression(this ExpressionSyntax expression, string methodName)
     {
         var simpleNameSyntax = expression.FindSimpleNameSyntax(methodName);
         return simpleNameSyntax?.FindMethodInvocationExpression();
     }
 
-    public static SimpleNameSyntax? FindSimpleNameSyntax(this ExpressionSyntax expression, string name)
-    {
-        return expression.FindNameSyntax<SimpleNameSyntax>(name);
-    }
+    /// <summary>
+    /// Finds the <see cref="SimpleNameSyntax"/> for a simple name with the specified name
+    /// within the given <see cref="ExpressionSyntax"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> to search within.</param>
+    /// <param name="name">The name of the simple name to find.</param>
+    /// <returns>The <see cref="SimpleNameSyntax"/> if found; otherwise, <see langword="null"/>.</returns>
+    public static SimpleNameSyntax? FindSimpleNameSyntax(this ExpressionSyntax expression, string name) =>
+        expression.FindNameSyntax<SimpleNameSyntax>(name);
 
-    public static GenericNameSyntax? FindGenericNameSyntax(this ExpressionSyntax expression, string name)
-    {
-        return expression.FindNameSyntax<GenericNameSyntax>(name);
-    }
+    /// <summary>
+    /// Finds the <see cref="GenericNameSyntax"/> for a generic name with the specified name
+    /// within the given <see cref="ExpressionSyntax"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> to search within.</param>
+    /// <param name="name">The name of the generic name to find.</param>
+    /// <returns>The <see cref="GenericNameSyntax"/> if found; otherwise, <see langword="null"/>.</returns>
+    public static GenericNameSyntax? FindGenericNameSyntax(this ExpressionSyntax expression, string name) =>
+        expression.FindNameSyntax<GenericNameSyntax>(name);
 
+    /// <summary>
+    /// Finds the specified type of name syntax with the given name within the ExpressionSyntax.
+    /// </summary>
+    /// <typeparam name="TNameSyntax">The type of name syntax to find.</typeparam>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> to search within.</param>
+    /// <param name="name">The name to find.</param>
+    /// <returns>The found name syntax if present; otherwise, <see langword="null"/>.</returns>
     public static TNameSyntax? FindNameSyntax<TNameSyntax>(this ExpressionSyntax expression, string name)
-        where TNameSyntax : SimpleNameSyntax
-    {
-        return expression.DescendantNodes()
+        where TNameSyntax : SimpleNameSyntax =>
+        expression.DescendantNodes()
             .OfType<TNameSyntax>()
             .FirstOrDefault(simpleNameSyntax => simpleNameSyntax.Identifier.Text == name);
-    }
 
-    public static InvocationExpressionSyntax? FindMethodInvocationExpression(this SimpleNameSyntax methodSimpleName)
-    {
-        return methodSimpleName.Parent switch
+    /// <summary>
+    /// Finds the <see cref="InvocationExpressionSyntax"/> for a method based on a <see cref="SimpleNameSyntax"/>.
+    /// </summary>
+    /// <param name="methodSimpleName">The <see cref="SimpleNameSyntax"/> representing the method name.</param>
+    /// <returns>The <see cref="InvocationExpressionSyntax"/> if found; otherwise, <see langword="null"/>.</returns>
+    public static InvocationExpressionSyntax? FindMethodInvocationExpression(this SimpleNameSyntax methodSimpleName) =>
+        methodSimpleName.Parent switch
         {
             InvocationExpressionSyntax invocation => invocation,
             MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } => invocation,
             _ => null
         };
-    }
 
-    public static bool IsGraphQLSymbol(this ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
-    {
-        var symbolInfo = context.SemanticModel.GetSymbolInfo(expression);
+    /// <summary>
+    /// Gets the <see cref="IMethodSymbol"/> from the given <see cref="ExpressionSyntax"/>
+    /// within the specified <see cref="SyntaxNodeAnalysisContext"/>.
+    /// </summary>
+    /// <param name="expression">The <see cref="ExpressionSyntax"/> representing a method invocation.</param>
+    /// <param name="context">The <see cref="SyntaxNodeAnalysisContext"/> for semantic analysis.</param>
+    /// <returns>The <see cref="IMethodSymbol"/> if found; otherwise, <see langword="null"/>.</returns>
+    public static IMethodSymbol? GetMethodSymbol(this ExpressionSyntax expression, SyntaxNodeAnalysisContext context) =>
+        context.SemanticModel.GetSymbolInfo(expression).Symbol as IMethodSymbol;
 
-        return symbolInfo.Symbol?.IsGraphQLSymbol()
-               ?? symbolInfo.CandidateSymbols
-                   .All(symbol => symbol.IsGraphQLSymbol());
-    }
-
-    public static bool IsGraphQLSymbol(this ISymbol symbol)
-    {
-        // GraphQL, GraphQL.MicrosoftDI...
-        return symbol.ContainingAssembly.Name.StartsWith(Constants.GraphQL);
-    }
-
-    public static IMethodSymbol? GetMethodSymbol(this ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
-    {
-        return context.SemanticModel.GetSymbolInfo(expression).Symbol as IMethodSymbol;
-    }
-
+    /// <summary>
+    /// Gets the named argument from a method invocation with the specified argument name.
+    /// </summary>
+    /// <param name="invocation">The <see cref="InvocationExpressionSyntax"/> representing the method invocation.</param>
+    /// <param name="argumentName">The name of the argument to retrieve.</param>
+    /// <param name="semanticModel">The <see cref="SemanticModel"/> for semantic analysis.</param>
+    /// <returns>The <see cref="ArgumentSyntax"/> if found; otherwise, <see langword="null"/>.</returns>
     public static ArgumentSyntax? GetMethodArgument(this InvocationExpressionSyntax invocation, string argumentName, SemanticModel semanticModel)
     {
         if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
@@ -73,34 +95,21 @@ public static class Extensions
         return GetArgument(argumentName, namedArguments, invocation, methodSymbol);
     }
 
-    public static Dictionary<string, ArgumentSyntax> GetNamedArguments(InvocationExpressionSyntax invocation)
-    {
-        return invocation.ArgumentList.Arguments
+    /// <summary>
+    /// Gets a dictionary of named arguments from the given <see cref="InvocationExpressionSyntax"/>.
+    /// </summary>
+    /// <param name="invocation">The <see cref="InvocationExpressionSyntax"/> to extract named arguments from.</param>
+    /// <returns>A dictionary of named arguments.</returns>
+    public static Dictionary<string, ArgumentSyntax> GetNamedArguments(InvocationExpressionSyntax invocation) =>
+        invocation.ArgumentList.Arguments
             .Where(arg => arg.NameColon != null)
             .ToDictionary(arg => arg.NameColon!.Name.Identifier.Text);
-    }
 
-    public static bool GetBoolOption(this AnalyzerOptions analyzerOptions, string name, SyntaxTree tree, bool defaultValue = default)
-    {
-        var config = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
-
-        if (config.TryGetValue(name, out string? configValue))
-        {
-            if (bool.TryParse(configValue, out bool value))
-            {
-                return value;
-            }
-        }
-
-        return defaultValue;
-    }
-
-    public static string? GetStringOption(this AnalyzerOptions analyzerOptions, string name, SyntaxTree tree, string? defaultValue = default)
-    {
-        var config = analyzerOptions.AnalyzerConfigOptionsProvider.GetOptions(tree);
-        return config.TryGetValue(name, out string? configValue) ? configValue : defaultValue;
-    }
-
+    /// <summary>
+    /// Gets the location of a method invocation including the method name and arguments.
+    /// </summary>
+    /// <param name="memberAccessExpressionSyntax">The <see cref="MemberAccessExpressionSyntax"/> representing the method invocation.</param>
+    /// <returns>The <see cref="Location"/> of the method invocation.</returns>
     public static Location GetMethodInvocationLocation(this MemberAccessExpressionSyntax memberAccessExpressionSyntax)
     {
         var methodNameLocation = memberAccessExpressionSyntax.Name.GetLocation();
@@ -110,23 +119,6 @@ public static class Extensions
             TextSpan.FromBounds(methodNameLocation.SourceSpan.Start, argsLocation.SourceSpan.End));
     }
 
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new(source);
-
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source, IEqualityComparer<T> comparer)
-        => new(source, comparer);
-
-    public static ISymbol? GetFieldBuilderReturnTypeSymbol(
-        this ExpressionSyntax expression,
-        SemanticModel semanticModel)
-    {
-        var resolveMethodInfo = semanticModel.GetSymbolInfo(expression);
-        if (resolveMethodInfo.Symbol is IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "FieldBuilder`2" } namedType })
-        {
-            return namedType.TypeArguments[1];
-        }
-
-        return null;
-    }
 
     /// <summary>
     /// If the <paramref name="symbol"/> is a method symbol, returns <see langword="true"/> if the method's return type is "awaitable",
@@ -181,7 +173,11 @@ public static class Extensions
         }
 
         // bool IsCompleted { get }
-        if (!returnType.GetMembers().OfType<IPropertySymbol>().Any(p => p.Name == WellKnownMemberNames.IsCompleted && p.Type.SpecialType == SpecialType.System_Boolean && p.GetMethod != null))
+        if (!returnType.GetMembers()
+                .OfType<IPropertySymbol>()
+                .Any(p => p.Name == WellKnownMemberNames.IsCompleted &&
+                          p.Type.SpecialType == SpecialType.System_Boolean &&
+                          p.GetMethod != null))
         {
             return false;
         }
@@ -193,10 +189,13 @@ public static class Extensions
         // NOTE: (rather than any OnCompleted method conforming to a certain pattern).
         // NOTE: Should this code be updated to match the spec?
 
-        // void OnCompleted(Action) 
+        // void OnCompleted(Action)
         // Actions are delegates, so we'll just check for delegates.
-        if (!methods.Any(x => x.Name == WellKnownMemberNames.OnCompleted && x.ReturnsVoid && x.Parameters is [{ Type.TypeKind: TypeKind.Delegate }]))
+        if (!methods.Any(x => x.Name == WellKnownMemberNames.OnCompleted &&
+                              x is { ReturnsVoid: true, Parameters: [{ Type.TypeKind: TypeKind.Delegate }] }))
+        {
             return false;
+        }
 
         // void GetResult() || T GetResult()
         return methods.Any(m => m.Name == WellKnownMemberNames.GetResult && !m.Parameters.Any());
@@ -209,9 +208,7 @@ public static class Extensions
         IMethodSymbol methodSymbol)
     {
         if (namedArguments.TryGetValue(argumentName, out var msgArg))
-        {
             return msgArg;
-        }
 
         int paramIndex = GetParamIndex(argumentName, methodSymbol);
         var argument = paramIndex != -1 && invocation.ArgumentList.Arguments.Count > paramIndex

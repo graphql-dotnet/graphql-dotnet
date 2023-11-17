@@ -9,15 +9,15 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task Sanity_NoDiagnostics()
     {
-        const string source = @"";
-
+        const string source = "";
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
     public async Task AllArgumentsProvided_NoNamedArguments_FixProvided()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -36,7 +36,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -61,7 +62,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task NamedArgumentsNotInOrder_FixPreservesSameOrder()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -80,7 +82,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -105,7 +108,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task NameArgumentIsNotFirst_FixCorrectly()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -122,7 +126,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -145,7 +150,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task FieldCalledOnVariable_FixCorrectly()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -185,7 +191,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task FieldAsync_FixAsFieldAndResolveAsync()
     {
-        const string source = """
+        const string source =
+            """
             using System.Threading.Tasks;
             using GraphQL.Types;
 
@@ -203,7 +210,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using System.Threading.Tasks;
             using GraphQL.Types;
 
@@ -227,7 +235,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task ArgumentsListMultilineFormatted_FormattingPreserved()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -247,7 +256,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -273,7 +283,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task NonGenericFieldMethod_FixProvided()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -290,7 +301,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -312,7 +324,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task FieldSubscribe_SubscribeArgument_ConvertToFieldAndResolveStream()
     {
-        const string source = """
+        const string source =
+            """
             using System;
             using GraphQL.Types;
 
@@ -336,7 +349,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using System;
             using GraphQL.Types;
 
@@ -366,7 +380,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task FieldDelegate_ConvertToFieldAndResolveDelegate()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -384,7 +399,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -408,7 +424,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task ArgumentsFormattingPreservedAsync()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -429,7 +446,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -457,7 +475,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task EmptyLineWithWhiteSpacesBeforeField_ArgumentsFormattingPreservedAsync()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -478,7 +497,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -509,7 +529,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task CommentBeforeField_ArgumentsFormattingPreservedAsync()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -529,7 +550,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -556,7 +578,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task ArgumentsFormattingPreserved_PreserveNewLines()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -577,7 +600,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -606,7 +630,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task ReformatOptionIsTrue_SourceReformatted()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -621,7 +646,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -664,7 +690,8 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task SkipNullsOptionIsFalse_NullArgumentsPreserved()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -682,7 +709,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;

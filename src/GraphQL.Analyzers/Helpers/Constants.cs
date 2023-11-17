@@ -1,4 +1,6 @@
-namespace GraphQL.Analyzers;
+// ReSharper disable InconsistentNaming
+
+namespace GraphQL.Analyzers.Helpers;
 
 #pragma warning disable IDE1006 // Naming Styles
 public static class Constants

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -70,7 +71,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!genericNameSyntax.IsGraphQLSymbol(context))
+        if (!genericNameSyntax.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }
