@@ -193,7 +193,9 @@ public static class ExpressionExtensions
         // Actions are delegates, so we'll just check for delegates.
         if (!methods.Any(x => x.Name == WellKnownMemberNames.OnCompleted &&
                               x is { ReturnsVoid: true, Parameters: [{ Type.TypeKind: TypeKind.Delegate }] }))
+        {
             return false;
+        }
 
         // void GetResult() || T GetResult()
         return methods.Any(m => m.Name == WellKnownMemberNames.GetResult && !m.Parameters.Any());
