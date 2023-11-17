@@ -10,15 +10,20 @@
 
 ## Cause
 
-`Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods define different field names.
+`Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods define
+different field names.
 
 ## Rule description
 
-Field name should be provided in the `Field`, `Connection` or `ConnectionBuilder.Create` method. If you intend to use a different name, modify it within the `Field`, `Connection` or `ConnectionBuilder.Create` method instead of using the `Name` method.
+Field name should be provided in the `Field`, `Connection` or
+`ConnectionBuilder.Create` method. If you intend to use a different name, modify
+it within the `Field`, `Connection` or `ConnectionBuilder.Create` method instead
+of using the `Name` method.
 
 ## How to fix violations
 
-Specify the preferred field name within the `Field`, `Connection` or `ConnectionBuilder.Create` method and remove the use of the `Name` method.
+Specify the preferred field name within the `Field`, `Connection` or
+`ConnectionBuilder.Create` method and remove the use of the `Name` method.
 
 ## Example of a violation
 
@@ -49,7 +54,8 @@ ConnectionBuilder.Create<StringGraphType, string>("Name2");
 
 ## Suppress a warning
 
-If you just want to suppress a single violation, add preprocessor directives to your source file to disable and then re-enable the rule.
+If you just want to suppress a single violation, add preprocessor directives to
+your source file to disable and then re-enable the rule.
 
 ```csharp
 #pragma warning disable GQL003
@@ -57,14 +63,17 @@ If you just want to suppress a single violation, add preprocessor directives to 
 #pragma warning restore GQL003
 ```
 
-To disable the rule for a file, folder, or project, set its severity to `none` in the [configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
+To disable the rule for a file, folder, or project, set its severity to `none`
+in the
+[configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
 
 ```ini
 [*.cs]
 dotnet_diagnostic.GQL003.severity = none
 ```
 
-For more information, see [How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+For more information, see
+[How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
 
 ## Related rules
 

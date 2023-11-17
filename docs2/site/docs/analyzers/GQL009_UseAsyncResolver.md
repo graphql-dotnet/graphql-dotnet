@@ -10,26 +10,25 @@
 
 ## Cause
 
-This rule triggers when the sync version of the `Resolve` or
-`ResolveScoped` methods is used with awaitable delegate.
+This rule triggers when the sync version of the `Resolve` or `ResolveScoped`
+methods is used with awaitable delegate.
 
 ## Rule description
 
-`ResolveAsync` and `ResolveScopedAsync` methods should be used to
-register awaitable delegates. The most common awaitable types are
-`System.Threading.Tasks.Task` and `System.Threading.Tasks.ValueTask`,
-but any type that defines a valid `GetAwaiter()` method, which
-returns a valid awaiter with a `GetResult()` method is considered
-awaitable and is detected by the analyzer.  
-The rule is useful when `FieldBuilder` is defined without return type
-argument or the return type argument is defined as `object` or
-`dynamic` and compiler allows returning `Task<T>` and other
-awaitables from the delegate.
+`ResolveAsync` and `ResolveScopedAsync` methods should be used to register
+awaitable delegates. The most common awaitable types are
+`System.Threading.Tasks.Task` and `System.Threading.Tasks.ValueTask`, but any
+type that defines a valid `GetAwaiter()` method, which returns a valid awaiter
+with a `GetResult()` method is considered awaitable and is detected by the
+analyzer.  
+The rule is useful when `FieldBuilder` is defined without return type argument
+or the return type argument is defined as `object` or `dynamic` and compiler
+allows returning `Task<T>` and other awaitables from the delegate.
 
 ## How to fix violations
 
-Replace the sync `Resolve` or `ResolveScoped` method with matching
-async version and await the delegate when needed.
+Replace the sync `Resolve` or `ResolveScoped` method with matching async version
+and await the delegate when needed.
 
 ## Example of a violation
 
@@ -119,7 +118,8 @@ public class MyGraphType : ObjectGraphType<Person>
 
 ## Suppress a warning
 
-If you just want to suppress a single violation, add preprocessor directives to your source file to disable and then re-enable the rule.
+If you just want to suppress a single violation, add preprocessor directives to
+your source file to disable and then re-enable the rule.
 
 ```csharp
 #pragma warning disable GQL009
@@ -127,13 +127,16 @@ If you just want to suppress a single violation, add preprocessor directives to 
 #pragma warning restore GQL009
 ```
 
-To disable the rule for a file, folder, or project, set its severity to `none` in the [configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
+To disable the rule for a file, folder, or project, set its severity to `none`
+in the
+[configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
 
 ```ini
 [*.cs]
 dotnet_diagnostic.GQL009.severity = none
 ```
 
-For more information, see [How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+For more information, see
+[How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
 
 ## Related rules
