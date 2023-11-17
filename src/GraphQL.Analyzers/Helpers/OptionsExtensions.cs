@@ -1,5 +1,5 @@
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace GraphQL.Analyzers.Helpers;
 
