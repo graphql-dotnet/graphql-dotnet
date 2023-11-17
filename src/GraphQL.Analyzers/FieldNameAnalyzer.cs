@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -63,7 +64,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!nameMemberAccessExpression.IsGraphQLSymbol(context))
+        if (!nameMemberAccessExpression.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }
