@@ -24,7 +24,7 @@ public class ApolloTracingTests
         query.Field<StringGraphType>("test")
             .Resolve(_ => new SimpleDataLoader<string>(async _ =>
             {
-                await Task.Delay(2000);
+                await Task.Delay(2200); // 2.2 seconds
                 return "Ok";
             }));
 
@@ -44,6 +44,6 @@ public class ApolloTracingTests
         var apolloTrace = ret.Extensions["tracing"].ShouldBeOfType<ApolloTrace>();
         var resolverData = apolloTrace.Execution.Resolvers.Single();
         resolverData.Path.ShouldBe(new object[] { "test" });
-        resolverData.Duration.ShouldBeGreaterThanOrEqualTo(2000000000L);
+        resolverData.Duration.ShouldBeGreaterThanOrEqualTo(2000000000L); // 2 seconds
     }
 }

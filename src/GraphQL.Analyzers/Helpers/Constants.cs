@@ -1,4 +1,6 @@
-namespace GraphQL.Analyzers;
+// ReSharper disable InconsistentNaming
+
+namespace GraphQL.Analyzers.Helpers;
 
 #pragma warning disable IDE1006 // Naming Styles
 public static class Constants
@@ -33,6 +35,7 @@ public static class Constants
         public const string FieldSubscribe = "FieldSubscribe";
         public const string FieldSubscribeAsync = "FieldSubscribeAsync";
         public const string Name = "Name";
+        public const string ParseDictionary = "ParseDictionary";
         public const string Resolve = "Resolve";
         public const string ResolveAsync = "ResolveAsync";
         public const string ResolveDelegate = "ResolveDelegate";
