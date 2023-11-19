@@ -124,4 +124,5 @@ For more information, see
 
 ## Related rules
 
-[# GQL007: Can not set source field](/GQL007_CanNotSetSourceField)
+[GQL007: Can not set source field](/GQL007_CanNotSetSourceField)
+[GQL010: Can not resolve input source type constructor](/GQL010_CanNotResolveInputSourceTypeConstructor)
