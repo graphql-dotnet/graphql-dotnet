@@ -11,7 +11,7 @@ public class BomTests
         string GetPath([CallerFilePath] string path = "") => path; // <GIT_ROOT>\src\GraphQL.ApiTests\BomTests.cs
 
         var callerFilePath = GetPath();
-        var gitRoot = new DirectoryInfo(callerFilePath).Parent!.Parent!.Parent!;
+        var gitRoot = new FileInfo(callerFilePath).Directory!.Parent!.Parent!;
         // Protection from situations when this test is copied to another repo or the folder structure changed, etc.
         var slnFile = Path.Combine(gitRoot.FullName, "src", "GraphQL.sln");
         if (!File.Exists(slnFile))
