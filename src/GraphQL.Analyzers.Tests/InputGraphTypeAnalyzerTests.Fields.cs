@@ -4,7 +4,7 @@ using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerif
 
 namespace GraphQL.Analyzers.Tests;
 
-public class InputGraphTypeAnalyzerTests
+public partial class InputGraphTypeAnalyzerTests
 {
     [Fact]
     public async Task Sanity_NoDiagnostics()
@@ -150,6 +150,8 @@ public class InputGraphTypeAnalyzerTests
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
+                    .WithSpan(5, 54, 5, 66).WithArguments("MySourceType"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                     .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")
             };

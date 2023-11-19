@@ -1,0 +1,145 @@
+# GQL010: Can not resolve input source type constructor
+
+|                        | Value  |
+| ---------------------- | ------ |
+| **Rule ID**            | GQL010 |
+| **Category**           | Usage  |
+| **Default severity**   | ERROR  |
+| **Enabled by default** | Yes    |
+| **Code fix provided**  | No     |
+
+## Cause
+
+This rule triggers when the type `TSourceType` used in the
+`InputObjectGraphType<TSourceType>` can't be constructed during the input
+parsing. If the type or one of its base types override the `ParseDictionary`
+method the validation is skipped.
+
+## Rule description
+
+The `TSourceType` should be a non-abstract `class`, `struct` or `record` and
+satisfy one of the following requirements:
+
+- Have an implicit default constructor
+- Have a public parameterless constructor
+- Have a singular public parameterized constructor
+- Have multiple public parameterized constructors and one and only one of them
+  is annotated with `GraphQLConstructorAttribute`
+
+## How to fix violations
+
+Follow the rules described in the [Rule description](#rule-description) section.
+
+## Example of a violation
+
+```c#
+// no public constructor
+public class MyInput1
+{
+    internal MyInput1(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+// multiple public parametrized constructors
+public class MyInput2
+{
+    public MyInput2(string name)
+    {
+        Name = name;
+    }
+
+    public MyInput2(int age)
+    {
+        Age = age;
+    }
+
+    public string? Name { get; set; }
+    public int Age { get; set; }
+}
+```
+
+## Example of how to fix
+
+```c#
+// make the constructor public
+public class MyInput1
+{
+    public MyInput(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+// annotate one of the constructors with a GraphQLConstructorAttribute
+public class MyInput2
+{
+    [GraphQLConstructor]
+    public MyInput2(string name)
+    {
+        Name = name;
+    }
+
+    public MyInput2(int age)
+    {
+        Age = age;
+    }
+
+    public string? Name { get; set; }
+    public int Age { get; set; }
+}
+```
+
+## Configure the analyzer
+
+If the `ParseDictionary` method of the analyzed type or any of its base types is
+overridden, the type analysis is skipped. However, you can manually force the
+analysis by specifying a comma-delimited list of full type names in the
+`.editorconfig` file using the
+`dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis` configuration
+key.
+
+For instance, to enforce the analysis check for both
+`MyServer.BaseInputObjectGraphType` and `MyServer.BaseInputObjectGraphType2`,
+include the following configuration in your `.editorconfig` file:
+
+```ini
+dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis = MyServer.BaseInputObjectGraphType,MyServer.BaseInputObjectGraphType2
+```
+
+## Suppress a warning
+
+If you just want to suppress a single violation, add preprocessor directives to
+your source file to disable and then re-enable the rule.
+
+```csharp
+#pragma warning disable GQL010
+// The code that's violating the rule is on this line.
+#pragma warning restore GQL010
+```
+
+To disable the rule for a file, folder, or project, set its severity to `none`
+in the
+[configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
+
+```ini
+[*.cs]
+dotnet_diagnostic.GQL010.severity = none
+```
+
+For more information, see
+[How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+
+## Related rules
+
+[GQL006: Can not match input field to the source field](/GQL006_CanNotMatchInputFieldToTheSourceField)  
+[GQL007: Can not set source field](/GQL007_CanNotSetSourceField)

@@ -61,6 +61,7 @@ public static class Constants
     public static class Types
     {
         public const string FieldType = "FieldType";
+        public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
     }
 
     public static class Interfaces

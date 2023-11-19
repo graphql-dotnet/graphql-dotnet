@@ -130,3 +130,4 @@ For more information, see
 ## Related rules
 
 [GQL006: Can not match input field to the source field](/GQL006_CanNotMatchInputFieldToTheSourceField)
+[GQL010: Can not resolve input source type constructor](/GQL010_CanNotResolveInputSourceTypeConstructor)
