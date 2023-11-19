@@ -16,7 +16,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         ImmutableArray.Create(
             CanNotMatchInputFieldToTheSourceField,
             CanNotSetSourceField,
-            CanNotResolveInputObjectConstructor);
+            CanNotResolveInputSourceTypeConstructor);
 
     public override void Initialize(AnalysisContext context)
     {

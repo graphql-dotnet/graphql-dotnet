@@ -7,16 +7,16 @@ namespace GraphQL.Analyzers;
 
 public partial class InputGraphTypeAnalyzer
 {
-    public static readonly DiagnosticDescriptor CanNotResolveInputObjectConstructor = new(
-        id: DiagnosticIds.CAN_NOT_RESOLVE_INPUT_OBJECT_CONSTRUCTOR,
-        title: "Can not resolve input object constructor",
-        messageFormat: "The source input type '{0}' must be a non-abstract, have a parameterless constructor, or " +
+    public static readonly DiagnosticDescriptor CanNotResolveInputSourceTypeConstructor = new(
+        id: DiagnosticIds.CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR,
+        title: "Can not resolve input source type constructor",
+        messageFormat: "The input source type '{0}' must be a non-abstract, have a parameterless constructor, or " +
                        "a singular parameterized constructor, or a parameterized constructor annotated with " +
                        $"'{Constants.Types.GraphQLConstructorAttribute}'",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.CAN_NOT_RESOLVE_INPUT_OBJECT_CONSTRUCTOR);
+        helpLinkUri: HelpLinks.CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR);
 
     private static void AnalyzeSourceTypeConstructors(
         SyntaxNodeAnalysisContext context,
@@ -80,7 +80,7 @@ public partial class InputGraphTypeAnalyzer
             if (location != null)
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    CanNotResolveInputObjectConstructor,
+                    CanNotResolveInputSourceTypeConstructor,
                     location,
                     (sourceTypeSymbol as INamedTypeSymbol)?.Name));
             }

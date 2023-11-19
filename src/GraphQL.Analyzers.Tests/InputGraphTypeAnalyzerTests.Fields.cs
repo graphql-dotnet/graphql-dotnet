@@ -150,7 +150,7 @@ public partial class InputGraphTypeAnalyzerTests
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
                     .WithSpan(5, 54, 5, 66).WithArguments("MySourceType"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                     .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")

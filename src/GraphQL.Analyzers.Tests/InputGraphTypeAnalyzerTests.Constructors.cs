@@ -41,7 +41,7 @@ public partial class InputGraphTypeAnalyzerTests
         var expected = report
             ? new[]
             {
-                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
                     .WithSpan(6, 64, 6, 72).WithArguments("MySource")
             }
             : DiagnosticResult.EmptyDiagnosticResults;
@@ -104,7 +104,7 @@ public partial class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
             .WithSpan(6, 64, 6, 72).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -152,7 +152,7 @@ public partial class InputGraphTypeAnalyzerTests
         var expected = report
             ? new[]
             {
-                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
                     .WithSpan(8, 64, 8, 72).WithArguments("MySource")
             }
             : DiagnosticResult.EmptyDiagnosticResults;
@@ -185,7 +185,7 @@ public partial class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
             .WithSpan(7, 64, 7, 72).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -253,7 +253,7 @@ public partial class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputObjectConstructor)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
             .WithSpan(15, 62, 15, 70).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
