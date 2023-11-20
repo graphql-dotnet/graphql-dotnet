@@ -17,7 +17,7 @@ namespace GraphQL.Types
     /// Also it can get descriptions for fields from the XML comments.
     /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
     /// </summary>
-    public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)] TSourceType> : InputObjectGraphType<TSourceType>
+    public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors)] TSourceType> : InputObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
@@ -100,9 +100,22 @@ namespace GraphQL.Types
         /// including properties on inherited classes.
         /// </summary>
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
-            => AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
+        {
+            // determine which constructor will be used to create the object, or null if unknown (perhaps due to overriding ParseDictionary)
+            var constructor = AutoRegisteringHelper.GetConstructor<TSourceType>();
+            // get constructor's parameter names
+            var parameters = constructor?.GetParameters().Select(x => x.Name).ToArray();
+            // define PropertyInfo predicate based on whether the constructor has any parameters
+            Func<PropertyInfo, bool> predicate = parameters == null || parameters.Length == 0
+                // any writable property
+                ? static x => x.SetMethod?.IsPublic ?? false
+                // any writable property, or any read-only property that has a constructor parameter
+                : x => (x.SetMethod?.IsPublic ?? false) || parameters.Contains(x.Name, StringComparer.InvariantCultureIgnoreCase);
+            // return the list of properties, excluding ones specifically specified in the AutoRegisteringInputGraphType constructor
+            return AutoRegisteringHelper.ExcludeProperties(
+                typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(predicate),
                 _excludedProperties);
+        }
 
         /// <inheritdoc cref="AutoRegisteringHelper.GetTypeInformation(MemberInfo, bool)"/>
         /// <remarks>

@@ -1844,7 +1844,7 @@ namespace GraphQL.Types
         public static GraphQL.Resolvers.IFieldResolver BuildFieldResolver(System.Reflection.MemberInfo memberInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
         public static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
     }
-    public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
+    public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }

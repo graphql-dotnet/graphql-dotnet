@@ -303,5 +303,22 @@ namespace GraphQL.Types
             typeInformation.ApplyAttributes();
             return typeInformation;
         }
+
+        /// <summary>
+        /// Identifies the constructor to use when constructing instances of <typeparamref name="TSourceType"/>.
+        /// Selects any public constructor marked with <see cref="GraphQLConstructorAttribute"/>, or the public
+        /// parameterless constructor, or the only public contructor, or returns <see langword="null"/> otherwise.
+        /// </summary>
+        internal static ConstructorInfo? GetConstructor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSourceType>()
+        {
+            var constructors = typeof(TSourceType).GetConstructors();
+            return constructors.Length switch
+            {
+                0 => null,
+                1 => constructors[0],
+                _ => Array.Find(constructors, c => c.GetCustomAttribute<GraphQLConstructorAttribute>() != null)
+                    ?? Array.Find(constructors, c => c.GetParameters().Length == 0),
+            };
+        }
     }
 }
