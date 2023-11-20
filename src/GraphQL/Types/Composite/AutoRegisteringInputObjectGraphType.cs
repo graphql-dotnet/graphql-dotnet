@@ -103,10 +103,12 @@ namespace GraphQL.Types
         {
             // determine which constructor will be used to create the object, or null if unknown (perhaps due to overriding ParseDictionary)
             var constructor = AutoRegisteringHelper.GetConstructorOrDefault<TSourceType>();
+            // get constructor's parameters
+            var constructorParameters = constructor?.GetParameters();
             // get constructor's parameter names
-            var parameters = constructor?.GetParameters().Select(x => x.Name).ToArray();
+            var parameters = constructorParameters == null || constructorParameters.Length == 0 ? null : constructorParameters.Select(x => x.Name).ToArray();
             // define PropertyInfo predicate based on whether the constructor has any parameters
-            Func<PropertyInfo, bool> predicate = parameters == null || parameters.Length == 0
+            Func<PropertyInfo, bool> predicate = parameters == null
                 // any writable property
                 ? static x => x.SetMethod?.IsPublic ?? false
                 // any writable property, or any read-only property that has a constructor parameter
