@@ -1,5 +1,6 @@
 namespace GraphQL.Tests.Execution;
 
+[Collection("StaticTests")] // due to tests with ValueConverter
 public abstract class InputConversionTestsBase
 {
     #region Input Types

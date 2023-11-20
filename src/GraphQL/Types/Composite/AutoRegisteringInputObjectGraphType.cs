@@ -102,7 +102,7 @@ namespace GraphQL.Types
         protected virtual IEnumerable<MemberInfo> GetRegisteredMembers()
         {
             // determine which constructor will be used to create the object, or null if unknown (perhaps due to overriding ParseDictionary)
-            var constructor = AutoRegisteringHelper.GetConstructor<TSourceType>();
+            var constructor = AutoRegisteringHelper.GetConstructorOrDefault<TSourceType>();
             // get constructor's parameter names
             var parameters = constructor?.GetParameters().Select(x => x.Name).ToArray();
             // define PropertyInfo predicate based on whether the constructor has any parameters

@@ -104,15 +104,7 @@ namespace GraphQL
             //   2. a constructor marked with GraphQLConstructorAttribute
             //   3. the parameterless constructor
             //   otherwise, throw
-            var ctor = _types.GetOrAdd(type, t =>
-            {
-                var allConstructors = t.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-                return allConstructors.Length == 1
-                    ? allConstructors[0]
-                    : Array.Find(allConstructors, x => x.GetCustomAttribute<GraphQLConstructorAttribute>() != null)
-                        ?? Array.Find(allConstructors, x => x.GetParameters().Length == 0)
-                        ?? throw new InvalidOperationException($"Multiple constructors available for type '{t.GetFriendlyName()}'; please indicate preferred constructor to use via GraphQLConstructorAttribute.");
-            });
+            var ctor = _types.GetOrAdd(type, AutoRegisteringHelper.GetConstructor);
 
             ConstructorInfo? targetCtor = null;
             ParameterInfo[]? ctorParameters = null;
