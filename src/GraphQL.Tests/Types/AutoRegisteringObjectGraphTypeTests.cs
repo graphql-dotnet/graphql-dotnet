@@ -711,7 +711,7 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         public int Field1 { get; set; } = 1;
         public int Field2 => 2;
-        public int Field3 { set { } }
+        public int Field3 { private get => 123; set { } }
         public int Field4() => 4;
         public int Field5 = 5;
         [Name("Field6AltName")]

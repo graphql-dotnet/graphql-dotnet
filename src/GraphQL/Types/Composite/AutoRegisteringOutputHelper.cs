@@ -139,7 +139,7 @@ internal static class AutoRegisteringOutputHelper
 
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
             var properties = AutoRegisteringHelper.ExcludeProperties(
-                types.SelectMany(type => type.GetProperties(flags)).Where(x => x.CanRead),
+                types.SelectMany(type => type.GetProperties(flags)).Where(x => x.GetMethod?.IsPublic ?? false),
                 excludedProperties);
             var methods = types.SelectMany(type => type.GetMethods(flags))
                 .Where(x =>
@@ -153,7 +153,7 @@ internal static class AutoRegisteringOutputHelper
         {
             var flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
             var properties = AutoRegisteringHelper.ExcludeProperties(
-                typeof(TSourceType).GetProperties(flags).Where(x => x.CanRead),
+                typeof(TSourceType).GetProperties(flags).Where(x => x.GetMethod?.IsPublic ?? false),
                 excludedProperties);
             var methods = typeof(TSourceType).GetMethods(flags)
                 .Where(x =>
