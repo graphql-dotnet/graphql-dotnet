@@ -93,7 +93,7 @@ Specifically, this relates to the following methods:
 
 This change was made to prevent duplicate registrations of the same service within the DI container.
 
-### 6. `ObjectExtensions.ToObject` changes
+### 6. `ObjectExtensions.ToObject` changes (impacts `InputObjectGraphType`)
 
 - `ObjectExtensions.ToObject<T>` was removed; it was only used by internal tests.
 - `ObjectExtensions.ToObject` requires input object graph type for conversion.
@@ -102,3 +102,11 @@ This change was made to prevent duplicate registrations of the same service with
 - If a public constructor is marked with `[GraphQLConstructor]`, it is used.
 - Otherwise the public parameterless constructor is used if available.
 - Otherwise an exception is thrown during deserialization.
+
+### 7. `AutoRegisteringInputObjectGraphType` changes
+
+- See above changes to `ObjectExtensions.ToObject` for deserialization notes.
+- Registers read-only properties when the property name matches the name of a parameter in the
+  chosen constructor. Comparison is case-insensitive, matching `ToObject` behavior.
+  Does not register constructor parameters that are not read-only properties.
+  Any attributes such as `[Id]` must be applied to the property, not the constructor parameter.

@@ -303,5 +303,65 @@ namespace GraphQL.Types
             typeInformation.ApplyAttributes();
             return typeInformation;
         }
+
+        /// <summary>
+        /// Identifies the constructor to use when constructing instances of <typeparamref name="TSourceType"/>.
+        /// Selects any public constructor marked with <see cref="GraphQLConstructorAttribute"/>, or the public
+        /// parameterless constructor, or the only public contructor, or returns <see langword="null"/> otherwise.
+        /// </summary>
+        internal static ConstructorInfo? GetConstructorOrDefault<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSourceType>()
+            => GetConstructorOrDefault(typeof(TSourceType));
+
+        /// <summary>
+        /// Identifies the constructor to use when constructing instances of <paramref name="sourceType"/>.
+        /// Selects any public constructor marked with <see cref="GraphQLConstructorAttribute"/>, or the public
+        /// parameterless constructor, or the only public contructor, or returns <see langword="null"/> otherwise.
+        /// </summary>
+        internal static ConstructorInfo? GetConstructorOrDefault([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type sourceType)
+        {
+            var constructors = sourceType.GetConstructors();
+            // if there are no public constructors, return null
+            if (constructors == null || constructors.Length == 0)
+                return null;
+            // if there is only one public constructor, return it
+            if (constructors.Length == 1)
+                return constructors[0];
+            // if there are multiple public constructors, return the one marked with GraphQLConstructorAttribute, or the parameterless constructor, or null
+            ConstructorInfo? match = null;
+            ConstructorInfo? parameterless = null;
+            foreach (var constructor in constructors)
+            {
+                if (constructor.GetCustomAttribute<GraphQLConstructorAttribute>() != null)
+                {
+                    if (match != null)
+                        throw new InvalidOperationException($"Multiple constructors marked with {nameof(GraphQLConstructorAttribute)} found on type '{sourceType.GetFriendlyName()}'.");
+                    match = constructor;
+                }
+                if (constructor.GetParameters().Length == 0)
+                {
+                    parameterless = constructor;
+                }
+            }
+            return match ?? parameterless;
+        }
+
+        /// <summary>
+        /// Identifies the constructor to use when constructing instances of <paramref name="sourceType"/>.
+        /// Selects any public constructor marked with <see cref="GraphQLConstructorAttribute"/>, or the public
+        /// parameterless constructor, or the only public contructor, or throws an exception otherwise.
+        /// </summary>
+        internal static ConstructorInfo GetConstructor([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type sourceType)
+        {
+            var ret = GetConstructorOrDefault(sourceType);
+            // if there are no valid constructors, throw the proper exception
+            if (ret == null)
+            {
+                if (sourceType.GetConstructors().Length == 0)
+                    throw new InvalidOperationException($"No public constructors found on type '{sourceType.GetFriendlyName()}'.");
+                else
+                    throw new InvalidOperationException($"Type '{sourceType.GetFriendlyName()}' must have a public parameterless constructor, a single constructor, or a public constructor marked with " + nameof(GraphQLConstructorAttribute) + ".");
+            }
+            return ret;
+        }
     }
 }

@@ -333,6 +333,37 @@ public class AutoRegisteringInputObjectGraphTypeTests
         fieldTests.FieldWithInitSetter.ShouldBe("hello");
     }
 
+    [Fact]
+    public void RegistersConstructorProperties()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<ReadOnlyClass>();
+        var idField = graphType.Fields.Find(nameof(ReadOnlyClass.Id)).ShouldNotBeNull();
+        idField.Name.ShouldBe("Id");
+        idField.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+        var nameField = graphType.Fields.Find(nameof(ReadOnlyClass.Name)).ShouldNotBeNull();
+        nameField.Name.ShouldBe("Name");
+        nameField.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>));
+
+        // initialize graphType
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("test");
+        new ServiceCollection()
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(s => s.RegisterType(graphType)))
+            .BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
+
+        // also verify the data is injected into the class properly
+        var dic = new Dictionary<string, object?>() {
+            { nameof(ReadOnlyClass.Id).ToCamelCase(), "123" },
+            { nameof(ReadOnlyClass.Name).ToCamelCase(), "John Doe" },
+        };
+        object obj = graphType.ParseDictionary(dic);
+        var data = obj.ShouldBeOfType<ReadOnlyClass>();
+        data.Id.ShouldBe(123);
+        data.Name.ShouldBe("John Doe");
+    }
+
     private class Class1
     {
         public string? Sample { get; set; }
@@ -508,5 +539,18 @@ public class AutoRegisteringInputObjectGraphTypeTests
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
+    }
+
+    private class ReadOnlyClass
+    {
+        public ReadOnlyClass(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        [Id]
+        public int Id { get; }
+        public string Name { get; }
     }
 }

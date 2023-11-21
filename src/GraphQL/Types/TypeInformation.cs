@@ -122,7 +122,10 @@ namespace GraphQL.Types
         public TypeInformation(PropertyInfo propertyInfo, bool isInput)
             : this(propertyInfo, isInput, propertyInfo.PropertyType, false, false, false, null)
         {
-            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), isInput);
+            // for the purposes of processing the nullability information, if the property is
+            // read-only, read the nullability information as if it were an output type (so read the getter)
+            var treatAsInput = isInput && propertyInfo.CanWrite;
+            var typeTree = Interpret(new NullabilityInfoContext().Create(propertyInfo), treatAsInput);
 
             ProcessTypeTree(typeTree, isInput);
         }
