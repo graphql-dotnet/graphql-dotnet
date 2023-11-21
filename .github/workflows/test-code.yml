@@ -51,7 +51,7 @@ jobs:
         run: dotnet build --no-restore -c Release
       - name: Build solution [Debug]
         working-directory: src
-        run: dotnet build --no-restore -c Debug
+        run: dotnet build --no-restore -c Debug -p:DeterministicSourcePaths=false
       - name: Test solution [Debug] with code coverage
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
