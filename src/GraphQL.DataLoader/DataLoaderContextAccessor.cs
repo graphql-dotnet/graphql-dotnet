@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace GraphQL.DataLoader;
 
 /// <inheritdoc cref="IDataLoaderContextAccessor"/>
@@ -11,11 +9,11 @@ public class DataLoaderContextAccessor : IDataLoaderContextAccessor
     [AllowNull]
     public DataLoaderContext Context
     {
-        get
-        {
-            Debug.Assert(_current.Value != null, "DataLoaderContext is null. Ensure that DataLoaderDocumentListener is registered in the IoC container");
-            return _current.Value!;
-        }
+        get => _current.Value ?? ThrowMissingContext();
         set => _current.Value = value;
     }
+
+    [DoesNotReturn]
+    private DataLoaderContext ThrowMissingContext()
+        => throw new InvalidOperationException("DataLoaderContext is null. Ensure that DataLoaderDocumentListener is registered in the IoC container");
 }
