@@ -17,7 +17,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>()
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>()
             where TNodeType : IGraphType
             => ConnectionBuilder<TSourceType>.Create<TNodeType>();
 
@@ -29,7 +29,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TSourceType>(string name)
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>(string name)
             where TNodeType : IGraphType
             => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
 
@@ -41,7 +41,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>()
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
@@ -54,7 +54,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TSourceType>(string name)
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>(string name)
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
@@ -67,7 +67,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>()
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>()
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -81,7 +81,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
         /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
         /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, TSourceType>(string name)
+        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>(string name)
             where TNodeType : IGraphType
             where TEdgeType : EdgeType<TNodeType>
             where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -92,7 +92,7 @@ namespace GraphQL.Builders
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
     // TODO: Remove in v5
-    public class ConnectionBuilder<TSourceType>
+    public class ConnectionBuilder<[NotAGraphType] TSourceType>
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
 
@@ -314,7 +314,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue = default!)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -332,7 +332,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue, Action<QueryArgument>? configure)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -397,7 +397,7 @@ namespace GraphQL.Builders
         /// .Returns&lt;Connection&lt;Widget&gt;&gt;()
         /// </code>
         /// </summary>
-        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
         {
             return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
         }

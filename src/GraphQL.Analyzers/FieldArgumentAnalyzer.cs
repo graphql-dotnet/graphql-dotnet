@@ -54,6 +54,11 @@ public class FieldArgumentAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        var x = context.SemanticModel.GetSymbolInfo(genericName);
+        var xx = (IMethodSymbol)x.Symbol!.OriginalDefinition;
+        var attr = xx.TypeArguments[1].GetAttributes();
+
+        ;
         var diagnostic = Diagnostic.Create(
             DoNotUseObsoleteArgumentMethod,
             argumentMemberAccessExpression.GetMethodInvocationLocation());
