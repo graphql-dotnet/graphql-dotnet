@@ -15,5 +15,5 @@ public class DataLoaderContextAccessor : IDataLoaderContextAccessor
 
     [DoesNotReturn]
     private DataLoaderContext ThrowMissingContext()
-        => throw new InvalidOperationException("DataLoaderContext is null. Ensure that DataLoaderDocumentListener is registered in the IoC container");
+        => throw new InvalidOperationException("DataLoaderContext is null. Ensure that you have called IGraphQLBuilder.AddDataLoader() or otherwise have added an instance of DataLoaderDocumentListener to ExecutionOptions.Listeners.");
 }
