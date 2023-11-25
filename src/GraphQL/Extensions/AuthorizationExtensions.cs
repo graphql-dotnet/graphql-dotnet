@@ -200,7 +200,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="policy">Authorization policy name.</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string policy)
         {
             builder.FieldType.AuthorizeWithPolicy(policy);
@@ -215,7 +215,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles">Comma-separated list of authorization role name(s).</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, string roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -229,7 +229,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles">List of authorization role name(s).</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> AuthorizeWithRoles<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -237,7 +237,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
-        public static FieldBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> Authorize<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.Authorize();
@@ -245,7 +245,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
-        public static FieldBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
+        public static FieldBuilder<TSourceType, TReturnType> AllowAnonymous<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this FieldBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.AllowAnonymous();
@@ -260,7 +260,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="policy">Authorization policy name.</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static ConnectionBuilder<TSourceType> AuthorizeWithPolicy<TSourceType>(
+        public static ConnectionBuilder<TSourceType> AuthorizeWithPolicy<[NotAGraphType] TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string policy)
         {
             builder.FieldType.AuthorizeWithPolicy(policy);
@@ -275,7 +275,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles">Comma-separated list of authorization role name(s).</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
+        public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<[NotAGraphType] TSourceType>(
             this ConnectionBuilder<TSourceType> builder, string roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -289,7 +289,7 @@ namespace GraphQL
         /// <param name="builder"></param>
         /// <param name="roles">List of authorization role name(s).</param>
         /// <returns>The reference to the specified <paramref name="builder"/>.</returns>
-        public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<TSourceType>(
+        public static ConnectionBuilder<TSourceType> AuthorizeWithRoles<[NotAGraphType] TSourceType>(
             this ConnectionBuilder<TSourceType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -297,7 +297,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
-        public static ConnectionBuilder<TSourceType> Authorize<TSourceType>(
+        public static ConnectionBuilder<TSourceType> Authorize<[NotAGraphType] TSourceType>(
             this ConnectionBuilder<TSourceType> builder)
         {
             builder.FieldType.Authorize();
@@ -305,7 +305,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
-        public static ConnectionBuilder<TSourceType> AllowAnonymous<TSourceType>(
+        public static ConnectionBuilder<TSourceType> AllowAnonymous<[NotAGraphType] TSourceType>(
             this ConnectionBuilder<TSourceType> builder)
         {
             builder.FieldType.AllowAnonymous();
@@ -313,7 +313,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWithPolicy{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<TSourceType, TReturnType>(
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithPolicy<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this ConnectionBuilder<TSourceType, TReturnType> builder, string policy)
         {
             builder.FieldType.AuthorizeWithPolicy(policy);
@@ -321,7 +321,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWithRoles{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this ConnectionBuilder<TSourceType, TReturnType> builder, string roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -329,7 +329,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AuthorizeWithRoles{TSourceType}(ConnectionBuilder{TSourceType}, string)"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<TSourceType, TReturnType>(
+        public static ConnectionBuilder<TSourceType, TReturnType> AuthorizeWithRoles<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this ConnectionBuilder<TSourceType, TReturnType> builder, params string[] roles)
         {
             builder.FieldType.AuthorizeWithRoles(roles);
@@ -337,7 +337,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="Authorize{TMetadataProvider}(TMetadataProvider)"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> Authorize<TSourceType, TReturnType>(
+        public static ConnectionBuilder<TSourceType, TReturnType> Authorize<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this ConnectionBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.Authorize();
@@ -345,7 +345,7 @@ namespace GraphQL
         }
 
         /// <inheritdoc cref="AllowAnonymous{TMetadataProvider}(TMetadataProvider)"/>
-        public static ConnectionBuilder<TSourceType, TReturnType> AllowAnonymous<TSourceType, TReturnType>(
+        public static ConnectionBuilder<TSourceType, TReturnType> AllowAnonymous<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>(
             this ConnectionBuilder<TSourceType, TReturnType> builder)
         {
             builder.FieldType.AllowAnonymous();
