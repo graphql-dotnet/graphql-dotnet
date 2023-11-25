@@ -33,7 +33,7 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 
     public static string ForceTypesAnalysisOption => "dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis";
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(CanNotMatchInputFieldToTheSourceField, CanNotSetSourceField);
 
     public override void Initialize(AnalysisContext context)
