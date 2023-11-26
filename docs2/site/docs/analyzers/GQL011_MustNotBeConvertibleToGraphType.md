@@ -49,7 +49,7 @@ public class MyGraphType : ObjectGraphType
     public MyGraphType()
     {
         Field<StringGraphType>("name")
-            .Returns<string>()
+            .Returns<StringGraphType>()
             .Resolve(context => null);
     }
 }
@@ -79,7 +79,7 @@ public class MyGraphType : ObjectGraphType
     public MyGraphType()
     {
         Field<StringGraphType>("name")
-            .Returns<StringGraphType>()
+            .Returns<string>()
             .Resolve(context => null);
     }
 }
