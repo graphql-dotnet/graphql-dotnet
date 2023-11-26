@@ -25,7 +25,7 @@ public class AwaitableResolverAnalyzer : DiagnosticAnalyzer
         [Constants.MethodNames.ResolveScoped] = Constants.MethodNames.ResolveScopedAsync
     };
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(UseAsyncResolver);
 
     public override void Initialize(AnalysisContext context)

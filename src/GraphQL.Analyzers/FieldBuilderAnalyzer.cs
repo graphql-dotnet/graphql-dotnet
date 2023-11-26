@@ -30,7 +30,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         Constants.MethodNames.FieldSubscribeAsync,
     };
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(DoNotUseObsoleteFieldMethods);
 
     public override void Initialize(AnalysisContext context)

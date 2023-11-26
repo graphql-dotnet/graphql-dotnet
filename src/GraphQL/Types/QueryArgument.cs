@@ -83,7 +83,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Gets or sets the default value of the argument.
         /// </summary>
-        public object? DefaultValue { get; set; } // TODO: [NotAGraphType]?
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// Returns the graph type of this argument.
