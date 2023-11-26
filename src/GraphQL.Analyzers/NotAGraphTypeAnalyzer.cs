@@ -62,13 +62,13 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
                 return;
         }
 
-        var notAGraphTypeAttribute = context.Compilation.GetTypeByMetadataName("GraphQL.NotAGraphTypeAttribute");
+        var notAGraphTypeAttribute = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.NotAGraphTypeAttribute);
         if (notAGraphTypeAttribute == null)
         {
             return;
         }
 
-        var graphTypeInterface = context.Compilation.GetTypeByMetadataName("GraphQL.Types.IGraphType");
+        var graphTypeInterface = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.IGraphType);
         if (graphTypeInterface == null)
         {
             return;
