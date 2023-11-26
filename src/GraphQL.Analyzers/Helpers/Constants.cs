@@ -68,6 +68,13 @@ public static class Constants
         public const string IInputObjectGraphType = "IInputObjectGraphType";
         public const string IObjectGraphType = "IObjectGraphType";
     }
+
+    public static class MetadataNames
+    {
+        public const string IGraphType = "GraphQL.Types.IGraphType";
+        public const string InputObjectGraphType = "GraphQL.Types.InputObjectGraphType`1";
+        public const string NotAGraphTypeAttribute = "GraphQL.NotAGraphTypeAttribute";
+    }
 }
 
 #pragma warning restore IDE1006 // Naming Styles

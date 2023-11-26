@@ -16,7 +16,7 @@ namespace GraphQL.Types
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// Also it can get descriptions for fields from the XML comments.
     /// </summary>
-    public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)] TSourceType> : ObjectGraphType<TSourceType>
+    public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicMethods)][NotAGraphType] TSourceType> : ObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 

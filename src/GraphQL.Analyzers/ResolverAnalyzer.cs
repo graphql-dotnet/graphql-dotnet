@@ -37,7 +37,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
         Constants.MethodNames.ResolveStreamAsync
     };
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(IllegalResolverUsage);
 
     public override void Initialize(AnalysisContext context)
