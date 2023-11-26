@@ -12,7 +12,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 {
     public static string ForceTypesAnalysisOption => "dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis";
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(
             CanNotMatchInputFieldToTheSourceField,
             CanNotSetSourceField,
@@ -54,7 +54,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return null;
         }
 
-        var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName("GraphQL.Types.InputObjectGraphType`1");
+        var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.InputObjectGraphType);
         var parseDictionaryBaseMethod = genericInputObjectGraphType?.GetMembers(Constants.MethodNames.ParseDictionary)
             .OfType<IMethodSymbol>()
             .Single(); // analyzers are not supposed to throw exceptions but we expect this to fail in tests if the base type changes

@@ -20,7 +20,7 @@ namespace GraphQL.Types
     /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
     /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .NET type of the source property within field resolvers for this graph.</typeparam>
-    public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
+    public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         /// <inheritdoc/>
         public Func<object, bool>? IsTypeOf { get; set; }
