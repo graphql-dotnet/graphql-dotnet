@@ -8,7 +8,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="InterfaceGraphType"/>
-    public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
+    public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
     {
         /// <summary>
         /// Initializes a new instance.

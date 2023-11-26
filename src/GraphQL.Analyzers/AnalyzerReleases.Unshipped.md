@@ -15,3 +15,4 @@ GQL007 | Usage | Warning | InputGraphTypeAnalyzer, [Documentation](https://graph
 GQL008 | Usage | Warning | FieldArgumentAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL008_DoNotUseObsoleteArgumentMethod)
 GQL009 | Usage | Error | AwaitableResolverAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL009_UseAsyncResolver)
 GQL010 | Usage | Error | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL010_CanNotResolveInputSourceTypeConstructor)
+GQL011 | Usage | Error | NotAGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/GQL011_MustNotBeConvertibleToGraphType)

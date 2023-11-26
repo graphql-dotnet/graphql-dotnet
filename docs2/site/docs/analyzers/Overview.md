@@ -72,6 +72,11 @@ The analyzer detects awaitable resolver delegates used in sync `Resolve` or
 `ResolveScoped` methods and provides a code fix to replace them with an
 appropriate async version.
 
+### 7. NotAGraphTypeAnalyzer
+
+The analyzer identifies instances of incorrectly using `GraphType` as generic
+type argument, where the type argument should not be of type `IGraphType`.
+
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when

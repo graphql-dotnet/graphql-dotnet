@@ -10,7 +10,7 @@ namespace GraphQL.Builders
     /// </summary>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-    public class FieldBuilder<TSourceType, TReturnType> : IMetadataWriter
+    public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IMetadataWriter
     {
         /// <summary>
         /// Returns the generated field.
@@ -172,7 +172,7 @@ namespace GraphQL.Builders
         /// Sets the return type of the field.
         /// </summary>
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
-        public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+        public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
             => new(FieldType);
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace GraphQL.Builders
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
         [Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads to set default value for parameter or use Arguments() method. This method will be removed in v8.")]
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             TArgumentType? defaultValue = default, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -236,7 +236,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="nullable">Indicates if the argument is optional or not.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable = false, Action<QueryArgument>? configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable = false, Action<QueryArgument>? configure = null)
         {
             Type type;
 
@@ -260,7 +260,7 @@ namespace GraphQL.Builders
         /// <param name="nullable">Indicates if the argument is optional or not.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, Action<QueryArgument>? configure = null)
+        public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable, string? description, Action<QueryArgument>? configure = null)
             => Argument<TArgumentClrType>(name, nullable, b =>
             {
                 b.Description = description;

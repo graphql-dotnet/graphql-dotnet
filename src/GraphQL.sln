@@ -180,6 +180,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md = ..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md
 		..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md = ..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md
 		..\docs2\site\docs\analyzers\GQL010_CanNotResolveInputSourceTypeConstructor.md = ..\docs2\site\docs\analyzers\GQL010_CanNotResolveInputSourceTypeConstructor.md
+		..\docs2\site\docs\analyzers\GQL011_MustNotBeConvertibleToGraphType.md = ..\docs2\site\docs\analyzers\GQL011_MustNotBeConvertibleToGraphType.md
 		..\docs2\site\docs\analyzers\Overview.md = ..\docs2\site\docs\analyzers\Overview.md
 	EndProjectSection
 EndProject

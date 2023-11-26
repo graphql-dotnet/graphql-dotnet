@@ -43,7 +43,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         DefineTheNameInFieldMethod,
         NameMethodInvocationCanBeRemoved,
         DifferentNamesDefinedByFieldAndNameMethods);
