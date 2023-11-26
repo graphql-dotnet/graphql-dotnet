@@ -160,6 +160,177 @@ public partial class InputGraphTypeAnalyzerTests
     }
 
     [Fact]
+    public async Task DefaultConstructor_GQL006()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputGraphType : InputObjectGraphType<DefaultConstructor>
+            {
+                public MyInputGraphType()
+                {
+                    Field<StringGraphType>("FirstName");
+                }
+            }
+
+            public class DefaultConstructor
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
+            .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "DefaultConstructor");
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task ParameterlessConstructor_GQL006()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputGraphType : InputObjectGraphType<ParameterlessConstructor>
+            {
+                public MyInputGraphType()
+                {
+                    Field<StringGraphType>("FirstName");
+                }
+            }
+
+            public class ParameterlessConstructor
+            {
+                // this constructor is chosen
+                public ParameterlessConstructor() { }
+
+                // this constructor is ignored
+                public ParameterlessConstructor(string firstName) { }
+
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
+            .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "ParameterlessConstructor");
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task SingleConstructor_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputGraphType : InputObjectGraphType<SingleConstructor>
+            {
+                public MyInputGraphType()
+                {
+                    Field<StringGraphType>("FirstName");
+                }
+            }
+
+            public class SingleConstructor
+            {
+                // single constructor is chosen
+                public SingleConstructor(string firstName) { }
+
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task ConstructorWithGraphQLConstructorAttribute_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputGraphType : InputObjectGraphType<ConstructorWithGraphQLConstructorAttribute>
+            {
+                public MyInputGraphType()
+                {
+                    Field<StringGraphType>("FirstName");
+                }
+            }
+
+            public class ConstructorWithGraphQLConstructorAttribute
+            {
+                // this constructor is ignored
+                public ConstructorWithGraphQLConstructorAttribute() { }
+
+                // this constructor is chosen
+                [GraphQLConstructor]
+                public ConstructorWithGraphQLConstructorAttribute(string firstName) { }
+
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task MultipleConstructorWithGraphQLConstructorAttribute_GQL006_And_GQL010()
+    {
+        const string source =
+            """
+            using GraphQL;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputGraphType : InputObjectGraphType<ConstructorWithGraphQLConstructorAttribute>
+            {
+                public MyInputGraphType()
+                {
+                    Field<StringGraphType>("FirstName");
+                }
+            }
+
+            // all constructors are ignored
+            public class ConstructorWithGraphQLConstructorAttribute
+            {
+                public ConstructorWithGraphQLConstructorAttribute(string firstName) { }
+
+                [GraphQLConstructor]
+                public ConstructorWithGraphQLConstructorAttribute(string firstName, int x) { }
+
+                [GraphQLConstructor]
+                public ConstructorWithGraphQLConstructorAttribute(string firstName, int x, int y) { }
+
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = new[]
+        {
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
+                .WithSpan(10, 32, 10, 43).WithArguments("FirstName", "ConstructorWithGraphQLConstructorAttribute"),
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
+                .WithSpan(6, 54, 6, 96).WithArguments("ConstructorWithGraphQLConstructorAttribute")
+        };
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
     public async Task NameExistsAsBaseConstructorArgument_GQL006()
     {
         const string source =
