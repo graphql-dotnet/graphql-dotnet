@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerifier<
     GraphQL.Analyzers.NotAGraphTypeAnalyzer>;
 
@@ -208,6 +209,102 @@ public class NotAGraphTypeAnalyzerTests
 
         var expected = VerifyCS.Diagnostic().WithSpan(10, 51, 10, 63)
             .WithArguments("IntGraphType", "TSourceType", "Create<TNodeType, TSourceType>");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task TypeWithGenericTypeParameter_WithoutTypeConstraint_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType<TSource> : ObjectGraphType<TSource>
+            {
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Theory]
+    [InlineData("IDisposable", false)]
+    [InlineData("IGraphType", true)]
+    [InlineData("StringGraphType", true)]
+    public async Task TypeWithGenericTypeParameter_WithGraphTypeConstraint_GQL011(string constraint, bool report)
+    {
+        string source =
+            $$"""
+              using System;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType<TSource> : ObjectGraphType<TSource>
+                  where TSource : {{constraint}}
+              {
+              }
+              """;
+
+        var expected = report
+            ? new[]
+            {
+                VerifyCS.Diagnostic().WithSpan(6, 53, 6, 60)
+                    .WithArguments("TSource", "TSourceType", "ObjectGraphType<TSourceType>")
+            }
+            : DiagnosticResult.EmptyDiagnosticResults;
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task TypeWithGenericTypeParameter_WithoutTypeConstraint_TypeParameterUsedInMethod_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Builders;
+
+            namespace Sample.Server;
+
+            public class MyGraphType<TSource, TReturn>
+            {
+                public void DoSomething() => FieldBuilder<TSource, TReturn>.Create();
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Theory]
+    [InlineData("IDisposable", false)]
+    [InlineData("IGraphType", true)]
+    [InlineData("StringGraphType", true)]
+    public async Task TypeWithGenericTypeParameter_WithTypeConstraint_TypeParameterUsedInMethod_GQL011(string constraint, bool report)
+    {
+        string source =
+            $$"""
+              using System;
+              using GraphQL.Builders;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType<TSource, TReturn>
+                    where TSource : {{constraint}}
+              {
+                  public void DoSomething() => FieldBuilder<TSource, TReturn>.Create();
+              }
+              """;
+
+        var expected = report
+            ? new[]
+            {
+                VerifyCS.Diagnostic().WithSpan(10, 47, 10, 54)
+                    .WithArguments("TSource", "TSourceType", "FieldBuilder<TSourceType, TReturnType>")
+            }
+            : DiagnosticResult.EmptyDiagnosticResults;
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 }

@@ -62,18 +62,8 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
                 return;
         }
 
-        var notAGraphTypeAttribute = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.NotAGraphTypeAttribute);
-        if (notAGraphTypeAttribute == null)
-        {
-            return;
-        }
-
-        var graphTypeInterface = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.IGraphType);
-        if (graphTypeInterface == null)
-        {
-            return;
-        }
-
+        INamedTypeSymbol? notAGraphTypeAttribute = null;
+        INamedTypeSymbol? graphTypeInterface = null;
         string? genericNameString = null;
 
         for (int i = 0; i < typeParameters.Length; i++)
@@ -93,18 +83,24 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
             }
         }
 
-        return;
-
         bool HasNotAGraphTypeAttribute(ISymbol typeParam)
         {
+            notAGraphTypeAttribute ??= context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.NotAGraphTypeAttribute);
             return typeParam.GetAttributes()
                 .Any(data => SymbolEqualityComparer.Default.Equals(data.AttributeClass, notAGraphTypeAttribute));
         }
-
         bool IsGraphType(ITypeSymbol typeArg)
         {
-            return typeArg.AllInterfaces
-                .Any(@interface => SymbolEqualityComparer.Default.Equals(@interface, graphTypeInterface));
+            graphTypeInterface ??= context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.IGraphType);
+            if (SymbolEqualityComparer.Default.Equals(typeArg, graphTypeInterface))
+            {
+                return true;
+            }
+
+            return typeArg is ITypeParameterSymbol typeParam
+                ? typeParam.ConstraintTypes.Any(IsGraphType)
+                : typeArg.AllInterfaces
+                    .Any(@interface => SymbolEqualityComparer.Default.Equals(@interface, graphTypeInterface));
         }
 
         string GetGenericNameString(ImmutableArray<ITypeParameterSymbol> typeParams, SimpleNameSyntax name)
