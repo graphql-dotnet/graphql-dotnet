@@ -38,7 +38,7 @@ namespace GraphQL.DataLoader
     public class DataLoaderContextAccessor : GraphQL.DataLoader.IDataLoaderContextAccessor
     {
         public DataLoaderContextAccessor() { }
-        public GraphQL.DataLoader.DataLoaderContext? Context { get; set; }
+        public GraphQL.DataLoader.DataLoaderContext Context { get; set; }
     }
     public static class DataLoaderContextExtensions
     {
@@ -108,7 +108,7 @@ namespace GraphQL.DataLoader
     }
     public interface IDataLoaderContextAccessor
     {
-        GraphQL.DataLoader.DataLoaderContext? Context { get; set; }
+        GraphQL.DataLoader.DataLoaderContext Context { get; set; }
     }
     public interface IDataLoader<T>
     {
