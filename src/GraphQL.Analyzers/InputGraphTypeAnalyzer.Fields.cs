@@ -34,7 +34,7 @@ public partial class InputGraphTypeAnalyzer
         ITypeSymbol sourceTypeSymbol)
     {
         var graphQlConstructorAttribute = context.Compilation
-            .GetTypeByMetadataName("GraphQL.GraphQLConstructorAttribute"); // TODO: move to const after merging #3798
+            .GetTypeByMetadataName(Constants.MetadataNames.GraphQLConstructorAttribute);
 
         var allowedSymbols = (sourceTypeSymbol is ITypeParameterSymbol parameterSymbol
                 ? GetAllowedFieldNames(parameterSymbol.ConstraintTypes, graphQlConstructorAttribute)
