@@ -72,6 +72,7 @@ public static class Constants
 
     public static class MetadataNames
     {
+        public const string GraphQLConstructorAttribute = "GraphQL.GraphQLConstructorAttribute";
         public const string IGraphType = "GraphQL.Types.IGraphType";
         public const string InputObjectGraphType = "GraphQL.Types.InputObjectGraphType`1";
         public const string NotAGraphTypeAttribute = "GraphQL.NotAGraphTypeAttribute";

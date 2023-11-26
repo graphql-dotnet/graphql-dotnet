@@ -33,9 +33,12 @@ public partial class InputGraphTypeAnalyzer
         BaseTypeDeclarationSyntax inputObjectDeclarationSyntax,
         ITypeSymbol sourceTypeSymbol)
     {
+        var graphQlConstructorAttribute = context.Compilation
+            .GetTypeByMetadataName(Constants.MetadataNames.GraphQLConstructorAttribute);
+
         var allowedSymbols = (sourceTypeSymbol is ITypeParameterSymbol parameterSymbol
-                ? GetAllowedFieldNames(parameterSymbol.ConstraintTypes)
-                : GetAllowedFieldNames(sourceTypeSymbol))
+                ? GetAllowedFieldNames(parameterSymbol.ConstraintTypes, graphQlConstructorAttribute)
+                : GetAllowedFieldNames(sourceTypeSymbol, graphQlConstructorAttribute))
             .GroupBy(symbol => symbol.Name, StringComparer.InvariantCultureIgnoreCase)
             .ToDictionary(
                 group => group.Key,
@@ -91,21 +94,19 @@ public partial class InputGraphTypeAnalyzer
         }
     }
 
-    private static IEnumerable<ISymbol> GetAllowedFieldNames(IEnumerable<ITypeSymbol> sourceTypeSymbols) =>
-        sourceTypeSymbols.SelectMany(GetAllowedFieldNames);
+    private static IEnumerable<ISymbol> GetAllowedFieldNames(
+        IEnumerable<ITypeSymbol> sourceTypeSymbols,
+        INamedTypeSymbol? graphQlConstructorAttribute) =>
+        sourceTypeSymbols.SelectMany(sourceTypeSymbol =>
+            GetAllowedFieldNames(sourceTypeSymbol, graphQlConstructorAttribute));
 
-    private static IEnumerable<ISymbol> GetAllowedFieldNames(ITypeSymbol sourceTypeSymbol)
+    private static IEnumerable<ISymbol> GetAllowedFieldNames(
+        ITypeSymbol sourceTypeSymbol,
+        INamedTypeSymbol? graphQlConstructorAttribute)
     {
         // consider ctor params on the type itself but not base classes
-        IEnumerable<ISymbol> symbols = sourceTypeSymbol
-            .GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(method => method is
-            {
-                MethodKind: MethodKind.Constructor,
-                DeclaredAccessibility: Accessibility.Public
-            })
-            .SelectMany(ctor => ctor.Parameters);
+        var symbols = FindConstructor(sourceTypeSymbol, graphQlConstructorAttribute)
+            ?.Parameters ?? Enumerable.Empty<ISymbol>();
 
         var nullableSourceTypeSymbol = sourceTypeSymbol;
         while (nullableSourceTypeSymbol != null)
@@ -119,6 +120,60 @@ public partial class InputGraphTypeAnalyzer
         }
 
         return symbols;
+    }
+
+    // Mimic the AutoRegisteringHelper.GetConstructorOrDefault behavior
+    private static IMethodSymbol? FindConstructor(
+        ITypeSymbol sourceTypeSymbol,
+        ISymbol? graphQlConstructorAttribute)
+    {
+        var constructors = sourceTypeSymbol
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(method => method is
+            {
+                MethodKind: MethodKind.Constructor,
+                DeclaredAccessibility: Accessibility.Public
+            })
+            .ToList();
+
+        // if there are no public constructors, return null
+        if (constructors.Count == 0)
+        {
+            return null;
+        }
+
+        // if there is only one public constructor, return it
+        if (constructors.Count == 1)
+        {
+            return constructors[0];
+        }
+
+        // if there are multiple public constructors, return the one marked with
+        // GraphQLConstructorAttribute, or the parameterless constructor, or null
+        IMethodSymbol? match = null;
+        IMethodSymbol? parameterless = null;
+        foreach (var constructor in constructors)
+        {
+            if (constructor.GetAttributes().Any(attr =>
+                    SymbolEqualityComparer.Default.Equals(attr.AttributeClass, graphQlConstructorAttribute)))
+            {
+                // when multiple constructors decorated with [GraphQLConstructor]
+                // we ignore all the constructors in this analyzer
+                if (match != null)
+                {
+                    return null;
+                }
+                match = constructor;
+            }
+
+            if (constructor.Parameters.Length == 0)
+            {
+                parameterless = constructor;
+            }
+        }
+
+        return match ?? parameterless;
     }
 
     private static IEnumerable<InvocationExpressionSyntax> GetDeclaredFields(BaseTypeDeclarationSyntax classDeclaration)
