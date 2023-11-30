@@ -94,14 +94,18 @@ public class ComplexScalarGraphType : ScalarGraphType
 
             var fields = new List<GraphQLObjectField>(dictionary.Count);
             var enumerator = dictionary.GetEnumerator();
-            while (enumerator.MoveNext())
+            using (enumerator as IDisposable) // IEnumerable<T> inherits IDisposable, but IEnumerable does not -- so it is very likely that IDisposable is implemented here
             {
-                if (enumerator.Key is not string keyString)
-                    throw new InvalidOperationException("Object keys must be string values");
-                fields.Add(new GraphQLObjectField(
-                    new GraphQLName(keyString),
-                    ToAST(enumerator.Value)));
+                while (enumerator.MoveNext())
+                {
+                    if (enumerator.Key is not string keyString)
+                        throw new InvalidOperationException("Object keys must be string values");
+                    fields.Add(new GraphQLObjectField(
+                        new GraphQLName(keyString),
+                        ToAST(enumerator.Value)));
+                }
             }
+
             return new() { Fields = fields };
         }
 
