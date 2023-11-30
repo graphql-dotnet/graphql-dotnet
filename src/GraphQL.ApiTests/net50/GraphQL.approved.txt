@@ -2014,6 +2014,16 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
     }
+    public class ComplexScalarGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public ComplexScalarGraphType() { }
+        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanParseValue(object? value) { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
+    }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
         public ConstantCaseAttribute() { }
@@ -3002,15 +3012,9 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
-    public class AnyScalarGraphType : GraphQL.Types.ScalarGraphType
+    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
     {
         public AnyScalarGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override bool CanParseValue(object? value) { }
-        public override bool IsValidDefault(object value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class FederatedResolveContext
     {

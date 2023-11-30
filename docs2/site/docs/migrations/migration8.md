@@ -38,6 +38,11 @@ services.AddSingleton<BooleanGraphType, MyBooleanGraphType>();
 See https://graphql-dotnet.github.io/docs/getting-started/custom-scalars/#3-register-the-custom-scalar-within-your-schema
 for more details.
 
+### 3. Added `ComplexScalarGraphType`
+
+This new scalar can be used to send or receive arbitrary objects or values to or from the server. It is functionally
+equivalent to the `AnyGraphType` used for GraphQL Federation, but defaults to the name of `Complex` rather than `_Any`.
+
 ## Breaking Changes
 
 ### 1. Query type is required

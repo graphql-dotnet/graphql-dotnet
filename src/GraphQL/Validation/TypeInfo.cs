@@ -39,7 +39,7 @@ namespace GraphQL.Validation
                 if (index >= from.Count)
                     throw new InvalidOperationException($"Stack contains only {from.Count} items");
 
-                var e = from.GetEnumerator();
+                using var e = from.GetEnumerator();
 
                 int i = index;
                 do
