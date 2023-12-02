@@ -26,7 +26,7 @@ public class DataLoaderSubscriptionTest : QueryTestBase
         ordersMock.Setup(x => x.GetOrderObservable()).Returns(orderStream);
         orderStream.OnNext(order);
 
-        var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }").ConfigureAwait(false);
+        var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }");
 
         /* Then */
         var stream = result.Streams.Values.FirstOrDefault();

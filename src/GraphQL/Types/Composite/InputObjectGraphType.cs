@@ -39,6 +39,20 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
         /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public InputObjectGraphType()
+            : this(null)
+        {
+        }
+
+        internal InputObjectGraphType(InputObjectGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
+        {
+            // if (cloneFrom == null) { /* initialization logic */ }
+        }
+
+        /// <summary>
         /// Converts a supplied dictionary of keys and values to an object.
         /// The default implementation uses <see cref="ObjectExtensions.ToObject"/> to convert the
         /// supplied field values into an object of type <typeparamref name="TSourceType"/>.
@@ -114,7 +128,7 @@ namespace GraphQL.Types
             if (value == null)
                 return null;
 
-            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
             string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
             PropertyInfo? propertyInfo;
             try

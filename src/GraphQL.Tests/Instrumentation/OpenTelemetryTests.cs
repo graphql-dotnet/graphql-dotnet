@@ -94,7 +94,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{ hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
@@ -119,7 +119,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
@@ -146,7 +146,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{ hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
@@ -193,7 +193,7 @@ public sealed class OpenTelemetryTests : IDisposable
         };
 
         // execute GraphQL document
-        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions);
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
@@ -230,7 +230,7 @@ public sealed class OpenTelemetryTests : IDisposable
         };
 
         // execute GraphQL document
-        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions);
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
@@ -248,7 +248,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query helloQuery { hello { dummy } }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
@@ -273,7 +273,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
@@ -296,7 +296,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{ serverError }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
@@ -324,7 +324,7 @@ public sealed class OpenTelemetryTests : IDisposable
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
@@ -347,7 +347,7 @@ public sealed class OpenTelemetryTests : IDisposable
             OperationName = "helloQuery",
             RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
@@ -371,7 +371,7 @@ public sealed class OpenTelemetryTests : IDisposable
             RequestServices = _host.Services,
             Root = cts,
             CancellationToken = cts.Token,
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();

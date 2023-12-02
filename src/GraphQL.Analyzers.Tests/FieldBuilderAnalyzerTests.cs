@@ -9,15 +9,15 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task Sanity_NoDiagnostics()
     {
-        const string source = @"";
-
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        const string source = "";
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
     public async Task AllArgumentsProvided_NoNamedArguments_FixProvided()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -36,7 +36,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -55,13 +56,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 33);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task NamedArgumentsNotInOrder_FixPreservesSameOrder()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -80,7 +82,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -99,13 +102,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 100);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task NameArgumentIsNotFirst_FixCorrectly()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -122,7 +126,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -139,13 +144,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 26);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldCalledOnVariable_FixCorrectly()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -179,13 +185,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldAsync_FixAsFieldAndResolveAsync()
     {
-        const string source = """
+        const string source =
+            """
             using System.Threading.Tasks;
             using GraphQL.Types;
 
@@ -203,7 +210,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using System.Threading.Tasks;
             using GraphQL.Types;
 
@@ -221,13 +229,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 65);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task ArgumentsListMultilineFormatted_FormattingPreserved()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -247,7 +256,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -267,13 +277,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 15, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task NonGenericFieldMethod_FixProvided()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -290,7 +301,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -306,13 +318,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldSubscribe_SubscribeArgument_ConvertToFieldAndResolveStream()
     {
-        const string source = """
+        const string source =
+            """
             using System;
             using GraphQL.Types;
 
@@ -336,7 +349,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using System;
             using GraphQL.Types;
 
@@ -360,13 +374,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 52);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldDelegate_ConvertToFieldAndResolveDelegate()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -384,7 +399,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -402,13 +418,14 @@ public class FieldBuilderAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 11, 33);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task ArgumentsFormattingPreservedAsync()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -418,12 +435,19 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name", "description", null,
-                        context => "text");
+                        resolve: context => Resolve(
+                            "s1",
+                              "s2",
+                                "s3"
+                        ));
                 }
+
+                public string Resolve(string s1, string s2, string s3) => "text";
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -433,19 +457,129 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("name").Description("description")
-                        .Resolve(context => "text");
+                        .Resolve(context => Resolve(
+                            "s1",
+                              "s2",
+                                "s3"
+                        ));
                 }
+
+                public string Resolve(string s1, string s2, string s3) => "text";
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 10, 31);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 15);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
+    public async Task EmptyLineWithWhiteSpacesBeforeField_ArgumentsFormattingPreservedAsync()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // next line contains whitespaces
+                    
+                    Field<StringGraphType>("name",
+                        resolve: context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        const string fix =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // next line contains whitespaces
+                    
+                    Field<StringGraphType>("name")
+                        .Resolve(context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        // ensure whitespace was not removed from input sample
+        source.Replace("\r", "").ShouldContain("// next line contains whitespaces\n    ");
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
+    public async Task CommentBeforeField_ArgumentsFormattingPreservedAsync()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // comment
+                    Field<StringGraphType>("name",
+                        resolve: context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        const string fix =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    // comment
+                    Field<StringGraphType>("name")
+                        .Resolve(context => Resolve(
+                            "text"
+                        ));
+                }
+
+                public string Resolve(string s1) => s1;
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 15);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task ArgumentsFormattingPreserved_PreserveNewLines()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -466,7 +600,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -489,13 +624,14 @@ public class FieldBuilderAnalyzerTests
 
         var expected1 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 11, 32);
         var expected2 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(15, 9, 16, 32);
-        await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix);
     }
 
     [Fact]
     public async Task ReformatOptionIsTrue_SourceReformatted()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -510,7 +646,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -547,13 +684,14 @@ public class FieldBuilderAnalyzerTests
                 }
             }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 
     [Fact]
     public async Task SkipNullsOptionIsFalse_NullArgumentsPreserved()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -571,7 +709,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -608,6 +747,6 @@ public class FieldBuilderAnalyzerTests
                 }
             }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 }

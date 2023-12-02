@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2
@@ -73,7 +73,7 @@ jobs:
         working-directory: docs2/public
         run: zip -r ../../src/out/Documentation.zip .
       - name: Upload Nuget packages and documentation as release artifacts
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |

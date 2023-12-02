@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,8 +14,8 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     // Fixed:     Field<T>("xxx")        or Field<T>("xxx", x => x.Prop)
     public static readonly DiagnosticDescriptor DefineTheNameInFieldMethod = new(
         id: DiagnosticIds.DEFINE_THE_NAME_IN_FIELD_METHOD,
-        title: "Define the name in 'Field' method",
-        messageFormat: "Field name should be provided via 'Field' method",
+        title: "Define the name in 'Field', 'Connection' or 'ConnectionBuilder.Create' method",
+        messageFormat: "The name should be provided via '{0}' method",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
@@ -25,7 +26,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor NameMethodInvocationCanBeRemoved = new(
         id: DiagnosticIds.NAME_METHOD_INVOCATION_CAN_BE_REMOVED,
         title: "'Name' method invocation can be removed",
-        messageFormat: "Field name should be provided via 'Field' method. 'Name' method invocation can be removed.",
+        messageFormat: "The name should be provided via '{0}' method. 'Name' method invocation can be removed.",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
@@ -35,8 +36,8 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
     // Fixed:     Field<T>("xxx") or Field<T>("yyy")
     public static readonly DiagnosticDescriptor DifferentNamesDefinedByFieldAndNameMethods = new(
         id: DiagnosticIds.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS,
-        title: "Different names defined by 'Field' and 'Name' methods",
-        messageFormat: "Field name should be provided via 'Field' method. Different names defined by 'Field' and 'Name' methods.",
+        title: "Different names defined by 'Field', 'Connection' or 'ConnectionBuilder.Create' and 'Name' methods",
+        messageFormat: "The name should be provided via '{0}' method. Different names defined by '{0}' and 'Name' methods.",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Warning,
         isEnabledByDefault: true,
@@ -63,29 +64,31 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!nameMemberAccessExpression.IsGraphQLSymbol(context))
+        if (!nameMemberAccessExpression.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }
 
-        var fieldInvocation = nameMemberAccessExpression.FindFieldInvocationExpression();
-        if (fieldInvocation == null)
+        if (!TryGetBuilderInvocation(
+                nameMemberAccessExpression,
+                out string? builderName,
+                out var builderMethodInvocation))
         {
             return;
         }
 
         // Field().Name("xxx")
-        if (!fieldInvocation.ArgumentList.Arguments.Any())
+        if (!builderMethodInvocation.ArgumentList.Arguments.Any())
         {
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName);
             return;
         }
 
         // Field(x => x.CompanyName).Name("xxx")
-        var fieldName = fieldInvocation.GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel);
+        var fieldName = builderMethodInvocation.GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel);
         if (fieldName == null)
         {
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, DiagnosticSeverity.Info);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DefineTheNameInFieldMethod, builderName);
             return;
         }
 
@@ -94,28 +97,63 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         if (fieldName.Expression.IsEquivalentTo(nameName.Expression))
         {
             // Field("xxx").Name("xxx")
-            ReportNameDiagnostic(context, nameMemberAccessExpression, NameMethodInvocationCanBeRemoved);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, NameMethodInvocationCanBeRemoved, builderName);
         }
         else
         {
             // Field("xxx").Name("yyy")
-            ReportNameDiagnostic(context, nameMemberAccessExpression, DifferentNamesDefinedByFieldAndNameMethods);
+            ReportNameDiagnostic(context, nameMemberAccessExpression, DifferentNamesDefinedByFieldAndNameMethods, builderName);
         }
     }
 
-    private void ReportNameDiagnostic(
+    private static bool TryGetBuilderInvocation(
+        MemberAccessExpressionSyntax nameMemberAccessExpression,
+        [NotNullWhen(true)] out string? builderName,
+        [NotNullWhen(true)] out InvocationExpressionSyntax? builderMethodInvocation)
+    {
+        builderName = Constants.MethodNames.Field;
+        builderMethodInvocation = nameMemberAccessExpression.FindMethodInvocationExpression(builderName);
+        if (builderMethodInvocation != null)
+        {
+            return true;
+        }
+
+        builderName = Constants.MethodNames.Connection;
+        builderMethodInvocation = nameMemberAccessExpression.FindMethodInvocationExpression(builderName);
+        if (builderMethodInvocation != null)
+        {
+            return true;
+        }
+
+        builderName = Constants.MethodNames.Create;
+        builderMethodInvocation = nameMemberAccessExpression.FindMethodInvocationExpression(builderName);
+        if (builderMethodInvocation != null)
+        {
+            return true;
+        }
+
+        builderName = null;
+        builderMethodInvocation = null;
+        return false;
+    }
+
+    private static void ReportNameDiagnostic(
         SyntaxNodeAnalysisContext context,
         MemberAccessExpressionSyntax nameMemberAccessExpression,
         DiagnosticDescriptor diagnosticDescriptor,
-        DiagnosticSeverity? overrideSeverity = null)
+        string builderMethodName)
     {
+        var props = new Dictionary<string, string?>
+        {
+            [Constants.AnalyzerProperties.BuilderMethodName] = builderMethodName
+        }.ToImmutableDictionary();
+
         var location = nameMemberAccessExpression.GetMethodInvocationLocation();
         var diagnostic = Diagnostic.Create(
             diagnosticDescriptor,
             location,
-            effectiveSeverity: overrideSeverity ?? diagnosticDescriptor.DefaultSeverity,
-            additionalLocations: null,
-            properties: null);
+            props,
+            messageArgs: builderMethodName);
         context.ReportDiagnostic(diagnostic);
     }
 }

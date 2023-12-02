@@ -116,7 +116,6 @@ namespace GraphQL
                    typeof(IObjectGraphType).IsAssignableFrom(namedType2) ||
                    typeof(IInterfaceGraphType).IsAssignableFrom(namedType2) ||
                    typeof(UnionGraphType).IsAssignableFrom(namedType2);
-            ;
         }
 
         /// <summary>

@@ -14,11 +14,17 @@ One of the deprecated `FieldXXX` methods that return `FieldType` were used.
 
 ## Rule description
 
-A bunch of `FieldXXX` APIs were deprecated and will be removed in future version. For more information see [v7 Migration Guide](../migrations/migration7/#11-a-bunch-of-fieldxxx-apis-were-deprecated).
+A bunch of `FieldXXX` APIs were deprecated and will be removed in future
+version. For more information see
+[v7 Migration Guide](../migrations/migration7/#11-a-bunch-of-fieldxxx-apis-were-deprecated).
 
 ## How to fix violations
 
-You will need to change a way of setting fields on your graph types. Instead of many `FieldXXX` overloads, start configuring your field with one of the `Field` methods defined on `ComplexGraphType`. All such methods define a new field and return an instance of `FieldBuilder<T,U>`. Then continue to configure the field with rich APIs provided by the returned builder.
+You will need to change a way of setting fields on your graph types. Instead of
+many `FieldXXX` overloads, start configuring your field with one of the `Field`
+methods defined on `ComplexGraphType`. All such methods define a new field and
+return an instance of `FieldBuilder<T,U>`. Then continue to configure the field
+with rich APIs provided by the returned builder.
 
 ## Example of a violation
 
@@ -61,7 +67,8 @@ Field<HumanType>("human")
 
 ## Suppress a warning
 
-If you just want to suppress a single violation, add preprocessor directives to your source file to disable and then re-enable the rule.
+If you just want to suppress a single violation, add preprocessor directives to
+your source file to disable and then re-enable the rule.
 
 ```csharp
 #pragma warning disable GQL004
@@ -69,18 +76,24 @@ If you just want to suppress a single violation, add preprocessor directives to 
 #pragma warning restore GQL004
 ```
 
-To disable the rule for a file, folder, or project, set its severity to `none` in the [configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
+To disable the rule for a file, folder, or project, set its severity to `none`
+in the
+[configuration file](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files).
 
 ```ini
 [*.cs]
 dotnet_diagnostic.GQL004.severity = none
 ```
 
-For more information, see [How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
+For more information, see
+[How to suppress code analysis warnings](https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/suppress-warnings).
 
 ## Configure code fix
 
-The given diagnostic rule offers an automatic code fix. By default, it attempts to retain the original user code formatting as much as possible but it will remove unnecessary `null` values. For instance, consider the subsequent code snippet:
+The given diagnostic rule offers an automatic code fix. By default, it attempts
+to retain the original user code formatting as much as possible but it will
+remove unnecessary `null` values. For instance, consider the subsequent code
+snippet:
 
 ```c#
 Field<StringGraphType>("name", "description", null,
@@ -96,7 +109,8 @@ Field<StringGraphType>("name").Description("description")
 
 ### Configure formatting
 
-The `reformat` configuration option will guide the code fix to apply code reformatting. The default value is `false`.
+The `reformat` configuration option will guide the code fix to apply code
+reformatting. The default value is `false`.
 
 ```ini
 [*.cs]
@@ -113,7 +127,8 @@ Field<StringGraphType>("name")
 
 ### Configure `null` values handling
 
-The `skip_nulls` option can be set to `false` to preserve `null` values assignments. The default value is `true`.
+The `skip_nulls` option can be set to `false` to preserve `null` values
+assignments. The default value is `true`.
 
 ```ini
 [*.cs]

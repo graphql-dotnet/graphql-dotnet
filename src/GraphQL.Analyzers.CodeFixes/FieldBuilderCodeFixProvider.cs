@@ -1,12 +1,12 @@
 using System.Collections.Immutable;
 using System.Composition;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Editing;
-using Microsoft.CodeAnalysis.Formatting;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace GraphQL.Analyzers;
@@ -32,8 +32,8 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         foreach (var diagnostic in context.Diagnostics)
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
-            bool isAsyncField = diagnostic.Properties.ContainsKey(Constants.Properties.IsAsync);
-            bool isDelegate = diagnostic.Properties.ContainsKey(Constants.Properties.IsDelegate);
+            bool isAsyncField = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsAsync);
+            bool isDelegate = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsDelegate);
 
             var fieldInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
 
@@ -77,6 +77,15 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             nameArg!.Expression,
             typeArg?.Expression);
 
+        const int oneLevelIndentation = 4;
+        int fieldInvocationIndentation = newFieldInvocationExpression
+            .GetLeadingTrivia()
+            .LastOrDefault(trivia => trivia.IsKind(SyntaxKind.WhitespaceTrivia))
+            .FullSpan.Length;
+
+        var whitespaceTrivia = Whitespace(new string(' ', fieldInvocationIndentation + oneLevelIndentation));
+        var newLineTrivia = EndOfLine(Environment.NewLine);
+
         // now handle rest of the arguments
         var args = GetArgumentsWithNames(fieldInvocationExpression, semanticModel);
 
@@ -114,19 +123,20 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
             if (invocationName != null)
             {
+                var leadingTrivia = reformat || newLine
+                    ? TriviaList(newLineTrivia, whitespaceTrivia)
+                    : TriviaList(whitespaceTrivia);
+
                 newFieldInvocationExpression = CreateInvocationExpression(
                     newFieldInvocationExpression,
                     invocationName,
                     arg.Expression,
-                    reformat || newLine,
+                    leadingTrivia,
                     skipNulls);
             }
         }
 
-        var workspace = document.Project.Solution.Workspace;
-        var formattedNewFieldInvocationExpression = Format(newFieldInvocationExpression, workspace);
-        docEditor.ReplaceNode(fieldInvocationExpression, formattedNewFieldInvocationExpression);
-
+        docEditor.ReplaceNode(fieldInvocationExpression, newFieldInvocationExpression);
         return docEditor.GetChangedDocument();
     }
 
@@ -220,7 +230,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         InvocationExpressionSyntax previousExpression,
         string invocationName,
         ExpressionSyntax argumentExpression,
-        bool newLine,
+        SyntaxTriviaList leadingTrivia,
         bool skipNulls)
     {
         if (skipNulls && argumentExpression.IsKind(SyntaxKind.NullLiteralExpression))
@@ -236,18 +246,16 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
                         SyntaxKind.SimpleMemberAccessExpression,
                         previousExpression,
                         IdentifierName(invocationName))
-                    .WithNewLine(newLine))
+                    .WithOperatorToken(
+                        Token(
+                            leadingTrivia,
+                            SyntaxKind.DotToken,
+                            TriviaList())))
             .WithArgumentList(
                 ArgumentList(
                         SingletonSeparatedList(
                             Argument(argumentExpression))));
 
         return exp;
-    }
-
-    private static SyntaxNode Format(SyntaxNode syntaxNode, Workspace workspace)
-    {
-        syntaxNode = syntaxNode.WithAdditionalAnnotations(Formatter.Annotation);
-        return Formatter.Format(syntaxNode, Formatter.Annotation, workspace);
     }
 }

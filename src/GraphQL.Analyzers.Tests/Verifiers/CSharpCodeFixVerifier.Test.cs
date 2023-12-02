@@ -1,7 +1,7 @@
+using GraphQL.Analyzers.Tests.Verifiers.XUnit;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis.Testing.Verifiers;
 
 namespace GraphQL.Analyzers.Tests.Verifiers;
 

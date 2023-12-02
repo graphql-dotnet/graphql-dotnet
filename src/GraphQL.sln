@@ -77,9 +77,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
 		..\docs2\site\docs\guides\document-caching.md = ..\docs2\site\docs\guides\document-caching.md
+		..\docs2\site\docs\guides\federated-tracing.md = ..\docs2\site\docs\guides\federated-tracing.md
 		..\docs2\site\docs\guides\known-issues.md = ..\docs2\site\docs\guides\known-issues.md
 		..\docs2\site\docs\guides\links.md = ..\docs2\site\docs\guides\links.md
 		..\docs2\site\docs\guides\schema-generation.md = ..\docs2\site\docs\guides\schema-generation.md
+		..\docs2\site\docs\guides\serialization.md = ..\docs2\site\docs\guides\serialization.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
@@ -172,6 +174,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md = ..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
 		..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md = ..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md
 		..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md = ..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md
+		..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md = ..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md
+		..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md = ..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md
+		..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md = ..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md
+		..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md = ..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md
+		..\docs2\site\docs\analyzers\Overview.md = ..\docs2\site\docs\analyzers\Overview.md
 	EndProjectSection
 EndProject
 Global

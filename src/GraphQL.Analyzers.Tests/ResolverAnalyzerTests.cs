@@ -11,7 +11,7 @@ public class ResolverAnalyzerTests
     public async Task Sanity_NoDiagnostics()
     {
         const string source = @"";
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -31,38 +31,38 @@ public class ResolverAnalyzerTests
     [InlineData("CustomObjectGraphType", "ResolveStreamAsync", "ResolveStreamAsync")]
     public async Task FieldMethodCalledInAllowedGraphTypeImplementation_NoDiagnostic(string baseType, string method, string resolver)
     {
-        string source = $$"""
-            using System;
-            using System.Threading.Tasks;
-            using GraphQL;
-            using GraphQL.MicrosoftDI;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : {{baseType}}
-            {
-                public MyGraphType() =>
-                    Field<StringGraphType, string>("Test").{{method}}({{resolver}});
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test").{{method}}({{resolver}});
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
-                    throw new NotImplementedException();
-            }
+                  private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomObjectGraphType : ObjectGraphType { }
-            """
-        ;
+              public class CustomObjectGraphType : ObjectGraphType { }
+              """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -70,26 +70,27 @@ public class ResolverAnalyzerTests
     [InlineData("CustomObjectGraphType")]
     public async Task FieldMethodCalledOnVariable_AllowedGraphType_NoDiagnostics(string graphType)
     {
-        string source = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register({{graphType}} graphType) =>
-                    graphType.Field<StringGraphType, string>("Test").Resolve(Resolve);
+              public class MyGraphType
+              {
+                  public void Register({{graphType}} graphType) =>
+                      graphType.Field<StringGraphType, string>("Test").Resolve(Resolve);
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomObjectGraphType : ObjectGraphType { }
-            """;
+              public class CustomObjectGraphType : ObjectGraphType { }
+              """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -97,28 +98,29 @@ public class ResolverAnalyzerTests
     [InlineData("CustomObjectGraphType")]
     public async Task FieldMethodCalledOnMethodReturningGraphType_AllowedGraphType_NoDiagnostics(string returnGraphType)
     {
-        string source = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register() =>
-                    GetGraphType().Field<StringGraphType, string>("Test").Resolve(Resolve);
+              public class MyGraphType
+              {
+                  public void Register() =>
+                      GetGraphType().Field<StringGraphType, string>("Test").Resolve(Resolve);
 
-                private {{returnGraphType}} GetGraphType() => new();
+                  private {{returnGraphType}} GetGraphType() => new();
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomObjectGraphType : ObjectGraphType { }
-            """;
+              public class CustomObjectGraphType : ObjectGraphType { }
+              """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -152,75 +154,77 @@ public class ResolverAnalyzerTests
     [InlineData("CustomInputObjectGraphType", "ResolveStreamAsync", "ResolveStreamAsync")]
     public async Task FieldMethodCalledInForbiddenGraphTypeImplementation_IllegalResolverUsage(string baseType, string method, string resolver)
     {
-        string source = $$"""
-            using System;
-            using System.Threading.Tasks;
-            using GraphQL;
-            using GraphQL.MicrosoftDI;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : {{baseType}}
-            {
-                public MyGraphType() =>
-                    Field<StringGraphType, string>("Test").{{method}}({{resolver}});
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test").{{method}}({{resolver}});
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
-                    throw new NotImplementedException();
-            }
+                  private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
-        string fix = $$"""
-            using System;
-            using System.Threading.Tasks;
-            using GraphQL;
-            using GraphQL.MicrosoftDI;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : {{baseType}}
-            {
-                public MyGraphType() =>
-                    Field<StringGraphType, string>("Test");
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test");
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private Task<string> ResolveAsync(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
+                  private IObservable<string> ResolveStream(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
 
-                private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
-                    throw new NotImplementedException();
-            }
+                  private Task<IObservable<string>> ResolveStreamAsync(IResolveFieldContext<object> arg) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
         const int startColumn = 48;
         int endColumn = startColumn + $"{method}({resolver})".Length;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(12, startColumn, 12, endColumn);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
@@ -230,50 +234,52 @@ public class ResolverAnalyzerTests
     [InlineData("CustomInputObjectGraphType")]
     public async Task FieldMethodCalledOnVariable_ForbiddenGraphType_IllegalResolverUsage(string graphType)
     {
-        string source = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register({{graphType}} graphType) =>
-                    graphType.Field<StringGraphType, string>("Test").Resolve(Resolve);
+              public class MyGraphType
+              {
+                  public void Register({{graphType}} graphType) =>
+                      graphType.Field<StringGraphType, string>("Test").Resolve(Resolve);
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
-        string fix = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register({{graphType}} graphType) =>
-                    graphType.Field<StringGraphType, string>("Test");
+              public class MyGraphType
+              {
+                  public void Register({{graphType}} graphType) =>
+                      graphType.Field<StringGraphType, string>("Test");
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 58, 10, 74);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Theory]
@@ -283,60 +289,63 @@ public class ResolverAnalyzerTests
     [InlineData("CustomInputObjectGraphType")]
     public async Task FieldMethodCalledOnMethodReturningGraphType_ForbiddenGraphType_IllegalResolverUsage(string returnGraphType)
     {
-        string source = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register() =>
-                    GetGraphType().Field<StringGraphType, string>("Test").Resolve(Resolve);
+              public class MyGraphType
+              {
+                  public void Register() =>
+                      GetGraphType().Field<StringGraphType, string>("Test").Resolve(Resolve);
 
-                private {{returnGraphType}} GetGraphType() => new();
+                  private {{returnGraphType}} GetGraphType() => new();
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
-        string fix = $$"""
-            using System;
-            using GraphQL;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using System;
+              using GraphQL;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register() =>
-                    GetGraphType().Field<StringGraphType, string>("Test");
+              public class MyGraphType
+              {
+                  public void Register() =>
+                      GetGraphType().Field<StringGraphType, string>("Test");
 
-                private {{returnGraphType}} GetGraphType() => new();
+                  private {{returnGraphType}} GetGraphType() => new();
 
-                private string Resolve(IResolveFieldContext<object> context) =>
-                    throw new NotImplementedException();
-            }
+                  private string Resolve(IResolveFieldContext<object> context) =>
+                      throw new NotImplementedException();
+              }
 
-            public class CustomInterfaceGraphType : InterfaceGraphType { }
+              public class CustomInterfaceGraphType : InterfaceGraphType { }
 
-            public class CustomInputObjectGraphType : InputObjectGraphType { }
-            """;
+              public class CustomInputObjectGraphType : InputObjectGraphType { }
+              """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 63, 10, 79);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldMethodCalledInForbiddenGraphType_OnNewLineAndLastCall_IllegalResolverUsage_CorrectFormatting()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -349,7 +358,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -362,13 +372,14 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldMethodCalledInForbiddenGraphType_OnNewLineButNotLastCall_IllegalResolverUsage_CorrectFormatting()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -382,7 +393,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -396,13 +408,14 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldMethodCalledInForbiddenGraphType_NotOnNewLineAndNotLastCall_IllegalResolverUsage_CorrectFormatting()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -415,7 +428,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -429,13 +443,14 @@ public class ResolverAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(8, 48, 8, 74);
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix).ConfigureAwait(false);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
     [Fact]
     public async Task FieldMethodCalledInForbiddenGraphType_ResolveOverloadUnknown_IllegalResolverUsage()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -448,7 +463,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -469,6 +485,6 @@ public class ResolverAnalyzerTests
             CompilerDiagnostics = CompilerDiagnostics.None,
             ExpectedDiagnostics = { expected }
         };
-        await test.RunAsync().ConfigureAwait(false);
+        await test.RunAsync();
     }
 }

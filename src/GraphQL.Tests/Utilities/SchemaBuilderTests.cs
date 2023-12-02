@@ -418,7 +418,7 @@ public class SchemaBuilderTests
         {
             opt.Query = "{ kind }";
             opt.ThrowOnUnhandledException = true;
-        }).ConfigureAwait(false);
+        });
 
         result.ShouldBeCrossPlatJson(
             """
@@ -455,7 +455,7 @@ public class SchemaBuilderTests
         {
             opt.Query = "{ kind }";
             opt.ThrowOnUnhandledException = true;
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the enumeration type 'PetKindType'. Enumeration does not contain such value. Available values: 'CAT' of type 'String', 'DOG' of type 'String'.");
     }
 
@@ -869,7 +869,7 @@ public class SchemaBuilderTests
         fieldType.DeprecationReason.ShouldBe("Test4");
         fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
         var context = new ResolveFieldContext() { Source = new TestType() };
-        (await fieldType.Resolver.ResolveAsync(context).ConfigureAwait(false)).ShouldBeOfType<string>().ShouldBe("value");
+        (await fieldType.Resolver.ResolveAsync(context)).ShouldBeOfType<string>().ShouldBe("value");
     }
 
     [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]
