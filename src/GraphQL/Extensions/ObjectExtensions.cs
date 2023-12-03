@@ -11,7 +11,7 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, (ConstructorInfo, ParameterInfo[])> _types = new();
+        private static readonly ConcurrentDictionary<Type, (ConstructorInfo Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
         private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly)> _members = new();
 
         /// <summary>
