@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
@@ -10,6 +11,9 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
+        private static readonly ConcurrentDictionary<Type, (ConstructorInfo, ParameterInfo[])> _types = new();
+        private static readonly ConcurrentDictionary<(Type, string), (MemberInfo, bool)> _members = new();
+
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// Can use any constructor of the indicated type, provided that there are keys in the
@@ -120,17 +124,25 @@ namespace GraphQL
                 // get graph type
                 var resolvedType = fieldType.ResolvedType
                     ?? throw new InvalidOperationException($"Field '{fieldType.Name}' of graph type '{graphType.Name}' does not have the ResolvedType property set.");
+                // verify no other fields have the same name
+                for (var j = 0; j < i; j++)
+                {
+                    if (fields[j].MemberName == fieldName)
+                        throw new InvalidOperationException($"Two fields within graph type '{graphType.Name}' were mapped to the same member '{fieldName}'.");
+                }
                 // add to list
                 fields[i] = (fieldType.Name, fieldName, resolvedType);
             }
-            // validate that no two different fields use the same member
-            var memberNames = new HashSet<string>(fields.Select(x => x.MemberName!));
-            if (memberNames.Count != fields.Length)
-                throw new InvalidOperationException($"Two fields within graph type '{graphType.Name}' were mapped to the same member.");
             // find best constructor to use, with preference to the constructor with the most parameters
-            var bestConstructor = AutoRegisteringHelper.GetConstructor(clrType);
+            var (bestConstructor, ctorParameters) = _types.GetOrAdd(
+                clrType,
+                static clrType =>
+                {
+                    var constructor = AutoRegisteringHelper.GetConstructor(clrType);
+                    var parameters = constructor.GetParameters();
+                    return (constructor, parameters);
+                });
             // pull out parameters that are applicable for that constructor
-            var ctorParameters = bestConstructor.GetParameters();
             var memberCount = fields.Length;
             var ctorFields = ctorParameters.Length > 0
                 ? new (string? Key, ParameterInfo Parameter, IGraphType? GraphType)[ctorParameters.Length]
@@ -170,7 +182,9 @@ namespace GraphQL
                 if (field.MemberName == null)
                     continue;
                 // look for match on type
-                var (member, initOnly) = FindMatchingMember(clrType, field.MemberName);
+#pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+                var (member, initOnly) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Item1, info.Item2));
+#pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
                 members[memberIndex++] = (field.Key, member, initOnly, field.ResolvedType);
             }
 
