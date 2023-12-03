@@ -63,9 +63,7 @@ public class Bug947
         Should.Throw<InvalidOperationException>(() => context.GetArgument<string>("object"));
         Should.Throw<InvalidOperationException>(() => context.GetArgument<DateTime>("object"));
 
-        var otherObject = context.GetArgument<SomeOtherObject>("object");
-        otherObject.unknown.ShouldBe(0);
-        otherObject.unknown2.ShouldBeNull();
+        Should.Throw<InvalidOperationException>(() => context.GetArgument<SomeOtherObject>("object"));
     }
 }
 
