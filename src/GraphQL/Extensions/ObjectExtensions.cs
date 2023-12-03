@@ -12,7 +12,7 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, (ConstructorInfo, ParameterInfo[])> _types = new();
-        private static readonly ConcurrentDictionary<(Type, string), (MemberInfo, bool)> _members = new();
+        private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly)> _members = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -88,7 +88,7 @@ namespace GraphQL
                         fieldInfo.SetValue(obj, coercedValue);
                     }
                 }
-                else if (field.InitOnly)
+                else if (field.IsInitOnly)
                 {
                     // initialize all unspecified init-only properties
                     var propertyInfo = (PropertyInfo)field.Member;
@@ -103,7 +103,7 @@ namespace GraphQL
         {
             public ConstructorInfo Constructor;
             public (string? Key, ParameterInfo ParameterInfo, IGraphType? GraphType)[] CtorFields;
-            public (string Key, MemberInfo Member, bool InitOnly, IGraphType GraphType)[] MemberFields;
+            public (string Key, MemberInfo Member, bool IsInitOnly, IGraphType GraphType)[] MemberFields;
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace GraphQL
                     continue;
                 // look for match on type
 #pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-                var (member, initOnly) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Item1, info.Item2));
+                var (member, initOnly) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
 #pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
                 members[memberIndex++] = (field.Key, member, initOnly, field.ResolvedType);
             }
