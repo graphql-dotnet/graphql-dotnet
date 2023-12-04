@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
@@ -12,7 +13,7 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, (ConstructorInfo Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
-        private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly)> _members = new();
+        private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired)> _members = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -88,11 +89,17 @@ namespace GraphQL
                         fieldInfo.SetValue(obj, coercedValue);
                     }
                 }
-                else if (field.IsInitOnly)
+                else if (field.IsInitOnly || field.IsRequired)
                 {
-                    // initialize all unspecified init-only properties
-                    var propertyInfo = (PropertyInfo)field.Member;
-                    propertyInfo.SetValue(obj, null);
+                    // initialize all unspecified init-only or required properties
+                    if (field.Member is PropertyInfo propertyInfo)
+                    {
+                        propertyInfo.SetValue(obj, null);
+                    }
+                    else
+                    {
+                        ((FieldInfo)field.Member).SetValue(obj, null);
+                    }
                 }
             }
 
@@ -103,7 +110,7 @@ namespace GraphQL
         {
             public ConstructorInfo Constructor;
             public (string? Key, ParameterInfo ParameterInfo, IGraphType? GraphType)[] CtorFields;
-            public (string Key, MemberInfo Member, bool IsInitOnly, IGraphType GraphType)[] MemberFields;
+            public (string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType GraphType)[] MemberFields;
         }
 
         /// <summary>
@@ -176,8 +183,8 @@ namespace GraphQL
 
             // find other members
             var members = memberCount > 0
-                ? new (string Key, MemberInfo Member, bool InitOnly, IGraphType ResolvedType)[memberCount]
-                : Array.Empty<(string Key, MemberInfo Member, bool InitOnly, IGraphType ResolvedType)>();
+                ? new (string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType ResolvedType)[memberCount]
+                : Array.Empty<(string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType ResolvedType)>();
             var memberIndex = 0;
             for (var i = 0; i < fields.Length; i++)
             {
@@ -187,9 +194,9 @@ namespace GraphQL
                     continue;
                 // look for match on type
 #pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-                var (member, initOnly) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
+                var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
 #pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-                members[memberIndex++] = (field.Key, member, initOnly, field.ResolvedType);
+                members[memberIndex++] = (field.Key, member, initOnly, isRequired, field.ResolvedType);
             }
 
             return new ReflectionInfo
@@ -199,7 +206,7 @@ namespace GraphQL
                 MemberFields = members,
             };
 
-            static (MemberInfo, bool) FindMatchingMember(
+            static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMatchingMember(
                 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
                 Type type,
                 string propertyName)
@@ -224,9 +231,11 @@ namespace GraphQL
                 if (propertyInfo?.SetMethod?.IsPublic ?? false)
                 {
                     var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
-                        .Any(type => type.FullName == "System.Runtime.CompilerServices.IsExternalInit");
+                        .Any(type => type == typeof(IsExternalInit));
 
-                    return (propertyInfo, isExternalInit);
+                    var isRequired = Attribute.IsDefined(propertyInfo, typeof(RequiredMemberAttribute));
+
+                    return (propertyInfo, isExternalInit, isRequired);
                 }
 
                 FieldInfo? fieldInfo;
@@ -246,7 +255,9 @@ namespace GraphQL
 
                 if (fieldInfo != null)
                 {
-                    return (fieldInfo, false);
+                    var isRequired = Attribute.IsDefined(fieldInfo, typeof(RequiredMemberAttribute));
+
+                    return (fieldInfo, false, isRequired);
                 }
 
                 throw new InvalidOperationException($"Cannot find member named '{propertyName}' on CLR type '{type.GetFriendlyName()}'.");

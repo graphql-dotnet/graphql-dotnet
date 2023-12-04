@@ -109,7 +109,7 @@ This change was made to prevent duplicate registrations of the same service with
   - Otherwise the public parameterless constructor is used if available.
   - Otherwise an exception is thrown during deserialization.
 - Only public properties are eligible candidates when matching a property.
-- Any init-only properties not provided in the dictionary are set to their default values.
+- Any init-only or required properties not provided in the dictionary are set to their default values.
 
 The changes above allow for matching behavior with source-generated or dynamically-compiled functions.
 

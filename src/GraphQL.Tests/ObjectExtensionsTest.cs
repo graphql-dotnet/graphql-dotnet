@@ -364,4 +364,27 @@ public class ObjectExtensionsTests
         public int Month { get; init; } = -2;
         public int Year { get; set; } = -3;
     }
+
+    [Fact]
+    public void toobject_initializes_required_props()
+    {
+        var inputs = """{ "company": "test", "month": 5 }""".ToInputs();
+        var person = inputs.ToObject<MyInput7>();
+        person.Name.ShouldBe(null);
+        person.Company.ShouldBe("test");
+        person.Description.ShouldBe("def");
+        person.Age.ShouldBe(0);
+        person.Month.ShouldBe(5);
+        person.Year.ShouldBe(-3);
+    }
+
+    private class MyInput7
+    {
+        public required string Name { get; set; } = "abc";
+        public required string Company { get; set; } = "ghi";
+        public string Description { get; set; } = "def";
+        public required int Age { get; set; } = -1;
+        public required int Month { get; set; } = -2;
+        public int Year { get; set; } = -3;
+    }
 }
