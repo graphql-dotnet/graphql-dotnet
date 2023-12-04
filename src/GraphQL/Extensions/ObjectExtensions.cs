@@ -133,15 +133,19 @@ namespace GraphQL
                 // add to list
                 fields[i] = (fieldType.Name, fieldName, resolvedType);
             }
+
             // find best constructor to use, with preference to the constructor with the most parameters
             var (bestConstructor, ctorParameters) = _types.GetOrAdd(
                 clrType,
                 static clrType =>
                 {
+#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                     var constructor = AutoRegisteringHelper.GetConstructor(clrType);
+#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                     var parameters = constructor.GetParameters();
                     return (constructor, parameters);
                 });
+
             // pull out parameters that are applicable for that constructor
             var memberCount = fields.Length;
             var ctorFields = ctorParameters.Length > 0
@@ -240,7 +244,7 @@ namespace GraphQL
 #pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                 }
 
-                if (fieldInfo?.IsPublic ?? false)
+                if (fieldInfo != null)
                 {
                     return (fieldInfo, false);
                 }
