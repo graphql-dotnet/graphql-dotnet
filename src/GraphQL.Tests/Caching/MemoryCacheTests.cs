@@ -4,7 +4,6 @@ using GraphQL.Caching;
 using GraphQLParser.AST;
 using Moq;
 using Moq.Protected;
-using Shouldly;
 
 namespace GraphQL.Tests.Caching;
 
