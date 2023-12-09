@@ -231,9 +231,9 @@ namespace GraphQL
                 if (propertyInfo?.SetMethod?.IsPublic ?? false)
                 {
                     var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
-                        .Any(type => type == typeof(IsExternalInit));
+                        .Any(type => type.FullName == typeof(IsExternalInit).FullName);
 
-                    var isRequired = Attribute.IsDefined(propertyInfo, typeof(RequiredMemberAttribute));
+                    var isRequired = propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
 
                     return (propertyInfo, isExternalInit, isRequired);
                 }
@@ -255,7 +255,7 @@ namespace GraphQL
 
                 if (fieldInfo != null)
                 {
-                    var isRequired = Attribute.IsDefined(fieldInfo, typeof(RequiredMemberAttribute));
+                    var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
 
                     return (fieldInfo, false, isRequired);
                 }
