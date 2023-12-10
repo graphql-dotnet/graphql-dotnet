@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Linq.Expressions;
 using System.Reflection;
 using GraphQLParser.AST;
 
@@ -36,7 +38,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="IInputObjectGraphType"/>
-    public class InputObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
+    public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
         /// <summary>
         /// Initializes a new instance.
@@ -70,8 +72,13 @@ namespace GraphQL.Types
                 return value;
 
             // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
-            return value.ToObject(typeof(TSourceType), this);
+            //return value.ToObject(typeof(TSourceType), this);
+
+            _parseDictionary ??= InputObjectGraphTypeHelper.BuildParseDictionaryMethod(this, typeof(TSourceType));
+            return _parseDictionary(value);
         }
+
+        private Func<IDictionary<string, object?>, object>? _parseDictionary;
 
         /// <inheritdoc/>
         public virtual bool IsValidDefault(object value)

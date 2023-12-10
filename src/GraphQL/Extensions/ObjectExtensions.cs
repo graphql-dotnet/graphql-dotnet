@@ -9,7 +9,7 @@ namespace GraphQL
     /// <summary>
     /// Provides extension methods for objects and a method for converting a dictionary into a strongly typed object.
     /// </summary>
-    public static class ObjectExtensions
+    public static partial class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, ConstructorInfo> _types = new();
 

@@ -103,4 +103,9 @@ public static class GlobalSwitches
     /// that have the same TSourceType, one instance will incorrectly pull cached information stored by the other instance.
     /// </summary>
     public static bool EnableReflectionCaching { get; set; }
+
+    internal static bool ParseToNonPublicConstructors { get; set; } = true;
+    internal static bool UseNewToObject { get; set; } = true;
+    internal static bool UseOldToObject { get; set; } = true;
+    internal static bool DynamicallyCompileToObject { get; set; } = true;
 }
