@@ -185,7 +185,7 @@ public static partial class ObjectExtensions
                 return SelectOrNull(expr, loopContent, isArray, isList, type, listGraphType);
             }
 
-            return Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(type), Expression.Constant(graphType));
+            return Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType));
         }
     }
 
@@ -205,22 +205,42 @@ public static partial class ObjectExtensions
     ];
 
     private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static T? GetPropertyValueTyped<T>(object? propertyValue, Type fieldType, IGraphType mappedType)
+    private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
+        object? value, IGraphType mappedType)
     {
         // if the property is null return the default value
-        if (propertyValue == null)
+        if (value == null)
             return default;
 
         // Short-circuit conversion if the property value already of the right type
-        if (fieldType == typeof(object) || fieldType.IsInstanceOfType(propertyValue))
-            return (T?)propertyValue;
+        // (works for converting to/from nullable value types too)
+        if (typeof(T) == typeof(object) || typeof(T).IsInstanceOfType(value))
+            return (T?)value;
 
-        if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
-            return (T?)result;
+        // in the rare circumstance that the value is not a compatible type,
+        //   use the reflection-based converter for object types, and
+        //   the value converter for value types
 
-        var ret = GetPropertyValue(propertyValue, fieldType, mappedType);
+        // note that during literal/variable parsing, input object graph types
+        //   are typically already converted to the correct type, as ParseDictionary
+        //   is called during parsing, so this code path would not normally be hit.
 
-        return ret == null ? default : (T)ret;
+        // matches only when mappedType is an input object graph type AND the value is a dictionary
+        if (value is IDictionary<string, object?> dictionary)
+        {
+            // unwrap non-null graph type
+            mappedType = mappedType is NonNullGraphType nonNullGraphType
+                ? nonNullGraphType.ResolvedType ?? throw new InvalidOperationException($"ResolvedType is null for graph type '{nonNullGraphType}'.")
+                : mappedType;
+
+            // process input object graph types
+            if (mappedType is IInputObjectGraphType inputObjectGraphType)
+            {
+                return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
+            }
+        }
+
+        return ValueConverter.ConvertTo<T>(value);
     }
 
     private static Expression SelectOrNull(Expression collection, Func<ParameterExpression, Expression> loopContent, bool asArray, bool asList, Type returnType, IGraphType graphType)
