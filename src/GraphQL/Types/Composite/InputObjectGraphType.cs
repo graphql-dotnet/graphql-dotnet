@@ -72,10 +72,9 @@ namespace GraphQL.Types
                 return value;
 
             // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
-            //return value.ToObject(typeof(TSourceType), this);
-
-            _parseDictionary ??= InputObjectGraphTypeHelper.BuildParseDictionaryMethod(this, typeof(TSourceType));
-            return _parseDictionary(value);
+#pragma warning disable IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
+            return value.ToObject(typeof(TSourceType), this);
+#pragma warning restore IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
         }
 
         private Func<IDictionary<string, object?>, object>? _parseDictionary;
