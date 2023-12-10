@@ -186,6 +186,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 
@@ -234,6 +235,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 

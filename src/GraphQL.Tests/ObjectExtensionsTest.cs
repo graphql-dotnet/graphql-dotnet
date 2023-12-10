@@ -260,11 +260,13 @@ public class ObjectExtensionsTests
         actual.ShouldBe(strings);
     }
 
-    [Fact]
-    public void toobject_uses_public_default_constructor_when_available()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_uses_public_default_constructor_when_available(bool compile)
     {
         var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
-        var person = inputs.ToObject<MyInput1>();
+        var person = inputs.ToObject<MyInput1>(compile);
         person.Name.ShouldBe("tom");
         person.Age.ShouldBe(10);
     }
@@ -279,11 +281,13 @@ public class ObjectExtensionsTests
         public MyInput1(string name, int age) { throw new InvalidOperationException(); }
     }
 
-    [Fact]
-    public void toobject_ignores_private_constructors()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_ignores_private_constructors(bool compile)
     {
         var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
-        var person = inputs.ToObject<MyInput2>();
+        var person = inputs.ToObject<MyInput2>(compile);
         person.Name.ShouldBe("tom");
         person.Age.ShouldBe(10);
     }
@@ -296,11 +300,13 @@ public class ObjectExtensionsTests
         public MyInput2(string name, int age) { Name = name; Age = age; }
     }
 
-    [Fact]
-    public void toobject_throws_for_multiple_constructors()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_throws_for_multiple_constructors(bool compile)
     {
         var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
-        Should.Throw<InvalidOperationException>(inputs.ToObject<MyInput3>);
+        Should.Throw<InvalidOperationException>(() => inputs.ToObject<MyInput3>(compile));
     }
 
     private class MyInput3
@@ -311,11 +317,13 @@ public class ObjectExtensionsTests
         public MyInput3(string name, int age) { Name = name; Age = age; }
     }
 
-    [Fact]
-    public void toobject_honors_marked_constructor()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_honors_marked_constructor(bool compile)
     {
         var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
-        var person = inputs.ToObject<MyInput4>();
+        var person = inputs.ToObject<MyInput4>(compile);
         person.Name.ShouldBe("tom");
         person.Age.ShouldBe(10);
     }
@@ -329,11 +337,13 @@ public class ObjectExtensionsTests
         public MyInput4(string name) { Name = name; }
     }
 
-    [Fact]
-    public void toobject_sets_initonly_props()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_sets_initonly_props(bool compile)
     {
         var inputs = """{ "name": "tom" }""".ToInputs();
-        var person = inputs.ToObject<MyInput5>();
+        var person = inputs.ToObject<MyInput5>(compile);
         person.Name.ShouldBe("tom");
     }
 
@@ -342,11 +352,13 @@ public class ObjectExtensionsTests
         public string Name { get; init; }
     }
 
-    [Fact]
-    public void toobject_initializes_initonly_props()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_initializes_initonly_props(bool compile)
     {
         var inputs = """{ "company": "test", "month": 5 }""".ToInputs();
-        var person = inputs.ToObject<MyInput6>();
+        var person = inputs.ToObject<MyInput6>(compile);
         person.Name.ShouldBe(null);
         person.Company.ShouldBe("test");
         person.Description.ShouldBe("def");
@@ -365,11 +377,13 @@ public class ObjectExtensionsTests
         public int Year { get; set; } = -3;
     }
 
-    [Fact]
-    public void toobject_initializes_required_props()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_initializes_required_props(bool compile)
     {
         var inputs = """{ "company": "test", "month": 5 }""".ToInputs();
-        var person = inputs.ToObject<MyInput7>();
+        var person = inputs.ToObject<MyInput7>(compile);
         person.Name.ShouldBe(null);
         person.Company.ShouldBe("test");
         person.Description.ShouldBe("def");

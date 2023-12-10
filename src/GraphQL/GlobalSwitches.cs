@@ -104,8 +104,13 @@ public static class GlobalSwitches
     /// </summary>
     public static bool EnableReflectionCaching { get; set; }
 
-    internal static bool ParseToNonPublicConstructors { get; set; } = true;
-    internal static bool UseNewToObject { get; set; } = true;
-    internal static bool UseOldToObject { get; set; } = true;
-    internal static bool DynamicallyCompileToObject { get; set; } = true;
+    /// <summary>
+    /// Enables or disables the use of <see cref="System.Linq.Expressions.Expression"/> to dynamically compile
+    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})"/>
+    /// at runtime.
+    /// <br/><br/>
+    /// By default enabled. <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
+    /// this value to <see langword="false"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
+    /// </summary>
+    public static bool DynamicallyCompileToObject { get; set; } = true;
 }
