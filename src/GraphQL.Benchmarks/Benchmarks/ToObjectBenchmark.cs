@@ -194,8 +194,8 @@ public class ToObjectBenchmark : IBenchmark
     public class Company
     {
         public required string Name { get; set; }
-        public required List<Employee> Employees { get; set; }
-        public required List<CompanyAddress> Addresses { get; set; }
+        public required IList<Employee> Employees { get; set; }
+        public required IList<CompanyAddress> Addresses { get; set; }
         public required string EmailAddress { get; set; }
         public required string PhoneNumber { get; set; }
         public Uri? Website { get; set; }

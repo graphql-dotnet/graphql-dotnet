@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
@@ -152,6 +153,7 @@ public static partial class ObjectExtensions
                 var elementGraphType = listGraphType.ResolvedType ?? throw new InvalidOperationException();
                 // determine the type of list to create
                 var isArray = false;
+                var isList = false;
                 Type? elementType = null;
                 if (type.IsArray)
                 {
@@ -162,31 +164,25 @@ public static partial class ObjectExtensions
                 {
                     elementType = typeof(object);
                 }
-                else if (type.IsGenericType && _genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
+                else if (type.IsGenericType)
                 {
-                    elementType = type.GetGenericArguments()[0];
-                }
-                else if (typeof(IEnumerable).IsAssignableFrom(type))
-                {
-                    elementType = type.GetInterfaces()
-                        .FirstOrDefault(type => type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        ?.GetGenericArguments()[0];
-                    if (elementType != null)
+                    var genericTypeDef = type.GetGenericTypeDefinition();
+                    if (genericTypeDef == typeof(List<>))
                     {
-                        // confirm that List<T> is compatible with type
-                        var listType = typeof(List<>).MakeGenericType(elementType);
-                        if (!type.IsAssignableFrom(listType))
-                            elementType = null;
+                        elementType = type.GetGenericArguments()[0];
+                        isList = true;
+                    }
+                    else if (_genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
+                    {
+                        elementType = type.GetGenericArguments()[0];
                     }
                 }
                 if (elementType == null)
                     throw new InvalidOperationException($"Could not determine enumerable type for type '{type.GetFriendlyName()}' while coercing graph type '{graphType}'.");
                 // create an expression that represents this:
                 // (IEnumerable<object>?)expr?.Select(x => CoerceExpression(x, elementType, listGraphType.ResolvedType))
-                var loopVar = Expression.Parameter(typeof(object));
-                var loopContent = CoerceExpression(loopVar, elementType, elementGraphType);
-                var expr2 = SelectOrNull(Expression.Convert(expr, typeof(IEnumerable)), loopVar, loopContent, isArray);
-                return Expression.Convert(expr2, type);
+                Func<ParameterExpression, Expression> loopContent = (loopVar) => CoerceExpression(loopVar, elementType, elementGraphType);
+                return SelectOrNull(expr, loopContent, isArray, isList, type, listGraphType);
             }
 
             return Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(type), Expression.Constant(graphType));
@@ -203,7 +199,6 @@ public static partial class ObjectExtensions
     private static readonly Type[] _genericEnumerableTypes = [
         typeof(IEnumerable<>),
         typeof(IList<>),
-        typeof(List<>),
         typeof(ICollection<>),
         typeof(IReadOnlyCollection<>),
         typeof(IReadOnlyList<>),
@@ -228,20 +223,149 @@ public static partial class ObjectExtensions
         return ret == null ? default : (T)ret;
     }
 
-    private static Expression SelectOrNull(Expression collection, ParameterExpression loopVar, Expression loopContent, bool asArray)
+    private static Expression SelectOrNull(Expression collection, Func<ParameterExpression, Expression> loopContent, bool asArray, bool asList, Type returnType, IGraphType graphType)
     {
-        var collectionVar = Expression.Variable(collection.Type, "collection");
+        /*
+         * var collectionVar = collection;
+         * TReturnType result = null;
+         * if (collectionVar != null)
+         * {
+         *     if (collectionVar is IList && !asList)
+         *     {
+         *         result = (TReturnType)SelectOrNull2(collectionVar, loopVar, loopContent, asArray, asList);
+         *     }
+         *     else if (collectionVar is IEnumerable)
+         *     {
+         *         result = (TReturnType)SelectOrNull1(collectionVar, loopVar, loopContent, asArray, asList);
+         *     }
+         *     else
+         *     {
+         *         throw new InvalidOperationException($"Cannot coerce collection of type '{typeName}' to IEnumerable for graph type '{graphType}'.");
+         *     }
+         * }
+         * return result;
+         */
+        var collectionVar = Expression.Variable(typeof(object), "collectionVar");
+        var resultVar = Expression.Variable(returnType, "result");
+
+        Expression enumerableCheck =
+            Expression.IfThenElse(
+                Expression.TypeIs(collectionVar, typeof(IEnumerable)),
+                Expression.Assign(
+                    resultVar,
+                    Expression.Convert(
+                        SelectEnumerable(Expression.Convert(collectionVar, typeof(IEnumerable)), loopContent, asArray),
+                        returnType)),
+                Expression.Call(_throwMethod, collectionVar, Expression.Constant(graphType, typeof(IGraphType))));
+
+        Expression listCheck = asList ? enumerableCheck :
+            Expression.IfThenElse(
+                Expression.TypeIs(collectionVar, typeof(IList)),
+                Expression.Assign(
+                    resultVar,
+                    Expression.Convert(
+                        SelectList(Expression.Convert(collectionVar, typeof(IList)), loopContent),
+                        returnType)),
+                enumerableCheck);
+
+        return Expression.Block(
+            new[] { collectionVar, resultVar },
+            Expression.Assign(collectionVar, collection),
+            Expression.Assign(resultVar, Expression.Constant(null, resultVar.Type)),
+            Expression.IfThen(
+                Expression.NotEqual(
+                    collectionVar,
+                    Expression.Constant(null, collectionVar.Type)),
+                listCheck),
+            resultVar);
+    }
+
+    private static readonly MethodInfo _throwMethod = typeof(ObjectExtensions).GetMethod(nameof(ThrowInvalidCollectionTypeException), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static void ThrowInvalidCollectionTypeException(object collection, IGraphType graphType)
+    {
+        string typeName = collection?.GetType().GetFriendlyName() ?? "null";
+        throw new InvalidOperationException($"Cannot coerce collection of CLR type '{typeName}' to IEnumerable for graph type '{graphType}'.");
+    }
+
+    private static Expression SelectList(Expression collection, Func<ParameterExpression, Expression> loopContentFunc)
+    {
+        var loopVar = Expression.Variable(typeof(object), "loopVar");
+        var loopContent = loopContentFunc(loopVar);
+        var countVar = Expression.Variable(typeof(int), "count");
+        var collectionVar = Expression.Variable(typeof(IList), "collection");
+        var indexVar = Expression.Variable(typeof(int), "i");
+        var collectionCountProperty = typeof(ICollection).GetProperty(nameof(ICollection.Count))!;
+        Debug.Assert(collectionCountProperty != null);
+
+        var breakLabel = Expression.Label("breakLabel");
+
+        var listType = loopContent.Type.MakeArrayType();
+        var listVariable = Expression.Variable(listType, "list");
+        var indexerProperty = typeof(IList).GetProperty("Item", [typeof(int)])!;
+        Debug.Assert(indexerProperty != null);
+
+        /*
+         * IList collectionVar;
+         * T[] listVariable;
+         * 
+         * collectionVar = collection;
+         * if (collectionVar != null)
+         * {
+         *     countVar = collectionVar.Count;
+         *     listVariable = new T[countVar];
+         *     index i = 0;
+         *     while (true)
+         *     {
+         *         if (i < countVar)
+         *         {
+         *             T loopVar = collectionVar[i];
+         *             listVariable[i++] = {loopContent};
+         *         }
+         *         else
+         *         {
+         *             break;
+         *         }
+         *     }
+         * }
+         * return listVariable;
+         */
+
+        return Expression.Block(
+            listType,
+            [collectionVar, listVariable, indexVar, countVar],
+            Expression.Assign(collectionVar, collection),
+            Expression.Assign(listVariable, Expression.Constant(null, listVariable.Type)),
+            Expression.Assign(countVar, Expression.Property(collectionVar, collectionCountProperty)),
+            Expression.Assign(listVariable, Expression.NewArrayBounds(loopContent.Type, countVar)),
+            Expression.Assign(indexVar, Expression.Constant(0, indexVar.Type)),
+            Expression.Loop(
+                Expression.IfThenElse(
+                    Expression.LessThan(indexVar, countVar),
+                    Expression.Block(
+                        [loopVar],
+                        Expression.Assign(loopVar, Expression.Property(collectionVar, indexerProperty, indexVar)),
+                        Expression.Assign(
+                            Expression.ArrayAccess(listVariable, Expression.PostIncrementAssign(indexVar)),
+                            loopContent)),
+                    Expression.Break(breakLabel)),
+                breakLabel),
+            listVariable);
+    }
+
+    private static Expression SelectEnumerable(Expression collection, Func<ParameterExpression, Expression> loopContentFunc, bool asArray)
+    {
+        var loopVar = Expression.Variable(typeof(object), "loopVar");
+        var loopContent = loopContentFunc(loopVar);
+        var collectionVar = Expression.Variable(typeof(IEnumerable), "collection");
         var enumeratorVar = Expression.Variable(typeof(IEnumerator), "enumerator");
         var getEnumeratorCall = Expression.Call(collectionVar, _getEnumeratorMethod);
         var moveNextCall = Expression.Call(enumeratorVar, _moveNextMethod);
         var getCurrent = Expression.MakeMemberAccess(enumeratorVar, _currentProperty);
 
-        var breakLabel = Expression.Label("label1");
-        var returnLabel = Expression.Label("label2");
+        var breakLabel = Expression.Label("breakLabel");
 
         var listType = typeof(List<>).MakeGenericType(loopContent.Type);
         var listVariable = Expression.Variable(listType, "list");
-        var returnVariable = Expression.Variable(asArray ? loopContent.Type.MakeArrayType() : listVariable.Type);
         var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
         Debug.Assert(addMethod != null);
         var toArrayMethod = listType.GetMethod(nameof(List<object>.ToArray))!;
@@ -255,46 +379,36 @@ public static partial class ObjectExtensions
          * 
          * collectionVar = collection;
          * returnVariable = null;
-         * if (collectionVar != null)
+         * enumeratorVar = collectionVar.GetEnumerator();
+         * listVariable = new();
+         * while (true)
          * {
-         *     enumeratorVar = collectionVar.GetEnumerator();
-         *     listVariable = new();
-         *     while (true)
+         *     if (enumerator.MoveNext() == true)
          *     {
-         *         if (enumerator.MoveNext() == true)
-         *         {
-         *             T loopVar;
-         *             loopVar = enumerator.Current;
-         *             listVariable.Add( {loopContent} );
-         *         }
-         *         else
-         *             break;
+         *         T loopVar;
+         *         loopVar = enumerator.Current;
+         *         listVariable.Add( {loopContent} );
          *     }
-         *     returnVariable = asArray ? listVariable.ToArray() : listVariable;
+         *     else
+         *         break;
          * }
-         * return returnVariable;
+         * return asArray ? listVariable.ToArray() : listVariable;
          */
         return Expression.Block(
-            returnVariable.Type,
-            new[] { collectionVar, enumeratorVar, listVariable, returnVariable },
+            [collectionVar, enumeratorVar, listVariable],
             Expression.Assign(collectionVar, collection),
-            Expression.Assign(returnVariable, Expression.Constant(null, returnVariable.Type)),
-            Expression.IfThen(
-                Expression.Equal(collectionVar, Expression.Constant(null, collection.Type)),
-                Expression.Goto(returnLabel)),
             Expression.Assign(enumeratorVar, getEnumeratorCall),
             Expression.Assign(listVariable, Expression.New(listVariable.Type)),
             Expression.Loop(
                 Expression.IfThenElse(
                     Expression.Equal(moveNextCall, Expression.Constant(true)),
-                    Expression.Block(new[] { loopVar },
+                    Expression.Block(
+                        [loopVar],
                         Expression.Assign(loopVar, getCurrent),
                         Expression.Call(listVariable, addMethod, loopContent)),
                     Expression.Break(breakLabel)),
                 breakLabel),
-            Expression.Assign(returnVariable, asArray ? Expression.Call(listVariable, toArrayMethod) : listVariable),
-            Expression.Label(returnLabel),
-            returnVariable);
+            asArray ? Expression.Call(listVariable, toArrayMethod) : listVariable);
     }
 
     private static readonly MethodInfo _getEnumeratorMethod = typeof(IEnumerable).GetMethod(nameof(IEnumerable.GetEnumerator))!;
