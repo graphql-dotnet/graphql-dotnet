@@ -20,84 +20,37 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets reflection information based on the specified graph type and CLR type.
-        /// </summary>
-        internal static (ConstructorInfo Constructor, List<(string Key, Type ClrType, IGraphType GraphType)> CtorFields, List<(string Key, MemberInfo Member, Type Type, IGraphType ResolvedType)> MemberFields) GetReflectionInformation(Type clrType, IInputObjectGraphType graphType)
-        {
-            // gather for each field: dictionary key, clr property name, and graph type
-            var fields = new List<(string Key, string? MemberName, IGraphType ResolvedType)>(graphType.Fields.Count);
-            foreach (var field in graphType.Fields)
-            {
-                // get clr property name (also used for matching on field name or constructor parameter name)
-                var fieldName = field.GetMetadata<string>(InputObjectGraphType.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? field.Name;
-                // get graph type
-                var resolvedType = field.ResolvedType
-                    ?? throw new InvalidOperationException($"Field '{field.Name}' of graph type '{graphType.Name}' does not have the ResolvedType property set.");
-                // add to list
-                fields.Add((field.Name, fieldName, resolvedType));
-            }
-            // validate that no two different fields use the same member
-            var memberNames = new HashSet<string>(fields.Select(x => x.MemberName!));
-            if (memberNames.Count != fields.Count)
-                throw new InvalidOperationException($"Two fields within graph type '{graphType.Name}' were mapped to the same member.");
-            // find best constructor to use, with preference to the constructor with the most parameters
-            var bestConstructor = AutoRegisteringHelper.GetConstructor(clrType);
-            // pull out parameters that are applicable for that constructor
-            var ctorParameters = bestConstructor.GetParameters();
-            var ctorFields = new List<(string Key, Type ClrType, IGraphType GraphType)>();
-            foreach (var ctorParam in ctorParameters)
-            {
-                // look for a field that matches the constructor parameter name
-                var index = fields.FindIndex(x => string.Equals(x.MemberName, ctorParam.Name, StringComparison.OrdinalIgnoreCase));
-                if (index == -1)
-                    throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
-                // add to list, and mark to be removed from fields
-                var value = fields[index];
-                ctorFields.Add((value.Key, ctorParam.ParameterType, value.ResolvedType));
-                value.MemberName = null;
-                fields[index] = value;
-            }
-            // remove fields that were used in the constructor
-            fields.RemoveAll(x => x.MemberName == null);
-            // find other members
-            var objProperties = clrType.GetProperties().Where(x => x.SetMethod?.IsPublic ?? false).ToList();
-            var objFields = clrType.GetFields(BindingFlags.Instance | BindingFlags.Public);
-            var members = new List<(string Key, MemberInfo Member, Type Type, IGraphType ResolvedType)>(fields.Count);
-            foreach (var field in fields)
-            {
-                // check properties
-                var objProp = objProperties.SingleOrDefault(x => string.Equals(x.Name, field.MemberName, StringComparison.OrdinalIgnoreCase));
-                if (objProp != null)
-                {
-                    members.Add((field.Key, objProp, objProp.PropertyType, field.ResolvedType));
-                    continue;
-                }
-                var objField = objFields.SingleOrDefault(x => string.Equals(x.Name, field.MemberName, StringComparison.OrdinalIgnoreCase))
-                    ?? throw new InvalidOperationException($"Cannot find member named '{field.MemberName}' on CLR type '{clrType.GetFriendlyName()}'.");
-                members.Add((field.Key, objField, objField.FieldType, field.ResolvedType));
-            }
-
-            return (bestConstructor, ctorFields, members);
-        }
-
-        /// <summary>
         /// Compiles a function to convert a dictionary to an object based on a specified <see cref="IInputObjectGraphType"/> instance.
         /// </summary>
         public static Func<IDictionary<string, object?>, object> CreateToObjectNewFunction(Type sourceType, IInputObjectGraphType graphType)
         {
-            var (bestConstructor, ctorFields, members) = GetReflectionInformation(sourceType, graphType);
+            var info = GetReflectionInformation(sourceType, graphType);
+            var bestConstructor = info.Constructor;
+            var ctorFields = info.CtorFields;
+            var members = info.MemberFields;
 
             // create expression; start with the parameter
             // then build the members
             var initExpression = Expression.MemberInit(
-                Expression.New(bestConstructor, ctorFields.Select(f => GetExpressionForParameter(f.Key, f.ClrType, f.GraphType))),
-                members.Select(member => Expression.Bind(member.Member, GetExpressionForParameter(member.Key, member.Type, member.ResolvedType))));
+                Expression.New(bestConstructor, ctorFields.Select(GetExpressionForParameter)),
+                members.Where(x => x.IsRequired || x.IsInitOnly).Select(member =>
+                {
+                    var type = member.Member is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)member.Member).FieldType;
+                    return Expression.Bind(member.Member, GetExpressionForParameter2(member.Key, type, member.GraphType));
+                }));
 
             // build the lambda
             var lambda = Expression.Lambda<Func<IDictionary<string, object?>, object>>(Expression.Convert(initExpression, typeof(object)), _dictionaryParam);
             return lambda.Compile();
 
-            static Expression GetExpressionForParameter(string key, Type type, IGraphType graphType)
+            static Expression GetExpressionForParameter((string? Key, ParameterInfo ParameterInfo, IGraphType? ResolvedType) member)
+            {
+                return member.Key != null
+                    ? GetExpressionForParameter2(member.Key, member.ParameterInfo.ParameterType, member.ResolvedType!)
+                    : Expression.Constant(member.ParameterInfo.DefaultValue, member.ParameterInfo.ParameterType);
+            }
+
+            static Expression GetExpressionForParameter2(string key, Type type, IGraphType graphType)
             {
                 var expr = Expression.Call(_getOrDefaultMethod, _dictionaryParam, Expression.Constant(key, typeof(string)));
                 return CoerceExpression(expr, type, graphType);

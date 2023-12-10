@@ -73,8 +73,10 @@ namespace GraphQL.Types
 
             // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
 #pragma warning disable IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
-            return value.ToObject(typeof(TSourceType), this);
+            //return value.ToObject(typeof(TSourceType), this);
 #pragma warning restore IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
+            _parseDictionary ??= ObjectExtensions.CreateToObjectNewFunction(typeof(TSourceType), this);
+            return _parseDictionary(value);
         }
 
         private Func<IDictionary<string, object?>, object>? _parseDictionary;
