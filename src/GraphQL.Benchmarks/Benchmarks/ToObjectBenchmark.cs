@@ -9,10 +9,10 @@ namespace GraphQL.Benchmarks;
 [MemoryDiagnoser]
 public class ToObjectBenchmark : IBenchmark
 {
-    private IGraphType _personType = null!;
-    private IGraphType _companyType = null!;
-    private IGraphType _employeeType = null!;
-    private IGraphType _salaryType = null!;
+    private IInputObjectGraphType _personType = null!;
+    private IInputObjectGraphType _companyType = null!;
+    private IInputObjectGraphType _employeeType = null!;
+    private IInputObjectGraphType _salaryType = null!;
     private Dictionary<string, object?> _personData = null!;
     private readonly Dictionary<string, object?> _noData = [];
     private Dictionary<string, object?> _companyData = null!;
@@ -29,10 +29,10 @@ public class ToObjectBenchmark : IBenchmark
         var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.Initialize();
-        _personType = schema.AllTypes[nameof(Person)]!;
-        _companyType = schema.AllTypes[nameof(Company)]!;
-        _employeeType = schema.AllTypes[nameof(Employee)]!;
-        _salaryType = schema.AllTypes[nameof(SalaryInfo)]!;
+        _personType = (IInputObjectGraphType)schema.AllTypes[nameof(Person)]!;
+        _companyType = (IInputObjectGraphType)schema.AllTypes[nameof(Company)]!;
+        _employeeType = (IInputObjectGraphType)schema.AllTypes[nameof(Employee)]!;
+        _salaryType = (IInputObjectGraphType)schema.AllTypes[nameof(SalaryInfo)]!;
         _personData = new Dictionary<string, object?>()
         {
             { "name", "John Doe" },
@@ -91,49 +91,49 @@ public class ToObjectBenchmark : IBenchmark
     [Benchmark]
     public void Person_Populated()
     {
-        ObjectExtensions.ToObject(_personData, typeof(Person), _personType);
+        _ = (Person)_personType.ParseDictionary(_personData);
     }
 
     [Benchmark]
     public void Person_Undefined()
     {
-        ObjectExtensions.ToObject(_noData, typeof(Person), _personType);
+        _ = (Person)_personType.ParseDictionary(_noData);
     }
 
     [Benchmark]
     public void Company_Populated()
     {
-        ObjectExtensions.ToObject(_companyData, typeof(Company), _companyType);
+        _ = (Company)_companyType.ParseDictionary(_companyData);
     }
 
     [Benchmark]
     public void Company_Undefined()
     {
-        ObjectExtensions.ToObject(_noData, typeof(Company), _companyType);
+        _ = (Company)_companyType.ParseDictionary(_noData);
     }
 
     [Benchmark]
     public void Employee_Populated()
     {
-        ObjectExtensions.ToObject(_employeeData, typeof(Employee), _employeeType);
+        _ = (Employee)_employeeType.ParseDictionary(_employeeData);
     }
 
     [Benchmark]
     public void Employee_Undefined()
     {
-        ObjectExtensions.ToObject(_noData, typeof(Employee), _employeeType);
+        _ = (Employee)_employeeType.ParseDictionary(_noData);
     }
 
     [Benchmark]
     public void Salary_Populated()
     {
-        ObjectExtensions.ToObject(_salaryData, typeof(SalaryInfo), _salaryType);
+        _ = (SalaryInfo)_salaryType.ParseDictionary(_salaryData);
     }
 
     [Benchmark]
     public void Salary_Undefined()
     {
-        ObjectExtensions.ToObject(_noData, typeof(SalaryInfo), _salaryType);
+        _ = (SalaryInfo)_salaryType.ParseDictionary(_noData);
     }
 
     void IBenchmark.RunProfiler() => Person_Populated();
