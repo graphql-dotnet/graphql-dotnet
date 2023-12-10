@@ -109,8 +109,24 @@ namespace GraphQL
         private struct ReflectionInfo
         {
             public ConstructorInfo Constructor;
-            public (string? Key, ParameterInfo ParameterInfo, IGraphType? GraphType)[] CtorFields;
-            public (string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType GraphType)[] MemberFields;
+            public CtorParameterInfo[] CtorFields;
+            public MemberFieldInfo[] MemberFields;
+
+            public struct CtorParameterInfo
+            {
+                public string? Key;
+                public ParameterInfo ParameterInfo;
+                public IGraphType? GraphType;
+            }
+
+            public struct MemberFieldInfo
+            {
+                public string Key;
+                public MemberInfo Member;
+                public bool IsInitOnly;
+                public bool IsRequired;
+                public IGraphType GraphType;
+            }
         }
 
         /// <summary>
@@ -156,8 +172,8 @@ namespace GraphQL
             // pull out parameters that are applicable for that constructor
             var memberCount = fields.Length;
             var ctorFields = ctorParameters.Length > 0
-                ? new (string? Key, ParameterInfo Parameter, IGraphType? GraphType)[ctorParameters.Length]
-                : Array.Empty<(string? Key, ParameterInfo Parameter, IGraphType? GraphType)>();
+                ? new ReflectionInfo.CtorParameterInfo[ctorParameters.Length]
+                : Array.Empty<ReflectionInfo.CtorParameterInfo>();
             for (var i = 0; i < ctorParameters.Length; i++)
             {
                 var ctorParam = ctorParameters[i];
@@ -166,7 +182,7 @@ namespace GraphQL
                 if (index == -1)
                 {
                     if (ctorParam.IsOptional)
-                        ctorFields[i] = (null, ctorParam, null);
+                        ctorFields[i] = new() { ParameterInfo = ctorParam };
                     else
                         throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
                 }
@@ -174,7 +190,12 @@ namespace GraphQL
                 {
                     // add to list, and mark to be removed from fields
                     var value = fields[index];
-                    ctorFields[i] = (value.Key, ctorParam, value.ResolvedType);
+                    ctorFields[i] = new()
+                    {
+                        Key = value.Key,
+                        ParameterInfo = ctorParam,
+                        GraphType = value.ResolvedType,
+                    };
                     value.MemberName = null;
                     fields[index] = value;
                     memberCount--;
@@ -183,8 +204,8 @@ namespace GraphQL
 
             // find other members
             var members = memberCount > 0
-                ? new (string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType ResolvedType)[memberCount]
-                : Array.Empty<(string Key, MemberInfo Member, bool IsInitOnly, bool IsRequired, IGraphType ResolvedType)>();
+                ? new ReflectionInfo.MemberFieldInfo[memberCount]
+                : Array.Empty<ReflectionInfo.MemberFieldInfo>();
             var memberIndex = 0;
             for (var i = 0; i < fields.Length; i++)
             {
@@ -196,7 +217,14 @@ namespace GraphQL
 #pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
                 var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
 #pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-                members[memberIndex++] = (field.Key, member, initOnly, isRequired, field.ResolvedType);
+                members[memberIndex++] = new()
+                {
+                    Key = field.Key,
+                    Member = member,
+                    IsInitOnly = initOnly,
+                    IsRequired = isRequired,
+                    GraphType = field.ResolvedType,
+                };
             }
 
             return new ReflectionInfo
