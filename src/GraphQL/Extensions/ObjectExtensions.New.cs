@@ -225,7 +225,8 @@ public static partial class ObjectExtensions
         //   are typically already converted to the correct type, as ParseDictionary
         //   is called during parsing, so this code path would not normally be hit.
 
-        // matches only when mappedType is an input object graph type AND the value is a dictionary
+        // matches only when mappedType is an input object graph type AND the value is a
+        //   dictionary (not yet parsed from a dictionary into an object)
         if (value is IDictionary<string, object?> dictionary)
         {
             // unwrap non-null graph type
