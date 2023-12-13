@@ -157,7 +157,7 @@ namespace GraphQL
                 fields[i] = (fieldType.Name, fieldName, resolvedType);
             }
 
-            // find best constructor to use, with preference to the constructor with the most parameters
+            // find best constructor to use
             var (bestConstructor, ctorParameters) = _types.GetOrAdd(
                 clrType,
                 static clrType =>
