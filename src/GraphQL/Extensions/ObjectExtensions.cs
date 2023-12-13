@@ -65,7 +65,9 @@ namespace GraphQL
             object obj;
             try
             {
-                obj = reflectionInfo.Constructor.Invoke(ctorArguments);
+                obj = reflectionInfo.CtorFields.Length == 0
+                    ? Activator.CreateInstance(type)!
+                    : reflectionInfo.Constructor.Invoke(ctorArguments);
             }
             catch (TargetInvocationException ex)
             {
@@ -157,7 +159,7 @@ namespace GraphQL
                 fields[i] = (fieldType.Name, fieldName, resolvedType);
             }
 
-            // find best constructor to use, with preference to the constructor with the most parameters
+            // find best constructor to use
             var (bestConstructor, ctorParameters) = _types.GetOrAdd(
                 clrType,
                 static clrType =>
@@ -283,6 +285,9 @@ namespace GraphQL
 
                 if (fieldInfo != null)
                 {
+                    if (fieldInfo.IsInitOnly)
+                        throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+
                     var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
 
                     return (fieldInfo, false, isRequired);

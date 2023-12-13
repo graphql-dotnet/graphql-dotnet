@@ -401,4 +401,36 @@ public class ObjectExtensionsTests
         public required int Month { get; set; } = -2;
         public int Year { get; set; } = -3;
     }
+
+    [Fact]
+    public void toobject_cannot_initialize_readonly_field()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema()
+        {
+            Query = queryObject
+        };
+        var inputType = new MyInput8Type();
+        schema.RegisterType(inputType);
+        schema.Initialize();
+
+        Should.Throw<InvalidOperationException>(() => inputType.ParseDictionary("{}".ToInputs()))
+            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+    }
+
+    private class MyInput8Type : InputObjectGraphType<MyInput8>
+    {
+        public MyInput8Type()
+        {
+            Field(x => x.Name);
+            Field(x => x.Age);
+        }
+    }
+
+    private class MyInput8
+    {
+        public required string Name { get; set; } = "abc";
+        public readonly int Age = -1;
+    }
 }

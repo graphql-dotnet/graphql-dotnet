@@ -110,6 +110,7 @@ This change was made to prevent duplicate registrations of the same service with
   - Otherwise an exception is thrown during deserialization.
 - Only public properties are eligible candidates when matching a property.
 - Any init-only or required properties not provided in the dictionary are set to their default values.
+- Only public writable fields are eligible candidates when matching a field.
 
 The changes above allow for matching behavior with source-generated or dynamically-compiled functions.
 
