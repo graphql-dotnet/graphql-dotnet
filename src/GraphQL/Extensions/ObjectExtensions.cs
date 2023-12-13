@@ -283,6 +283,9 @@ namespace GraphQL
 
                 if (fieldInfo != null)
                 {
+                    if (fieldInfo.IsInitOnly)
+                        throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+
                     var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
 
                     return (fieldInfo, false, isRequired);
