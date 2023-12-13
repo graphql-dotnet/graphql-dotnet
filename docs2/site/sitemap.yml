@@ -85,6 +85,31 @@
             file: links.md
           - title: Document Caching
             file: document-caching.md
+      - title: Analyzers
+        dir: analyzers
+        items:
+          - title: Overview
+            file: Overview.md
+          - title: GQL001
+            file: GQL001_DefineTheNameInFieldMethod.md
+          - title: GQL002
+            file: GQL002_NameMethodInvocationCanBeRemoved.md
+          - title: GQL003
+            file: GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
+          - title: GQL004
+            file: GQL004_DoNotUseObsoleteFieldMethods.md
+          - title: GQL005
+            file: GQL005_IllegalResolverUsage.md
+          - title: GQL006
+            file: GQL006_CanNotMatchInputFieldToTheSourceField.md
+          - title: GQL007
+            file: GQL007_CanNotSetSourceField.md
+          - title: GQL008
+            file: GQL008_DoNotUseObsoleteArgumentMethod.md
+          - title: GQL009
+            file: GQL009_UseAsyncResolver.md
+          - title: GQL011
+            file: GQL011_MustNotBeConvertibleToGraphType.md
       - title: Migration Guides
         dir: migrations
         items:
