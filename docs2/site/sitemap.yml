@@ -89,27 +89,27 @@
         dir: analyzers
         items:
           - title: Overview
-            file: Overview.md
+            file: overview.md
           - title: GQL001
-            file: GQL001_DefineTheNameInFieldMethod.md
+            file: gql001.md
           - title: GQL002
-            file: GQL002_NameMethodInvocationCanBeRemoved.md
+            file: gql002.md
           - title: GQL003
-            file: GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
+            file: gql003.md
           - title: GQL004
-            file: GQL004_DoNotUseObsoleteFieldMethods.md
+            file: gql004.md
           - title: GQL005
-            file: GQL005_IllegalResolverUsage.md
+            file: gql005.md
           - title: GQL006
-            file: GQL006_CanNotMatchInputFieldToTheSourceField.md
+            file: gql006.md
           - title: GQL007
-            file: GQL007_CanNotSetSourceField.md
+            file: gql007.md
           - title: GQL008
-            file: GQL008_DoNotUseObsoleteArgumentMethod.md
+            file: gql008.md
           - title: GQL009
-            file: GQL009_UseAsyncResolver.md
+            file: gql009.md
           - title: GQL011
-            file: GQL011_MustNotBeConvertibleToGraphType.md
+            file: gql011.md
       - title: Migration Guides
         dir: migrations
         items:

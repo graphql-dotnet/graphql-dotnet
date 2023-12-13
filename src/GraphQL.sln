@@ -169,17 +169,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Tests", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B}"
 	ProjectSection(SolutionItems) = preProject
-		..\docs2\site\docs\analyzers\GQL001_DefineTheNameInFieldMethod.md = ..\docs2\site\docs\analyzers\GQL001_DefineTheNameInFieldMethod.md
-		..\docs2\site\docs\analyzers\GQL002_NameMethodInvocationCanBeRemoved.md = ..\docs2\site\docs\analyzers\GQL002_NameMethodInvocationCanBeRemoved.md
-		..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md = ..\docs2\site\docs\analyzers\GQL003_DifferentNamesDefinedByFieldAndNameMethods.md
-		..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md = ..\docs2\site\docs\analyzers\GQL004_DoNotUseObsoleteFieldMethods.md
-		..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md = ..\docs2\site\docs\analyzers\GQL005_IllegalResolverUsage.md
-		..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md = ..\docs2\site\docs\analyzers\GQL006_CanNotMatchInputFieldToTheSourceField.md
-		..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md = ..\docs2\site\docs\analyzers\GQL007_CanNotSetSourceField.md
-		..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md = ..\docs2\site\docs\analyzers\GQL008_DoNotUseObsoleteArgumentMethod.md
-		..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md = ..\docs2\site\docs\analyzers\GQL009_UseAsyncResolver.md
-		..\docs2\site\docs\analyzers\GQL011_MustNotBeConvertibleToGraphType.md = ..\docs2\site\docs\analyzers\GQL011_MustNotBeConvertibleToGraphType.md
-		..\docs2\site\docs\analyzers\Overview.md = ..\docs2\site\docs\analyzers\Overview.md
+		..\docs2\site\docs\analyzers\gql001.md = ..\docs2\site\docs\analyzers\gql001.md
+		..\docs2\site\docs\analyzers\gql002.md = ..\docs2\site\docs\analyzers\gql002.md
+		..\docs2\site\docs\analyzers\gql003.md = ..\docs2\site\docs\analyzers\gql003.md
+		..\docs2\site\docs\analyzers\gql004.md = ..\docs2\site\docs\analyzers\gql004.md
+		..\docs2\site\docs\analyzers\gql005.md = ..\docs2\site\docs\analyzers\gql005.md
+		..\docs2\site\docs\analyzers\gql006.md = ..\docs2\site\docs\analyzers\gql006.md
+		..\docs2\site\docs\analyzers\gql007.md = ..\docs2\site\docs\analyzers\gql007.md
+		..\docs2\site\docs\analyzers\gql008.md = ..\docs2\site\docs\analyzers\gql008.md
+		..\docs2\site\docs\analyzers\gql009.md = ..\docs2\site\docs\analyzers\gql009.md
+		..\docs2\site\docs\analyzers\gql011.md = ..\docs2\site\docs\analyzers\gql011.md
+		..\docs2\site\docs\analyzers\overview_temp.md = ..\docs2\site\docs\analyzers\overview_temp.md
 	EndProjectSection
 EndProject
 Global
