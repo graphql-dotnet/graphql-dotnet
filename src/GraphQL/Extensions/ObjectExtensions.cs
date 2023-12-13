@@ -65,7 +65,9 @@ namespace GraphQL
             object obj;
             try
             {
-                obj = reflectionInfo.Constructor.Invoke(ctorArguments);
+                obj = reflectionInfo.CtorFields.Length == 0
+                    ? Activator.CreateInstance(type)!
+                    : reflectionInfo.Constructor.Invoke(ctorArguments);
             }
             catch (TargetInvocationException ex)
             {
