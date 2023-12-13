@@ -179,7 +179,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\gql008.md = ..\docs2\site\docs\analyzers\gql008.md
 		..\docs2\site\docs\analyzers\gql009.md = ..\docs2\site\docs\analyzers\gql009.md
 		..\docs2\site\docs\analyzers\gql011.md = ..\docs2\site\docs\analyzers\gql011.md
-		..\docs2\site\docs\analyzers\overview_temp.md = ..\docs2\site\docs\analyzers\overview_temp.md
+		..\docs2\site\docs\analyzers\overview.md = ..\docs2\site\docs\analyzers\overview.md
 	EndProjectSection
 EndProject
 Global
