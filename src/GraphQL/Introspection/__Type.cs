@@ -159,7 +159,7 @@ namespace GraphQL.Introspection
                 {
                     var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
-                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated", !deprecationOfInputValues);
 
                     int index = 0;
                     foreach (var field in type.Fields.List)
