@@ -28,7 +28,7 @@ public static partial class ObjectExtensions
     /// <summary>
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
     /// </summary>
-    internal static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info)
+    private static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info)
     {
         var bestConstructor = info.Constructor;
         var ctorFields = info.CtorFields;
