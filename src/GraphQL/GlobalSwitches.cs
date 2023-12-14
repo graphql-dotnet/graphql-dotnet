@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using GraphQL.Conversion;
 using GraphQL.Utilities;
 
@@ -105,12 +107,18 @@ public static class GlobalSwitches
     public static bool EnableReflectionCaching { get; set; }
 
     /// <summary>
-    /// Enables or disables the use of <see cref="System.Linq.Expressions.Expression"/> to dynamically compile
-    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})"/>
-    /// at runtime.
+    /// Enables or disables the use of dynamic compliation to compile the conversion of dictionaries to objects for
+    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})">InputObjectGraphType&lt;T&gt;.ParseDictionary</see>
+    /// at runtime. Compiled code is cached in memory for the lifetime of the input object graph type.
     /// <br/><br/>
-    /// By default enabled. <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
+    /// By default enabled for runtimes that support dynamic compilation (i.e. not AOT).
+    /// <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
     /// this value to <see langword="false"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
     /// </summary>
-    public static bool DynamicallyCompileToObject { get; set; } = true;
+    public static bool DynamicallyCompileToObject { get; set; } =
+#if NETSTANDARD2_0
+        true;
+#else
+        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
 }

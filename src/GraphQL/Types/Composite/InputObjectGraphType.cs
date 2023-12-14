@@ -65,7 +65,7 @@ namespace GraphQL.Types
         {
             base.Initialize(schema);
 
-            if (_parseDictionary == null) // only executes when typeof(TSourceType) != typeof(object)
+            if (_parseDictionary == null) // when typeof(TSourceType) != typeof(object)
             {
                 // check the value converter for a conversion from dictionary to this object type
                 var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
