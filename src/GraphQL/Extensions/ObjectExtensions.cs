@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
@@ -11,9 +12,8 @@ namespace GraphQL
     /// </summary>
     public static class ObjectExtensions
     {
-        private static readonly ConcurrentDictionary<Type, ConstructorInfo> _types = new();
-
-        private static readonly List<object?> _emptyValues = new();
+        private static readonly ConcurrentDictionary<Type, (ConstructorInfo Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
+        private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired)> _members = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
@@ -28,66 +28,16 @@ namespace GraphQL
         /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
-        public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType mappedType)
+        public static object ToObject(
+            this IDictionary<string, object?> source,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+            Type type,
+            IGraphType mappedType)
         {
             var inputGraphType = (mappedType is NonNullGraphType nonNullGraphType
                 ? nonNullGraphType.ResolvedType as IInputObjectGraphType
                 : mappedType as IInputObjectGraphType)
                 ?? throw new InvalidOperationException($"Graph type supplied is not an input object graph type.");
-
-            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
-            string GetPropertyName(string key, out FieldType field)
-            {
-                // type may not contain mapping information
-                field = inputGraphType.GetField(key)
-                    ?? throw new InvalidOperationException($"Could not find field '{key}' on type '{inputGraphType}'.");
-                return field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, key) ?? key;
-            }
-
-            // Returns values (from source or defaults) that match constructor signature + used keys from source
-            (List<object?>?, List<string?>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
-            {
-                // parameterless constructors are the most common use case
-                if (parameters.Length == 0)
-                    return (_emptyValues, null);
-
-                // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
-                List<object?>? values = null;
-                List<string?>? keys = null;
-
-                if (parameters.All(p =>
-                {
-                    // Source values take precedence
-                    if (source.Any(keyValue =>
-                    {
-                        bool matched = string.Equals(GetPropertyName(keyValue.Key, out var _), p.Name, StringComparison.InvariantCultureIgnoreCase);
-                        if (matched)
-                        {
-                            (values ??= new()).Add(keyValue.Value);
-                            (keys ??= new()).Add(keyValue.Key);
-                        }
-                        return matched;
-                    }))
-                    {
-                        return true;
-                    }
-
-                    // Then check for default values if any
-                    if (p.HasDefaultValue)
-                    {
-                        (values ??= new()).Add(p.DefaultValue);
-                        (keys ??= new()).Add(null);
-                        return true;
-                    }
-
-                    return false;
-                }))
-                {
-                    return (values, keys);
-                }
-
-                return (null, null);
-            }
 
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -96,54 +46,28 @@ namespace GraphQL
             if (ValueConverter.TryConvertTo(source, type, out object? result, typeof(IDictionary<string, object>)))
                 return result!;
 
-            if (type.IsAbstract)
-                throw new InvalidOperationException($"Type '{type}' is abstract and can not be used to construct objects from dictionary values. Please register a conversion within the ValueConverter or for input graph types override ParseDictionary method.");
+            var reflectionInfo = GetReflectionInformation(type, inputGraphType);
 
-            // attempt to use:
-            //   1. the only constructor
-            //   2. a constructor marked with GraphQLConstructorAttribute
-            //   3. the parameterless constructor
-            //   otherwise, throw
-            var ctor = _types.GetOrAdd(type, AutoRegisteringHelper.GetConstructor);
+            // build the constructor arguments
+            object?[] ctorArguments = reflectionInfo.CtorFields.Length == 0
+                ? Array.Empty<object>()
+                : new object[reflectionInfo.CtorFields.Length];
 
-            ConstructorInfo? targetCtor = null;
-            ParameterInfo[]? ctorParameters = null;
-            List<object?>? values = null;
-            List<string?>? usedKeys = null;
-
-            var parameters = ctor.GetParameters();
-            (values, usedKeys) = GetValuesAndUsedKeys(parameters);
-            if (values != null)
+            for (int i = 0; i < reflectionInfo.CtorFields.Length; ++i)
             {
-                targetCtor = ctor;
-                ctorParameters = parameters;
+                var ctorField = reflectionInfo.CtorFields[i];
+                ctorArguments[i] = ctorField.Key != null
+                    ? GetPropertyValue(source.TryGetValue(ctorField.Key, out var value) ? value : null, ctorField.ParameterInfo.ParameterType, ctorField.GraphType!)
+                    : ctorField.ParameterInfo.DefaultValue;
             }
 
-            if (targetCtor == null || ctorParameters == null || values == null)
-                throw new ArgumentException($"Type '{type}' does not contain a constructor that could be used for current input arguments.", nameof(type));
-
-            object?[] ctorArguments = ctorParameters.Length == 0 ? Array.Empty<object>() : new object[ctorParameters.Length];
-
-            for (int i = 0; i < ctorParameters.Length; ++i)
-            {
-                var fieldName = usedKeys![i];
-                if (fieldName is not null)
-                {
-                    var fieldType = inputGraphType.Fields.Find(fieldName)?.ResolvedType
-                        ?? throw new InvalidOperationException($"Could not get ResolvedType for field '{fieldName}' of type '{inputGraphType}'.");
-                    object? arg = GetPropertyValue(values[i], ctorParameters[i].ParameterType, fieldType);
-                    ctorArguments[i] = arg;
-                }
-                else
-                {
-                    ctorArguments[i] = values[i]; // default constructor argument
-                }
-            }
-
+            // construct the object
             object obj;
             try
             {
-                obj = targetCtor.Invoke(ctorArguments);
+                obj = reflectionInfo.CtorFields.Length == 0
+                    ? Activator.CreateInstance(type)!
+                    : reflectionInfo.Constructor.Invoke(ctorArguments);
             }
             catch (TargetInvocationException ex)
             {
@@ -151,52 +75,226 @@ namespace GraphQL
                 return ""; // never executed, necessary only for intellisense
             }
 
-            foreach (var item in source)
+            // populate the remaining fields
+            foreach (var field in reflectionInfo.MemberFields)
             {
-                // these parameters have already been used in the constructor, no need to set property
-                if (usedKeys?.Any(k => k == item.Key) == true)
-                    continue;
-
-                string propertyName = GetPropertyName(item.Key, out var field);
-                PropertyInfo? propertyInfo = null;
-
-                try
+                if (source.TryGetValue(field.Key, out var value))
                 {
-                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                }
-                catch (AmbiguousMatchException)
-                {
-                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                }
-
-                if (propertyInfo != null && propertyInfo.CanWrite)
-                {
-                    object? value = GetPropertyValue(item.Value, propertyInfo.PropertyType, field.ResolvedType
-                        ?? throw new InvalidOperationException($"Could not get ResolvedType for field '{field.Name}' of type '{inputGraphType}'."));
-                    propertyInfo.SetValue(obj, value, null); //issue: this works even if propertyInfo is ValueType and value is null
-                }
-                else
-                {
-                    FieldInfo? fieldInfo;
-
-                    try
+                    if (field.Member is PropertyInfo propertyInfo)
                     {
-                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        var coercedValue = GetPropertyValue(value, propertyInfo.PropertyType, field.GraphType);
+                        propertyInfo.SetValue(obj, coercedValue); //issue: this works even if propertyInfo is ValueType and value is null
                     }
-                    catch (AmbiguousMatchException)
+                    else if (field.Member is FieldInfo fieldInfo)
                     {
-                        fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+                        var coercedValue = GetPropertyValue(value, fieldInfo.FieldType, field.GraphType);
+                        fieldInfo.SetValue(obj, coercedValue);
                     }
-
-                    if (fieldInfo != null)
+                }
+                else if (field.IsInitOnly || field.IsRequired)
+                {
+                    // initialize all unspecified init-only or required properties
+                    if (field.Member is PropertyInfo propertyInfo)
                     {
-                        object? value = GetPropertyValue(item.Value, fieldInfo.FieldType, field.ResolvedType!);
-                        fieldInfo.SetValue(obj, value);
+                        propertyInfo.SetValue(obj, null);
+                    }
+                    else
+                    {
+                        ((FieldInfo)field.Member).SetValue(obj, null);
                     }
                 }
             }
 
             return obj;
+        }
+
+        private struct ReflectionInfo
+        {
+            public ConstructorInfo Constructor;
+            public CtorParameterInfo[] CtorFields;
+            public MemberFieldInfo[] MemberFields;
+
+            public struct CtorParameterInfo
+            {
+                public string? Key;
+                public ParameterInfo ParameterInfo;
+                public IGraphType? GraphType;
+            }
+
+            public struct MemberFieldInfo
+            {
+                public string Key;
+                public MemberInfo Member;
+                public bool IsInitOnly;
+                public bool IsRequired;
+                public IGraphType GraphType;
+            }
+        }
+
+        /// <summary>
+        /// Gets reflection information based on the specified CLR type and graph type.
+        /// </summary>
+        private static ReflectionInfo GetReflectionInformation(
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+            Type clrType,
+            IInputObjectGraphType graphType)
+        {
+            // gather for each field: dictionary key, clr property name, and graph type
+            var fields = new (string Key, string? MemberName, IGraphType ResolvedType)[graphType.Fields.Count];
+            for (var i = 0; i < graphType.Fields.Count; i++)
+            {
+                var fieldType = graphType.Fields.List[i];
+                // get clr property name (also used for matching on field name or constructor parameter name)
+                var fieldName = fieldType.GetMetadata<string>(InputObjectGraphType.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? fieldType.Name;
+                // get graph type
+                var resolvedType = fieldType.ResolvedType
+                    ?? throw new InvalidOperationException($"Field '{fieldType.Name}' of graph type '{graphType.Name}' does not have the ResolvedType property set.");
+                // verify no other fields have the same name
+                for (var j = 0; j < i; j++)
+                {
+                    if (fields[j].MemberName == fieldName)
+                        throw new InvalidOperationException($"Two fields within graph type '{graphType.Name}' were mapped to the same member '{fieldName}'.");
+                }
+                // add to list
+                fields[i] = (fieldType.Name, fieldName, resolvedType);
+            }
+
+            // find best constructor to use
+            var (bestConstructor, ctorParameters) = _types.GetOrAdd(
+                clrType,
+                static clrType =>
+                {
+#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    var constructor = AutoRegisteringHelper.GetConstructor(clrType);
+#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    var parameters = constructor.GetParameters();
+                    return (constructor, parameters);
+                });
+
+            // pull out parameters that are applicable for that constructor
+            var memberCount = fields.Length;
+            var ctorFields = ctorParameters.Length > 0
+                ? new ReflectionInfo.CtorParameterInfo[ctorParameters.Length]
+                : Array.Empty<ReflectionInfo.CtorParameterInfo>();
+            for (var i = 0; i < ctorParameters.Length; i++)
+            {
+                var ctorParam = ctorParameters[i];
+                // look for a field that matches the constructor parameter name
+                var index = Array.FindIndex<(string, string? MemberName, IGraphType)>(fields, 0, fields.Length, x => string.Equals(x.MemberName, ctorParam.Name, StringComparison.OrdinalIgnoreCase));
+                if (index == -1)
+                {
+                    if (ctorParam.IsOptional)
+                        ctorFields[i] = new() { ParameterInfo = ctorParam };
+                    else
+                        throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
+                }
+                else
+                {
+                    // add to list, and mark to be removed from fields
+                    var value = fields[index];
+                    ctorFields[i] = new()
+                    {
+                        Key = value.Key,
+                        ParameterInfo = ctorParam,
+                        GraphType = value.ResolvedType,
+                    };
+                    value.MemberName = null;
+                    fields[index] = value;
+                    memberCount--;
+                }
+            }
+
+            // find other members
+            var members = memberCount > 0
+                ? new ReflectionInfo.MemberFieldInfo[memberCount]
+                : Array.Empty<ReflectionInfo.MemberFieldInfo>();
+            var memberIndex = 0;
+            for (var i = 0; i < fields.Length; i++)
+            {
+                var field = fields[i];
+                // skip fields handled by constructor
+                if (field.MemberName == null)
+                    continue;
+                // look for match on type
+#pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+                var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
+#pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+                members[memberIndex++] = new()
+                {
+                    Key = field.Key,
+                    Member = member,
+                    IsInitOnly = initOnly,
+                    IsRequired = isRequired,
+                    GraphType = field.ResolvedType,
+                };
+            }
+
+            return new ReflectionInfo
+            {
+                Constructor = bestConstructor,
+                CtorFields = ctorFields,
+                MemberFields = members,
+            };
+
+            static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMatchingMember(
+                [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
+                Type type,
+                string propertyName)
+            {
+                PropertyInfo? propertyInfo = null;
+
+                // note: analzyer raises false IL2070 warning due to BindingFlags.IgnoreCase being present
+
+                try
+                {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                }
+                catch (AmbiguousMatchException)
+                {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                }
+
+                if (propertyInfo?.SetMethod?.IsPublic ?? false)
+                {
+                    var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
+                        .Any(type => type.FullName == typeof(IsExternalInit).FullName);
+
+                    var isRequired = propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+                    return (propertyInfo, isExternalInit, isRequired);
+                }
+
+                FieldInfo? fieldInfo;
+
+                try
+                {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                }
+                catch (AmbiguousMatchException)
+                {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                    fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+                }
+
+                if (fieldInfo != null)
+                {
+                    if (fieldInfo.IsInitOnly)
+                        throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+
+                    var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+                    return (fieldInfo, false, isRequired);
+                }
+
+                throw new InvalidOperationException($"Cannot find member named '{propertyName}' on CLR type '{type.GetFriendlyName()}'.");
+            }
         }
 
         /// <summary>

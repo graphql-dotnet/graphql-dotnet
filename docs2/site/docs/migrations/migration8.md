@@ -103,10 +103,16 @@ This change was made to prevent duplicate registrations of the same service with
 - `ObjectExtensions.ToObject<T>` was removed; it was only used by internal tests.
 - `ObjectExtensions.ToObject` requires input object graph type for conversion.
 - Only public constructors are eligible candidates while selecting a constructor.
-- If only a single public constructor is available, it is used.
-- If a public constructor is marked with `[GraphQLConstructor]`, it is used.
-- Otherwise the public parameterless constructor is used if available.
-- Otherwise an exception is thrown during deserialization.
+- Constructor is selected based on the following rules:
+  - If only a single public constructor is available, it is used.
+  - If a public constructor is marked with `[GraphQLConstructor]`, it is used.
+  - Otherwise the public parameterless constructor is used if available.
+  - Otherwise an exception is thrown during deserialization.
+- Only public properties are eligible candidates when matching a property.
+- Any init-only or required properties not provided in the dictionary are set to their default values.
+- Only public writable fields are eligible candidates when matching a field.
+
+The changes above allow for matching behavior with source-generated or dynamically-compiled functions.
 
 ### 7. `AutoRegisteringInputObjectGraphType` changes
 

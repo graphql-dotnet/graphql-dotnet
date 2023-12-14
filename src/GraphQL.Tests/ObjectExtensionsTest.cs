@@ -328,4 +328,95 @@ public class ObjectExtensionsTests
         [GraphQLConstructor]
         public MyInput4(string name) { Name = name; }
     }
+
+    [Fact]
+    public void toobject_sets_initonly_props()
+    {
+        var inputs = """{ "name": "tom" }""".ToInputs();
+        var person = inputs.ToObject<MyInput5>();
+        person.Name.ShouldBe("tom");
+    }
+
+    private class MyInput5
+    {
+        public string Name { get; init; }
+    }
+
+    [Fact]
+    public void toobject_initializes_initonly_props()
+    {
+        var inputs = """{ "company": "test", "month": 5 }""".ToInputs();
+        var person = inputs.ToObject<MyInput6>();
+        person.Name.ShouldBe(null);
+        person.Company.ShouldBe("test");
+        person.Description.ShouldBe("def");
+        person.Age.ShouldBe(0);
+        person.Month.ShouldBe(5);
+        person.Year.ShouldBe(-3);
+    }
+
+    private class MyInput6
+    {
+        public string Name { get; init; } = "abc";
+        public string Company { get; init; } = "ghi";
+        public string Description { get; set; } = "def";
+        public int Age { get; init; } = -1;
+        public int Month { get; init; } = -2;
+        public int Year { get; set; } = -3;
+    }
+
+    [Fact]
+    public void toobject_initializes_required_props()
+    {
+        var inputs = """{ "company": "test", "month": 5 }""".ToInputs();
+        var person = inputs.ToObject<MyInput7>();
+        person.Name.ShouldBe(null);
+        person.Company.ShouldBe("test");
+        person.Description.ShouldBe("def");
+        person.Age.ShouldBe(0);
+        person.Month.ShouldBe(5);
+        person.Year.ShouldBe(-3);
+    }
+
+    private class MyInput7
+    {
+        public required string Name { get; set; } = "abc";
+        public required string Company { get; set; } = "ghi";
+        public string Description { get; set; } = "def";
+        public required int Age { get; set; } = -1;
+        public required int Month { get; set; } = -2;
+        public int Year { get; set; } = -3;
+    }
+
+    [Fact]
+    public void toobject_cannot_initialize_readonly_field()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema()
+        {
+            Query = queryObject
+        };
+        var inputType = new MyInput8Type();
+        schema.RegisterType(inputType);
+        schema.Initialize();
+
+        Should.Throw<InvalidOperationException>(() => inputType.ParseDictionary("{}".ToInputs()))
+            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+    }
+
+    private class MyInput8Type : InputObjectGraphType<MyInput8>
+    {
+        public MyInput8Type()
+        {
+            Field(x => x.Name);
+            Field(x => x.Age);
+        }
+    }
+
+    private class MyInput8
+    {
+        public required string Name { get; set; } = "abc";
+        public readonly int Age = -1;
+    }
 }

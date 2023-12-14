@@ -10,6 +10,10 @@
     "DetailedBenchmarks": {
       "commandName": "Project",
       "commandLineArgs": "DetailedBenchmark"
+    },
+    "ToObjectBenchmarks": {
+      "commandName": "Project",
+      "commandLineArgs": "ToObjectBenchmark"
     }
   }
 }
