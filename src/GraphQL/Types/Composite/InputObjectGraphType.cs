@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using GraphQLParser.AST;
@@ -40,6 +41,8 @@ namespace GraphQL.Types
     /// <inheritdoc cref="IInputObjectGraphType"/>
     public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
+        private Func<IDictionary<string, object?>, object>? _parseDictionary;
+
         /// <summary>
         /// Initializes a new instance.
         /// </summary>
@@ -52,12 +55,46 @@ namespace GraphQL.Types
             : base(cloneFrom)
         {
             // if (cloneFrom == null) { /* initialization logic */ }
+
+            if (typeof(TSourceType) == typeof(object))
+            {
+                // for InputObjectGraphType just return the dictionary
+                _parseDictionary = static x => x;
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void Initialize(ISchema schema)
+        {
+            base.Initialize(schema);
+
+            if (_parseDictionary == null) // only executes when typeof(TSourceType) != typeof(object)
+            {
+                // check the value converter for a conversion from dictionary to this object type
+                var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), typeof(TSourceType));
+                if (conv != null)
+                {
+                    _parseDictionary = conv;
+                }
+                else if (GlobalSwitches.DynamicallyCompileToObject)
+                {
+                    // validate and compile the conversion from dictionary to object
+                    _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this);
+                }
+                else
+                {
+                    // use reflection to convert the dictionary to object
+                    _parseDictionary = ParseDictionaryViaReflection;
+                }
+            }
         }
 
         /// <summary>
         /// Converts a supplied dictionary of keys and values to an object.
-        /// The default implementation uses <see cref="ObjectExtensions.ToObject"/> to convert the
+        /// The default implementation uses <see cref="ObjectExtensions.ToObject(IDictionary{string, object?}, Type, IGraphType)"/> to convert the
         /// supplied field values into an object of type <typeparamref name="TSourceType"/>.
+        /// When <see cref="GlobalSwitches.DynamicallyCompileToObject"/> is <see langword="true"/>, this method is compiled to a delegate
+        /// during <see cref="Initialize"/> and the compiled delegate is used for all subsequent calls.
         /// Overriding this method allows for customizing the deserialization process of input objects,
         /// much like a field resolver does for output objects. For example, you can set some 'computed'
         /// properties for your input object which were not passed in the GraphQL request.
@@ -67,25 +104,19 @@ namespace GraphQL.Types
             if (value == null)
                 return null!;
 
-            // for InputObjectGraphType just return the dictionary
+            if (_parseDictionary != null)
+                return _parseDictionary(value);
+
+            // remainder of this method should not occur unless the user has overridden Initialize,
+            // which is likely only when they wish to override ParseDictionary
             if (typeof(TSourceType) == typeof(object))
                 return value;
 
-            // for InputObjectGraphType<TSourceType>, convert to TSourceType via ToObject.
-            if (GlobalSwitches.DynamicallyCompileToObject)
-            {
-                _parseDictionary ??= ObjectExtensions.CompileToObject(typeof(TSourceType), this);
-                return _parseDictionary(value);
-            }
-            else
-            {
-#pragma warning disable IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
-                return value.ToObject(typeof(TSourceType), this);
-#pragma warning restore IL2087 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The generic parameter of the source method or type does not have matching annotations.
-            }
+            return ParseDictionaryViaReflection(value);
         }
 
-        private Func<IDictionary<string, object?>, object>? _parseDictionary;
+        private object ParseDictionaryViaReflection(IDictionary<string, object?> value)
+            => value.ToObject(typeof(TSourceType), this);
 
         /// <inheritdoc/>
         public virtual bool IsValidDefault(object value)

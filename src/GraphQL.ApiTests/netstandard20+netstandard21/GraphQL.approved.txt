@@ -2282,6 +2282,7 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }

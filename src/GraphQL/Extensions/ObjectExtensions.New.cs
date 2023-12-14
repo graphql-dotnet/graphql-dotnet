@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
@@ -11,19 +10,32 @@ public static partial class ObjectExtensions
 {
     /// <summary>
     /// Compiles a function to convert a dictionary to an object based on a specified <see cref="IInputObjectGraphType"/> instance.
+    /// The compiled function assumes the passed dictionary object is not <see langword="null"/>.
     /// </summary>
     public static Func<IDictionary<string, object?>, object> CompileToObject(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         Type sourceType,
         IInputObjectGraphType graphType)
     {
+        var conv = ValueConverter.GetConversion(typeof(IDictionary<string, object?>), sourceType);
+        if (conv != null)
+            return conv;
+
         var info = GetReflectionInformation(sourceType, graphType);
+        return CompileToObject(info);
+    }
+
+    /// <summary>
+    /// Compiles a function to convert a dictionary to an object based on a specified <see cref="ReflectionInfo"/> instance.
+    /// </summary>
+    internal static Func<IDictionary<string, object?>, object> CompileToObject(ReflectionInfo info)
+    {
         var bestConstructor = info.Constructor;
         var ctorFields = info.CtorFields;
         var members = info.MemberFields;
 
         // T obj;
-        var objParam = Expression.Variable(sourceType, "obj");
+        var objParam = Expression.Variable(info.Type, "obj");
 
         // obj = new T(...) { ... };
         var expressions = new List<Expression>(members.Count(x => !x.IsRequired && !x.IsInitOnly) + 2)
@@ -237,6 +249,7 @@ public static partial class ObjectExtensions
             // process input object graph types
             if (mappedType is IInputObjectGraphType inputObjectGraphType)
             {
+                // note that ToObject checks the ValueConverter before parsing the dictionary
                 return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
             }
         }

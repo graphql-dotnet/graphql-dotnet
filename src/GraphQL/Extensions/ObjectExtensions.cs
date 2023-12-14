@@ -47,7 +47,15 @@ namespace GraphQL
                 return result!;
 
             var reflectionInfo = GetReflectionInformation(type, inputGraphType);
+            return ToObject(source, reflectionInfo);
+        }
 
+        /// <summary>
+        /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// Uses the constructor and properties specified by the supplied <see cref="ReflectionInfo"/>.
+        /// </summary>
+        internal static object ToObject(this IDictionary<string, object?> source, ReflectionInfo reflectionInfo)
+        {
             // build the constructor arguments
             object?[] ctorArguments = reflectionInfo.CtorFields.Length == 0
                 ? Array.Empty<object>()
@@ -66,7 +74,7 @@ namespace GraphQL
             try
             {
                 obj = reflectionInfo.CtorFields.Length == 0
-                    ? Activator.CreateInstance(type)!
+                    ? Activator.CreateInstance(reflectionInfo.Type)!
                     : reflectionInfo.Constructor.Invoke(ctorArguments);
             }
             catch (TargetInvocationException ex)
@@ -108,11 +116,13 @@ namespace GraphQL
             return obj;
         }
 
-        private struct ReflectionInfo
+        internal class ReflectionInfo
         {
-            public ConstructorInfo Constructor;
-            public CtorParameterInfo[] CtorFields;
-            public MemberFieldInfo[] MemberFields;
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+            public Type Type = null!;
+            public ConstructorInfo Constructor = null!;
+            public CtorParameterInfo[] CtorFields = null!;
+            public MemberFieldInfo[] MemberFields = null!;
 
             public struct CtorParameterInfo
             {
@@ -134,7 +144,7 @@ namespace GraphQL
         /// <summary>
         /// Gets reflection information based on the specified CLR type and graph type.
         /// </summary>
-        private static ReflectionInfo GetReflectionInformation(
+        internal static ReflectionInfo GetReflectionInformation(
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
             Type clrType,
             IInputObjectGraphType graphType)
@@ -231,6 +241,7 @@ namespace GraphQL
 
             return new ReflectionInfo
             {
+                Type = clrType,
                 Constructor = bestConstructor,
                 CtorFields = ctorFields,
                 MemberFields = members,
