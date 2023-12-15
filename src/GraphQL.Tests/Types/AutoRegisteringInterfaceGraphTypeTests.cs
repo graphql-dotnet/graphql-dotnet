@@ -270,7 +270,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null)]
     [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null)]
     [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123)]
-    public void Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value)
+    public void Argument_ResolverTests(string fieldName, string? arg1Name, object? arg1Value, int? arg2Value)
     {
         var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
