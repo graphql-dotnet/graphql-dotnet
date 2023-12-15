@@ -85,6 +85,31 @@
             file: links.md
           - title: Document Caching
             file: document-caching.md
+      - title: Analyzers
+        dir: analyzers
+        items:
+          - title: Overview
+            file: overview.md
+          - title: GQL001
+            file: gql001.md
+          - title: GQL002
+            file: gql002.md
+          - title: GQL003
+            file: gql003.md
+          - title: GQL004
+            file: gql004.md
+          - title: GQL005
+            file: gql005.md
+          - title: GQL006
+            file: gql006.md
+          - title: GQL007
+            file: gql007.md
+          - title: GQL008
+            file: gql008.md
+          - title: GQL009
+            file: gql009.md
+          - title: GQL011
+            file: gql011.md
       - title: Migration Guides
         dir: migrations
         items:
