@@ -123,9 +123,14 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
             if (invocationName != null)
             {
-                var leadingTrivia = reformat || newLine
-                    ? TriviaList(newLineTrivia, whitespaceTrivia)
-                    : TriviaList(whitespaceTrivia);
+                var argLeadingTrivia = arg.GetLeadingTrivia();
+                var leadingTrivia = reformat
+                    ? argLeadingTrivia.Any()
+                        ? TriviaList(newLineTrivia).AddRange(argLeadingTrivia)
+                        : TriviaList(newLineTrivia, whitespaceTrivia)
+                    : newLine
+                        ? TriviaList(newLineTrivia).AddRange(argLeadingTrivia)
+                        : TriviaList(whitespaceTrivia);
 
                 newFieldInvocationExpression = CreateInvocationExpression(
                     newFieldInvocationExpression,
@@ -140,6 +145,10 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         }
 
         docEditor.ReplaceNode(fieldInvocationExpression, newFieldInvocationExpression);
+
+        var x = await docEditor.GetChangedDocument().GetTextAsync(cancellationToken).ConfigureAwait(false);
+        var xx = x.ToString();
+
         return docEditor.GetChangedDocument();
     }
 

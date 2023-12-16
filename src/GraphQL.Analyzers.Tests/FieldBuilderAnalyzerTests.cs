@@ -328,6 +328,63 @@ public class FieldBuilderAnalyzerTests
     }
 
     [Fact]
+    public async Task ArgumentsListMultilineFormatted_FormattingPreserved3()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : InputObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>(
+                        "name",
+                        // arg comment
+                        arguments: new QueryArguments(
+                            new QueryArgument<StringGraphType> { Name = "argName1" },
+                            new QueryArgument<StringGraphType> { Name = "argName2" }
+                        ),
+                        // description comment
+                        description: "desc"
+                    );
+                }
+            }
+            """;
+
+        // NOTE: empty lines before the comment shouldn't appear,
+        // but I have no idea where they come from...
+        const string fix =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : InputObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("name")
+
+                        // arg comment
+                        .Arguments(new QueryArguments(
+                            new QueryArgument<StringGraphType> { Name = "argName1" },
+                            new QueryArgument<StringGraphType> { Name = "argName2" }
+                        ))
+
+                        // description comment
+                        .Description("desc");
+                }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 18, 10);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
     public async Task NonGenericFieldMethod_FixProvided()
     {
         const string source =
@@ -728,6 +785,71 @@ public class FieldBuilderAnalyzerTests
                         {FieldBuilderCodeFixProvider.ReformatOption} = true
                         ")
                         """)
+                }
+            }
+        };
+        await test.RunAsync();
+    }
+
+    [Fact]
+    public async Task ReformatOptionIsTrue_SourceReformatted2()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("name", "description",
+                        // comment
+                        deprecationReason: "reason",
+                        resolve: context => "text");
+                }
+            }
+            """;
+
+        const string fix =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("name")
+                        .Description("description")
+
+                        // comment
+                        .DeprecationReason("reason")
+                        .Resolve(context => "text");
+                }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
+        var test = new VerifyCS.Test
+        {
+            TestCode = source,
+            FixedCode = fix,
+            ExpectedDiagnostics = { expected },
+            TestState =
+            {
+                AnalyzerConfigFiles =
+                {
+                    ("/.editorconfig",
+                        $"""
+                         root = true
+
+                         [*]
+                         {FieldBuilderCodeFixProvider.ReformatOption} = true
+                         ")
+                         """)
                 }
             }
         };
