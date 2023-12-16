@@ -95,4 +95,31 @@ public class InputObjectGraphTypeTests
 
         public override object ParseDictionary(IDictionary<string, object?> value) => new MyInput2();
     }
+
+    [Fact]
+    public void overriding_initialize_still_works()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema() { Query = queryObject };
+        var inputType = new MyInput3Type();
+        schema.RegisterType(inputType);
+        schema.Initialize();
+        inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput3>();
+    }
+
+    public class MyInput3
+    {
+        public string? Name { get; set; }
+    }
+
+    public class MyInput3Type : InputObjectGraphType<MyInput3>
+    {
+        public MyInput3Type()
+        {
+            Field(x => x.Name);
+        }
+
+        public override void Initialize(ISchema schema) { }
+    }
 }

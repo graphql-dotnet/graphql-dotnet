@@ -636,5 +636,4 @@ public class ObjectExtensionsTests
     {
         public int[] Age { get; set; }
     }
-
 }
