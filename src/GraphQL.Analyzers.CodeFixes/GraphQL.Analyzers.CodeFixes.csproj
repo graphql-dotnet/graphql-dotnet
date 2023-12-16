@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Must verify that analzyers are recognized by VS after upgrading, as 4.7.0 was not working with VS 2022 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.6.0" />
+    <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
   </ItemGroup>
 
   <ItemGroup>
