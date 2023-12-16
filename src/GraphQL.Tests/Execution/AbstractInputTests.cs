@@ -7,14 +7,8 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
     [Fact]
     public void throws_literals()
     {
-        const string query = """
-            mutation M {
-              run(input: { id: "123" })
-            }
-            """;
-        var res = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
-        res.Errors[0].Code.ShouldBe("INVALID_LITERAL");
-        res.Errors[0].Message.ShouldBe("""Invalid literal for argument 'input' of field 'run'. No public constructors found on type 'MyInputClassBase'.""");
+        Should.Throw<InvalidOperationException>(() => Schema.Initialize())
+            .Message.ShouldBe("No public constructors found on CLR type 'MyInputClassBase'.");
     }
 }
 

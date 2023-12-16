@@ -136,6 +136,13 @@ public class ToObjectBenchmark : IBenchmark
         _ = (SalaryInfo)_salaryType.ParseDictionary(_noData);
     }
 
+    [Params(true, false)]
+    public bool UseCompilation
+    {
+        get => GlobalSwitches.DynamicallyCompileToObject;
+        set => GlobalSwitches.DynamicallyCompileToObject = value;
+    }
+
     void IBenchmark.RunProfiler() => Person_Populated();
 
     public class Query
@@ -187,8 +194,8 @@ public class ToObjectBenchmark : IBenchmark
     public class Company
     {
         public required string Name { get; set; }
-        public required List<Employee> Employees { get; set; }
-        public required List<CompanyAddress> Addresses { get; set; }
+        public required IList<Employee> Employees { get; set; }
+        public required IList<CompanyAddress> Addresses { get; set; }
         public required string EmailAddress { get; set; }
         public required string PhoneNumber { get; set; }
         public Uri? Website { get; set; }

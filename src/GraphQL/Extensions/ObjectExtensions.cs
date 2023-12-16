@@ -10,7 +10,7 @@ namespace GraphQL
     /// <summary>
     /// Provides extension methods for objects and a method for converting a dictionary into a strongly typed object.
     /// </summary>
-    public static class ObjectExtensions
+    public static partial class ObjectExtensions
     {
         private static readonly ConcurrentDictionary<Type, (ConstructorInfo Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
         private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired)> _members = new();
@@ -47,7 +47,15 @@ namespace GraphQL
                 return result!;
 
             var reflectionInfo = GetReflectionInformation(type, inputGraphType);
+            return ToObject(source, reflectionInfo);
+        }
 
+        /// <summary>
+        /// Creates a new instance of the indicated type, populating it with the dictionary.
+        /// Uses the constructor and properties specified by the supplied <see cref="ReflectionInfo"/>.
+        /// </summary>
+        private static object ToObject(this IDictionary<string, object?> source, ReflectionInfo reflectionInfo)
+        {
             // build the constructor arguments
             object?[] ctorArguments = reflectionInfo.CtorFields.Length == 0
                 ? Array.Empty<object>()
@@ -66,7 +74,7 @@ namespace GraphQL
             try
             {
                 obj = reflectionInfo.CtorFields.Length == 0
-                    ? Activator.CreateInstance(type)!
+                    ? Activator.CreateInstance(reflectionInfo.Type)!
                     : reflectionInfo.Constructor.Invoke(ctorArguments);
             }
             catch (TargetInvocationException ex)
@@ -108,26 +116,57 @@ namespace GraphQL
             return obj;
         }
 
-        private struct ReflectionInfo
+        private readonly ref struct ReflectionInfo
         {
-            public ConstructorInfo Constructor;
-            public CtorParameterInfo[] CtorFields;
-            public MemberFieldInfo[] MemberFields;
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+            public readonly Type Type;
+            public readonly ConstructorInfo Constructor;
+            public readonly CtorParameterInfo[] CtorFields;
+            public readonly MemberFieldInfo[] MemberFields;
 
-            public struct CtorParameterInfo
+            public ReflectionInfo(
+                [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
+                Type type,
+                ConstructorInfo constructor,
+                CtorParameterInfo[] ctorFields,
+                MemberFieldInfo[] memberFields)
             {
-                public string? Key;
-                public ParameterInfo ParameterInfo;
-                public IGraphType? GraphType;
+                Type = type;
+                Constructor = constructor;
+                CtorFields = ctorFields;
+                MemberFields = memberFields;
             }
 
-            public struct MemberFieldInfo
+            public readonly struct CtorParameterInfo
             {
-                public string Key;
-                public MemberInfo Member;
-                public bool IsInitOnly;
-                public bool IsRequired;
-                public IGraphType GraphType;
+                public readonly string? Key;
+                public readonly ParameterInfo ParameterInfo;
+                public readonly IGraphType? GraphType;
+
+                public CtorParameterInfo(string? key, ParameterInfo parameterInfo, IGraphType? graphType)
+                {
+                    Key = key;
+                    ParameterInfo = parameterInfo;
+                    GraphType = graphType;
+                }
+            }
+
+            public readonly struct MemberFieldInfo
+            {
+                public readonly string Key;
+                public readonly MemberInfo Member;
+                public readonly bool IsInitOnly;
+                public readonly bool IsRequired;
+                public readonly IGraphType GraphType;
+
+                public MemberFieldInfo(string key, MemberInfo member, bool isInitOnly, bool isRequired, IGraphType graphType)
+                {
+                    Key = key;
+                    Member = member;
+                    IsInitOnly = isInitOnly;
+                    IsRequired = isRequired;
+                    GraphType = graphType;
+                }
             }
         }
 
@@ -184,20 +223,15 @@ namespace GraphQL
                 if (index == -1)
                 {
                     if (ctorParam.IsOptional)
-                        ctorFields[i] = new() { ParameterInfo = ctorParam };
+                        ctorFields[i] = new(key: null, ctorParam, graphType: null);
                     else
-                        throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
+                        throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for CLR type '{clrType.GetFriendlyName()}'.");
                 }
                 else
                 {
                     // add to list, and mark to be removed from fields
                     var value = fields[index];
-                    ctorFields[i] = new()
-                    {
-                        Key = value.Key,
-                        ParameterInfo = ctorParam,
-                        GraphType = value.ResolvedType,
-                    };
+                    ctorFields[i] = new(value.Key, ctorParam, value.ResolvedType);
                     value.MemberName = null;
                     fields[index] = value;
                     memberCount--;
@@ -219,22 +253,10 @@ namespace GraphQL
 #pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
                 var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
 #pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-                members[memberIndex++] = new()
-                {
-                    Key = field.Key,
-                    Member = member,
-                    IsInitOnly = initOnly,
-                    IsRequired = isRequired,
-                    GraphType = field.ResolvedType,
-                };
+                members[memberIndex++] = new(field.Key, member, initOnly, isRequired, field.ResolvedType);
             }
 
-            return new ReflectionInfo
-            {
-                Constructor = bestConstructor,
-                CtorFields = ctorFields,
-                MemberFields = members,
-            };
+            return new ReflectionInfo(clrType, bestConstructor, ctorFields, members);
 
             static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMatchingMember(
                 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
@@ -364,7 +386,7 @@ namespace GraphQL
                 }
 
                 if (propertyValue is not IEnumerable valueList)
-                    return newCollection;
+                    throw new InvalidOperationException($"Cannot coerce collection of CLR type '{propertyValue.GetType().GetFriendlyName()}' to IEnumerable for graph type '{mappedType}'.");
 
                 // Array of known size is populated in-place
                 if (fieldType.IsArray && propertyValueAsIList != null)

@@ -330,6 +330,11 @@ public class SchemaTypes : IEnumerable<IGraphType>
         Debug.Assert((_context.InitializationTrace?.Count ?? 0) == 0);
 
         _typeDictionary = null!; // not needed once initialization is complete
+
+        foreach (var type in Dictionary.Values)
+        {
+            type.Initialize(schema);
+        }
     }
 
     private static (IEnumerable<IGraphType>, IEnumerable<Type>) GetSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
@@ -537,7 +542,6 @@ public class SchemaTypes : IEnumerable<IGraphType>
             throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
         }
 
-        type.Initialize(context.Schema);
         if (context.InitializationTrace != null)
             type.WithMetadata(INITIALIZATIION_TRACE_KEY, string.Join(Environment.NewLine, context.InitializationTrace));
         SetGraphType(type.Name, type);

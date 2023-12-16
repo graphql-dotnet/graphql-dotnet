@@ -357,9 +357,9 @@ namespace GraphQL.Types
             if (ret == null)
             {
                 if (sourceType.GetConstructors().Length == 0)
-                    throw new InvalidOperationException($"No public constructors found on type '{sourceType.GetFriendlyName()}'.");
+                    throw new InvalidOperationException($"No public constructors found on CLR type '{sourceType.GetFriendlyName()}'.");
                 else
-                    throw new InvalidOperationException($"Type '{sourceType.GetFriendlyName()}' must have a public parameterless constructor, a single constructor, or a public constructor marked with " + nameof(GraphQLConstructorAttribute) + ".");
+                    throw new InvalidOperationException($"CLR type '{sourceType.GetFriendlyName()}' must have a public parameterless constructor, a single constructor, or a public constructor marked with " + nameof(GraphQLConstructorAttribute) + ".");
             }
             return ret;
         }
