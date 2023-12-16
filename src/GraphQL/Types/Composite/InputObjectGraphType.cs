@@ -60,6 +60,7 @@ namespace GraphQL.Types
             }
         }
 
+        private static readonly Type[] _parseDictionaryParameterTypes = [typeof(IDictionary<string, object?>)];
         /// <inheritdoc/>
         public override void Initialize(ISchema schema)
         {
@@ -75,8 +76,17 @@ namespace GraphQL.Types
                 }
                 else if (GlobalSwitches.DynamicallyCompileToObject)
                 {
-                    // validate and compile the conversion from dictionary to object
-                    _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this);
+                    // check if the user has overridden ParseDictionary
+                    if (GetType().GetMethod(nameof(ParseDictionary), _parseDictionaryParameterTypes)!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
+                    {
+                        // if the user has not, validate and compile the conversion from dictionary to object immediately
+                        _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this);
+                    }
+                    else
+                    {
+                        // if they have, validate and compile upon first use (if any)
+                        _parseDictionary = data => (_parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this))(data);
+                    }
                 }
                 else
                 {
@@ -104,11 +114,7 @@ namespace GraphQL.Types
             if (_parseDictionary != null)
                 return _parseDictionary(value);
 
-            // remainder of this method should not occur unless the user has overridden Initialize,
-            // which is likely only when they wish to override ParseDictionary
-            if (typeof(TSourceType) == typeof(object))
-                return value;
-
+            // remainder of this method should not occur unless the user has overridden Initialize
             return ParseDictionaryViaReflection(value);
         }
 

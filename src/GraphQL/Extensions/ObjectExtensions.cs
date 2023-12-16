@@ -223,7 +223,7 @@ namespace GraphQL
                 if (index == -1)
                 {
                     if (ctorParam.IsOptional)
-                        ctorFields[i] = new(null, ctorParam, null);
+                        ctorFields[i] = new(key: null, ctorParam, graphType: null);
                     else
                         throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
                 }

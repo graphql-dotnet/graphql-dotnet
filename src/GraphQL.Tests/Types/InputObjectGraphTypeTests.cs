@@ -1,3 +1,5 @@
+#nullable enable
+
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
@@ -19,5 +21,58 @@ public class InputObjectGraphTypeTests
         var type = new ObjectGraphType();
         var exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Field<InputObjectGraphType>("test"));
         exception.Message.ShouldContain("Output type 'Object' can have fields only of output types: ScalarGraphType, ObjectGraphType, InterfaceGraphType, UnionGraphType or EnumerationGraphType.");
+    }
+
+    [Fact]
+    public void invalid_type_throws()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema() { Query = queryObject };
+        var inputType = new MyInputType();
+        schema.RegisterType(inputType);
+
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("No public constructors found on CLR type 'MyInput'.");
+
+    }
+
+    [Fact]
+    public void overriding_parsedictionary_ignores_type_validation()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema() { Query = queryObject };
+        var inputType = new MyInputCustomParseDictionaryType();
+        schema.RegisterType(inputType);
+        schema.Initialize();
+        inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+    }
+
+    public abstract class MyInput
+    {
+        public string? Name { get; set; }
+    }
+
+    public class MyInput2 : MyInput
+    {
+    }
+
+    public class MyInputType : InputObjectGraphType<MyInput>
+    {
+        public MyInputType()
+        {
+            Field(x => x.Name);
+        }
+    }
+
+    public class MyInputCustomParseDictionaryType : InputObjectGraphType<MyInput>
+    {
+        public MyInputCustomParseDictionaryType()
+        {
+            Field(x => x.Name);
+        }
+
+        public override object ParseDictionary(IDictionary<string, object?> value) => new MyInput2();
     }
 }
