@@ -448,7 +448,7 @@ public static partial class ObjectExtensions
     private static readonly MethodInfo _getEnumeratorMethod = typeof(IEnumerable).GetMethod(nameof(IEnumerable.GetEnumerator))!;
     private static readonly MethodInfo _moveNextMethod = typeof(IEnumerator).GetMethod(nameof(IEnumerator.MoveNext))!;
     private static readonly PropertyInfo _currentProperty = typeof(IEnumerator).GetProperty(nameof(IEnumerator.Current))!;
-    private static readonly ParameterExpression _dictionaryParam = Expression.Parameter(typeof(IDictionary<string, object?>));
+    private static readonly ParameterExpression _dictionaryParam = Expression.Parameter(typeof(IDictionary<string, object?>), "dic");
 
     private static readonly MethodInfo _getOrDefaultMethod = typeof(ObjectExtensions).GetMethod(nameof(GetOrDefaultImplementation), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static ValueTuple<object?, bool> GetOrDefaultImplementation(IDictionary<string, object?> obj, string key)
