@@ -225,7 +225,7 @@ namespace GraphQL
                     if (ctorParam.IsOptional)
                         ctorFields[i] = new(key: null, ctorParam, graphType: null);
                     else
-                        throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for type '{clrType.GetFriendlyName()}'.");
+                        throw new InvalidOperationException($"Cannot find field named '{ctorParam.Name}' on graph type '{graphType.Name}' to fulfill constructor parameter for CLR type '{clrType.GetFriendlyName()}'.");
                 }
                 else
                 {

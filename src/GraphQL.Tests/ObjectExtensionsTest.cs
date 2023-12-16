@@ -1,3 +1,4 @@
+using System.Numerics;
 using GraphQL.Types;
 
 namespace GraphQL.Tests;
@@ -431,5 +432,195 @@ public class ObjectExtensionsTests
     {
         public required string Name { get; set; } = "abc";
         public readonly int Age = -1;
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    [InlineData(true, true)]
+    public void toobject_uses_valueconverter(bool compile, bool withValueConverter)
+    {
+        var inputs = """{ "name": "tom", "age": 10 }""".ToInputs();
+        if (withValueConverter)
+            ValueConverter.Register(_ => new MyInput9("testing"));
+        try
+        {
+            if (withValueConverter)
+            {
+                inputs.ToObject<MyInput9>(compile).ShouldNotBeNull();
+            }
+            else
+            {
+                Should.Throw<InvalidOperationException>(() => inputs.ToObject<MyInput9>(compile));
+            }
+        }
+        finally
+        {
+            ValueConverter.Register<MyInput9>(null);
+        }
+    }
+
+    private class MyInput9
+    {
+        public MyInput9(string dummy) { _ = dummy; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_uses_constructor_with_optional_parameters(bool compile)
+    {
+        var inputs = """{ "name": "tom" }""".ToInputs();
+        var value = inputs.ToObject<MyInput10>(compile).ShouldNotBeNull();
+        value.Name.ShouldBe("tom");
+    }
+
+    public class MyInput10
+    {
+        public MyInput10(string name, int age = 10)
+        {
+            Name = name;
+            age.ShouldBe(10);
+        }
+
+        public string Name { get; }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_throws_for_constructor_with_unknown_parameters(bool compile)
+    {
+        var inputs = """{ "name": "tom" }""".ToInputs();
+        Should.Throw<InvalidOperationException>(() => inputs.ToObject<MyInput11>(compile))
+            .Message.ShouldBe("Cannot find field named 'age' on graph type 'MyInput11' to fulfill constructor parameter for CLR type 'MyInput11'.");
+    }
+
+    public class MyInput11
+    {
+        public MyInput11(string name, int age)
+        {
+            Name = name;
+            _ = age;
+        }
+
+        public string Name { get; }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_works_for_fields(bool compile)
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema()
+        {
+            Query = queryObject
+        };
+        var inputType = new InputObjectGraphType<MyInput12>();
+        inputType.Field(x => x.Name);
+        schema.RegisterType(inputType);
+        schema.Initialize();
+
+        var inputs = """{ "name": "tom" }""".ToInputs();
+        object value;
+        if (compile)
+        {
+            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput12), inputType)(inputs);
+        }
+        else
+        {
+            value = inputs.ToObject(typeof(MyInput12), inputType);
+        }
+        value.ShouldBeOfType<MyInput12>().Name.ShouldBe("tom");
+    }
+
+    public class MyInput12
+    {
+        public string Name;
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_throws_for_invalid_list_type(bool compiled)
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema()
+        {
+            Query = queryObject
+        };
+        var inputType = new InputObjectGraphType<MyInput12>();
+        inputType.Field(x => x.Name, type: typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
+        schema.RegisterType(inputType);
+        if (compiled)
+        {
+            Should.Throw<InvalidOperationException>(() => schema.Initialize())
+                .Message.ShouldBe("Could not determine enumerable type for CLR type 'String' while coercing graph type '[Int]'.");
+        }
+        else
+        {
+            GlobalSwitches.DynamicallyCompileToObject = false;
+            try
+            {
+                schema.Initialize();
+                Should.Throw<InvalidOperationException>(() => inputType.ParseDictionary("""{ "name": [1,2,3] }""".ToInputs()));
+            }
+            finally
+            {
+                GlobalSwitches.DynamicallyCompileToObject = true;
+            }
+        }
+    }
+
+    public class MyInput13
+    {
+        public string Name;
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_works_nested_complex_objects(bool compile)
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema()
+        {
+            Query = queryObject
+        };
+        var inputType15 = new InputObjectGraphType() { Name = "Input15" };
+        inputType15.Field<StringGraphType>("Name");
+        var inputType = new InputObjectGraphType() { Name = "Input14" };
+        inputType.Field("Person", inputType15);
+        schema.RegisterType(inputType);
+        schema.Initialize();
+
+        var inputs = """{ "person": { "name": "tom" } }""".ToInputs();
+        object value;
+        if (compile)
+        {
+            value = GraphQL.ObjectExtensions.CompileToObject(typeof(MyInput14), inputType)(inputs);
+        }
+        else
+        {
+            value = inputs.ToObject(typeof(MyInput14), inputType);
+        }
+        value.ShouldBeOfType<MyInput14>().Person.ShouldNotBeNull().Name.ShouldBe("tom");
+    }
+
+    public class MyInput14
+    {
+        public MyInput15 Person { get; set; }
+    }
+
+    public class MyInput15
+    {
+        public string Name { get; set; }
     }
 }

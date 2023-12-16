@@ -190,7 +190,7 @@ public static partial class ObjectExtensions
                     }
                 }
                 if (elementType == null)
-                    throw new InvalidOperationException($"Could not determine enumerable type for type '{type.GetFriendlyName()}' while coercing graph type '{graphType}'.");
+                    throw new InvalidOperationException($"Could not determine enumerable type for CLR type '{type.GetFriendlyName()}' while coercing graph type '{graphType}'.");
                 // create an expression that represents this:
                 // (IEnumerable<object>?)expr?.Select(x => CoerceExpression(x, elementType, listGraphType.ResolvedType))
                 Func<ParameterExpression, Expression> loopContent = (loopVar) => CoerceExpression(loopVar, elementType, elementGraphType);

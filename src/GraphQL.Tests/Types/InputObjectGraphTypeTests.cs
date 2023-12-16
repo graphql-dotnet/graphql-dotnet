@@ -4,6 +4,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
 
+[Collection("StaticTests")]
 public class InputObjectGraphTypeTests
 {
     [Fact]
@@ -34,7 +35,26 @@ public class InputObjectGraphTypeTests
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
             .Message.ShouldBe("No public constructors found on CLR type 'MyInput'.");
+    }
 
+    [Fact]
+    public void registered_value_converter_skips_validation()
+    {
+        var queryObject = new ObjectGraphType() { Name = "Query" };
+        queryObject.Field<StringGraphType>("dummy");
+        var schema = new Schema() { Query = queryObject };
+        var inputType = new MyInputType();
+        schema.RegisterType(inputType);
+        ValueConverter.Register<MyInput>(_ => new MyInput2());
+        try
+        {
+            schema.Initialize();
+            inputType.ParseDictionary(new Dictionary<string, object?>()).ShouldBeOfType<MyInput2>();
+        }
+        finally
+        {
+            ValueConverter.Register<MyInput>(null);
+        }
     }
 
     [Fact]
