@@ -266,11 +266,11 @@ public static partial class ObjectExtensions
          * {
          *     if (collectionVar is IList && !asList)
          *     {
-         *         result = (TReturnType)SelectOrNull2(collectionVar, loopVar, loopContent, asArray, asList);
+         *         result = (TReturnType)SelectList(collectionVar, loopVar, loopContent, asArray, asList);
          *     }
          *     else if (collectionVar is IEnumerable)
          *     {
-         *         result = (TReturnType)SelectOrNull1(collectionVar, loopVar, loopContent, asArray, asList);
+         *         result = (TReturnType)SelectEnumerable(collectionVar, loopVar, loopContent, asArray, asList);
          *     }
          *     else
          *     {
