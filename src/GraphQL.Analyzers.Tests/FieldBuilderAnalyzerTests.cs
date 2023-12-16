@@ -281,6 +281,53 @@ public class FieldBuilderAnalyzerTests
     }
 
     [Fact]
+    public async Task ArgumentsListMultilineFormatted_FormattingPreserved2()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : InputObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>(
+                        "name",
+                        arguments: new QueryArguments(
+                            new QueryArgument<StringGraphType> { Name = "argName1" },
+                            new QueryArgument<StringGraphType> { Name = "argName2" }
+                        )
+                    );
+                }
+            }
+            """;
+
+        const string fix =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : InputObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("name")
+                        .Arguments(new QueryArguments(
+                            new QueryArgument<StringGraphType> { Name = "argName1" },
+                            new QueryArgument<StringGraphType> { Name = "argName2" }
+                        ));
+                }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 15, 10);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
     public async Task NonGenericFieldMethod_FixProvided()
     {
         const string source =

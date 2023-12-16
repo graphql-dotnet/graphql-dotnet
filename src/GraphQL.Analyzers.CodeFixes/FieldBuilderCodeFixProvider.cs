@@ -130,7 +130,10 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
                 newFieldInvocationExpression = CreateInvocationExpression(
                     newFieldInvocationExpression,
                     invocationName,
-                    arg.Expression,
+                    arg.Expression
+                        .WithTrailingTrivia(
+                            arg.Expression.GetTrailingTrivia()
+                                .Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia))),
                     leadingTrivia,
                     skipNulls);
             }
