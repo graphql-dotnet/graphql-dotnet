@@ -39,7 +39,7 @@ jobs:
         working-directory: docs2
         run: yarn gatsby build
       - name: Upload documentation as workflow artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Documentation
           path: docs2/public/**
@@ -61,7 +61,7 @@ jobs:
         working-directory: src
         run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o out
       - name: Upload Nuget packages as workflow artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Nuget packages
           path: |
