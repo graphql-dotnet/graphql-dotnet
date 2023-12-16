@@ -386,7 +386,7 @@ namespace GraphQL
                 }
 
                 if (propertyValue is not IEnumerable valueList)
-                    return newCollection;
+                    throw new InvalidOperationException($"Cannot coerce collection of CLR type '{propertyValue.GetType().GetFriendlyName()}' to IEnumerable for graph type '{mappedType}'.");
 
                 // Array of known size is populated in-place
                 if (fieldType.IsArray && propertyValueAsIList != null)

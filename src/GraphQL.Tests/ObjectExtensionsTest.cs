@@ -1,4 +1,3 @@
-using System.Numerics;
 using GraphQL.Types;
 
 namespace GraphQL.Tests;
@@ -555,7 +554,7 @@ public class ObjectExtensionsTests
         {
             Query = queryObject
         };
-        var inputType = new InputObjectGraphType<MyInput12>();
+        var inputType = new InputObjectGraphType<MyInput13>();
         inputType.Field(x => x.Name, type: typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
         schema.RegisterType(inputType);
         if (compiled)
@@ -580,7 +579,7 @@ public class ObjectExtensionsTests
 
     public class MyInput13
     {
-        public string Name;
+        public string Name { get; set; }
     }
 
     [Theory]
@@ -623,4 +622,19 @@ public class ObjectExtensionsTests
     {
         public string Name { get; set; }
     }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void toobject_throws_for_invalid_collection_type(bool compiled)
+    {
+        Should.Throw<InvalidOperationException>(() => """{ "age": 3.5 }""".ToInputs().ToObject<MyInput16>(compiled))
+            .Message.ShouldBe("Cannot coerce collection of CLR type 'Double' to IEnumerable for graph type '[Int!]'.");
+    }
+
+    public class MyInput16
+    {
+        public int[] Age { get; set; }
+    }
+
 }
