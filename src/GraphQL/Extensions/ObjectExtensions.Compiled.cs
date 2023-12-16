@@ -91,7 +91,7 @@ public static partial class ObjectExtensions
             /*
              * ValueTuple<object?, bool> value;
              * T ret;
-             * value = GetOrDefaultImplementation2(dic, key);
+             * value = GetOrDefaultImplementation(dic, key);
              * if (value.Item2)
              * {
              *     ret = CoerceExpression<T>(value.Item1, member.MemberType, member.GraphType);
