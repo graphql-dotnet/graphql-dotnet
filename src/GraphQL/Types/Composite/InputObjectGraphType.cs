@@ -60,7 +60,6 @@ namespace GraphQL.Types
             }
         }
 
-        private static readonly Type[] _parseDictionaryParameterTypes = [typeof(IDictionary<string, object?>)];
         /// <inheritdoc/>
         public override void Initialize(ISchema schema)
         {
@@ -77,7 +76,7 @@ namespace GraphQL.Types
                 else if (GlobalSwitches.DynamicallyCompileToObject)
                 {
                     // check if the user has overridden ParseDictionary
-                    if (GetType().GetMethod(nameof(ParseDictionary), _parseDictionaryParameterTypes)!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
+                    if (GetType().GetMethod(nameof(ParseDictionary), [typeof(IDictionary<string, object?>)])!.DeclaringType == typeof(InputObjectGraphType<TSourceType>))
                     {
                         // if the user has not, validate and compile the conversion from dictionary to object immediately
                         _parseDictionary = ObjectExtensions.CompileToObject(typeof(TSourceType), this);
