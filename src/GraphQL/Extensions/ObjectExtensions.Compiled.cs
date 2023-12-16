@@ -339,26 +339,20 @@ public static partial class ObjectExtensions
         Debug.Assert(indexerProperty != null);
 
         /*
-         * IList collectionVar;
-         * T[] listVariable;
-         * 
-         * collectionVar = collection;
-         * if (collectionVar != null)
+         * IList collectionVar = collection;
+         * countVar = collectionVar.Count;
+         * T[] listVariable = new T[countVar];
+         * index i = 0;
+         * while (true)
          * {
-         *     countVar = collectionVar.Count;
-         *     listVariable = new T[countVar];
-         *     index i = 0;
-         *     while (true)
+         *     if (i < countVar)
          *     {
-         *         if (i < countVar)
-         *         {
-         *             T loopVar = collectionVar[i];
-         *             listVariable[i++] = {loopContent};
-         *         }
-         *         else
-         *         {
-         *             break;
-         *         }
+         *         T loopVar = collectionVar[i];
+         *         listVariable[i++] = {loopContent};
+         *     }
+         *     else
+         *     {
+         *         break;
          *     }
          * }
          * return listVariable;
@@ -368,7 +362,6 @@ public static partial class ObjectExtensions
             listType,
             [collectionVar, listVariable, indexVar, countVar],
             Expression.Assign(collectionVar, collection),
-            Expression.Assign(listVariable, Expression.Constant(null, listVariable.Type)),
             Expression.Assign(countVar, Expression.Property(collectionVar, collectionCountProperty)),
             Expression.Assign(listVariable, Expression.NewArrayBounds(loopContent.Type, countVar)),
             Expression.Assign(indexVar, Expression.Constant(0, indexVar.Type)),
@@ -406,21 +399,14 @@ public static partial class ObjectExtensions
         Debug.Assert(toArrayMethod != null);
 
         /*
-         * IEnumerable collectionVar;
-         * IEnumerator enumeratorVar;
-         * List<T> listVariable;
-         * TList returnVariable; // TList = List<T> or T[] depending on asArray
-         * 
-         * collectionVar = collection;
-         * returnVariable = null;
-         * enumeratorVar = collectionVar.GetEnumerator();
-         * listVariable = new();
+         * IEnumerable collectionVar = collection;
+         * IEnumerator enumeratorVar = collectionVar.GetEnumerator();
+         * List<T> listVariable = new();
          * while (true)
          * {
          *     if (enumerator.MoveNext() == true)
          *     {
-         *         T loopVar;
-         *         loopVar = enumerator.Current;
+         *         T loopVar = enumerator.Current;
          *         listVariable.Add( {loopContent} );
          *     }
          *     else
