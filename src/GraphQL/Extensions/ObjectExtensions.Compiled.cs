@@ -41,10 +41,10 @@ public static partial class ObjectExtensions
         var expressions = new List<Expression>(members.Count(x => !x.IsRequired && !x.IsInitOnly) + 2)
         {
             Expression.Assign(
-            objParam,
-            Expression.MemberInit(
-                Expression.New(bestConstructor, ctorFields.Select(GetExpressionForCtorParameter)),
-                members.Where(x => x.IsRequired || x.IsInitOnly).Select(GetBindingForMember)))
+                objParam,
+                Expression.MemberInit(
+                    Expression.New(bestConstructor, ctorFields.Select(GetExpressionForCtorParameter)),
+                    members.Where(x => x.IsRequired || x.IsInitOnly).Select(GetBindingForMember)))
         };
 
         // set properties on obj when they exist in the dictionary
