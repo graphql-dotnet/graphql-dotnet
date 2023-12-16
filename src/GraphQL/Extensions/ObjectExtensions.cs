@@ -137,7 +137,7 @@ namespace GraphQL
                 MemberFields = memberFields;
             }
 
-            public readonly record struct CtorParameterInfo
+            public readonly struct CtorParameterInfo
             {
                 public readonly string? Key;
                 public readonly ParameterInfo ParameterInfo;
