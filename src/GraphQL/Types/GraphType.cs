@@ -51,6 +51,9 @@ namespace GraphQL.Types
         {
             var type = GetType();
 
+            if (!GlobalSwitches.UseLegacyTypeNaming)
+                return type.GraphQLName();
+
             string name = type.Name;
             if (GlobalSwitches.UseDeclaringTypeNames)
             {
