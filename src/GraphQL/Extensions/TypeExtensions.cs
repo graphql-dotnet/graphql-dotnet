@@ -143,7 +143,6 @@ namespace GraphQL
 
             if (typeName == nameof(GraphType) || typeName == nameof(Type))
                 return typeName;
-#pragma warning restore CS1718 // Comparison made to same variable
 
             typeName = typeName.Replace(nameof(GraphType), nameof(Type));
 
