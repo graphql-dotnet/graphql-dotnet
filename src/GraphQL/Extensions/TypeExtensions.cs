@@ -108,7 +108,7 @@ namespace GraphQL
                         var parent = type.DeclaringType;
                         while (parent != null)
                         {
-                            name = parent.Name + "_" + name;
+                            name = $"{parent.Name}_{name}";
                             parent = parent.DeclaringType;
                         }
                     }
