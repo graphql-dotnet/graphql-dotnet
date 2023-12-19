@@ -141,7 +141,6 @@ namespace GraphQL
                 typeName = typeName.Substring(0, typeName.IndexOf('`'));
             }
 
-#pragma warning disable CS1718 // Comparison made to same variable
             if (typeName == nameof(GraphType) || typeName == nameof(Type))
                 return typeName;
 #pragma warning restore CS1718 // Comparison made to same variable
