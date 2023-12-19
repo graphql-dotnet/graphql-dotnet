@@ -30,6 +30,7 @@ public class TypeExtensionTests
     [InlineData(false, false, typeof(GenericClassGraph<Class1, string>), "Class1StringGenericClassGraph")]
     [InlineData(false, false, typeof(GenericClassGraphType<Class1, string>), "Class1StringGenericClass")]
     [InlineData(false, true, typeof(Class1), "TypeExtensionTests_Class1")]
+    [InlineData(false, true, typeof(GenericClass<Class1>), "TypeExtensionTests_Class1TypeExtensionTests_GenericClass")]
     [InlineData(false, false, typeof(NonNullGraphType<StringGraphType>), "String")]
     [InlineData(false, false, typeof(ListGraphType<StringGraphType>), "String")]
     [InlineData(false, false, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>), "String")]
@@ -58,12 +59,15 @@ public class TypeExtensionTests
     [InlineData(true, false, typeof(GenericClassGraph<Class1, string>), "GenericClassGraph")]
     [InlineData(true, false, typeof(GenericClassGraphType<Class1, string>), "GenericClass")]
     [InlineData(true, true, typeof(Class1), "Class1")]
+    [InlineData(true, true, typeof(GenericClass<Class1>), "GenericClass")]
     [InlineData(true, false, typeof(NonNullGraphType<StringGraphType>), "String")]
     [InlineData(true, false, typeof(ListGraphType<StringGraphType>), "String")]
     [InlineData(true, false, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>), "String")]
     [InlineData(true, false, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<InputObjectGraphType<Class1>>>>), "InputObject")]
     [InlineData(true, false, typeof(ConnectionType<StringGraphType>), "Connection")]
     [InlineData(true, false, typeof(Connection<string>), "Connection")]
+
+    // note: cannot test F# anonymous class names within C# tests
     public void GraphQLNameTest(bool useLegacyTypeNaming, bool useDeclaringTypeNames, Type type, string expected)
     {
         var oldUseLegacyTypeNaming = GlobalSwitches.UseLegacyTypeNaming;
