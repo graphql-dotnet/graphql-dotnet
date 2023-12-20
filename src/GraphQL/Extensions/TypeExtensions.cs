@@ -80,10 +80,14 @@ namespace GraphQL
                 static string NameOf(Type type)
                 {
                     type = type.GetNamedType();
-                    var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-                    if (!string.IsNullOrEmpty(attr?.Name))
+
+                    if (!typeof(IGraphType).IsAssignableFrom(type))
                     {
-                        return attr!.Name!;
+                        var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+                        if (!string.IsNullOrEmpty(attr?.Name))
+                        {
+                            return attr!.Name!;
+                        }
                     }
 
                     var name = type.Name;
