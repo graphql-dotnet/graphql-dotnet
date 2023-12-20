@@ -121,3 +121,28 @@ The changes above allow for matching behavior with source-generated or dynamical
   chosen constructor. Comparison is case-insensitive, matching `ToObject` behavior.
   Does not register constructor parameters that are not read-only properties.
   Any attributes such as `[Id]` must be applied to the property, not the constructor parameter.
+
+### 8. Default naming of generic graph types has changed
+
+The default graph name of generic types has changed to include the generic type name.
+This should reduce naming conflicts when generics are in use. See below examples:
+
+| Graph type class name | Old graph type name | New graph type name |
+|------------------|---------------------|---------------------|
+| `AutoRegisteringObjectGraphType<SearchResults<Person>>` | `SearchResults` | `PersonSearchResults` |
+| `LoggerGraphType<Person, string>` | `Logger` | `PersonStringLogger` |
+
+To revert to the prior behavior, set the following global switch prior to creating your schema classes:
+
+```csharp
+using GraphQL;
+
+GlobalSwitches.UseLegacyTypeNaming = true;
+```
+
+As usual, you are encouraged to set the name in the constructor of your class, or
+immediately after construction, or for auto-registering types, via an attribute.
+You can also set global attributes that will be applied to all auto-registering types
+if you wish to define your own naming logic.
+
+The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.

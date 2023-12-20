@@ -95,7 +95,8 @@ public static class GlobalSwitches
     /// <summary>
     /// Use the v7 naming strategy for graph type names.
     /// </summary>
-    public static bool UseLegacyTypeNaming { get; set; } = true;
+    [Obsolete("This property will be removed in v9.")]
+    public static bool UseLegacyTypeNaming { get; set; } = false;
 
     /// <summary>
     /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
