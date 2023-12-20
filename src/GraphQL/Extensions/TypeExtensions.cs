@@ -72,7 +72,9 @@ namespace GraphQL
         /// <returns>A string containing a GraphQL compatible type name.</returns>
         public static string GraphQLName(this Type type)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
             if (!GlobalSwitches.UseLegacyTypeNaming)
+#pragma warning restore CS0618 // Type or member is obsolete
             {
                 return NameOf(type)
                     .Replace('@', '_'); // F# anonymous class support

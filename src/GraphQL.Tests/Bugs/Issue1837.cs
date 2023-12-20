@@ -60,7 +60,7 @@ public class Issue1837ArrayInputType : InputObjectGraphType
                 Name = "abc"
             });
         });
-        ex.Message.ShouldStartWith("Input type 'Issue1837ArrayInputType' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type.");
+        ex.Message.ShouldStartWith("Input type 'Issue1837ArrayInput' can have fields only of input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType. Field 'abc' has an output type.");
 
         AddField(new FieldType
         {
