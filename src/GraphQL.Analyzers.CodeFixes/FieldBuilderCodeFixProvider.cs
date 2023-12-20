@@ -89,7 +89,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         // now handle rest of the arguments
         var args = GetArgumentsWithNames(fieldInvocationExpression, semanticModel);
 
-        foreach ((string name, var arg, bool newLine) in args)
+        foreach ((string name, var arg, var prevTrailingTrivia) in args)
         {
             string? invocationName = null;
             switch (name)
@@ -123,20 +123,46 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
 
             if (invocationName != null)
             {
-                var leadingTrivia = reformat || newLine
-                    ? TriviaList(newLineTrivia, whitespaceTrivia)
-                    : TriviaList(whitespaceTrivia);
+                var leadingTrivia = ComputeLeadingTrivia();
 
                 newFieldInvocationExpression = CreateInvocationExpression(
                     newFieldInvocationExpression,
                     invocationName,
-                    arg.Expression,
+                    arg.Expression
+                        .WithTrailingTrivia(
+                            arg.Expression.GetTrailingTrivia()
+                                .Where(t => !t.IsKind(SyntaxKind.EndOfLineTrivia))),
                     leadingTrivia,
                     skipNulls);
+            }
+
+            SyntaxTriviaList ComputeLeadingTrivia()
+            {
+                var argLeadingTrivia = arg.GetLeadingTrivia();
+                bool hasNewLine = prevTrailingTrivia.Any(trivia => trivia.Token.TrailingTrivia
+                    .Any(trailingTrivia => trailingTrivia.IsKind(SyntaxKind.EndOfLineTrivia)));
+
+                if (hasNewLine)
+                {
+                    return prevTrailingTrivia.AddRange(argLeadingTrivia);
+                }
+
+                if (reformat)
+                {
+                    return prevTrailingTrivia
+                        .Add(newLineTrivia)
+                        .Add(whitespaceTrivia)
+                        .AddRange(argLeadingTrivia);
+                }
+
+                return TriviaList(whitespaceTrivia)
+                    .AddRange(prevTrailingTrivia)
+                    .AddRange(argLeadingTrivia);
             }
         }
 
         docEditor.ReplaceNode(fieldInvocationExpression, newFieldInvocationExpression);
+
         return docEditor.GetChangedDocument();
     }
 
@@ -189,7 +215,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         }
     }
 
-    private static IEnumerable<(string name, ArgumentSyntax argument, bool newLine)> GetArgumentsWithNames(
+    private static IEnumerable<(string name, ArgumentSyntax argument, SyntaxTriviaList prevTrailingTrivia)> GetArgumentsWithNames(
         InvocationExpressionSyntax invocation,
         SemanticModel semanticModel)
     {
@@ -197,7 +223,7 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         var @params = methodSymbol.Parameters;
 
         int index = 0;
-        bool newLine = false;
+        var prevTrailingTrivia = SyntaxTriviaList.Empty;
 
         foreach (var nodeOrToken in invocation.ArgumentList.ChildNodesAndTokens())
         {
@@ -205,11 +231,11 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             {
                 if (arg.NameColon != null)
                 {
-                    yield return (arg.NameColon.Name.Identifier.Text, arg, newLine);
+                    yield return (arg.NameColon.Name.Identifier.Text, arg, prevTrailingTrivia);
                 }
                 else
                 {
-                    yield return (@params[index].Name, arg, newLine);
+                    yield return (@params[index].Name, arg, prevTrailingTrivia);
                 }
 
                 index++;
@@ -217,11 +243,9 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             else if (nodeOrToken.IsToken)
             {
                 // if any token has trailing EndOfLineTrivia, the next argument will start on the new line
-                newLine = nodeOrToken
+                prevTrailingTrivia = nodeOrToken
                     .AsToken()
-                    .GetAllTrivia()
-                    .Any(trivia => trivia.Token.TrailingTrivia
-                        .Any(trailingTrivia => trailingTrivia.IsKind(SyntaxKind.EndOfLineTrivia)));
+                    .TrailingTrivia;
             }
         }
     }

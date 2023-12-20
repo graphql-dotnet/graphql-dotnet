@@ -93,6 +93,11 @@ public static class GlobalSwitches
     public static bool RequireRootQueryType { get; set; } = true;
 
     /// <summary>
+    /// Use the v7 naming strategy for graph type names.
+    /// </summary>
+    public static bool UseLegacyTypeNaming { get; set; } = true;
+
+    /// <summary>
     /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
     /// useful for scoped schemas.
     /// <br/><br/>
