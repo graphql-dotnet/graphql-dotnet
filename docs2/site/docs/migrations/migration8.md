@@ -127,7 +127,7 @@ The changes above allow for matching behavior with source-generated or dynamical
 The default graph name of generic types has changed to include the generic type name.
 This should reduce naming conflicts when generics are in use. To consolidate behavior
 across different code paths, both `Type` and `GraphType` are stripped from the end
-of the class name.  See below examples:
+of the class name. See below examples:
 
 | Graph type class name | Old graph type name | New graph type name |
 |------------------|---------------------|---------------------|
