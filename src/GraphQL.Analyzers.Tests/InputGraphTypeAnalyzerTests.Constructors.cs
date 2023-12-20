@@ -14,7 +14,7 @@ public partial class InputGraphTypeAnalyzerTests
     [InlineData("public MySource(string name) { }", false)]
     [InlineData("private MySource(string name) { }", true)]
     [InlineData("internal MySource(string name) { }", true)]
-    public async Task SingleConstructor_GQL010_WhenNonPublic(string constructor, bool report)
+    public async Task SingleConstructor_GQL010_WhenNonPublic(string? constructor, bool report)
     {
         string source =
             $$"""
@@ -117,7 +117,7 @@ public partial class InputGraphTypeAnalyzerTests
     [InlineData("[GraphQLConstructor]", "[GraphQLConstructor]", true)]
     [InlineData("[Another]", "[GraphQLConstructor]", false)]
     [InlineData("[Another]", "[Another]", true)]
-    public async Task TwoNonDefaultConstructors_WithAttribute_GQL010_WhenNotSingleGraphQLConstructorAttribute(string attribute1, string attribute2, bool report)
+    public async Task TwoNonDefaultConstructors_WithAttribute_GQL010_WhenNotSingleGraphQLConstructorAttribute(string? attribute1, string? attribute2, bool report)
     {
         string source =
             $$"""

@@ -26,7 +26,7 @@ public class LiteralValuesTests
     [InlineData("""query ($arg3: Date = "3") { str (arg3: $arg3) }""", null, true, "DEFAULT_VALUES_OF_CORRECT_TYPE", "Variable 'arg3' of type 'Date' has invalid default value '\"3\"'. Expected type 'Date', found \"3\".", 1, 22)]
     [InlineData("""query ($arg4: Test = "3") { str (arg4: $arg4) }""", null, false, "INVALID_LITERAL", "Invalid literal for node. Error parsing test literal", 1, 22)]
     [InlineData("""query ($arg4: Test = "3") { str (arg4: $arg4) }""", null, true, "INVALID_LITERAL", "Invalid literal for node. Error parsing test literal", 1, 22)]
-    public async void Test_Input(string query, string variables, bool useRules, string code, string message, int line, int column)
+    public async void Test_Input(string query, string? variables, bool useRules, string code, string message, int line, int column)
     {
         var schema = new MySchema();
         schema.Initialize();
