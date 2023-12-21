@@ -2,6 +2,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
 
+[Collection("StaticTests")]
 public class ObjectGraphTypeTests
 {
     private class TestInterface : InterfaceGraphType { }
@@ -51,10 +52,21 @@ public class ObjectGraphTypeTests
         }
     }
 
-    [Fact]
-    public void should_ignore_graphqlmetadata_attribute()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void should_ignore_graphqlmetadata_attribute(bool useLegacyTypeNaming)
     {
-        var type = new TypeWithAttribute();
-        type.Name.ShouldBe("TypeWithAttribute");
+        var oldUseLegacyTypeNaming = GlobalSwitches.UseLegacyTypeNaming;
+        GlobalSwitches.UseLegacyTypeNaming = useLegacyTypeNaming;
+        try
+        {
+            var type = new TypeWithAttribute();
+            type.Name.ShouldBe("TypeWithAttribute");
+        }
+        finally
+        {
+            GlobalSwitches.UseLegacyTypeNaming = oldUseLegacyTypeNaming;
+        }
     }
 }
