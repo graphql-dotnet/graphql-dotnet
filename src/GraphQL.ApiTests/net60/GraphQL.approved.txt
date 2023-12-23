@@ -1764,6 +1764,8 @@ namespace GraphQL.Telemetry
         protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Diagnostics.Activity? StartActivity(GraphQL.ExecutionOptions options) { }
+        [System.Obsolete("Use the sync method \'StartActivity\'. This method will be removed in v8.")]
         protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivityAsync(GraphQL.ExecutionOptions options) { }
     }
 }
