@@ -49,8 +49,10 @@ public sealed class OpenTelemetryTests : IDisposable
 
     public void Dispose() => _host.Dispose();
 
-    [Fact]
-    public void CanInitializeTelemetryViaReflection()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CanInitializeTelemetryViaReflection(bool thenOverride)
     {
         //note: requires [Collection("StaticTests")] on the test class to ensure that no other tests are run concurrently
         try
@@ -72,15 +74,31 @@ public sealed class OpenTelemetryTests : IDisposable
             // verify that the initializer was called
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
 
-            // verify that the telemetry service is added implicitly
-            var services = new ServiceCollection();
-            services.AddGraphQL(_ => { });
-            var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldNotBeNull();
-            serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
-            serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
-
-            // ensure auto-telemetry is still enabled
-            OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+            if (!thenOverride)
+            {
+                var services = new ServiceCollection();
+                services.AddGraphQL(b => { });
+                // verify that the telemetry service is added implicitly
+                var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldNotBeNull();
+                serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+                serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+                // verify that no other telemetry service was added
+                services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldBeNull();
+                // ensure auto-telemetry is still enabled
+                OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+            }
+            else
+            {
+                // verify that the telemetry service is added implicitly
+                var services = new ServiceCollection();
+                services.AddGraphQL(b => b.UseTelemetry());
+                services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldBeNull();
+                var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
+                serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+                serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+                // ensure auto-telemetry is disabled
+                OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
+            }
         }
         finally
         {
