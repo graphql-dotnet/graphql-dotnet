@@ -57,7 +57,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     // make sure no accidental use of the default constructor by DI by making it private,
     // accessible only through AutoTelemetryProvider, a shared static instance
-    internal static GraphQLTelemetryProvider? _autoTelemetryProvider;
+    private static GraphQLTelemetryProvider? _autoTelemetryProvider;
     internal static GraphQLTelemetryProvider AutoTelemetryProvider => _autoTelemetryProvider ??= new GraphQLTelemetryProvider();
 
     /// <inheritdoc/>
