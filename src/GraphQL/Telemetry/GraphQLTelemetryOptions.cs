@@ -26,7 +26,7 @@ public class GraphQLTelemetryOptions
     /// <summary>
     /// Indicates whether to collect telemetry about the GraphQL query execution.
     /// If filter returns <see langword="true" />, the telemetry is collected.
-    /// If filter returns <see langword="false" />, the telemetry about the GraphQL query
+    /// If filter returns <see langword="false" />, the telemetry for the GraphQL query
     /// and all the downstream calls is not collected.
     /// </summary>
     public Func<ExecutionOptions, bool> Filter { get; set; } = _ => true;
