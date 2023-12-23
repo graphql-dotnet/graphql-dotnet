@@ -24,7 +24,10 @@ public class GraphQLTelemetryOptions
     public Func<ExecutionOptions, string?> SanitizeDocument { get; set; } = options => options.Query;
 
     /// <summary>
-    /// Indicates whether the GraphQL execution is included in the telemetry.
+    /// Indicates whether to collect telemetry about the GraphQL query execution.
+    /// If filter returns <see langword="true" />, the telemetry is collected.
+    /// If filter returns <see langword="false" />, the telemetry about the GraphQL query
+    /// and all the downstream calls is not collected.
     /// </summary>
     public Func<ExecutionOptions, bool> Filter { get; set; } = _ => true;
 

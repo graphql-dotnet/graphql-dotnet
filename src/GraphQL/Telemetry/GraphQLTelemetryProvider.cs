@@ -50,9 +50,6 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// <inheritdoc/>
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (!_telemetryOptions.Filter(options))
-            return await next(options).ConfigureAwait(false);
-
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
 #pragma warning disable CS0618 // Type or member is obsolete
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
@@ -61,6 +58,25 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         // do not record any telemetry if there are no listeners or it decided not to sample the current request
         if (activity == null)
             return await next(options).ConfigureAwait(false);
+
+        if (!activity.IsAllDataRequested)
+            return await next(options).ConfigureAwait(false);
+
+        try
+        {
+            if (!_telemetryOptions.Filter(options))
+            {
+                activity.IsAllDataRequested = false;
+                activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+                return await next(options).ConfigureAwait(false);
+            }
+        }
+        catch
+        {
+            activity.IsAllDataRequested = false;
+            activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+            return await next(options).ConfigureAwait(false);
+        }
 
         // record the requested operation name and optionally the GraphQL document
         await SetInitialTagsAsync(activity, options).ConfigureAwait(false);
