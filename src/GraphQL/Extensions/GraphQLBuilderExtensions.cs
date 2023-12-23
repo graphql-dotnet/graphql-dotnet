@@ -1196,6 +1196,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Configures the GraphQL engine to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
     /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
     /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
+    /// Disables auto-instrumentation for GraphQL.
     /// </summary>
     /// <remarks>
     /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
@@ -1206,8 +1207,29 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
     public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
     {
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
         builder.Services.Configure(configure);
         builder.Services.TryRegister<IConfigureExecution, GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder)
+        where TProvider : GraphQLTelemetryProvider
+    {
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+        builder.ConfigureExecution<TProvider>();
+        return builder;
+    }
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, TProvider telemetryProvider)
+        where TProvider : GraphQLTelemetryProvider
+    {
+        if (telemetryProvider == null)
+            throw new ArgumentNullException(nameof(telemetryProvider));
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+        builder.ConfigureExecution(telemetryProvider);
         return builder;
     }
 #endif
