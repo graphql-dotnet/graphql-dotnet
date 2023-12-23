@@ -89,10 +89,11 @@ public sealed class OpenTelemetryTests : IDisposable
             }
             else
             {
-                // verify that the telemetry service is added implicitly
                 var services = new ServiceCollection();
                 services.AddGraphQL(b => b.UseTelemetry());
+                // verify that the telemetry service is not added implicitly
                 services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldBeNull();
+                // verify that the explicitly added telemetry service was added
                 var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
                 serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
                 serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
