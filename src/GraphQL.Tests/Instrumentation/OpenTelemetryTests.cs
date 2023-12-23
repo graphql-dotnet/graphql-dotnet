@@ -7,7 +7,6 @@ using GraphQL.Telemetry;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
