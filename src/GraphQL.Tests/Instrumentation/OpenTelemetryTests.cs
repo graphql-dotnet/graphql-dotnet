@@ -129,6 +129,8 @@ public sealed class OpenTelemetryTests : IDisposable
     [InlineData(4)]
     [InlineData(5)]
     [InlineData(6)]
+    [InlineData(7)]
+    [InlineData(8)]
     public async Task BasicTest(int registrationMethod)
     {
         _hostBuilder = new HostBuilder()
