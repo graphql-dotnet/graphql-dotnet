@@ -20,6 +20,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 {
     private readonly GraphQLTelemetryOptions _telemetryOptions;
     private const string ACTIVITY_OPERATION_NAME = "graphql";
+    private readonly bool _onlyWhenAutoTelemetryEnabled;
 
     /// <summary>
     /// Returns an <see cref="System.Diagnostics.ActivitySource"/> instance to be used for GraphQL.NET telemetry.
@@ -44,11 +45,33 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         _telemetryOptions = options;
     }
 
+    /// <summary>
+    /// Initializes a new instance that only executes when <see cref="OpenTelemetry.AutoInstrumentation.Initializer.Enabled"/>
+    /// is <see langword="true"/>, using the options from <see cref="OpenTelemetry.AutoInstrumentation.Initializer.Options"/>.
+    /// </summary>
+    private GraphQLTelemetryProvider()
+    {
+        _onlyWhenAutoTelemetryEnabled = true;
+        _telemetryOptions = OpenTelemetry.AutoInstrumentation.Initializer.Options ?? new GraphQLTelemetryOptions();
+    }
+
+    // make sure no accidental use of the default constructor by DI by making it private,
+    // accessible only through AutoTelemetryProvider, a shared static instance
+    private static GraphQLTelemetryProvider? _autoTelemetryProvider;
+    internal static GraphQLTelemetryProvider AutoTelemetryProvider => _autoTelemetryProvider ??= new GraphQLTelemetryProvider();
+
     /// <inheritdoc/>
     public virtual float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
 
     /// <inheritdoc/>
-    public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+    public virtual Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+    {
+        return !_onlyWhenAutoTelemetryEnabled || OpenTelemetry.AutoInstrumentation.Initializer.Enabled
+            ? ExecuteInternalAsync(options, next)
+            : next(options);
+    }
+
+    private async Task<ExecutionResult> ExecuteInternalAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         if (!_telemetryOptions.Filter(options))
             return await next(options).ConfigureAwait(false);
