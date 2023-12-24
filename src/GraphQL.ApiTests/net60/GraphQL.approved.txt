@@ -403,6 +403,20 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> telemetryProviderFactory)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider telemetryProvider)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
         public static GraphQL.IConfigureAutoSchema WithMutation<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
@@ -1765,6 +1779,8 @@ namespace GraphQL.Telemetry
         protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Diagnostics.Activity? StartActivity(GraphQL.ExecutionOptions options) { }
+        [System.Obsolete("Use the sync method \'StartActivity\'. This method will be removed in v8.")]
         protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivityAsync(GraphQL.ExecutionOptions options) { }
     }
 }

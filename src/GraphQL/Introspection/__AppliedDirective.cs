@@ -13,6 +13,8 @@ namespace GraphQL.Introspection
         /// </summary>
         public __AppliedDirective()
         {
+            SetName(nameof(__AppliedDirective), validate: false);
+
             Description =
                 "Directive applied to a schema element";
 

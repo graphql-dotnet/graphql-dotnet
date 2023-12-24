@@ -13,7 +13,7 @@ namespace GraphQL.Introspection
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __EnumValue(bool allowAppliedDirectives = false)
         {
-            Name = nameof(__EnumValue);
+            SetName(nameof(__EnumValue), validate: false);
             Description =
                 "One possible value for a given Enum. Enum values are unique values, not " +
                 "a placeholder for a string or numeric value. However an Enum value is " +
