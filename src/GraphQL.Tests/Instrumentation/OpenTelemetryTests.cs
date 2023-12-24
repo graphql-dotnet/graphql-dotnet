@@ -15,6 +15,7 @@ namespace GraphQL.Tests.Instrumentation;
 [Collection("StaticTests")]
 public sealed class OpenTelemetryTests : IDisposable
 {
+    private readonly TestEventListener _testEventListener = new();
     private readonly List<Activity> _exportedActivities = new();
     private IHostBuilder __hostBuilder;
     private IHostBuilder _hostBuilder
@@ -310,6 +311,8 @@ public sealed class OpenTelemetryTests : IDisposable
     [Fact]
     public async Task Filterable()
     {
+        _testEventListener.Events.Clear();
+
         var executionOptions = new ExecutionOptions
         {
             Query = "query helloQuery { hello }",
@@ -332,6 +335,41 @@ public sealed class OpenTelemetryTests : IDisposable
         // verify activity telemetry
         _exportedActivities.ShouldBeEmpty();
         ranFilter.ShouldBeTrue();
+        _testEventListener.Events.Count.ShouldBeGreaterThan(0);
+        _testEventListener.Events.ShouldContain(e => e.EventName == "RequestIsFilteredOut");
+        _testEventListener.Events.ShouldNotContain(e => e.EventName == "RequestFilterException");
+    }
+
+    [Fact]
+    public async Task FilterableWithException()
+    {
+        _testEventListener.Events.Clear();
+
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query helloQuery { hello }",
+            RequestServices = _host.Services,
+        };
+        var ranFilter = false;
+        _options.Filter = options =>
+        {
+            options.ShouldBe(executionOptions);
+            ranFilter = true;
+            throw new Exception("Ooops");
+        };
+
+        // execute GraphQL document
+        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+
+        // verify GraphQL response
+        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+
+        // verify activity telemetry
+        _exportedActivities.ShouldBeEmpty();
+        ranFilter.ShouldBeTrue();
+        _testEventListener.Events.Count.ShouldBeGreaterThan(0);
+        _testEventListener.Events.ShouldContain(e => e.EventName == "RequestFilterException" && e.Message == "Filter threw exception, request will not be traced.");
+        _testEventListener.Events.ShouldNotContain(e => e.EventName == "RequestIsFilteredOut");
     }
 
     [Fact]

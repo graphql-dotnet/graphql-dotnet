@@ -73,8 +73,19 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     private async Task<ExecutionResult> ExecuteInternalAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (!_telemetryOptions.Filter(options))
+        try
+        {
+            if (_telemetryOptions.Filter?.Invoke(options) == false)
+            {
+                GraphQLEventSource.Log.RequestIsFilteredOut();
+                return await next(options).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            GraphQLEventSource.Log.RequestFilterException(ex);
             return await next(options).ConfigureAwait(false);
+        }
 
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
 #pragma warning disable CS0618 // Type or member is obsolete
