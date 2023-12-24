@@ -406,9 +406,7 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder)
-            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure)
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null)
             where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure)
             where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
@@ -416,7 +414,7 @@ namespace GraphQL
             where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider telemetryProvider)
             where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
-        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? configure)
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? configure = null)
             where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
             where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions, System.IServiceProvider>? configure)

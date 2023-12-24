@@ -1,3 +1,4 @@
+#nullable enable
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
@@ -15,15 +16,37 @@ namespace GraphQL.Tests.Instrumentation;
 public sealed class OpenTelemetryTests : IDisposable
 {
     private readonly List<Activity> _exportedActivities = new();
-    private readonly IHost _host;
-    private readonly IDocumentExecuter<ISchema> _executer;
-    private readonly IGraphQLTextSerializer _serializer;
-    private readonly GraphQLTelemetryOptions _options;
+    private IHostBuilder __hostBuilder;
+    private IHostBuilder _hostBuilder
+    {
+        get => __hostBuilder;
+        set
+        {
+            __host?.Dispose();
+            __host = null;
+            __hostBuilder = value;
+        }
+    }
+    private IHost? __host;
+    private IHost _host
+    {
+        get
+        {
+            if (__host == null)
+            {
+                __host = _hostBuilder.Build();
+                __host.Start();
+            }
+            return __host;
+        }
+    }
+    private IDocumentExecuter<ISchema> _executer => _host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
+    private IGraphQLTextSerializer _serializer => _host.Services.GetRequiredService<IGraphQLTextSerializer>();
+    private GraphQLTelemetryOptions _options => _host.Services.GetRequiredService<GraphQLTelemetryOptions>();
 
     public OpenTelemetryTests()
     {
-        // configure services
-        _host = new HostBuilder()
+        __hostBuilder = new HostBuilder()
             .ConfigureServices(services =>
             {
                 services.AddOpenTelemetry()
@@ -35,18 +58,10 @@ public sealed class OpenTelemetryTests : IDisposable
                     .AddSystemTextJson()
                     .AddAutoSchema<Query>()
                     .UseTelemetry());
-            })
-            .Build();
-
-        // starts telemetry services
-        _host.Start();
-
-        _executer = _host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
-        _serializer = _host.Services.GetRequiredService<IGraphQLTextSerializer>();
-        _options = _host.Services.GetRequiredService<GraphQLTelemetryOptions>();
+            });
     }
 
-    public void Dispose() => _host.Dispose();
+    public void Dispose() => __host?.Dispose();
 
     [Theory]
     [InlineData(true)]
@@ -65,7 +80,7 @@ public sealed class OpenTelemetryTests : IDisposable
             var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
             var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Public | BindingFlags.Static).ShouldNotBeNull();
             var optionsType = typeof(DocumentExecuter).Assembly.GetType("GraphQL.Telemetry.GraphQLTelemetryOptions").ShouldNotBeNull();
-            var optionsInstance = Activator.CreateInstance(optionsType);
+            var optionsInstance = Activator.CreateInstance(optionsType)!;
             var recordDocumentOption = optionsType.GetProperty("RecordDocument").ShouldNotBeNull();
             recordDocumentOption.SetValue(optionsInstance, true);
             method.Invoke(null, new object[] { optionsInstance });
@@ -107,9 +122,64 @@ public sealed class OpenTelemetryTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task BasicTest()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(6)]
+    public async Task BasicTest(int registrationMethod)
     {
+        _hostBuilder = new HostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddOpenTelemetry()
+                    .WithTracing(b => b
+                        .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddInMemoryExporter(_exportedActivities));
+
+                services.AddGraphQL(b =>
+                {
+                    b.AddSystemTextJson();
+                    b.AddAutoSchema<Query>();
+
+                    GraphQLTelemetryOptions Config(GraphQLTelemetryOptions options)
+                    {
+                        options.EnrichWithExecutionOptions = (a, _) => a.SetTag("mytag", registrationMethod);
+                        return options;
+                    }
+
+                    switch (registrationMethod)
+                    {
+                        case 1:
+                            b.UseTelemetry(c => Config(c));
+                            break;
+                        case 2:
+                            b.UseTelemetry((c, _) => Config(c));
+                            break;
+                        case 3:
+                            b.UseTelemetry<GraphQLTelemetryProvider>(c => Config(c));
+                            break;
+                        case 4:
+                            b.UseTelemetry<GraphQLTelemetryProvider>((c, _) => Config(c));
+                            break;
+                        case 5:
+                            b.UseTelemetry(_ => new GraphQLTelemetryProvider(Config(new())));
+                            break;
+                        case 6:
+                            b.UseTelemetry(new GraphQLTelemetryProvider(Config(new())));
+                            break;
+                        case 7:
+                            b.UseTelemetry<GraphQLTelemetryProvider, GraphQLTelemetryOptions>(c => Config(c));
+                            break;
+                        case 8:
+                            b.UseTelemetry<GraphQLTelemetryProvider, GraphQLTelemetryOptions>((c, _) => Config(c));
+                            break;
+                    }
+                });
+            });
+
         // execute GraphQL document
         var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
@@ -122,9 +192,10 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.TagObjects.ShouldBe(new KeyValuePair<string, object?>[]
         {
             new("graphql.document", "{ hello }"),
+            new("mytag", registrationMethod),
             new("graphql.operation.type", "query"),
             // no operation name
         });
@@ -147,7 +218,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             new("graphql.operation.type", "query"),
@@ -174,7 +245,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{ testing }"),
             new("graphql.operation.type", "query"),
@@ -221,7 +292,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             new("testoptions", "test1"),
@@ -276,7 +347,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello { dummy } }"),
             new("graphql.operation.type", "query"),
@@ -301,7 +372,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{"),
         });
@@ -324,7 +395,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{ serverError }"),
             new("graphql.operation.type", "query"),
@@ -349,7 +420,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             // no operation name within ExecutionOptions, and request was canceled before parsing
@@ -372,7 +443,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.operation.name", "helloQuery"), // operation name pulled from ExecutionOptions
             new("graphql.document", "query helloQuery { hello }"),
@@ -396,7 +467,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query cancelQuery { cancel }"),
             new("graphql.operation.type", "query"),
@@ -412,7 +483,7 @@ public sealed class OpenTelemetryTests : IDisposable
 
         public static string Cancel(IResolveFieldContext context)
         {
-            var cts = (CancellationTokenSource)context.Source;
+            var cts = (CancellationTokenSource)context.Source!;
             cts.Cancel();
             cts.Token.ThrowIfCancellationRequested();
             return "Canceled";

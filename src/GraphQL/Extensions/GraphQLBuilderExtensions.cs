@@ -1209,16 +1209,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         => UseTelemetry<GraphQLTelemetryProvider>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder)
-        where TProvider : GraphQLTelemetryProvider
-    {
-        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
-        builder.ConfigureExecution<TProvider>();
-        return builder;
-    }
-
-    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure)
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
         where TProvider : GraphQLTelemetryProvider
         => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
 
@@ -1228,7 +1219,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions>? configure)
+    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions>? configure = null)
         where TProvider : GraphQLTelemetryProvider
         where TOptions : GraphQLTelemetryOptions, new()
         => UseTelemetry<TProvider, TOptions>(builder, configure != null ? (opts, _) => configure(opts) : null);
