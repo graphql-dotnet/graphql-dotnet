@@ -338,10 +338,42 @@ public sealed class OpenTelemetryTests : IDisposable
         ranFilter.ShouldBeTrue();
     }
 
+    [Fact]
+    public async Task FilterThrowsException()
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query withActivityQuery { withActivity }",
+            RequestServices = _host.Services,
+        };
+        bool ranFilter = false;
+        _options.Filter = options =>
+        {
+            options.ShouldBe(executionOptions);
+            ranFilter = true;
+            throw new FilterException();
+        };
+
+        // execute GraphQL document
+        await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+
+        // verify activity telemetry
+        ranFilter.ShouldBeTrue();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
+        {
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
+        });
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task ExtensibilityWhenFiltered(bool filter)
+    [InlineData(null)] // null for exception
+    public async Task ExtensibilityWhenFiltered(bool? filter)
     {
         var executionOptions = new ExecutionOptions
         {
@@ -349,7 +381,7 @@ public sealed class OpenTelemetryTests : IDisposable
             RequestServices = _host.Services,
         };
 
-        _options.Filter = _ => filter;
+        _options.Filter = _ => filter ?? throw new FilterException();
 
         bool enrichWithExecutionOptionsCalled = false;
         _options.EnrichWithExecutionOptions = (_, _) =>
@@ -363,16 +395,28 @@ public sealed class OpenTelemetryTests : IDisposable
         _options.EnrichWithExecutionResult = (_, _, _) =>
             enrichWithExecutionResult = true;
 
-        // execute GraphQL document
-        var result = await _executer.ExecuteAsync(executionOptions);
+        bool enrichWithException = false;
+        _options.EnrichWithException = (_, _) =>
+            enrichWithException = true;
 
-        // verify GraphQL response
-        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        if (filter.HasValue)
+        {
+            // execute GraphQL document
+            var result = await _executer.ExecuteAsync(executionOptions);
+            // verify GraphQL response
+            _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        }
+        else
+        {
+            // execute GraphQL document
+            await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+        }
 
         // verify enrich methods execution
-        enrichWithExecutionOptionsCalled.ShouldBe(filter);
-        enrichWithDocumentCalled.ShouldBe(filter);
-        enrichWithExecutionResult.ShouldBe(filter);
+        enrichWithExecutionOptionsCalled.ShouldBe(filter ?? false);
+        enrichWithDocumentCalled.ShouldBe(filter ?? false);
+        enrichWithExecutionResult.ShouldBe(filter ?? false);
+        enrichWithException.ShouldBe(filter == null);
     }
 
     [Fact]
@@ -543,6 +587,8 @@ public sealed class OpenTelemetryTests : IDisposable
 
         public static string ServerError => throw new InvalidOperationException("Could not process data");
     }
+
+    private class FilterException : Exception { }
 }
 
 #endif
