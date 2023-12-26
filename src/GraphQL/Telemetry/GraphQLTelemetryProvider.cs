@@ -85,7 +85,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         if (!activity.IsAllDataRequested)
             return await next(options).ConfigureAwait(false);
 
-        if (!Filter(options, activity))
+        if (!await FilterAsync(options, activity).ConfigureAwait(false))
             return await next(options).ConfigureAwait(false);
 
         // record the requested operation name and optionally the GraphQL document
@@ -107,14 +107,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
             // if the request was canceled or if ThrowOnUnhandledException is true. And since
             // OperationCanceledExceptions are not a fault, we do not record them as such.
             if (ex is not OperationCanceledException)
-            {
-#if NET6_0_OR_GREATER
-                activity.SetStatus(ActivityStatusCode.Error);
-#else
-                activity.SetTag("otel.status_code", "ERROR");
-#endif
-            }
-            _telemetryOptions.EnrichWithException(activity, ex);
+                await OnException(activity, ex).ConfigureAwait(false);
             throw;
         }
 
@@ -199,7 +192,29 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         return Task.CompletedTask;
     }
 
-    private bool Filter(ExecutionOptions options, Activity activity)
+    /// <summary>
+    /// Handle execution exception. The default implementation sets the <see cref="Activity"/> error status,
+    /// records exception event if <see cref="GraphQLTelemetryOptions.RecordException"/> is <see langword="true"/>
+    /// and executes the <see cref="GraphQLTelemetryOptions.EnrichWithException"/> callback.
+    /// </summary>
+    protected virtual Task OnException(Activity activity, Exception ex)
+    {
+#if NET6_0_OR_GREATER
+        activity.SetStatus(ActivityStatusCode.Error);
+#else
+        activity.SetTag("otel.status_code", "ERROR");
+#endif
+
+        if (_telemetryOptions.RecordException)
+        {
+            activity.RecordException(ex);
+        }
+
+        _telemetryOptions.EnrichWithException(activity, ex);
+        return Task.CompletedTask;
+    }
+
+    private async Task<bool> FilterAsync(ExecutionOptions options, Activity activity)
     {
         try
         {
@@ -212,12 +227,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
         catch (Exception ex)
         {
-#if NET6_0_OR_GREATER
-            activity.SetStatus(ActivityStatusCode.Error);
-#else
-            activity.SetTag("otel.status_code", "ERROR");
-#endif
-            _telemetryOptions.EnrichWithException(activity, ex);
+            await OnException(activity, ex).ConfigureAwait(false);
             throw;
         }
 
