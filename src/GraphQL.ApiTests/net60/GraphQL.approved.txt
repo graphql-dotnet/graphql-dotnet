@@ -1767,6 +1767,7 @@ namespace GraphQL.Telemetry
         public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.ExecutionResult> EnrichWithExecutionResult { get; set; }
         public System.Func<GraphQL.ExecutionOptions, bool> Filter { get; set; }
         public bool RecordDocument { get; set; }
+        public bool RecordException { get; set; }
         public System.Func<GraphQL.ExecutionOptions, string?> SanitizeDocument { get; set; }
     }
     public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
@@ -1776,6 +1777,7 @@ namespace GraphQL.Telemetry
         protected static System.Diagnostics.ActivitySource ActivitySource { get; }
         public static string SourceName { get; }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.Task OnExceptionAsync(System.Diagnostics.Activity activity, System.Exception ex) { }
         protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
