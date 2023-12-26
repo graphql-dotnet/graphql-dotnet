@@ -227,7 +227,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
         catch (Exception ex)
         {
-            await OnException(activity, ex).ConfigureAwait(false);
+            await OnExceptionAsync(activity, ex).ConfigureAwait(false);
             throw;
         }
 
