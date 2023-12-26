@@ -26,7 +26,7 @@ namespace GraphQL.Introspection
         /// </param>
         public __Field(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
-            Name = nameof(__Field);
+            SetName(nameof(__Field), validate: false);
 
             Description =
                 "Object and Interface types are described by a list of Fields, each of " +

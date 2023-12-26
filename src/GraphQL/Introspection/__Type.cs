@@ -27,7 +27,7 @@ namespace GraphQL.Introspection
         /// </param>
         public __Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
-            SetName(nameof(__Type), false);
+            SetName(nameof(__Type), validate: false);
 
             Description =
                 "The fundamental unit of any GraphQL Schema is the type. There are " +

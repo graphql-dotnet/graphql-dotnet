@@ -13,7 +13,7 @@ namespace GraphQL.Introspection
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Schema(bool allowAppliedDirectives = false)
         {
-            Name = "__Schema";
+            SetName(nameof(__Schema), validate: false);
 
             Description =
                 "A GraphQL Schema defines the capabilities of a GraphQL server. It " +
