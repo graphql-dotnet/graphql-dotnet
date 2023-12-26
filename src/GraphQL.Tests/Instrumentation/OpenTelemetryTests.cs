@@ -52,6 +52,7 @@ public sealed class OpenTelemetryTests : IDisposable
                 services.AddOpenTelemetry()
                     .WithTracing(b => b
                         .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddSource(Query.ACTIVITY_SOURCE_NAME)
                         .AddInMemoryExporter(_exportedActivities));
 
                 services.AddGraphQL(b => b
@@ -307,12 +308,14 @@ public sealed class OpenTelemetryTests : IDisposable
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
-    [Fact]
-    public async Task Filterable()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Filterable(bool filter)
     {
         var executionOptions = new ExecutionOptions
         {
-            Query = "query helloQuery { hello }",
+            Query = "query withActivityQuery { withActivity }",
             RequestServices = _host.Services,
         };
         bool ranFilter = false;
@@ -320,18 +323,100 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             options.ShouldBe(executionOptions);
             ranFilter = true;
-            return false;
+            return filter;
         };
 
         // execute GraphQL document
         var result = await _executer.ExecuteAsync(executionOptions);
 
         // verify GraphQL response
-        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        string childActivityCreated = filter.ToString().ToLower();
+        _serializer.Serialize(result).ShouldBe($$$"""{"data":{"withActivity":{{{childActivityCreated}}}}}""");
 
         // verify activity telemetry
-        _exportedActivities.ShouldBeEmpty();
+        _exportedActivities.Count.ShouldBe(filter ? 2 : 0);
         ranFilter.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task FilterThrowsException()
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query withActivityQuery { withActivity }",
+            RequestServices = _host.Services,
+        };
+        bool ranFilter = false;
+        _options.Filter = options =>
+        {
+            options.ShouldBe(executionOptions);
+            ranFilter = true;
+            throw new FilterException();
+        };
+
+        // execute GraphQL document
+        await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+
+        // verify activity telemetry
+        ranFilter.ShouldBeTrue();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
+        {
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
+        });
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    [InlineData(null)] // null for exception
+    public async Task ExtensibilityWhenFiltered(bool? filter)
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query helloQuery { hello }",
+            RequestServices = _host.Services,
+        };
+
+        _options.Filter = _ => filter ?? throw new FilterException();
+
+        bool enrichWithExecutionOptionsCalled = false;
+        _options.EnrichWithExecutionOptions = (_, _) =>
+            enrichWithExecutionOptionsCalled = true;
+
+        bool enrichWithDocumentCalled = false;
+        _options.EnrichWithDocument = (_, _, _, _, _) =>
+            enrichWithDocumentCalled = true;
+
+        bool enrichWithExecutionResult = false;
+        _options.EnrichWithExecutionResult = (_, _, _) =>
+            enrichWithExecutionResult = true;
+
+        bool enrichWithException = false;
+        _options.EnrichWithException = (_, _) =>
+            enrichWithException = true;
+
+        if (filter.HasValue)
+        {
+            // execute GraphQL document
+            var result = await _executer.ExecuteAsync(executionOptions);
+            // verify GraphQL response
+            _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        }
+        else
+        {
+            // execute GraphQL document
+            await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+        }
+
+        // verify enrich methods execution
+        enrichWithExecutionOptionsCalled.ShouldBe(filter ?? false);
+        enrichWithDocumentCalled.ShouldBe(filter ?? false);
+        enrichWithExecutionResult.ShouldBe(filter ?? false);
+        enrichWithException.ShouldBe(filter == null);
     }
 
     [Fact]
@@ -481,6 +566,9 @@ public sealed class OpenTelemetryTests : IDisposable
 
     private class Query
     {
+        public const string ACTIVITY_SOURCE_NAME = "Query";
+        private static readonly ActivitySource _activitySource = new(ACTIVITY_SOURCE_NAME);
+
         public static string Hello => "World";
 
         public static string Cancel(IResolveFieldContext context)
@@ -491,8 +579,16 @@ public sealed class OpenTelemetryTests : IDisposable
             return "Canceled";
         }
 
+        public static bool WithActivity()
+        {
+            using var activity = _activitySource.StartActivity();
+            return activity != null;
+        }
+
         public static string ServerError => throw new InvalidOperationException("Could not process data");
     }
+
+    private class FilterException : Exception { }
 }
 
 #endif

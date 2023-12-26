@@ -73,9 +73,6 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     private async Task<ExecutionResult> ExecuteInternalAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (!_telemetryOptions.Filter(options))
-            return await next(options).ConfigureAwait(false);
-
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
 #pragma warning disable CS0618 // Type or member is obsolete
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
@@ -83,6 +80,12 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
         // do not record any telemetry if there are no listeners or it decided not to sample the current request
         if (activity == null)
+            return await next(options).ConfigureAwait(false);
+
+        if (!activity.IsAllDataRequested)
+            return await next(options).ConfigureAwait(false);
+
+        if (!Filter(options, activity))
             return await next(options).ConfigureAwait(false);
 
         // record the requested operation name and optionally the GraphQL document
@@ -194,6 +197,31 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
         _telemetryOptions.EnrichWithExecutionResult(activity, executionOptions, result);
         return Task.CompletedTask;
+    }
+
+    private bool Filter(ExecutionOptions options, Activity activity)
+    {
+        try
+        {
+            if (!_telemetryOptions.Filter(options))
+            {
+                activity.IsAllDataRequested = false;
+                activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+#if NET6_0_OR_GREATER
+            activity.SetStatus(ActivityStatusCode.Error);
+#else
+            activity.SetTag("otel.status_code", "ERROR");
+#endif
+            _telemetryOptions.EnrichWithException(activity, ex);
+            throw;
+        }
+
+        return true;
     }
 
     // note: this could be implemented as a validation rule with no public API changes
