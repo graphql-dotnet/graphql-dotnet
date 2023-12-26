@@ -378,7 +378,7 @@ public sealed class OpenTelemetryTests : IDisposable
             @event.Name.ShouldBe("exception");
             @event.Tags.ShouldNotBeEmpty();
             @event.Tags.FirstOrDefault(t => t.Key == "exception.type").Value.ShouldBe("GraphQL.Tests.Instrumentation.OpenTelemetryTests+FilterException");
-            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(default);
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(string.Empty);
             @event.Tags.FirstOrDefault(t => t.Key == "exception.message").Value.ShouldBe("exception message");
         }
         else
