@@ -338,8 +338,10 @@ public sealed class OpenTelemetryTests : IDisposable
         ranFilter.ShouldBeTrue();
     }
 
-    [Fact]
-    public async Task FilterThrowsException()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task FilterThrowsException(bool recordException)
     {
         var executionOptions = new ExecutionOptions
         {
@@ -351,8 +353,10 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             options.ShouldBe(executionOptions);
             ranFilter = true;
-            throw new FilterException();
+            throw new FilterException("exception message");
         };
+
+        _options.RecordException = recordException;
 
         // execute GraphQL document
         await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
@@ -367,6 +371,20 @@ public sealed class OpenTelemetryTests : IDisposable
 #endif
         });
         activity.Status().ShouldBe(ActivityStatusCode.Error);
+
+        if (recordException)
+        {
+            var @event = activity.Events.ShouldHaveSingleItem();
+            @event.Name.ShouldBe("exception");
+            @event.Tags.ShouldNotBeEmpty();
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.type").Value.ShouldBe("GraphQL.Tests.Instrumentation.OpenTelemetryTests+FilterException");
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(string.Empty);
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.message").Value.ShouldBe("exception message");
+        }
+        else
+        {
+            activity.Events.ShouldBeEmpty();
+        }
     }
 
     [Theory]
@@ -494,6 +512,49 @@ public sealed class OpenTelemetryTests : IDisposable
         activity.Status().ShouldBe(ActivityStatusCode.Error);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task WithServerErrorWhenThrowOnUnhandledExceptionTrue(bool recordException)
+    {
+        _options.RecordException = recordException;
+
+        // execute GraphQL document
+        await _executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ serverError }",
+            RequestServices = _host.Services,
+            ThrowOnUnhandledException = true
+        }).ShouldThrowAsync<InvalidOperationException>();
+
+        // verify activity telemetry
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
+        {
+            new("graphql.document", "{ serverError }"),
+            new("graphql.operation.type", "query"),
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
+        });
+        activity.DisplayName.ShouldBe("query");
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
+
+        if (recordException)
+        {
+            var @event = activity.Events.ShouldHaveSingleItem();
+            @event.Name.ShouldBe("exception");
+            @event.Tags.ShouldNotBeEmpty();
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.type").Value.ShouldBe("System.InvalidOperationException");
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(string.Empty);
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.message").Value.ShouldBe("Could not process data");
+        }
+        else
+        {
+            activity.Events.ShouldBeEmpty();
+        }
+    }
+
     [Fact]
     public async Task WithCancellation1()
     {
@@ -562,6 +623,7 @@ public sealed class OpenTelemetryTests : IDisposable
         });
         activity.DisplayName.ShouldBe("query cancelQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
+        activity.Events.ShouldBeEmpty();
     }
 
     private class Query
@@ -588,7 +650,11 @@ public sealed class OpenTelemetryTests : IDisposable
         public static string ServerError => throw new InvalidOperationException("Could not process data");
     }
 
-    private class FilterException : Exception { }
+    private class FilterException : Exception
+    {
+        public FilterException() { }
+        public FilterException(string message) : base(message) { }
+    }
 }
 
 #endif
