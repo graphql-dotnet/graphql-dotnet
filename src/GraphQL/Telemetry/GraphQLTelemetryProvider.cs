@@ -197,7 +197,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     /// records exception event if <see cref="GraphQLTelemetryOptions.RecordException"/> is <see langword="true"/>
     /// and executes the <see cref="GraphQLTelemetryOptions.EnrichWithException"/> callback.
     /// </summary>
-    protected virtual Task OnException(Activity activity, Exception ex)
+    protected virtual Task OnExceptionAsync(Activity activity, Exception ex)
     {
 #if NET6_0_OR_GREATER
         activity.SetStatus(ActivityStatusCode.Error);
