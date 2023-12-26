@@ -214,7 +214,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         return Task.CompletedTask;
     }
 
-    private async Task<bool> FilterAsync(ExecutionOptions options, Activity activity)
+    private async ValueTask<bool> FilterAsync(ExecutionOptions options, Activity activity)
     {
         try
         {
