@@ -107,7 +107,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
             // if the request was canceled or if ThrowOnUnhandledException is true. And since
             // OperationCanceledExceptions are not a fault, we do not record them as such.
             if (ex is not OperationCanceledException)
-                await OnException(activity, ex).ConfigureAwait(false);
+                await OnExceptionAsync(activity, ex).ConfigureAwait(false);
             throw;
         }
 
