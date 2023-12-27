@@ -131,13 +131,7 @@ public class InputObjectGraphTypeTests
         // the string value is coerced to a Uri prior to beginning execution of the request
         var inputType = new InputObjectGraphType<Class1>();
         inputType.Field(x => x.Url, type: typeof(StringGraphType))
-            .ParseValue(original =>
-            {
-                var originalString = (string?)original;
-                if (originalString == null)
-                    return null;
-                return new Uri(originalString);
-            });
+            .ParseValue(original => original is string originalString ? new Uri(originalString) : null);
         var queryType = new ObjectGraphType();
         queryType.Field<StringGraphType>(
             "test",
