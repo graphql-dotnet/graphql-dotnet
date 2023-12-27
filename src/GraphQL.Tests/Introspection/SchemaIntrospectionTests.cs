@@ -19,7 +19,7 @@ public class SchemaIntrospectionTests
                 Query = new TestQuery()
             };
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
         string json = serializer.Serialize(executionResult);
 
@@ -39,7 +39,7 @@ public class SchemaIntrospectionTests
                 NameConverter = PascalCaseNameConverter.Instance,
             };
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
         string json = serializer.Serialize(executionResult);
 
@@ -67,7 +67,7 @@ public class SchemaIntrospectionTests
                 Query = TestQueryType(),
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
         string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString();
@@ -104,7 +104,7 @@ public class SchemaIntrospectionTests
                 Comparer = new AlphabeticalSchemaComparer()
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
         string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString();
@@ -160,7 +160,7 @@ public class SchemaIntrospectionTests
         {
             _.Schema = schema;
             _.Query = InputObjectBugQuery;
-        }).ConfigureAwait(false);
+        });
 
         string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();

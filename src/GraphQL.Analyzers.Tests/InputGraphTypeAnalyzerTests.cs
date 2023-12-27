@@ -10,7 +10,7 @@ public class InputGraphTypeAnalyzerTests
     public async Task Sanity_NoDiagnostics()
     {
         const string source = "";
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -34,34 +34,35 @@ public class InputGraphTypeAnalyzerTests
         string symbolType = "",
         string reason = "")
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyInputGraphType : InputObjectGraphType<MySourceType>
-            {
-                public MyInputGraphType()
-                {
-                    Field<StringGraphType>("Name");
-                }
-            }
+              public class MyInputGraphType : InputObjectGraphType<MySourceType>
+              {
+                  public MyInputGraphType()
+                  {
+                      Field<StringGraphType>("Name");
+                  }
+              }
 
-            public class MySourceType
-            {
-                {{sourceMember}}
-            }
-            """;
+              public class MySourceType
+              {
+                  {{sourceMember}}
+              }
+              """;
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_SET_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithSpan(9, 32, 9, 38).WithArguments("Name", symbolType, "Name", "MySourceType", reason)
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -78,37 +79,38 @@ public class InputGraphTypeAnalyzerTests
         string symbol2,
         bool isAllowed)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyInputGraphType : InputObjectGraphType<MySourceType>
-            {
-                public MyInputGraphType()
-                {
-                    Field<StringGraphType>("Name");
-                }
-            }
+              public class MyInputGraphType : InputObjectGraphType<MySourceType>
+              {
+                  public MyInputGraphType()
+                  {
+                      Field<StringGraphType>("Name");
+                  }
+              }
 
-            public class MySourceType
-            {
-                {{symbol1}}
-                {{symbol2}}
-            }
-            """;
+              public class MySourceType
+              {
+                  {{symbol1}}
+                  {{symbol2}}
+              }
+              """;
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_SET_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithSpan(9, 32, 9, 38).WithArguments("Name", "field", "name", "MySourceType", "'readonly'"),
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_SET_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithSpan(9, 32, 9, 38).WithArguments("Name", "property", "Name", "MySourceType", "not 'public' and doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -122,42 +124,44 @@ public class InputGraphTypeAnalyzerTests
     [InlineData("private", "string firstName, int age", false)]
     public async Task NameExistsAsConstructorParameter_WithDifferentAccessibility_GQL006(string ctorAccessibility, string ctorParams, bool isAllowed)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyInputGraphType : InputObjectGraphType<MySourceType>
-            {
-                public MyInputGraphType()
-                {
-                    Field<StringGraphType>("FirstName");
-                }
-            }
+              public class MyInputGraphType : InputObjectGraphType<MySourceType>
+              {
+                  public MyInputGraphType()
+                  {
+                      Field<StringGraphType>("FirstName");
+                  }
+              }
 
-            public class MySourceType
-            {
-                {{ctorAccessibility}} MySourceType({{ctorParams}}) { }
+              public class MySourceType
+              {
+                  {{ctorAccessibility}} MySourceType({{ctorParams}}) { }
 
-                public string Name { get; set; }
-            }
-            """;
+                  public string Name { get; set; }
+              }
+              """;
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                     .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task NameExistsAsBaseConstructorArgument_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -184,15 +188,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task FieldNameExistsOnBaseSourceType_NoDiagnostics()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -216,13 +221,14 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
     public async Task FieldNameDoesNotExistOnSourceType_NotInputObjectGraphType_NoDiagnostics()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -241,13 +247,14 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
     public async Task NonGenericInputObjectGraphType_NoDiagnostics()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -261,13 +268,14 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Fact]
     public async Task SourceTypeIsObject_NoDiagnostics()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -281,7 +289,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        await VerifyCS.VerifyAnalyzerAsync(source).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
     [Theory]
@@ -290,44 +298,46 @@ public class InputGraphTypeAnalyzerTests
     [InlineData("Consts.EmailConst")]
     public async Task FieldNameIsConstOrLiteral_NotExistsOnSourceType_GQL006(string fieldName)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyInputGraphType : InputObjectGraphType<MySourceType>
-            {
-                private const string EmailConst = "Email";
+              public class MyInputGraphType : InputObjectGraphType<MySourceType>
+              {
+                  private const string EmailConst = "Email";
 
-                public MyInputGraphType()
-                {
-                    Field<StringGraphType>({{fieldName}});
-                    Field<StringGraphType>("Name");
-                }
-            }
+                  public MyInputGraphType()
+                  {
+                      Field<StringGraphType>({{fieldName}});
+                      Field<StringGraphType>("Name");
+                  }
+              }
 
-            public class MySourceType
-            {
-                public string Name { get; set; }
-            }
+              public class MySourceType
+              {
+                  public string Name { get; set; }
+              }
 
-            public class Consts
-            {
-                public const string EmailConst = "Email";
-            }
-            """;
+              public class Consts
+              {
+                  public const string EmailConst = "Email";
+              }
+              """;
 
         const int startColumn = 32;
         int endColumn = startColumn + fieldName.Length;
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(11, startColumn, 11, endColumn).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task NonGenericField_NameNotExistsOnSourceType_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -347,15 +357,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(9, 15, 9, 22).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task ThisField_NameNotExistsOnSourceType_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -375,15 +386,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(9, 37, 9, 44).WithArguments("Email", "MySourceType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task MultipleFieldNamesNotExistOnSourceType_MultipleGQL006Diagnostics()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -408,18 +420,19 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = new[]
         {
-            VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                 .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySourceType"),
-            VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                 .WithSpan(12, 32, 12, 41).WithArguments("Address", "MySourceType")
         };
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task BaseInputTypeWithGenericParameter_WithTypeConstraint_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -440,15 +453,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task BaseInputTypeWithGenericParameter_WithMultipleTypeConstraint_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -475,15 +489,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource or IBaseSource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task BaseInputTypeWithGenericParameter_WithoutTypeConstraint_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -500,19 +515,20 @@ public class InputGraphTypeAnalyzerTests
 
         var expected = new[]
         {
-            VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                 .WithSpan(9, 32, 9, 38).WithArguments("Name", "TSourceType"),
-            VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+            VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                 .WithSpan(10, 32, 10, 39).WithArguments("Email", "TSourceType"),
         };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task BaseInputTypeWithGenericParameter_InputObjectGraphTypeWithClosedType_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -532,15 +548,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task DerivedFromBaseInputTypeWithGenericParameter_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -571,14 +588,15 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD).WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField).WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task DerivedFromBaseInputTypeWithGenericParameter_MoreDerivedTypeConstraint_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -610,15 +628,16 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(11, 32, 11, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Fact]
     public async Task DerivedFromBaseInputTypeWith_BaseTypeDefinesSourceType_GQL006()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -653,9 +672,9 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD)
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
             .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -663,34 +682,35 @@ public class InputGraphTypeAnalyzerTests
     [InlineData("private", false)]
     public async Task FieldDefinedWithExpression_NoNameOverride_GQL007(string setterAccessibility, bool isAllowed)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class CustomInputObjectGraphType : InputObjectGraphType<MySourceType>
-            {
-                public CustomInputObjectGraphType()
-                {
-                    Field(source => source.Name);
-                }
-            }
+              public class CustomInputObjectGraphType : InputObjectGraphType<MySourceType>
+              {
+                  public CustomInputObjectGraphType()
+                  {
+                      Field(source => source.Name);
+                  }
+              }
 
-            public class MySourceType
-            {
-                public string Name { get; {{setterAccessibility}} set; }
-            }
-            """;
+              public class MySourceType
+              {
+                  public string Name { get; {{setterAccessibility}} set; }
+              }
+              """;
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_SET_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithSpan(9, 25, 9, 36).WithArguments("Name", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
     [Theory]
@@ -698,33 +718,179 @@ public class InputGraphTypeAnalyzerTests
     [InlineData("private", false)]
     public async Task FieldDefinedWithExpression_WithNameOverride_GQL007(string setterAccessibility, bool isAllowed)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class CustomInputObjectGraphType : InputObjectGraphType<MySourceType>
-            {
-                public CustomInputObjectGraphType()
-                {
-                    Field("FirstName", source => source.Name);
-                }
-            }
+              public class CustomInputObjectGraphType : InputObjectGraphType<MySourceType>
+              {
+                  public CustomInputObjectGraphType()
+                  {
+                      Field("FirstName", source => source.Name);
+                  }
+              }
 
-            public class MySourceType
-            {
-                public string Name { get; {{setterAccessibility}} set; }
-            }
-            """;
+              public class MySourceType
+              {
+                  public string Name { get; {{setterAccessibility}} set; }
+              }
+              """;
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
             : new[]
             {
-                VerifyCS.Diagnostic(DiagnosticIds.CAN_NOT_SET_SOURCE_FIELD)
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithSpan(9, 15, 9, 26).WithArguments("FirstName", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
-        await VerifyCS.VerifyAnalyzerAsync(source, expected).ConfigureAwait(false);
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_NotDefinedByTheInputObjectGraphType_GQL007()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                    Field<StringGraphType>("Address");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : BaseBaseInputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class BaseBaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                // hide the original method
+                public new virtual object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
+            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData("Sample.Server.BaseInputObjectGraphType", false)]
+    [InlineData("Sample.Server.BaseInputObjectGraphType, Sample.Server.BaseInputObjectGraphType2", true)]
+    public async Task BaseInputObjectGraphType_OverridesParseDictionary_ForceTypesAnalysis_GQL007(string forceTypes, bool report)
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                    Field<StringGraphType>("Address");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : BaseInputObjectGraphType2<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class BaseInputObjectGraphType2<TSourceType> : InputObjectGraphType<TSourceType>
+            {
+                public override object ParseDictionary(IDictionary<string, object> value) =>
+                    base.ParseDictionary(value);
+            }
+
+            public class MySource
+            {
+                public string Name { get; set; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
+            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+
+        var test = new VerifyCS.Test
+        {
+            TestCode = source,
+            TestState =
+            {
+                AnalyzerConfigFiles =
+                {
+                    ("/.editorconfig",
+                        $$"""
+                         root = true
+
+                         [*]
+                         {{InputGraphTypeAnalyzer.ForceTypesAnalysisOption}} = {{forceTypes}}
+                         ")
+                         """)
+                }
+            }
+        };
+
+        if (report)
+        {
+            test.ExpectedDiagnostics.Add(expected);
+        }
+
+        await test.RunAsync();
     }
 }

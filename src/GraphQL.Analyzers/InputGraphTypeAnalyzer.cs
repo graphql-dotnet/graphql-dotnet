@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +31,9 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.CAN_NOT_SET_SOURCE_FIELD);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public static string ForceTypesAnalysisOption => "dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis";
+
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(CanNotMatchInputFieldToTheSourceField, CanNotSetSourceField);
 
     public override void Initialize(AnalysisContext context)
@@ -234,11 +237,16 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return null;
         }
 
-        var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName("GraphQL.Types.InputObjectGraphType`1");
-        if (genericInputObjectGraphType == null)
-        {
-            return null;
-        }
+        var genericInputObjectGraphType = context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.InputObjectGraphType);
+        var parseDictionaryBaseMethod = genericInputObjectGraphType?.GetMembers(Constants.MethodNames.ParseDictionary)
+            .OfType<IMethodSymbol>()
+            .Single(); // analyzers are not supposed to throw exceptions but we expect this to fail in tests if the base type changes
+
+        string? forceTypesAnalysisOption = context.Options.GetStringOption(ForceTypesAnalysisOption, context.Node.SyntaxTree);
+        var forceTypesAnalysis = forceTypesAnalysisOption
+            ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(t => t.Trim())
+            .ToList();
 
         var sourceTypeSymbol = typeSymbol;
         while (sourceTypeSymbol != null)
@@ -246,6 +254,16 @@ public class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             if (SymbolEqualityComparer.Default.Equals(sourceTypeSymbol.OriginalDefinition, genericInputObjectGraphType))
             {
                 return sourceTypeSymbol.TypeArguments.Single(); // <TSourceType>
+            }
+
+            bool overridesParseDictionary = sourceTypeSymbol
+                .GetMembers("ParseDictionary")
+                .OfType<IMethodSymbol>()
+                .Any(m => SymbolEqualityComparer.Default.Equals(m.OverriddenMethod?.OriginalDefinition, parseDictionaryBaseMethod));
+
+            if (overridesParseDictionary && forceTypesAnalysis?.Contains($"{sourceTypeSymbol.ContainingNamespace}.{sourceTypeSymbol.Name}") != true)
+            {
+                return null;
             }
 
             sourceTypeSymbol = sourceTypeSymbol.BaseType;

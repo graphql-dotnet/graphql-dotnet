@@ -227,7 +227,7 @@ public class ResolveFieldContextTests
             User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
         };
         options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
-        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
+        var result = await executer.ExecuteAsync(options);
         string resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
         resultText.ShouldBe(isAuthenticated ? """{"data":{"isAuthenticated":true}}""" : """{"data":{"isAuthenticated":false}}""");
     }
@@ -274,7 +274,7 @@ public class ResolveFieldContextTests
                 _context.Errors.Add(new ExecutionError("test"));
         });
 
-        await Task.WhenAll(t1, t2).ConfigureAwait(false);
+        await Task.WhenAll(t1, t2);
 
         _context.Errors.Count.ShouldBe(10);
     }

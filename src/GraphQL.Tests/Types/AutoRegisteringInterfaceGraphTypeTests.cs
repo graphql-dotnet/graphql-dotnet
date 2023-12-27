@@ -270,7 +270,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [InlineData(nameof(ArgumentTestsInterface.IdIntArg), "arg1", 123, null)]
     [InlineData(nameof(ArgumentTestsInterface.TypedArg), "arg1", "123", null)]
     [InlineData(nameof(ArgumentTestsInterface.MultipleArgs), "arg1", "hello", 123)]
-    public void Argument_ResolverTests(string fieldName, string arg1Name, object? arg1Value, int? arg2Value)
+    public void Argument_ResolverTests(string fieldName, string? arg1Name, object? arg1Value, int? arg2Value)
     {
         var graphType = new AutoRegisteringInterfaceGraphType<ArgumentTestsInterface>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -469,7 +469,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         {
             Query = query,
             RequestServices = provider,
-        }).ConfigureAwait(false);
+        });
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         string actual = serializer.Serialize(result);
         actual.ShouldBeCrossPlatJson(expected);
@@ -494,7 +494,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
             Query = query,
             RequestServices = provider,
             ThrowOnUnhandledException = true,
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery2.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
     }
 
@@ -521,7 +521,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
             Query = query,
             RequestServices = provider,
             ThrowOnUnhandledException = true,
-        })).ConfigureAwait(false);
+        }));
         ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery3.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
     }
 

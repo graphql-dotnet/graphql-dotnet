@@ -15,7 +15,7 @@ jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/labeler@v4
+    - uses: actions/labeler@v5
       with:
         sync-labels: ""
         repo-token: "${{ secrets.GITHUB_TOKEN }}"

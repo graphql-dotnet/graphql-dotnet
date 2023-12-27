@@ -58,7 +58,7 @@ public class SerialExecutionStrategyTests
             Schema = schema,
             Query = "mutation { families { leader_dataLoader { lastName name } leader { lastName name } } }",
         };
-        await documentExecuter.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        await documentExecuter.ExecuteAsync(executionOptions);
         sb.ToString().ShouldBeCrossPlat("""
             families
             families.0.leader_dataLoader

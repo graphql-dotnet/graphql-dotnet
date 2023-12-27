@@ -10,7 +10,7 @@ namespace GraphQL.Types
     /// <summary>
     /// Represents a default base class for all complex (that is, having their own properties) input and output graph types.
     /// </summary>
-    public abstract class ComplexGraphType<TSourceType> : GraphType, IComplexGraphType
+    public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType, IComplexGraphType
     {
         internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
 
@@ -159,7 +159,7 @@ namespace GraphQL.Types
         /// Creates a field builder used by Field() methods.
         /// </summary>
         [Obsolete("Please use the overload that accepts the name as the first argument.")]
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
@@ -167,7 +167,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
         }
@@ -176,7 +176,7 @@ namespace GraphQL.Types
         /// Creates a field builder used by Field() methods.
         /// </summary>
         [Obsolete("Please use the overload that accepts the name as the first argument.")]
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(IGraphType type)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(IGraphType type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(type);
         }
@@ -184,7 +184,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Creates a field builder used by Field() methods.
         /// </summary>
-        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, IGraphType type)
+        protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, IGraphType type)
         {
             return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
         }
@@ -372,7 +372,7 @@ namespace GraphQL.Types
         /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
         /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
         [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
-        public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(
+        public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(
             string name,
             string? description = null,
             QueryArguments? arguments = null,
@@ -473,7 +473,7 @@ namespace GraphQL.Types
         /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
         /// <typeparam name="TReturnType">The return type of the field resolver.</typeparam>
         /// <param name="name">The name of the field.</param>
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, TReturnType>(string name)
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(string name)
             where TGraphType : IGraphType
         {
             var builder = CreateBuilder<TReturnType>(name, typeof(TGraphType));
@@ -483,7 +483,7 @@ namespace GraphQL.Types
 
         /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
         [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, TReturnType>()
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, [NotAGraphType] TReturnType>()
             where TGraphType : IGraphType
             => Field<TGraphType, TReturnType>("default");
 
@@ -505,7 +505,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false)
+        public virtual FieldBuilder<TSourceType, TReturnType> Field<[NotAGraphType] TReturnType>(string name, bool nullable = false)
         {
             Type type;
 

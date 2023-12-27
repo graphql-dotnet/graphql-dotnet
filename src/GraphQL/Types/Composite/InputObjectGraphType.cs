@@ -36,7 +36,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="IInputObjectGraphType"/>
-    public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
+    public class InputObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
         /// <summary>
         /// Initializes a new instance.
@@ -128,7 +128,7 @@ namespace GraphQL.Types
             if (value == null)
                 return null;
 
-            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
             string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
             PropertyInfo? propertyInfo;
             try

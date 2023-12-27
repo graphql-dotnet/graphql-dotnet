@@ -19,7 +19,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
             Query = "query firstQuery {test} query secondQuery {test}",
             Schema = Schema,
             OperationName = operationName,
-        }).ConfigureAwait(false);
+        });
         valid.ShouldNotBeNull();
         valid.Data.ShouldNotBeNull();
         valid.Errors.ShouldBeNull();
@@ -37,7 +37,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
             Query = "query firstQuery {test} query secondQuery {test}",
             Schema = Schema,
             OperationName = operationName
-        }).ConfigureAwait(false);
+        });
         result.ShouldNotBeNull();
         result.Data.ShouldBeNull();
         result.Errors.ShouldNotBeNull();

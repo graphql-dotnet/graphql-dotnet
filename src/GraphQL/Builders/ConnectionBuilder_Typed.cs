@@ -6,7 +6,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source and return type.
     /// </summary>
-    public class ConnectionBuilder<TSourceType, TReturnType>
+    public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>
     {
         private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
@@ -170,7 +170,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, TArgumentType>(string name, string? description,
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -228,7 +228,7 @@ namespace GraphQL.Builders
         /// Sets the return type of the field.
         /// </summary>
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
-        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>()
+        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
         {
             return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
         }
