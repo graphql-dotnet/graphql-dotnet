@@ -75,7 +75,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
     protected virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
-        new(_memoryCache.TryGetValue<GraphQLDocument>(options.Query, out var value) ? value : null);
+        new(_memoryCache.TryGetValue<GraphQLDocument>(options.Query!, out var value) ? value : null);
 
     /// <summary>
     /// Sets a document in the cache. Must be thread-safe.
@@ -89,7 +89,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             throw new ArgumentNullException(nameof(value));
         }
 
-        _memoryCache.Set(options.Query, value, GetMemoryCacheEntryOptions(options));
+        _memoryCache.Set(options.Query!, value, GetMemoryCacheEntryOptions(options));
 
         return default;
     }
