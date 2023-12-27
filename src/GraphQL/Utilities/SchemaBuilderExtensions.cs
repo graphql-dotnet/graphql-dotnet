@@ -8,13 +8,13 @@ namespace GraphQL.Utilities
         private const string AST_METAFIELD = "__AST_MetaField__"; // TODO: possible remove
         private const string EXTENSION_AST_METAFIELD = "__EXTENSION_AST_MetaField__"; // TODO: possible remove
 
-        public static bool IsExtensionType(this IProvideMetadata type)
+        public static bool IsExtensionType(this IMetadataReader type)
         {
             return type.HasExtensionAstTypes()
                 && !type.AstTypeHasFields();
         }
 
-        public static bool AstTypeHasFields(this IProvideMetadata type)
+        public static bool AstTypeHasFields(this IMetadataReader type)
         {
             return GetAstType<ASTNode>(type) switch
             {
@@ -24,13 +24,13 @@ namespace GraphQL.Utilities
             };
         }
 
-        public static T? GetAstType<T>(this IProvideMetadata type) where T : class // TODO: possible remove
+        public static T? GetAstType<T>(this IMetadataReader type) where T : class // TODO: possible remove
         {
             return type.GetMetadata<T>(AST_METAFIELD);
         }
 
         public static TMetadataProvider SetAstType<TMetadataProvider>(this TMetadataProvider provider, ASTNode node) // TODO: possible remove
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataWriter
 
         {
             provider.WithMetadata(AST_METAFIELD, node); //TODO: remove?
@@ -42,7 +42,7 @@ namespace GraphQL.Utilities
         }
 
         public static TMetadataProvider CopyDirectivesFrom<TMetadataProvider>(this TMetadataProvider provider, IHasDirectivesNode node)
-            where TMetadataProvider : IProvideMetadata
+            where TMetadataProvider : IMetadataWriter
         {
             if (node.Directives?.Count > 0)
             {
@@ -61,15 +61,14 @@ namespace GraphQL.Utilities
             return provider;
         }
 
-        public static bool HasExtensionAstTypes(this IProvideMetadata type)
+        public static bool HasExtensionAstTypes(this IMetadataReader type)
         {
             return type.HasMetadata(EXTENSION_AST_METAFIELD) && GetExtensionAstTypes(type).Count > 0;
         }
 
-        public static void AddExtensionAstType<T>(this IProvideMetadata type, T astType)
-            where T : ASTNode
+        public static void AddExtensionAstType<T>(this IMetadataWriter type, T astType) where T : ASTNode
         {
-            var types = GetExtensionAstTypes(type);
+            var types = GetExtensionAstTypes(type.MetadataReader);
             types.Add(astType);
             type.Metadata[EXTENSION_AST_METAFIELD] = types;
 
@@ -77,12 +76,12 @@ namespace GraphQL.Utilities
                 type.CopyDirectivesFrom(ast);
         }
 
-        public static List<ASTNode> GetExtensionAstTypes(this IProvideMetadata type)
+        public static List<ASTNode> GetExtensionAstTypes(this IMetadataReader type)
         {
             return type.GetMetadata(EXTENSION_AST_METAFIELD, () => new List<ASTNode>())!;
         }
 
-        public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IProvideMetadata type) where T : ASTNode
+        public static IEnumerable<GraphQLDirective> GetExtensionDirectives<T>(this IMetadataReader type) where T : ASTNode
         {
             var types = type.GetExtensionAstTypes().OfType<IHasDirectivesNode>().Where(n => n.Directives != null);
             return types.SelectMany(x => x.Directives!);

@@ -108,11 +108,15 @@
             file: gql008.md
           - title: GQL009
             file: gql009.md
+          - title: GQL010
+            file: gql010.md
           - title: GQL011
             file: gql011.md
       - title: Migration Guides
         dir: migrations
         items:
+          - title: Migration Guide [v7 -> v8]
+            file: migration8.md
           - title: Migration Guide [v5 -> v7]
             file: migration7.md
           - title: Migration Guide [v4 -> v5]

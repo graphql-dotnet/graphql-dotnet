@@ -24,6 +24,7 @@ public class AliasedInputFieldSchema : Schema
 {
     public AliasedInputFieldSchema()
     {
+        Query = new DummyType();
         Mutation = new AliasedInputFieldMutation();
     }
 }

@@ -3,6 +3,7 @@ using GraphQL.DI;
 using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
+using GraphQL.Types.Relay;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -23,6 +24,10 @@ public class SchemaTypesTests
         services.AddSingleton<DroidType>();
         services.AddSingleton<CharacterInterface>();
         services.AddSingleton<EpisodeEnum>();
+        services.AddSingleton<PageInfoType>();
+        services.AddSingleton(typeof(ConnectionType<>));
+        services.AddSingleton(typeof(ConnectionType<,>));
+        services.AddSingleton(typeof(EdgeType<>));
         using var provider = services.BuildServiceProvider();
 
         // mock it so we can verify behavior
@@ -43,6 +48,12 @@ public class SchemaTypesTests
         mock.Verify(x => x.GetService(typeof(EpisodeEnum)), Times.Once);
         mock.Verify(x => x.GetService(typeof(IEnumerable<IConfigureSchema>)), Times.Once);
         mock.Verify(x => x.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(PageInfoType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(ConnectionType<CharacterInterface, EdgeType<CharacterInterface>>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(EdgeType<CharacterInterface>)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(IntGraphType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(StringGraphType)), Times.Once);
+        mock.Verify(x => x.GetService(typeof(BooleanGraphType)), Times.Once);
         mock.VerifyNoOtherCalls();
     }
 
@@ -59,7 +70,7 @@ public class SchemaTypesTests
             Name = "Query"
         };
 
-        schema.RegisterType(queryGraphType);
+        schema.Query = queryGraphType;
 
         // Object 1
         var graphType1 = new ObjectGraphType
@@ -107,5 +118,129 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             Initialize(schema, serviceProvider, null);
             Should.Throw<InvalidOperationException>(() => Initialize(schema, serviceProvider, null));
         }
+    }
+
+    [Fact]
+    public void can_initialize_built_in_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = Mock.Of<IServiceProvider>(MockBehavior.Loose);
+
+        // create a schema for the built-in types
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("string");
+        queryType.Field<IntGraphType>("int");
+        queryType.Field<IdGraphType>("id");
+        queryType.Field<BooleanGraphType>("boolean");
+        queryType.Field<FloatGraphType>("float");
+        var schema = new Schema(mockServiceProvider)
+        {
+            Query = queryType
+        };
+
+        // attempt to initialize the schema
+        schema.Initialize();
+    }
+
+    [Fact]
+    public void can_initialize_built_in_custom_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = Mock.Of<IServiceProvider>(MockBehavior.Loose);
+
+        // create a schema for the built-in types
+        var queryType = new ObjectGraphType();
+
+        // date/time types
+        queryType.Field<DateTimeGraphType>("datetime");
+        queryType.Field<DateTimeOffsetGraphType>("datetimeoffset");
+        queryType.Field<DateGraphType>("date");
+        queryType.Field<TimeSpanSecondsGraphType>("timespanseconds");
+        queryType.Field<TimeSpanMillisecondsGraphType>("timespanmilliseconds");
+#if NET6_0_OR_GREATER
+        queryType.Field<DateOnlyGraphType>("dateonly");
+        queryType.Field<TimeOnlyGraphType>("timeonly");
+#endif
+
+        // floating-point types
+        queryType.Field<DecimalGraphType>("decimal");
+#if NET5_0_OR_GREATER
+        queryType.Field<HalfGraphType>("half");
+#endif
+
+        // integer types
+        queryType.Field<BigIntGraphType>("bigint");
+        queryType.Field<UIntGraphType>("uint");
+        queryType.Field<LongGraphType>("long");
+        queryType.Field<ULongGraphType>("ulong");
+        queryType.Field<ShortGraphType>("short");
+        queryType.Field<UShortGraphType>("ushort");
+        queryType.Field<ByteGraphType>("byte");
+        queryType.Field<SByteGraphType>("sbyte");
+
+        // other types
+        queryType.Field<UriGraphType>("uri");
+        queryType.Field<GuidGraphType>("guid");
+
+        var schema = new Schema(mockServiceProvider)
+        {
+            Query = queryType
+        };
+
+        // attempt to initialize the schema
+        schema.Initialize();
+    }
+
+    [Fact]
+    public async Task can_override_built_in_types()
+    {
+        // create a service provider which returns null for all requested services
+        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Loose);
+        mockServiceProvider.Setup(x => x.GetService(typeof(StringGraphType))).Returns(new MyStringGraphType());
+        mockServiceProvider.Setup(x => x.GetService(typeof(GuidGraphType))).Returns(new MyGuidGraphType());
+
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("string").Resolve(_ => "test");
+        query.Field<GuidGraphType>("guid").Resolve(_ => Guid.NewGuid());
+
+        var schema = new Schema(mockServiceProvider.Object)
+        {
+            Query = query
+        };
+
+        schema.Initialize();
+
+        var result = await schema.ExecuteAsync(opts => opts.Query = "{ string guid }");
+
+        result.ShouldBeCrossPlatJson("""
+            {
+                "data": {
+                    "string": "test_",
+                    "guid": "00000001-0002-0003-0004-000000000005"
+                }
+            }
+            """);
+    }
+
+    private class MyStringGraphType : StringGraphType
+    {
+        public MyStringGraphType()
+        {
+            Name = "String";
+        }
+
+        public override object ParseValue(object value) => value?.ToString().TrimEnd('_');
+
+        public override object Serialize(object value) => value == null ? null : value.ToString() + "_";
+    }
+
+    private class MyGuidGraphType : GuidGraphType
+    {
+        public MyGuidGraphType()
+        {
+            Name = "Guid";
+        }
+
+        public override object Serialize(object value) => base.Serialize(new Guid("00000001-0002-0003-0004-000000000005"));
     }
 }

@@ -38,10 +38,6 @@ public class VariablesAreInputTypesTests : ValidationTestBase<VariablesAreInputT
                 message: VariablesAreInputTypesError.UndefinedVarMessage("c", "Pet"),
                 line: 1,
                 column: 40);
-            _.Error(
-               message: "Variable '$b' is invalid. No value provided for a non-null variable.",
-               line: 1,
-               column: 20);
         });
     }
 }

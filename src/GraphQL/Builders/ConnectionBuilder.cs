@@ -92,7 +92,7 @@ namespace GraphQL.Builders
     /// Builds a connection field for graphs that have the specified source type.
     /// </summary>
     // TODO: Remove in v5
-    public class ConnectionBuilder<[NotAGraphType] TSourceType>
+    public class ConnectionBuilder<[NotAGraphType] TSourceType> : IMetadataWriter
     {
         internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
 
@@ -405,7 +405,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
+        public virtual ConnectionBuilder<TSourceType> Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -415,12 +415,14 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
+        public virtual ConnectionBuilder<TSourceType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -430,6 +432,8 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return new ValueTask<object?>(resolver(connectionContext));
             });
+
+            return this;
         }
 
         private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
@@ -443,5 +447,14 @@ namespace GraphQL.Builders
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
         }
+
+        // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
+        // exposing metadata methods directly on the field builder; users can always use the FieldType property
+        // to access the underlying metadata directly.
+        Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+        IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

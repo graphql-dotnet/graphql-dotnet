@@ -26,7 +26,7 @@ public class DataLoaderDocumentListener : IDocumentExecutionListener
     /// <inheritdoc/>
     public Task BeforeExecutionAsync(IExecutionContext context)
     {
-        _accessor.Context ??= new();
+        _accessor.Context = new();
 
         return Task.CompletedTask;
     }

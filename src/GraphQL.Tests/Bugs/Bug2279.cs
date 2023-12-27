@@ -35,6 +35,8 @@ public class Bug2279GraphType<T> : ObjectGraphType<T>
 {
     public Bug2279GraphType()
     {
+        Name = "Bug2279GraphType_1";
+
         if (typeof(T) == typeof(int))
         {
             Field<IntGraphType, T>("value").Resolve(x => x.Source);

@@ -12,5 +12,6 @@ public static class HelpLinks
     public const string CAN_NOT_SET_SOURCE_FIELD = $"{DOCS_URL}/gql007";
     public const string DO_NOT_USE_OBSOLETE_ARGUMENT_METHOD = $"{DOCS_URL}/gql008";
     public const string USE_ASYNC_RESOLVER = $"{DOCS_URL}/gql009";
+    public const string CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR = $"{DOCS_URL}/gql010";
     public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = $"{DOCS_URL}/gql011";
 }

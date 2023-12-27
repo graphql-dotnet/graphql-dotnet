@@ -50,6 +50,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
             Query = "{ abcd }"
         };
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
+        schema.Query = new DummyType();
         schema.FieldMiddleware = mockMiddleware;
 
         await docExec.ExecuteAsync(execOptions);
@@ -69,6 +70,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         };
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
         schema.FieldMiddleware = mockMiddleware;
+        schema.Query = new DummyType();
 
         await docExec.ExecuteAsync(execOptions);
         await docExec.ExecuteAsync(execOptions);

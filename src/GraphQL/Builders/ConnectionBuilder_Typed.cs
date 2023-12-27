@@ -6,7 +6,7 @@ namespace GraphQL.Builders
     /// <summary>
     /// Builds a connection field for graphs that have the specified source and return type.
     /// </summary>
-    public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType>
+    public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IMetadataWriter
     {
         private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
@@ -237,7 +237,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -247,13 +247,15 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return resolver(connectionContext);
             });
+
+            return this;
         }
 
         /// <summary>
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
+        public virtual ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;
             var pageSize = PageSizeFromMetadata;
@@ -263,6 +265,8 @@ namespace GraphQL.Builders
                 CheckForErrors(connectionContext);
                 return new ValueTask<TReturnType?>(resolver(connectionContext));
             });
+
+            return this;
         }
 
         private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
@@ -276,5 +280,14 @@ namespace GraphQL.Builders
                 throw new ArgumentException("Cannot use `last` with unidirectional connections.");
             }
         }
+
+        // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
+        // exposing metadata methods directly on the field builder; users can always use the FieldType property
+        // to access the underlying metadata directly.
+        Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+        IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+        TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+        TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+        bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
     }
 }

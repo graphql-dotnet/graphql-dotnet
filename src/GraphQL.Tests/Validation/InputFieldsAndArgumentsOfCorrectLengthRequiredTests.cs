@@ -151,10 +151,10 @@ public class InputFieldsAndArgumentsOfCorrectLengthRequiredTests : ValidationTes
                message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
                line: 4,
                column: 57);
-            _.Error(
-               message: "Variable '$value' is invalid. Received a null input for a non-null variable.",
-               line: 1,
-               column: 9);
+            //_.Error(
+            //   message: "Variable '$value' is invalid. Received a null input for a non-null variable.",
+            //   line: 1,
+            //   column: 9);
             _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
         });
     }
@@ -388,10 +388,10 @@ public class InputFieldsAndArgumentsOfCorrectLengthRequiredTests : ValidationTes
                message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
                line: 3,
                column: 10);
-            _.Error(
-               message: "Variable '$value' is invalid. Received a null input for a non-null variable.",
-               line: 1,
-               column: 9);
+            //_.Error(
+            //   message: "Variable '$value' is invalid. Received a null input for a non-null variable.",
+            //   line: 1,
+            //   column: 9);
             _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
         });
     }

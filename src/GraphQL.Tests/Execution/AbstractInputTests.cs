@@ -7,14 +7,8 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
     [Fact]
     public void throws_literals()
     {
-        const string query = """
-            mutation M {
-              run(input: { id: "123" })
-            }
-            """;
-        const string expected = """{ "run": null }""";
-        var res = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
-        res.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+        Should.Throw<InvalidOperationException>(() => Schema.Initialize())
+            .Message.ShouldBe("No public constructors found on CLR type 'MyInputClassBase'.");
     }
 }
 
@@ -22,6 +16,7 @@ public class AbstractInputSchema : Schema
 {
     public AbstractInputSchema()
     {
+        Query = new DummyType();
         Mutation = new AbstractInputMutation();
     }
 }

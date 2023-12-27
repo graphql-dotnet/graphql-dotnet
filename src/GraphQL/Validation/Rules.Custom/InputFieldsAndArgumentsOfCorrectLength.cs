@@ -64,7 +64,7 @@ namespace GraphQL.Validation.Rules
             })
         );
 
-        private static void CheckLength(ASTNode node, GraphQLValue value, IProvideMetadata? provider, ValidationContext context)
+        private static void CheckLength(ASTNode node, GraphQLValue value, IMetadataReader? provider, ValidationContext context)
         {
             var lengthDirective = provider?.FindAppliedDirective("length");
             if (lengthDirective == null)

@@ -21,11 +21,11 @@ public class SchemaTests
 
         ContainsTypeNames(
             schema,
-            "RootSchemaType",
-            "ASchemaType",
-            "BSchemaType",
-            "CSchemaType",
-            "DSchemaType");
+            "RootSchema",
+            "ASchema",
+            "BSchema",
+            "CSchema",
+            "DSchema");
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class SchemaTests
 
         ContainsTypeNames(
             schema,
-            "DListType");
+            "DList");
     }
 
     [Fact]
@@ -67,8 +67,8 @@ public class SchemaTests
         ContainsTypeNames(
             schema,
             "AUnion",
-            "WithoutIsTypeOf1Type",
-            "WithoutIsTypeOf2Type");
+            "WithoutIsTypeOf1",
+            "WithoutIsTypeOf2");
     }
 
     [Fact]
@@ -114,14 +114,14 @@ public class SchemaTests
     {
         var schema = new ARootSchema();
 
-        DoesNotContainTypeNames(schema, "ASchemaType!");
+        DoesNotContainTypeNames(schema, "ASchema!");
     }
 
     [Fact]
     public void handles_cycle_field_type()
     {
         var schema = new SimpleCycleSchema();
-        schema.AllTypes["CycleType"].ShouldNotBeNull();
+        schema.AllTypes["Cycle"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -184,7 +184,10 @@ public class SchemaTests
     [Fact]
     public void initialized_schema_should_throw_error_when_register_type_or_directive()
     {
-        var schema = new Schema();
+        var schema = new Schema()
+        {
+            Query = new DummyType()
+        };
 
         schema.Initialized.ShouldBeFalse();
         schema.Initialize();

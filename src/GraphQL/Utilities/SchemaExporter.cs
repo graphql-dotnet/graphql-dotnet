@@ -239,7 +239,7 @@ public class SchemaExporter
     /// Converts the specified type definition to an extension definition
     /// if it was defined as such by the <see cref="SchemaBuilder"/>.
     /// </summary>
-    protected virtual ASTNode ApplyExtend(ASTNode node, IProvideMetadata graphType)
+    protected virtual ASTNode ApplyExtend(ASTNode node, IMetadataReader graphType)
     {
         if (graphType.HasExtensionAstTypes() && graphType.GetAstType<ASTNode>() == null)
         {
@@ -484,7 +484,7 @@ public class SchemaExporter
     /// already set on the schema object, then the deprecation reason is added
     /// as a directive also.
     /// </summary>
-    protected virtual T ApplyDirectives<T>(T node, IProvideMetadata obj) // v8: IMetadataReader
+    protected virtual T ApplyDirectives<T>(T node, IMetadataReader obj) // v8: IMetadataReader
         where T : IHasDirectivesNode
     {
         var deprecationReason = (obj as IProvideDeprecationReason)?.DeprecationReason;

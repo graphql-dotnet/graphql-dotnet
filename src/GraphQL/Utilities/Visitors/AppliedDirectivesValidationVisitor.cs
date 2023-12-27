@@ -63,7 +63,7 @@ namespace GraphQL.Utilities
         public void VisitUnion(UnionGraphType type, ISchema schema) => ValidateAppliedDirectives(type, null, null, schema, DirectiveLocation.Union);
 
         /// <inheritdoc/>
-        private void ValidateAppliedDirectives(IProvideMetadata provider, object? parent1, object? parent2, ISchema schema, DirectiveLocation? location)
+        private void ValidateAppliedDirectives(IMetadataReader provider, object? parent1, object? parent2, ISchema schema, DirectiveLocation? location)
         {
             //TODO: switch to the schema coordinates?
             string GetElementDescription() => (provider, parent1, parent2) switch

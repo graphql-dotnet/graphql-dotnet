@@ -488,6 +488,7 @@ namespace GraphQL.Types
             CoerceInputTypeDefaultValues();
             SchemaValidationVisitor.Instance.Run(this);
             AppliedDirectivesValidationVisitor.Instance.Run(this);
+            FieldTypeDefaultArgumentsVisitor.Instance.Run(this);
         }
 
         /// <summary>

@@ -186,6 +186,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 
@@ -234,6 +235,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 
@@ -906,6 +908,14 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 
+    /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
+    public static IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this IGraphQLBuilder builder)
+        where TConfigureSchema : class, IConfigureSchema
+    {
+        builder.Services.TryRegister<IConfigureSchema, TConfigureSchema>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
+
     /// <summary>
     /// Configures an action to configure execution options, which run prior to calls to
     /// <see cref="ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see>
@@ -941,7 +951,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
         where TConfigureExecution : class, IConfigureExecution
     {
-        builder.Services.Register<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 
@@ -974,10 +984,10 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="useForCachedDocuments"/> is <see langword="true"/>, do not separately install the validation rule within
     /// your execution code or the validation rule may be run twice for each execution.
     /// </remarks>
-    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false)
+    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
+        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(serviceLifetime);
         builder.ConfigureExecutionOptions(options =>
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
@@ -1027,10 +1037,10 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="useForCachedDocuments"/> is <see langword="true"/>, do not separately install the validation rule within
     /// your execution code or the validation rule may be run twice for each execution.
     /// </remarks>
-    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
+    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
+        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), serviceLifetime);
         builder.ConfigureExecutionOptions(options =>
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();

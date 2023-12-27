@@ -276,6 +276,17 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
+
+        // initialize schema
+        var services = new ServiceCollection();
+        services
+            .AddSingleton("testService")
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(b => b.RegisterType(graphType)));
+        using var provider = services.BuildServiceProvider();
+        provider.GetRequiredService<ISchema>().Initialize();
+
         using var cts = new CancellationTokenSource();
         cts.Cancel();
         var context = new ResolveFieldContext
@@ -283,6 +294,8 @@ public class AutoRegisteringObjectGraphTypeTests
             Arguments = new Dictionary<string, ArgumentValue>(),
             CancellationToken = cts.Token,
             Source = new ArgumentTests(),
+            FieldDefinition = fieldType,
+            RequestServices = provider,
         };
         if (arg1Name != null)
         {
@@ -292,10 +305,6 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             context.Arguments.Add("arg2", new ArgumentValue(arg2Value, ArgumentSource.Variable));
         }
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton<string>("testService");
-        using var provider = serviceCollection.BuildServiceProvider();
-        context.RequestServices = provider;
         fieldType.Resolver.ShouldNotBeNull();
         (await fieldType.Resolver!.ResolveAsync(context)).ShouldBe(expected);
     }
@@ -473,6 +482,14 @@ public class AutoRegisteringObjectGraphTypeTests
         var graphType = new TestFieldSupport<TestStructModel>();
         graphType.Name.ShouldBe("Test");
         graphType.Fields.Count.ShouldBe(3);
+
+        // initialize graph type
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<Class1>()
+            .ConfigureSchema(s => s.RegisterType(graphType)));
+        services.BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
+
         var context = new ResolveFieldContext
         {
             Source = new TestStructModel(),
@@ -480,11 +497,19 @@ public class AutoRegisteringObjectGraphTypeTests
             {
                 { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
             },
+            FieldDefinition = graphType.Fields.Find("id")!,
         };
-        (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
-        graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
-        (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
-        (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
+        (await graphType.Fields.Find("id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
+        graphType.Fields.Find("id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+        context.FieldDefinition = graphType.Fields.Find("name")!;
+        (await graphType.Fields.Find("name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
+        context.FieldDefinition = graphType.Fields.Find("idAndName")!;
+        (await graphType.Fields.Find("idAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
+    }
+
+    public class Class1
+    {
+        public string? Test { get; set; }
     }
 
     [Fact]
@@ -686,7 +711,7 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         public int Field1 { get; set; } = 1;
         public int Field2 => 2;
-        public int Field3 { set { } }
+        public int Field3 { private get => 123; set { } }
         public int Field4() => 4;
         public int Field5 = 5;
         [Name("Field6AltName")]
