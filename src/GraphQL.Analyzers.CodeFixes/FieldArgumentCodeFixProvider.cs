@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Composition;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -135,15 +136,14 @@ public class FieldArgumentCodeFixProvider : CodeFixProvider
 
         SimpleLambdaExpressionSyntax ConvertBodyConfigureLambdaToBlockLambda(SimpleLambdaExpressionSyntax lambda)
         {
-            var whitespace = Whitespace(" ");
             var block = SyntaxFactory
                 .Block(
                     ExpressionStatement(lambda.ExpressionBody!.WithoutTrailingTrivia())
-                        .WithLeadingTrivia(whitespace),
+                        .WithLeadingTrivia(Space),
                     ExpressionStatement(
                             CreateDefaultValuePropertyAssignment(lambda.Parameter.ToString(), defaultValueArg.Expression))
-                        .WithLeadingTrivia(whitespace)
-                        .WithTrailingTrivia(whitespace))
+                        .WithLeadingTrivia(Space)
+                        .WithTrailingTrivia(Space))
                 .WithLeadingTrivia(lambda.ExpressionBody!.GetLeadingTrivia());
 
             return SimpleLambdaExpression(lambda.Parameter, block)

@@ -24,7 +24,18 @@ public class GraphQLTelemetryOptions
     public Func<ExecutionOptions, string?> SanitizeDocument { get; set; } = options => options.Query;
 
     /// <summary>
-    /// Indicates whether the GraphQL execution is included in the telemetry.
+    /// Gets or sets a value indicating whether the exception will be recorded as ActivityEvent.
+    /// </summary>
+    /// <remarks>
+    /// https://github.com/open-telemetry/semantic-conventions/blob/main/docs/exceptions/exceptions-spans.md.
+    /// </remarks>
+    public bool RecordException { get; set; }
+
+    /// <summary>
+    /// Indicates whether to collect telemetry about the GraphQL query execution.
+    /// If filter returns <see langword="true" />, the telemetry is collected.
+    /// If filter returns <see langword="false" />, the telemetry for the GraphQL query
+    /// and all the downstream calls is not collected.
     /// </summary>
     public Func<ExecutionOptions, bool> Filter { get; set; } = _ => true;
 

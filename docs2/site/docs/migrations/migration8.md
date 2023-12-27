@@ -38,6 +38,11 @@ services.AddSingleton<BooleanGraphType, MyBooleanGraphType>();
 See https://graphql-dotnet.github.io/docs/getting-started/custom-scalars/#3-register-the-custom-scalar-within-your-schema
 for more details.
 
+### 3. Added `ComplexScalarGraphType`
+
+This new scalar can be used to send or receive arbitrary objects or values to or from the server. It is functionally
+equivalent to the `AnyGraphType` used for GraphQL Federation, but defaults to the name of `Complex` rather than `_Any`.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -92,3 +97,57 @@ Specifically, this relates to the following methods:
 - `UseConfiguration<T>()` with the same `T` type
 
 This change was made to prevent duplicate registrations of the same service within the DI container.
+
+### 6. `ObjectExtensions.ToObject` changes (impacts `InputObjectGraphType`)
+
+- `ObjectExtensions.ToObject<T>` was removed; it was only used by internal tests.
+- `ObjectExtensions.ToObject` requires input object graph type for conversion.
+- Only public constructors are eligible candidates while selecting a constructor.
+- Constructor is selected based on the following rules:
+  - If only a single public constructor is available, it is used.
+  - If a public constructor is marked with `[GraphQLConstructor]`, it is used.
+  - Otherwise the public parameterless constructor is used if available.
+  - Otherwise an exception is thrown during deserialization.
+- Only public properties are eligible candidates when matching a property.
+- Any init-only or required properties not provided in the dictionary are set to their default values.
+- Only public writable fields are eligible candidates when matching a field.
+
+The changes above allow for matching behavior with source-generated or dynamically-compiled functions.
+
+### 7. `AutoRegisteringInputObjectGraphType` changes
+
+- See above changes to `ObjectExtensions.ToObject` for deserialization notes.
+- Registers read-only properties when the property name matches the name of a parameter in the
+  chosen constructor. Comparison is case-insensitive, matching `ToObject` behavior.
+  Does not register constructor parameters that are not read-only properties.
+  Any attributes such as `[Id]` must be applied to the property, not the constructor parameter.
+
+### 8. Default naming of generic graph types has changed
+
+The default graph name of generic types has changed to include the generic type name.
+This should reduce naming conflicts when generics are in use. To consolidate behavior
+across different code paths, both `Type` and `GraphType` are stripped from the end
+of the class name. See below examples:
+
+| Graph type class name | Old graph type name | New graph type name |
+|------------------|---------------------|---------------------|
+| `PersonType` | `PersonType` | `Person` |
+| `PersonGraphType` | `Person` | `Person` |
+| `AutoRegisteringObjectGraphType<SearchResults<Person>>` | `SearchResults` | `PersonSearchResults` |
+| `LoggerGraphType<Person, string>` | `Logger` | `PersonStringLogger` |
+| `InputObjectGraphType<Person>` | `InputObject_1` | `PersonInputObject` |
+
+To revert to the prior behavior, set the following global switch prior to creating your schema classes:
+
+```csharp
+using GraphQL;
+
+GlobalSwitches.UseLegacyTypeNaming = true;
+```
+
+As usual, you are encouraged to set the name in the constructor of your class, or
+immediately after construction, or for auto-registering types, via an attribute.
+You can also set global attributes that will be applied to all auto-registering types
+if you wish to define your own naming logic.
+
+The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.

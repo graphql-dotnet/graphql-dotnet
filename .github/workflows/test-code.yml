@@ -32,7 +32,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Setup .NET SDKs
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             3.1.x
@@ -51,7 +51,7 @@ jobs:
         run: dotnet build --no-restore -c Release
       - name: Build solution [Debug]
         working-directory: src
-        run: dotnet build --no-restore -c Debug
+        run: dotnet build --no-restore -c Debug -p:DeterministicSourcePaths=false
       - name: Test solution [Debug] with code coverage
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
@@ -94,7 +94,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Setup .NET SDKs
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -36,7 +37,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
         Constants.MethodNames.ResolveStreamAsync
     };
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(IllegalResolverUsage);
 
     public override void Initialize(AnalysisContext context)
@@ -57,7 +58,7 @@ public class ResolverAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!resolveMemberAccessExpression.IsGraphQLSymbol(context))
+        if (!resolveMemberAccessExpression.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }

@@ -26,7 +26,7 @@ namespace GraphQL.Introspection
         /// </param>
         public __InputValue(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
-            Name = nameof(__InputValue);
+            SetName(nameof(__InputValue), validate: false);
 
             Description =
                 "Arguments provided to Fields or Directives and the input fields of an " +

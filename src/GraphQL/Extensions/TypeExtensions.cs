@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
+using System.Text;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -63,12 +64,73 @@ namespace GraphQL
         }
 
         /// <summary>
-        /// Gets the GraphQL name of the type. This is derived from the type name and can be overridden by the <see cref="GraphQLMetadataAttribute"/>.
+        /// Gets the GraphQL name of the type. This is derived from the type name and can
+        /// be overridden by the <see cref="GraphQLMetadataAttribute"/>. The name is chosen
+        /// depending on <see cref="GlobalSwitches.UseLegacyTypeNaming"/>.
         /// </summary>
         /// <param name="type">The indicated type.</param>
         /// <returns>A string containing a GraphQL compatible type name.</returns>
         public static string GraphQLName(this Type type)
         {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (!GlobalSwitches.UseLegacyTypeNaming)
+#pragma warning restore CS0618 // Type or member is obsolete
+            {
+                return NameOf(type)
+                    .Replace('@', '_'); // F# anonymous class support
+
+                static string NameOf(Type type)
+                {
+                    type = type.GetNamedType();
+
+                    if (!typeof(IGraphType).IsAssignableFrom(type))
+                    {
+                        var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+                        if (!string.IsNullOrEmpty(attr?.Name))
+                        {
+                            return attr!.Name!;
+                        }
+                    }
+
+                    var name = type.Name;
+
+                    if (type.IsGenericType)
+                        name = name.Substring(0, name.IndexOf('`'));
+
+                    if (name != "GraphType" && name != "Type")
+                    {
+                        if (name.EndsWith("GraphType", StringComparison.Ordinal))
+                        {
+                            name = name.Substring(0, name.Length - "GraphType".Length);
+                        }
+                        else if (name.EndsWith("Type", StringComparison.Ordinal))
+                        {
+                            name = name.Substring(0, name.Length - "Type".Length);
+                        }
+                    }
+
+                    if (GlobalSwitches.UseDeclaringTypeNames)
+                    {
+                        var parent = type.DeclaringType;
+                        while (parent != null)
+                        {
+                            name = $"{parent.Name}_{name}";
+                            parent = parent.DeclaringType;
+                        }
+                    }
+
+                    if (!type.IsGenericType)
+                        return name;
+                    var sb = new StringBuilder();
+                    foreach (var arg in type.GetGenericArguments())
+                    {
+                        sb.Append(NameOf(arg));
+                    }
+                    sb.Append(name);
+                    return sb.ToString();
+                }
+            }
+
             type = type.GetNamedType();
 
             var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();

@@ -212,6 +212,7 @@ namespace GraphQL
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
+        public static bool DynamicallyCompileToObject { get; set; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -222,6 +223,8 @@ namespace GraphQL
         public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
+        [System.Obsolete("This property will be removed in v9.")]
+        public static bool UseLegacyTypeNaming { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
@@ -401,8 +404,27 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TProvider> telemetryProviderFactory)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, TProvider telemetryProvider)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions>? configure = null)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
+        public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<TOptions, System.IServiceProvider>? configure)
+            where TProvider : GraphQL.Telemetry.GraphQLTelemetryProvider
+            where TOptions : GraphQL.Telemetry.GraphQLTelemetryOptions, new () { }
         public static GraphQL.IConfigureAutoSchema WithMutation<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Constructor, AllowMultiple=false)]
+    public class GraphQLConstructorAttribute : System.Attribute
+    {
+        public GraphQLConstructorAttribute() { }
     }
     public static class GraphQLExtensions
     {
@@ -613,11 +635,10 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType? mappedType = null) { }
+        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType) { }
+        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
-        public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
-            where T :  class { }
+        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
@@ -1748,6 +1769,7 @@ namespace GraphQL.Telemetry
         public System.Action<System.Diagnostics.Activity, GraphQL.ExecutionOptions, GraphQL.ExecutionResult> EnrichWithExecutionResult { get; set; }
         public System.Func<GraphQL.ExecutionOptions, bool> Filter { get; set; }
         public bool RecordDocument { get; set; }
+        public bool RecordException { get; set; }
         public System.Func<GraphQL.ExecutionOptions, string?> SanitizeDocument { get; set; }
     }
     public class GraphQLTelemetryProvider : GraphQL.DI.IConfigureExecution
@@ -1757,9 +1779,12 @@ namespace GraphQL.Telemetry
         protected static System.Diagnostics.ActivitySource ActivitySource { get; }
         public static string SourceName { get; }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+        protected virtual System.Threading.Tasks.Task OnExceptionAsync(System.Diagnostics.Activity activity, System.Exception ex) { }
         protected virtual System.Threading.Tasks.Task SetInitialTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options) { }
         protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
+        protected virtual System.Diagnostics.Activity? StartActivity(GraphQL.ExecutionOptions options) { }
+        [System.Obsolete("Use the sync method \'StartActivity\'. This method will be removed in v8.")]
         protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivityAsync(GraphQL.ExecutionOptions options) { }
     }
 }
@@ -1842,7 +1867,7 @@ namespace GraphQL.Types
         public static GraphQL.Resolvers.IFieldResolver BuildFieldResolver(System.Reflection.MemberInfo memberInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
         public static GraphQL.Resolvers.ISourceStreamResolver BuildSourceStreamResolver(System.Reflection.MethodInfo methodInfo, System.Type? sourceType, GraphQL.Types.FieldType? fieldType, System.Linq.Expressions.LambdaExpression instanceExpression) { }
     }
-    public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
+    public class AutoRegisteringInputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.InputObjectGraphType<TSourceType>
     {
         public AutoRegisteringInputObjectGraphType() { }
         public AutoRegisteringInputObjectGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
@@ -2011,6 +2036,16 @@ namespace GraphQL.Types
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
+    }
+    public class ComplexScalarGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public ComplexScalarGraphType() { }
+        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanParseValue(object? value) { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
@@ -2321,9 +2356,10 @@ namespace GraphQL.Types
     {
         public InputObjectGraphType() { }
     }
-    public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public class InputObjectGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]  TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
@@ -3001,15 +3037,9 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
-    public class AnyScalarGraphType : GraphQL.Types.ScalarGraphType
+    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
     {
         public AnyScalarGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override bool CanParseValue(object? value) { }
-        public override bool IsValidDefault(object value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class FederatedResolveContext
     {

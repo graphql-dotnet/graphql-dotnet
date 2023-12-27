@@ -1,4 +1,4 @@
-namespace GraphQL.Analyzers;
+namespace GraphQL.Analyzers.Helpers;
 
 public static class DiagnosticIds
 {
@@ -10,4 +10,7 @@ public static class DiagnosticIds
     public const string CAN_NOT_MATCH_INPUT_FIELD_TO_THE_SOURCE_FIELD = "GQL006";
     public const string CAN_NOT_SET_SOURCE_FIELD = "GQL007";
     public const string DO_NOT_USE_OBSOLETE_ARGUMENT_METHOD = "GQL008";
+    public const string USE_ASYNC_RESOLVER = "GQL009";
+    public const string CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR = "GQL010";
+    public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = "GQL011";
 }

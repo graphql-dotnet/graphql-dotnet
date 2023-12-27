@@ -1,5 +1,6 @@
 using GraphQL.Execution;
 using GraphQL.Resolvers;
+using GraphQL.Types;
 using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,7 +41,14 @@ public class NameFieldResolverTests
             new ResolveFieldContext
             {
                 Source = person,
-                FieldDefinition = new GraphQL.Types.FieldType { Name = name },
+                FieldDefinition = new FieldType
+                {
+                    Name = name,
+                    Arguments = new QueryArguments
+                    {
+                        new QueryArgument(new StringGraphType()) { Name = "prefix" },
+                    },
+                },
                 FieldAst = new GraphQLField(name == null ? default : new GraphQLName(name)),
                 Arguments = new Dictionary<string, ArgumentValue>()
                 {

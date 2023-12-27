@@ -9,7 +9,7 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
     public void byte_array_should_work()
     {
         const string query = """
-            query BytesRequest($bytesHolder: Issue1874InputBytesType) {
+            query BytesRequest($bytesHolder: Issue1874InputBytes) {
               bytes(bytesObject: $bytesHolder) {
                 bytes
               }
@@ -23,7 +23,7 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
     public void string_should_work()
     {
         const string query = """
-            query BytesRequest($bytesHolder: Issue1874Input64BytesType) {
+            query BytesRequest($bytesHolder: Issue1874Input64Bytes) {
               bytes64(bytesObject: $bytesHolder) {
                 bytes
               }

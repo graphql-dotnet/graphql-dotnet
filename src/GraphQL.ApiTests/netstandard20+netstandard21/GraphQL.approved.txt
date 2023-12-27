@@ -212,6 +212,7 @@ namespace GraphQL
     {
         public static System.Action<string, GraphQL.Utilities.NamedElement> NameValidation;
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
+        public static bool DynamicallyCompileToObject { get; set; }
         public static bool EnableReadDefaultValueFromAttributes { get; set; }
         public static bool EnableReadDeprecationReasonFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromAttributes { get; set; }
@@ -222,6 +223,8 @@ namespace GraphQL
         public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
+        [System.Obsolete("This property will be removed in v9.")]
+        public static bool UseLegacyTypeNaming { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
@@ -393,6 +396,11 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Constructor, AllowMultiple=false)]
+    public class GraphQLConstructorAttribute : System.Attribute
+    {
+        public GraphQLConstructorAttribute() { }
     }
     public static class GraphQLExtensions
     {
@@ -603,11 +611,10 @@ namespace GraphQL
     }
     public static class ObjectExtensions
     {
-        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType? mappedType = null) { }
+        public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject(System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType) { }
+        public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
-        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType? mappedType = null) { }
-        public static T ToObject<T>(this System.Collections.Generic.IDictionary<string, object?> source)
-            where T :  class { }
+        public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
@@ -1964,6 +1971,16 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
     }
+    public class ComplexScalarGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public ComplexScalarGraphType() { }
+        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanParseValue(object? value) { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override object? Serialize(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
+    }
     public class ConstantCaseAttribute : GraphQL.Types.EnumCaseAttribute
     {
         public ConstantCaseAttribute() { }
@@ -2269,6 +2286,7 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
+        public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
@@ -2946,15 +2964,9 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
-    public class AnyScalarGraphType : GraphQL.Types.ScalarGraphType
+    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
     {
         public AnyScalarGraphType() { }
-        public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override bool CanParseValue(object? value) { }
-        public override bool IsValidDefault(object value) { }
-        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
-        public override object? ParseValue(object? value) { }
-        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     public class FederatedResolveContext
     {

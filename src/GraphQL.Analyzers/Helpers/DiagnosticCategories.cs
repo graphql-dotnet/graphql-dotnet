@@ -1,4 +1,4 @@
-namespace GraphQL.Analyzers;
+namespace GraphQL.Analyzers.Helpers;
 
 public static class DiagnosticCategories
 {

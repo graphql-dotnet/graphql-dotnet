@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,7 +43,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DIFFERENT_NAMES_DEFINED_BY_FIELD_AND_NAME_METHODS);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
         DefineTheNameInFieldMethod,
         NameMethodInvocationCanBeRemoved,
         DifferentNamesDefinedByFieldAndNameMethods);
@@ -63,7 +64,7 @@ public class FieldNameAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!nameMemberAccessExpression.IsGraphQLSymbol(context))
+        if (!nameMemberAccessExpression.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }

@@ -1,4 +1,6 @@
-namespace GraphQL.Analyzers;
+// ReSharper disable InconsistentNaming
+
+namespace GraphQL.Analyzers.Helpers;
 
 #pragma warning disable IDE1006 // Naming Styles
 public static class Constants
@@ -33,6 +35,7 @@ public static class Constants
         public const string FieldSubscribe = "FieldSubscribe";
         public const string FieldSubscribeAsync = "FieldSubscribeAsync";
         public const string Name = "Name";
+        public const string ParseDictionary = "ParseDictionary";
         public const string Resolve = "Resolve";
         public const string ResolveAsync = "ResolveAsync";
         public const string ResolveDelegate = "ResolveDelegate";
@@ -40,6 +43,7 @@ public static class Constants
         public const string ResolveScopedAsync = "ResolveScopedAsync";
         public const string ResolveStream = "ResolveStream";
         public const string ResolveStreamAsync = "ResolveStreamAsync";
+        public const string Returns = "Returns";
     }
 
     public static class ObjectProperties
@@ -57,12 +61,21 @@ public static class Constants
     public static class Types
     {
         public const string FieldType = "FieldType";
+        public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
     }
 
     public static class Interfaces
     {
         public const string IInputObjectGraphType = "IInputObjectGraphType";
         public const string IObjectGraphType = "IObjectGraphType";
+    }
+
+    public static class MetadataNames
+    {
+        public const string GraphQLConstructorAttribute = "GraphQL.GraphQLConstructorAttribute";
+        public const string IGraphType = "GraphQL.Types.IGraphType";
+        public const string InputObjectGraphType = "GraphQL.Types.InputObjectGraphType`1";
+        public const string NotAGraphTypeAttribute = "GraphQL.NotAGraphTypeAttribute";
     }
 }
 

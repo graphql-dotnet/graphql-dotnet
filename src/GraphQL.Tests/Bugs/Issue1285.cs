@@ -10,7 +10,7 @@ public class Issue1285 : QueryTestBase<Issue1285Schema>
     {
         const string query = """
         query {
-          getsome(input: { readOnlyProp: 7, privateSetProp: 3, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
+          getsome(input: { readOnlyProp: 7, valueProp: null, ints: null, ints2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0], intsList: null, intsList2: [1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0] })
         }
         """;
         const string expected = """
@@ -50,7 +50,6 @@ public class Issue1285Query : ObjectGraphType
 
                 arg.ValueProp.ShouldBe(0);
                 arg.ReadOnlyProp.ShouldBe(7);
-                arg.PrivateSetProp.ShouldBe(3);
 
                 return arg.Ints;
             });
@@ -59,7 +58,7 @@ public class Issue1285Query : ObjectGraphType
 
 public class ArrayInput
 {
-    private ArrayInput(int readOnlyProP)
+    public ArrayInput(int readOnlyProP)
     {
         ReadOnlyProp = readOnlyProP;
     }
@@ -75,8 +74,6 @@ public class ArrayInput
     public int ValueProp { get; set; }
 
     public int ReadOnlyProp { get; }
-
-    public int PrivateSetProp { get; private set; }
 }
 
 public class ArrayInputType : InputObjectGraphType<ArrayInput>
@@ -89,6 +86,5 @@ public class ArrayInputType : InputObjectGraphType<ArrayInput>
         Field(o => o.IntsList2, nullable: true);
         Field(o => o.ValueProp, nullable: true);
         Field(o => o.ReadOnlyProp, nullable: true);
-        Field(o => o.PrivateSetProp, nullable: true);
     }
 }

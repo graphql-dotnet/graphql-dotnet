@@ -57,6 +57,9 @@ namespace GraphQL.Execution
                 return false;
             }
 
+            var resolvedType = Directive.Arguments?.Find(name)?.ResolvedType
+                ?? throw new InvalidOperationException($"Could not obtain graph type instance for argument '{name}'");
+
             if (arg.Value is IDictionary<string, object?> inputObject)
             {
                 if (argumentType == typeof(object))
@@ -65,11 +68,11 @@ namespace GraphQL.Execution
                     return true;
                 }
 
-                result = inputObject.ToObject(argumentType, Directive.Arguments?.Find(name)?.ResolvedType);
+                result = inputObject.ToObject(argumentType, resolvedType);
                 return true;
             }
 
-            result = arg.Value.GetPropertyValue(argumentType, Directive.Arguments?.Find(name)?.ResolvedType);
+            result = arg.Value.GetPropertyValue(argumentType, resolvedType);
             return true;
         }
     }

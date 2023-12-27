@@ -16,7 +16,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithSingleTypeParameter_NoDiagnostic()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -36,7 +37,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithoutDefaultValueArgument_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -50,7 +52,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -71,7 +74,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithoutDefaultValueArgument2_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -85,7 +89,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -106,7 +111,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithoutConfigureFunc_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -121,7 +127,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -143,7 +150,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithoutConfigureFunc2_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -161,7 +169,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -186,7 +195,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -201,7 +211,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -223,7 +234,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc2_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -239,7 +251,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -265,7 +278,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc3_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -284,7 +298,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -309,7 +324,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc4_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -331,7 +347,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -360,7 +377,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc5_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -409,7 +427,8 @@ public class FieldArgumentAnalyzerTests
     [Fact]
     public async Task Argument_WithDefaultValueArgument_WithConfigureFunc6_Fixed()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -428,7 +447,8 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
