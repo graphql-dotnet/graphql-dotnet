@@ -68,7 +68,7 @@ namespace GraphQL.Execution
                 var value = argNode?.Value;
                 var type = arg.ResolvedType!;
 
-                values[arg.Name] = CoerceValue(type, value, new CoerceValueContext
+                var argValue = CoerceValue(type, value, new CoerceValueContext
                 {
                     Argument = argNode,
                     Document = document,
@@ -76,6 +76,21 @@ namespace GraphQL.Execution
                     ParentNode = fieldOrFragmentSpread,
                     Variables = variables,
                 }, arg.DefaultValue);
+
+                if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
+                {
+                    try
+                    {
+                        argValue = new(arg.Parser(argValue.Value), argValue.Source);
+                        arg.Validator(argValue.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidValueError(document, fieldOrFragmentSpread, directive, argNode, value, ex);
+                    }
+                }
+
+                values[arg.Name] = argValue;
             }
 
             return values;
@@ -255,11 +270,12 @@ namespace GraphQL.Execution
                             var parsedValue = value.Value;
                             try
                             {
-                                parsedValue = field.ParseValue(parsedValue);
+                                parsedValue = field.Parser(parsedValue);
+                                field.Validator(parsedValue);
                             }
                             catch (Exception ex) when (context.Document != null && context.ParentNode != null)
                             {
-                                throw new InvalidLiteralError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                                throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
                             }
                             obj[field.Name] = parsedValue;
                         }

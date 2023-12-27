@@ -133,11 +133,36 @@ namespace GraphQL.Builders
         }
 
         /// <summary>
-        /// Sets the input resolver for the field.
+        /// Sets the input coercion for the field, replacing any existing coercion function.
+        /// Runs before any validation defined via <see cref="Validate"/>.
+        /// Applies only to input fields.
         /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object?, object?> parseValue)
         {
-            FieldType.ParseValue = parseValue;
+            FieldType.Parser = parseValue;
+            return this;
+        }
+
+        /// <summary>
+        /// Adds validation to the field, appending it to any existing validation function.
+        /// Runs after any coercion defined via <see cref="ParseValue"/>.
+        /// Applies only to input fields.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object?> validation)
+        {
+            if (FieldType.Validator == FieldType.DefaultValidator)
+            {
+                FieldType.Validator = validation;
+            }
+            else
+            {
+                var oldValidator = FieldType.Validator;
+                FieldType.Validator = value =>
+                {
+                    oldValidator(value);
+                    validation(value);
+                };
+            }
             return this;
         }
 

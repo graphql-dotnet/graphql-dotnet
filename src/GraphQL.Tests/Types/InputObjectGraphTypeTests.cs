@@ -171,11 +171,11 @@ public class InputObjectGraphTypeTests
             """
                 {"errors":[
                     {
-                        "message":"Invalid literal for argument \u0027input\u0027 of field \u0027test\u0027. Invalid URI: The format of the URI could not be determined.",
+                        "message":"Invalid value for argument \u0027input\u0027 of field \u0027test\u0027. Invalid URI: The format of the URI could not be determined.",
                         "locations":[{"line":1,"column":15}],
                         "extensions":{
-                            "code":"INVALID_LITERAL",
-                            "codes":["INVALID_LITERAL","URI_FORMAT"],
+                            "code":"INVALID_VALUE",
+                            "codes":["INVALID_VALUE","URI_FORMAT"],
                             "number":"5.6"
                         }
                     }

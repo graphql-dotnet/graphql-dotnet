@@ -93,10 +93,29 @@ namespace GraphQL.Types
         public ISourceStreamResolver? StreamResolver { get; set; }
 
         /// <summary>
-        /// Validates and/or parses the value received from the client.
+        /// Parses the value received from the client.
+        /// Occurs during validation prior to <see cref="Validator"/>.
         /// Throw an exception if necessary to indicate a problem.
         /// Only applicable to fields of input graph types.
         /// </summary>
-        public Func<object?, object?> ParseValue { get; set; } = static value => value;
+        public Func<object?, object?> Parser { get; set; } = DefaultParser;
+
+        /// <summary>
+        /// Default parsing method that returns the value as-is.
+        /// </summary>
+        internal static Func<object?, object?> DefaultParser = static value => value;
+
+        /// <summary>
+        /// Validates the value received from the client.
+        /// Occurs during validation after <see cref="Parser"/> has parsed the value.
+        /// Throw an exception if necessary to indicate a problem.
+        /// Only applicable to fields of input graph types.
+        /// </summary>
+        public Action<object?> Validator { get; set; } = DefaultValidator;
+
+        /// <summary>
+        /// Default validation method that does nothing.
+        /// </summary>
+        internal static Action<object?> DefaultValidator = static _ => { };
     }
 }

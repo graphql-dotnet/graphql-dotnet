@@ -958,6 +958,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Validate(System.Action<object?> validation) { }
         [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
@@ -2112,11 +2113,12 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object?, object?> ParseValue { get; set; }
+        public System.Func<object?, object?> Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
+        public System.Action<object?> Validator { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2405,8 +2407,10 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
+        public System.Func<object?, object?> Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public System.Type? Type { get; }
+        public System.Action<object?> Validator { get; set; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType
@@ -3103,6 +3107,11 @@ namespace GraphQL.Validation
     {
         public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, System.Exception innerException) { }
         public InvalidLiteralError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, string message, System.Exception? innerException = null) { }
+    }
+    public class InvalidValueError : GraphQL.Validation.ValidationError
+    {
+        public InvalidValueError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, System.Exception innerException) { }
+        public InvalidValueError(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.ASTNode parentNode, GraphQLParser.AST.GraphQLDirective? directive, GraphQLParser.AST.GraphQLArgument? argument, GraphQLParser.AST.ASTNode node, string message, System.Exception? innerException = null) { }
     }
     [System.Serializable]
     public class InvalidVariableError : GraphQL.Validation.ValidationError
