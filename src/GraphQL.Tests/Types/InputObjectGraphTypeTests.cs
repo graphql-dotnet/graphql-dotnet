@@ -130,7 +130,7 @@ public class InputObjectGraphTypeTests
         // demonstrates having a StringGraphType field that accepts a Uri as input
         // the string value is coerced to a Uri prior to beginning execution of the request
         var inputType = new InputObjectGraphType<Class1>();
-        inputType.Field<StringGraphType, Uri>("url")
+        inputType.Field(x => x.Url, type: typeof(StringGraphType))
             .ParseValue(original =>
             {
                 var originalString = (string?)original;
@@ -152,6 +152,7 @@ public class InputObjectGraphTypeTests
                 return input.Url?.ToString();
             });
         var schema = new Schema { Query = queryType };
+
         // check with valid url
         var result = await new DocumentExecuter().ExecuteAsync(_ =>
         {
@@ -159,6 +160,7 @@ public class InputObjectGraphTypeTests
             _.Query = """{ test(input: { url: "http://www.google.com" }) }""";
         });
         result.ShouldBeSimilarTo("""{"data":{"test":"http://www.google.com/"}}""");
+
         // check with invalid url
         result = await new DocumentExecuter().ExecuteAsync(_ =>
         {
