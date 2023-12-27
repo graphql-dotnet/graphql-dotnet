@@ -51,7 +51,9 @@ namespace GraphQL.Types
         {
             var type = GetType();
 
+#pragma warning disable CS0618 // Type or member is obsolete
             if (!GlobalSwitches.UseLegacyTypeNaming)
+#pragma warning restore CS0618 // Type or member is obsolete
                 return type.GraphQLName();
 
             string name = type.Name;
