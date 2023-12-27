@@ -36,7 +36,7 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="IInputObjectGraphType"/>
-    public class InputObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
+    public class InputObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSourceType>, IInputObjectGraphType
     {
         /// <summary>
         /// Initializes a new instance.

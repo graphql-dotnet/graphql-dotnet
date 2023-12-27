@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,7 +30,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         Constants.MethodNames.FieldSubscribeAsync,
     };
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(DoNotUseObsoleteFieldMethods);
 
     public override void Initialize(AnalysisContext context)
@@ -70,7 +71,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (!genericNameSyntax.IsGraphQLSymbol(context))
+        if (!genericNameSyntax.IsGraphQLSymbol(context.SemanticModel))
         {
             return;
         }

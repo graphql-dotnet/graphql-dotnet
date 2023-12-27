@@ -1,3 +1,4 @@
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
     GraphQL.Analyzers.FieldNameAnalyzer,
@@ -21,43 +22,44 @@ public class FieldNameAnalyzerTests
     [InlineData(Constants.MethodNames.Connection)]
     public async Task FieldAndNameMethodsCalled_NotGraphQLBuilder_NoDiagnostics(string builder)
     {
-        string source = $$"""
-            namespace Sample.Server;
+        string source =
+            $$"""
+              namespace Sample.Server;
 
-            public class MyType
-            {
-                public MyType()
-                {
-                    {{builder}}<string>().Name("Text");
-                }
+              public class MyType
+              {
+                  public MyType()
+                  {
+                      {{builder}}<string>().Name("Text");
+                  }
 
-                private FieldBuilder<T> Field<T>()
-                {
-                    return new FieldBuilder<T>();
-                }
+                  private FieldBuilder<T> Field<T>()
+                  {
+                      return new FieldBuilder<T>();
+                  }
 
-                private ConnectionBuilder<T> Connection<T>()
-                {
-                    return new ConnectionBuilder<T>();
-                }
-            }
+                  private ConnectionBuilder<T> Connection<T>()
+                  {
+                      return new ConnectionBuilder<T>();
+                  }
+              }
 
-            public class FieldBuilder<T>
-            {
-                public FieldBuilder<T> Name(string name)
-                {
-                    return this;
-                }
-            }
+              public class FieldBuilder<T>
+              {
+                  public FieldBuilder<T> Name(string name)
+                  {
+                      return this;
+                  }
+              }
 
-            public class ConnectionBuilder<T>
-            {
-                public ConnectionBuilder<T> Name(string name)
-                {
-                    return this;
-                }
-            }
-            """;
+              public class ConnectionBuilder<T>
+              {
+                  public ConnectionBuilder<T> Name(string name)
+                  {
+                      return this;
+                  }
+              }
+              """;
 
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
@@ -68,35 +70,37 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldWithoutName_NameMethodCallInTheMiddle_DefineTheNameInFieldMethod(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>().Name("Text").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>().Name("Text").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>().".Length + 1;
         int endColumn = startColumn + "Name(\"Text\")".Length;
@@ -112,35 +116,37 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldWithoutName_NameMethodCallInTheEnd_DefineTheNameInFieldMethod(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>().Description("description").Name("Text");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>().Description("description").Name("Text");
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text").Description("description");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text").Description("description");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>().Description(\"description\").".Length + 1;
         int endColumn = startColumn + "Name(\"Text\")".Length;
@@ -156,20 +162,21 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldWithName_NoNameMethodCalled_NoDiagnostics(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
+                  }
+              }
+              """;
 
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
@@ -180,35 +187,37 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldAndNameMethodsHaveSameValues_NameMethodInvocationCanBeRemoved(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text").Name("Text").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text").Name("Text").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text").Resolve(context => "Test");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>(\"Text\").".Length + 1;
         int endColumn = startColumn + "Name(\"Text\")".Length;
@@ -225,35 +234,37 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE, "name: \"Text\"")]
     public async Task FieldAndNameMethodsHaveSameValues_NamedArguments_NameMethodInvocationCanBeRemoved(string builder, string builderArgs)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>({{builderArgs}}).Name("Text").Description("description");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>({{builderArgs}}).Name("Text").Description("description");
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>({{builderArgs}}).Description("description");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>({{builderArgs}}).Description("description");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>({builderArgs}).".Length + 1;
         int endColumn = startColumn + "Name(\"Text\")".Length;
@@ -269,39 +280,41 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldAndNameMethodsHaveSameExpressions_NameMethodInvocationCanBeRemoved(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>(GetName()).Name(GetName()).Resolve(context => "Test");
-                }
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>(GetName()).Name(GetName()).Resolve(context => "Test");
+                  }
 
-                private string GetName() => "Text";
-            }
-            """;
+                  private string GetName() => "Text";
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>(GetName()).Resolve(context => "Test");
-                }
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>(GetName()).Resolve(context => "Test");
+                  }
 
-                private string GetName() => "Text";
-            }
-            """;
+                  private string GetName() => "Text";
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>(GetName()).".Length + 1;
         int endColumn = startColumn + "Name(GetName())".Length;
@@ -320,56 +333,59 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE, 1)]
     public async Task FieldAndNameMethodsHaveDifferentNames_DifferentNamesDefinedByFieldAndNameMethods(string builder, int codeActionIndex)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1").Name("Text2").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1").Name("Text2").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix0 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix0 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix1 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix1 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text2").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text2").Resolve(context => "Test");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>(\"Text1\").".Length + 1;
         int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
-        string[] fixes = new[] { fix0, fix1 };
+        string[] fixes = { fix0, fix1 };
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -391,59 +407,62 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE, 1)]
     public async Task FieldAndNameMethodsHaveDifferentNames_DifferentNamesDefinedByFieldAndNameMethods_CorrectlyFormatted(string builder, int codeActionIndex)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1").Name("Text2")
-                        .Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1").Name("Text2")
+                          .Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix0 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix0 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1")
-                        .Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1")
+                          .Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix1 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix1 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text2")
-                        .Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text2")
+                          .Resolve(context => "Test");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>(\"Text1\").".Length + 1;
         int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
-        string[] fixes = new[] { fix0, fix1 };
+        string[] fixes = { fix0, fix1 };
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -465,57 +484,60 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE, 1)]
     public async Task FieldAndNameMethodsHaveDifferentNames_DifferentNamesDefinedByFieldAndNameMethods_CorrectlyFormatted2(string builder, int codeActionIndex)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1").Description("description")
-                        .Name("Text2");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1").Description("description")
+                          .Name("Text2");
+                  }
+              }
+              """;
 
-        string fix0 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix0 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text1").Description("description");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text1").Description("description");
+                  }
+              }
+              """;
 
-        string fix1 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix1 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>("Text2").Description("description");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>("Text2").Description("description");
+                  }
+              }
+              """;
 
-        int startColumn = $"            .".Length + 1;
+        int startColumn = "            .".Length + 1;
         int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
-        string[] fixes = new[] { fix0, fix1 };
+        string[] fixes = { fix0, fix1 };
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(11, startColumn, 11, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -537,56 +559,59 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE, 1)]
     public async Task FieldAndNameMethodsHaveDifferentNames_FieldUsesNamedArguments_DifferentNamesDefinedByFieldAndNameMethods(string builder, int codeActionIndex)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>(name: "Text1").Name("Text2").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>(name: "Text1").Name("Text2").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix0 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix0 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>(name: "Text1").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>(name: "Text1").Resolve(context => "Test");
+                  }
+              }
+              """;
 
-        string fix1 = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix1 =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>(name: "Text2").Resolve(context => "Test");
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>(name: "Text2").Resolve(context => "Test");
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>(name: \"Text1\").".Length + 1;
         int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
-        string[] fixes = new[] { fix0, fix1 };
+        string[] fixes = { fix0, fix1 };
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -604,7 +629,8 @@ public class FieldNameAnalyzerTests
     [InlineData(1)]
     public async Task FieldAndNameMethodsHaveDifferentNames_FieldUsesNamedArguments_DifferentNamesDefinedByFieldAndNameMethods2(int codeActionIndex)
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -618,7 +644,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        const string fix0 = """
+        const string fix0 =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -632,7 +659,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        const string fix1 = """
+        const string fix1 =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -646,8 +674,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        string[] fixes = new[] { fix0, fix1 };
-        string methodName = Constants.MethodNames.Field;
+        string[] fixes = { fix0, fix1 };
+        const string methodName = Constants.MethodNames.Field;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(9, 54, 9, 67).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -665,33 +693,35 @@ public class FieldNameAnalyzerTests
     [InlineData(Constants.MethodNames.Connection)]
     public async Task FieldCalledOnVariableWithoutName_DefineTheNameInFieldMethod(string builder)
     {
-        string source = $$"""
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register(ObjectGraphType graphType)
-                {
-                    graphType.{{builder}}<StringGraphType>().Name("Text").Resolve(context => "Tests");
-                }
-            }
-            """;
+              public class MyGraphType
+              {
+                  public void Register(ObjectGraphType graphType)
+                  {
+                      graphType.{{builder}}<StringGraphType>().Name("Text").Resolve(context => "Tests");
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType
-            {
-                public void Register(ObjectGraphType graphType)
-                {
-                    graphType.{{builder}}<StringGraphType>("Text").Resolve(context => "Tests");
-                }
-            }
-            """;
+              public class MyGraphType
+              {
+                  public void Register(ObjectGraphType graphType)
+                  {
+                      graphType.{{builder}}<StringGraphType>("Text").Resolve(context => "Tests");
+                  }
+              }
+              """;
 
         int startColumn = $"        graphType.{builder}<StringGraphType>().".Length + 1;
         int endColumn = startColumn + "Name(\"Text\")".Length;
@@ -704,7 +734,8 @@ public class FieldNameAnalyzerTests
     [Fact]
     public async Task GenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -723,7 +754,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -751,7 +783,8 @@ public class FieldNameAnalyzerTests
     [Fact]
     public async Task NonGenericFieldWithExpression_NameMethodCalled_DefineTheNameInFieldMethod()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -770,7 +803,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Types;
 
             namespace Sample.Server;
@@ -801,35 +835,37 @@ public class FieldNameAnalyzerTests
     [InlineData(CONNECTION_BUILDER_CREATE)]
     public async Task FieldWithoutName_NameMethodCalled_NameOverloadUnknown_DefineTheNameInFieldMethod(string builder)
     {
-        string source = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string source =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>().Name();
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>().Name();
+                  }
+              }
+              """;
 
-        string fix = $$"""
-            using GraphQL.Builders;
-            using GraphQL.Types;
+        string fix =
+            $$"""
+              using GraphQL.Builders;
+              using GraphQL.Types;
 
-            namespace Sample.Server;
+              namespace Sample.Server;
 
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    {{builder}}<StringGraphType>();
-                }
-            }
-            """;
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      {{builder}}<StringGraphType>();
+                  }
+              }
+              """;
 
         int startColumn = $"        {builder}<StringGraphType>().".Length + 1;
         int endColumn = startColumn + "Name()".Length;
@@ -849,7 +885,8 @@ public class FieldNameAnalyzerTests
     [Fact]
     public async Task NonGenericConnectionBuilderCreateMethod_NameMethodCalled_DefineTheNameInFieldMethod()
     {
-        const string source = """
+        const string source =
+            """
             using GraphQL.Builders;
             using GraphQL.Types;
 
@@ -864,7 +901,8 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        const string fix = """
+        const string fix =
+            """
             using GraphQL.Builders;
             using GraphQL.Types;
 

@@ -27,7 +27,7 @@ namespace GraphQL.Introspection
         /// </param>
         public __Type(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
         {
-            Name = nameof(__Type);
+            SetName(nameof(__Type), validate: false);
 
             Description =
                 "The fundamental unit of any GraphQL Schema is the type. There are " +
@@ -159,7 +159,7 @@ namespace GraphQL.Introspection
                 {
                     var inputFields = context.ArrayPool.Rent<FieldType>(type.Fields.Count);
 
-                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated", !deprecationOfInputValues);
 
                     int index = 0;
                     foreach (var field in type.Fields.List)

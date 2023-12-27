@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Composition;
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -70,11 +71,12 @@ public class AwaitableResolverCodeFixProvider : CodeFixProvider
                 // Resolve(async ctx => await AsyncMethod() or statement)
                 var newLambda = lambda
                     .WithAsyncKeyword(
-                        Token(SyntaxKind.AsyncKeyword).WithLeadingTrivia(Space))
+                        Token(SyntaxKind.AsyncKeyword).WithLeadingTrivia(lambda.GetLeadingTrivia()))
                     .WithExpressionBody(
                         AwaitExpression(
-                            Token(SyntaxKind.AwaitKeyword).WithTrailingTrivia(Space),
-                            lambda.ExpressionBody));
+                                Token(SyntaxKind.AwaitKeyword),
+                                lambda.ExpressionBody)
+                            .WithLeadingTrivia(lambda.ExpressionBody.GetLeadingTrivia()));
 
                 docEditor.ReplaceNode(lambda, newLambda);
 

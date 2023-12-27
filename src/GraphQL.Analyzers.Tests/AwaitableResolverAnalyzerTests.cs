@@ -1,3 +1,4 @@
+using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis.Testing;
 using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpCodeFixVerifier<
     GraphQL.Analyzers.AwaitableResolverAnalyzer,
@@ -483,5 +484,103 @@ public class AwaitableResolverAnalyzerTests
         string expectedFix = report ? fix : source;
 
         await VerifyCS.VerifyCodeFixAsync(source, expected, expectedFix);
+    }
+
+    [Fact]
+    public async Task SyncResolve_AwaitableLambdaResolver_GQL009_FormatPreserved()
+    {
+        const string source =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test")
+                        .Resolve(
+                            ctx => Task.FromResult("text")
+                        );
+                }
+            }
+
+            """;
+
+        const string fix =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test")
+                        .ResolveAsync(
+                            async ctx => await Task.FromResult("text")
+                        );
+                }
+            }
+
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(12, 14, 12, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+    }
+
+    [Fact]
+    public async Task SyncResolve_AwaitableLambdaResolver_GQL009_FormatPreserved2()
+    {
+        const string source =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test")
+                        .Resolve(ctx =>
+                            Task.FromResult("text")
+                    );
+                }
+            }
+
+            """;
+
+        const string fix =
+            """
+            using System;
+            using System.Threading.Tasks;
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyGraphType : ObjectGraphType
+            {
+                public MyGraphType()
+                {
+                    Field<StringGraphType>("Test")
+                        .ResolveAsync(async ctx =>
+                            await Task.FromResult("text")
+                    );
+                }
+            }
+
+            """;
+
+        var expected = VerifyCS.Diagnostic().WithSpan(12, 14, 12, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 }
