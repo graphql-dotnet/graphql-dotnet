@@ -231,6 +231,43 @@ public class InputObjectGraphTypeTests
     }
 
     [Fact]
+    public void validation_method_compounds_existing_validation()
+    {
+        var inputType = new InputObjectGraphType();
+        var fieldDef = inputType.Field<StringGraphType>("test")
+            .Validate(value =>
+            {
+                if (value is int)
+                    throw new ArgumentException();
+            })
+            .Validate(value =>
+            {
+                if (value is string)
+                    throw new InvalidOperationException();
+            })
+            .FieldType;
+        fieldDef.Validator(Guid.NewGuid());
+        Should.Throw<ArgumentException>(() => fieldDef.Validator(123));
+        Should.Throw<InvalidOperationException>(() => fieldDef.Validator("abc"));
+    }
+
+    [Fact]
+    public void parsevalue_method_replaces_validation()
+    {
+        var inputType = new InputObjectGraphType();
+        var fieldDef = inputType.Field<StringGraphType>("test")
+            .ParseValue(value => "456")
+            .ParseValue(value =>
+            {
+                if ((string)value == "123")
+                    return "789";
+                return value;
+            })
+            .FieldType;
+        fieldDef.Parser("123").ShouldBeOfType<string>().ShouldBe("789");
+    }
+
+    [Fact]
     public void values_parsed_with_field_expression()
     {
         var inputType = new InputObjectGraphType<Class3>();
