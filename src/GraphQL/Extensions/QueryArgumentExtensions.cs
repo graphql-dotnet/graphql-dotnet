@@ -10,6 +10,7 @@ public static class QueryArgumentExtensions
     /// <summary>
     /// Sets the input coercion for the argument, replacing any existing coercion function.
     /// Runs before any validation defined via <see cref="QueryArgument.Validator"/>.
+    /// Null values are not passed to this function.
     /// </summary>
     public static QueryArgument ParseValue(this QueryArgument argument, Func<object, object> parseValue)
     {
@@ -20,6 +21,7 @@ public static class QueryArgumentExtensions
     /// <summary>
     /// Adds validation to the argument, appending it to any existing validation function.
     /// Runs after any coercion defined within <see cref="QueryArgument.Parser"/>.
+    /// Null values are not passed to this function.
     /// </summary>
     public static QueryArgument Validate(this QueryArgument argument, Action<object> validator)
     {

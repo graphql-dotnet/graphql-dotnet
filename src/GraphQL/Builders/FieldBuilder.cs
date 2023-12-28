@@ -135,6 +135,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the input coercion for the field, replacing any existing coercion function.
         /// Runs before any validation defined via <see cref="Validate"/>.
+        /// Null values are not passed to this function.
         /// Applies only to input fields.
         /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object, object> parseValue)
@@ -146,6 +147,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Adds validation to the field, appending it to any existing validation function.
         /// Runs after any coercion defined via <see cref="ParseValue"/>.
+        /// Null values are not passed to this function.
         /// Applies only to input fields.
         /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object> validation)
