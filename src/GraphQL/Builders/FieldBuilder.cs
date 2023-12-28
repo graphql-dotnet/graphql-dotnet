@@ -152,19 +152,15 @@ namespace GraphQL.Builders
         /// </summary>
         public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object> validation)
         {
-            if (FieldType.Validator == FieldType.DefaultValidator)
-            {
-                FieldType.Validator = validation;
-            }
-            else
-            {
-                var oldValidator = FieldType.Validator;
-                FieldType.Validator = value =>
+            var oldValidator = FieldType.Validator;
+            FieldType.Validator = oldValidator == FieldType.DefaultValidator
+                ? validation
+                : value =>
                 {
                     oldValidator(value);
                     validation(value);
                 };
-            }
+
             return this;
         }
 
