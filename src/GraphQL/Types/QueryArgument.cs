@@ -128,7 +128,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Default parsing method that returns the value as-is.
         /// </summary>
-        internal static Func<object?, object?> DefaultParser = static value => value;
+        internal static readonly Func<object?, object?> DefaultParser = static value => value;
 
         /// <summary>
         /// Validates the value received from the client.
@@ -141,7 +141,7 @@ namespace GraphQL.Types
         /// <summary>
         /// Default validation method that does nothing.
         /// </summary>
-        internal static Action<object?> DefaultValidator = static _ => { };
+        internal static readonly Action<object?> DefaultValidator = static _ => { };
 
         private ArgumentOutOfRangeException Create(string paramName, Type value) => new(paramName,
             $"'{value.GetFriendlyName()}' is not a valid input type. QueryArgument must be one of the input types: ScalarGraphType, EnumerationGraphType or IInputObjectGraphType.");

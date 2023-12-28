@@ -564,7 +564,11 @@ public class AutoRegisteringObjectGraphTypeTests
         });
         result.Executed.ShouldBeFalse();
         var resultJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+#if NET7_0_OR_GREATER
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. The input string \u0027abc\u0027 was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#else
         resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. Input string was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#endif
     }
 
     private class Class3
