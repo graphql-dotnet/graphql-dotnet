@@ -147,19 +147,11 @@ public class InputObjectGraphTypeTests
         var schema = new Schema { Query = queryType };
 
         // check with valid url
-        var result = await new DocumentExecuter().ExecuteAsync(_ =>
-        {
-            _.Schema = schema;
-            _.Query = """{ test(input: { url: "http://www.google.com" }) }""";
-        });
+        var result = await schema.ExecuteAsync(_ => _.Query = """{ test(input: { url: "http://www.google.com" }) }""");
         result.ShouldBeSimilarTo("""{"data":{"test":"http://www.google.com/"}}""");
 
         // check with invalid url
-        result = await new DocumentExecuter().ExecuteAsync(_ =>
-        {
-            _.Schema = schema;
-            _.Query = """{ test(input: { url: "abcd" }) }""";
-        });
+        result = await schema.ExecuteAsync(_ => _.Query = """{ test(input: { url: "abcd" }) }""");
         result.ShouldBeSimilarTo(
             """
                 {"errors":[
