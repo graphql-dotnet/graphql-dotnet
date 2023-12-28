@@ -636,6 +636,11 @@ namespace GraphQL
     {
         public OutputTypeAttribute() { }
     }
+    public static class QueryArgumentExtensions
+    {
+        public static GraphQL.Types.QueryArgument ParseValue(this GraphQL.Types.QueryArgument argument, System.Func<object?, object?> parseValue) { }
+        public static GraphQL.Types.QueryArgument Validate(this GraphQL.Types.QueryArgument argument, System.Action<object?> validator) { }
+    }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
         public ReadonlyResolveFieldContext(GraphQL.Execution.ExecutionNode node, GraphQL.Execution.ExecutionContext context) { }
