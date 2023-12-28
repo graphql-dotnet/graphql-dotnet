@@ -1,6 +1,9 @@
 # Transport
+
 The `GraphQL.Transport` namespace contains classes and interfaces that handle the communication between a GraphQL client and server, as well as the serialization and deserialization of GraphQL objects.
+
 ## GraphQLRequest
+
 `GraphQLRequest` is a class that represents a [*GraphQL-over-HTTP request*](https://github.com/graphql/graphql-over-http/blob/master/spec/GraphQLOverHTTP.md#request) sent by client. It contains the following properties:
 
 - `OperationName` - (Optional, string): The name of the Operation in the Document to execute.
@@ -9,9 +12,6 @@ The `GraphQL.Transport` namespace contains classes and interfaces that handle th
 - `Extensions` - (Optional, Inputs): This entry is reserved for implementors to extend the protocol however they see fit.
 
 **Note:** the *Query* property can be null in case of [persisted queries](https://www.apollographql.com/docs/apollo-server/performance/apq/) when a client sends only SHA-256 hash of the query in *Extensions* given that corresponding key-value pair has been saved on a server beforehand
-
-
-
 
 ## OperationMessage
 
@@ -30,25 +30,25 @@ Both of these protocols are used by the [Apollo Client](https://www.apollographq
     - `complete` - Bidirectional. This message indicate that the GraphQL subscription has completed.
 
     #### graphql-transport-ws
-    - `GQL_CONNECTION_INIT` - Client -> Server. Client sends this message to initialize the connection.
-    - `GQL_CONNECTION_ACK` - Server -> Client. Server sends this message to acknowledge the connection.
-    - `GQL_CONNECTION_ERROR` - Server -> Client. Server sends this message to indicate that an error occurred while establishing the connection.
-    - `GQL_CONNECTION_TERMINATE` - Client -> Server. Client sends this message to terminate the connection.
-    - `GQL_START` - Client -> Server. Client sends this message to start a GraphQL operation.
-    - `GQL_DATA` - Server -> Client. Server sends this message to send the GraphQL execution result.
-    - `GQL_ERROR` - Server -> Client. Server sends this message to indicate that an error occurred during the GraphQL operation.
-    - `GQL_COMPLETE` - Server -> Client. Server sends this message to indicate that the GraphQL operation is complete.
-    - `GQL_STOP` - Client -> Server. Client sends this message to stop a running GraphQL operation.
+    - `connection_init` - Client -> Server. Client sends this message to initialize the connection.
+    - `connection_ack` - Server -> Client. Server sends this message to acknowledge the connection.
+    - `connection_error` - Server -> Client. Server sends this message to indicate that an error occurred while establishing the connection.
+    - `ka` - Server -> Client. Server sends this message periodically to keep the client connection alive.
+    - `connection_terminate` - Client -> Server. Client sends this message to terminate the connection.
+    - `start` - Client -> Server. Client sends this message to start a GraphQL operation.
+    - `data` - Server -> Client. Server sends this message to send the GraphQL execution result.
+    - `error` - Server -> Client. Server sends this message to indicate that an error occurred during the GraphQL operation.
+    - `complete` - Server -> Client. Server sends this message to indicate that the GraphQL operation is complete.
+    - `stop` - Client -> Server. Client sends this message to stop a running GraphQL operation.
 - Payload - (Optional, object): The payload of the message. The payload is only used for *subscribe*, *GQL_DATA*, *GQL_ERROR*, and *GQL_COMPLETE* messages.
 
-**Note:** s mentioned in [Apollo Client](https://www.apollographql.com/docs/react/data/subscriptions/#websocket-setup) documentation, the *graphql-transport-ws* is a legacy protocol and should not be used in new applications. The *GraphQL-WS* protocol is the recommended protocol to use.
+**Note:** As mentioned in [Apollo Client](https://www.apollographql.com/docs/react/data/subscriptions/#websocket-setup) documentation, the *graphql-transport-ws* is a legacy protocol and should not be used in new applications. The *GraphQL-WS* protocol is the recommended protocol to use.
 
 ## IGraphQLSerializer & IGraphQLTextSerializer
 
-Serialize and deserialize object hierarchies to/from a `stream` and `string` respectively. Should include special support for `ExecutionResult` , `Inputs` and transport-specific classes as necessary. Dotnet-GraphQL provides `Newtonsoft.Json` and `System.Text.Json` as default implementations of this interfaces. 
+Serialize and deserialize object hierarchies to/from a `Stream` and `string` respectively. Should include special support for `ExecutionResult` , `Inputs` and transport-specific classes as necessary. GraphQL.NET provides `Newtonsoft.Json` and `System.Text.Json` as default implementations of these interfaces. 
 
-
-Simple example of `System.Text.Json` serializer in a asp.net controller is shown below:
+Simple example of `System.Text.Json` serializer in an ASP.Net Core controller is shown below:
 
 *Program.cs*
 ```csharp
@@ -76,12 +76,8 @@ public async Task<IActionResult> Post([FromBody] GraphQLRequest query)
                 options.Schema = _schema;
                 options.Query = query.Query;
             }).ConfigureAwait(false);
-            if (result.Errors?.Count > 0)
-            {
-                return BadRequest();
-            }
-
-            return Ok(_serializer.Serialize(result));
+        Response.StatusCode = (int)(result.Executed ? HttpStatusCode.OK : HttpStatusCode.BadRequest);
+        return Content(_serializer.Serialize(result), "application/graphql-response+json", System.Text.Encoding.UTF8);
     }
 ```
 
