@@ -251,4 +251,25 @@ public class InputObjectGraphTypeTests
     {
         public string? String { get; set; }
     }
+
+    [Fact]
+    public void values_parsed_with_field_expression()
+    {
+        var inputType = new InputObjectGraphType<Class3>();
+        inputType.Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field<StringGraphType>("test")
+            .Argument<int>("input", configure: arg => arg.ResolvedType = inputType);
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is converted to an integer
+        inputType.Fields.First().Parser("123").ShouldBe(123);
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser("abc"));
+    }
+
+    private class Class3
+    {
+        public int Id { get; set; }
+    }
 }

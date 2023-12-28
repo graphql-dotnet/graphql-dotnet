@@ -187,12 +187,14 @@ namespace GraphQL.Types
                 return (null, Expression);
 
             var type = TypeInformation.ConstructGraphType();
+            var memberType = ParameterInfo.ParameterType;
             var argument = new QueryArgument(type)
             {
                 Name = ParameterInfo.Name!,
                 Description = ParameterInfo.Description(),
                 DefaultValue = ParameterInfo.IsOptional ? ParameterInfo.DefaultValue : null,
             };
+            argument.Parser = value => value == null || memberType.IsInstanceOfType(value) ? value : ObjectExtensions.GetPropertyValue(value, memberType, argument.ResolvedType!);
             return (argument, null);
         }
     }
