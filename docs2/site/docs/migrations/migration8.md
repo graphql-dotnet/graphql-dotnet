@@ -72,7 +72,7 @@ produce a response similar to the following:
 {
   "errors": [
     {
-      "message": "Invalid value for argument 'id' of field 'testMe'. Input string was not in a correct format.",
+      "message": "Invalid value for argument 'id' of field 'testMe'. The input string 'abc' was not in a correct format.",
       "locations": [
         {
           "line": 1,
