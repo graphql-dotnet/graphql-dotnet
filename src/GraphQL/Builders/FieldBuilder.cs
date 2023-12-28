@@ -137,7 +137,7 @@ namespace GraphQL.Builders
         /// Runs before any validation defined via <see cref="Validate"/>.
         /// Applies only to input fields.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object?, object?> parseValue)
+        public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object, object> parseValue)
         {
             FieldType.Parser = parseValue;
             return this;
@@ -148,7 +148,7 @@ namespace GraphQL.Builders
         /// Runs after any coercion defined via <see cref="ParseValue"/>.
         /// Applies only to input fields.
         /// </summary>
-        public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object?> validation)
+        public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object> validation)
         {
             if (FieldType.Validator == FieldType.DefaultValidator)
             {

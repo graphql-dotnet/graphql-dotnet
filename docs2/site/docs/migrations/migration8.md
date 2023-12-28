@@ -129,7 +129,7 @@ property name, it may be desired to define a custom parser. For example:
 ```csharp
 // for input object graph type
 Field<StringGraphType>("website") // match by property name, perhaps for a constructor argument
-    .ParseValue(value => value is string stringValue ? new Uri(stringValue) : null);
+    .ParseValue(value => new Uri((string)value));
 
 class MyInputObject
 {
@@ -139,7 +139,8 @@ class MyInputObject
 
 Without adding a parser the coercion will occur within the resolver during `GetArgument<Uri>("abc")`
 as occured in previous versions of GraphQL.NET. This will result in a server exception being thrown
-and processed by the unhandled exception handler if the value cannot be coerced to a `Uri`.
+and processed by the unhandled exception handler if the value cannot be coerced to a `Uri`. Note that
+the parser function need not check for null values.
 
 ### 5. `Validator` delegates added to input field and argument definitions
 
@@ -153,25 +154,25 @@ on the `FieldBuilder` or `QueryArgument`. Here are some examples:
 Field(x => x.FirstName)
     .Validate(value =>
     {
-        if (value is string stringValue && stringValue.Length >= 10)
+        if (((string)value).Length >= 10)
             throw new ArgumentException("Length must be less than 10 characters.");
     });
 Field(x => x.Age)
     .Validate(value =>
     {
-        if (value is int intValue && intValue < 18)
+        if ((int)value < 18)
             throw new ArgumentException("Age must be 18 or older.");
     });
 Field(x => x.Password)
     .Validate(value =>
     {
-        if (value is string stringValue)
-            VerifyPasswordComplexity(stringValue);
+        VerifyPasswordComplexity((string)value);
     });
 ```
 
 The `Validator` delegate is called during the validation stage, prior to execution of the request.
-Supplying an invalid value will produce a response similar to the following:
+Null values are not passed to the validation function. Supplying an invalid value will produce
+a response similar to the following:
 
 ```json
 {
@@ -228,7 +229,7 @@ private class MyMaxLength : GraphQLAttribute
     {
         queryArgument.Validate(value =>
         {
-            if (value is string s && s.Length > _maxLength)
+            if (((string)value).Length > _maxLength)
             {
                 throw new ArgumentException($"Value is too long. Max length is {_maxLength}.");
             }

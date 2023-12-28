@@ -582,7 +582,7 @@ namespace GraphQL.Types
 
             if (this is IInputObjectGraphType)
             {
-                builder.ParseValue(value => value == null || value is TProperty ? value : ObjectExtensions.GetPropertyValue(value, typeof(TProperty), builder.FieldType.ResolvedType!));
+                builder.ParseValue(value => value is TProperty ? value : value.GetPropertyValue(typeof(TProperty), builder.FieldType.ResolvedType!)!);
             }
 
             if (this is IObjectGraphType)

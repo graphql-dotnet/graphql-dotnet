@@ -194,7 +194,7 @@ namespace GraphQL.Types
                 Description = ParameterInfo.Description(),
                 DefaultValue = ParameterInfo.IsOptional ? ParameterInfo.DefaultValue : null,
             };
-            argument.Parser = value => value == null || memberType.IsInstanceOfType(value) ? value : ObjectExtensions.GetPropertyValue(value, memberType, argument.ResolvedType!);
+            argument.Parser = value => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, argument.ResolvedType!)!;
             return (argument, null);
         }
     }

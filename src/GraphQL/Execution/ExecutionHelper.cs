@@ -79,15 +79,21 @@ namespace GraphQL.Execution
 
                 if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
                 {
-                    try
+                    object? parsedValue = argValue.Value;
+                    if (parsedValue != null)
                     {
-                        argValue = new(arg.Parser(argValue.Value), argValue.Source);
-                        arg.Validator(argValue.Value);
+                        try
+                        {
+                            parsedValue = arg.Parser(parsedValue);
+                            if (parsedValue != null)
+                                arg.Validator(parsedValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidValueError(document, fieldOrFragmentSpread, directive, argNode, value, ex);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        throw new InvalidValueError(document, fieldOrFragmentSpread, directive, argNode, value, ex);
-                    }
+                    argValue = new(parsedValue, argValue.Source);
                 }
 
                 values[arg.Name] = argValue;
@@ -268,14 +274,18 @@ namespace GraphQL.Execution
                         if (value.Source != ArgumentSource.FieldDefault)
                         {
                             var parsedValue = value.Value;
-                            try
+                            if (parsedValue != null)
                             {
-                                parsedValue = field.Parser(parsedValue);
-                                field.Validator(parsedValue);
-                            }
-                            catch (Exception ex) when (context.Document != null && context.ParentNode != null)
-                            {
-                                throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                                try
+                                {
+                                    parsedValue = field.Parser(parsedValue);
+                                    if (parsedValue != null)
+                                        field.Validator(parsedValue);
+                                }
+                                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
+                                {
+                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                                }
                             }
                             obj[field.Name] = parsedValue;
                         }

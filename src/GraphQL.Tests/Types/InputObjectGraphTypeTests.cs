@@ -131,7 +131,7 @@ public class InputObjectGraphTypeTests
         // the string value is coerced to a Uri prior to beginning execution of the request
         var inputType = new InputObjectGraphType<Class1>();
         inputType.Field(x => x.Url, type: typeof(StringGraphType))
-            .ParseValue(original => original is string originalString ? new Uri(originalString) : null);
+            .ParseValue(value => new Uri((string)value));
         var queryType = new ObjectGraphType();
         queryType.Field<StringGraphType>(
             "test",
@@ -185,13 +185,12 @@ public class InputObjectGraphTypeTests
     [Fact]
     public async Task input_validator_works()
     {
-
         // demonstrates having a StringGraphType field that accepts only strings of length 5
         var inputType = new InputObjectGraphType<Class2>();
         inputType.Field(x => x.String, type: typeof(StringGraphType))
             .Validate(value =>
             {
-                if (value is string s && s.Length != 5)
+                if (((string)value).Length != 5)
                     throw new ArgumentException("String must be a length of 5 characters.");
             });
         var queryType = new ObjectGraphType();

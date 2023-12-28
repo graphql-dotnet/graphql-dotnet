@@ -625,7 +625,7 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             queryArgument.Validate(value =>
             {
-                if (value is string s && s.Length > _maxLength)
+                if (((string)value).Length > _maxLength)
                 {
                     throw new ArgumentException($"Value is too long. Max length is {_maxLength}.");
                 }

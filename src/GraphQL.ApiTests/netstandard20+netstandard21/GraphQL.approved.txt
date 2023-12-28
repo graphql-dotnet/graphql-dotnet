@@ -638,8 +638,8 @@ namespace GraphQL
     }
     public static class QueryArgumentExtensions
     {
-        public static GraphQL.Types.QueryArgument ParseValue(this GraphQL.Types.QueryArgument argument, System.Func<object?, object?> parseValue) { }
-        public static GraphQL.Types.QueryArgument Validate(this GraphQL.Types.QueryArgument argument, System.Action<object?> validator) { }
+        public static GraphQL.Types.QueryArgument ParseValue(this GraphQL.Types.QueryArgument argument, System.Func<object, object> parseValue) { }
+        public static GraphQL.Types.QueryArgument Validate(this GraphQL.Types.QueryArgument argument, System.Action<object> validator) { }
     }
     public class ReadonlyResolveFieldContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext, GraphQL.IResolveFieldContext<object?>
     {
@@ -954,7 +954,7 @@ namespace GraphQL.Builders
         [System.Obsolete("Please configure the field name by providing the name as an argument to the \'Fiel" +
             "d\' method.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ParseValue(System.Func<object?, object?> parseValue) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ParseValue(System.Func<object, object> parseValue) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolve) { }
@@ -963,7 +963,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Validate(System.Action<object?> validation) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Validate(System.Action<object> validation) { }
         [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
@@ -2118,12 +2118,12 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object?, object?> Parser { get; set; }
+        public System.Func<object, object> Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
-        public System.Action<object?> Validator { get; set; }
+        public System.Action<object> Validator { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2412,10 +2412,10 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object?, object?> Parser { get; set; }
+        public System.Func<object, object> Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public System.Type? Type { get; }
-        public System.Action<object?> Validator { get; set; }
+        public System.Action<object> Validator { get; set; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType

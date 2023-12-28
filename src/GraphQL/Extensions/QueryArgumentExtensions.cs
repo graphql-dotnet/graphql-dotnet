@@ -11,7 +11,7 @@ public static class QueryArgumentExtensions
     /// Sets the input coercion for the argument, replacing any existing coercion function.
     /// Runs before any validation defined via <see cref="QueryArgument.Validator"/>.
     /// </summary>
-    public static QueryArgument ParseValue(this QueryArgument argument, Func<object?, object?> parseValue)
+    public static QueryArgument ParseValue(this QueryArgument argument, Func<object, object> parseValue)
     {
         argument.Parser = parseValue;
         return argument;
@@ -21,7 +21,7 @@ public static class QueryArgumentExtensions
     /// Adds validation to the argument, appending it to any existing validation function.
     /// Runs after any coercion defined within <see cref="QueryArgument.Parser"/>.
     /// </summary>
-    public static QueryArgument Validate(this QueryArgument argument, Action<object?> validator)
+    public static QueryArgument Validate(this QueryArgument argument, Action<object> validator)
     {
         var oldValidator = argument.Validator;
         argument.Validator = argument.Validator == QueryArgument.DefaultValidator
