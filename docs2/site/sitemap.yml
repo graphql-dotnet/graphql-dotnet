@@ -44,6 +44,8 @@
             file: unions.md
           - title: Subscriptions
             file: subscriptions.md
+          - title: transport
+            file: transport.md
           - title: Query Validation
             file: query-validation.md
           - title: Query Organization
