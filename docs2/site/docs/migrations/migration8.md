@@ -199,7 +199,7 @@ a response similar to the following:
 ```
 
 For type-first schemas, you may define your own attributes to perform validation, either on input
-field or output field arguments. For example:
+fields or on output field arguments. For example:
 
 ```csharp
 // for AutoRegisteringObjectGraphType<MyClass>
