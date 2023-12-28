@@ -208,27 +208,15 @@ public class InputObjectGraphTypeTests
         var schema = new Schema { Query = queryType };
 
         // check with valid string
-        var result = await new DocumentExecuter().ExecuteAsync(_ =>
-        {
-            _.Schema = schema;
-            _.Query = """{ test(input: { string: "abcde" }) }""";
-        });
+        var result = await schema.ExecuteAsync(_ => _.Query = """{ test(input: { string: "abcde" }) }""");
         result.ShouldBeSimilarTo("""{"data":{"test":"abcde"}}""");
 
         // check with null string
-        result = await new DocumentExecuter().ExecuteAsync(_ =>
-        {
-            _.Schema = schema;
-            _.Query = """{ test(input: { string: null }) }""";
-        });
+        result = await schema.ExecuteAsync(_ => _.Query = """{ test(input: { string: null }) }""");
         result.ShouldBeSimilarTo("""{"data":{"test":null}}""");
 
         // check with invalid string
-        result = await new DocumentExecuter().ExecuteAsync(_ =>
-        {
-            _.Schema = schema;
-            _.Query = """{ test(input: { string: "abcd" }) }""";
-        });
+        result = await schema.ExecuteAsync(_ => _.Query = """{ test(input: { string: "abcd" }) }""");
         result.ShouldBeSimilarTo(
             """
                 {"errors":[
