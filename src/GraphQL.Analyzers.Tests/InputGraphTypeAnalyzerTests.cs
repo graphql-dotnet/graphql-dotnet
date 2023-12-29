@@ -44,7 +44,7 @@ public class InputGraphTypeAnalyzerTests
               {
                   public MyInputGraphType()
                   {
-                      Field<StringGraphType>("Name");
+                      Field<StringGraphType>({|#0:"Name"|});
                   }
               }
 
@@ -59,7 +59,7 @@ public class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
-                    .WithSpan(9, 32, 9, 38).WithArguments("Name", symbolType, "Name", "MySourceType", reason)
+                    .WithLocation(0).WithArguments("Name", symbolType, "Name", "MySourceType", reason)
             };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -89,7 +89,7 @@ public class InputGraphTypeAnalyzerTests
               {
                   public MyInputGraphType()
                   {
-                      Field<StringGraphType>("Name");
+                      Field<StringGraphType>({|#0:"Name"|});
                   }
               }
 
@@ -105,9 +105,9 @@ public class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
-                    .WithSpan(9, 32, 9, 38).WithArguments("Name", "field", "name", "MySourceType", "'readonly'"),
+                    .WithLocation(0).WithArguments("Name", "field", "name", "MySourceType", "'readonly'"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
-                    .WithSpan(9, 32, 9, 38).WithArguments("Name", "property", "Name", "MySourceType", "not 'public' and doesn't have a public setter")
+                    .WithLocation(0).WithArguments("Name", "property", "Name", "MySourceType", "not 'public' and doesn't have a public setter")
             };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -134,7 +134,7 @@ public class InputGraphTypeAnalyzerTests
               {
                   public MyInputGraphType()
                   {
-                      Field<StringGraphType>("FirstName");
+                      Field<StringGraphType>({|#0:"FirstName"|});
                   }
               }
 
@@ -151,7 +151,7 @@ public class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                    .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType")
+                    .WithLocation(0).WithArguments("FirstName", "MySourceType")
             };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -170,7 +170,7 @@ public class InputGraphTypeAnalyzerTests
             {
                 public MyInputGraphType()
                 {
-                    Field<StringGraphType>("FirstName");
+                    Field<StringGraphType>({|#0:"FirstName"|});
                 }
             }
 
@@ -189,7 +189,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "MySourceType");
+            .WithLocation(0).WithArguments("FirstName", "MySourceType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -310,7 +310,7 @@ public class InputGraphTypeAnalyzerTests
 
                   public MyInputGraphType()
                   {
-                      Field<StringGraphType>({{fieldName}});
+                      Field<StringGraphType>({|#0:{{fieldName}}|});
                       Field<StringGraphType>("Name");
                   }
               }
@@ -326,10 +326,8 @@ public class InputGraphTypeAnalyzerTests
               }
               """;
 
-        const int startColumn = 32;
-        int endColumn = startColumn + fieldName.Length;
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, startColumn, 11, endColumn).WithArguments("Email", "MySourceType");
+            .WithLocation(0).WithArguments("Email", "MySourceType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -346,7 +344,7 @@ public class InputGraphTypeAnalyzerTests
             {
                 public MyInputGraphType()
                 {
-                    Field("Email", typeof(StringGraphType));
+                    Field({|#0:"Email"|}, typeof(StringGraphType));
                     Field("Name", typeof(StringGraphType));
                 }
             }
@@ -358,7 +356,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(9, 15, 9, 22).WithArguments("Email", "MySourceType");
+            .WithLocation(0).WithArguments("Email", "MySourceType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -375,7 +373,7 @@ public class InputGraphTypeAnalyzerTests
             {
                 public MyInputGraphType()
                 {
-                    this.Field<StringGraphType>("Email");
+                    this.Field<StringGraphType>({|#0:"Email"|});
                     this.Field<StringGraphType>("Name");
                 }
             }
@@ -387,7 +385,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(9, 37, 9, 44).WithArguments("Email", "MySourceType");
+            .WithLocation(0).WithArguments("Email", "MySourceType");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -405,9 +403,9 @@ public class InputGraphTypeAnalyzerTests
                 public MyInputGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                     Field<IntGraphType>("Age");
-                    Field<StringGraphType>("Address");
+                    Field<StringGraphType>({|#1:"Address"|});
                 }
             }
 
@@ -421,9 +419,9 @@ public class InputGraphTypeAnalyzerTests
         var expected = new[]
         {
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySourceType"),
+                .WithLocation(0).WithArguments("Email", "MySourceType"),
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                .WithSpan(12, 32, 12, 41).WithArguments("Address", "MySourceType")
+                .WithLocation(1).WithArguments("Address", "MySourceType")
         };
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -443,7 +441,7 @@ public class InputGraphTypeAnalyzerTests
                 public BaseInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                 }
             }
 
@@ -454,7 +452,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource");
+            .WithLocation(0).WithArguments("Email", "MyBaseSource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -473,7 +471,7 @@ public class InputGraphTypeAnalyzerTests
                 public BaseInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                     Field<StringGraphType>("Address");
                 }
             }
@@ -490,7 +488,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, 32, 11, 39).WithArguments("Email", "MyBaseSource or IBaseSource");
+            .WithLocation(0).WithArguments("Email", "MyBaseSource or IBaseSource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -507,8 +505,8 @@ public class InputGraphTypeAnalyzerTests
             {
                 public BaseInputObjectGraphType()
                 {
-                    Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Name"|});
+                    Field<StringGraphType>({|#1:"Email"|});
                 }
             }
             """;
@@ -516,9 +514,9 @@ public class InputGraphTypeAnalyzerTests
         var expected = new[]
         {
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                .WithSpan(9, 32, 9, 38).WithArguments("Name", "TSourceType"),
+                .WithLocation(0).WithArguments("Name", "TSourceType"),
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                .WithSpan(10, 32, 10, 39).WithArguments("Email", "TSourceType"),
+                .WithLocation(1).WithArguments("Email", "TSourceType"),
         };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -538,7 +536,7 @@ public class InputGraphTypeAnalyzerTests
                 public BaseInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                 }
             }
 
@@ -549,7 +547,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
+            .WithLocation(0).WithArguments("Email", "MySource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -567,7 +565,7 @@ public class InputGraphTypeAnalyzerTests
                 public CustomInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                     Field<StringGraphType>("Address");
                 }
             }
@@ -588,7 +586,7 @@ public class InputGraphTypeAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField).WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField).WithLocation(0).WithArguments("Email", "MySource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -607,7 +605,7 @@ public class InputGraphTypeAnalyzerTests
                 public AnotherBaseInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                     Field<StringGraphType>("Address");
                 }
             }
@@ -629,7 +627,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, 32, 11, 39).WithArguments("Email", "MySource");
+            .WithLocation(0).WithArguments("Email", "MySource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -647,7 +645,7 @@ public class InputGraphTypeAnalyzerTests
                 public CustomInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Email");
+                    Field<StringGraphType>({|#0:"Email"|});
                     Field<StringGraphType>("Address");
                 }
             }
@@ -673,7 +671,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(10, 32, 10, 39).WithArguments("Email", "MySource");
+            .WithLocation(0).WithArguments("Email", "MySource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -692,7 +690,7 @@ public class InputGraphTypeAnalyzerTests
               {
                   public CustomInputObjectGraphType()
                   {
-                      Field(source => source.Name);
+                      Field(source => {|#0:source.Name|});
                   }
               }
 
@@ -707,7 +705,7 @@ public class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
-                    .WithSpan(9, 25, 9, 36).WithArguments("Name", "property", "Name", "MySourceType", "doesn't have a public setter")
+                    .WithLocation(0).WithArguments("Name", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -728,7 +726,7 @@ public class InputGraphTypeAnalyzerTests
               {
                   public CustomInputObjectGraphType()
                   {
-                      Field("FirstName", source => source.Name);
+                      Field({|#0:"FirstName"|}, source => source.Name);
                   }
               }
 
@@ -743,7 +741,7 @@ public class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
-                    .WithSpan(9, 15, 9, 26).WithArguments("FirstName", "property", "Name", "MySourceType", "doesn't have a public setter")
+                    .WithLocation(0).WithArguments("FirstName", "property", "Name", "MySourceType", "doesn't have a public setter")
             };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -797,7 +795,7 @@ public class InputGraphTypeAnalyzerTests
                 public CustomInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Address");
+                    Field<StringGraphType>({|#0:"Address"|});
                 }
             }
 
@@ -821,7 +819,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+            .WithLocation(0).WithArguments("Address", "MySource");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
@@ -842,7 +840,7 @@ public class InputGraphTypeAnalyzerTests
                 public CustomInputObjectGraphType()
                 {
                     Field<StringGraphType>("Name");
-                    Field<StringGraphType>("Address");
+                    Field<StringGraphType>({|#0:"Address"|});
                 }
             }
 
@@ -865,7 +863,7 @@ public class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(11, 32, 11, 41).WithArguments("Address", "MySource");
+            .WithLocation(0).WithArguments("Address", "MySource");
 
         var test = new VerifyCS.Test
         {

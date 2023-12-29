@@ -81,7 +81,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>().Name("Text").Resolve(context => "Test");
+                      {{builder}}<StringGraphType>().{|#0:Name("Text")|}.Resolve(context => "Test");
                   }
               }
               """;
@@ -102,11 +102,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>().".Length + 1;
-        int endColumn = startColumn + "Name(\"Text\")".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -127,7 +125,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>().Description("description").Name("Text");
+                      {{builder}}<StringGraphType>().Description("description").{|#0:Name("Text")|};
                   }
               }
               """;
@@ -148,11 +146,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>().Description(\"description\").".Length + 1;
-        int endColumn = startColumn + "Name(\"Text\")".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -198,7 +194,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>("Text").Name("Text").Resolve(context => "Test");
+                      {{builder}}<StringGraphType>("Text").{|#0:Name("Text")|}.Resolve(context => "Test");
                   }
               }
               """;
@@ -219,11 +215,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>(\"Text\").".Length + 1;
-        int endColumn = startColumn + "Name(\"Text\")".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -245,7 +239,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>({{builderArgs}}).Name("Text").Description("description");
+                      {{builder}}<StringGraphType>({{builderArgs}}).{|#0:Name("Text")|}.Description("description");
                   }
               }
               """;
@@ -266,11 +260,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>({builderArgs}).".Length + 1;
-        int endColumn = startColumn + "Name(\"Text\")".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -291,7 +283,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>(GetName()).Name(GetName()).Resolve(context => "Test");
+                      {{builder}}<StringGraphType>(GetName()).{|#0:Name(GetName())|}.Resolve(context => "Test");
                   }
 
                   private string GetName() => "Text";
@@ -316,11 +308,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>(GetName()).".Length + 1;
-        int endColumn = startColumn + "Name(GetName())".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.NameMethodInvocationCanBeRemoved).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -344,7 +334,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>("Text1").Name("Text2").Resolve(context => "Test");
+                      {{builder}}<StringGraphType>("Text1").{|#0:Name("Text2")|}.Resolve(context => "Test");
                   }
               }
               """;
@@ -381,13 +371,11 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>(\"Text1\").".Length + 1;
-        int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
         string[] fixes = { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -418,7 +406,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>("Text1").Name("Text2")
+                      {{builder}}<StringGraphType>("Text1").{|#0:Name("Text2")|}
                           .Resolve(context => "Test");
                   }
               }
@@ -458,13 +446,11 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>(\"Text1\").".Length + 1;
-        int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
         string[] fixes = { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -496,7 +482,7 @@ public class FieldNameAnalyzerTests
                   public MyGraphType()
                   {
                       {{builder}}<StringGraphType>("Text1").Description("description")
-                          .Name("Text2");
+                          .{|#0:Name("Text2")|};
                   }
               }
               """;
@@ -533,13 +519,11 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = "            .".Length + 1;
-        int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
         string[] fixes = { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(11, startColumn, 11, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -570,7 +554,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>(name: "Text1").Name("Text2").Resolve(context => "Test");
+                      {{builder}}<StringGraphType>(name: "Text1").{|#0:Name("Text2")|}.Resolve(context => "Test");
                   }
               }
               """;
@@ -607,13 +591,11 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>(name: \"Text1\").".Length + 1;
-        int endColumn = startColumn + "Name(\"Text2\")".Length;
         string methodName = GetMethodName(builder);
 
         string[] fixes = { fix0, fix1 };
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -639,7 +621,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<string>(name: "Text1", nullable: true).Name("Text2").Resolve(context => "Test");
+                    Field<string>(name: "Text1", nullable: true).{|#0:Name("Text2")|}.Resolve(context => "Test");
                 }
             }
             """;
@@ -677,7 +659,7 @@ public class FieldNameAnalyzerTests
         string[] fixes = { fix0, fix1 };
         const string methodName = Constants.MethodNames.Field;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithSpan(9, 54, 9, 67).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -703,7 +685,7 @@ public class FieldNameAnalyzerTests
               {
                   public void Register(ObjectGraphType graphType)
                   {
-                      graphType.{{builder}}<StringGraphType>().Name("Text").Resolve(context => "Tests");
+                      graphType.{{builder}}<StringGraphType>().{|#0:Name("Text")|}.Resolve(context => "Tests");
                   }
               }
               """;
@@ -723,11 +705,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        graphType.{builder}<StringGraphType>().".Length + 1;
-        int endColumn = startColumn + "Name(\"Text\")".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, startColumn, 9, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -744,7 +724,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<string>(x => x.FullName).Name("Name");
+                    Field<string>(x => x.FullName).{|#0:Name("Name")|};
                 }
             }
 
@@ -776,7 +756,7 @@ public class FieldNameAnalyzerTests
 
         const string methodName = Constants.MethodNames.Field;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 40, 9, 52).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -793,7 +773,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field(x => x.FullName).Name("Name");
+                    Field(x => x.FullName).{|#0:Name("Name")|};
                 }
             }
 
@@ -825,7 +805,7 @@ public class FieldNameAnalyzerTests
 
         const string methodName = Constants.MethodNames.Field;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(9, 32, 9, 44).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -846,7 +826,7 @@ public class FieldNameAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      {{builder}}<StringGraphType>().Name();
+                      {{builder}}<StringGraphType>().{|#0:Name()|};
                   }
               }
               """;
@@ -867,11 +847,9 @@ public class FieldNameAnalyzerTests
               }
               """;
 
-        int startColumn = $"        {builder}<StringGraphType>().".Length + 1;
-        int endColumn = startColumn + "Name()".Length;
         string methodName = GetMethodName(builder);
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(10, startColumn, 10, endColumn).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -896,7 +874,7 @@ public class FieldNameAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    ConnectionBuilder.Create<StringGraphType, string>().Name("Text").Resolve(context => "Test");
+                    ConnectionBuilder.Create<StringGraphType, string>().{|#0:Name("Text")|}.Resolve(context => "Test");
                 }
             }
             """;
@@ -919,7 +897,7 @@ public class FieldNameAnalyzerTests
 
         const string methodName = Constants.MethodNames.Create;
 
-        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithSpan(10, 61, 10, 73).WithArguments(methodName);
+        var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DefineTheNameInFieldMethod).WithLocation(0).WithArguments(methodName);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 

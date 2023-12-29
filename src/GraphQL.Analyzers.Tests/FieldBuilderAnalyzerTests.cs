@@ -26,12 +26,12 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         "name",
                         "description",
                         new QueryArguments(new QueryArgument<StringGraphType> { Name = "argName" }),
                         context => "text",
-                        "deprecated reason");
+                        "deprecated reason")|};
                 }
             }
             """;
@@ -55,7 +55,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 33);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -72,12 +72,12 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         name: "name",
                         deprecationReason: "deprecated reason",
                         description: "description",
                         resolve: context => "text",
-                        arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "argName" }));
+                        arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "argName" }))|};
                 }
             }
             """;
@@ -101,7 +101,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 100);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -118,10 +118,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         resolve: context => "text",
                         description: "description",
-                        name: "name");
+                        name: "name")|};
                 }
             }
             """;
@@ -143,7 +143,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 26);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -160,10 +160,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public void Register(ObjectGraphType graphType)
                 {
-                    graphType.Field<StringGraphType>(
+                    {|#0:graphType.Field<StringGraphType>(
                         name: "name",
                         resolve: context => "text",
-                        description: "description");
+                        description: "description")|};
                 }
             }
             """;
@@ -184,7 +184,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -202,10 +202,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    FieldAsync<StringGraphType>(
+                    {|#0:FieldAsync<StringGraphType>(
                         "name",
                         "description",
-                        resolve: context => Task.FromResult<object>("text"));
+                        resolve: context => Task.FromResult<object>("text"))|};
                 }
             }
             """;
@@ -228,7 +228,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 65);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -245,13 +245,13 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         "name",
                         arguments: new QueryArguments(new QueryArgument<StringGraphType>
                         {
                             Name = "argName"
                         }),
-                        resolve: context => "text");
+                        resolve: context => "text")|};
                 }
             }
             """;
@@ -276,7 +276,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 15, 40);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -293,13 +293,13 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         "name",
                         arguments: new QueryArguments(
                             new QueryArgument<StringGraphType> { Name = "argName1" },
                             new QueryArgument<StringGraphType> { Name = "argName2" }
                         )
-                    );
+                    )|};
                 }
             }
             """;
@@ -323,7 +323,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 15, 10);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -340,7 +340,7 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         "name" /* a */, // b
                         // c
                         arguments: new QueryArguments(
@@ -349,7 +349,7 @@ public class FieldBuilderAnalyzerTests
                         ),
                         // d
                         description: "desc"
-                    ); // e
+                    )|}; // e
                 }
             }
             """;
@@ -381,7 +381,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 18, 10);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -398,10 +398,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field(
+                    {|#0:Field(
                         typeof(string),
                         "name",
-                        resolve: context => "text");
+                        resolve: context => "text")|};
                 }
             }
             """;
@@ -422,7 +422,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -440,10 +440,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    FieldSubscribe<StringGraphType>(
+                    {|#0:FieldSubscribe<StringGraphType>(
                         "name",
                         resolve: context => "text",
-                        subscribe: context => new Observable());
+                        subscribe: context => new Observable())|};
                 }
 
                 private class Observable : IObservable<string>
@@ -478,7 +478,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 52);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -495,9 +495,9 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    FieldDelegate<StringGraphType>(
+                    {|#0:FieldDelegate<StringGraphType>(
                         "name",
-                        resolve: TestMethod);
+                        resolve: TestMethod)|};
                 }
 
                 public string TestMethod() => "test";
@@ -522,7 +522,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 11, 33);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -539,12 +539,12 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name", "description", null,
+                    {|#0:Field<StringGraphType>("name", "description", null,
                         resolve: context => Resolve(
                             "s1",
                               "s2",
                                 "s3"
-                        ));
+                        ))|};
                 }
 
                 public string Resolve(string s1, string s2, string s3) => "text";
@@ -573,7 +573,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 14, 15);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -592,10 +592,10 @@ public class FieldBuilderAnalyzerTests
                 {
                     // next line contains whitespaces
                     
-                    Field<StringGraphType>("name",
+                    {|#0:Field<StringGraphType>("name",
                         resolve: context => Resolve(
                             "text"
-                        ));
+                        ))|};
                 }
 
                 public string Resolve(string s1) => s1;
@@ -627,7 +627,7 @@ public class FieldBuilderAnalyzerTests
         // ensure whitespace was not removed from input sample
         source.Replace("\r", "").ShouldContain("// next line contains whitespaces\n    ");
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(11, 9, 14, 15);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -645,10 +645,10 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
                     // comment
-                    Field<StringGraphType>("name",
+                    {|#0:Field<StringGraphType>("name",
                         resolve: context => Resolve(
                             "text"
-                        ));
+                        ))|};
                 }
 
                 public string Resolve(string s1) => s1;
@@ -676,7 +676,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 13, 15);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -694,13 +694,13 @@ public class FieldBuilderAnalyzerTests
                 public MyGraphType()
                 {
 
-                    Field<StringGraphType>("name1", "description1", null,
-                        context => "text1");
+                    {|#0:Field<StringGraphType>("name1", "description1", null,
+                        context => "text1")|};
 
                     var str = "string";
 
-                    Field<StringGraphType>("name2", "description2", null,
-                        context => "text2");
+                    {|#1:Field<StringGraphType>("name2", "description2", null,
+                        context => "text2")|};
                 }
             }
             """;
@@ -727,8 +727,8 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected1 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(10, 9, 11, 32);
-        var expected2 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(15, 9, 16, 32);
+        var expected1 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
+        var expected2 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(1);
         await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix);
     }
 
@@ -745,8 +745,8 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name", "description", null,
-                        context => "text");
+                    {|#0:Field<StringGraphType>("name", "description", null,
+                        context => "text")|};
                 }
             }
             """;
@@ -768,7 +768,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 10, 31);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -805,10 +805,10 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name" /* a */, /* b */ "description",
+                    {|#0:Field<StringGraphType>("name" /* a */, /* b */ "description",
                         // c
                         deprecationReason: "reason", // d
-                        resolve: context => "text"); // e
+                        resolve: context => "text")|}; // e
                 }
             }
             """;
@@ -857,7 +857,7 @@ public class FieldBuilderAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 12, 40);
+        var expected = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -894,11 +894,11 @@ public class FieldBuilderAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>(
+                    {|#0:Field<StringGraphType>(
                         "name",
                         "description",
                         null,
-                        context => "text");
+                        context => "text")|};
                 }
             }
             """;
@@ -925,7 +925,7 @@ public class FieldBuilderAnalyzerTests
         {
             TestCode = source,
             FixedCode = fix,
-            ExpectedDiagnostics = { VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithSpan(9, 9, 13, 31) },
+            ExpectedDiagnostics = { VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0) },
             TestState =
             {
                 AnalyzerConfigFiles =
