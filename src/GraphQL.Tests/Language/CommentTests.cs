@@ -35,7 +35,7 @@ public class CommentTests
             """;
 
         var document = _builder.Build(query);
-        document.Operation().Comments[0].Value.ShouldBe("comment");
+        document.Operation().Comments![0].Value.ShouldBe("comment");
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class CommentTests
             .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
         document.Operation()
             .SelectionSet.Selections.OfType<GraphQLField>().First()
-            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
+            .SelectionSet.ShouldNotBeNull().Selections.OfType<GraphQLField>().First().Comments.ShouldBeNull();
     }
 
     [Fact]
@@ -72,10 +72,10 @@ public class CommentTests
 
         var document = _builder.Build(query);
         document.Operation()
-            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment1");
+            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment1");
         document.Operation()
             .SelectionSet.Selections.OfType<GraphQLField>().First()
-            .SelectionSet.Selections.OfType<GraphQLField>().First().Comments[0].Value.ShouldBe("comment2");
+            .SelectionSet.ShouldNotBeNull().Selections.OfType<GraphQLField>().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment2");
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class CommentTests
             """;
 
         var document = _builder.Build(query);
-        document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comments[0].Value.ShouldBe("comment");
+        document.Definitions.OfType<GraphQLFragmentDefinition>().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment");
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class CommentTests
         var document = _builder.Build(query);
         document.Operation()
             .SelectionSet.Selections.OfType<GraphQLField>().First()
-            .SelectionSet.Selections.OfType<GraphQLFragmentSpread>().First().Comments[0].Value.ShouldBe("comment");
+            .SelectionSet.ShouldNotBeNull().Selections.OfType<GraphQLFragmentSpread>().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment");
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class CommentTests
         var document = _builder.Build(query);
         document.Operation()
             .SelectionSet.Selections.OfType<GraphQLField>().First()
-            .SelectionSet.Selections.OfType<GraphQLInlineFragment>().First().Comments[0].Value.ShouldBe("comment");
+            .SelectionSet.ShouldNotBeNull().Selections.OfType<GraphQLInlineFragment>().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment");
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class CommentTests
         var document = _builder.Build(query);
         document.Operation()
             .SelectionSet.Selections.OfType<GraphQLField>().First()
-            .Arguments.First().Comments[0].Value.ShouldBe("comment");
+            .Arguments.ShouldNotBeNull().First().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment");
     }
 
     [Fact]
@@ -174,6 +174,6 @@ public class CommentTests
 
         var document = _builder.Build(query);
         document.Operation()
-            .Variables.First().Comments[0].Value.ShouldBe("comment");
+            .Variables.ShouldHaveSingleItem().Comments.ShouldHaveSingleItem().Value.ShouldBe("comment");
     }
 }

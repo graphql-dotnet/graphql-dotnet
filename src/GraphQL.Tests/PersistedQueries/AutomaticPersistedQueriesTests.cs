@@ -49,9 +49,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("2")]
     public async Task Wrong_Version_Should_Be_Detected(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "1",
                 ["version"] = version
@@ -61,8 +61,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
         AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "PersistedQueryNotSupported");
-        result.Errors.Single().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
-            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Automatic persisted queries protocol version '2' is not supported."));
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object?>("reason", "Automatic persisted queries protocol version '2' is not supported."));
     }
 
     [Theory]
@@ -70,9 +70,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Not_Saved_Query_Should_Return_Not_Found_Code(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "1",
                 ["version"] = version
@@ -82,8 +82,8 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
         AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "PersistedQueryNotFound");
-        result.Errors.Single().ShouldBeOfType<PersistedQueryNotFoundError>()
-            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object>("reason", "Persisted query with hash '1' was not found."));
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType<PersistedQueryNotFoundError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object?>("reason", "Persisted query with hash '1' was not found."));
     }
 
     [Theory]
@@ -91,9 +91,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Bad_Hash_Should_Be_Detected(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "badHash",
                 ["version"] = version
@@ -113,9 +113,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Persisted_Query_Should_Work(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "d7b0dfafc61a1f0618f4f346911d5aa87bef97b134f2943383223bdac4410134",
                 ["version"] = version
@@ -171,7 +171,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
         _serializer = Provider.GetRequiredService<IGraphQLTextSerializer>();
     }
 
-    public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure = null)
+    public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions>? configure = null)
     {
         var options = new ExecutionOptions
         {

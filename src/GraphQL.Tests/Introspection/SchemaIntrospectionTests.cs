@@ -70,7 +70,7 @@ public class SchemaIntrospectionTests
         });
         string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
-        static string GetName(JsonElement el) => el.GetProperty("name").GetString();
+        static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
         var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
@@ -107,7 +107,7 @@ public class SchemaIntrospectionTests
         });
         string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
-        static string GetName(JsonElement el) => el.GetProperty("name").GetString();
+        static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
         var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 

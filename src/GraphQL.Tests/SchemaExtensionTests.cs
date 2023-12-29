@@ -40,7 +40,7 @@ public class SchemaExtensionTests
     [Fact]
     public void RegisterTypeMappings_Null()
     {
-        Should.Throw<ArgumentNullException>(() => new Schema().RegisterTypeMappings(null));
+        Should.Throw<ArgumentNullException>(() => new Schema().RegisterTypeMappings(null!));
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507

@@ -263,7 +263,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_Empty(IGraphQLTextSerializer serializer)
     {
         const string test = "{}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBeNull();
         actual.OperationName.ShouldBeNull();
         actual.Variables.ShouldBeNull();
@@ -275,9 +275,9 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_Other_Properties(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"operationName\":\"hello2\",\"extensions\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBe("hello");
         actual.OperationName.ShouldBe("hello2");
-        Verify(actual.Extensions);
+        Verify(actual.Extensions!);
     }
 }
