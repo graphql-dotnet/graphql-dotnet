@@ -580,6 +580,11 @@ namespace GraphQL.Types
                 .DeprecationReason(expression.DeprecationReasonOf())
                 .DefaultValue(expression.DefaultValueOf());
 
+            if (this is IInputObjectGraphType)
+            {
+                builder.ParseValue(value => value is TProperty ? value : value.GetPropertyValue(typeof(TProperty), builder.FieldType.ResolvedType!)!);
+            }
+
             if (this is IObjectGraphType)
                 builder.Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression));
 

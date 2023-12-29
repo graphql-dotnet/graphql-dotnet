@@ -364,6 +364,28 @@ public class AutoRegisteringInputObjectGraphTypeTests
         data.Name.ShouldBe("John Doe");
     }
 
+    [Fact]
+    public void ParserSetProperly()
+    {
+        var inputType = new AutoRegisteringInputObjectGraphType<Class3>();
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field<StringGraphType>("test")
+            .Argument<int>("input", configure: arg => arg.ResolvedType = inputType);
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is converted to an integer
+        inputType.Fields.First().ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
+        inputType.Fields.First().Parser("123").ShouldBe(123);
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser("abc"));
+    }
+
+    private class Class3
+    {
+        [Id]
+        public int Id { get; set; }
+    }
+
     private class Class1
     {
         public string? Sample { get; set; }

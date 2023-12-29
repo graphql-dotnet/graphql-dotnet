@@ -169,6 +169,8 @@ namespace GraphQL.Types
             if (isInputType)
             {
                 fieldType.WithMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, memberInfo.Name);
+                var memberType = memberInfo is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)memberInfo).FieldType;
+                fieldType.Parser = value => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, fieldType.ResolvedType!)!;
             }
             if (!isInputType &&
                 memberInfo is MethodInfo methodInfo &&

@@ -543,6 +543,96 @@ public class AutoRegisteringObjectGraphTypeTests
             .ParamName.ShouldBe("instanceExpression");
     }
 
+    [Fact]
+    public async Task ParserOnArgumentsSetProperly()
+    {
+        var queryType = new AutoRegisteringObjectGraphType<Class3>();
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is converted to an integer
+        var fieldType = queryType.Fields.First();
+        var argument = fieldType.Arguments.ShouldNotBeNull().First();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
+        argument.Parser("123").ShouldBe(123);
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<FormatException>(() => argument.Parser("abc"));
+        // perform end-to-end test for bad argument
+        var result = await new DocumentExecuter().ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = """{ testMe(id: "abc") }""";
+        });
+        result.Executed.ShouldBeFalse();
+        var resultJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+#if NET7_0_OR_GREATER
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. The input string \u0027abc\u0027 was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#else
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. Input string was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#endif
+    }
+
+    private class Class3
+    {
+        public static int TestMe([Id] int id) => id;
+    }
+
+    [Fact]
+    public async Task ValidatorOnArgumentsSetProperly()
+    {
+        var queryType = new AutoRegisteringObjectGraphType<Class4>();
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is validated
+        var fieldType = queryType.Fields.First();
+        var argument = fieldType.Arguments.ShouldNotBeNull().First();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<StringGraphType>>();
+        argument.Validator("abc");
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<ArgumentException>(() => argument.Validator("abcdef"));
+        // perform end-to-end test for bad argument
+        var result = await new DocumentExecuter().ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = """{ testMe(value: "abcdef") }""";
+        });
+        result.Executed.ShouldBeFalse();
+        var resultJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027value\u0027 of field \u0027testMe\u0027. Value is too long. Max length is 5.","locations":[{"line":1,"column":17}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","ARGUMENT"],"number":"5.6"}}]}""");
+    }
+
+    private class Class4
+    {
+        public static string TestMe([MyMaxLength(5)] string value) => value;
+    }
+
+    private class MyMaxLength : GraphQLAttribute
+    {
+        private readonly int _maxLength;
+        public MyMaxLength(int maxLength)
+        {
+            _maxLength = maxLength;
+        }
+
+        public override void Modify(ArgumentInformation argumentInformation)
+        {
+            if (argumentInformation.TypeInformation.Type != typeof(string))
+            {
+                throw new InvalidOperationException("MyMaxLength can only be used on string arguments.");
+            }
+        }
+
+        public override void Modify(QueryArgument queryArgument)
+        {
+            queryArgument.Validate(value =>
+            {
+                if (((string)value).Length > _maxLength)
+                {
+                    throw new ArgumentException($"Value is too long. Max length is {_maxLength}.");
+                }
+            });
+        }
+    }
+
     public class NoMemberInstanceExpression<T> : AutoRegisteringObjectGraphType<T>
     {
         protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;

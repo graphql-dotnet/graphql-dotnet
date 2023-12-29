@@ -43,6 +43,209 @@ for more details.
 This new scalar can be used to send or receive arbitrary objects or values to or from the server. It is functionally
 equivalent to the `AnyGraphType` used for GraphQL Federation, but defaults to the name of `Complex` rather than `_Any`.
 
+### 4. `Parser` delegates added to input field and argument definitions
+
+This allows for custom parsing of input values. The `Parser` delegate is used to convert the input value
+to the expected type, and can be set via the `ParseValue` method on the `FieldBuilder` or `QueryArgument`.
+
+The auto-registering graph types will automatically configure the `Parser` delegate appropriately, and the
+`Field(x => x.Property)` and `Field("FieldName", x => x.Property)` syntax will as well.
+
+The most common use case for this is when using the ID graph type (passed via a string) for a numeric or GUID identifier.
+For example, consider the following code:
+
+```csharp
+// for input object graph type
+Field("Id", x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+
+class MyInputObject
+{
+    public int Id { get; set; }
+}
+```
+
+This will now cause an error when the client sends a string value for the Id field that cannot be coerced to
+an `int` during the validation stage, rather than during the execution stage. Supplying an invalid value will
+produce a response similar to the following:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Invalid value for argument 'id' of field 'testMe'. The input string 'abc' was not in a correct format.",
+      "locations": [
+        {
+          "line": 1,
+          "column": 14
+        }
+      ],
+      "extensions": {
+        "code": "INVALID_VALUE",
+        "codes": [
+          "INVALID_VALUE",
+          "FORMAT"
+        ],
+        "number": "5.6"
+      }
+    }
+  ]
+}
+```
+
+This now is a validation error and not passed to the unhandled exception handler. Previously, this would have been
+considered a server exception and processed by the unhandled exception handler, returning an error similar to the
+following:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Error trying to resolve field 'testMe'.",
+      "locations": [
+        {
+          "line": 1,
+          "column": 3
+        }
+      ],
+      "path": [
+        "testMe"
+      ],
+      "extensions": {
+        "code": "FORMAT",
+        "codes": [
+          "FORMAT"
+        ]
+      }
+    }
+  ],
+  "data": null
+}
+```
+
+You can also define a custom parser when appropriate to convert an input value to the expected type.
+This is typically unnecessary when using the `Field(x => x.Property)` syntax, but when matching via
+property name, it may be desired to define a custom parser. For example:
+
+```csharp
+// for input object graph type
+Field<StringGraphType>("website") // match by property name, perhaps for a constructor argument
+    .ParseValue(value => new Uri((string)value));
+
+class MyInputObject
+{
+    public Uri? Website { get; set; }
+}
+```
+
+Without adding a parser the coercion will occur within the resolver during `GetArgument<Uri>("abc")`
+as occured in previous versions of GraphQL.NET. This will result in a server exception being thrown
+and processed by the unhandled exception handler if the value cannot be coerced to a `Uri`. Note that
+the parser function need not check for null values.
+
+### 5. `Validator` delegates added to input field and argument definitions
+
+This allows for custom validation of input values. It can be used to easily validate input values
+such as email addresses, phone numbers, or to validate a value is within a specific range. The
+`Validator` delegate is used to validate the input value, and can be set via the `Validate` method
+on the `FieldBuilder` or `QueryArgument`. Here are some examples:
+
+```csharp
+// for an input object graph type
+Field(x => x.FirstName)
+    .Validate(value =>
+    {
+        if (((string)value).Length >= 10)
+            throw new ArgumentException("Length must be less than 10 characters.");
+    });
+Field(x => x.Age)
+    .Validate(value =>
+    {
+        if ((int)value < 18)
+            throw new ArgumentException("Age must be 18 or older.");
+    });
+Field(x => x.Password)
+    .Validate(value =>
+    {
+        VerifyPasswordComplexity((string)value);
+    });
+```
+
+The `Validator` delegate is called during the validation stage, prior to execution of the request.
+Null values are not passed to the validation function. Supplying an invalid value will produce
+a response similar to the following:
+
+```json
+{
+  "errors": [
+    {
+      "message": "Invalid value for argument 'firstName' of field 'testMe'. Length must be less than 10 characters.",
+      "locations": [
+        {
+          "line": 1,
+          "column": 14
+        }
+      ],
+      "extensions": {
+        "code": "INVALID_VALUE",
+        "codes": [
+          "INVALID_VALUE",
+          "ARGUMENT"
+        ],
+        "number": "5.6"
+      }
+    }
+  ]
+}
+```
+
+For type-first schemas, you may define your own attributes to perform validation, either on input
+fields or on output field arguments. For example:
+
+```csharp
+// for AutoRegisteringObjectGraphType<MyClass>
+
+public class MyClass
+{
+    public static string TestMe([MyMaxLength(5)] string value) => value;
+}
+
+private class MyMaxLength : GraphQLAttribute
+{
+    private readonly int _maxLength;
+    public MyMaxLength(int maxLength)
+    {
+        _maxLength = maxLength;
+    }
+
+    public override void Modify(ArgumentInformation argumentInformation)
+    {
+        if (argumentInformation.TypeInformation.Type != typeof(string))
+        {
+            throw new InvalidOperationException("MyMaxLength can only be used on string arguments.");
+        }
+    }
+
+    public override void Modify(QueryArgument queryArgument)
+    {
+        queryArgument.Validate(value =>
+        {
+            if (((string)value).Length > _maxLength)
+            {
+                throw new ArgumentException($"Value is too long. Max length is {_maxLength}.");
+            }
+        });
+    }
+}
+```
+
+Similar to the `Parser` delegate, the `Validator` delegate is called during the validation stage,
+and will not unnecessarily trigger the unhandled exception handler due to client input errors.
+
+At this time GraphQL.NET does not directly support the `MaxLength` and similar attributes from
+`System.ComponentModel.DataAnnotations`, but this may be added in a future version. You can
+implement your own attributes as shown above, or call the `Validate` method to set a validation
+function.
+
 ## Breaking Changes
 
 ### 1. Query type is required

@@ -66,6 +66,12 @@ namespace GraphQL.Utilities
 
             if (field.StreamResolver != null && type != schema.Subscription)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+
+            if (field.Parser != FieldType.DefaultParser)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Parser set. You should set Parser only for fields of input object types.");
+
+            if (field.Validator != FieldType.DefaultValidator)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Validator set. You should set Validator only for fields of input object types.");
         }
 
         /// <inheritdoc/>
@@ -138,6 +144,12 @@ namespace GraphQL.Utilities
 
             if (field.Resolver != null)
                 throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
+
+            if (field.Parser != FieldType.DefaultParser)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Parser set. Each interface is translated to a concrete type during request execution. You should set Parser only for fields of input object types.");
+
+            if (field.Validator != FieldType.DefaultValidator)
+                throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Validator set. Each interface is translated to a concrete type during request execution. You should set Validator only for fields of input object types.");
         }
 
         /// <inheritdoc/>

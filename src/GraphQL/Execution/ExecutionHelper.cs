@@ -68,7 +68,7 @@ namespace GraphQL.Execution
                 var value = argNode?.Value;
                 var type = arg.ResolvedType!;
 
-                values[arg.Name] = CoerceValue(type, value, new CoerceValueContext
+                var argValue = CoerceValue(type, value, new CoerceValueContext
                 {
                     Argument = argNode,
                     Document = document,
@@ -76,6 +76,27 @@ namespace GraphQL.Execution
                     ParentNode = fieldOrFragmentSpread,
                     Variables = variables,
                 }, arg.DefaultValue);
+
+                if (value != null) // if value is null, it's a default value (and argValue.Source == ArgumentSource.FieldDefault)
+                {
+                    object? parsedValue = argValue.Value;
+                    if (parsedValue != null)
+                    {
+                        try
+                        {
+                            parsedValue = arg.Parser(parsedValue);
+                            if (parsedValue != null)
+                                arg.Validator(parsedValue);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidValueError(document, fieldOrFragmentSpread, directive, argNode, value, ex);
+                        }
+                    }
+                    argValue = new(parsedValue, argValue.Source);
+                }
+
+                values[arg.Name] = argValue;
             }
 
             return values;
@@ -250,7 +271,25 @@ namespace GraphQL.Execution
                         // when a optional variable is specified for the input field, and the variable is not defined, and
                         //   when there is no default value specified for the input field, then do not add the entry to the
                         //   unordered map.
-                        if (value.Source != ArgumentSource.FieldDefault || value.Value != null)
+                        if (value.Source != ArgumentSource.FieldDefault)
+                        {
+                            var parsedValue = value.Value;
+                            if (parsedValue != null)
+                            {
+                                try
+                                {
+                                    parsedValue = field.Parser(parsedValue);
+                                    if (parsedValue != null)
+                                        field.Validator(parsedValue);
+                                }
+                                catch (Exception ex) when (context.Document != null && context.ParentNode != null)
+                                {
+                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                                }
+                            }
+                            obj[field.Name] = parsedValue;
+                        }
+                        else if (value.Value != null)
                             obj[field.Name] = value.Value;
                     }
                     else if (field.DefaultValue != null)
