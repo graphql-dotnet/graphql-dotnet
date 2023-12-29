@@ -36,7 +36,7 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             Query = null,
             Schema = Schema,
         });
-        result.Errors.Single().ShouldBeOfType(typeof(QueryMissingError));
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType(typeof(QueryMissingError));
         result.Errors.Single().Locations.ShouldBeNull();
         result.Errors.Single().Path.ShouldBeNull();
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>

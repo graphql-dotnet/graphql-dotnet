@@ -77,7 +77,7 @@ public abstract class InputConversionTestsBase
         const string json = """{"a": 1}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1);
-        inputs["a"].GetType().ShouldBe(typeof(int));
+        inputs["a"]!.GetType().ShouldBe(typeof(int));
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public abstract class InputConversionTestsBase
         const string json = """{"a": 1000000000000000001}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1000000000000000001);
-        inputs["a"].GetType().ShouldBe(typeof(long));
+        inputs["a"]!.GetType().ShouldBe(typeof(long));
     }
 
     [Fact]
@@ -272,7 +272,7 @@ public abstract class InputConversionTestsBase
         var myInput = inputs.ToObject<EnumInput>();
 
         myInput.ShouldNotBeNull();
-        myInput.B.Value.ShouldBe(Numbers2.Three);
+        myInput.B!.Value.ShouldBe(Numbers2.Three);
     }
 
     [Fact]
@@ -356,5 +356,5 @@ public abstract class InputConversionTestsBase
         person3.Age.ShouldBe(0);
     }
 
-    protected abstract Inputs VariablesToInputs(string variables);
+    protected abstract Inputs VariablesToInputs(string? variables);
 }

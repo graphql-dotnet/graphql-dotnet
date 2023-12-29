@@ -42,7 +42,7 @@ public class ComplexityValidationTest : ComplexityTestBase
         var complexityConfiguration = new ComplexityConfiguration { MaxDepth = 2 };
         var res = await Execute(complexityConfiguration, query);
 
-        res.Errors.ShouldNotBe(null);
+        res.Errors.ShouldNotBeNull();
         res.Errors.Count.ShouldBe(1);
         res.Errors[0].ShouldBeOfType<ComplexityError>();
         res.Errors[0].Message.ShouldBe("Query is too nested to execute. Depth is 3 levels, maximum allowed on this endpoint is 2.");
@@ -65,7 +65,7 @@ public class ComplexityValidationTest : ComplexityTestBase
         var complexityConfiguration = new ComplexityConfiguration { FieldImpact = 5, MaxComplexity = 10 };
         var res = await Execute(complexityConfiguration, query);
 
-        res.Errors.ShouldNotBe(null);
+        res.Errors.ShouldNotBeNull();
         res.Errors.Count.ShouldBe(1);
         res.Errors[0].ShouldBeOfType<ComplexityError>();
         res.Errors[0].Message.ShouldBe("Query is too complex to execute. Complexity is 20, maximum allowed on this endpoint is 10. The field with the highest complexity is 'hero' with value 5.");
@@ -99,7 +99,7 @@ public class ComplexityValidationTest : ComplexityTestBase
         };
         var res = await Execute(complexityConfiguration, query);
 
-        res.Errors.ShouldNotBe(null);
+        res.Errors.ShouldNotBeNull();
         res.Errors.Count.ShouldBe(1);
         res.Errors[0].ShouldBeOfType<ComplexityError>();
         res.Errors[0].Message.ShouldBe("Query is too complex to execute. Complexity is 480, maximum allowed on this endpoint is 25. The field with the highest complexity is 'friends' with value 125.");
@@ -134,7 +134,7 @@ public class ComplexityValidationTest : ComplexityTestBase
         var complexityConfiguration = new ComplexityConfiguration();
         var res = await Execute(complexityConfiguration, query);
 
-        res.Errors.ShouldNotBe(null);
+        res.Errors.ShouldNotBeNull();
         res.Errors.Count.ShouldBe(3);
         res.Errors.All(e => e is not ComplexityError);
     }
@@ -167,7 +167,7 @@ public class ComplexityValidationTest : ComplexityTestBase
         var complexityConfiguration = new ComplexityConfiguration();
         var res = await Execute(complexityConfiguration, query, onlyComplexityRule: true);
 
-        res.Errors.ShouldNotBe(null);
+        res.Errors.ShouldNotBeNull();
         res.Errors.Count.ShouldBe(1);
         res.Errors[0].ShouldBeOfType<ValidationError>().Message.ShouldBe("It looks like document has fragment cycle. Please make sure you are using standard validation rules especially NoFragmentCycles one.");
     }

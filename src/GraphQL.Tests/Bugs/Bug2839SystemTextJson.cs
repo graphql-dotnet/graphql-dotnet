@@ -71,7 +71,7 @@ public class Bug2839SystemTextJson
             Name = "DateTime";
         }
 
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             DateTime _ => value,
             DateTimeOffset _ => value,

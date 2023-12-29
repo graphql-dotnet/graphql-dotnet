@@ -63,8 +63,8 @@ public class Issue899Level1 : ObjectGraphType
         Field<ListGraphType<ListGraphType<Issue899Level2>>>("level2").Resolve(context =>
         {
             context.GetArgument<string>("arg2").ShouldBe("2");
-            context.Parent.GetArgument<string>("arg1").ShouldBe("1");
-            context.Parent.Parent.ShouldBeNull();
+            context.Parent!.GetArgument<string>("arg1").ShouldBe("1");
+            context.Parent!.Parent.ShouldBeNull();
 
             return new[] { new[] { new object() } };
         })
@@ -79,9 +79,9 @@ public class Issue899Level2 : ObjectGraphType
         Field<ListGraphType<Issue899Level3>>("level3").Resolve(context =>
         {
             context.GetArgument<string>("arg3").ShouldBe("3");
-            context.Parent.GetArgument<string>("arg2").ShouldBe("2");
-            context.Parent.Parent.GetArgument<string>("arg1").ShouldBe("1");
-            context.Parent.Parent.Parent.ShouldBeNull();
+            context.Parent!.GetArgument<string>("arg2").ShouldBe("2");
+            context.Parent!.Parent!.GetArgument<string>("arg1").ShouldBe("1");
+            context.Parent!.Parent!.Parent.ShouldBeNull();
 
             return new[] { new object() };
         })
@@ -96,10 +96,10 @@ public class Issue899Level3 : ObjectGraphType
         Field<StringGraphType>("level4").Resolve(context =>
         {
             context.GetArgument<string>("arg4").ShouldBe("4");
-            context.Parent.GetArgument<string>("arg3").ShouldBe("3");
-            context.Parent.Parent.GetArgument<string>("arg2").ShouldBe("2");
-            context.Parent.Parent.Parent.GetArgument<string>("arg1").ShouldBe("1");
-            context.Parent.Parent.Parent.Parent.ShouldBeNull();
+            context.Parent!.GetArgument<string>("arg3").ShouldBe("3");
+            context.Parent!.Parent!.GetArgument<string>("arg2").ShouldBe("2");
+            context.Parent!.Parent!.Parent!.GetArgument<string>("arg1").ShouldBe("1");
+            context.Parent!.Parent!.Parent!.Parent.ShouldBeNull();
 
             return "X";
         })

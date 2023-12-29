@@ -111,7 +111,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
         });
@@ -146,7 +146,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
         });
@@ -193,7 +193,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
         });

@@ -30,7 +30,7 @@ public class Issue1152ExceptionDelegate : QueryTestBase<Issue1152Schema>
         list.Count.ShouldBe(1);
         list[0].ShouldBeOfType<InvalidTimeZoneException>().StackTrace.ShouldNotBeNull();
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>().StackTrace.ShouldBeNull();
     }
 }

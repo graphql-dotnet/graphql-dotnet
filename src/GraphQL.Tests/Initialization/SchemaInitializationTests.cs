@@ -225,7 +225,7 @@ public class SchemaWithDeprecatedAppliedDirective : Schema
         var f = Query.AddField(new FieldType { Name = "field1", ResolvedType = new StringGraphType() }).ApplyDirective("deprecated", "reason", "aaa");
         f.DeprecationReason.ShouldBe("aaa");
         f.DeprecationReason = "bbb";
-        f.FindAppliedDirective("deprecated").FindArgument("reason").Value.ShouldBe("bbb");
+        f.FindAppliedDirective("deprecated").ShouldNotBeNull().FindArgument("reason").ShouldNotBeNull().Value.ShouldBe("bbb");
     }
 }
 
@@ -326,7 +326,7 @@ public class SchemaWithInvalidDefault1 : Schema
 
     public class SomeInput
     {
-        public IList<string> Names { get; set; }
+        public IList<string?>? Names { get; set; }
     }
 }
 
@@ -336,7 +336,7 @@ public class SchemaWithInvalidDefault2 : Schema
     {
         var root = new ObjectGraphType();
         root.Field<NonNullGraphType<StringGraphType>>("field")
-            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } });
+            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string?> { "a", null, "b" } });
         Query = root;
     }
 }
@@ -442,7 +442,7 @@ public class Bug3507Schema : Schema
             .Argument<DateGraphType>("newDate", true)
             .Resolve()
             .WithScope()
-            .ResolveAsync(_ => Task.FromResult((object)true));
+            .ResolveAsync(_ => Task.FromResult((object?)true));
         Query = type;
     }
 }

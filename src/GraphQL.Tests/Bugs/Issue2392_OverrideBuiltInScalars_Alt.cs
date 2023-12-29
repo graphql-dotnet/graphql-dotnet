@@ -222,16 +222,16 @@ public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_Over
             Name = "Int";
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
-            object ret = base.ParseLiteral(value);
+            object? ret = base.ParseLiteral(value);
             return ret is int i ? i - 1 : ret;
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
             => value is int i ? i - 1 : base.ParseValue(value);
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
             => value is int i ? i + 1 : base.Serialize(value);
     }
 
@@ -242,13 +242,13 @@ public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_Over
             Name = "String";
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
             => value is GraphQLStringValue s ? "input-" + s.Value : base.ParseLiteral(value);
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
             => value is string s ? "input-" + s : base.ParseValue(value);
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
             => value is string s ? "output-" + s : base.Serialize(value);
     }
 
@@ -259,8 +259,8 @@ public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_Over
             Name = "MyQuery";
         }
 
-        public override object ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
+        public override object? ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
 
-        public override object ParseValue(object value) => throw new System.NotImplementedException();
+        public override object? ParseValue(object? value) => throw new System.NotImplementedException();
     }
 }
