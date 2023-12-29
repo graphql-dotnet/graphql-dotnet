@@ -30,9 +30,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup .NET SDKs
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             3.1.x
@@ -51,7 +51,7 @@ jobs:
         run: dotnet build --no-restore -c Release
       - name: Build solution [Debug]
         working-directory: src
-        run: dotnet build --no-restore -c Debug
+        run: dotnet build --no-restore -c Debug -p:DeterministicSourcePaths=false
       - name: Test solution [Debug] with code coverage
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
         working-directory: src
@@ -84,15 +84,145 @@ jobs:
         with:
           files: 'src/.coverage/**/coverage.opencover.xml'
 
+  testfederation:
+    strategy:
+      matrix:
+        federationversion: [1, 2]
+    name: Test federation ${{ matrix.federationversion }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup .NET SDKs
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install dependencies
+        working-directory: src
+        run: dotnet restore GraphQL.Federation.SchemaFirst.Sample1
+      - name: Build Sample1
+        working-directory: src
+        run: dotnet build --no-restore GraphQL.Federation.SchemaFirst.Sample1
+      - name: Build Sample2
+        working-directory: src
+        run: dotnet build GraphQL.Federation.SchemaFirst.Sample2
+      - name: Start Sample1 on port 5601
+        working-directory: src
+        run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample1 &
+      - name: Start Sample2 on port 5602
+        working-directory: src
+        run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample2 &
+      - name: Install Apollo Rover CLI
+        run: |
+          curl -sSL https://rover.apollo.dev/nix/latest | sh
+          echo "/home/runner/.rover/bin" >> $GITHUB_PATH
+          /home/runner/.rover/bin/rover --version
+      - name: Install jq
+        run: sudo apt-get install -y jq
+      - name: Wait for Sample1 to spin up
+        run: |
+          for i in {1..60}
+          do
+            echo "Request $i to the URL..."
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5601)
+            if [ $response -eq 200 ]; then
+              echo "Received 200 response, step completed."
+              exit 0
+            fi
+            echo "Did not receive a 200 response, sleeping for 0.5 second..."
+            sleep 0.5
+          done
+          echo "Timed out after 30 seconds, step failed."
+          exit 1
+      - name: Wait for Sample2 to spin up
+        run: |
+          for i in {1..60}
+          do
+            echo "Request $i to the URL..."
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5602)
+            if [ $response -eq 200 ]; then
+              echo "Received 200 response, step completed."
+              exit 0
+            fi
+            echo "Did not receive a 200 response, sleeping for 0.5 second..."
+            sleep 0.5
+          done
+          echo "Timed out after 30 seconds, step failed."
+          exit 1
+      - name: Build supergraph with federation-${{ matrix.federationversion }}-supergraph-config.yaml
+        working-directory: src/Federation
+        run: rover supergraph compose --config ./federation-${{ matrix.federationversion }}-supergraph-config.yaml --elv2-license=accept > supergraph.graphql
+      - name: Print supergraph
+        working-directory: src/Federation
+        run: cat supergraph.graphql
+      - name: Download router
+        working-directory: src/Federation
+        run: curl -sSL https://router.apollo.dev/download/nix/latest | sh
+      - name: Start router
+        working-directory: src/Federation
+        run: ./router --dev --supergraph supergraph.graphql &
+      - name: Wait for router to spin up
+        run: |
+          for i in {1..60}
+          do
+            echo "Request $i to the URL..."
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8088/health)
+            if [ $response -eq 200 ]; then
+              echo "Received 200 response, step completed."
+              exit 0
+            fi
+            echo "Did not receive a 200 response, sleeping for 0.5 second..."
+            sleep 0.5
+          done
+          echo "Timed out after 30 seconds, step failed."
+          exit 1
+      - name: Run GraphQL queries
+        working-directory: src/Federation
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d @federation-request-1.json http://127.0.0.1:4000 > response-1.json
+          curl -X POST -H "Content-Type: application/json" -d @federation-request-2.json http://127.0.0.1:4000 > response-2.json
+          curl -X POST -H "Content-Type: application/json" -d @federation-request-3.json http://127.0.0.1:4000 > response-3.json
+      - name: Print query result 1
+        working-directory: src/Federation
+        run: cat response-1.json
+      - name: Print query result 2
+        working-directory: src/Federation
+        run: cat response-2.json
+      - name: Print query result 3
+        working-directory: src/Federation
+        run: cat response-3.json
+      - name: Compare query result 1 to expected response
+        working-directory: src/Federation
+        run: |
+          jq . response-1.json > actual-response-1.json
+          jq . federation-response-1.json > expected-response-1.json
+          diff -b actual-response-1.json expected-response-1.json
+      - name: Compare query result 2 to expected response
+        working-directory: src/Federation
+        run: |
+          jq . response-2.json > actual-response-2.json
+          jq . federation-response-2.json > expected-response-2.json
+          diff -b actual-response-2.json expected-response-2.json
+      - name: Compare query result 3 to expected response
+        working-directory: src/Federation
+        run: |
+          jq . response-3.json > actual-response-3.json
+          jq . federation-response-3.json > expected-response-3.json
+          diff -b actual-response-3.json expected-response-3.json
+
   buildcheck:
     needs:
       - test
+      - testfederation
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Pass build check
-        if: ${{ needs.test.result == 'success' }}
+        if: ${{ needs.test.result == 'success' && needs.testfederation.result == 'success' }}
         run: exit 0
       - name: Fail build check
-        if: ${{ needs.test.result != 'success' }}
+        if: ${{ needs.test.result != 'success' || needs.testfederation.result != 'success' }}
         run: exit 1

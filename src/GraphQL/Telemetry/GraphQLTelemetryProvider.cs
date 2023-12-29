@@ -20,6 +20,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 {
     private readonly GraphQLTelemetryOptions _telemetryOptions;
     private const string ACTIVITY_OPERATION_NAME = "graphql";
+    private readonly bool _onlyWhenAutoTelemetryEnabled;
 
     /// <summary>
     /// Returns an <see cref="System.Diagnostics.ActivitySource"/> instance to be used for GraphQL.NET telemetry.
@@ -44,20 +45,47 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         _telemetryOptions = options;
     }
 
+    /// <summary>
+    /// Initializes a new instance that only executes when <see cref="OpenTelemetry.AutoInstrumentation.Initializer.Enabled"/>
+    /// is <see langword="true"/>, using the options from <see cref="OpenTelemetry.AutoInstrumentation.Initializer.Options"/>.
+    /// </summary>
+    private GraphQLTelemetryProvider()
+    {
+        _onlyWhenAutoTelemetryEnabled = true;
+        _telemetryOptions = OpenTelemetry.AutoInstrumentation.Initializer.Options ?? new GraphQLTelemetryOptions();
+    }
+
+    // make sure no accidental use of the default constructor by DI by making it private,
+    // accessible only through AutoTelemetryProvider, a shared static instance
+    private static GraphQLTelemetryProvider? _autoTelemetryProvider;
+    internal static GraphQLTelemetryProvider AutoTelemetryProvider => _autoTelemetryProvider ??= new GraphQLTelemetryProvider();
+
     /// <inheritdoc/>
     public virtual float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
 
     /// <inheritdoc/>
-    public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+    public virtual Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (!_telemetryOptions.Filter(options))
-            return await next(options).ConfigureAwait(false);
+        return !_onlyWhenAutoTelemetryEnabled || OpenTelemetry.AutoInstrumentation.Initializer.Enabled
+            ? ExecuteInternalAsync(options, next)
+            : next(options);
+    }
 
+    private async Task<ExecutionResult> ExecuteInternalAsync(ExecutionOptions options, ExecutionDelegate next)
+    {
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
+#pragma warning disable CS0618 // Type or member is obsolete
         using var activity = await StartActivityAsync(options).ConfigureAwait(false);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // do not record any telemetry if there are no listeners or it decided not to sample the current request
         if (activity == null)
+            return await next(options).ConfigureAwait(false);
+
+        if (!activity.IsAllDataRequested)
+            return await next(options).ConfigureAwait(false);
+
+        if (!await FilterAsync(options, activity).ConfigureAwait(false))
             return await next(options).ConfigureAwait(false);
 
         // record the requested operation name and optionally the GraphQL document
@@ -79,14 +107,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
             // if the request was canceled or if ThrowOnUnhandledException is true. And since
             // OperationCanceledExceptions are not a fault, we do not record them as such.
             if (ex is not OperationCanceledException)
-            {
-#if NET6_0_OR_GREATER
-                activity.SetStatus(ActivityStatusCode.Error);
-#else
-                activity.SetTag("otel.status_code", "ERROR");
-#endif
-            }
-            _telemetryOptions.EnrichWithException(activity, ex);
+                await OnExceptionAsync(activity, ex).ConfigureAwait(false);
             throw;
         }
 
@@ -97,11 +118,16 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         return result;
     }
 
+    /// <inheritdoc cref="StartActivity"/>
+    [Obsolete("Use the sync method 'StartActivity'. This method will be removed in v8.")]
+    protected virtual ValueTask<Activity?> StartActivityAsync(ExecutionOptions options)
+        => new(StartActivity(options));
+
     /// <summary>
     /// Creates an <see cref="Activity"/> for the specified <see cref="ExecutionOptions"/> and starts it.
     /// </summary>
-    protected virtual ValueTask<Activity?> StartActivityAsync(ExecutionOptions options)
-        => new(ActivitySource.StartActivity(ACTIVITY_OPERATION_NAME));
+    protected virtual Activity? StartActivity(ExecutionOptions options)
+        => ActivitySource.StartActivity(ACTIVITY_OPERATION_NAME);
 
     /// <summary>
     /// Sets the <see cref="Activity"/> tags based on the specified <see cref="ExecutionOptions"/>.
@@ -164,6 +190,48 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         }
         _telemetryOptions.EnrichWithExecutionResult(activity, executionOptions, result);
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Handle execution exception. The default implementation sets the <see cref="Activity"/> error status,
+    /// records exception event if <see cref="GraphQLTelemetryOptions.RecordException"/> is <see langword="true"/>
+    /// and executes the <see cref="GraphQLTelemetryOptions.EnrichWithException"/> callback.
+    /// </summary>
+    protected virtual Task OnExceptionAsync(Activity activity, Exception ex)
+    {
+#if NET6_0_OR_GREATER
+        activity.SetStatus(ActivityStatusCode.Error);
+#else
+        activity.SetTag("otel.status_code", "ERROR");
+#endif
+
+        if (_telemetryOptions.RecordException)
+        {
+            activity.RecordException(ex);
+        }
+
+        _telemetryOptions.EnrichWithException(activity, ex);
+        return Task.CompletedTask;
+    }
+
+    private async ValueTask<bool> FilterAsync(ExecutionOptions options, Activity activity)
+    {
+        try
+        {
+            if (!_telemetryOptions.Filter(options))
+            {
+                activity.IsAllDataRequested = false;
+                activity.ActivityTraceFlags &= ~ActivityTraceFlags.Recorded;
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            await OnExceptionAsync(activity, ex).ConfigureAwait(false);
+            throw;
+        }
+
+        return true;
     }
 
     // note: this could be implemented as a validation rule with no public API changes

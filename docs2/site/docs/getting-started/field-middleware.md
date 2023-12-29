@@ -78,7 +78,7 @@ public delegate ValueTask<object?> FieldMiddlewareDelegate(IResolveFieldContext 
 
 ## Field Middleware and Dependency Injection
 
-First, you are advised to read the article about [Dependency Injection](Dependency-Injection).
+First, you are advised to read the article about [Dependency Injection](../dependency-injection).
 
 Typically you will want to set the middleware within the schema constructor.
 

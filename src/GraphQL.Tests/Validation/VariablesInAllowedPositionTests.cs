@@ -299,7 +299,8 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
     [Fact]
     public void string_to_string_list()
     {
-        const string query = """
+        const string query =
+            """
             query Query($stringVar: String) {
               complicatedArgs {
                 stringListArgField(stringListArg: $stringVar)
@@ -317,6 +318,9 @@ public class VariablesInAllowedPositionTests : ValidationTestBase<VariablesInAll
                 err.Loc(3, 39);
             });
         });
+
+        Schema.Features.AllowScalarVariablesForListTypes = true;
+        ShouldPassRule(query);
     }
 
     [Fact]

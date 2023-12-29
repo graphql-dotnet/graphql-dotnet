@@ -1,3 +1,4 @@
+#nullable enable
 #if NET5_0_OR_GREATER
 
 using System.Diagnostics;
@@ -7,7 +8,6 @@ using GraphQL.Telemetry;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
 namespace GraphQL.Tests.Instrumentation;
@@ -16,41 +16,58 @@ namespace GraphQL.Tests.Instrumentation;
 public sealed class OpenTelemetryTests : IDisposable
 {
     private readonly List<Activity> _exportedActivities = new();
-    private readonly IHost _host;
-    private readonly IDocumentExecuter<ISchema> _executer;
-    private readonly IGraphQLTextSerializer _serializer;
-    private readonly GraphQLTelemetryOptions _options;
+    private IHostBuilder __hostBuilder;
+    private IHostBuilder _hostBuilder
+    {
+        get => __hostBuilder;
+        set
+        {
+            __host?.Dispose();
+            __host = null;
+            __hostBuilder = value;
+        }
+    }
+    private IHost? __host;
+    private IHost _host
+    {
+        get
+        {
+            if (__host == null)
+            {
+                __host = _hostBuilder.Build();
+                __host.Start();
+            }
+            return __host;
+        }
+    }
+    private IDocumentExecuter<ISchema> _executer => _host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
+    private IGraphQLTextSerializer _serializer => _host.Services.GetRequiredService<IGraphQLTextSerializer>();
+    private GraphQLTelemetryOptions _options => _host.Services.GetRequiredService<GraphQLTelemetryOptions>();
 
     public OpenTelemetryTests()
     {
-        // configure services
-        _host = new HostBuilder()
+        __hostBuilder = new HostBuilder()
             .ConfigureServices(services =>
             {
                 services.AddOpenTelemetry()
                     .WithTracing(b => b
                         .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddSource(Query.ACTIVITY_SOURCE_NAME)
                         .AddInMemoryExporter(_exportedActivities));
 
                 services.AddGraphQL(b => b
                     .AddSystemTextJson()
                     .AddAutoSchema<Query>()
                     .UseTelemetry());
-            })
-            .Build();
-
-        // starts telemetry services
-        _host.Start();
-
-        _executer = _host.Services.GetRequiredService<IDocumentExecuter<ISchema>>();
-        _serializer = _host.Services.GetRequiredService<IGraphQLTextSerializer>();
-        _options = _host.Services.GetRequiredService<GraphQLTelemetryOptions>();
+            });
     }
 
-    public void Dispose() => _host.Dispose();
+    public void Dispose() => __host?.Dispose();
 
-    [Fact]
-    public void CanInitializeTelemetryViaReflection()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void CanInitializeTelemetryViaReflection(bool thenOverride)
     {
         //note: requires [Collection("StaticTests")] on the test class to ensure that no other tests are run concurrently
         try
@@ -64,7 +81,7 @@ public sealed class OpenTelemetryTests : IDisposable
             var type = typeof(DocumentExecuter).Assembly.GetType("OpenTelemetry.AutoInstrumentation.Initializer").ShouldNotBeNull();
             var method = type.GetMethod("EnableAutoInstrumentation", BindingFlags.Public | BindingFlags.Static).ShouldNotBeNull();
             var optionsType = typeof(DocumentExecuter).Assembly.GetType("GraphQL.Telemetry.GraphQLTelemetryOptions").ShouldNotBeNull();
-            var optionsInstance = Activator.CreateInstance(optionsType);
+            var optionsInstance = Activator.CreateInstance(optionsType)!;
             var recordDocumentOption = optionsType.GetProperty("RecordDocument").ShouldNotBeNull();
             recordDocumentOption.SetValue(optionsInstance, true);
             method.Invoke(null, new object[] { optionsInstance });
@@ -72,12 +89,32 @@ public sealed class OpenTelemetryTests : IDisposable
             // verify that the initializer was called
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
 
-            // verify that the telemetry service is added implicitly
-            var services = new ServiceCollection();
-            services.AddGraphQL(_ => { });
-            var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
-            serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
-            serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+            if (!thenOverride)
+            {
+                var services = new ServiceCollection();
+                services.AddGraphQL(b => { });
+                // verify that the telemetry service is added implicitly
+                var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldNotBeNull();
+                serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+                serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+                // verify that no other telemetry service was added
+                services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldBeNull();
+                // ensure auto-telemetry is still enabled
+                OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
+            }
+            else
+            {
+                var services = new ServiceCollection();
+                services.AddGraphQL(b => b.UseTelemetry());
+                // verify that the telemetry service is not added implicitly
+                services.SingleOrDefault(x => x.ImplementationInstance == GraphQLTelemetryProvider.AutoTelemetryProvider).ShouldBeNull();
+                // verify that the explicitly added telemetry service was added
+                var serviceDescriptor = services.SingleOrDefault(x => x.ImplementationType == typeof(GraphQLTelemetryProvider)).ShouldNotBeNull();
+                serviceDescriptor.ServiceType.ShouldBe(typeof(IConfigureExecution));
+                serviceDescriptor.Lifetime.ShouldBe(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton);
+                // ensure auto-telemetry is disabled
+                OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeFalse();
+            }
         }
         finally
         {
@@ -86,24 +123,82 @@ public sealed class OpenTelemetryTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task BasicTest()
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(5)]
+    [InlineData(6)]
+    [InlineData(7)]
+    [InlineData(8)]
+    public async Task BasicTest(int registrationMethod)
     {
+        _hostBuilder = new HostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddOpenTelemetry()
+                    .WithTracing(b => b
+                        .AddSource(GraphQLTelemetryProvider.SourceName) // need to specify the source name to be traced
+                        .AddInMemoryExporter(_exportedActivities));
+
+                services.AddGraphQL(b =>
+                {
+                    b.AddSystemTextJson();
+                    b.AddAutoSchema<Query>();
+
+                    GraphQLTelemetryOptions Config(GraphQLTelemetryOptions options)
+                    {
+                        options.EnrichWithExecutionOptions = (a, _) => a.SetTag("mytag", registrationMethod);
+                        return options;
+                    }
+
+                    switch (registrationMethod)
+                    {
+                        case 1:
+                            b.UseTelemetry(c => Config(c));
+                            break;
+                        case 2:
+                            b.UseTelemetry((c, _) => Config(c));
+                            break;
+                        case 3:
+                            b.UseTelemetry<GraphQLTelemetryProvider>(c => Config(c));
+                            break;
+                        case 4:
+                            b.UseTelemetry<GraphQLTelemetryProvider>((c, _) => Config(c));
+                            break;
+                        case 5:
+                            b.UseTelemetry(_ => new GraphQLTelemetryProvider(Config(new())));
+                            break;
+                        case 6:
+                            b.UseTelemetry(new GraphQLTelemetryProvider(Config(new())));
+                            break;
+                        case 7:
+                            b.UseTelemetry<GraphQLTelemetryProvider, GraphQLTelemetryOptions>(c => Config(c));
+                            break;
+                        case 8:
+                            b.UseTelemetry<GraphQLTelemetryProvider, GraphQLTelemetryOptions>((c, _) => Config(c));
+                            break;
+                    }
+                });
+            });
+
         // execute GraphQL document
         var result = await _executer.ExecuteAsync(new ExecutionOptions
         {
             Query = "{ hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.TagObjects.ShouldBe(new KeyValuePair<string, object?>[]
         {
             new("graphql.document", "{ hello }"),
+            new("mytag", registrationMethod),
             new("graphql.operation.type", "query"),
             // no operation name
         });
@@ -119,14 +214,14 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             new("graphql.operation.type", "query"),
@@ -146,14 +241,14 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{ hello }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{ testing }"),
             new("graphql.operation.type", "query"),
@@ -193,14 +288,14 @@ public sealed class OpenTelemetryTests : IDisposable
         };
 
         // execute GraphQL document
-        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions);
 
         // verify GraphQL response
         _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             new("testoptions", "test1"),
@@ -213,12 +308,14 @@ public sealed class OpenTelemetryTests : IDisposable
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
 
-    [Fact]
-    public async Task Filterable()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Filterable(bool filter)
     {
         var executionOptions = new ExecutionOptions
         {
-            Query = "query helloQuery { hello }",
+            Query = "query withActivityQuery { withActivity }",
             RequestServices = _host.Services,
         };
         bool ranFilter = false;
@@ -226,18 +323,118 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             options.ShouldBe(executionOptions);
             ranFilter = true;
-            return false;
+            return filter;
         };
 
         // execute GraphQL document
-        var result = await _executer.ExecuteAsync(executionOptions).ConfigureAwait(false);
+        var result = await _executer.ExecuteAsync(executionOptions);
 
         // verify GraphQL response
-        _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        string childActivityCreated = filter.ToString().ToLower();
+        _serializer.Serialize(result).ShouldBe($$$"""{"data":{"withActivity":{{{childActivityCreated}}}}}""");
 
         // verify activity telemetry
-        _exportedActivities.ShouldBeEmpty();
+        _exportedActivities.Count.ShouldBe(filter ? 2 : 0);
         ranFilter.ShouldBeTrue();
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task FilterThrowsException(bool recordException)
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query withActivityQuery { withActivity }",
+            RequestServices = _host.Services,
+        };
+        bool ranFilter = false;
+        _options.Filter = options =>
+        {
+            options.ShouldBe(executionOptions);
+            ranFilter = true;
+            throw new FilterException("exception message");
+        };
+
+        _options.RecordException = recordException;
+
+        // execute GraphQL document
+        await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+
+        // verify activity telemetry
+        ranFilter.ShouldBeTrue();
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
+        {
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
+        });
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
+
+        if (recordException)
+        {
+            var @event = activity.Events.ShouldHaveSingleItem();
+            @event.Name.ShouldBe("exception");
+            @event.Tags.ShouldNotBeEmpty();
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.type").Value.ShouldBe("GraphQL.Tests.Instrumentation.OpenTelemetryTests+FilterException");
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(string.Empty);
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.message").Value.ShouldBe("exception message");
+        }
+        else
+        {
+            activity.Events.ShouldBeEmpty();
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    [InlineData(null)] // null for exception
+    public async Task ExtensibilityWhenFiltered(bool? filter)
+    {
+        var executionOptions = new ExecutionOptions
+        {
+            Query = "query helloQuery { hello }",
+            RequestServices = _host.Services,
+        };
+
+        _options.Filter = _ => filter ?? throw new FilterException();
+
+        bool enrichWithExecutionOptionsCalled = false;
+        _options.EnrichWithExecutionOptions = (_, _) =>
+            enrichWithExecutionOptionsCalled = true;
+
+        bool enrichWithDocumentCalled = false;
+        _options.EnrichWithDocument = (_, _, _, _, _) =>
+            enrichWithDocumentCalled = true;
+
+        bool enrichWithExecutionResult = false;
+        _options.EnrichWithExecutionResult = (_, _, _) =>
+            enrichWithExecutionResult = true;
+
+        bool enrichWithException = false;
+        _options.EnrichWithException = (_, _) =>
+            enrichWithException = true;
+
+        if (filter.HasValue)
+        {
+            // execute GraphQL document
+            var result = await _executer.ExecuteAsync(executionOptions);
+            // verify GraphQL response
+            _serializer.Serialize(result).ShouldBe("""{"data":{"hello":"World"}}""");
+        }
+        else
+        {
+            // execute GraphQL document
+            await _executer.ExecuteAsync(executionOptions).ShouldThrowAsync<FilterException>();
+        }
+
+        // verify enrich methods execution
+        enrichWithExecutionOptionsCalled.ShouldBe(filter ?? false);
+        enrichWithDocumentCalled.ShouldBe(filter ?? false);
+        enrichWithExecutionResult.ShouldBe(filter ?? false);
+        enrichWithException.ShouldBe(filter == null);
     }
 
     [Fact]
@@ -248,14 +445,14 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query helloQuery { hello { dummy } }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello { dummy } }"),
             new("graphql.operation.type", "query"),
@@ -273,14 +470,14 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{"),
         });
@@ -296,14 +493,14 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "{ serverError }",
             RequestServices = _host.Services,
-        }).ConfigureAwait(false);
+        });
 
         // verify GraphQL response
         result.Errors.ShouldNotBeNull().Count.ShouldBeGreaterThan(0);
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "{ serverError }"),
             new("graphql.operation.type", "query"),
@@ -315,6 +512,49 @@ public sealed class OpenTelemetryTests : IDisposable
         activity.Status().ShouldBe(ActivityStatusCode.Error);
     }
 
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task WithServerErrorWhenThrowOnUnhandledExceptionTrue(bool recordException)
+    {
+        _options.RecordException = recordException;
+
+        // execute GraphQL document
+        await _executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ serverError }",
+            RequestServices = _host.Services,
+            ThrowOnUnhandledException = true
+        }).ShouldThrowAsync<InvalidOperationException>();
+
+        // verify activity telemetry
+        var activity = _exportedActivities.ShouldHaveSingleItem();
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
+        {
+            new("graphql.document", "{ serverError }"),
+            new("graphql.operation.type", "query"),
+#if !NET6_0_OR_GREATER
+            new("otel.status_code", "ERROR"),
+#endif
+        });
+        activity.DisplayName.ShouldBe("query");
+        activity.Status().ShouldBe(ActivityStatusCode.Error);
+
+        if (recordException)
+        {
+            var @event = activity.Events.ShouldHaveSingleItem();
+            @event.Name.ShouldBe("exception");
+            @event.Tags.ShouldNotBeEmpty();
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.type").Value.ShouldBe("System.InvalidOperationException");
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.stacktrace").Value.ShouldNotBe(string.Empty);
+            @event.Tags.FirstOrDefault(t => t.Key == "exception.message").Value.ShouldBe("Could not process data");
+        }
+        else
+        {
+            activity.Events.ShouldBeEmpty();
+        }
+    }
+
     [Fact]
     public async Task WithCancellation1()
     {
@@ -324,11 +564,11 @@ public sealed class OpenTelemetryTests : IDisposable
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query helloQuery { hello }"),
             // no operation name within ExecutionOptions, and request was canceled before parsing
@@ -347,11 +587,11 @@ public sealed class OpenTelemetryTests : IDisposable
             OperationName = "helloQuery",
             RequestServices = _host.Services,
             CancellationToken = new CancellationToken(true),
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.operation.name", "helloQuery"), // operation name pulled from ExecutionOptions
             new("graphql.document", "query helloQuery { hello }"),
@@ -371,11 +611,11 @@ public sealed class OpenTelemetryTests : IDisposable
             RequestServices = _host.Services,
             Root = cts,
             CancellationToken = cts.Token,
-        })).ConfigureAwait(false);
+        }));
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string>[]
+        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
         {
             new("graphql.document", "query cancelQuery { cancel }"),
             new("graphql.operation.type", "query"),
@@ -383,21 +623,37 @@ public sealed class OpenTelemetryTests : IDisposable
         });
         activity.DisplayName.ShouldBe("query cancelQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
+        activity.Events.ShouldBeEmpty();
     }
 
     private class Query
     {
+        public const string ACTIVITY_SOURCE_NAME = "Query";
+        private static readonly ActivitySource _activitySource = new(ACTIVITY_SOURCE_NAME);
+
         public static string Hello => "World";
 
         public static string Cancel(IResolveFieldContext context)
         {
-            var cts = (CancellationTokenSource)context.Source;
+            var cts = (CancellationTokenSource)context.Source!;
             cts.Cancel();
             cts.Token.ThrowIfCancellationRequested();
             return "Canceled";
         }
 
+        public static bool WithActivity()
+        {
+            using var activity = _activitySource.StartActivity();
+            return activity != null;
+        }
+
         public static string ServerError => throw new InvalidOperationException("Could not process data");
+    }
+
+    private class FilterException : Exception
+    {
+        public FilterException() { }
+        public FilterException(string message) : base(message) { }
     }
 }
 

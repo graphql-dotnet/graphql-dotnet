@@ -36,4 +36,4 @@ public class Dog : ObjectGraphType<DogModel>
 In this example `CatOrDog` type should implement `ResolveType` or both `Cat` and
 `Dog` types should implement `IsTypeOf`. Note that `IsTypeOf` is already implemented
 for `ObjectGraphType<TSourceType>` so in this example `ResolveType` is not used.
-For details about `IsTypeOf` and `ResolveType` see [Interfaces](Interfaces).
+For details about `IsTypeOf` and `ResolveType` see [Interfaces](../interfaces).

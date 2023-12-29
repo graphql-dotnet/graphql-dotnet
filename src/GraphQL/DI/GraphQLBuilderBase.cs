@@ -1,4 +1,7 @@
 using GraphQL.Execution;
+#if NET5_0_OR_GREATER
+using GraphQL.Telemetry;
+#endif
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
@@ -78,19 +81,7 @@ namespace GraphQL.DI
             {
                 // this will run prior to any other calls to UseTelemetry
                 // it will also cause telemetry to be called first in the pipeline
-                this.UseTelemetry(OpenTelemetry.AutoInstrumentation.Initializer.Options != null
-                    ? (opts =>
-                    {
-                        var autoOpts = OpenTelemetry.AutoInstrumentation.Initializer.Options;
-                        opts.RecordDocument = autoOpts.RecordDocument;
-                        opts.SanitizeDocument = autoOpts.SanitizeDocument;
-                        opts.Filter = autoOpts.Filter;
-                        opts.EnrichWithExecutionOptions = autoOpts.EnrichWithExecutionOptions;
-                        opts.EnrichWithDocument = autoOpts.EnrichWithDocument;
-                        opts.EnrichWithExecutionResult = autoOpts.EnrichWithExecutionResult;
-                        opts.EnrichWithException = autoOpts.EnrichWithException;
-                    })
-                    : null);
+                this.ConfigureExecution(GraphQLTelemetryProvider.AutoTelemetryProvider);
             }
 #endif
         }

@@ -9,13 +9,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL-Parser" Version="8.3.0" />
+    <PackageReference Include="GraphQL-Parser" Version="8.4.2" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
-    <PackageReference Include="Nullability.Source" Version="2.1.0" PrivateAssets="all" />
+    <PackageReference Include="Nullability.Source" Version="2.3.0" PrivateAssets="all" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'" />
     <PackageReference Include="System.Memory" Version="4.5.5" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" Condition="'$(TargetFramework)' == 'netstandard2.1'" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- We don't consume the analyzers in this library itself,
+         but we reference the project to add a package dependency so users of this library will automatically get the analyzers. -->
+    <ProjectReference Include="..\GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj"
+                      PrivateAssets="none"
+                      Condition="'$(ExcludeRestorePackageImports)' != ''"  />
   </ItemGroup>
 
 </Project>

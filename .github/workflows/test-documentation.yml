@@ -19,9 +19,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2
@@ -30,3 +30,9 @@ jobs:
       - name: yarn gatsby build
         working-directory: docs2
         run: yarn gatsby build
+      - name: Upload docs as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Documentation
+          path: docs2/public/**
+          if-no-files-found: error

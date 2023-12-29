@@ -17,6 +17,8 @@ namespace GraphQL.Introspection
         /// </summary>
         public __DirectiveArgument()
         {
+            SetName(nameof(__DirectiveArgument), validate: false);
+
             Description =
                 "Value of an argument provided to directive";
 

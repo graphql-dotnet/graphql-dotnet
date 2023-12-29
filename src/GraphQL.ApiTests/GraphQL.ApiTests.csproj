@@ -2,12 +2,12 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PublicApiGenerator" Version="11.0.0" />
+    <PackageReference Include="PublicApiGenerator" Version="11.1.0" />
   </ItemGroup>
 
   <ItemGroup>

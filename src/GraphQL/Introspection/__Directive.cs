@@ -15,7 +15,7 @@ namespace GraphQL.Introspection
         /// <param name="allowRepeatable">Allows 'isRepeatable' field for this type. This feature is from a working draft of the specification.</param>
         public __Directive(bool allowAppliedDirectives = false, bool allowRepeatable = false)
         {
-            Name = nameof(__Directive);
+            SetName(nameof(__Directive), validate: false);
 
             Description =
                 "A Directive provides a way to describe alternate runtime execution and " +

@@ -159,7 +159,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Registers <typeparamref name="TSchema"/> within the dependency injection framework. <see cref="ISchema"/> is also
     /// registered if it is not already registered within the dependency injection framework. Singleton and scoped
-    /// lifetimes are supported.
+    /// lifetimes are supported. For scoped lifetimes, enables <see cref="GlobalSwitches.EnableReflectionCaching"/>.
     /// </summary>
     /// <remarks>
     /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
@@ -181,6 +181,13 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Register the service with the DI provider as TSchema, overwriting any existing registration
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(serviceLifetime);
+
+#if !DEBUG // otherwise any scoped service test would change the global switches
+        if (serviceLifetime != ServiceLifetime.Singleton)
+        {
+            GlobalSwitches.EnableReflectionCaching = true;
+        }
+#endif
 
         return builder;
     }
@@ -222,6 +229,13 @@ public static class GraphQLBuilderExtensions // TODO: split
         // Register the service with the DI provider as TSchema, overwriting any existing registration
         // Also register the service as ISchema if not already registered.
         builder.Services.TryRegisterAsBoth<ISchema, TSchema>(schemaFactory, serviceLifetime);
+
+#if !DEBUG // otherwise any scoped service test would change the global switches
+        if (serviceLifetime != ServiceLifetime.Singleton)
+        {
+            GlobalSwitches.EnableReflectionCaching = true;
+        }
+#endif
 
         return builder;
     }
@@ -1180,20 +1194,66 @@ public static class GraphQLBuilderExtensions // TODO: split
 #if NET5_0_OR_GREATER
     /// <summary>
     /// Configures the GraphQL engine to collect traces via the <see cref="System.Diagnostics.Activity">System.Diagnostics.Activity API</see> and records events that match the
-    /// <see href="https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/semantic_conventions/instrumentation/graphql.md">OpenTelemetry recommendations</see>.
+    /// <see href="https://opentelemetry.io/docs/specs/semconv/database/graphql/">OpenTelemetry recommendations</see>.
     /// Trace data contains the GraphQL operation name, the operation type, and the optionally the document.
+    /// Disables auto-instrumentation for GraphQL.
     /// </summary>
     /// <remarks>
     /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
     /// </remarks>
     public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
-        => UseTelemetry(builder, configure != null ? (opts, _) => configure(opts) : null);
+        => UseTelemetry<GraphQLTelemetryProvider>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
     public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
+        => UseTelemetry<GraphQLTelemetryProvider>(builder, configure);
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
+        where TProvider : GraphQLTelemetryProvider
+        => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
+        where TProvider : GraphQLTelemetryProvider
+        => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions>? configure = null)
+        where TProvider : GraphQLTelemetryProvider
+        where TOptions : GraphQLTelemetryOptions, new()
+        => UseTelemetry<TProvider, TOptions>(builder, configure != null ? (opts, _) => configure(opts) : null);
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions, IServiceProvider>? configure)
+        where TProvider : GraphQLTelemetryProvider
+        where TOptions : GraphQLTelemetryOptions, new()
     {
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
         builder.Services.Configure(configure);
-        builder.Services.TryRegister<IConfigureExecution, GraphQLTelemetryProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.TryRegister<IConfigureExecution, TProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, TProvider telemetryProvider)
+        where TProvider : GraphQLTelemetryProvider
+    {
+        if (telemetryProvider == null)
+            throw new ArgumentNullException(nameof(telemetryProvider));
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+        builder.ConfigureExecution(telemetryProvider);
+        return builder;
+    }
+
+    /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
+    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Func<IServiceProvider, TProvider> telemetryProviderFactory)
+        where TProvider : GraphQLTelemetryProvider
+    {
+        if (telemetryProviderFactory == null)
+            throw new ArgumentNullException(nameof(telemetryProviderFactory));
+        OpenTelemetry.AutoInstrumentation.Initializer.Enabled = false;
+        builder.ConfigureExecution(telemetryProviderFactory);
         return builder;
     }
 #endif

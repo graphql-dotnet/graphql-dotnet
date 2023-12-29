@@ -13,17 +13,28 @@ namespace GraphQL.Types
         /// <summary>
         /// Initializes a new instance of the graph type.
         /// </summary>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         protected GraphType()
+            : this(null)
+        {
+        }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        internal GraphType(GraphType? cloneFrom)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            if (!IsTypeModifier) // specification requires name must be null for these types
+            if (cloneFrom == null)
             {
-                // GraphType must always have a valid name so set it to default name in constructor
-                // and skip validation only for well-known types including introspection.
-                // This name can be always changed later to any valid value.
-                SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                if (!IsTypeModifier) // specification requires name must be null for these types
+                {
+                    // GraphType must always have a valid name so set it to default name in constructor
+                    // and skip validation only for well-known types including introspection.
+                    // This name can be always changed later to any valid value.
+                    SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                }
+                return;
             }
+            _name = cloneFrom._name;
+            cloneFrom.CopyMetadataTo(this);
         }
 
         /// <inheritdoc/>
@@ -39,6 +50,9 @@ namespace GraphQL.Types
         private string GetDefaultName()
         {
             var type = GetType();
+
+            if (!GlobalSwitches.UseLegacyTypeNaming)
+                return type.GraphQLName();
 
             string name = type.Name;
             if (GlobalSwitches.UseDeclaringTypeNames)

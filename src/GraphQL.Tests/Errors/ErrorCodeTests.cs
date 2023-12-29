@@ -14,7 +14,7 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();
@@ -31,7 +31,7 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();
@@ -45,7 +45,7 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = "{ secondSync }";
-        }).ConfigureAwait(false);
+        });
 
         result.Errors.Count.ShouldBe(1);
         var error = result.Errors.First();

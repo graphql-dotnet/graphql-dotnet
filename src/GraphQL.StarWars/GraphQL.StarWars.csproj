@@ -10,4 +10,20 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.*" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 
+      The reference to GraphQL.Analyzers is indirectly referenced when referencing
+      the GraphQL NuGet package. There is no need to manually add this reference in your
+      .csproj file if you are using the GraphQL NuGet package.
+
+      Note: The GraphQL.Analyzers.CodeFixes project will never be published to NuGet.
+    -->
+    <ProjectReference Include="..\GraphQL.Analyzers\GraphQL.Analyzers.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
+    <ProjectReference Include="..\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
+  </ItemGroup>
+
 </Project>

@@ -10,7 +10,7 @@ public class ScopedAsyncFieldResolverTests : ScopedContextBase
             context.RequestServices.ShouldBe(_scopedServiceProvider);
             return new ValueTask<string>("success");
         });
-        (await resolver.ResolveAsync(_scopedContext).ConfigureAwait(false)).ShouldBe("success");
+        (await resolver.ResolveAsync(_scopedContext)).ShouldBe("success");
         VerifyScoped();
     }
 
@@ -24,7 +24,7 @@ public class ScopedAsyncFieldResolverTests : ScopedContextBase
             return new ValueTask<int>(2);
         });
         _scopedContext.Source = "test";
-        (await resolver.ResolveAsync(_scopedContext).ConfigureAwait(false)).ShouldBe(2);
+        (await resolver.ResolveAsync(_scopedContext)).ShouldBe(2);
         VerifyScoped();
     }
 
@@ -32,13 +32,13 @@ public class ScopedAsyncFieldResolverTests : ScopedContextBase
     public void RequiresRequestServices_TReturn_only()
     {
         var resolver = new ScopedFieldResolver<int>(context => new ValueTask<int>(5));
-        Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false));
+        Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()));
     }
 
     [Fact]
     public void RequiresRequestServices_TSource_and_TReturn()
     {
         var resolver = new ScopedFieldResolver<string, int>(context => new ValueTask<int>(5));
-        Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false));
+        Should.Throw<MissingRequestServicesException>(async () => await resolver.ResolveAsync(new ResolveFieldContext()));
     }
 }

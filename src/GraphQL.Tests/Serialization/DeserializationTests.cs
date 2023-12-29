@@ -70,7 +70,7 @@ public class DeserializationTests : DeserializationTestBase
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
         var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
-        var actual = await serializer.ReadAsync<TestClass1>(testData).ConfigureAwait(false);
+        var actual = await serializer.ReadAsync<TestClass1>(testData);
         actual.Query.ShouldBe("hello");
         Verify(actual.Variables);
         // verify that the stream has not been disposed

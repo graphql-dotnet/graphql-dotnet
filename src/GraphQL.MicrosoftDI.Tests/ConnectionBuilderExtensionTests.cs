@@ -32,50 +32,50 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     }
 
     [Fact]
-    public void WithScope0()
+    public async Task WithScope0()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .Resolve(_ => "hello");
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope0Alt()
+    public async Task WithScope0Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder.ResolveScoped(_ => "hello");
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope1()
+    public async Task WithScope1()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .WithService<string>()
             .Resolve((_, value) => value);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope2()
+    public async Task WithScope2()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -83,15 +83,15 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .Resolve((_, value, v2) => value + v2);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope3()
+    public async Task WithScope3()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -100,15 +100,15 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope4()
+    public async Task WithScope4()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -118,15 +118,15 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope5()
+    public async Task WithScope5()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -137,117 +137,117 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope2Alt()
+    public async Task WithScope2Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .WithServices<string, int>()
             .Resolve((_, value, v2) => value + v2);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope3Alt()
+    public async Task WithScope3Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .WithServices<string, int, short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope4Alt()
+    public async Task WithScope4Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .WithServices<string, int, short, byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope5Alt()
+    public async Task WithScope5Alt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithScope()
             .WithServices<string, int, short, byte, long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
+        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithoutScope0()
+    public async Task WithoutScope0()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .Resolve(_ => "hello");
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope1()
+    public async Task WithoutScope1()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithService<string>()
             .Resolve((_, value) => value);
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope2()
+    public async Task WithoutScope2()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
             .WithService<string>()
             .WithService<int>()
             .Resolve((_, value, v2) => value + v2);
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello2");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope3()
+    public async Task WithoutScope3()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -255,15 +255,15 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello23");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello23");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope4()
+    public async Task WithoutScope4()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -272,15 +272,15 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello234");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello234");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope5()
+    public async Task WithoutScope5()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -290,7 +290,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).Result.ShouldBe("hello2345");
+        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2345");
         VerifyUnscoped();
     }
 
@@ -298,7 +298,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -312,7 +312,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope0AsyncAlt()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder.ResolveScopedAsync(_ => Task.FromResult<object>("hello"));
         field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
@@ -323,7 +323,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope1Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -338,7 +338,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope2Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -354,7 +354,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope3Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -371,7 +371,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope4Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -389,7 +389,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithScope5Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -408,7 +408,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope0Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -421,7 +421,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope1Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -435,7 +435,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope2Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -450,7 +450,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope3Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -466,7 +466,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope4Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
@@ -483,7 +483,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
     public void WithoutScope5Async()
     {
         var graph = new ObjectGraphType();
-        var builder = graph.Connection<StringGraphType>();
+        var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder
             .Resolve()
