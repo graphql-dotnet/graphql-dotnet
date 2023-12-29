@@ -40,7 +40,7 @@ Both of these protocols are used by the [Apollo Client](https://www.apollographq
     - `error` - Server -> Client. Server sends this message to indicate that an error occurred during the GraphQL operation.
     - `complete` - Server -> Client. Server sends this message to indicate that the GraphQL operation is complete.
     - `stop` - Client -> Server. Client sends this message to stop a running GraphQL operation.
-- Payload - (Optional, object): The payload of the message. The payload is only used for *subscribe*, *GQL_DATA*, *GQL_ERROR*, and *GQL_COMPLETE* messages.
+- Payload - (Optional, object): The payload of the message. It is typically a `GraphQLRequest` or `ExecutionResult` instance depending on the message type.
 
 **Note:** As mentioned in [Apollo Client](https://www.apollographql.com/docs/react/data/subscriptions/#websocket-setup) documentation, the *graphql-transport-ws* is a legacy protocol and should not be used in new applications. The *GraphQL-WS* protocol is the recommended protocol to use.
 
