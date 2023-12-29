@@ -29,7 +29,7 @@ public class DataLoaderSubscriptionTest : QueryTestBase
         var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }");
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         ordersMock.Verify(x => x.GetOrderObservable(), Times.Once);

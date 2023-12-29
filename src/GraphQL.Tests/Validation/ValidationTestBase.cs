@@ -97,7 +97,7 @@ public class ValidationTestBase<TRule, TSchema>
             Schema = schema,
             Document = document,
             Rules = rules,
-            Operation = document.Definitions.OfType<GraphQLOperationDefinition>().First(),
+            Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault()!,
             Variables = variables
         }).Result.validationResult;
     }

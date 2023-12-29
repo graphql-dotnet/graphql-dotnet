@@ -189,7 +189,7 @@ internal static class TestExtensions
 {
     public static FieldMiddlewareDelegate? BuildResolve(this FieldMiddlewareBuilder builder)
     {
-        var transform = builder.Build().ShouldNotBeNull();
+        var transform = builder.Build();
         return transform != null ? transform(null!) : null;
     }
 }

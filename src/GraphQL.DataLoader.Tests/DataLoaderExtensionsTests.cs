@@ -62,11 +62,11 @@ public class DataLoaderExtensionsTests : DataLoaderTestBase
 
         var usersStore = mock.Object;
 
-        User[] users1 = null;
-        User[] users2 = null;
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
+        User[]? users1 = null;
+        User[]? users2 = null;
+        User? user1 = null;
+        User? user2 = null;
+        User? user3 = null;
 
         var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 

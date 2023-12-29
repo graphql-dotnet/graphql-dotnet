@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Tests.Subscription;
 using GraphQL.Types;
 

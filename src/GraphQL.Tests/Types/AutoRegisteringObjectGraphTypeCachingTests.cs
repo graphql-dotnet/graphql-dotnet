@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.ComponentModel;
 using GraphQL.Execution;
 using GraphQL.Types;
