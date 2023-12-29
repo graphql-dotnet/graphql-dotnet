@@ -275,8 +275,8 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
         ValidationTestConfig _,
         string field,
         string type,
-        IEnumerable<string> suggestedTypes = null,
-        IEnumerable<string> suggestedFields = null,
+        IEnumerable<string>? suggestedTypes = null,
+        IEnumerable<string>? suggestedFields = null,
         int line = 0,
         int column = 0)
     {

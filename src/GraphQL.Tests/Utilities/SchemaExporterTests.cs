@@ -19,7 +19,7 @@ public class SchemaExporterTests
             "PetComplex".ReadSDL(),
             builder =>
             {
-                builder.Types.ForAll(config => config.ResolveType = _ => null);
+                builder.Types.ForAll(config => config.ResolveType = _ => null!);
                 builder.IgnoreComments = false;
             }
         );

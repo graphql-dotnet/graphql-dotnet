@@ -30,7 +30,7 @@ public class SchemaBuilderFromGitHubTests
             Name = name;
         }
 
-        public override object ParseValue(object value) => throw new System.NotImplementedException();
+        public override object? ParseValue(object? value) => throw new System.NotImplementedException();
     }
 
     [Fact]
