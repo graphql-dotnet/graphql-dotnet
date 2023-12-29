@@ -27,7 +27,7 @@ public class SchemaTypesTests
 
         // mock it so we can verify behavior
         var mock = new Mock<IServiceProvider>(MockBehavior.Loose);
-        mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => provider.GetService(type));
+        mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => provider!.GetService(type)!);
 
         // run test
         var schema = new StarWarsSchema(mock.Object);

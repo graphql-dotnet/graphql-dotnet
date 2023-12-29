@@ -167,11 +167,11 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         var data = executionResult.Data!.ToDict();
         var schema = data["__schema"].ToDict();
-        var types = (IEnumerable<object>)schema["types"];
-        var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
-        var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
+        var types = (IEnumerable<object>)schema["types"]!;
+        var entityType = types.Single(t => (string)t.ToDict()["name"]! == "_Entity").ToDict();
+        var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"]!;
         var possibleType = possibleTypes.First().ToDict();
-        string name = (string)possibleType["name"];
+        string name = (string)possibleType["name"]!;
 
         Assert.Equal("User", name);
     }

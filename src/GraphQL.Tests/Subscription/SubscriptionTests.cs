@@ -44,7 +44,7 @@ public class SubscriptionTests
         chat.AddMessageGetAll(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -88,7 +88,7 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -97,7 +97,7 @@ public class SubscriptionTests
         var data = message.Data.ToDict();
         data.ShouldNotBeNull();
         data["newMessageContent"].ShouldNotBeNull();
-        data["newMessageContent"].ToString().ShouldBe("test");
+        data["newMessageContent"]!.ToString().ShouldBe("test");
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -163,7 +163,7 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -194,7 +194,7 @@ public class SubscriptionTests
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
             Schema = schema,
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
@@ -203,7 +203,7 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -233,7 +233,7 @@ public class SubscriptionTests
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
             Schema = schema,
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
@@ -242,7 +242,7 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -267,14 +267,14 @@ public class SubscriptionTests
         chat.AddError(new Exception("test"));
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
-        error.InnerException.Message.ShouldBe("test");
+        error.InnerException!.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
     }
 
     private class NoopMiddleware : IFieldMiddleware
     {
-        public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next) => next(context);
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next) => next(context);
     }
 }

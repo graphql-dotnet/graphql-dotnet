@@ -298,7 +298,7 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var inputs = new Inputs(new Dictionary<string, object> { { "id", "1" } });
+        var inputs = new Inputs(new Dictionary<string, object?> { { "id", "1" } });
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -346,11 +346,11 @@ public class StarWarsBasicQueryTests : StarWarsTestBase
             }
             """;
 
-        var data = new Dictionary<string, object>
+        var data = new Dictionary<string, object?>
         {
             {
                 "human",
-                new Dictionary<string, object>
+                new Dictionary<string, object?>
                 {
                     {"name", "Boba Fett"},
                     {"homePlanet", "Kamino"}
