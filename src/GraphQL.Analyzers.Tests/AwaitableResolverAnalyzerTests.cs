@@ -159,7 +159,7 @@ public class AwaitableResolverAnalyzerTests
                   public MyGraphType()
                   {
                       Field<StringGraphType, {{returnType}}>("Test")
-                          .Resolve(ctx => {{awaitableType}}.FromResult("text"));
+                          .{|#0:Resolve|}(ctx => {{awaitableType}}.FromResult("text"));
                   }
               }
 
@@ -187,7 +187,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -211,14 +211,14 @@ public class AwaitableResolverAnalyzerTests
                   public MyGraphType()
                   {
                       Field<StringGraphType, {{returnType}}>("Test")
-                          .Resolve(ctx => {{awaitableType}}.FromResult("text"));
+                          .{|#0:Resolve|}(ctx => {{awaitableType}}.FromResult("text"));
                   }
               }
 
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -248,7 +248,7 @@ public class AwaitableResolverAnalyzerTests
                   public MyGraphType()
                   {
                       Field<StringGraphType, {{returnType}}>("Test")
-                          .ResolveScoped(ctx => {{awaitableType}}.FromResult("text"));
+                          .{|#0:ResolveScoped|}(ctx => {{awaitableType}}.FromResult("text"));
                   }
               }
 
@@ -257,7 +257,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments(Constants.MethodNames.ResolveScopedAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveScopedAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -281,7 +281,7 @@ public class AwaitableResolverAnalyzerTests
                   public MyGraphType()
                   {
                       Field<StringGraphType, {{returnType}}>("Test")
-                          .ResolveScoped(ctx => {{awaitableType}}.FromResult("text"));
+                          .{|#0:ResolveScoped|}(ctx => {{awaitableType}}.FromResult("text"));
                   }
               }
 
@@ -290,7 +290,7 @@ public class AwaitableResolverAnalyzerTests
               {{CUSTOM_AWAITABLE_SOURCE}}
               """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(13, 14, 13, 27).WithArguments(Constants.MethodNames.ResolveScopedAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveScopedAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, source);
     }
 
@@ -316,7 +316,7 @@ public class AwaitableResolverAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      Field<StringGraphType>("Test").Resolve(ctx => {{resolver}});
+                      Field<StringGraphType>("Test").{|#0:Resolve|}(ctx => {{resolver}});
                   }
 
                   private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
@@ -348,7 +348,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -378,7 +378,7 @@ public class AwaitableResolverAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      Field<StringGraphType>("Test").Resolve(ctx =>
+                      Field<StringGraphType>("Test").{|#0:Resolve|}(ctx =>
                       {
                           if (true)
                               return {{resolver}};
@@ -422,7 +422,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -448,7 +448,7 @@ public class AwaitableResolverAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      Field<StringGraphType>("Test").Resolve({{resolver}});
+                      Field<StringGraphType>("Test").{|#0:Resolve|}({{resolver}});
                   }
 
                   private string Resolve(IResolveFieldContext<object> ctx) => throw new NotImplementedException();
@@ -478,7 +478,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithSpan(12, 40, 12, 47).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -502,7 +502,7 @@ public class AwaitableResolverAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Test")
-                        .Resolve(
+                        .{|#0:Resolve|}(
                             ctx => Task.FromResult("text")
                         );
                 }
@@ -531,7 +531,7 @@ public class AwaitableResolverAnalyzerTests
 
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(12, 14, 12, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -551,7 +551,7 @@ public class AwaitableResolverAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Test")
-                        .Resolve(ctx =>
+                        .{|#0:Resolve|}(ctx =>
                             Task.FromResult("text")
                     );
                 }
@@ -580,7 +580,7 @@ public class AwaitableResolverAnalyzerTests
 
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(12, 14, 12, 21).WithArguments(Constants.MethodNames.ResolveAsync);
+        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 }
