@@ -37,7 +37,7 @@ namespace GraphQL.Validation.Errors
         {
         }
 
-        internal static string UnknownArgMessage(string argName, string fieldName, string type, string[]? suggestedArgs)
+        internal static string UnknownArgMessage(string argName, string fieldName, string type, params string[] suggestedArgs)
         {
             var message = $"Unknown argument '{argName}' on field '{fieldName}' of type '{type}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
@@ -47,7 +47,7 @@ namespace GraphQL.Validation.Errors
             return message;
         }
 
-        internal static string UnknownDirectiveArgMessage(string argName, string directiveName, string[]? suggestedArgs)
+        internal static string UnknownDirectiveArgMessage(string argName, string directiveName, params string[] suggestedArgs)
         {
             var message = $"Unknown argument '{argName}' on directive '{directiveName}'.";
             if (suggestedArgs != null && suggestedArgs.Length > 0)
