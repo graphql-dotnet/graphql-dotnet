@@ -23,7 +23,7 @@ public partial class InputGraphTypeAnalyzerTests
 
               namespace Sample.Server;
 
-              public class CustomInputObjectGraphType : InputObjectGraphType<MySource>
+              public class CustomInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
               {
                   public CustomInputObjectGraphType()
                   {
@@ -42,7 +42,7 @@ public partial class InputGraphTypeAnalyzerTests
             ? new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-                    .WithSpan(6, 64, 6, 72).WithArguments("MySource")
+                    .WithLocation(0).WithArguments("MySource")
             }
             : DiagnosticResult.EmptyDiagnosticResults;
 
@@ -88,7 +88,7 @@ public partial class InputGraphTypeAnalyzerTests
 
             namespace Sample.Server;
 
-            public class CustomInputObjectGraphType : InputObjectGraphType<MySource>
+            public class CustomInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
             {
                 public CustomInputObjectGraphType()
                 {
@@ -105,7 +105,7 @@ public partial class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-            .WithSpan(6, 64, 6, 72).WithArguments("MySource");
+            .WithLocation(0).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -128,7 +128,7 @@ public partial class InputGraphTypeAnalyzerTests
 
               namespace Sample.Server;
 
-              public class CustomInputObjectGraphType : InputObjectGraphType<MySource>
+              public class CustomInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
               {
                   public CustomInputObjectGraphType()
                   {
@@ -153,7 +153,7 @@ public partial class InputGraphTypeAnalyzerTests
             ? new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-                    .WithSpan(8, 64, 8, 72).WithArguments("MySource")
+                    .WithLocation(0).WithArguments("MySource")
             }
             : DiagnosticResult.EmptyDiagnosticResults;
 
@@ -171,7 +171,7 @@ public partial class InputGraphTypeAnalyzerTests
 
             namespace Sample.Server;
 
-            public class CustomInputObjectGraphType : InputObjectGraphType<MySource>
+            public class CustomInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
             {
                 public CustomInputObjectGraphType()
                 {
@@ -186,7 +186,7 @@ public partial class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-            .WithSpan(7, 64, 7, 72).WithArguments("MySource");
+            .WithLocation(0).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -241,7 +241,7 @@ public partial class InputGraphTypeAnalyzerTests
                 }
             }
 
-            public class BaseInputObjectGraphType : InputObjectGraphType<MySource>
+            public class BaseInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
             {
             }
 
@@ -254,7 +254,7 @@ public partial class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-            .WithSpan(15, 62, 15, 70).WithArguments("MySource");
+            .WithLocation(0).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
