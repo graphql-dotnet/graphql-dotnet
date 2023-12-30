@@ -16,21 +16,11 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void should_throw_error_if_name_is_null_or_empty(string fieldName)
+    public void should_throw_error_if_name_is_null_or_empty(string? fieldName)
     {
         var type = new ObjectGraphType();
         ArgumentOutOfRangeException exception;
-        // race condition with does_not_throw_with_filtering_nameconverter test
-        try
-        {
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName));
-        }
-        catch (ShouldAssertException)
-        {
-            System.Threading.Thread.Sleep(100); // wait a bit and retry
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName));
-        }
-
+        exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName!));
         exception.Message.ShouldStartWith("A field name can not be null or empty.");
     }
 
@@ -167,21 +157,21 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
+        var result = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
             result.Edges[0].Cursor.ShouldBe("01");
-            result.Edges[0].Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items[0].Field1.ShouldBe("abcd");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
         }
     }
 
@@ -212,28 +202,28 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             },
         };
         type.Connection<ObjectGraphType>("testConnection")
-            .ResolveAsync(_ => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
             result.Edges[0].Cursor.ShouldBe("01");
-            result.Edges[0].Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items[0].Field1.ShouldBe("abcd");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
         }
     }
 
@@ -265,28 +255,28 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             },
         };
         type.Connection<ChildType, ParentChildrenEdgeType>("testConnection")
-            .ResolveAsync(_ => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
             result.Edges[0].Cursor.ShouldBe("01");
-            result.Edges[0].Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items[0].Field1.ShouldBe("abcd");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
         }
     }
@@ -341,28 +331,28 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             ConnectionField1 = ConnectionField1Value
         };
         type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>("testConnection")
-            .ResolveAsync(_ => Task.FromResult<object>(connection));
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-        object boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext());
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as ParentChildrenConnection;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(3);
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(3);
             result.Edges[0].Cursor.ShouldBe("01");
-            result.Edges[0].Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(3);
-            result.Items[0].Field1.ShouldBe("abcd");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(3);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
             result.HighestField2.ShouldBe(10);
             result.ConnectionField1.ShouldBe(ConnectionField1Value);
@@ -373,20 +363,20 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     public void unidirectional_creates_proper_arguments()
     {
         var graph = new ParentType();
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "after").ShouldBe(1);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "first").ShouldBe(1);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "before").ShouldBe(0);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "last").ShouldBe(0);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "after").ShouldBe(1);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "first").ShouldBe(1);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "before").ShouldBe(0);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "last").ShouldBe(0);
     }
 
     [Fact]
     public void bidirectional_creates_proper_arguments()
     {
         var graph = new ParentType();
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "after").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "first").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "before").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "after").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "first").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "before").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "last").ShouldBe(1);
     }
 
     [Fact]
@@ -398,8 +388,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             .Bidirectional()
             .Bidirectional();
 
-        graph.Fields.Find("connection").Arguments.Count(x => x.Name == "before").ShouldBe(1);
-        graph.Fields.Find("connection").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        graph.Fields.Find("connection")!.Arguments!.Count(x => x.Name == "before").ShouldBe(1);
+        graph.Fields.Find("connection")!.Arguments!.Count(x => x.Name == "last").ShouldBe(1);
     }
 
     [Fact]
@@ -409,7 +399,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         graph.Connection<ChildType>("connection")
             .PageSize(10)
             .Resolve(context => context.First);
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
+        (await graph.Fields.Find("connection").ShouldNotBeNull().Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
     }
 
     [Fact]
@@ -418,8 +408,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         var graph = new ObjectGraphType();
         graph.Connection<ChildType>("connection")
             .PageSize(10)
-            .ResolveAsync(context => Task.FromResult<object>(context.First));
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
+            .ResolveAsync(context => Task.FromResult<object?>(context.First));
+        (await graph.Fields.Find("connection").ShouldNotBeNull().Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
     }
 
     public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>

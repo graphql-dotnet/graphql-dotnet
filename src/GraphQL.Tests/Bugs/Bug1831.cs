@@ -26,7 +26,7 @@ public class Bug1831 : QueryTestBase<Bug1831Schema>
         };
         error1.AddLocation(new Location(1, 7));
         var error2 = new ValidationError(default, KnownTypeNamesError.NUMBER,
-            KnownTypeNamesError.UnknownTypeMessage("abcdefg", null))
+            KnownTypeNamesError.UnknownTypeMessage("abcdefg"))
         {
             Code = "KNOWN_TYPE_NAMES"
         };

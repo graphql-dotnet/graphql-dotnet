@@ -32,12 +32,12 @@ public class GraphQLRequestTests : DeserializationTestBase
         {
             Query = "hello",
             OperationName = "opname",
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 { "arg1", 1 },
                 { "arg2", "test" },
             }),
-            Extensions = new Inputs(new Dictionary<string, object>
+            Extensions = new Inputs(new Dictionary<string, object?>
             {
                 { "arg1", 2 },
                 { "arg2", "test2" },
@@ -58,7 +58,7 @@ public class GraphQLRequestTests : DeserializationTestBase
         var request = new GraphQLRequest
         {
             Query = "hello",
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 { "arg", ExampleData },
             }),
@@ -108,9 +108,9 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBe("hello");
-        Verify(actual.Variables);
+        Verify(actual.Variables!);
     }
 
     [Theory]
@@ -118,7 +118,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_IsCaseSensitive(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"Variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBe("hello");
         actual.Variables.ShouldBeNull();
     }
@@ -162,11 +162,11 @@ public class GraphQLRequestTests : DeserializationTestBase
         where T : IEnumerable<GraphQLRequest>
     {
         string test = $"[{{\"query\":\"hello\",\"variables\":{ExampleJson}}}, {{\"query\":\"dummy\"}}]";
-        var actual = serializer.Deserialize<T>(test);
+        var actual = serializer.Deserialize<T>(test)!;
         actual.Count().ShouldBe(2);
         var request = actual.First();
         request.Query.ShouldBe("hello");
-        Verify(request.Variables);
+        Verify(request.Variables!);
         var request2 = actual.Last();
         request2.Query.ShouldBe("dummy");
     }
@@ -175,7 +175,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_Null_GraphQLRequest_In_List(IGraphQLTextSerializer serializer)
     {
-        var actual = serializer.Deserialize<GraphQLRequest[]>("[null]");
+        var actual = serializer.Deserialize<GraphQLRequest[]>("[null]")!;
         actual.Length.ShouldBe(1);
         actual[0].ShouldBeNull();
     }
@@ -186,7 +186,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     {
         // verifies that when deserializing to IList<GraphQLRequest>, and when a single item is in the list, the result is not a GraphQLRequest[]
         // note: the server counts on this behavior to determine whether or not a request is a batch request
-        var actual = serializer.Deserialize<IList<GraphQLRequest>>("[{}]");
+        var actual = serializer.Deserialize<IList<GraphQLRequest>>("[{}]")!;
         actual.ShouldNotBeOfType<GraphQLRequest[]>();
         actual.Count.ShouldBe(1);
     }
@@ -207,7 +207,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_List_NotCaseSensitive(IGraphQLTextSerializer serializer)
     {
         const string test = """{"VARIABLES":{"date":"2015-12-22T10:10:10+03:00"},"query":"test"}""";
-        var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
+        var actual = serializer.Deserialize<List<GraphQLRequest>>(test)!;
         actual.Count.ShouldBe(1);
         actual[0].Query.ShouldBe("test");
         actual[0].Variables.ShouldBeNull();
@@ -218,10 +218,10 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_List_Multiple_Items(IGraphQLTextSerializer serializer)
     {
         string test = $"[{{\"query\":\"hello\",\"variables\":{ExampleJson}}},{{\"query\":\"hello2\"}}]";
-        var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
+        var actual = serializer.Deserialize<List<GraphQLRequest>>(test)!;
         actual.Count.ShouldBe(2);
         actual[0].Query.ShouldBe("hello");
-        Verify(actual[0].Variables);
+        Verify(actual[0].Variables!);
         actual[1].Query.ShouldBe("hello2");
         actual[1].Variables.ShouldBeNull();
     }
@@ -231,7 +231,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_List_No_Items(IGraphQLTextSerializer serializer)
     {
         const string test = "[]";
-        var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
+        var actual = serializer.Deserialize<List<GraphQLRequest>>(test)!;
         actual.Count.ShouldBe(0);
     }
 
@@ -243,7 +243,7 @@ public class GraphQLRequestTests : DeserializationTestBase
         var actual = serializer.Deserialize<List<GraphQLRequest>>(test);
         var request = actual.ShouldHaveSingleItem();
         request.Query.ShouldBe("hello");
-        Verify(request.Variables);
+        Verify(request.Variables!);
     }
 
     [Theory]
@@ -251,7 +251,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_Nulls(IGraphQLTextSerializer serializer)
     {
         const string test = "{\"query\":null,\"operationName\":null,\"variables\":null,\"extensions\":null}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBeNull();
         actual.OperationName.ShouldBeNull();
         actual.Variables.ShouldBeNull();
@@ -263,7 +263,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_Empty(IGraphQLTextSerializer serializer)
     {
         const string test = "{}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBeNull();
         actual.OperationName.ShouldBeNull();
         actual.Variables.ShouldBeNull();
@@ -275,9 +275,9 @@ public class GraphQLRequestTests : DeserializationTestBase
     public void Reads_GraphQLRequest_Other_Properties(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"operationName\":\"hello2\",\"extensions\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<GraphQLRequest>(test);
+        var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBe("hello");
         actual.OperationName.ShouldBe("hello2");
-        Verify(actual.Extensions);
+        Verify(actual.Extensions!);
     }
 }

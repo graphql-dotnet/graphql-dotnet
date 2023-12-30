@@ -7,15 +7,15 @@ public class QueryArgumentTests
     [Fact]
     public void throws_exception_with_null_instance_type()
     {
-        IGraphType type = null;
-        Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(type));
+        IGraphType? type = null;
+        Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(type!));
     }
 
     [Fact]
     public void throws_exception_with_null_type()
     {
-        Type type = null;
-        Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(type));
+        Type? type = null;
+        Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(type!));
     }
 
     [Fact]

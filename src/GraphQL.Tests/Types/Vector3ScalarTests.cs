@@ -61,7 +61,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
         var scalar = new Vector3Type();
         var input = new Vector3(1, 2, 3);
         var ast = scalar.ToAST(input);
-        object value = scalar.ParseLiteral(ast);
+        object? value = scalar.ParseLiteral(ast);
         var output = value.ShouldBeOfType<Vector3>();
         output.X.ShouldBe(input.X);
         output.Y.ShouldBe(input.Y);
@@ -121,7 +121,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             Name = "Vector3";
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
         {
             if (value == null)
                 return null;
@@ -188,7 +188,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             return ThrowValueConversionError(value);
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
             if (value is GraphQLNullValue)
                 return null;
@@ -198,19 +198,19 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
 
             if (value is GraphQLObjectValue objectValue)
             {
-                var entries = objectValue.Fields.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
+                var entries = objectValue.Fields!.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
                 if (entries.Count != 3)
                     return ThrowLiteralConversionError(value);
-                double x = (double)entries["x"];
-                double y = (double)entries["y"];
-                double z = (double)entries["z"];
+                double x = (double)entries["x"]!;
+                double y = (double)entries["y"]!;
+                double z = (double)entries["z"]!;
                 return new Vector3((float)x, (float)y, (float)z);
             }
 
             return ThrowLiteralConversionError(value);
         }
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
         {
             if (value == null)
                 return null;
@@ -228,7 +228,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             return ThrowSerializationError(value);
         }
 
-        public override GraphQLValue ToAST(object value)
+        public override GraphQLValue ToAST(object? value)
         {
             if (value == null)
                 return new GraphQLNullValue();

@@ -60,8 +60,8 @@ public class FieldBuilderTests
         fields[0].Type.ShouldBe(typeof(StringGraphType));
 
         var context = new ResolveFieldContext();
-        object result = await fields[0].Resolver.ResolveAsync(context);
-        result.GetType().ShouldBe(typeof(string));
+        object? result = await fields[0].Resolver.ShouldNotBeNull().ResolveAsync(context);
+        result.ShouldNotBeNull().GetType().ShouldBe(typeof(string));
         result.ShouldBe("SomeString");
     }
 
@@ -105,7 +105,7 @@ public class FieldBuilderTests
             .Argument<BooleanGraphType>("arg4", cfg => cfg.WithMetadata("useBefore", new DateTime(2030, 1, 2)).DefaultValue = true);
 
         var field = objectType.Fields.First();
-        field.Arguments.Count.ShouldBe(4);
+        field.Arguments.ShouldNotBeNull().Count.ShouldBe(4);
 
         field.Arguments[0].Name.ShouldBe("arg1");
         field.Arguments[0].Description.ShouldBe("desc1");
@@ -145,13 +145,13 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        field.Arguments.Count.ShouldBe(1);
+        field.Arguments.ShouldNotBeNull().Count.ShouldBe(1);
 
         field.Arguments[0].Name.ShouldBe("arg1");
         field.Arguments[0].Description.ShouldBe("desc1");
         field.Arguments[0].Type.ShouldBe(typeof(StringGraphType));
         field.Arguments[0].DefaultValue.ShouldBe("12345");
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -173,7 +173,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
@@ -193,7 +193,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
@@ -217,7 +217,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -262,7 +262,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -285,7 +285,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
@@ -305,7 +305,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -328,7 +328,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
@@ -348,7 +348,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -371,7 +371,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -398,7 +398,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
@@ -421,7 +421,7 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Source = 12345
         });

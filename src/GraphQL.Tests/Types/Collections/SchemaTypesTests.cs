@@ -32,7 +32,7 @@ public class SchemaTypesTests
 
         // mock it so we can verify behavior
         var mock = new Mock<IServiceProvider>(MockBehavior.Loose);
-        mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => provider.GetService(type));
+        mock.Setup(x => x.GetService(It.IsAny<Type>())).Returns<Type>(type => provider!.GetService(type)!);
 
         // run test
         var schema = new StarWarsSchema(mock.Object);
@@ -229,9 +229,9 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             Name = "String";
         }
 
-        public override object ParseValue(object value) => value?.ToString().TrimEnd('_');
+        public override object? ParseValue(object? value) => value?.ToString()!.TrimEnd('_');
 
-        public override object Serialize(object value) => value == null ? null : value.ToString() + "_";
+        public override object? Serialize(object? value) => value == null ? null : value.ToString() + "_";
     }
 
     private class MyGuidGraphType : GuidGraphType
@@ -241,6 +241,6 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             Name = "Guid";
         }
 
-        public override object Serialize(object value) => base.Serialize(new Guid("00000001-0002-0003-0004-000000000005"));
+        public override object? Serialize(object? value) => base.Serialize(new Guid("00000001-0002-0003-0004-000000000005"));
     }
 }

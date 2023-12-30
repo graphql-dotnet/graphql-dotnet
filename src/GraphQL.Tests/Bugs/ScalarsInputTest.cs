@@ -182,9 +182,9 @@ mutation {
     public void Should_Not_Accept_String_As_Int_In_Literal()
     {
         const string query = """mutation { int(number: "100") }""";
-        const string expected = null;
+        const string? expected = null;
         var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Int', found \"100\".");
+        result.Errors![0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Int', found \"100\".");
     }
 
     [Fact]
@@ -193,16 +193,16 @@ mutation {
         const string query = "mutation AAA($val : Int!) { int(number: $val) }";
         const string expected = """{ "int": 100 }""";
         var result = AssertQueryWithErrors(query, expected, variables: """{ "val": "100" }""".ToInputs(), expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Int'");
+        result.Errors![0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Int'");
     }
 
     [Fact]
     public void Should_Not_Accept_String_As_Long_In_Literal()
     {
         const string query = """mutation { long(number: "100") }""";
-        const string expected = null;
+        const string? expected = null;
         var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Long', found \"100\".");
+        result.Errors![0].Message.ShouldBe("Argument 'number' has invalid value. Expected type 'Long', found \"100\".");
     }
 
     [Fact]
@@ -211,7 +211,7 @@ mutation {
         const string query = "mutation AAA($val : Long!) { long(number: $val) }";
         const string expected = """{ "long": 100 }""";
         var result = AssertQueryWithErrors(query, expected, variables: """{ "val": "100" }""".ToInputs(), expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Long'");
+        result.Errors![0].Message.ShouldBe("Variable '$val' is invalid. Unable to convert '100' to 'Long'");
     }
 }
 

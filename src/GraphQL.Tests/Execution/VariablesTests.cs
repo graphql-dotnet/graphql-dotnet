@@ -15,7 +15,7 @@ public class TestComplexScalarType : ScalarGraphType
         Name = "ComplexScalar";
     }
 
-    public override object Serialize(object value)
+    public override object? Serialize(object? value)
     {
         if (value is string && value.Equals("DeserializedValue"))
         {
@@ -25,7 +25,7 @@ public class TestComplexScalarType : ScalarGraphType
         return value;
     }
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
     {
         if (value is string && value.Equals("SerializedValue"))
         {
@@ -35,7 +35,7 @@ public class TestComplexScalarType : ScalarGraphType
         return null;
     }
 
-    public override object ParseLiteral(GraphQLValue value)
+    public override object? ParseLiteral(GraphQLValue value)
     {
         if (value is GraphQLStringValue stringValue)
         {
@@ -56,12 +56,12 @@ public class TestJsonScalarReturningObject : ScalarGraphType
         Name = "JsonScalarReturningObject";
     }
 
-    public override object Serialize(object value) => value;
+    public override object? Serialize(object? value) => value;
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
         => value is string stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>(stringValue) : null;
 
-    public override object ParseLiteral(GraphQLValue value)
+    public override object? ParseLiteral(GraphQLValue value)
         => value is GraphQLStringValue stringValue ? JsonSerializer.Deserialize<TestJsonScalarObject>((string)stringValue.Value) : null; // string conversion for NET48
 }
 
@@ -96,7 +96,7 @@ public class TestType : ObjectGraphType
             .Argument<TestInputObject>("input")
             .Resolve(context =>
             {
-                string result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
+                string result = JsonSerializer.Serialize(context.GetArgument<object?>("input"));
                 return result;
             });
 
@@ -117,7 +117,7 @@ public class TestType : ObjectGraphType
             .Argument<NonNullGraphType<StringGraphType>>("input")
             .Resolve(context =>
             {
-                string result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
+                string result = JsonSerializer.Serialize(context.GetArgument<object?>("input"));
                 return result;
             });
 
@@ -125,7 +125,7 @@ public class TestType : ObjectGraphType
             .Argument<StringGraphType>("input", arg => arg.DefaultValue = "Hello World")
             .Resolve(context =>
             {
-                string result = JsonSerializer.Serialize(context.GetArgument<object>("input"));
+                string result = JsonSerializer.Serialize(context.GetArgument<object?>("input"));
                 return result;
             });
 
@@ -187,7 +187,7 @@ public class Variables_With_Inline_Structs_Tests : QueryTestBase<VariablesSchema
             """;
 
         var result = AssertQueryWithErrors(query, null, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("""Invalid literal for argument 'input' of field 'fieldWithObjectInput'. Expected object value for 'TestInputObject', found not an object '["foo", "bar", "baz"]'.""");
+        result.Errors![0].Message.ShouldBe("""Invalid literal for argument 'input' of field 'fieldWithObjectInput'. Expected object value for 'TestInputObject', found not an object '["foo", "bar", "baz"]'.""");
     }
 }
 
@@ -256,13 +256,13 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void errors_on_null_for_nested_non_null()
     {
-        const string expected = null;
+        const string? expected = null;
 
         var inputs = """{ "input": { "a": "foo", "b": "bar", "c": null } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe("Variable '$input.c' is invalid. Received a null input for a non-null variable.");
     }
@@ -270,13 +270,13 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void errors_on_incorrect_type()
     {
-        const string expected = null;
+        const string? expected = null;
 
         var inputs = """{ "input": "foo bar" }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
 
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe(
@@ -286,13 +286,13 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void errors_on_omission_of_nested_non_null()
     {
-        const string expected = null;
+        const string? expected = null;
 
         var inputs = """{ "input": { "a": "foo", "b": "bar" } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe("Variable '$input.c' is invalid. No value provided for a non-null variable.");
     }
@@ -300,13 +300,13 @@ public class UsingVariablesTests : QueryTestBase<VariablesSchema>
     [Fact]
     public void errors_on_addition_of_unknown_input_field()
     {
-        const string expected = null;
+        const string? expected = null;
 
         var inputs = """{ "input": { "a": "foo", "b": "bar", "c": "baz", "e": "dog" } }""".ToInputs();
 
         var result = AssertQueryWithErrors(_query, expected, inputs, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe("Variable '$input' is invalid. Unrecognized input fields 'e' for type 'TestInputObject'.");
     }
@@ -474,11 +474,11 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
             }
             """;
 
-        const string expected = null;
+        const string? expected = null;
 
         var result = AssertQueryWithErrors(query, expected, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe("Variable '$value' is invalid. No value provided for a non-null variable.");
     }
@@ -492,13 +492,13 @@ public class HandlesNonNullScalarTests : QueryTestBase<VariablesSchema>
             }
             """;
 
-        const string expected = null;
+        const string? expected = null;
 
         var inputs = """{"value": null}""".ToInputs();
 
         var result = AssertQueryWithErrors(query, expected, inputs, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors.ShouldHaveSingleItem();
         caughtError.ShouldNotBeNull();
         caughtError.Message.ShouldBe("Variable '$value' is invalid. Received a null input for a non-null variable.");
     }

@@ -283,7 +283,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.Initialize();
-        schema.Query.Fields.Find("test").Type.ShouldBe(mappedType);
+        schema.Query.Fields.Find("test")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -314,7 +314,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Query.Fields.Find("test").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -353,7 +353,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Directives.Find("MyDirective").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        schema.Directives.Find("MyDirective")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -386,9 +386,9 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        var inputTypeActual = schema.Query.Fields.Find("test").Arguments.Find("arg").ResolvedType.ShouldBeOfType<InputObjectGraphType>();
+        var inputTypeActual = schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.ResolvedType.ShouldBeOfType<InputObjectGraphType>();
         inputTypeActual.ShouldBe(inputType);
-        inputTypeActual.Fields.Find("field").Type.ShouldBe(mappedType);
+        inputTypeActual.Fields.Find("field")!.Type.ShouldBe(mappedType);
     }
 
     [Fact]

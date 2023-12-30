@@ -32,7 +32,7 @@ public class ApolloTracingTests : StarWarsTestBase
             _.EnableMetrics = true;
         });
         result.EnrichWithApolloTracing(start);
-        var trace = (ApolloTrace)result.Extensions["tracing"];
+        var trace = (ApolloTrace)result.Extensions!["tracing"]!;
 
         trace.Version.ShouldBe(1);
         trace.Parsing.StartOffset.ShouldNotBe(0);

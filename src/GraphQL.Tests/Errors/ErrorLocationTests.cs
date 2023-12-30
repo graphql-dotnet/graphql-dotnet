@@ -18,9 +18,9 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
             _.Query = query;
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
-        error.Locations.Count.ShouldBe(1);
+        error.Locations!.Count.ShouldBe(1);
         var location = error.Locations.First();
         location.Line.ShouldBe(line);
         location.Column.ShouldBe(column);
@@ -38,9 +38,9 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
             _.Query = query;
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
-        error.Locations.Count.ShouldBe(1);
+        error.Locations!.Count.ShouldBe(1);
         var location = error.Locations.First();
         location.Line.ShouldBe(line);
         location.Column.ShouldBe(column);
@@ -55,7 +55,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
             _.Query = "{ testSub { one two } }";
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Path.ShouldBe(new[] { "testSub", "two" });
     }
@@ -69,7 +69,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
             _.Query = "{ testSubList { one two } }";
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Path.ShouldBe(new object[] { "testSubList", 0, "two" });
     }

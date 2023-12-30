@@ -40,13 +40,13 @@ public class NonNullGraphTypeTests : QueryTestBase<NullableSchema>
             root: new ExampleContext(null, null, null),
             expectedErrorCount: 3);
 
-        var errors = result.Errors.ToArray();
+        var errors = result.Errors!.ToArray();
         errors[0].Message.ShouldBe("Error trying to resolve field 'a'.");
-        errors[0].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: a, Type: Int!.");
+        errors[0].InnerException!.Message.ShouldBe("Cannot return null for a non-null type. Field: a, Type: Int!.");
         errors[1].Message.ShouldBe("Error trying to resolve field 'b'.");
-        errors[1].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: b, Type: Boolean!.");
+        errors[1].InnerException!.Message.ShouldBe("Cannot return null for a non-null type. Field: b, Type: Boolean!.");
         errors[2].Message.ShouldBe("Error trying to resolve field 'c'.");
-        errors[2].InnerException.Message.ShouldBe("Cannot return null for a non-null type. Field: c, Type: String!.");
+        errors[2].InnerException!.Message.ShouldBe("Cannot return null for a non-null type. Field: c, Type: String!.");
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class NonNullGraphTypeTests : QueryTestBase<NullableSchema>
 
 public class ExampleContext
 {
-    public ExampleContext(int? a, bool? b, string c)
+    public ExampleContext(int? a, bool? b, string? c)
     {
         A = a;
         B = b;
@@ -84,7 +84,7 @@ public class ExampleContext
 
     public bool? B { get; set; }
 
-    public string C { get; set; }
+    public string? C { get; set; }
 }
 
 public class NullableSchema : Schema
@@ -94,9 +94,9 @@ public class NullableSchema : Schema
         var query = new ObjectGraphType();
 
         query.Field<NullableSchemaType>("nullable")
-            .Resolve(c => new DataModel { Data = c.Source as ExampleContext });
+            .Resolve(c => new DataModel { Data = (c.Source as ExampleContext)! });
         query.Field<NonNullableSchemaType>("nonNullable")
-            .Resolve(c => new DataModel { Data = c.Source as ExampleContext });
+            .Resolve(c => new DataModel { Data = (c.Source as ExampleContext)! });
 
         Query = query;
     }

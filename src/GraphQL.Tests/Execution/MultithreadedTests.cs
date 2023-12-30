@@ -19,7 +19,7 @@ public class MultithreadedTests
         });
 
         // prep a test execution using that middleware
-        StarWarsTestBase starWarsTest = null;
+        StarWarsTestBase starWarsTest = null!;
         Func<Task> testExecution = async () =>
         {
             var result = await starWarsTest.Executer.ExecuteAsync(new ExecutionOptions

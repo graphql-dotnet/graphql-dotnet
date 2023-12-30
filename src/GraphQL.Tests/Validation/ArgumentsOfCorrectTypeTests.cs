@@ -1100,7 +1100,7 @@ public static class ValidationExtensions
         string value,
         int line,
         int column,
-        string errors = null)
+        string? errors = null)
     {
         errors ??= $"Expected type '{typeName}', found {value}.";
 

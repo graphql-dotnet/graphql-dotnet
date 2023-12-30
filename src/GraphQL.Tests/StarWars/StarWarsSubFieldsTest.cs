@@ -103,7 +103,7 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
            ctx.SubFields.ShouldNotBeNull();
            ctx.SubFields.Keys.ShouldContain("id");
            ctx.SubFields.Keys.ShouldContain("friends");
-           return Task.FromResult<object>(null);
+           return Task.FromResult<object?>(null);
        });
         const string query = """
             {

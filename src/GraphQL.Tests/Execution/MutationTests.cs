@@ -130,7 +130,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 int change = context.GetArgument<int>("newNumber");
-                return root.ImmediatelyChangeTheNumber(change);
+                return root!.ImmediatelyChangeTheNumber(change);
             }
         );
 
@@ -140,7 +140,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 int change = context.GetArgument<int>("newNumber");
-                return await root.PromiseToChangeTheNumberAsync(change).ConfigureAwait(false);
+                return await root!.PromiseToChangeTheNumberAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -150,7 +150,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 int change = context.GetArgument<int>("newNumber");
-                return root.FailToChangeTheNumber(change);
+                return root!.FailToChangeTheNumber(change);
             }
         );
 
@@ -169,7 +169,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<DateTime>("newDateTime");
-                return root.ImmediatelyChangeTheDateTime(change);
+                return root!.ImmediatelyChangeTheDateTime(change);
             }
         );
 
@@ -179,7 +179,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 var change = context.GetArgument<DateTime>("newDateTime");
-                return await root.PromiseToChangeTheDateTimeAsync(change).ConfigureAwait(false);
+                return await root!.PromiseToChangeTheDateTimeAsync(change).ConfigureAwait(false);
             }
         );
 
@@ -189,7 +189,7 @@ public class MutationChange : ObjectGraphType
             {
                 var root = context.Source as Root;
                 _ = context.GetArgument<DateTime>("newDateTime");
-                return root.FailToChangeTheDateTime();
+                return root!.FailToChangeTheDateTime();
             }
         );
 
@@ -307,9 +307,9 @@ public class MutationTests : QueryTestBase<MutationSchema>
             """;
 
         var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
-        result.Errors.First().InnerException.Message.ShouldBe("Cannot change the number 3");
-        var last = result.Errors.Last();
-        last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the number 6");
+        result.Errors!.First().InnerException!.Message.ShouldBe("Cannot change the number 3");
+        var last = result.Errors!.Last();
+        last.InnerException!.GetBaseException().Message.ShouldBe("Cannot change the number 6");
     }
 
     [Fact]
@@ -404,9 +404,9 @@ public class MutationTests : QueryTestBase<MutationSchema>
             """;
 
         var result = await AssertQueryWithErrorsAsync(query, expected, root: new Root(6, DateTime.Now), expectedErrorCount: 2);
-        result.Errors.First().InnerException.Message.ShouldBe("Cannot change the datetime");
-        var last = result.Errors.Last();
-        last.InnerException.GetBaseException().Message.ShouldBe("Cannot change the datetime");
+        result.Errors!.First().InnerException!.Message.ShouldBe("Cannot change the datetime");
+        var last = result.Errors!.Last();
+        last.InnerException!.GetBaseException().Message.ShouldBe("Cannot change the datetime");
     }
 
     [Fact]

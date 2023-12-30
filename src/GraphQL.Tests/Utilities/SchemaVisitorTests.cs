@@ -103,7 +103,7 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         field.ShouldNotBeNull();
         field.Description.ShouldBe("field");
 
-        var arg = field.Arguments.Find("arg");
+        var arg = field.Arguments.ShouldNotBeNull().Find("arg");
         arg.ShouldNotBeNull();
         arg.Description.ShouldBe("arg");
 
@@ -142,54 +142,54 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         var schema = new Schema();
         schema.ApplyDirective("schema");
         schema.HasAppliedDirectives().ShouldBeTrue();
-        schema.GetAppliedDirectives().Count.ShouldBe(1);
+        schema.GetAppliedDirectives().ShouldNotBeNull().ShouldNotBeNull().Count.ShouldBe(1);
 
         var objectType = new ObjectGraphType();
         objectType.ApplyDirective("type");
         objectType.HasAppliedDirectives().ShouldBeTrue();
-        objectType.GetAppliedDirectives().Count.ShouldBe(1);
+        objectType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var field = objectType.Field<StringGraphType>("test").Directive("field");
         field.FieldType.HasAppliedDirectives().ShouldBeTrue();
-        field.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
+        field.FieldType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var interfaceType = new InterfaceGraphType();
         interfaceType.ApplyDirective("interface");
         interfaceType.HasAppliedDirectives().ShouldBeTrue();
-        interfaceType.GetAppliedDirectives().Count.ShouldBe(1);
+        interfaceType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var unionType = new UnionGraphType();
         unionType.ApplyDirective("union");
         unionType.HasAppliedDirectives().ShouldBeTrue();
-        unionType.GetAppliedDirectives().Count.ShouldBe(1);
+        unionType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var arg = new QueryArgument(new StringGraphType());
         arg.ApplyDirective("arg");
         arg.HasAppliedDirectives().ShouldBeTrue();
-        arg.GetAppliedDirectives().Count.ShouldBe(1);
+        arg.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var enumType = new EnumerationGraphType();
         enumType.ApplyDirective("enumType");
         enumType.HasAppliedDirectives().ShouldBeTrue();
-        enumType.GetAppliedDirectives().Count.ShouldBe(1);
+        enumType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var enumValue = new EnumValueDefinition("UNUSED", null);
         enumValue.ApplyDirective("enumValue");
         enumValue.HasAppliedDirectives().ShouldBeTrue();
-        enumValue.GetAppliedDirectives().Count.ShouldBe(1);
+        enumValue.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var inputType = new InputObjectGraphType();
         inputType.ApplyDirective("inputType");
         inputType.HasAppliedDirectives().ShouldBeTrue();
-        inputType.GetAppliedDirectives().Count.ShouldBe(1);
+        inputType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var input = inputType.Field<StringGraphType>("test").Directive("inputField");
         input.FieldType.HasAppliedDirectives().ShouldBeTrue();
-        input.FieldType.GetAppliedDirectives().Count.ShouldBe(1);
+        input.FieldType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
         var scalarType = new BigIntGraphType();
         scalarType.ApplyDirective("scalar");
         scalarType.HasAppliedDirectives().ShouldBeTrue();
-        scalarType.GetAppliedDirectives().Count.ShouldBe(1);
+        scalarType.GetAppliedDirectives().ShouldNotBeNull().ShouldNotBeNull().Count.ShouldBe(1);
     }
 }

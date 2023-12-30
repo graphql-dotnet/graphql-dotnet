@@ -37,7 +37,7 @@ public class Bug781UnobservedTasks
         _unobserved.ShouldBe(unobserved);
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         _unobserved = true;
         Console.WriteLine("Unobserved exception: " + e.Exception);

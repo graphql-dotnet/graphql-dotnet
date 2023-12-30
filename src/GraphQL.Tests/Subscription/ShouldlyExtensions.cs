@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GraphQL.Tests.Subscription;
 
 public static class ShouldlyExtensions

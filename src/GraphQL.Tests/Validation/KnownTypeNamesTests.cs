@@ -42,7 +42,7 @@ public class KnownTypeNamesTests : ValidationTestBase<KnownTypeNames, Validation
                     name
                 }
                 """;
-            _.Error(KnownTypeNamesError.UnknownTypeMessage("Abcd", null), 1, 17);
+            _.Error(KnownTypeNamesError.UnknownTypeMessage("Abcd"), 1, 17);
         });
     }
 
@@ -62,8 +62,8 @@ public class KnownTypeNamesTests : ValidationTestBase<KnownTypeNames, Validation
                     name
                   }
                 """;
-            _.Error(KnownTypeNamesError.UnknownTypeMessage("JumbledUpLetters", null), 1, 19);
-            _.Error(KnownTypeNamesError.UnknownTypeMessage("Badger", null), 4, 21);
+            _.Error(KnownTypeNamesError.UnknownTypeMessage("JumbledUpLetters"), 1, 19);
+            _.Error(KnownTypeNamesError.UnknownTypeMessage("Badger"), 4, 21);
             _.Error(KnownTypeNamesError.UnknownTypeMessage("Peettt", new[] { "Pet" }), 7, 25);
         });
     }

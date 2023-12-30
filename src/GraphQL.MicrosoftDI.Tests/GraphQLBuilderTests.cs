@@ -9,7 +9,7 @@ public class GraphQLBuilderTests
     [Fact]
     public void NullConstructor()
     {
-        Should.Throw<ArgumentNullException>(() => new GraphQLBuilder(null, _ => { }));
+        Should.Throw<ArgumentNullException>(() => new GraphQLBuilder(null!, _ => { }));
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class GraphQLBuilderTests
     public void Register_Factory(DI.ServiceLifetime serviceLifetime, bool replace, bool withExisting)
     {
         bool match = false;
-        Func<IServiceProvider, Class1> factory = _ => null;
+        Func<IServiceProvider, Class1> factory = _ => null!;
         var descriptorList = new List<ServiceDescriptor>();
         var mockServiceCollection = new Mock<IServiceCollection>(MockBehavior.Strict);
         mockServiceCollection.Setup(x => x.Add(It.IsAny<ServiceDescriptor>())).Callback<ServiceDescriptor>(d =>
@@ -207,7 +207,7 @@ public class GraphQLBuilderTests
     public void TryRegister_Factory(DI.ServiceLifetime serviceLifetime)
     {
         bool match = false;
-        Func<IServiceProvider, Class1> factory = _ => null;
+        Func<IServiceProvider, Class1> factory = _ => null!;
         var descriptorList = new List<ServiceDescriptor>();
         var mockServiceCollection = new Mock<IServiceCollection>(MockBehavior.Strict);
         mockServiceCollection.Setup(x => x.Add(It.IsAny<ServiceDescriptor>())).Callback<ServiceDescriptor>(d =>
@@ -263,28 +263,28 @@ public class GraphQLBuilderTests
     public void Register_InvalidParameters()
     {
         var builder = new GraphQLBuilder(new ServiceCollection(), _ => { });
-        Should.Throw<ArgumentNullException>(() => builder.Register(null, typeof(Class1), DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), (Type)null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.Register(null, _ => null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), (Func<IServiceProvider, object>)null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.Register(null, new Class1()));
-        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), null));
+        Should.Throw<ArgumentNullException>(() => builder.Register(null!, typeof(Class1), DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), (Type)null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.Register(null!, _ => null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), (Func<IServiceProvider, object>)null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.Register(null!, new Class1()));
+        Should.Throw<ArgumentNullException>(() => builder.Register(typeof(Class1), null!));
         Should.Throw<ArgumentOutOfRangeException>(() => builder.Register(typeof(Class1), typeof(Class1), (DI.ServiceLifetime)10));
-        Should.Throw<ArgumentOutOfRangeException>(() => builder.Register(typeof(Class1), _ => null, (DI.ServiceLifetime)10));
+        Should.Throw<ArgumentOutOfRangeException>(() => builder.Register(typeof(Class1), _ => null!, (DI.ServiceLifetime)10));
     }
 
     [Fact]
     public void TryRegister_InvalidParameters()
     {
         var builder = new GraphQLBuilder(new ServiceCollection(), _ => { });
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null, typeof(Class1), DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), (Type)null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null, _ => null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), (Func<IServiceProvider, object>)null, DI.ServiceLifetime.Singleton));
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null, new Class1()));
-        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), null));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null!, typeof(Class1), DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), (Type)null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null!, _ => null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), (Func<IServiceProvider, object>)null!, DI.ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(null!, new Class1()));
+        Should.Throw<ArgumentNullException>(() => builder.TryRegister(typeof(Class1), null!));
         Should.Throw<ArgumentOutOfRangeException>(() => builder.TryRegister(typeof(Class1), typeof(Class1), (DI.ServiceLifetime)10));
-        Should.Throw<ArgumentOutOfRangeException>(() => builder.TryRegister(typeof(Class1), _ => null, (DI.ServiceLifetime)10));
+        Should.Throw<ArgumentOutOfRangeException>(() => builder.TryRegister(typeof(Class1), _ => null!, (DI.ServiceLifetime)10));
     }
 
     [Fact]

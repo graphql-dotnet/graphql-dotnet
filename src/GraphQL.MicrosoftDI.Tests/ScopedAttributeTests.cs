@@ -156,18 +156,18 @@ public class ScopedAttributeTests
         public int Value => _class1.Value;
     }
 
-    private class SampleObserver : IObserver<object>
+    private class SampleObserver : IObserver<object?>
     {
-        private string _expectedData;
+        private string? _expectedData;
 
-        public SampleObserver(string expectedData)
+        public SampleObserver(string? expectedData)
         {
             _expectedData = expectedData;
         }
 
         public void OnCompleted() => throw new NotImplementedException();
         public void OnError(Exception error) => throw new NotImplementedException();
-        public void OnNext(object value)
+        public void OnNext(object? value)
         {
             value.ShouldBe(_expectedData);
             _expectedData = null; //match only once

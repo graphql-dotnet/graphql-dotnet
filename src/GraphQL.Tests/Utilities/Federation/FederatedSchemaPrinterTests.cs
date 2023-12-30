@@ -12,7 +12,7 @@ public class FederatedSchemaPrinterTests
     {
         // Arrange
         var schema = FederatedSchema.For(definitions);
-        SchemaPrinterOptions options = default;
+        SchemaPrinterOptions? options = default;
 
         schema.Initialize();
 

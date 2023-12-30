@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GraphQL.Tests.Subscription;
 
 internal class SampleObservable<T> : IObservable<T>

@@ -70,13 +70,13 @@ public class Bug3415 : QueryTestBase<Bug3415.MySchema>
             Field<MyUnionGraphType>("test")
                 .Resolve(context =>
                 {
-                    context.SubFields.Count.ShouldBe(0); // we don't know concrete union member until we return it from this resolver on the last line
+                    context.SubFields!.Count.ShouldBe(0); // we don't know concrete union member until we return it from this resolver on the last line
                     return new MyObject();
                 });
             Field<MyUnionGraphType>("test_with_typename")
                 .Resolve(context =>
                 {
-                    context.SubFields.Count.ShouldBe(1); // we don't know concrete union member until we return it from this resolver on the last line
+                    context.SubFields!.Count.ShouldBe(1); // we don't know concrete union member until we return it from this resolver on the last line
                     context.SubFields.First().Key.ShouldBe("__typename");
                     return new MyObject();
                 });

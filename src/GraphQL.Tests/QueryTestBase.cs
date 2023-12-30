@@ -5,6 +5,8 @@ using GraphQL.Tests.DI;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
+using Microsoft.Extensions.DependencyInjection;
+using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.Tests;
 
@@ -43,19 +45,19 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
         set => _serviceProvider = value;
     }
 
-    public TSchema Schema => (TSchema)ServiceProvider.GetService(typeof(TSchema)) ?? throw new InvalidOperationException("Schema was not specified in DI container");
+    public TSchema Schema => ServiceProvider.GetService<TSchema>() ?? throw new InvalidOperationException("Schema was not specified in DI container");
 
     public IDocumentExecuter Executer { get; }
 
     public ExecutionResult AssertQuerySuccess(
         string query,
         string expected,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
-        INameConverter nameConverter = null,
+        IEnumerable<IValidationRule>? rules = null,
+        INameConverter? nameConverter = null,
         bool suppressSerializeExpected = false)
     {
         object queryResult = suppressSerializeExpected ? expected : CreateQueryResult(expected);
@@ -64,15 +66,15 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
     public ExecutionResult AssertQueryWithErrors(
         string query,
-        string expected,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        string? expected,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
+        IEnumerable<IValidationRule>? rules = null,
         int expectedErrorCount = 0,
         bool renderErrors = false,
-        Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
+        Func<UnhandledExceptionContext, Task>? unhandledExceptionDelegate = null,
         bool executed = true)
     {
         var queryResult = CreateQueryResult(expected, executed: executed);
@@ -91,15 +93,15 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
     public Task<ExecutionResult> AssertQueryWithErrorsAsync(
         string query,
-        string expected,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        string? expected,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
+        IEnumerable<IValidationRule>? rules = null,
         int expectedErrorCount = 0,
         bool renderErrors = false,
-        Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
+        Func<UnhandledExceptionContext, Task>? unhandledExceptionDelegate = null,
         bool executed = true)
     {
         var queryResult = CreateQueryResult(expected, executed: executed);
@@ -119,14 +121,14 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     public ExecutionResult AssertQueryIgnoreErrors(
         string query,
         ExecutionResult expectedExecutionResult,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
+        IEnumerable<IValidationRule>? rules = null,
         int expectedErrorCount = 0,
         bool renderErrors = false,
-        Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null)
+        Func<UnhandledExceptionContext, Task>? unhandledExceptionDelegate = null)
     {
         return AssertQueryIgnoreErrorsAsync(
             query, expectedExecutionResult, variables, root,
@@ -139,14 +141,14 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     public async Task<ExecutionResult> AssertQueryIgnoreErrorsAsync(
         string query,
         ExecutionResult expectedExecutionResult,
-        Inputs variables = null,
-        object root = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        object? root = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
+        IEnumerable<IValidationRule>? rules = null,
         int expectedErrorCount = 0,
         bool renderErrors = false,
-        Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null)
+        Func<UnhandledExceptionContext, Task>? unhandledExceptionDelegate = null)
     {
         var schema = Schema;
         var runResult = await Executer.ExecuteAsync(options =>
@@ -155,7 +157,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             options.Query = query;
             options.Root = root;
             options.Variables = variables;
-            options.UserContext = userContext;
+            options.UserContext = userContext ?? new Dictionary<string, object?>();
             options.CancellationToken = cancellationToken;
             options.ValidationRules = rules;
             options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
@@ -181,13 +183,13 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     public ExecutionResult AssertQuery(
         string query,
         object expectedExecutionResultOrJson,
-        Inputs variables,
-        object root,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables,
+        object? root,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default,
-        IEnumerable<IValidationRule> rules = null,
-        Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate = null,
-        INameConverter nameConverter = null)
+        IEnumerable<IValidationRule>? rules = null,
+        Func<UnhandledExceptionContext, Task>? unhandledExceptionDelegate = null,
+        INameConverter? nameConverter = null)
     {
         var schema = Schema;
         schema.NameConverter = nameConverter ?? CamelCaseNameConverter.Instance;
@@ -197,7 +199,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             options.Query = query;
             options.Root = root;
             options.Variables = variables;
-            options.UserContext = userContext;
+            options.UserContext = userContext ?? new Dictionary<string, object?>();
             options.CancellationToken = cancellationToken;
             options.ValidationRules = rules;
             options.UnhandledExceptionDelegate = unhandledExceptionDelegate ?? (_ => Task.CompletedTask);
@@ -215,7 +217,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             {
                 additionalInfo += string.Join(Environment.NewLine, runResult.Errors
                     .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                    .Select(x => x.InnerException.Message));
+                    .Select(x => x.InnerException!.Message));
             }
 
             writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);
@@ -224,6 +226,6 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
         return runResult;
     }
 
-    public static ExecutionResult CreateQueryResult(string result, ExecutionErrors errors = null, bool executed = true)
+    public static ExecutionResult CreateQueryResult(string? result, ExecutionErrors? errors = null, bool executed = true)
         => result.ToExecutionResult(errors, executed);
 }

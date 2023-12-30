@@ -27,7 +27,7 @@ public class NameFieldResolverTests
     [InlineData("ShadowedName", "Anyone")]
     [InlineData("BaseName", "Base")]
     [InlineData("BaseMethod", "Base2")]
-    public async Task resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)
+    public async Task resolve_should_work_with_properties_and_methods(string? name, object? expected, bool throws = false)
     {
         var person = new Person
         {
@@ -37,25 +37,25 @@ public class NameFieldResolverTests
 
         var services = new ServiceCollection();
         services.AddSingleton(new Class1());
-        Func<ValueTask<object>> result = () => NameFieldResolver.Instance.ResolveAsync(
+        Func<ValueTask<object?>> result = () => NameFieldResolver.Instance.ResolveAsync(
             new ResolveFieldContext
             {
                 Source = person,
                 FieldDefinition = new FieldType
                 {
-                    Name = name,
+                    Name = name!,
                     Arguments = new QueryArguments
                     {
                         new QueryArgument(new StringGraphType()) { Name = "prefix" },
                     },
                 },
-                FieldAst = new GraphQLField(name == null ? default : new GraphQLName(name)),
+                FieldAst = new GraphQLField(name == null ? default! : new GraphQLName(name)),
                 Arguments = new Dictionary<string, ArgumentValue>()
                 {
                     { "prefix", new ArgumentValue("test ", ArgumentSource.Literal) }
                 },
                 RequestServices = services.BuildServiceProvider(),
-                UserContext = new Dictionary<string, object> { { "name", "Anyone 30" } },
+                UserContext = new Dictionary<string, object?> { { "name", "Anyone 30" } },
             });
 
         if (throws)
@@ -83,7 +83,7 @@ public class NameFieldResolverTests
 
         public string FullInfoWithParam(string prefix) => prefix + FullInfo();
 
-        public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source).FullInfo();
+        public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source!).FullInfo();
 
         public string FromService([FromServices] Class1 obj) => obj.Value;
 

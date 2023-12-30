@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 
@@ -23,14 +21,13 @@ public static class JsonStringExtensions
             Executed = executed
         };
 
+    [return: NotNullIfNotNull("json")]
     public static Dictionary<string, object?>? ToDictionary(this string? json)
     {
         if (json == null)
             return null;
 
         var ret = json.ToInputs();
-        if (ret == null)
-            return null;
 
         return new Dictionary<string, object?>(ret);
     }

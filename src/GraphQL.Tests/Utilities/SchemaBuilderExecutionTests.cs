@@ -46,11 +46,11 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             options.Query = "{ method }";
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("OVERFLOW");
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'method'.");
 
-        string stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace;
+        string stack = result.Errors[0].InnerException.ShouldBeOfType<OverflowException>().StackTrace!;
         if (stack.StartsWith("   в "))
             stack = stack.Remove(0, 5);
         if (stack.StartsWith("   at "))
@@ -78,11 +78,11 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             options.Query = "{ property }";
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("DIVIDE_BY_ZERO");
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'property'.");
 
-        string stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace;
+        string stack = result.Errors[0].InnerException.ShouldBeOfType<DivideByZeroException>().StackTrace!;
         if (stack.StartsWith("   в "))
             stack = stack.Remove(0, 5);
         if (stack.StartsWith("   at "))
@@ -114,7 +114,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             options.Query = "{ test { id name } }";
         });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         result.Errors[0].Code.ShouldBe("INVALID_OPERATION");
         result.Errors[0].Message.ShouldBe("Error trying to resolve field 'name'.");
         result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Expected to find property or method 'name' on type 'Test' but it does not exist.");
@@ -143,8 +143,8 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         });
 
         result.Errors.ShouldBeNull();
-        var data = result.Data.ShouldBeAssignableTo<RootExecutionNode>();
-        var t = data.ToDict()["test"].ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>().ToDict();
+        var data = result.Data.ShouldBeAssignableTo<RootExecutionNode>()!;
+        var t = data.ToDict()["test"].ShouldBeAssignableTo<IReadOnlyDictionary<string, object>>()!.ToDict();
         t["id"].ShouldBe("foo");
         t["name"].ShouldBe("bar");
     }
@@ -213,8 +213,8 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
         var schema = Schema.For("CustomSubscription".ReadSDL());
 
         schema.Query.Name.ShouldBe("CustomQuery");
-        schema.Mutation.Name.ShouldBe("CustomMutation");
-        schema.Subscription.Name.ShouldBe("CustomSubscription");
+        schema.Mutation!.Name.ShouldBe("CustomMutation");
+        schema.Subscription!.Name.ShouldBe("CustomSubscription");
     }
 
     [Theory]
@@ -224,7 +224,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     {
         var schema = Schema.For(
             fileName.ReadSDL(),
-            builder => builder.Types.ForAll(config => config.ResolveType = _ => null)
+            builder => builder.Types.ForAll(config => config.ResolveType = _ => null!)
         );
 
         schema.AllTypes.Count.ShouldBe(expectedCount);
@@ -237,7 +237,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             "PetComplex".ReadSDL(),
             builder =>
             {
-                builder.Types.ForAll(config => config.ResolveType = _ => null);
+                builder.Types.ForAll(config => config.ResolveType = _ => null!);
                 builder.IgnoreComments = false;
             }
         );
@@ -247,21 +247,21 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
 
         var cat = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Cat");
         cat.Description.ShouldBe(" A cat");
-        cat.GetField("name").Description.ShouldBe(" cat's name");
-        cat.GetField("weight").Arguments[0].Name.ShouldBe("inPounds");
-        cat.GetField("weight").Arguments[0].ResolvedType.GetType().ShouldBe(typeof(BooleanGraphType));
-        cat.GetField("weight").Arguments[0].Description.ShouldBe("comment on argument");
+        cat.GetField("name")!.Description.ShouldBe(" cat's name");
+        cat.GetField("weight")!.Arguments![0].Name.ShouldBe("inPounds");
+        cat.GetField("weight")!.Arguments![0].ResolvedType!.GetType().ShouldBe(typeof(BooleanGraphType));
+        cat.GetField("weight")!.Arguments![0].Description.ShouldBe("comment on argument");
         var dog = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Dog");
         dog.Description.ShouldBe(" A dog");
-        dog.GetField("age").Description.ShouldBe(" dog's age");
+        dog.GetField("age")!.Description.ShouldBe(" dog's age");
 
         var pet = schema.AllTypes.OfType<UnionGraphType>().First(t => t.Name == "Pet");
         pet.Description.ShouldBe("Cats with dogs");
         pet.PossibleTypes.Count.ShouldBe(2);
 
         var query = schema.AllTypes.OfType<IComplexGraphType>().First(t => t.Name == "Query");
-        query.GetField("allAnimalsCount").DeprecationReason.ShouldBe("do not touch!");
-        query.GetField("catsGroups").ResolvedType.ToString().ShouldBe("[[Cat!]!]!");
+        query.GetField("allAnimalsCount")!.DeprecationReason.ShouldBe("do not touch!");
+        query.GetField("catsGroups")!.ResolvedType!.ToString().ShouldBe("[[Cat!]!]!");
     }
 
     [Fact]
@@ -564,7 +564,7 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             """);
 
         var type = (InputObjectGraphType)schema.AllTypes.First(t => t.Name == "HumanInput");
-        type.GetField("homePlanet").DefaultValue.ShouldBeNull();
+        type.GetField("homePlanet")!.DefaultValue.ShouldBeNull();
     }
 
     [Fact]
@@ -780,7 +780,7 @@ public class Blog
     public string Title { get; set; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "for tests")]
-    public Post Post(string id, long unused) => PostData.Posts.FirstOrDefault(x => x.Id == id);
+    public Post? Post(string id, long unused) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 [GraphQLMetadata("Query")]
@@ -799,14 +799,14 @@ public class BlogQueryType
 [GraphQLMetadata("Query")]
 public class PostQueryType
 {
-    public Post Post(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
+    public Post? Post(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 [GraphQLMetadata("Query")]
 public class PostQueryRenamedType
 {
     [GraphQLMetadata("post", Description = "A description")]
-    public Post GetPostById(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
+    public Post? GetPostById(string id) => PostData.Posts.FirstOrDefault(x => x.Id == id);
 }
 
 internal abstract class Pet
@@ -863,7 +863,7 @@ internal class ParametersType
         => resolveContext != null && context != null && source != null && id != 0;
 }
 
-internal class MyUserContext : Dictionary<string, object>
+internal class MyUserContext : Dictionary<string, object?>
 {
     public string Name { get; set; }
 }

@@ -147,6 +147,7 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
             "The keys passed to the fetch delegate should be de-duplicated");
     }
 
+#nullable disable
     [Fact]
     public async Task Returns_Null_For_Null_Reference_Types()
     {
@@ -160,4 +161,5 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         var loader = new CollectionBatchDataLoader<int?, string>((_, _) => throw new Exception());
         (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
     }
+#nullable enable
 }

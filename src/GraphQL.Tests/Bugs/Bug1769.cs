@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Bugs;
 // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1769
 public class Bug1769 : QueryTestBase<Bug1769Schema>
 {
-    private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, bool executed = true)
+    private void AssertQueryWithError(string query, string? result, string message, int line, int column, object[]? path, Exception? exception = null, string? code = null, string? inputs = null, bool executed = true)
     {
         var error = exception == null ? new ExecutionError(message) : new ExecutionError(message, exception);
         if (line != 0)
@@ -36,7 +36,7 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             Query = null,
             Schema = Schema,
         });
-        result.Errors.Single().ShouldBeOfType(typeof(QueryMissingError));
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType(typeof(QueryMissingError));
         result.Errors.Single().Locations.ShouldBeNull();
         result.Errors.Single().Path.ShouldBeNull();
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
@@ -60,9 +60,9 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
     {
         _ = new DocumentExecuter();
         _ = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator());
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null, new DocumentValidator()));
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null));
-        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null, new IConfigureExecution[] { }));
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(null!, new DocumentValidator()));
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), null!));
+        Assert.Throws<ArgumentNullException>(() => new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), null!, new IConfigureExecution[] { }));
     }
 }
 

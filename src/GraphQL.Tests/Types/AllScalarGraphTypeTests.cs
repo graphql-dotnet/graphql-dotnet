@@ -109,8 +109,8 @@ public class AllScalarGraphTypeTests
     public void no_parsevalue_null(Type graphType)
     {
         var g = Create(graphType);
-        g.CanParseLiteral(null).ShouldBeFalse();
-        Should.Throw<InvalidOperationException>(() => g.ParseLiteral(null));
+        g.CanParseLiteral(null!).ShouldBeFalse();
+        Should.Throw<InvalidOperationException>(() => g.ParseLiteral(null!));
     }
 
     [Theory]
@@ -148,7 +148,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -215,7 +215,7 @@ public class AllScalarGraphTypeTests
                 continue;
             }
             g.CanParseValue(converted).ShouldBeTrue();
-            object parsed = g.ParseValue(converted);
+            object? parsed = g.ParseValue(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -229,7 +229,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -266,9 +266,9 @@ public class AllScalarGraphTypeTests
 #endif
 
         var g = Create(graphType);
-        object converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
+        object? converted = Newtonsoft.Json.JsonConvert.DeserializeObject(((IFormattable)value).ToString(null, CultureInfo.InvariantCulture));
         g.CanParseValue(converted).ShouldBeTrue();
-        object parsed = g.ParseValue(converted);
+        object? parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
 #if NET5_0_OR_GREATER
         if (parsed is Half h1 && value is Half h2)
@@ -288,7 +288,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -326,9 +326,9 @@ public class AllScalarGraphTypeTests
 
         var g = Create(graphType);
         string valueString = ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
-        object converted = $"{{ \"arg\": {valueString} }}".ToDictionary()["arg"];
-        g.CanParseValue(converted).ShouldBeTrue($"Converted value: {converted}, Type: {converted.GetType()}");
-        object parsed = g.ParseValue(converted);
+        object? converted = $"{{ \"arg\": {valueString} }}".ToDictionary()["arg"];
+        g.CanParseValue(converted).ShouldBeTrue($"Converted value: {converted}, Type: {converted?.GetType()}");
+        object? parsed = g.ParseValue(converted);
         parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
 #if NET5_0_OR_GREATER
         if (parsed is Half h1 && value is Half h2)
@@ -348,7 +348,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -403,7 +403,7 @@ public class AllScalarGraphTypeTests
             }
 
             g.CanParseLiteral(astValue).ShouldBeTrue();
-            object parsed = g.ParseLiteral(astValue);
+            object? parsed = g.ParseLiteral(astValue);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -417,7 +417,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -483,7 +483,7 @@ public class AllScalarGraphTypeTests
             {
                 continue;
             }
-            object parsed = g.Serialize(converted);
+            object? parsed = g.Serialize(converted);
             parsed.ShouldBeOfType(value.GetType()); // be sure that the correct type is returned
             parsed.ShouldBe(value);
         }
@@ -497,7 +497,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(SByteGraphType), (sbyte)0)]
     [InlineData(typeof(SByteGraphType), (sbyte)127)]
     [InlineData(typeof(ShortGraphType), short.MinValue)]
-    [InlineData(typeof(ShortGraphType), (short)default)]
+    [InlineData(typeof(ShortGraphType), (short)0)]
     [InlineData(typeof(ShortGraphType), short.MaxValue)]
     [InlineData(typeof(UShortGraphType), ushort.MinValue)]
     [InlineData(typeof(UShortGraphType), ushort.MaxValue)]
@@ -564,7 +564,7 @@ public class AllScalarGraphTypeTests
                 continue;
             }
             var astActual = g.ToAST(converted);
-            GraphQLValue astExpected = value switch
+            GraphQLValue? astExpected = value switch
             {
                 sbyte sb => new GraphQLIntValue(sb),
                 byte b => new GraphQLIntValue(b),
@@ -577,13 +577,14 @@ public class AllScalarGraphTypeTests
                 BigInteger bi => new GraphQLIntValue(bi),
                 float f => new GraphQLFloatValue(f),
                 double d => new GraphQLFloatValue(d),
-                _ => null
+                _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
             };
             astActual.ShouldBeOfType(astExpected.GetType());
             astActual
                 .ShouldBeAssignableTo<IHasValueNode>()
+                .ShouldNotBeNull()
                 .Value
-                .ShouldBe(astExpected.ShouldBeAssignableTo<IHasValueNode>().Value);
+                .ShouldBe(astExpected.ShouldBeAssignableTo<IHasValueNode>().ShouldNotBeNull().Value);
         }
     }
 
@@ -597,7 +598,7 @@ public class AllScalarGraphTypeTests
     public void parseValue_other_ok(Type graphType, object value, object parsed)
     {
         var g = Create(graphType);
-        object ret = g.ParseValue(value);
+        object? ret = g.ParseValue(value);
         ret.ShouldBeOfType(parsed.GetType());
         ret.ShouldBe(parsed);
         g.CanParseValue(value).ShouldBeTrue();
@@ -619,11 +620,11 @@ public class AllScalarGraphTypeTests
             bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
             double f => new GraphQLFloatValue(f),
             string s => new GraphQLStringValue(s),
-            _ => null
+            _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
         };
 
         var g = Create(graphType);
-        object ret = g.ParseLiteral(astValue);
+        object? ret = g.ParseLiteral(astValue);
         ret.ShouldBeOfType(parsed.GetType());
         ret.ShouldBe(parsed);
         g.CanParseLiteral(astValue).ShouldBeTrue();
@@ -639,7 +640,7 @@ public class AllScalarGraphTypeTests
     public void serialize_other_ok(Type graphType, object value, object serialized)
     {
         var g = Create(graphType);
-        object ret = g.Serialize(value);
+        object? ret = g.Serialize(value);
         ret.ShouldBeOfType(serialized.GetType());
         ret.ShouldBe(serialized);
         g.CanParseValue(value).ShouldBeTrue();
@@ -723,7 +724,7 @@ public class AllScalarGraphTypeTests
             bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
             double d => new GraphQLFloatValue(d),
             string s => new GraphQLStringValue(s),
-            _ => null
+            _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
         };
 
         var g = Create(graphType);
@@ -973,5 +974,5 @@ public class AllScalarGraphTypeTests
         }
     }
 
-    private static ScalarGraphType Create(Type graphType) => (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).Invoke(null);
+    private static ScalarGraphType Create(Type graphType) => (ScalarGraphType)graphType.GetConstructor(Type.EmptyTypes).ShouldNotBeNull().Invoke(null);
 }

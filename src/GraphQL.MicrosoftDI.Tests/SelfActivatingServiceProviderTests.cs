@@ -72,7 +72,7 @@ public class SelfActivatingServiceProviderTests
     public void created_instances_are_not_disposed()
     {
         // if this test "fails", then our documentation needs to change. It does not necessarily indicate a fault.
-        MyClass1 class1 = null;
+        MyClass1? class1 = null;
         var services = new ServiceCollection();
         services.AddSingleton(_ => class1 = new MyClass1());
         var provider = services.BuildServiceProvider();
@@ -80,6 +80,7 @@ public class SelfActivatingServiceProviderTests
         var class2 = myprovider.GetRequiredService<MyClass2>();
         provider.Dispose();
         (myprovider as IDisposable).ShouldBeNull(); // SelfActivatingServiceProvider does not yet support IDisposable
+        class1.ShouldNotBeNull();
         class1.Disposed.ShouldBeTrue();
         class2.Disposed.ShouldBeFalse();
     }
@@ -88,7 +89,7 @@ public class SelfActivatingServiceProviderTests
     public void unregistered_generic_types_return_null()
     {
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        mockServiceProvider.Setup(x => x.GetService(typeof(List<>))).Returns(null).Verifiable();
+        mockServiceProvider.Setup(x => x.GetService(typeof(List<>))).Returns(null!).Verifiable();
         var sasp = new SelfActivatingServiceProvider(mockServiceProvider.Object);
         sasp.GetService(typeof(List<>)).ShouldBeNull();
         mockServiceProvider.Verify();

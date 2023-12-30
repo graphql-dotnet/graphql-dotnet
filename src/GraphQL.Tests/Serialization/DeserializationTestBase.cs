@@ -6,7 +6,7 @@ public class DeserializationTestBase
 {
     protected readonly TestData ExampleData = new()
     {
-        array = new object[]
+        array = new object?[]
         {
             null,
             "test",
@@ -30,9 +30,9 @@ public class DeserializationTestBase
 
     public class TestData
     {
-        public object[] array { get; set; }
+        public object?[] array { get; set; }
         public TestChildData obj { get; set; }
-        public string itemNull { get; set; }
+        public string? itemNull { get; set; }
         public string itemString { get; set; }
         public int itemNum { get; set; }
         public double itemFloat { get; set; }
@@ -41,19 +41,19 @@ public class DeserializationTestBase
 
     public class TestChildData
     {
-        public string itemNull { get; set; }
+        public string? itemNull { get; set; }
         public string itemString { get; set; }
         public int itemNum { get; set; }
         public double itemFloat { get; set; }
     }
 
-    protected void Verify(IReadOnlyDictionary<string, object> actual)
+    protected void Verify(IReadOnlyDictionary<string, object?> actual)
     {
         var array = actual["array"].ShouldBeOfType<List<object>>();
         array[0].ShouldBeNull();
-        array[1].ShouldBeOfType<string>().ShouldBe((string)ExampleData.array[1]);
-        array[2].ShouldBeOfType<int>().ShouldBe((int)ExampleData.array[2]);
-        array[3].ShouldBeOfType<double>().ShouldBe((double)ExampleData.array[3]);
+        array[1].ShouldBeOfType<string>().ShouldBe((string)ExampleData.array[1]!);
+        array[2].ShouldBeOfType<int>().ShouldBe((int)ExampleData.array[2]!);
+        array[3].ShouldBeOfType<double>().ShouldBe((double)ExampleData.array[3]!);
         var obj = actual["obj"].ShouldBeOfType<Dictionary<string, object>>();
         obj["itemNull"].ShouldBeNull();
         obj["itemString"].ShouldBeOfType<string>().ShouldBe(ExampleData.obj.itemString);
