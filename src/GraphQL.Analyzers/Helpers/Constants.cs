@@ -60,6 +60,7 @@ public static class Constants
 
     public static class Types
     {
+        public const string AutoRegisteringInputObjectGraphType = "AutoRegisteringInputObjectGraphType";
         public const string FieldType = "FieldType";
         public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
     }

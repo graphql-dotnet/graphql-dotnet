@@ -4,6 +4,9 @@ using VerifyCS = GraphQL.Analyzers.Tests.VerifiersExtensions.CSharpAnalyzerVerif
 
 namespace GraphQL.Analyzers.Tests;
 
+// AutoRegisteringInputObjectGraphType inherits from InputObjectGraphType.
+// We expect all the functionality for types derived from AutoRegisteringInputObjectGraphType
+// work the same as for types derived from InputObjectGraphType
 public partial class InputGraphTypeAnalyzerTests
 {
     [Theory]
@@ -31,6 +34,18 @@ public partial class InputGraphTypeAnalyzerTests
                   }
               }
 
+              public class AutoCustomInputObjectGraphType : AutoRegisteringInputObjectGraphType<{|#1:MySource|}>
+              {
+              }
+
+              public class MyGraphType : ObjectGraphType
+              {
+                  public MyGraphType()
+                  {
+                      Field<AutoRegisteringInputObjectGraphType<{|#2:MySource|}>>();
+                  }
+              }
+
               public class MySource
               {
                   {{constructor}}
@@ -39,11 +54,15 @@ public partial class InputGraphTypeAnalyzerTests
               """;
 
         var expected = report
-            ? new[]
-            {
+            ?
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-                    .WithLocation(0).WithArguments("MySource")
-            }
+                    .WithLocation(0).WithArguments("MySource"),
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
+                    .WithLocation(1).WithArguments("MySource"),
+                VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
+                    .WithLocation(2).WithArguments("MySource")
+            ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
