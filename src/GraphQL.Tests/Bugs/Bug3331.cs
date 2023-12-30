@@ -85,7 +85,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
             });
     }
 
-    private static IObjectGraphType CreateDataResultObjectGraphType<TEntity>(string name, IObjectGraphType objectGraphType, FuncFieldResolver<DataResult<MyObject>, List<TEntity>> fieldResolver)
+    private static IObjectGraphType CreateDataResultObjectGraphType<TEntity>(string name, IObjectGraphType objectGraphType, FuncFieldResolver<DataResult<MyObject>, List<TEntity>>? fieldResolver)
     {
         var graphType = new ObjectGraphType
         {

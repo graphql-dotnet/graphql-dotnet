@@ -26,7 +26,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.Fields.Single(x => x.Name == "post");
+        var field = query!.Fields.Single(x => x.Name == "post");
         field.GetMetadata<string>("Authorize").ShouldBe("SomePolicy");
     }
 
@@ -58,7 +58,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
 
         var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
-        blog.IsTypeOf.ShouldNotBeNull();
+        blog!.IsTypeOf.ShouldNotBeNull();
         blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
     }
 
@@ -90,7 +90,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
 
         var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
-        blog.IsTypeOf.ShouldNotBeNull();
+        blog!.IsTypeOf.ShouldNotBeNull();
         blog.IsTypeOf(new ABlog()).ShouldBeTrue();
     }
 }
@@ -114,7 +114,7 @@ public class MyAuthorizeAttribute : GraphQLAttribute
 public class PostWithExtraAttributesType
 {
     [GraphQLMetadata("post"), MyAuthorize(Policy = "SomePolicy")]
-    public Post GetPostById(string id)
+    public Post? GetPostById(string id)
     {
         return PostData.Posts.FirstOrDefault(x => x.Id == id);
     }

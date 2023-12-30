@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Caching;
 using GraphQLParser.AST;
 using Moq;

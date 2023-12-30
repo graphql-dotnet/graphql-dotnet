@@ -33,7 +33,7 @@ public class NullableInputListTests : QueryTestBase<TestSchema>
               "example": "null"
             }
             """;
-        AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object>
+        AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object?>
         {
             { "inputs", null }
         }));

@@ -26,7 +26,7 @@ public class Issue1189 : SchemaBuilderTestBase
     [Theory]
     [InlineData(typeof(Issue1189_DroidType_ExecutionError), "Error Message", null)]
     [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve field 'friend'.", "")]
-    public void Issue1189_Should_Work(Type resolverType, string errorMessage, string code)
+    public void Issue1189_Should_Work(Type resolverType, string errorMessage, string? code)
     {
         Builder.Types.Include<Issue1189_Query>();
         Builder.Types.For("Character").Type = typeof(Issue1189_Character);

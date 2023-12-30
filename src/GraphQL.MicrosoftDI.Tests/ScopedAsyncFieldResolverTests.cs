@@ -8,7 +8,7 @@ public class ScopedAsyncFieldResolverTests : ScopedContextBase
         var resolver = new ScopedFieldResolver<string>(context =>
         {
             context.RequestServices.ShouldBe(_scopedServiceProvider);
-            return new ValueTask<string>("success");
+            return new ValueTask<string?>("success");
         });
         (await resolver.ResolveAsync(_scopedContext)).ShouldBe("success");
         VerifyScoped();

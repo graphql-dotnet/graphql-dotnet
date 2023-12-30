@@ -41,7 +41,7 @@ public class ValidationTestBase<TRule, TSchema>
 
             error.Message.ShouldBe(assert.Message);
 
-            string allLocations = string.Concat(error.Locations.Select(l => $"({l.Line},{l.Column})"));
+            string allLocations = string.Concat(error.Locations.ShouldNotBeNull().Select(l => $"({l.Line},{l.Column})"));
             var locations = error.Locations;
 
             for (int j = 0; j < assert.Locations.Count; j++)
@@ -61,7 +61,7 @@ public class ValidationTestBase<TRule, TSchema>
         }
     }
 
-    protected void ShouldPassRule(string query, string variables = null)
+    protected void ShouldPassRule(string query, string? variables = null)
     {
         ShouldPassRule(config =>
         {
@@ -97,7 +97,7 @@ public class ValidationTestBase<TRule, TSchema>
             Schema = schema,
             Document = document,
             Rules = rules,
-            Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault(),
+            Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault()!,
             Variables = variables
         }).Result;
     }

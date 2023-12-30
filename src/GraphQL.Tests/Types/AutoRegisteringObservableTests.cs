@@ -146,7 +146,7 @@ public class AutoRegisteringObservableTests
         var cts = new CancellationTokenSource();
         var context = new ResolveFieldContext() { CancellationToken = cts.Token };
         var observable = await streamResolver.ResolveAsync(context);
-        var mockObserver = new Mock<IObserver<object>>(MockBehavior.Strict);
+        var mockObserver = new Mock<IObserver<object?>>(MockBehavior.Strict);
         var tcs = new TaskCompletionSource<bool>();
         mockObserver.Setup(x => x.OnNext("canceled")).Callback(() => tcs.SetResult(true)).Verifiable();
         var disposer = observable.Subscribe(mockObserver.Object);
@@ -172,7 +172,7 @@ public class AutoRegisteringObservableTests
             var context = new ResolveFieldContext()
             {
                 RequestServices = services.BuildServiceProvider(),
-                OutputExtensions = new Dictionary<string, object>(),
+                OutputExtensions = new Dictionary<string, object?>(),
             };
             // the ServiceTestClass will be created during the call to ResolveAsync
             var observable = await streamResolver.ResolveAsync(context);
@@ -197,8 +197,8 @@ public class AutoRegisteringObservableTests
             var context = new ResolveFieldContext()
             {
                 RequestServices = services.BuildServiceProvider(),
-                InputExtensions = new Dictionary<string, object>() { { "in", inService } },
-                OutputExtensions = new Dictionary<string, object>(),
+                InputExtensions = new Dictionary<string, object?>() { { "in", inService } },
+                OutputExtensions = new Dictionary<string, object?>(),
             };
             // the ServiceTestClass will be created during the call to ResolveAsync
             var observable = await streamResolver.ResolveAsync(context);
@@ -224,8 +224,8 @@ public class AutoRegisteringObservableTests
                 Query = new DummyType(),
                 Subscription = new AutoRegisteringObjectGraphType<TestClass>(),
             },
-            Variables = new Dictionary<string, object>() { { "n", 2 } }.ToInputs(),
-            Extensions = new Dictionary<string, object>() { { "ext", 20 } }.ToInputs(),
+            Variables = new Dictionary<string, object?>() { { "n", 2 } }.ToInputs(),
+            Extensions = new Dictionary<string, object?>() { { "ext", 20 } }.ToInputs(),
             EnableMetrics = true,
             Root = "root",
             User = new ClaimsPrincipal(new ClaimsIdentity("test")),
@@ -246,21 +246,21 @@ public class AutoRegisteringObservableTests
         public static async Task<IObservable<string>> ListOfStrings2() => new string[] { "a", "b", "c" }.ToObservable();
         public static async ValueTask<IObservable<string>> ListOfStrings3() => new string[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static IObservable<object> ListOfStrings4() => new object[] { "a", "b", "c" }.ToObservable();
+        public static IObservable<object?> ListOfStrings4() => new object[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static async Task<IObservable<object>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
+        public static async Task<IObservable<object?>> ListOfStrings5() => new object[] { "a", "b", "c" }.ToObservable();
         [OutputType(typeof(StringGraphType))]
-        public static async ValueTask<IObservable<object>> ListOfStrings6() => new object[] { "a", "b", "c" }.ToObservable();
+        public static async ValueTask<IObservable<object?>> ListOfStrings6() => new object[] { "a", "b", "c" }.ToObservable();
 
         public static IObservable<int> ListOfNumbers1() => new int[] { 1, 2, 3 }.ToObservable();
         public static async Task<IObservable<int>> ListOfNumbers2() => new int[] { 1, 2, 3 }.ToObservable();
         public static async ValueTask<IObservable<int>> ListOfNumbers3() => new int[] { 1, 2, 3 }.ToObservable();
         [OutputType(typeof(IntGraphType))]
-        public static IObservable<object> ListOfNumbers4() => new object[] { 1, 2, 3 }.ToObservable();
+        public static IObservable<object?> ListOfNumbers4() => new object[] { 1, 2, 3 }.ToObservable();
         [OutputType(typeof(IntGraphType))]
-        public static async Task<IObservable<object>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
+        public static async Task<IObservable<object?>> ListOfNumbers5() => new object[] { 1, 2, 3 }.ToObservable();
         [OutputType(typeof(IntGraphType))]
-        public static async ValueTask<IObservable<object>> ListOfNumbers6() => new object[] { 1, 2, 3 }.ToObservable();
+        public static async ValueTask<IObservable<object?>> ListOfNumbers6() => new object[] { 1, 2, 3 }.ToObservable();
 
         public static IObservable<string> ReturnError1() => Observable.Throw<string>(new Exception("sample error"));
         public static async Task<IObservable<string>> ReturnError2() => Observable.Throw<string>(new Exception("sample error"));
@@ -379,12 +379,12 @@ public class AutoRegisteringObservableTests
             num.ShouldBe(2);
             context.Document.Source.ShouldBe("subscription($n:Int!) { resolveFieldContextPassThrough(num:$n) @skip(if:false) }");
             context.GetArgument<int>("num").ShouldBe(2);
-            context.Arguments["num"].Source.ShouldBe(ArgumentSource.Variable);
+            context.Arguments!["num"].Source.ShouldBe(ArgumentSource.Variable);
             context.Variables.ValueFor("n", out var argValue).ShouldBeTrue();
             argValue.Value.ShouldBe(2);
             context.InputExtensions["ext"].ShouldBe(20);
             context.ArrayPool.ShouldNotBeNull();
-            context.Directives["skip"].ShouldNotBeNull().Arguments["if"].Value.ShouldBe(false);
+            context.Directives!["skip"].ShouldNotBeNull().Arguments["if"].Value.ShouldBe(false);
             context.Errors.ShouldNotBeNull();
             context.FieldAst.Name.Value.ShouldBe("resolveFieldContextPassThrough");
             context.FieldDefinition.Name.ShouldBe("resolveFieldContextPassThrough");
@@ -395,10 +395,10 @@ public class AutoRegisteringObservableTests
             context.Path.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
             context.ResponsePath.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
             context.RootValue.ShouldBe("root");
-            context.Schema.Subscription.Name.ShouldBe("TestClass");
+            context.Schema.Subscription!.Name.ShouldBe("TestClass");
             context.Source.ShouldBe("root");
             context.SubFields.ShouldBeNull();
-            context.User.Identity.AuthenticationType.ShouldBe("test");
+            context.User!.Identity!.AuthenticationType.ShouldBe("test");
             context.UserContext["key1"].ShouldBe("value1");
             yield return "1";
         }

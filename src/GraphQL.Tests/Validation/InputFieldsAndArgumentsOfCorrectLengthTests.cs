@@ -31,7 +31,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                   }
                 }
                 """;
-            _.Variables = new Dictionary<string, object> { ["value"] = "aaaa" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "aaaa" }.ToInputs();
         });
     }
 
@@ -71,7 +71,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "ObjectField 'stringField' has invalid length (2). Length must be in range [3, 7].",
                line: 4,
                column: 56);
-            _.Variables = new Dictionary<string, object> { ["value"] = "aa" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "aa" }.ToInputs();
         });
     }
 
@@ -111,7 +111,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "ObjectField 'stringField' has invalid length (8). Length must be in range [3, 7].",
                line: 4,
                column: 56);
-            _.Variables = new Dictionary<string, object> { ["value"] = "aaaaaaaa" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "aaaaaaaa" }.ToInputs();
         });
     }
 
@@ -151,7 +151,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "ObjectField 'stringField' has invalid length (null). Length must be in range [3, 7].",
                line: 4,
                column: 56);
-            _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = null }.ToInputs();
         });
     }
 
@@ -264,7 +264,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                   }
                 }
                 """;
-            _.Variables = new Dictionary<string, object> { ["value"] = "aaa" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "aaa" }.ToInputs();
         });
     }
 
@@ -304,7 +304,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "Argument 'id' has invalid length (1). Length must be in range [2, 5].",
                line: 3,
                column: 9);
-            _.Variables = new Dictionary<string, object> { ["value"] = "a" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "a" }.ToInputs();
         });
     }
 
@@ -344,7 +344,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "Argument 'id' has invalid length (6). Length must be in range [2, 5].",
                line: 3,
                column: 9);
-            _.Variables = new Dictionary<string, object> { ["value"] = "aaaaaa" }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = "aaaaaa" }.ToInputs();
         });
     }
 
@@ -384,7 +384,7 @@ public class InputFieldsAndArgumentsOfCorrectLengthTests : ValidationTestBase<In
                message: "Argument 'id' has invalid length (null). Length must be in range [2, 5].",
                line: 3,
                column: 9);
-            _.Variables = new Dictionary<string, object> { ["value"] = null }.ToInputs();
+            _.Variables = new Dictionary<string, object?> { ["value"] = null }.ToInputs();
         });
     }
 }

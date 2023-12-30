@@ -132,9 +132,9 @@ public class Issue1874Base64GraphType : ScalarGraphType
         };
     }
 
-    public override object ParseValue(object value)
-        => System.Convert.FromBase64String(value.ToString());
+    public override object? ParseValue(object? value)
+        => System.Convert.FromBase64String(value!.ToString()!);
 
-    public override object Serialize(object value)
-        => System.Convert.ToBase64String(value is byte[] valueBytes ? valueBytes : ((System.Collections.Generic.IEnumerable<byte>)value).ToArray());
+    public override object? Serialize(object? value)
+        => System.Convert.ToBase64String(value is byte[] valueBytes ? valueBytes : ((System.Collections.Generic.IEnumerable<byte>)value!).ToArray());
 }

@@ -17,8 +17,8 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
         var usersStore = mock.Object;
 
-        User user1 = null;
-        User user2 = null;
+        User? user1 = null;
+        User? user2 = null;
 
         var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
@@ -57,13 +57,13 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
         var usersStore = mock.Object;
 
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
-        User user4 = null;
-        User user5 = null;
+        User? user1 = null;
+        User? user2 = null;
+        User? user3 = null;
+        User? user4 = null;
+        User? user5 = null;
 
-        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, null, null, 2);
+        var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync, maxBatchSize: 2);
 
         // Start async tasks to load by ID
         var result1 = loader.LoadAsync(1);
@@ -117,9 +117,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
         var usersStore = mock.Object;
 
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
+        User? user1 = null;
+        User? user2 = null;
+        User? user3 = null;
 
         var loader = new BatchDataLoader<int, User>(usersStore.GetUsersByIdAsync);
 
@@ -166,9 +166,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var usersStore = mock.Object;
         var nullObjectUser = new User();
 
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
+        User? user1 = null;
+        User? user2 = null;
+        User? user3 = null;
 
         // There is no user with the ID of 3
         // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
@@ -213,9 +213,9 @@ public class BatchDataLoaderTests : DataLoaderTestBase
 
         var nullObjectUser = new User();
 
-        User user1 = null;
-        User user2 = null;
-        User user3 = null;
+        User? user1 = null;
+        User? user2 = null;
+        User? user3 = null;
 
         // There is no user with the ID of 3
         // 3 will not be in the returned Dictionary, so the DataLoader should use the specified default value
@@ -370,6 +370,7 @@ public class BatchDataLoaderTests : DataLoaderTestBase
             "The keys passed to the fetch delegate should be de-duplicated");
     }
 
+#nullable disable
     [Fact]
     public async Task Returns_Null_For_Null_Reference_Types()
     {
@@ -383,4 +384,5 @@ public class BatchDataLoaderTests : DataLoaderTestBase
         var loader = new BatchDataLoader<int?, string>((_, _) => throw new Exception());
         (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
     }
+#nullable enable
 }

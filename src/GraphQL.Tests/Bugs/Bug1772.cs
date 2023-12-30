@@ -8,10 +8,10 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
 {
     [Theory]
     [InlineData("")]
-    [InlineData((string)null)]
+    [InlineData(null)]
     [InlineData("firstQuery")]
     [InlineData("secondQuery")]
-    public async Task DocumentExecuter_works_for_valid_operation(string operationName)
+    public async Task DocumentExecuter_works_for_valid_operation(string? operationName)
     {
         var de = new DocumentExecuter();
         var valid = await de.ExecuteAsync(new ExecutionOptions

@@ -21,7 +21,7 @@ public class InputsConverterTests
     {
         using var stringReader = new System.IO.StringReader(json);
         using var jsonReader = new JsonTextReader(stringReader);
-        return _jsonSerializer.Deserialize<T>(jsonReader);
+        return _jsonSerializer.Deserialize<T>(jsonReader)!;
     }
 
     private string Serialize<T>(T data)
@@ -112,8 +112,7 @@ public class InputsConverterTests
 
         var actual = Deserialize<Inputs>(json);
 
-        actual["values"].ShouldNotBeNull();
-        object values = actual["values"];
+        object values = actual["values"].ShouldNotBeNull();
         values.ShouldBeAssignableTo<IEnumerable<object>>();
     }
 
@@ -133,7 +132,7 @@ public class InputsConverterTests
 
         var actual = Deserialize<Inputs>(json);
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -161,7 +160,7 @@ public class InputsConverterTests
         actual["int"].ShouldBe(123);
         actual["bool"].ShouldBe(true);
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -215,7 +214,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string"
@@ -243,7 +242,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["string"] = null
             }.ToInputs(),
@@ -269,11 +268,11 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string",
-                ["complex"] = new Dictionary<string, object>
+                ["complex"] = new Dictionary<string, object?>
                 {
                     ["double"] = 1.123d
                 }
@@ -315,13 +314,13 @@ public class InputsConverterTests
             },
         });
 
-        var dic = jsonSerializer.Deserialize<Inputs>(new JsonTextReader(new StringReader(json)));
+        var dic = jsonSerializer.Deserialize<Inputs>(new JsonTextReader(new StringReader(json)))!;
         dic.ShouldContainKeyAndValue("date", d);
     }
 
     private class Nested
     {
-        public string Value1 { get; set; }
+        public string? Value1 { get; set; }
 
         public Inputs Dictionary { get; set; }
 

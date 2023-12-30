@@ -7,11 +7,11 @@ namespace GraphQL.Tests.Utilities;
 public class SchemaPrinterTests
 {
     private string printSingleFieldSchema<T>(
-        IEnumerable<QueryArgument> arguments = null)
+        IEnumerable<QueryArgument>? arguments = null)
         where T : GraphType
     {
         var root = new ObjectGraphType { Name = "Query" };
-        root.Field<T>("singleField").Arguments(arguments);
+        root.Field<T>("singleField").Arguments(arguments ?? []);
 
         var schema = new Schema
         {
@@ -72,10 +72,10 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_directive()
     {
-        var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
+        var printer = new SchemaPrinter(null!, new SchemaPrinterOptions { IncludeDescriptions = true });
         var skip = new SkipDirective();
-        var arg = skip.Arguments.First();
-        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
+        var arg = skip.Arguments.ShouldNotBeNull().First();
+        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type.ShouldNotBeNull(), null!);
 
         string result = printer.PrintDirective(skip);
         const string expected = """"
@@ -93,10 +93,10 @@ public class SchemaPrinterTests
     [Fact]
     public void prints_directive_2()
     {
-        var printer = new SchemaPrinter(null, new SchemaPrinterOptions { IncludeDescriptions = true });
+        var printer = new SchemaPrinter(null!, new SchemaPrinterOptions { IncludeDescriptions = true });
         var skip = new SkipDirective();
-        var arg = skip.Arguments.First();
-        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type, null);
+        var arg = skip.Arguments.ShouldNotBeNull().First();
+        arg.ResolvedType = new TestSchemaTypes().BuildGraphQLType(arg.Type.ShouldNotBeNull(), null!);
 
         string result = printer.PrintDirective(skip);
         const string expected = """"
@@ -115,7 +115,7 @@ public class SchemaPrinterTests
     public void prints_directive_without_arguments()
     {
         var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query);
-        string result = new SchemaPrinter(null).PrintDirective(d);
+        string result = new SchemaPrinter(null!).PrintDirective(d);
         result.ShouldBe("directive @my on FIELD | QUERY");
     }
 
@@ -123,7 +123,7 @@ public class SchemaPrinterTests
     public void prints_repeatable_directive_without_arguments()
     {
         var d = new Directive("my", DirectiveLocation.Field, DirectiveLocation.Query) { Repeatable = true };
-        string result = new SchemaPrinter(null).PrintDirective(d);
+        string result = new SchemaPrinter(null!).PrintDirective(d);
         result.ShouldBe("directive @my repeatable on FIELD | QUERY");
     }
 
@@ -135,7 +135,7 @@ public class SchemaPrinterTests
             Repeatable = true,
             Arguments = new QueryArguments(new QueryArgument(new IntGraphType()) { Name = "max" })
         };
-        string result = new SchemaPrinter(null).PrintDirective(d);
+        string result = new SchemaPrinter(null!).PrintDirective(d);
         result.ShouldBe("""
             directive @my(
               max: Int
@@ -1715,7 +1715,7 @@ type Zebra {
 
     public class SomeInput2
     {
-        public IList<string> Names { get; set; }
+        public IList<string>? Names { get; set; }
     }
 
     public class OddType : ScalarGraphType
@@ -1725,9 +1725,9 @@ type Zebra {
             Name = "Odd";
         }
 
-        public override object ParseValue(object value) => null;
+        public override object? ParseValue(object? value) => null;
 
-        public override object ParseLiteral(GraphQLValue value) => null;
+        public override object? ParseLiteral(GraphQLValue value) => null;
     }
 
     public class RgbEnum : EnumerationGraphType

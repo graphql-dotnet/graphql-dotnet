@@ -21,6 +21,6 @@ internal static class ServiceRegisterExtensions
 
     public static void Singleton<TService>(this IServiceRegister register, TService instance)
     {
-        register.Register(typeof(TService), instance);
+        register.Register(typeof(TService), instance!);
     }
 }

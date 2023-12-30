@@ -11,13 +11,13 @@ public class AdapterTests
     [Fact]
     public void NullBaseContextThrows()
     {
-        Should.Throw<ArgumentNullException>(() => new ScopedResolveFieldContextAdapter<string>(null, null));
+        Should.Throw<ArgumentNullException>(() => new ScopedResolveFieldContextAdapter<string>(null!, null!));
     }
 
     [Fact]
     public void AllowNullProvider()
     {
-        var adapter = new ScopedResolveFieldContextAdapter<object>(new ResolveFieldContext(), null);
+        var adapter = new ScopedResolveFieldContextAdapter<object>(new ResolveFieldContext(), null!);
         adapter.RequestServices.ShouldBeNull();
     }
 
@@ -28,19 +28,19 @@ public class AdapterTests
         {
             Source = "hello"
         };
-        Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(rfc, null));
+        Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(rfc, null!));
     }
 
     [Fact]
     public void SourceNullThrowsForValueTypes()
     {
-        Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(new ResolveFieldContext(), null));
+        Should.Throw<ArgumentException>(() => new ScopedResolveFieldContextAdapter<int>(new ResolveFieldContext(), null!));
     }
 
     [Fact]
     public void SourceNullNullableTypes()
     {
-        var adapter = new ScopedResolveFieldContextAdapter<int?>(new ResolveFieldContext(), null);
+        var adapter = new ScopedResolveFieldContextAdapter<int?>(new ResolveFieldContext(), null!);
         adapter.Source.ShouldBeNull();
     }
 
@@ -54,8 +54,8 @@ public class AdapterTests
             CancellationToken = default,
             Document = new GraphQLDocument(new()),
             Errors = new ExecutionErrors(),
-            InputExtensions = new Dictionary<string, object>() { { "7", new object() } },
-            OutputExtensions = new Dictionary<string, object>() { { "1", new object() } },
+            InputExtensions = new Dictionary<string, object?>() { { "7", new object() } },
+            OutputExtensions = new Dictionary<string, object?>() { { "1", new object() } },
             FieldAst = new GraphQLField(new GraphQLName("test")),
             FieldDefinition = new FieldType(),
             Metrics = new Instrumentation.Metrics(),
@@ -68,7 +68,7 @@ public class AdapterTests
             Schema = Mock.Of<ISchema>(),
             Source = "hello",
             SubFields = new Dictionary<string, (GraphQLField, FieldType)>(),
-            UserContext = new Dictionary<string, object>() { { "3", new object() } },
+            UserContext = new Dictionary<string, object?>() { { "3", new object() } },
             Variables = new Variables(),
         };
         var rs = Mock.Of<IServiceProvider>();

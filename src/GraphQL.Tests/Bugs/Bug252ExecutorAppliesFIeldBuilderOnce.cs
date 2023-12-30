@@ -12,7 +12,7 @@ public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
     public int AppliedCount;
     private readonly FieldMiddlewareBuilder overriddenBuilder = new();
 
-    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
+    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
     {
         AppliedCount++;
         return overriddenBuilder.Build();

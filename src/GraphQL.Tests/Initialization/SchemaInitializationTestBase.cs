@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Initialization;
 
 public abstract class SchemaInitializationTestBase
 {
-    public void ShouldThrow<TSchema, TException>(Action<TException> assert = null)
+    public void ShouldThrow<TSchema, TException>(Action<TException>? assert = null)
         where TSchema : Schema, new()
         where TException : Exception
     {

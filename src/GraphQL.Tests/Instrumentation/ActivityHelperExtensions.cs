@@ -10,7 +10,7 @@ internal static class ActivityHelperExtensions
     private const string OkStatusCodeTagValue = "OK";
     private const string ErrorStatusCodeTagValue = "ERROR";
 
-    private static ActivityStatusCode? GetStatusCodeForTagValue(string statusCodeTagValue)
+    private static ActivityStatusCode? GetStatusCodeForTagValue(string? statusCodeTagValue)
     {
         return statusCodeTagValue switch
         {
@@ -21,7 +21,7 @@ internal static class ActivityHelperExtensions
         };
     }
 
-    private static bool TryGetStatusCodeForTagValue(string statusCodeTagValue, out ActivityStatusCode statusCode)
+    private static bool TryGetStatusCodeForTagValue(string? statusCodeTagValue, out ActivityStatusCode statusCode)
     {
         ActivityStatusCode? tempStatusCode = GetStatusCodeForTagValue(statusCodeTagValue);
 
@@ -39,9 +39,9 @@ internal static class ActivityHelperExtensions
     /// <param name="statusCode"><see cref="StatusCode"/>.</param>
     /// <param name="statusDescription">Status description.</param>
     /// <returns><see langword="true"/> if <see cref="Status"/> was found on the supplied Activity.</returns>
-    private static bool TryGetStatus(this Activity activity, out ActivityStatusCode statusCode, out string statusDescription)
+    private static bool TryGetStatus(this Activity activity, out ActivityStatusCode statusCode, out string? statusDescription)
     {
-        Debug.Assert(activity != null, "Activity should not be null");
+        activity.ShouldNotBeNull();
 
         bool foundStatusCode = false;
         statusCode = default;
@@ -82,7 +82,7 @@ internal static class ActivityHelperExtensions
 #if NET6_0_OR_GREATER
         return activity.Status;
 #else
-        return activity.TryGetStatus(out var statusCode, out string statusDescription)
+        return activity.TryGetStatus(out var statusCode, out string? statusDescription)
             ? statusCode
             : ActivityStatusCode.Unset;
 #endif

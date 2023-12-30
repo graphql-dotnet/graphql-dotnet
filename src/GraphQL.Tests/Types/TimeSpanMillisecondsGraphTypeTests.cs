@@ -46,7 +46,7 @@ public class TimeSpanMillisecondsGraphTypeTests
     {
         CultureTestHelper.UseCultures(() =>
         {
-            object actual = _type.Serialize(value);
+            object? actual = _type.Serialize(value);
             actual.ShouldBeOfType<long>().ShouldBe(value is BigInteger b ? (long)b : Convert.ToInt64(value));
         });
     }
@@ -56,8 +56,8 @@ public class TimeSpanMillisecondsGraphTypeTests
     {
         CultureTestHelper.UseCultures(() =>
         {
-            long expected = (long)new TimeSpan(1, 2, 3, 4, 5).TotalMilliseconds;
-            object actual = _type.Serialize(new TimeSpan(1, 2, 3, 4, 5));
+            long? expected = (long)new TimeSpan(1, 2, 3, 4, 5).TotalMilliseconds;
+            object? actual = _type.Serialize(new TimeSpan(1, 2, 3, 4, 5));
             actual.ShouldBe(expected);
         });
     }
@@ -69,7 +69,7 @@ public class TimeSpanMillisecondsGraphTypeTests
         {
             var expected = new TimeSpan(1, 2, 3, 4, 5);
 
-            object actual = _type.ParseValue(expected);
+            object? actual = _type.ParseValue(expected);
 
             actual.ShouldBe(expected);
         });
@@ -84,13 +84,13 @@ public class TimeSpanMillisecondsGraphTypeTests
         {
             var expected = TimeSpan.FromMilliseconds(Convert.ToDouble(value));
 
-            GraphQLValue ast = value switch
+            GraphQLValue? ast = value switch
             {
                 int i => new GraphQLIntValue(i),
                 long l => new GraphQLIntValue(l),
                 _ => null
             };
-            object actual = _type.ParseLiteral(ast);
+            object? actual = _type.ParseLiteral(ast!);
 
             actual.ShouldBe(expected);
         });
@@ -104,7 +104,7 @@ public class TimeSpanMillisecondsGraphTypeTests
         {
             var expected = TimeSpan.FromMilliseconds(value is BigInteger b ? (double)b : Convert.ToDouble(value));
 
-            object actual = _type.ParseValue(value);
+            object? actual = _type.ParseValue(value);
 
             actual.ShouldBe(expected);
         });
@@ -116,9 +116,9 @@ public class TimeSpanMillisecondsGraphTypeTests
         CultureTestHelper.UseCultures(() =>
         {
             var expected = new TimeSpan(1, 2, 3, 4);
-            int input = (int)new TimeSpan(1, 2, 3, 4).TotalMilliseconds;
+            int? input = (int)new TimeSpan(1, 2, 3, 4).TotalMilliseconds;
 
-            object actual = _type.ParseValue(input);
+            object? actual = _type.ParseValue(input);
 
             actual.ShouldBe(expected);
         });

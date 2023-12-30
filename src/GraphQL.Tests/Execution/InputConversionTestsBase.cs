@@ -78,7 +78,7 @@ public abstract class InputConversionTestsBase
         const string json = """{"a": 1}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1);
-        inputs["a"].GetType().ShouldBe(typeof(int));
+        inputs["a"]!.GetType().ShouldBe(typeof(int));
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public abstract class InputConversionTestsBase
         const string json = """{"a": 1000000000000000001}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1000000000000000001);
-        inputs["a"].GetType().ShouldBe(typeof(long));
+        inputs["a"]!.GetType().ShouldBe(typeof(long));
     }
 
     [Fact]
@@ -273,7 +273,7 @@ public abstract class InputConversionTestsBase
         var myInput = inputs.ToObject<EnumInput>();
 
         myInput.ShouldNotBeNull();
-        myInput.B.Value.ShouldBe(Numbers2.Three);
+        myInput.B!.Value.ShouldBe(Numbers2.Three);
     }
 
     [Fact]
@@ -338,24 +338,24 @@ public abstract class InputConversionTestsBase
         var inputs = VariablesToInputs(json);
 
         // before custom converter
-        var person1 = inputs.ToObject<Person>();
+        var person1 = inputs.ToObject<Person>()!;
         person1.Name.ShouldBe("tom");
         person1.Age.ShouldBe(10);
 
         ValueConverter.Register(v => new Person { Name = (string)v["name"] + "sample", Age = (int)v["age"] + 2 });
 
         // after registering custom converter
-        var person2 = inputs.ToObject<Person>();
+        var person2 = inputs.ToObject<Person>()!;
         person2.Name.ShouldBe("tomsample");
         person2.Age.ShouldBe(12);
 
         // after unregistering custom converter
         ValueConverter.Register<Person>(null);
 
-        var person3 = inputs.ToObject<Person>();
+        var person3 = inputs.ToObject<Person>()!;
         person3.Name.ShouldBe("tom");
         person3.Age.ShouldBe(10);
     }
 
-    protected abstract Inputs VariablesToInputs(string variables);
+    protected abstract Inputs VariablesToInputs(string? variables);
 }

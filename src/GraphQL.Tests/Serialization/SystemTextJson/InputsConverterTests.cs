@@ -52,7 +52,7 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["int"].ShouldBe(123);
         actual["double"].ShouldBe(123.456);
@@ -69,7 +69,7 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["string"].ShouldBeNull();
     }
@@ -83,7 +83,7 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["values"].ShouldNotBeNull();
     }
@@ -97,10 +97,9 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
-        actual["values"].ShouldNotBeNull();
-        object values = actual["values"];
+        object values = actual["values"].ShouldNotBeNull();
         values.ShouldBeAssignableTo<IEnumerable<object>>();
     }
 
@@ -118,9 +117,9 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -143,12 +142,12 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["int"].ShouldBe(123);
         actual["bool"].ShouldBe(true);
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -171,7 +170,7 @@ public class InputsConverterTests
             }
             """;
 
-        var actual = JsonSerializer.Deserialize<Nested>(json, _options);
+        var actual = JsonSerializer.Deserialize<Nested>(json, _options)!;
 
         actual.Value1.ShouldBe("string");
         actual.Value2.ShouldBe(123);
@@ -202,7 +201,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string"
@@ -230,7 +229,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["string"] = null
             }.ToInputs(),
@@ -256,11 +255,11 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string",
-                ["complex"] = new Dictionary<string, object>
+                ["complex"] = new Dictionary<string, object?>
                 {
                     ["double"] = 1.123d
                 }
@@ -288,7 +287,7 @@ public class InputsConverterTests
 
     private class Nested
     {
-        public string Value1 { get; set; }
+        public string? Value1 { get; set; }
 
         public Inputs Dictionary { get; set; }
 

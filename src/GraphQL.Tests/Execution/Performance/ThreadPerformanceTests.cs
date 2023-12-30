@@ -24,7 +24,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
             Field<StringGraphType, string>("quarterSecond").ResolveAsync(_ => Get(500, "Quarter"));
         }
 
-        private async Task<string> Get(int milliseconds, string result)
+        private async Task<string?> Get(int milliseconds, string result)
         {
             await Task.Delay(milliseconds).ConfigureAwait(false);
             return result;
@@ -43,11 +43,11 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
             Field<StringGraphType, string>("setOne").ResolveAsync(_ => Set("1"));
         }
 
-        private Task<string> Set(string result)
+        private Task<string?> Set(string result)
         {
             Calls.Add(result);
             string list = string.Join(",", Calls.ToList());
-            return Task.FromResult(list);
+            return Task.FromResult<string?>(list);
         }
     }
 
@@ -120,6 +120,6 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
         });
 
         result.Errors.ShouldBeNull();
-        ((string)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
+        ((string?)result.Data.ToDict()["m17"]).ShouldBe("5,5,1,1,1,5,5,5,5,1,5,1,5,1,5,1,5");
     }
 }

@@ -5,7 +5,6 @@
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

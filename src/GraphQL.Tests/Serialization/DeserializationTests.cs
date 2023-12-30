@@ -8,7 +8,7 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void StringToInputs(IGraphQLTextSerializer serializer)
     {
-        var actual = serializer.Deserialize<Inputs>(ExampleJson);
+        var actual = serializer.Deserialize<Inputs>(ExampleJson)!;
         Verify(actual);
     }
 
@@ -17,7 +17,7 @@ public class DeserializationTests : DeserializationTestBase
     public void FromJson(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         Verify(actual.Variables);
     }
@@ -27,7 +27,7 @@ public class DeserializationTests : DeserializationTestBase
     public void FromJson_Null(IGraphQLTextSerializer serializer)
     {
         const string test = "{\"query\":\"hello\",\"variables\":null}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         actual.Variables.ShouldBeNull();
     }
@@ -37,7 +37,7 @@ public class DeserializationTests : DeserializationTestBase
     public void FromJson_Missing(IGraphQLTextSerializer serializer)
     {
         const string test = "{\"query\":\"hello\"}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         actual.Variables.ShouldBeNull();
     }
@@ -47,10 +47,10 @@ public class DeserializationTests : DeserializationTestBase
     public void FromJson_IsCaseInsensitive_Element(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass2>(test);
+        var actual = serializer.Deserialize<TestClass2>(test)!;
         actual.Query.ShouldBe("hello");
         var variables = serializer.ReadNode<Inputs>(actual.Variables);
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
@@ -58,10 +58,10 @@ public class DeserializationTests : DeserializationTestBase
     public void FromJson_IsCaseInsensitive_Inputs(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         var variables = actual.Variables;
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
@@ -71,7 +71,7 @@ public class DeserializationTests : DeserializationTestBase
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
         var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
         var actual = await serializer.ReadAsync<TestClass1>(testData);
-        actual.Query.ShouldBe("hello");
+        actual!.Query.ShouldBe("hello");
         Verify(actual.Variables);
         // verify that the stream has not been disposed
         testData.ReadByte().ShouldBe(-1);
@@ -85,9 +85,9 @@ public class DeserializationTests : DeserializationTestBase
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
         var actual = serializer.Deserialize<TestClass2>(test);
-        actual.Query.ShouldBe("hello");
+        actual!.Query.ShouldBe("hello");
         var variables = serializer.ReadNode<Inputs>(actual.Variables);
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
@@ -96,7 +96,7 @@ public class DeserializationTests : DeserializationTestBase
     {
         var date = new DateTimeOffset(2022, 2, 6, 12, 26, 53, TimeSpan.FromHours(-5));
         string dateStr = date.ToString("O");
-        var actual = serializer.Deserialize<Inputs>($"{{\"date\":\"{dateStr}\"}}");
+        var actual = serializer.Deserialize<Inputs>($"{{\"date\":\"{dateStr}\"}}")!;
         actual.ShouldContainKeyAndValue("date", dateStr);
     }
 

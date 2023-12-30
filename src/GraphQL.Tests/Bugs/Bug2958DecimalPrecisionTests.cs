@@ -32,7 +32,7 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 }
 """;
 
-        var inputs = serializer.Deserialize<GraphQLRequest>(request);
+        var inputs = serializer.Deserialize<GraphQLRequest>(request)!;
         inputs.Variables.ShouldNotBeNull();
         inputs.Variables.Count.ShouldBe(1);
         var inner = inputs.Variables["input"].ShouldBeOfType<Dictionary<string, object>>();
