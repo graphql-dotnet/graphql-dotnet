@@ -575,7 +575,7 @@ public class AllScalarGraphTypeTests
                 BigInteger bi => new GraphQLIntValue(bi),
                 float f => new GraphQLFloatValue(f),
                 double d => new GraphQLFloatValue(d),
-                _ => throw new InvalidOperationException("Invalid value type")
+                _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
             };
             astActual.ShouldBeOfType(astExpected.GetType());
             astActual
@@ -618,7 +618,7 @@ public class AllScalarGraphTypeTests
             bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
             double f => new GraphQLFloatValue(f),
             string s => new GraphQLStringValue(s),
-            _ => throw new InvalidOperationException("Invalid value type")
+            _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
         };
 
         var g = Create(graphType);
@@ -722,7 +722,7 @@ public class AllScalarGraphTypeTests
             bool b => b ? new GraphQLTrueBooleanValue() : new GraphQLFalseBooleanValue(),
             double d => new GraphQLFloatValue(d),
             string s => new GraphQLStringValue(s),
-            _ => throw new InvalidOperationException("Invalid value type")
+            _ => throw new InvalidOperationException($"Invalid value type '{value.GetType().Name}'")
         };
 
         var g = Create(graphType);
