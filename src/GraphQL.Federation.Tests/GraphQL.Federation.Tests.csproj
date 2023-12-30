@@ -3,7 +3,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
