@@ -130,7 +130,7 @@ public partial class InputGraphTypeAnalyzerTests
 
               namespace Sample.Server;
 
-              public class MyInputGraphType : InputObjectGraphType<MySourceType>
+              public class MyInputGraphType : InputObjectGraphType<{|#1:MySourceType|}>
               {
                   public MyInputGraphType()
                   {
@@ -151,7 +151,7 @@ public partial class InputGraphTypeAnalyzerTests
             : new[]
             {
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-                    .WithSpan(5, 54, 5, 66).WithArguments("MySourceType"),
+                    .WithLocation(1).WithArguments("MySourceType"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                     .WithLocation(0).WithArguments("FirstName", "MySourceType")
             };
@@ -172,7 +172,7 @@ public partial class InputGraphTypeAnalyzerTests
             {
                 public MyInputGraphType()
                 {
-                    Field<StringGraphType>("FirstName");
+                    Field<StringGraphType>({|#0:"FirstName"|});
                 }
             }
 
@@ -183,7 +183,7 @@ public partial class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "DefaultConstructor");
+            .WithLocation(0).WithArguments("FirstName", "DefaultConstructor");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -201,7 +201,7 @@ public partial class InputGraphTypeAnalyzerTests
             {
                 public MyInputGraphType()
                 {
-                    Field<StringGraphType>("FirstName");
+                    Field<StringGraphType>({|#0:"FirstName"|});
                 }
             }
 
@@ -218,7 +218,7 @@ public partial class InputGraphTypeAnalyzerTests
             """;
 
         var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-            .WithSpan(9, 32, 9, 43).WithArguments("FirstName", "ParameterlessConstructor");
+            .WithLocation(0).WithArguments("FirstName", "ParameterlessConstructor");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -296,11 +296,11 @@ public partial class InputGraphTypeAnalyzerTests
 
             namespace Sample.Server;
 
-            public class MyInputGraphType : InputObjectGraphType<ConstructorWithGraphQLConstructorAttribute>
+            public class MyInputGraphType : InputObjectGraphType<{|#0:ConstructorWithGraphQLConstructorAttribute|}>
             {
                 public MyInputGraphType()
                 {
-                    Field<StringGraphType>("FirstName");
+                    Field<StringGraphType>({|#1:"FirstName"|});
                 }
             }
 
@@ -322,9 +322,9 @@ public partial class InputGraphTypeAnalyzerTests
         var expected = new[]
         {
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
-                .WithSpan(10, 32, 10, 43).WithArguments("FirstName", "ConstructorWithGraphQLConstructorAttribute"),
+                .WithLocation(1).WithArguments("FirstName", "ConstructorWithGraphQLConstructorAttribute"),
             VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
-                .WithSpan(6, 54, 6, 96).WithArguments("ConstructorWithGraphQLConstructorAttribute")
+                .WithLocation(0).WithArguments("ConstructorWithGraphQLConstructorAttribute")
         };
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
