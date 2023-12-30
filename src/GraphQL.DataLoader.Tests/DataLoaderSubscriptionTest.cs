@@ -30,7 +30,7 @@ public class DataLoaderSubscriptionTest : QueryTestBase
 
         /* Then */
         var stream = result.Streams.ShouldNotBeNull().Values.First();
-        var message = await stream.FirstOrDefaultAsync();
+        var message = await stream.FirstAsync();
 
         ordersMock.Verify(x => x.GetOrderObservable(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
