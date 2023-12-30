@@ -167,7 +167,7 @@ public class ResolverAnalyzerTests
               public class MyGraphType : {{baseType}}
               {
                   public MyGraphType() =>
-                      Field<StringGraphType, string>("Test").{{method}}({{resolver}});
+                      Field<StringGraphType, string>("Test").{|#0:{{method}}({{resolver}})|};
 
                   private string Resolve(IResolveFieldContext<object> context) =>
                       throw new NotImplementedException();
@@ -220,10 +220,7 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        const int startColumn = 48;
-        int endColumn = startColumn + $"{method}({resolver})".Length;
-
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(12, startColumn, 12, endColumn);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -245,7 +242,7 @@ public class ResolverAnalyzerTests
               public class MyGraphType
               {
                   public void Register({{graphType}} graphType) =>
-                      graphType.Field<StringGraphType, string>("Test").Resolve(Resolve);
+                      graphType.Field<StringGraphType, string>("Test").{|#0:Resolve(Resolve)|};
 
                   private string Resolve(IResolveFieldContext<object> context) =>
                       throw new NotImplementedException();
@@ -278,7 +275,7 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 58, 10, 74);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -300,7 +297,7 @@ public class ResolverAnalyzerTests
               public class MyGraphType
               {
                   public void Register() =>
-                      GetGraphType().Field<StringGraphType, string>("Test").Resolve(Resolve);
+                      GetGraphType().Field<StringGraphType, string>("Test").{|#0:Resolve(Resolve)|};
 
                   private {{returnGraphType}} GetGraphType() => new();
 
@@ -337,7 +334,7 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(10, 63, 10, 79);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -354,7 +351,7 @@ public class ResolverAnalyzerTests
             {
                 public MyGraphType() =>
                     Field<StringGraphType, string>("Test")
-                        .Resolve(context => "Test");
+                        .{|#0:Resolve(context => "Test")|};
             }
             """;
 
@@ -371,7 +368,7 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -388,7 +385,7 @@ public class ResolverAnalyzerTests
             {
                 public MyGraphType() =>
                     Field<StringGraphType, string>("Test")
-                        .Resolve(context => "Test")
+                        .{|#0:Resolve(context => "Test")|}
                         .Description("description");
             }
             """;
@@ -407,7 +404,7 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(9, 14, 9, 40);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -423,7 +420,7 @@ public class ResolverAnalyzerTests
             public class MyGraphType : InputObjectGraphType
             {
                 public MyGraphType() =>
-                    Field<StringGraphType, string>("Test").Resolve(context => "Test")
+                    Field<StringGraphType, string>("Test").{|#0:Resolve(context => "Test")|}
                         .Description("description");
             }
             """;
@@ -442,7 +439,7 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(8, 48, 8, 74);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -458,7 +455,7 @@ public class ResolverAnalyzerTests
             public class MyGraphType : InputObjectGraphType
             {
                 public MyGraphType() =>
-                    Field<StringGraphType, string>("Test").Resolve()
+                    Field<StringGraphType, string>("Test").{|#0:Resolve()|}
                         .Description("description");
             }
             """;
@@ -477,7 +474,7 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithSpan(8, 48, 8, 57);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
         var test = new VerifyCS.Test
         {
             TestCode = source,

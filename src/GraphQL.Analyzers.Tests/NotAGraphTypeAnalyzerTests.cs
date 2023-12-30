@@ -63,15 +63,12 @@ public class NotAGraphTypeAnalyzerTests
               {
                   public MyClass()
                   {
-                      _ = typeof({{baseType}}<StringGraphType>);
+                      _ = typeof({{baseType}}<{|#0:StringGraphType|}>);
                   }
               }
               """;
 
-        int start = $"        _ = typeof({baseType}<".Length + 1;
-        int end = start + "StringGraphType".Length;
-
-        var expected = VerifyCS.Diagnostic().WithSpan(11, start, 11, end)
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
             .WithArguments("StringGraphType", typeParameterName, $"{baseType}<{typeParameterName}>");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -95,22 +92,16 @@ public class NotAGraphTypeAnalyzerTests
               {
                   public MyClass()
                   {
-                      _ = typeof({{baseType}}<StringGraphType, IntGraphType>);
+                      _ = typeof({{baseType}}<{|#0:StringGraphType|}, {|#1:IntGraphType|}>);
                   }
               }
               """;
 
-        int start1 = $"        _ = typeof({baseType}<".Length + 1;
-        int end1 = start1 + "StringGraphType".Length;
-
-        int start2 = end1 + ", ".Length;
-        int end2 = start2 + "IntGraphType".Length;
-
         var expected = new[]
         {
-            VerifyCS.Diagnostic().WithSpan(10, start1, 10, end1)
+            VerifyCS.Diagnostic().WithLocation(0)
                 .WithArguments("StringGraphType", typeParameterName1, $"{baseType}<{typeParameterName1}, {typeParameterName2}>"),
-            VerifyCS.Diagnostic().WithSpan(10, start2, 10, end2)
+            VerifyCS.Diagnostic().WithLocation(1)
                 .WithArguments("IntGraphType", typeParameterName2, $"{baseType}<{typeParameterName1}, {typeParameterName2}>")
         };
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -130,12 +121,12 @@ public class NotAGraphTypeAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name").Argument<IntGraphType>("arg", false);
+                    Field<StringGraphType>("name").Argument<{|#0:IntGraphType|}>("arg", false);
                 }
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 49, 10, 61)
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
             .WithArguments("IntGraphType", "TArgumentClrType", "Argument<TArgumentClrType>");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -154,12 +145,12 @@ public class NotAGraphTypeAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("name").Returns<IntGraphType>();
+                    Field<StringGraphType>("name").Returns<{|#0:IntGraphType|}>();
                 }
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 48, 10, 60)
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
             .WithArguments("IntGraphType", "TNewReturnType", "Returns<TNewReturnType>");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -178,12 +169,12 @@ public class NotAGraphTypeAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType, IntGraphType>("name");
+                    Field<StringGraphType, {|#0:IntGraphType|}>("name");
                 }
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 32, 10, 44)
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
             .WithArguments("IntGraphType", "TReturnType", "Field<TGraphType, TReturnType>");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -202,12 +193,12 @@ public class NotAGraphTypeAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    ConnectionBuilder.Create<StringGraphType, IntGraphType>();
+                    ConnectionBuilder.Create<StringGraphType, {|#0:IntGraphType|}>();
                 }
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 51, 10, 63)
+        var expected = VerifyCS.Diagnostic().WithLocation(0)
             .WithArguments("IntGraphType", "TSourceType", "Create<TNodeType, TSourceType>");
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -242,7 +233,7 @@ public class NotAGraphTypeAnalyzerTests
 
               namespace Sample.Server;
 
-              public class MyGraphType<TSource> : ObjectGraphType<TSource>
+              public class MyGraphType<TSource> : ObjectGraphType<{|#0:TSource|}>
                   where TSource : {{constraint}}
               {
               }
@@ -251,7 +242,7 @@ public class NotAGraphTypeAnalyzerTests
         var expected = report
             ? new[]
             {
-                VerifyCS.Diagnostic().WithSpan(6, 53, 6, 60)
+                VerifyCS.Diagnostic().WithLocation(0)
                     .WithArguments("TSource", "TSourceType", "ObjectGraphType<TSourceType>")
             }
             : DiagnosticResult.EmptyDiagnosticResults;
@@ -294,14 +285,14 @@ public class NotAGraphTypeAnalyzerTests
               public class MyGraphType<TSource, TReturn>
                     where TSource : {{constraint}}
               {
-                  public void DoSomething() => FieldBuilder<TSource, TReturn>.Create();
+                  public void DoSomething() => FieldBuilder<{|#0:TSource|}, TReturn>.Create();
               }
               """;
 
         var expected = report
             ? new[]
             {
-                VerifyCS.Diagnostic().WithSpan(10, 47, 10, 54)
+                VerifyCS.Diagnostic().WithLocation(0)
                     .WithArguments("TSource", "TSourceType", "FieldBuilder<TSourceType, TReturnType>")
             }
             : DiagnosticResult.EmptyDiagnosticResults;

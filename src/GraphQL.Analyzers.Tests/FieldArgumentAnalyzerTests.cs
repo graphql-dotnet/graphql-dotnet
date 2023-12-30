@@ -47,7 +47,7 @@ public class FieldArgumentAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("Text").Argument<StringGraphType, string>("arg", "description");
+                    Field<StringGraphType>("Text").{|#0:Argument<StringGraphType, string>("arg", "description")|};
                 }
             }
             """;
@@ -67,7 +67,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(9, 40, 9, 95);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -84,7 +84,7 @@ public class FieldArgumentAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    Field<StringGraphType>("Text").Argument<StringGraphType, string>("arg", "description", configure: argument => argument.DefaultValue = "MyDefault");
+                    Field<StringGraphType>("Text").{|#0:Argument<StringGraphType, string>("arg", "description", configure: argument => argument.DefaultValue = "MyDefault")|};
                 }
             }
             """;
@@ -104,7 +104,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(9, 40, 9, 155);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -122,7 +122,7 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>("arg", "description", "MyDefault");
+                        .{|#0:Argument<StringGraphType, string>("arg", "description", "MyDefault")|};
                 }
             }
             """;
@@ -143,7 +143,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 10, 82);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -161,10 +161,10 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>(
+                        .{|#0:Argument<StringGraphType, string>(
                             "arg",
                             "description",
-                            "MyDefault");
+                            "MyDefault")|};
                 }
             }
             """;
@@ -188,7 +188,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 13, 29);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -206,7 +206,7 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>("arg", "description", "MyDefault", argument => argument.DeprecationReason = "Deprecation Reason");
+                        .{|#0:Argument<StringGraphType, string>("arg", "description", "MyDefault", argument => argument.DeprecationReason = "Deprecation Reason")|};
                 }
             }
             """;
@@ -227,7 +227,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 10, 145);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -245,8 +245,8 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>("arg", "description", "MyDefault", argument =>
-                            argument.DeprecationReason = "Deprecation Reason");
+                        .{|#0:Argument<StringGraphType, string>("arg", "description", "MyDefault", argument =>
+                            argument.DeprecationReason = "Deprecation Reason")|};
                 }
             }
             """;
@@ -271,7 +271,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 11, 67);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -289,11 +289,11 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>(
+                        .{|#0:Argument<StringGraphType, string>(
                             "arg",
                             "description",
                             "MyDefault",
-                            argument => argument.DeprecationReason = "Deprecation Reason" );
+                            argument => argument.DeprecationReason = "Deprecation Reason" )|};
                 }
             }
             """;
@@ -317,7 +317,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 14, 80);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -335,14 +335,14 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>(
+                        .{|#0:Argument<StringGraphType, string>(
                             "arg",
                             "description",
                             "MyDefault",
                             argument =>
                             {
                                 argument.DeprecationReason = "Deprecation Reason";
-                            });
+                            })|};
                 }
             }
             """;
@@ -370,7 +370,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 17, 19);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -388,13 +388,13 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>(
+                        .{|#0:Argument<StringGraphType, string>(
                             "arg",
                             "description",
                             "MyDefault",
                             argument =>
                                     {
-                                    });
+                                    })|};
                 }
             }
             """;
@@ -420,7 +420,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 16, 27);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -438,11 +438,11 @@ public class FieldArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Text")
-                        .Argument<StringGraphType, string>(
+                        .{|#0:Argument<StringGraphType, string>(
                             "arg",
                             "description",
                             "MyDefault",
-                            argument => { });
+                            argument => { })|};
                 }
             }
             """;
@@ -466,7 +466,7 @@ public class FieldArgumentAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic().WithSpan(10, 14, 14, 33);
+        var expected = VerifyCS.Diagnostic().WithLocation(0);
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 }
