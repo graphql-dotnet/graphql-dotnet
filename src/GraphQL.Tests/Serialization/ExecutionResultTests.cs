@@ -22,7 +22,7 @@ public class ExecutionResultTests
                 new ExecutionError("some error 1"),
                 new ExecutionError("some error 2"),
             },
-            Extensions = new Dictionary<string, object>
+            Extensions = new Dictionary<string, object?>
             {
                 { "someExtension", new { someProperty = "someValue", someOtherProperty = 1 } }
             }
@@ -103,9 +103,9 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult
         {
-            Data = new Dictionary<string, object>().ToExecutionTree(),
+            Data = new Dictionary<string, object?>().ToExecutionTree(),
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = true
         };
 
@@ -122,9 +122,9 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult
         {
-            Data = new Dictionary<string, object>().ToExecutionTree(),
+            Data = new Dictionary<string, object?>().ToExecutionTree(),
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = false
         };
 
@@ -143,7 +143,7 @@ public class ExecutionResultTests
         {
             Data = null,
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = true
         };
 

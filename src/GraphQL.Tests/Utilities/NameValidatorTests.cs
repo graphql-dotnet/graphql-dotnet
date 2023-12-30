@@ -6,7 +6,7 @@ public class NameValidatorTests
 {
     [Fact]
     public void ValidateName_whenNameIsNull_throwsArgumentOutOfRange() =>
-       Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(default, NamedElement.Field));
+       Should.Throw<ArgumentOutOfRangeException>(() => NameValidator.ValidateName(null!, NamedElement.Field));
 
     [Fact]
     public void ValidateName_whenNameIsEmpty_throwsArgumentOutOfRange()

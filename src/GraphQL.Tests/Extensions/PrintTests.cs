@@ -49,7 +49,7 @@ public class PrintTests
         foreach (char c in ret)
             c.ShouldBeGreaterThanOrEqualTo(' ');
 
-        string deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret);
+        string deserialized = System.Text.Json.JsonSerializer.Deserialize<string>(ret)!;
         deserialized.ShouldBe(sample);
 
         var token = GraphQLParser.Lexer.Lex(ret);

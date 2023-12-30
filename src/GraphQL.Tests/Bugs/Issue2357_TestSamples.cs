@@ -69,21 +69,21 @@ public class Issue2357_TestSamples : QueryTestBase<Issue2357_TestSamples.MySchem
             Name = "DbId";
         }
 
-        public override object ParseLiteral(GraphQLValue value) => value switch
+        public override object? ParseLiteral(GraphQLValue value) => value switch
         {
             GraphQLStringValue s => int.TryParse((string)s.Value, out int i) && i > 0 ? i : throw new FormatException($"'{s.Value}' is not a valid identifier."), // string conversion for NET48
             GraphQLNullValue _ => 0,
             _ => ThrowLiteralConversionError(value)
         };
 
-        public override object ParseValue(object value) => value switch
+        public override object? ParseValue(object? value) => value switch
         {
             string s => int.TryParse(s, out int i) && i > 0 ? i : throw new FormatException($"'{s}' is not a valid identifier."),
             null => 0,
             _ => ThrowValueConversionError(value)
         };
 
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             int i => i > 0 ? i.ToString() : i == 0 ? null : ThrowSerializationError(value),
             _ => ThrowSerializationError(value)

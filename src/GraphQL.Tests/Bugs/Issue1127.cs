@@ -45,7 +45,7 @@ public class Issue127Query : ObjectGraphType
             )
             .Resolve(ctx =>
             {
-                ctx.Arguments["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
+                ctx.Arguments!["s1"].ShouldBe(new ArgumentValue("def1", ArgumentSource.FieldDefault));
                 ctx.Arguments["s2"].ShouldBe(ArgumentValue.NullLiteral);
                 ctx.Arguments["s3"].ShouldBe(new ArgumentValue("aaa", ArgumentSource.Literal));
 
@@ -54,9 +54,9 @@ public class Issue127Query : ObjectGraphType
                 ctx.Arguments["input3"].Value.ShouldNotBeNull();
                 ctx.Arguments["input3"].Source.ShouldBe(ArgumentSource.Literal);
 
-                (ctx.Arguments["input3"].Value as Dictionary<string, object>)["name"].ShouldBe("struct");
-                (ctx.Arguments["input3"].Value as Dictionary<string, object>)["created"].ShouldBe(new DateTime(2000, 1, 1));
-                (ctx.Arguments["input3"].Value as Dictionary<string, object>)["lastModified"].ShouldBe(new DateTime(2001, 1, 1));
+                (ctx.Arguments["input3"].Value as Dictionary<string, object>)!["name"].ShouldBe("struct");
+                (ctx.Arguments["input3"].Value as Dictionary<string, object>)!["created"].ShouldBe(new DateTime(2000, 1, 1));
+                (ctx.Arguments["input3"].Value as Dictionary<string, object>)!["lastModified"].ShouldBe(new DateTime(2001, 1, 1));
 
                 return "completed";
             });
@@ -72,7 +72,7 @@ public class BaseInputType : InputObjectGraphType
         Field<DateTimeGraphType>("created");
         Field<DateTimeGraphType>("lastModified");
 
-        Fields.SingleOrDefault(f => f.Name == "created").DefaultValue = new DateTime(2000, 1, 1);
-        Fields.SingleOrDefault(f => f.Name == "lastModified").DefaultValue = new DateTime(2001, 1, 1);
+        Fields.Single(f => f.Name == "created").DefaultValue = new DateTime(2000, 1, 1);
+        Fields.Single(f => f.Name == "lastModified").DefaultValue = new DateTime(2001, 1, 1);
     }
 }

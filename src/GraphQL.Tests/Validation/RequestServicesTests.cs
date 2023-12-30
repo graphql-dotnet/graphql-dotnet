@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;

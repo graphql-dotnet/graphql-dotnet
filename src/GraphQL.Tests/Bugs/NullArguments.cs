@@ -31,7 +31,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors!.Single();
         caughtError.ShouldNotBeNull();
         caughtError.InnerException.ShouldBeNull();
         caughtError.Message.Contains("In field \"bar\": In field \"id\": Expected \"Int!\", found null.");
@@ -48,7 +48,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors!.Single();
         caughtError.ShouldNotBeNull();
         caughtError.InnerException.ShouldBeNull();
         caughtError.Message.Contains("In field \"foo\": Expected \"String!\", found null.");
@@ -65,7 +65,7 @@ public class NullArguments : QueryTestBase<NullMutationSchema>
 
         var result = AssertQueryWithErrors(query, null, null, expectedErrorCount: 1, executed: false);
 
-        var caughtError = result.Errors.Single();
+        var caughtError = result.Errors!.Single();
         caughtError.ShouldNotBeNull();
         caughtError.InnerException.ShouldBeNull();
         caughtError.Message.Contains("In field \"bar\": Expected \"NonNullSubChild!\", found null.");

@@ -17,13 +17,13 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(IGraphQLSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType))
             .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, RegistrationCompareMode>((_, func, serviceLifetime, _) =>
             {
-                Should.Throw<InvalidOperationException>(() => func(null));
+                Should.Throw<InvalidOperationException>(() => func(null!));
                 return builder.ServiceRegister;
             }).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IGraphQLTextSerializer), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType))
             .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, RegistrationCompareMode>((_, func, serviceLifetime, _) =>
             {
-                Should.Throw<InvalidOperationException>(() => func(null));
+                Should.Throw<InvalidOperationException>(() => func(null!));
                 return builder.ServiceRegister;
             }).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IDocumentExecuter), typeof(DocumentExecuter), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
@@ -32,7 +32,7 @@ public class GraphQLBuilderBaseTests
         mock.Setup(b => b.TryRegister(typeof(IDocumentValidator), typeof(DocumentValidator), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IErrorInfoProvider), typeof(ErrorInfoProvider), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
         mock.Setup(b => b.TryRegister(typeof(IExecutionStrategySelector), typeof(DefaultExecutionStrategySelector), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(builder.ServiceRegister).Verifiable();
-        mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null)).Returns(builder.ServiceRegister).Verifiable();
+        mock.Setup(b => b.Configure((Action<ErrorInfoProviderOptions, IServiceProvider>)null!)).Returns(builder.ServiceRegister).Verifiable();
         var actions = new List<IConfigureExecution>();
         mock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false)).Returns<Type, IConfigureExecution, bool>((_, action, _) =>
         {
@@ -79,7 +79,7 @@ public class GraphQLBuilderBaseTests
     {
         public readonly Mock<IServiceRegister> MockBuilder = new(MockBehavior.Strict);
 
-        public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider> action = null)
+        public IServiceRegister Configure<TOptions>(Action<TOptions, IServiceProvider>? action = null)
             where TOptions : class, new()
             => MockBuilder.Object.Configure(action);
 

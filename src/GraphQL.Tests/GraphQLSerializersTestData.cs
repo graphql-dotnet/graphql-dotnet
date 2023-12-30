@@ -3,8 +3,6 @@ using Xunit.Abstractions;
 
 namespace GraphQL.Tests;
 
-#nullable enable
-
 public class GraphQLSerializersTestData : IEnumerable<object[]>
 {
     // See https://github.com/xunit/xunit/issues/1473

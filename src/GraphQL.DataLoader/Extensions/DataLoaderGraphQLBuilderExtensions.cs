@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.DataLoader;
 using GraphQL.DI;
 

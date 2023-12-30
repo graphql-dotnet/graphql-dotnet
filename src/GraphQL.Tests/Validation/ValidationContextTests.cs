@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;

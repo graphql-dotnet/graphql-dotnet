@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Subscription;

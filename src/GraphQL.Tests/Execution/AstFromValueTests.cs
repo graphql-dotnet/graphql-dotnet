@@ -8,13 +8,13 @@ public class AstFromValueTests
     [Fact]
     public void throws_for_null_graphtype()
     {
-        Should.Throw<ArgumentNullException>(() => ((IGraphType)null).ToAST(true));
+        Should.Throw<ArgumentNullException>(() => ((IGraphType)null!).ToAST(true));
     }
 
     [Fact]
     public void converts_null_to_null()
     {
-        object value = null;
+        object? value = null;
         var result = new StringGraphType().ToAST(value);
         result.ShouldBeOfType<GraphQLNullValue>();
     }
@@ -23,7 +23,6 @@ public class AstFromValueTests
     public void converts_string_to_string_value()
     {
         var result = new StringGraphType().ToAST("test");
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLStringValue>().Value.ShouldBe("test");
     }
 
@@ -31,8 +30,7 @@ public class AstFromValueTests
     public void converts_bool_to_boolean_value()
     {
         var result = new BooleanGraphType().ToAST(true);
-        result.ShouldNotBeNull();
-        result.ShouldBeAssignableTo<GraphQLBooleanValue>().Value.ShouldBe("true");
+        result.ShouldBeAssignableTo<GraphQLBooleanValue>().ShouldNotBeNull().Value.ShouldBe("true");
     }
 
     [Fact]
@@ -40,7 +38,6 @@ public class AstFromValueTests
     {
         const long val = 12345678910111213;
         var result = new LongGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12345678910111213");
     }
 
@@ -56,7 +53,6 @@ public class AstFromValueTests
     {
         const decimal val = 1234.56789m;
         var result = new DecimalGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("1234.56789");
     }
 
@@ -65,7 +61,6 @@ public class AstFromValueTests
     {
         const int val = 123;
         var result = new IntGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("123");
     }
 
@@ -74,7 +69,6 @@ public class AstFromValueTests
     {
         const double val = 0.42;
         var result = new FloatGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLFloatValue>().Value.ShouldBe("0.42");
     }
 
@@ -83,7 +77,6 @@ public class AstFromValueTests
     {
         const byte value = 12;
         var result = new ByteGraphType().ToAST(value);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("12");
     }
 
@@ -92,7 +85,6 @@ public class AstFromValueTests
     {
         const sbyte val = -12;
         var result = new SByteGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLIntValue>().Value.ShouldBe("-12");
     }
 
@@ -101,7 +93,6 @@ public class AstFromValueTests
     {
         var val = new Uri("http://www.wp.pl");
         var result = new UriGraphType().ToAST(val);
-        result.ShouldNotBeNull();
         result.ShouldBeOfType<GraphQLStringValue>().Value.ShouldBe(val.ToString());
     }
 }

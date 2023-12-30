@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Conversion;
 
 public class NameConverterTests : BasicQueryTestBase
 {
-    public static ISchema build_schema(INameConverter converter = null, string argument = "Id")
+    public static ISchema build_schema(INameConverter? converter = null, string argument = "Id")
     {
         var schema = new Schema
         {
@@ -79,8 +79,8 @@ public class NameConverterTests : BasicQueryTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.GetField("peRsoN");
-        field.Arguments.Find("id").ShouldNotBeNull();
+        var field = query!.GetField("peRsoN")!;
+        field.Arguments!.Find("id").ShouldNotBeNull();
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class NameConverterTests : BasicQueryTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.GetField("PeRsoN");
-        field.Arguments.Find("ID").ShouldNotBeNull();
+        var field = query!.GetField("PeRsoN")!;
+        field.Arguments!.Find("ID").ShouldNotBeNull();
     }
 }

@@ -14,7 +14,7 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
             """;
         const string expected = """{ "run": null }""";
         var res = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
-        res.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+        res.Errors![0].Code.ShouldBe("INVALID_OPERATION");
     }
 }
 

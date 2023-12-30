@@ -235,7 +235,7 @@ public class NoUnusedVariablesTests : ValidationTestBase<NoUnusedVariables, Vali
     private void unusedVar(
       ValidationTestConfig _,
       string varName,
-      string opName,
+      string? opName,
       int line,
       int column
       )

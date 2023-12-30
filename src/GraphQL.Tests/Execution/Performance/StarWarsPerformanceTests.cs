@@ -32,7 +32,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
             """;
 
         var smallListTimer = new Stopwatch();
-        ExecutionResult runResult2 = null;
+        ExecutionResult? runResult2 = null;
         smallListTimer.Start();
 
         //Note: Implementing a custom IDocumentValidator would increase speeds 600%
@@ -45,7 +45,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
                 _.Query = query;
                 _.Root = null;
                 _.Variables = null;
-                _.UserContext = null;
+                _.UserContext = null!;
                 _.CancellationToken = default;
                 _.ValidationRules = null;
             });
@@ -55,7 +55,7 @@ public class StarWarsPerformanceTests : StarWarsTestBase
 
         _output.WriteLine($"Milliseconds: {smallListTimer.ElapsedMilliseconds}");
 
-        runResult2.Errors.ShouldBeNull();
+        runResult2.ShouldNotBeNull().Errors.ShouldBeNull();
         smallListTimer.ElapsedMilliseconds.ShouldBeLessThan(9400 * 2); //machine specific data with a buffer
     }
 }

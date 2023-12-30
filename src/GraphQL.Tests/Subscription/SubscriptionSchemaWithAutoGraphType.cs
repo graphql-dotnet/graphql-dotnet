@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Reactive.Linq;
 using GraphQL.Types;
 

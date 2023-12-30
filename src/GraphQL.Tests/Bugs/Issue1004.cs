@@ -53,9 +53,9 @@ public class Issue1004Query : ObjectGraphType
     {
         Name = "Query";
         IsTypeOf = o => true;
-        Field<StringGraphType>("field1").Resolve(_ => throw null);
-        Field<StringGraphType>("field2").Description("Not so important").Resolve(_ => throw null);
-        Field<StringGraphType>("nonInterfaceField").Resolve(_ => throw null); // https://github.com/graphql-dotnet/graphql-dotnet/pull/3352
+        Field<StringGraphType>("field1").Resolve(_ => throw null!);
+        Field<StringGraphType>("field2").Description("Not so important").Resolve(_ => throw null!);
+        Field<StringGraphType>("nonInterfaceField").Resolve(_ => throw null!); // https://github.com/graphql-dotnet/graphql-dotnet/pull/3352
         Interface<Issue1004Interface>();
     }
 }

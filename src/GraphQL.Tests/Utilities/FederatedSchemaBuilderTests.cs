@@ -63,7 +63,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
             """;
 
-        Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
+        Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult<User?>(new User { Id = "123", Username = "Quinn" }));
 
         const string query = """
                 query ($_representations: [_Any!]!) {
@@ -106,7 +106,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             }
             """;
 
-        Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult(new User { Id = "123", Username = "Quinn" }));
+        Builder.Types.For("User").ResolveReferenceAsync(ctx => Task.FromResult<User?>(new User { Id = "123", Username = "Quinn" }));
 
         string query = $$"""
                 query ($_representations: [_Any!]!) {
@@ -165,13 +165,13 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             _.Query = query;
         });
 
-        var data = executionResult.Data.ToDict();
+        var data = executionResult.Data!.ToDict();
         var schema = data["__schema"].ToDict();
-        var types = (IEnumerable<object>)schema["types"];
-        var entityType = types.Single(t => (string)t.ToDict()["name"] == "_Entity").ToDict();
-        var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"];
+        var types = (IEnumerable<object>)schema["types"]!;
+        var entityType = types.Single(t => (string)t.ToDict()["name"]! == "_Entity").ToDict();
+        var possibleTypes = (IEnumerable<object>)entityType["possibleTypes"]!;
         var possibleType = possibleTypes.First().ToDict();
-        string name = (string)possibleType["name"];
+        string name = (string)possibleType["name"]!;
 
         Assert.Equal("User", name);
     }
@@ -202,14 +202,14 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         Builder.Types.For("User").ResolveReferenceAsync(ctx =>
         {
-            string id = ctx.Arguments["id"].ToString();
+            string id = ctx.Arguments["id"]!.ToString()!;
             // return Task.FromResult(users.FirstOrDefault(user => user.Id == id));
             var loader = accessor.Context.GetOrAddBatchLoader<string, User>("GetAccountByIdAsync", ids =>
             {
                 var results = users.Where(user => ids.Contains(user.Id));
                 return Task.FromResult((IDictionary<string, User>)results.ToDictionary(c => c.Id));
             });
-            return Task.FromResult(loader.LoadAsync(id));
+            return Task.FromResult<IDataLoaderResult<User>?>(loader.LoadAsync(id));
         });
 
         const string query = """

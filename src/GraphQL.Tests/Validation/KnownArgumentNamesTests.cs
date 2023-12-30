@@ -104,7 +104,7 @@ public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, Va
                     noArgsField(first: 1)
                   }
                 """;
-            _.Error(KnownArgumentNamesError.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs", null), 2, 17);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("first", "noArgsField", "ComplicatedArgs"), 2, 17);
         });
     }
 
@@ -118,7 +118,7 @@ public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, Va
                     dog @skip(unless: true)
                   }
                 """;
-            _.Error(KnownArgumentNamesError.UnknownDirectiveArgMessage("unless", "skip", null), 2, 15);
+            _.Error(KnownArgumentNamesError.UnknownDirectiveArgMessage("unless", "skip"), 2, 15);
         });
     }
 
@@ -132,8 +132,8 @@ public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, Va
                     doesKnowCommand(whoknows: 1, dogCommand: SIT, unknown: true)
                   }
                 """;
-            _.Error(KnownArgumentNamesError.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog", null), 2, 21);
-            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 2, 51);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("whoknows", "doesKnowCommand", "Dog"), 2, 21);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog"), 2, 51);
         });
     }
 
@@ -156,8 +156,8 @@ public class KnownArgumentNamesTests : ValidationTestBase<KnownArgumentNames, Va
                     }
                   }
                 """;
-            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 3, 23);
-            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog", null), 8, 27);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog"), 3, 23);
+            _.Error(KnownArgumentNamesError.UnknownArgMessage("unknown", "doesKnowCommand", "Dog"), 8, 27);
         });
     }
 }

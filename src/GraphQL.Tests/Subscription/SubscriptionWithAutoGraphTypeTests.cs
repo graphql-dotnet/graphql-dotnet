@@ -48,7 +48,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessageGetAll(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -81,14 +81,14 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
         var data = message.Data.ToDict();
         data.ShouldNotBeNull();
         data["newMessageContent"].ShouldNotBeNull();
-        data["newMessageContent"].ToString().ShouldBe("test");
+        data["newMessageContent"]!.ToString().ShouldBe("test");
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -148,7 +148,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -176,7 +176,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
@@ -185,7 +185,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -212,7 +212,7 @@ public class SubscriptionWithAutoGraphTypeTests
         var result = await ExecuteSubscribeAsync(new ExecutionOptions
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
@@ -221,7 +221,7 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -241,9 +241,9 @@ public class SubscriptionWithAutoGraphTypeTests
         Chat.AddError(new Exception("test"));
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
-        error.InnerException.Message.ShouldBe("test");
+        error.InnerException!.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
     }
 }

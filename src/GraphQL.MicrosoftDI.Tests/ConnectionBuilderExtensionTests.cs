@@ -8,7 +8,7 @@ namespace GraphQL.MicrosoftDI.Tests;
 
 public class ConnectionBuilderExtensionTests : ScopedContextBase
 {
-    private readonly ResolveConnectionContext<object> _unscopedConnectionContext;
+    private readonly ResolveConnectionContext<object?> _unscopedConnectionContext;
 
     public ConnectionBuilderExtensionTests()
     {
@@ -17,8 +17,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(short)))).Returns((short)3);
         _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(byte)))).Returns((byte)4);
         _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(x => x == typeof(long)))).Returns((long)5);
-        _unscopedConnectionContext = new ResolveConnectionContext<object>(
-            new ResolveFieldContext<object>
+        _unscopedConnectionContext = new ResolveConnectionContext<object?>(
+            new ResolveFieldContext<object?>
             {
                 RequestServices = _scopedServiceProvider
             },
@@ -41,7 +41,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithScope()
             .Resolve(_ => "hello");
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
@@ -52,7 +52,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
         builder.ResolveScoped(_ => "hello");
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
@@ -67,7 +67,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .WithService<string>()
             .Resolve((_, value) => value);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
@@ -83,7 +83,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .Resolve((_, value, v2) => value + v2);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
@@ -100,7 +100,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello23");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
@@ -118,7 +118,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello234");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
@@ -137,7 +137,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
@@ -152,7 +152,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .WithServices<string, int>()
             .Resolve((_, value, v2) => value + v2);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
@@ -167,7 +167,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .WithServices<string, int, short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello23");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
@@ -182,7 +182,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .WithServices<string, int, short, byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello234");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
@@ -197,7 +197,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .WithServices<string, int, short, byte, long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        (await field.Resolver.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
@@ -210,7 +210,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         builder
             .Resolve()
             .Resolve(_ => "hello");
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
@@ -224,7 +224,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithService<string>()
             .Resolve((_, value) => value);
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
@@ -239,7 +239,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .Resolve((_, value, v2) => value + v2);
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2");
         VerifyUnscoped();
     }
 
@@ -255,7 +255,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .Resolve((_, value, v2, v3) => value + v2 + v3);
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello23");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello23");
         VerifyUnscoped();
     }
 
@@ -272,7 +272,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .Resolve((_, value, v2, v3, v4) => value + v2 + v3 + v4);
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello234");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello234");
         VerifyUnscoped();
     }
 
@@ -290,7 +290,7 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .Resolve((_, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5);
-        (await field.Resolver.ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2345");
+        (await field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext)).ShouldBe("hello2345");
         VerifyUnscoped();
     }
 
@@ -303,8 +303,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         builder
             .Resolve()
             .WithScope()
-            .ResolveAsync(_ => Task.FromResult<object>("hello"));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
+            .ResolveAsync(_ => Task.FromResult<object?>("hello"));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -314,8 +314,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         var graph = new ObjectGraphType();
         var builder = graph.Connection<StringGraphType>("connection");
         var field = builder.FieldType;
-        builder.ResolveScopedAsync(_ => Task.FromResult<object>("hello"));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
+        builder.ResolveScopedAsync(_ => Task.FromResult<object?>("hello"));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -329,8 +329,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithService<string>()
             .WithScope()
-            .ResolveAsync((_, value) => Task.FromResult<object>(value));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
+            .ResolveAsync((_, value) => Task.FromResult<object?>(value));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -345,8 +345,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .WithScope()
-            .ResolveAsync((_, value, v2) => Task.FromResult<object>(value + v2));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2");
+            .ResolveAsync((_, value, v2) => Task.FromResult<object?>(value + v2));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello2");
         VerifyScoped();
     }
 
@@ -362,8 +362,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .WithScope()
-            .ResolveAsync((_, value, v2, v3) => Task.FromResult<object>(value + v2 + v3));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello23");
+            .ResolveAsync((_, value, v2, v3) => Task.FromResult<object?>(value + v2 + v3));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello23");
         VerifyScoped();
     }
 
@@ -380,8 +380,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .WithScope()
-            .ResolveAsync((_, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello234");
+            .ResolveAsync((_, value, v2, v3, v4) => Task.FromResult<object?>(value + v2 + v3 + v4));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello234");
         VerifyScoped();
     }
 
@@ -399,8 +399,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .WithScope()
-            .ResolveAsync((_, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5));
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2345");
+            .ResolveAsync((_, value, v2, v3, v4, v5) => Task.FromResult<object?>(value + v2 + v3 + v4 + v5));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_scopedContext).ShouldBeTask("hello2345");
         VerifyScoped();
     }
 
@@ -412,8 +412,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         var field = builder.FieldType;
         builder
             .Resolve()
-            .ResolveAsync(_ => Task.FromResult<object>("hello"));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
+            .ResolveAsync(_ => Task.FromResult<object?>("hello"));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
         VerifyUnscoped();
     }
 
@@ -426,8 +426,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
         builder
             .Resolve()
             .WithService<string>()
-            .ResolveAsync((_, value) => Task.FromResult<object>(value));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
+            .ResolveAsync((_, value) => Task.FromResult<object?>(value));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello");
         VerifyUnscoped();
     }
 
@@ -441,8 +441,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithService<string>()
             .WithService<int>()
-            .ResolveAsync((_, value, v2) => Task.FromResult<object>(value + v2));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2");
+            .ResolveAsync((_, value, v2) => Task.FromResult<object?>(value + v2));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2");
         VerifyUnscoped();
     }
 
@@ -457,8 +457,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .WithService<short>()
-            .ResolveAsync((_, value, v2, v3) => Task.FromResult<object>(value + v2 + v3));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello23");
+            .ResolveAsync((_, value, v2, v3) => Task.FromResult<object?>(value + v2 + v3));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello23");
         VerifyUnscoped();
     }
 
@@ -474,8 +474,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .WithService<byte>()
-            .ResolveAsync((_, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello234");
+            .ResolveAsync((_, value, v2, v3, v4) => Task.FromResult<object?>(value + v2 + v3 + v4));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello234");
         VerifyUnscoped();
     }
 
@@ -492,8 +492,8 @@ public class ConnectionBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .WithService<long>()
-            .ResolveAsync((_, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5));
-        field.Resolver.ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2345");
+            .ResolveAsync((_, value, v2, v3, v4, v5) => Task.FromResult<object?>(value + v2 + v3 + v4 + v5));
+        field.Resolver.ShouldNotBeNull().ResolveAsync(_unscopedConnectionContext).ShouldBeTask("hello2345");
         VerifyUnscoped();
     }
 }

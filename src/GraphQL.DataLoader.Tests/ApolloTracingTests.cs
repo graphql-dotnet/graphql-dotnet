@@ -41,7 +41,7 @@ public class ApolloTracingTests
             Query = "{test}",
             RequestServices = services,
         });
-        var apolloTrace = ret.Extensions["tracing"].ShouldBeOfType<ApolloTrace>();
+        var apolloTrace = ret.Extensions.ShouldNotBeNull()["tracing"].ShouldBeOfType<ApolloTrace>();
         var resolverData = apolloTrace.Execution.Resolvers.Single();
         resolverData.Path.ShouldBe(new object[] { "test" });
         resolverData.Duration.ShouldBeGreaterThanOrEqualTo(2000000000L); // 2 seconds
