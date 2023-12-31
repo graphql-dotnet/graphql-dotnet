@@ -1,3 +1,16 @@
+namespace GraphQL
+{
+    public static class ConfigureDataLoaderExtensions
+    {
+        public static GraphQL.DataLoader.IConfigureDataLoader AddBatchDataLoader<TKey, T, TFetcher>(this GraphQL.DataLoader.IConfigureDataLoader builder, int maxBatchSize = 2147483647, System.Collections.Generic.IEqualityComparer<TKey>? equalityComparer = null, T defaultValue = default, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TKey :  notnull
+            where TFetcher :  class, GraphQL.DataLoader.IBatchFetcher<TKey, T> { }
+    }
+    public static class DataLoaderGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.DataLoader.IConfigureDataLoader> configure) { }
+    }
+}
 namespace GraphQL.DataLoader
 {
     public class BatchDataLoader<TKey, T> : GraphQL.DataLoader.DataLoaderBase<TKey, T>
@@ -102,6 +115,15 @@ namespace GraphQL.DataLoader
         public DataLoaderResult(T result) { }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
     }
+    public interface IBatchFetcher<TKey, T>
+        where TKey :  notnull
+    {
+        System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>> FetchAsync(System.Collections.Generic.IEnumerable<TKey> keys, System.Threading.CancellationToken token);
+    }
+    public interface IConfigureDataLoader
+    {
+        GraphQL.DI.IServiceRegister Services { get; }
+    }
     public interface IDataLoader
     {
         System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default);
@@ -124,12 +146,5 @@ namespace GraphQL.DataLoader
         public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public System.Threading.Tasks.Task<T> GetResultAsync(System.Threading.CancellationToken cancellationToken = default) { }
         public GraphQL.DataLoader.IDataLoaderResult<T> LoadAsync() { }
-    }
-}
-namespace GraphQL
-{
-    public static class DataLoaderGraphQLBuilderExtensions
-    {
-        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder) { }
     }
 }
