@@ -148,9 +148,12 @@ namespace GraphQL
 
                 if (!validationResult.IsValid)
                 {
+                    var errors = validationResult.Errors;
+                    if (context.Errors.Count > 0)
+                        errors.AddRange(context.Errors);
                     return new ExecutionResult
                     {
-                        Errors = validationResult.Errors,
+                        Errors = errors,
                         Perf = metrics.Finish()
                     };
                 }
