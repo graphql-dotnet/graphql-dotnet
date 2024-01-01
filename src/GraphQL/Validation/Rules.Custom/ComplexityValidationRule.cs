@@ -41,7 +41,7 @@ public class ComplexityValidationRule : IValidationRule, INodeVisitor
             try
             {
                 using (context.Metrics.Subject("document", "Analyzing complexity"))
-                    Validate(context.Document, _complexityConfiguration, context.Schema);
+                    Validate(context.Document, context.Schema);
             }
             catch (ComplexityError ex)
             {
@@ -53,21 +53,19 @@ public class ComplexityValidationRule : IValidationRule, INodeVisitor
     }
 
     /// <inheritdoc/>
-    public void Validate(GraphQLDocument document, ComplexityConfiguration complexityParameters, ISchema schema)
+    public void Validate(GraphQLDocument document, ISchema schema)
     {
-        if (complexityParameters == null)
-            return;
-        var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f, complexityParameters.MaxRecursionCount, schema);
+        var complexityResult = Analyze(document, _complexityConfiguration.FieldImpact ?? 2.0f, _complexityConfiguration.MaxRecursionCount, schema);
 
-        Analyzed(document, complexityParameters, complexityResult);
+        Analyzed(document, _complexityConfiguration, complexityResult);
 
-        if (complexityResult.Complexity > complexityParameters.MaxComplexity)
+        if (complexityResult.Complexity > _complexityConfiguration.MaxComplexity)
             throw new ComplexityError(
-                $"Query is too complex to execute. Complexity is {complexityResult.Complexity}, maximum allowed on this endpoint is {complexityParameters.MaxComplexity}. The field with the highest complexity is '{GetName(complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key)}' with value {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Value}.");
+                $"Query is too complex to execute. Complexity is {complexityResult.Complexity}, maximum allowed on this endpoint is {_complexityConfiguration.MaxComplexity}. The field with the highest complexity is '{GetName(complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key)}' with value {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Value}.");
 
-        if (complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
+        if (complexityResult.TotalQueryDepth > _complexityConfiguration.MaxDepth)
             throw new ComplexityError(
-                $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
+                $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {_complexityConfiguration.MaxDepth}.");
 
         string GetName(ASTNode node)
         {
@@ -97,7 +95,7 @@ public class ComplexityValidationRule : IValidationRule, INodeVisitor
     /// <summary>
     /// Analyzes the complexity of a document.
     /// </summary>
-    internal ComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
+    internal static ComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
     {
         if (avgImpact <= 1)
             throw new ArgumentOutOfRangeException(nameof(avgImpact));
