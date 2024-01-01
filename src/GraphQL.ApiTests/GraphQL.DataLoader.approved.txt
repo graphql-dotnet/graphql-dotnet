@@ -5,10 +5,13 @@ namespace GraphQL
         public static GraphQL.DataLoader.IConfigureDataLoader AddBatchDataLoader<TKey, T, TFetcher>(this GraphQL.DataLoader.IConfigureDataLoader builder, int maxBatchSize = 2147483647, System.Collections.Generic.IEqualityComparer<TKey>? equalityComparer = null, T defaultValue = default, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TKey :  notnull
             where TFetcher :  class, GraphQL.DataLoader.IBatchFetcher<TKey, T> { }
+        public static GraphQL.DataLoader.IConfigureDataLoader AddCollectionBatchDataLoader<TKey, T, TFetcher>(this GraphQL.DataLoader.IConfigureDataLoader builder, int maxBatchSize = 2147483647, System.Collections.Generic.IEqualityComparer<TKey>? equalityComparer = null, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
+            where TKey :  notnull
+            where TFetcher :  class, GraphQL.DataLoader.ICollectionBatchFetcher<TKey, T> { }
     }
     public static class DataLoaderGraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.DataLoader.IConfigureDataLoader> configure) { }
+        public static GraphQL.DI.IGraphQLBuilder AddDataLoader(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.DataLoader.IConfigureDataLoader>? configure = null) { }
     }
 }
 namespace GraphQL.DataLoader
@@ -119,6 +122,11 @@ namespace GraphQL.DataLoader
         where TKey :  notnull
     {
         System.Threading.Tasks.Task<System.Collections.Generic.IDictionary<TKey, T>> FetchAsync(System.Collections.Generic.IEnumerable<TKey> keys, System.Threading.CancellationToken token);
+    }
+    public interface ICollectionBatchFetcher<TKey, T>
+        where TKey :  notnull
+    {
+        System.Threading.Tasks.Task<System.Linq.ILookup<TKey, T>> FetchAsync(System.Collections.Generic.IEnumerable<TKey> keys, System.Threading.CancellationToken token);
     }
     public interface IConfigureDataLoader
     {
