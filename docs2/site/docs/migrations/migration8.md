@@ -354,3 +354,9 @@ You can also set global attributes that will be applied to all auto-registering 
 if you wish to define your own naming logic.
 
 The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.
+
+### 9. DataLoader extension methods have been moved to the GraphQL namespace
+
+This change simplifies using extension methods for the data loaders. You may need to
+remove the `using GraphQL.DataLoader;` statement from your code to resolve any
+compiler warnings, and/or add `using GraphQL;`.
