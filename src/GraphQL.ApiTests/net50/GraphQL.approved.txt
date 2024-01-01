@@ -99,7 +99,7 @@ namespace GraphQL
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.IValidationResult validationResult, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
-        protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
+        protected virtual GraphQLParser.AST.GraphQLOperationDefinition GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
     public static class DocumentExecuterExtensions
@@ -1360,9 +1360,19 @@ namespace GraphQL.Execution
         public InvalidOperationError(string message) { }
     }
     [System.Serializable]
+    public class InvalidOperationNameError : GraphQL.Execution.DocumentError
+    {
+        public InvalidOperationNameError(string operationName) { }
+    }
+    [System.Serializable]
     public class NoOperationError : GraphQL.Execution.DocumentError
     {
         public NoOperationError() { }
+    }
+    [System.Serializable]
+    public class NoOperationNameError : GraphQL.Execution.DocumentError
+    {
+        public NoOperationNameError() { }
     }
     public class NullExecutionNode : GraphQL.Execution.ExecutionNode
     {

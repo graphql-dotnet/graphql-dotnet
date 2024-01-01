@@ -109,13 +109,7 @@ namespace GraphQL
                         document = _documentBuilder.Build(options.Query!);
                 }
 
-                if (document.OperationsCount() == 0)
-                {
-                    throw new NoOperationError();
-                }
-
-                var operation = GetOperation(options.OperationName, document)
-                    ?? throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
+                var operation = GetOperation(options.OperationName, document);
                 metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;
@@ -270,8 +264,34 @@ namespace GraphQL
         /// Returns <see langword="null"/> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        protected virtual GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLDocument document)
-            => document.OperationWithName(operationName);
+        /// <exception cref="InvalidOperationError">Thrown when the operation name is specified but no operation can be found with that name.</exception>
+        /// <exception cref="NoOperationError">Thrown when no operation can be found and no operation name was specified.</exception>
+        protected virtual GraphQLOperationDefinition GetOperation(string? operationName, GraphQLDocument document)
+        {
+            if (operationName == null)
+            {
+                GraphQLOperationDefinition? match = null;
+                foreach (var def in document.Definitions)
+                {
+                    if (def is GraphQLOperationDefinition op)
+                    {
+                        if (match != null)
+                            throw new NoOperationNameError();
+                        match = op;
+                    }
+                }
+
+                return match ?? throw new NoOperationError();
+            }
+
+            foreach (var def in document.Definitions)
+            {
+                if (def is GraphQLOperationDefinition op && op.Name == operationName)
+                    return op;
+            }
+
+            throw new InvalidOperationNameError(operationName);
+        }
 
         /// <summary>
         /// Returns an instance of an <see cref="IExecutionStrategy"/> given specified execution parameters.
