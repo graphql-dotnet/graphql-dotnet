@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation.Complexity;
@@ -196,6 +197,12 @@ namespace GraphQL.Builders
         /// <typeparam name="TNewReturnType">The type of the return value of the resolver.</typeparam>
         public virtual FieldBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
             => new(FieldType);
+
+        /// <summary>
+        /// Indicates that the resolver for this field will be returning a data loader.
+        /// </summary>
+        public virtual FieldBuilder<TSourceType, IDataLoaderResult<TReturnType>> ReturnsDataLoader()
+            => Returns<IDataLoaderResult<TReturnType>>();
 
         /// <summary>
         /// Adds an argument to the field.
