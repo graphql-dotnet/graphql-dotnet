@@ -959,6 +959,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStream(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.IObservable<TReturnType?>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<System.IObservable<TReturnType?>>> sourceStreamResolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType>> ReturnsDataLoader() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
         [System.Obsolete("Please use the overload that accepts the name as the first argument.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
