@@ -1,8 +1,9 @@
 using System.Collections;
 using GraphQL.Builders;
+using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 
-namespace GraphQL.DataLoader;
+namespace GraphQL;
 
 /// <summary>
 /// Provides extension methods useful for data loaders
