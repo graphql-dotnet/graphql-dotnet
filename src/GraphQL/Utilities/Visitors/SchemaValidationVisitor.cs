@@ -243,7 +243,7 @@ namespace GraphQL.Utilities
                 foreach (var field in schema.Subscription.Fields.List)
                 {
                     if (field.StreamResolver == null)
-                        throw new InvalidOperationException($"The field '{field.Name}' of the subscription root type '{schema.Subscription.Name}' must have StreamResolver set. You should set StreamResolver only all root fields of subscriptions.");
+                        throw new InvalidOperationException($"The field '{field.Name}' of the subscription root type '{schema.Subscription.Name}' must have StreamResolver set.");
                 }
             }
         }
