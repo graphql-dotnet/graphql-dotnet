@@ -1288,13 +1288,6 @@ public class GraphQLBuilderExtensionTests
     {
     }
 
-    private class TestComplexityAnalyzer : ComplexityValidationRule
-    {
-        public TestComplexityAnalyzer() : base(new())
-        {
-        }
-    }
-
     private class TestErrorInfoProvider : ErrorInfoProvider
     {
     }

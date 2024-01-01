@@ -3685,7 +3685,7 @@ namespace GraphQL.Validation.Rules.Custom
     public class ComplexityValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
     {
         public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
-        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
+        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
         public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Types.ISchema schema) { }
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
