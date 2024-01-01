@@ -10,13 +10,11 @@ namespace GraphQL.Tests.Complexity;
 public class ComplexityTestBase
 {
     // For our heuristics in these tests it is assumed that each Field returns on average of two results.
-    public ComplexityValidationRule Analyzer { get; } = new ComplexityValidationRule(new());
-
     public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder { MaxDepth = 1000 };
 
     public StarWarsTestBase StarWarsTestBase { get; } = new StarWarsBasicQueryTests();
 
-    protected ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
+    protected ComplexityResult AnalyzeComplexity(string query) => ComplexityValidationRule.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
 
     public async Task<ExecutionResult> Execute(ComplexityConfiguration complexityConfig, string query, bool onlyComplexityRule = false) =>
         await StarWarsTestBase.Executer.ExecuteAsync(options =>

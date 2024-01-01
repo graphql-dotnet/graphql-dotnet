@@ -112,7 +112,6 @@ public class ComplexityMetaDataFixture : IDisposable
     }
 
     private readonly ServiceProvider _provider;
-    private readonly ComplexityValidationRule _analyzer;
     private readonly IDocumentBuilder _documentBuilder;
     private readonly ComplexityConfiguration _config;
     private readonly ISchema _schema;
@@ -129,7 +128,6 @@ public class ComplexityMetaDataFixture : IDisposable
         _documentBuilder = _provider.GetRequiredService<IDocumentBuilder>();
         _config = _provider.GetRequiredService<ComplexityConfiguration>();
         _schema = _provider.GetRequiredService<ISchema>();
-        _analyzer = _provider.GetRequiredService<ComplexityValidationRule>();
         _executer = _provider.GetRequiredService<IDocumentExecuter<ComplexitySchema>>();
     }
 
@@ -142,7 +140,7 @@ public class ComplexityMetaDataFixture : IDisposable
         }).ConfigureAwait(false);
         result.Errors.ShouldBeNull();
 
-        return _analyzer.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
+        return ComplexityValidationRule.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
     }
 
     public void Dispose() => _provider.Dispose();
