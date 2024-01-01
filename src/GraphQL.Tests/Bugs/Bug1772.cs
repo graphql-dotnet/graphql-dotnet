@@ -4,7 +4,7 @@ using GraphQL.Types;
 namespace GraphQL.Tests.Bugs;
 
 // https://github.com/graphql-dotnet/graphql-dotnet/pull/1772
-// https://github.com/graphql-dotnet/graphql-dotnet/issues/3318
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3318 and https://github.com/graphql-dotnet/graphql-dotnet/pull/3870
 public class Bug1772 : QueryTestBase<Bug1772Schema>
 {
     [Theory]
