@@ -11,9 +11,11 @@ public static class DataLoaderGraphQLBuilderExtensions
     /// dependency injection framework and configures the document listener to be added to the list of document
     /// listeners within <see cref="ExecutionOptions.Listeners"/> upon document execution.
     /// </summary>
-    public static IGraphQLBuilder AddDataLoader(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddDataLoader(this IGraphQLBuilder builder, Action<IConfigureDataLoader>? configure = null)
     {
         builder.Services.Register<IDataLoaderContextAccessor, DataLoaderContextAccessor>(ServiceLifetime.Singleton);
-        return builder.AddDocumentListener<DataLoaderDocumentListener>();
+        builder.AddDocumentListener<DataLoaderDocumentListener>();
+        configure?.Invoke(new ConfigureDataLoader(builder.Services));
+        return builder;
     }
 }
