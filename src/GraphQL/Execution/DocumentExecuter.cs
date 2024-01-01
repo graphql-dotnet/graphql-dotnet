@@ -4,7 +4,6 @@ using GraphQL.Instrumentation;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
-using GraphQLParser;
 using GraphQLParser.AST;
 using ExecutionContext = GraphQL.Execution.ExecutionContext;
 
