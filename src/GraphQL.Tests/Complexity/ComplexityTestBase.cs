@@ -10,7 +10,7 @@ namespace GraphQL.Tests.Complexity;
 public class ComplexityTestBase
 {
     // For our heuristics in these tests it is assumed that each Field returns on average of two results.
-    public ComplexityAnalyzer Analyzer { get; } = new ComplexityAnalyzer();
+    public ComplexityValidationRule Analyzer { get; } = new ComplexityValidationRule(new());
 
     public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder { MaxDepth = 1000 };
 
