@@ -1,7 +1,7 @@
 namespace GraphQL.Execution
 {
     /// <summary>
-    /// Represents an error triggered by an invalid operation being requested that is not configured for the schema.
+    /// Represents an error triggered by an operation type being requested that is not configured for the schema.
     /// </summary>
     [Serializable]
     public class InvalidOperationError : DocumentError

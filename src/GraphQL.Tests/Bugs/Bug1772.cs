@@ -1,14 +1,14 @@
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Tests.Bugs;
 
-// https://github.com/graphql-dotnet/graphql-dotnet/pulls/1772
+// https://github.com/graphql-dotnet/graphql-dotnet/pull/1772
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3318 and https://github.com/graphql-dotnet/graphql-dotnet/pull/3870
 public class Bug1772 : QueryTestBase<Bug1772Schema>
 {
     [Theory]
-    [InlineData("")]
-    [InlineData(null)]
     [InlineData("firstQuery")]
     [InlineData("secondQuery")]
     public async Task DocumentExecuter_works_for_valid_operation(string? operationName)
@@ -26,6 +26,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
     }
 
     [Theory]
+    [InlineData("")]
     [InlineData("thirdQuery")]
     [InlineData("query")]
     [InlineData("test")]
@@ -42,8 +43,65 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
         result.Data.ShouldBeNull();
         result.Errors.ShouldNotBeNull();
         result.Errors.Count.ShouldBe(1);
-        result.Errors[0].ShouldBeOfType<InvalidOperationError>();
-        result.Errors[0].Message.ShouldBe("Query does not contain operation '" + operationName + "'.");
+        result.Errors[0].ShouldBeOfType<InvalidOperationNameError>();
+        result.Errors[0].Message.ShouldBe("Document does not contain an operation named '" + operationName + "'.");
+        result.Errors[0].InnerException.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DocumentExecuter_throws_for_multiple_operations()
+    {
+        var de = new DocumentExecuter();
+        var result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = "query firstQuery {test} query secondQuery {test}",
+            Schema = Schema,
+            OperationName = null,
+        });
+        result.ShouldNotBeNull();
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldNotBeNull();
+        result.Errors.Count.ShouldBe(1);
+        result.Errors[0].ShouldBeOfType<NoOperationNameError>();
+        result.Errors[0].Message.ShouldBe("Document contains more than one operation, but the operation name was not specified.");
+        result.Errors[0].InnerException.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task DocumentExecuter_throws_for_no_operations()
+    {
+        var de = new DocumentExecuter();
+        var result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = "",
+            Schema = Schema,
+            OperationName = null,
+        });
+        result.ShouldNotBeNull();
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldNotBeNull();
+        result.Errors.Count.ShouldBe(1);
+        result.Errors[0].ShouldBeOfType<NoOperationError>();
+        result.Errors[0].Message.ShouldBe("Document does not contain any operations.");
+        result.Errors[0].InnerException.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task validation_error_for_duplicate_operation_names()
+    {
+        var de = new DocumentExecuter();
+        var result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = "query a { test } query a { test }",
+            Schema = Schema,
+            OperationName = "a",
+        });
+        result.ShouldNotBeNull();
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldNotBeNull();
+        result.Errors.Count.ShouldBe(1);
+        result.Errors[0].ShouldBeOfType<UniqueOperationNamesError>();
+        result.Errors[0].Message.ShouldBe("There can only be one operation named a.");
         result.Errors[0].InnerException.ShouldBeNull();
     }
 }
