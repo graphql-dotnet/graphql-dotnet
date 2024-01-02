@@ -1,4 +1,6 @@
-namespace GraphQL.DataLoader;
+using GraphQL.DataLoader;
+
+namespace GraphQL;
 
 /// <summary>
 /// Provides extension methods for retrieving <see cref="IDataLoader"/> implementations via a <see cref="DataLoaderContext"/>
