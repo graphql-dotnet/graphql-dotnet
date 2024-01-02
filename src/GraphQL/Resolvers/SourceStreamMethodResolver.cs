@@ -7,7 +7,7 @@ namespace GraphQL.Resolvers
     /// A precompiled source stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
-    public partial class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
+    public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     {
         private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _sourceStreamResolver = null!;
 
