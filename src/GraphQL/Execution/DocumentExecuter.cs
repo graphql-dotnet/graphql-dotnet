@@ -146,20 +146,14 @@ namespace GraphQL
                         .ConfigureAwait(false);
                 }
 
-                if (!validationResult.IsValid)
+                if (!validationResult.IsValid || context.Errors.Count > 0)
                 {
+                    var errors = !validationResult.IsValid ? validationResult.Errors : context.Errors;
+                    if (!validationResult.IsValid && context.Errors.Count > 0)
+                        errors.AddRange(context.Errors);
                     return new ExecutionResult
                     {
-                        Errors = validationResult.Errors,
-                        Perf = metrics.Finish()
-                    };
-                }
-
-                if (context.Errors.Count > 0)
-                {
-                    return new ExecutionResult
-                    {
-                        Errors = context.Errors,
+                        Errors = errors,
                         Perf = metrics.Finish()
                     };
                 }
