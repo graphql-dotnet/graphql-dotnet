@@ -7,7 +7,7 @@ namespace GraphQL.Resolvers
     /// A precompiled source stream resolver for a specific <see cref="MethodInfo"/>.
     /// Calls the specified method (with the specified arguments) and returns the value of the method.
     /// </summary>
-    public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
+    public partial class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
     {
         private Func<IResolveFieldContext, ValueTask<IObservable<object?>>> _sourceStreamResolver = null!;
 
@@ -163,32 +163,5 @@ namespace GraphQL.Resolvers
         public ValueTask<IObservable<object?>> ResolveStreamAsync(IResolveFieldContext context) => _sourceStreamResolver(context);
 
         ValueTask<IObservable<object?>> ISourceStreamResolver.ResolveAsync(IResolveFieldContext context) => ResolveStreamAsync(context);
-
-        /// <summary>
-        /// Converts an <see cref="IObservable{T}"/> for value types into an <see cref="IObservable{T}">IObservable&lt;object?&gt;</see>.
-        /// </summary>
-        private sealed class ObservableAdapter<T> : IObservable<object?>
-        {
-            private readonly IObservable<T> _observable;
-
-            public ObservableAdapter(IObservable<T> observable)
-            {
-                _observable = observable;
-            }
-
-            public IDisposable Subscribe(IObserver<object?> observer) => _observable.Subscribe(new ObserverAdapter(observer));
-
-            private sealed class ObserverAdapter : IObserver<T>
-            {
-                private readonly IObserver<object?> _observer;
-                public ObserverAdapter(IObserver<object?> observer)
-                {
-                    _observer = observer;
-                }
-                public void OnCompleted() => _observer.OnCompleted();
-                public void OnError(Exception error) => _observer.OnError(error);
-                public void OnNext(T value) => _observer.OnNext(value); // note: boxing here
-            }
-        }
     }
 }
