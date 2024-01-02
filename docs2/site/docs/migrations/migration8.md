@@ -246,6 +246,11 @@ At this time GraphQL.NET does not directly support the `MaxLength` and similar a
 implement your own attributes as shown above, or call the `Validate` method to set a validation
 function.
 
+### 6. Validation rules can validate field arguments and directive arguments
+
+Validation rules can now validate field arguments and directive arguments. This is useful for
+...
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -354,3 +359,13 @@ You can also set global attributes that will be applied to all auto-registering 
 if you wish to define your own naming logic.
 
 The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.
+
+### 9. `IVariableVisitorProvider.ValidateArgumentAsync` added
+
+The `IVariableVisitorProvider` interface has a new method `ValidateArgumentAsync` that is
+called during validation. This method is called after all field arguments and directive
+arguments have been parsed, allowing a validation rule to validate parsed argument values.
+
+No changes will be required to most validation rules which only implement `IValidationRule`.
+But for any validation rule which also implements `IVariableVisitorProvider`, you will need
+to add an implementation for this new method.

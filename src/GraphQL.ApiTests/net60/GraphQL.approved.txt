@@ -3194,6 +3194,7 @@ namespace GraphQL.Validation
     public interface IVariableVisitorProvider
     {
         GraphQL.Validation.IVariableVisitor GetVisitor(GraphQL.Validation.ValidationContext context);
+        System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateArgumentsAsync(GraphQL.Validation.ValidationContext context);
     }
     public class InvalidLiteralError : GraphQL.Validation.ValidationError
     {
@@ -3229,6 +3230,7 @@ namespace GraphQL.Validation
     public class TypeInfo : GraphQL.Validation.INodeVisitor
     {
         public TypeInfo(GraphQL.Types.ISchema schema) { }
+        public void Clear() { }
         public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
         public GraphQLParser.AST.ASTNode? GetAncestor(int index) { }
         public GraphQL.Types.QueryArgument? GetArgument() { }
@@ -3242,7 +3244,9 @@ namespace GraphQL.Validation
     public class ValidationContext : GraphQL.Execution.IProvideUserContext
     {
         public ValidationContext() { }
+        public System.Collections.Generic.Dictionary<GraphQLParser.AST.GraphQLField, System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>>? ArgumentValues { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
+        public System.Collections.Generic.Dictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.ValidationError> Errors { get; }
         public GraphQL.Inputs Extensions { get; set; }
@@ -3564,6 +3568,7 @@ namespace GraphQL.Validation.Rules
         public static readonly GraphQL.Validation.Rules.InputFieldsAndArgumentsOfCorrectLength Instance;
         public InputFieldsAndArgumentsOfCorrectLength() { }
         public GraphQL.Validation.IVariableVisitor GetVisitor(GraphQL.Validation.ValidationContext _) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateArgumentsAsync(GraphQL.Validation.ValidationContext _) { }
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class KnownArgumentNames : GraphQL.Validation.IValidationRule
