@@ -31,6 +31,20 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     }
 
     [Fact]
+    public async Task BasicInt()
+    {
+        var result = await ExecuteAsync("subscription { testInt }");
+        result.ShouldBeSuccessful();
+        SubscriptionObj.ShouldNotBeNull();
+        result.Perf.ShouldBeNull();
+        Source.Next("1");
+        Source.Next("2");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testInt": 1 } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testInt": 2 } }""");
+        Observer.ShouldHaveNoMoreResults();
+    }
+
+    [Fact]
     public async Task NoMetricsForDataEvents()
     {
         var result = await ExecuteAsync("subscription { test }", o => o.EnableMetrics = true);
@@ -545,6 +559,9 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     private class Subscription
     {
         public static IObservable<string> Test([FromServices] IObservable<string> source) => source;
+
+        public static IObservable<int> TestInt([FromServices] IObservable<string> source)
+            => new ObservableSelect<string, int>(source, value => int.Parse(value));
 
         public static IObservable<string> TestWithInitialExtensions(IResolveFieldContext context, [FromServices] IObservable<string> source)
         {
