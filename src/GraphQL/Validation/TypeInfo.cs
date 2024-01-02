@@ -22,10 +22,37 @@ namespace GraphQL.Validation
         /// <summary>
         /// Initializes a new instance for the specified schema.
         /// </summary>
-        /// <param name="schema"></param>
         public TypeInfo(ISchema schema)
         {
             _schema = schema;
+        }
+
+        /// <summary>
+        /// Clears information about the current state of the AST tree.
+        /// </summary>
+        public void Clear()
+        {
+            _typeStack.Clear();
+            _inputTypeStack.Clear();
+            _parentTypeStack.Clear();
+            _fieldDefStack.Clear();
+            _ancestorStack.Clear();
+            _directive = null;
+            _argument = null;
+            NoFragmentCycles_VisitedFrags?.Clear();
+            NoFragmentCycles_SpreadPath?.Clear();
+            NoFragmentCycles_SpreadPathIndexByName?.Clear();
+            NoUndefinedVariables_VariableNameDefined?.Clear();
+            NoUnusedFragments_OperationDefs?.Clear();
+            NoUnusedFragments_FragmentDefs?.Clear();
+            NoUnusedVariables_VariableDefs?.Clear();
+            UniqueArgumentNames_KnownArgs?.Clear();
+            UniqueFragmentNames_KnownFragments?.Clear();
+            UniqueInputFieldNames_KnownNameStack?.Clear();
+            UniqueInputFieldNames_KnownNames?.Clear();
+            UniqueOperationNames_Frequency?.Clear();
+            UniqueVariableNames_KnownVariables?.Clear();
+            VariablesInAllowedPosition_VarDefMap?.Clear();
         }
 
         private static T? PeekElement<T>(Stack<T> from, int index)

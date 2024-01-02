@@ -46,6 +46,9 @@ namespace GraphQL.Validation.Rules
         /// <inheritdoc/>
         public IVariableVisitor GetVisitor(ValidationContext _) => FieldVisitor.Instance;
 
+        /// <inheritdoc/>
+        public ValueTask<INodeVisitor?> ValidateArgumentsAsync(ValidationContext _) => default;
+
         /// <summary>
         /// Returns a static instance of this validation rule.
         /// </summary>

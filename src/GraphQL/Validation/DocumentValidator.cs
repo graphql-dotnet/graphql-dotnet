@@ -145,19 +145,53 @@ namespace GraphQL.Validation
                 // parse all field arguments
                 using var parseArgumentVisitorContext = new ParseArgumentVisitor.Context(context, variables);
                 await ParseArgumentVisitor.Instance.VisitAsync(context.Document, parseArgumentVisitorContext).ConfigureAwait(false);
-                var argumentValues = parseArgumentVisitorContext.ArgumentValues;
-                var directiveValues = parseArgumentVisitorContext.DirectiveValues;
+                context.ArgumentValues = parseArgumentVisitorContext.ArgumentValues;
+                context.DirectiveValues = parseArgumentVisitorContext.DirectiveValues;
 
-                // todo: execute validation rules that need to be able to read field arguments/directives
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors)
+                    {
+                        Variables = variables,
+                        ArgumentValues = context.ArgumentValues,
+                        DirectiveValues = context.DirectiveValues,
+                    };
+                }
 
-                if (!context.HasErrors && variables == Variables.None && argumentValues == null && directiveValues == null)
+                if (rules.Any())
+                {
+                    List<INodeVisitor>? visitors = null;
+
+                    foreach (var rule in rules)
+                    {
+                        if (rule is IVariableVisitorProvider provider)
+                        {
+                            var visitor = await provider.ValidateArgumentsAsync(context).ConfigureAwait(false);
+                            if (visitor != null)
+                            {
+                                visitors ??= [context.TypeInfo];
+                                visitors.Add(visitor);
+                            }
+                        }
+                    }
+
+                    if (visitors != null)
+                    {
+                        // clear state of TypeInfo structure to be sure that it is not polluted by previous validation
+                        context.TypeInfo.Clear();
+
+                        await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
+                    }
+                }
+
+                if (!context.HasErrors && variables == Variables.None && context.ArgumentValues == null && context.DirectiveValues == null)
                     return SuccessfullyValidatedResult.Instance;
 
                 return new ValidationResult(context.Errors)
                 {
                     Variables = variables,
-                    ArgumentValues = argumentValues,
-                    DirectiveValues = directiveValues,
+                    ArgumentValues = context.ArgumentValues,
+                    DirectiveValues = context.DirectiveValues,
                 };
             }
             finally
