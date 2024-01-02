@@ -1,5 +1,6 @@
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 
 namespace GraphQL.Tests.Bugs;
 
@@ -82,6 +83,25 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
         result.Errors.Count.ShouldBe(1);
         result.Errors[0].ShouldBeOfType<NoOperationError>();
         result.Errors[0].Message.ShouldBe("Document does not contain any operations.");
+        result.Errors[0].InnerException.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task validation_error_for_duplicate_operation_names()
+    {
+        var de = new DocumentExecuter();
+        var result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = "query a { test } query a { test }",
+            Schema = Schema,
+            OperationName = "a",
+        });
+        result.ShouldNotBeNull();
+        result.Data.ShouldBeNull();
+        result.Errors.ShouldNotBeNull();
+        result.Errors.Count.ShouldBe(1);
+        result.Errors[0].ShouldBeOfType<UniqueOperationNamesError>();
+        result.Errors[0].Message.ShouldBe("There can only be one operation named a.");
         result.Errors[0].InnerException.ShouldBeNull();
     }
 }
