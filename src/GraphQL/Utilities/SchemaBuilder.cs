@@ -111,6 +111,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var directives = new List<Directive>();
 
+            // process the schema definition first
             foreach (var def in document.Definitions)
             {
                 if (def is GraphQLSchemaDefinition schemaDef)
@@ -118,7 +119,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     _schemaDef = schemaDef;
                     schema.SetAstType(schemaDef);
                 }
-                else if (def is GraphQLObjectTypeDefinition objDef)
+            }
+
+            foreach (var def in document.Definitions)
+            {
+                if (def is GraphQLObjectTypeDefinition objDef)
                 {
                     var type = ToObjectGraphType(objDef);
                     _types[type.Name] = type;
