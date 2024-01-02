@@ -1,4 +1,5 @@
 using GraphQL.Resolvers;
+using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI;
@@ -26,5 +27,6 @@ internal class DynamicScopedFieldResolver : IFieldResolver
     }
 
     /// <inheritdoc/>
+    [AllowedOn<IObjectGraphType>]
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolverFunc(context);
 }
