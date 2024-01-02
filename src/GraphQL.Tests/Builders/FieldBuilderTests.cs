@@ -423,18 +423,12 @@ public class FieldBuilderTests
     }
 
     [Fact]
-    public async Task returns_dataloader()
+    public async Task microsoft_di_resolve_works_with_dataloader()
     {
         var objectType = new ObjectGraphType<Tuple<string>>();
         var fieldType = objectType.Field(x => x.Item1)
-            // test ReturnsDataLoader method
-            .ReturnsDataLoader()
-            // ensure correct field builder type
-            .ShouldBeOfType<FieldBuilder<Tuple<string>, IDataLoaderResult<string>>>()
-            // ensure works with resolve builders
             .Resolve()
-            .Resolve(_ => new DataLoaderResult<string>(Task.FromResult("abc")))
-            // get FieldType so we can test it
+            .ResolveAsync(_ => new DataLoaderResult<string?>(Task.FromResult<string?>("abc")))
             .FieldType;
 
         var result = await fieldType.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());

@@ -199,12 +199,6 @@ namespace GraphQL.Builders
             => new(FieldType);
 
         /// <summary>
-        /// Indicates that the resolver for this field will be returning a data loader.
-        /// </summary>
-        public virtual FieldBuilder<TSourceType, IDataLoaderResult<TReturnType>> ReturnsDataLoader()
-            => Returns<IDataLoaderResult<TReturnType>>();
-
-        /// <summary>
         /// Adds an argument to the field.
         /// </summary>
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
