@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using GraphQL.Builders;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
@@ -428,7 +427,7 @@ public class FieldBuilderTests
         var objectType = new ObjectGraphType<Tuple<string>>();
         var fieldType = objectType.Field(x => x.Item1)
             .Resolve()
-            .ResolveAsync(_ => new DataLoaderResult<string?>(Task.FromResult<string?>("abc")))
+            .ResolveAsync(_ => new DataLoaderResult<string>(Task.FromResult("abc")))
             .FieldType;
 
         var result = await fieldType.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
