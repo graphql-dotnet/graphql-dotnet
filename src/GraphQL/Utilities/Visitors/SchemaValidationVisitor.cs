@@ -238,6 +238,14 @@ namespace GraphQL.Utilities
             var n3 = schema.Subscription?.Name;
             if (n1 == n2 && n1 != null || n1 == n3 && n1 != null || n2 == n3 && n2 != null)
                 throw new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided.");
+            if (schema.Subscription != null)
+            {
+                foreach (var field in schema.Subscription.Fields.List)
+                {
+                    if (field.StreamResolver == null)
+                        throw new InvalidOperationException($"The field '{field.Name}' of the subscription root type '{schema.Subscription.Name}' must have StreamResolver set.");
+                }
+            }
         }
 
         // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Unions

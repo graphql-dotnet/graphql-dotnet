@@ -201,9 +201,17 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task NotSubscriptionField()
     {
-        var result = await ExecuteAsync("subscription { notSubscriptionField }");
-        result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027.","locations":[{"line":1,"column":16}],"path":["notSubscriptionField"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field<StringGraphType>("dummy");
+        var subscriptionType = new ObjectGraphType() { Name = "Subscription" };
+        subscriptionType.Field<StringGraphType>("notSubscriptionField");
+        var schema = new Schema()
+        {
+            Query = queryType,
+            Subscription = subscriptionType
+        };
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("The field 'notSubscriptionField' of the subscription root type 'Subscription' must have StreamResolver set.");
     }
 
     public int Counter = 0;
@@ -567,7 +575,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
 
         public static IObservable<string> TestObservableNull() => null!;
 
-        public static string NotSubscriptionField() => "testing";
+        //public static string NotSubscriptionField() => "testing";
     }
 
     private class MyWidget
