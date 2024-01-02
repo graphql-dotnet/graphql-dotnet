@@ -2866,6 +2866,8 @@ namespace GraphQL.Utilities
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
     }
+    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
+        "d in v9.")]
     public class SchemaPrinter
     {
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
@@ -2982,6 +2984,8 @@ namespace GraphQL.Utilities.Federation
         public override GraphQL.Types.Schema Build(string typeDefinitions) { }
         protected override void PreConfigure(GraphQL.Types.Schema schema) { }
     }
+    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
+        "d in v9.")]
     public class FederatedSchemaPrinter : GraphQL.Utilities.SchemaPrinter
     {
         public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
