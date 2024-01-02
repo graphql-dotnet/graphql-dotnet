@@ -211,7 +211,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
             Subscription = subscriptionType
         };
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("The field 'notSubscriptionField' of the subscription root type 'Subscription' must have StreamResolver set. You should set StreamResolver only all root fields of subscriptions.");
+            .Message.ShouldBe("The field 'notSubscriptionField' of the subscription root type 'Subscription' must have StreamResolver set.");
     }
 
     public int Counter = 0;
