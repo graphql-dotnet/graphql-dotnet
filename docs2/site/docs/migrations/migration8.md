@@ -360,3 +360,12 @@ The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NE
 This change simplifies using extension methods for the data loaders. You may need to
 remove the `using GraphQL.DataLoader;` statement from your code to resolve any
 compiler warnings, and/or add `using GraphQL;`.
+
+### 10. The SchemaPrinter has been deprecated
+
+Please see the v7 migration document regarding the new `schema.ToAST()` and
+`schema.Print()` methods available for printing the schema (available since 7.6).
+
+For federated schemas, the `ServiceGraphType`'s `sdl` field will now use the
+new implementation to print the schema. Please raise an issue if this causes
+a problem for your federated schema.

@@ -10,11 +10,11 @@ namespace GraphQL.Utilities.Federation
         {
             Name = "_Service";
 
-            Field<StringGraphType>("sdl").Resolve(context =>
+            var options = new PrintOptions
             {
-                var printer = new FederatedSchemaPrinter(context.Schema);
-                return printer.PrintFederatedSchema();
-            });
+                IncludeFederationTypes = false, // for federation v1 support
+            };
+            Field<StringGraphType>("sdl").Resolve(context => context.Schema.Print(options));
         }
     }
 }
