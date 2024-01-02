@@ -263,8 +263,9 @@ namespace GraphQL
         /// Returns <see langword="null"/> if an operation cannot be found that matches the given criteria.
         /// Returns the first operation from the document if no operation name was specified.
         /// </summary>
-        /// <exception cref="InvalidOperationError">Thrown when the operation name is specified but no operation can be found with that name.</exception>
-        /// <exception cref="NoOperationError">Thrown when no operation can be found and no operation name was specified.</exception>
+        /// <exception cref="InvalidOperationNameError">Thrown when the operation name is specified but no operation can be found with that name.</exception>
+        /// <exception cref="NoOperationNameError">Thrown when the document includes multiple operations, but no operation name was specified in the request.</exception>
+        /// <exception cref="NoOperationError">Thrown when the document does not include any operations.</exception>
         protected virtual GraphQLOperationDefinition GetOperation(string? operationName, GraphQLDocument document)
         {
             if (operationName == null)
