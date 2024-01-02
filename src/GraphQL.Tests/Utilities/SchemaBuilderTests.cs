@@ -106,7 +106,7 @@ public class SchemaBuilderTests
             }
             """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("Subscription"));
         schema.Initialize();
 
         var subscription = schema.Subscription;
@@ -115,6 +115,15 @@ public class SchemaBuilderTests
         subscription.Fields.Count.ShouldBe(1);
 
         subscription.Fields.Single().Name.ShouldBe("subscribe");
+    }
+
+    private class DummySubscription
+    {
+        [GraphQLMetadata("subscribe")]
+        public string SubscribeResolver(IResolveFieldContext context) => (string)context.Source!;
+
+        [GraphQLMetadata(ResolverType = ResolverType.StreamResolver)]
+        public IObservable<string> Subscribe() => throw new NotImplementedException();
     }
 
     [Fact]
@@ -140,7 +149,7 @@ public class SchemaBuilderTests
             }
             """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("MySubscription"));
         schema.Initialize();
 
         var query = schema.Query;
@@ -185,7 +194,7 @@ public class SchemaBuilderTests
             }
             """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("MySubscription"));
         schema.Directives.Register(new Directive("public", DirectiveLocation.Schema));
         schema.Directives.Register(new Directive("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
         schema.Directives.Register(new Directive("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });

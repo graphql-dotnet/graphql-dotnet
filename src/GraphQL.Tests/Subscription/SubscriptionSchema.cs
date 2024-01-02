@@ -70,6 +70,14 @@ public class ChatSubscriptions : ObjectGraphType
             Type = typeof(StringGraphType),
             StreamResolver = new SourceStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
         });
+
+        int counter = 0;
+        AddField(new FieldType
+        {
+            Name = "messageCounter",
+            Type = typeof(IntGraphType),
+            StreamResolver = new SourceStreamResolver<int>(context => Subscribe(context).Select(_ => ++counter))
+        });
     }
 
     private IObservable<Message> SubscribeById(IResolveFieldContext context)
@@ -145,7 +153,7 @@ public class MessageInputType : InputObjectGraphType
     {
         Field<StringGraphType>("fromId");
         Field<StringGraphType>("content");
-        Field<DateGraphType>("sentAt");
+        Field<DateTimeOffsetGraphType>("sentAt");
     }
 }
 
@@ -164,7 +172,7 @@ public class Message
 
     public string Content { get; set; }
 
-    public DateTime SentAt { get; set; }
+    public DateTimeOffset SentAt { get; set; }
 }
 
 public class MessageFrom
@@ -180,7 +188,7 @@ public class ReceivedMessage
 
     public string Content { get; set; }
 
-    public DateTime SentAt { get; set; }
+    public DateTimeOffset SentAt { get; set; }
 }
 
 public interface IChat
