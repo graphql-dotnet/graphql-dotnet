@@ -394,8 +394,8 @@ public class OrderType : ObjectGraphType<Order>
 You do not need to use `IDataLoaderContextAccessor` or `DataLoaderDocumentListener` and may remove those references
 from your code.
 
-If you are using the resolver builder feature of the `GraphQL.MicrosoftDI` package,
-call `ReturnsDataLoader()` to indicate that the return type will be a data loader.
+You may also use the resolver builder feature of the `GraphQL.MicrosoftDI` package,
+as shown in the below example:
 
 ```csharp
     public class MyQuery : ObjectGraphType
@@ -404,7 +404,6 @@ call `ReturnsDataLoader()` to indicate that the return type will be a data loade
         {
             Field<OrderType, Order>("Order")
                 .Argument<NonNullGraphType<IdGraphType>>("id")
-                .ReturnsDataLoader()
                 .Resolve()
                 .WithService<MyOrderDataLoader>()
                 .ResolveAsync((context, loader) =>
@@ -417,7 +416,7 @@ call `ReturnsDataLoader()` to indicate that the return type will be a data loade
 
 Note that if you attempt to create a service scope via `WithScope()` for a scoped
 data loader, each data loaded entry will exist in its own service scope, and none
-of the entries will be batch loaded.  However, you can use a singleton data loader,
+of the entries will be batch loaded. However, you can use a singleton data loader,
 creating a service scope for the load operation, as shown below.
 
 ## Singleton DI-based data loader instances
