@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL.Builders
 {
@@ -410,7 +410,7 @@ namespace GraphQL.Builders
             => this.ApplyDirective(name, configure);
 
         /// <summary>
-        /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
+        /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
         /// </summary>
         /// <param name="impact">Field's complexity impact.</param>
         [Obsolete("Please use the WithComplexityImpact method")]

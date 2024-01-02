@@ -1,6 +1,7 @@
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
@@ -111,7 +112,6 @@ public class ComplexityMetaDataFixture : IDisposable
     }
 
     private readonly ServiceProvider _provider;
-    private readonly ComplexityAnalyzer _analyzer;
     private readonly IDocumentBuilder _documentBuilder;
     private readonly ComplexityConfiguration _config;
     private readonly ISchema _schema;
@@ -126,9 +126,8 @@ public class ComplexityMetaDataFixture : IDisposable
             ).BuildServiceProvider();
 
         _documentBuilder = _provider.GetRequiredService<IDocumentBuilder>();
-        _config = new();
+        _config = _provider.GetRequiredService<ComplexityConfiguration>();
         _schema = _provider.GetRequiredService<ISchema>();
-        _analyzer = new();
         _executer = _provider.GetRequiredService<IDocumentExecuter<ComplexitySchema>>();
     }
 
@@ -141,7 +140,7 @@ public class ComplexityMetaDataFixture : IDisposable
         }).ConfigureAwait(false);
         result.Errors.ShouldBeNull();
 
-        return _analyzer.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
+        return ComplexityValidationRule.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
     }
 
     public void Dispose() => _provider.Dispose();

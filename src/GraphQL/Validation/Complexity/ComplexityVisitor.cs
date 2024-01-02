@@ -1,11 +1,12 @@
 using GraphQL.Types;
+using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity
 {
     /// <summary>
-    /// Two-phase complexity visitor. See <see cref="ComplexityAnalyzer.Analyze(GraphQLDocument, double, int, ISchema?)"/>.
+    /// Two-phase complexity visitor. See <see cref="ComplexityValidationRule.Analyze(GraphQLDocument, double, int, ISchema?)"/>.
     /// Phase 1. Calculate complexity of all fragments defined in GraphQL document; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is false.
     /// Phase 2. Calculate complexity of executed operation; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is true.
     /// </summary>
