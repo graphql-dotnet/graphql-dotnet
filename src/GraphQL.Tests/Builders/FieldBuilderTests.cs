@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using GraphQL.DataLoader;
 using GraphQL.Execution;
+using GraphQL.MicrosoftDI;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
@@ -417,5 +419,19 @@ public class FieldBuilderTests
         {
             Source = 12345
         });
+    }
+
+    [Fact]
+    public async Task microsoft_di_resolve_works_with_dataloader()
+    {
+        var objectType = new ObjectGraphType<Tuple<string>>();
+        var fieldType = objectType.Field(x => x.Item1)
+            .Resolve()
+            .ResolveAsync(_ => new DataLoaderResult<string>(Task.FromResult("abc")))
+            .FieldType;
+
+        var result = await fieldType.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
+        var loadedResult = await result.ShouldBeAssignableTo<IDataLoaderResult<string>>()!.GetResultAsync();
+        loadedResult.ShouldBe("abc");
     }
 }
