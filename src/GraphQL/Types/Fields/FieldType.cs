@@ -70,7 +70,6 @@ namespace GraphQL.Types
         public IGraphType? ResolvedType { get; set; }
 
         /// <inheritdoc/>
-        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public QueryArguments? Arguments { get; set; }
 
         /// <summary>
@@ -81,19 +80,16 @@ namespace GraphQL.Types
         /// default set needs to be returned.
         /// Note that this value is automatically initialized during schema initialization.
         /// </summary>
-        [AllowedOn<IObjectGraphType>]
         internal IDictionary<string, ArgumentValue>? DefaultArgumentValues { get; set; }
 
         /// <summary>
         /// Gets or sets a field resolver for the field. Only applicable to fields of output graph types.
         /// </summary>
-        [AllowedOn<IObjectGraphType>]
         public IFieldResolver? Resolver { get; set; }
 
         /// <summary>
         /// Gets or sets a subscription resolver for the field. Only applicable to the root fields of subscription.
         /// </summary>
-        [AllowedOn<IObjectGraphType>]
         public ISourceStreamResolver? StreamResolver { get; set; }
 
         /// <summary>
@@ -102,7 +98,6 @@ namespace GraphQL.Types
         /// Throw an exception if necessary to indicate a problem.
         /// Only applicable to fields of input graph types.
         /// </summary>
-        [AllowedOn<IInputObjectGraphType>]
         public Func<object, object> Parser { get; set; } = DefaultParser;
 
         /// <summary>
@@ -116,7 +111,6 @@ namespace GraphQL.Types
         /// Throw an exception if necessary to indicate a problem.
         /// Only applicable to fields of input graph types.
         /// </summary>
-        [AllowedOn<IInputObjectGraphType>]
         public Action<object> Validator { get; set; } = DefaultValidator;
 
         /// <summary>
