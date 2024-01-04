@@ -220,7 +220,7 @@ public class AllowedOnAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments(method, "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -276,7 +276,7 @@ public class AllowedOnAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -336,7 +336,7 @@ public class AllowedOnAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -371,7 +371,7 @@ public class AllowedOnAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -408,7 +408,7 @@ public class AllowedOnAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -444,7 +444,7 @@ public class AllowedOnAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
@@ -480,7 +480,7 @@ public class AllowedOnAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+        var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
             .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         var test = new VerifyCS.Test
         {
@@ -534,7 +534,7 @@ public class AllowedOnAnalyzerTests
 
         if (report)
         {
-            var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+            var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
                 .WithLocation(0).WithArguments("Argument", "IObjectGraphType or IInterfaceGraphType");
             await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
         }
@@ -589,7 +589,7 @@ public class AllowedOnAnalyzerTests
 
         if (report)
         {
-            var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage)
+            var expected = VerifyCS.Diagnostic(AllowedOnAnalyzer.IllegalMethodUsage)
                 .WithLocation(0).WithArguments(methodName, "IInputObjectGraphType");
             await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
         }

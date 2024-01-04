@@ -12,17 +12,17 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
 {
     // Violation: any of _forbiddenMethodNames used on type that doesn't implement _allowedInterfaces
     // Fixed:     remove the illegal method
-    public static readonly DiagnosticDescriptor IllegalMethodOrPropertyUsage = new(
-        id: DiagnosticIds.ILLEGAL_METHOD_OR_PROPERTY_USAGE,
+    public static readonly DiagnosticDescriptor IllegalMethodUsage = new(
+        id: DiagnosticIds.ILLEGAL_METHOD_USAGE,
         title: "Illegal resolver usage",
         messageFormat: "'{0}' invocation is only allowed on types implementing {1}",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.ILLEGAL_METHOD_OR_PROPERTY_USAGE);
+        helpLinkUri: HelpLinks.ILLEGAL_METHOD_USAGE);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(IllegalMethodOrPropertyUsage);
+        ImmutableArray.Create(IllegalMethodUsage);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -102,7 +102,7 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
 
         if (!implementsAllowedInterfaces)
         {
-            ReportFieldTypeDiagnostic(context, memberAccessExpression, IllegalMethodOrPropertyUsage, allowedTypes.Value);
+            ReportFieldTypeDiagnostic(context, memberAccessExpression, IllegalMethodUsage, allowedTypes.Value);
         }
     }
 

@@ -14,7 +14,7 @@ namespace GraphQL.Analyzers;
 public class AllowedOnCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage.Id);
+        ImmutableArray.Create(AllowedOnAnalyzer.IllegalMethodUsage.Id);
 
     public sealed override FixAllProvider GetFixAllProvider() =>
         WellKnownFixAllProviders.BatchFixer;
