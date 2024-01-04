@@ -178,6 +178,7 @@ services.AddGraphQL(b => b
             await using var scope = options.RequestServices!.CreateAsyncScope();
             var db = scope.ServiceProvider.GetRequiredService<MyDatabaseContext>();
             var errorLog = new ErrorLog {
+                // when APQ is in use, pull the query from the document if necessary
                 Query = options.Query ?? options.Document?.Source.ToString(),
                 DateStamp = DateTime.UtcNow,
                 Message = context.Exception.Message,
@@ -195,7 +196,7 @@ services.AddGraphQL(b => b
 ```
 
 Please note that the unhandled exception handler is not called when the request's cancellation
-token is triggered, for instance when the client disconnects.
+token is triggered, for instance when the client disconnects before execution is complete.
 
 ## Error Serialization
 
