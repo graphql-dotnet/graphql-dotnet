@@ -963,6 +963,15 @@ public class GraphQLBuilderExtensionTests
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
     }
+
+    [Fact]
+    public void AddUnhandledExceptionHandler_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext, ExecutionOptions>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, Task>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, ExecutionOptions, Task>)null!));
+    }
     #endregion
 
     #region - AddValidationRule -

@@ -1277,15 +1277,28 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// </para>
     /// </remarks>
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate)
-        => builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = unhandledExceptionDelegate);
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = unhandledExceptionDelegate);
+    }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
-        => builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+    }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext> unhandledExceptionDelegate)
     {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
         var handler = (UnhandledExceptionContext context) =>
         {
             unhandledExceptionDelegate(context);
@@ -1298,6 +1311,9 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
     {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
         builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context =>
         {
             unhandledExceptionDelegate(context, settings);
