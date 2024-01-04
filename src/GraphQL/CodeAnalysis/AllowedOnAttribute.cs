@@ -1,7 +1,14 @@
+using GraphQL.Types;
+
 namespace GraphQL;
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
-internal class AllowedOnAttribute<T> : Attribute { }
+/// <summary>
+/// Marker attribute for analyzer usage to indicate
+/// graph types where annotated method is allowed to be used
+/// </summary>
+[AttributeUsage(AttributeTargets.Method)]
+internal class AllowedOnAttribute<T> : Attribute where T : IComplexGraphType { }
 
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]
-internal class AllowedOnAttribute<T1, T2> : Attribute { }
+/// <inheritdoc cref="AllowedOnAttribute{T}"/>
+[AttributeUsage(AttributeTargets.Method)]
+internal class AllowedOnAttribute<T1, T2> : Attribute where T1 : IComplexGraphType where T2 : IComplexGraphType { }

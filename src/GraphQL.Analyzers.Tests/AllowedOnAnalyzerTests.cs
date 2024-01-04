@@ -598,4 +598,21 @@ public class AllowedOnAnalyzerTests
             await VerifyCS.VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, source);
         }
     }
+
+    [Fact]
+    public async Task FullyQualifiedStaticName_NoExceptions()
+    {
+        const string source =
+            """
+              namespace Sample.Server;
+
+              public class MyGraphType
+              {
+                  public MyGraphType() =>
+                      _ = System.Text.Encoding.UTF8.GetBytes("xxx");
+              }
+              """;
+
+        await VerifyCS.VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, source);
+    }
 }

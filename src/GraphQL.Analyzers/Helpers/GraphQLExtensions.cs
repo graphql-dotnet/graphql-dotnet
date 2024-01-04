@@ -31,7 +31,7 @@ public static class GraphQLExtensions
     /// <returns><see langword="true"/> if the symbol is a GraphQL symbol; otherwise, <see langword="false"/>.</returns>
     public static bool IsGraphQLSymbol(this ISymbol symbol) =>
         // GraphQL, GraphQL.MicrosoftDI...
-        symbol.ContainingAssembly.Name.StartsWith(Constants.GraphQL);
+        symbol.ContainingAssembly?.Name.StartsWith(Constants.GraphQL) == true;
 
     /// <summary>
     /// Gets the return type symbol of the <see cref="ExpressionSyntax"/> which represents a method defined by
