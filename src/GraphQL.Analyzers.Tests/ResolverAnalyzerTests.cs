@@ -10,7 +10,7 @@ public class ResolverAnalyzerTests
     [Fact]
     public async Task Sanity_NoDiagnostics()
     {
-        const string source = @"";
+        string source = string.Empty;
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
@@ -220,7 +220,8 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments(method, "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -275,7 +276,8 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -334,7 +336,8 @@ public class ResolverAnalyzerTests
               public class CustomInputObjectGraphType : InputObjectGraphType { }
               """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -368,7 +371,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -404,7 +408,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -439,7 +444,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
@@ -474,7 +480,8 @@ public class ResolverAnalyzerTests
             }
             """;
 
-        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalResolverUsage).WithLocation(0);
+        var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+            .WithLocation(0).WithArguments("Resolve", "IObjectGraphType");
         var test = new VerifyCS.Test
         {
             TestCode = source,
@@ -483,5 +490,112 @@ public class ResolverAnalyzerTests
             ExpectedDiagnostics = { expected }
         };
         await test.RunAsync();
+    }
+
+    [Theory]
+    [InlineData("ObjectGraphType", false)]
+    [InlineData("InterfaceGraphType", false)]
+    [InlineData("InputObjectGraphType", true)]
+    public async Task ArgumentMethodCalled_ReportWhenIllegalBaseType(string baseType, bool report)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test").{|#0:Argument<StringGraphType>("arg")|};
+              }
+              """;
+
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test");
+              }
+              """;
+
+        if (report)
+        {
+            var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+                .WithLocation(0).WithArguments("Argument", "IObjectGraphType or IInterfaceGraphType");
+            await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+        }
+        else
+        {
+            await VerifyCS.VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, source);
+        }
+    }
+
+    [Theory]
+    [InlineData("ObjectGraphType", "ParseValue(o => o)", "ParseValue", true)]
+    [InlineData("InterfaceGraphType", "ParseValue(o => o)", "ParseValue", true)]
+    [InlineData("InputObjectGraphType", "ParseValue(o => o)", "ParseValue", false)]
+    [InlineData("ObjectGraphType", "Validate(o => { })", "Validate", true)]
+    [InlineData("InterfaceGraphType", "Validate(o => { })", "Validate", true)]
+    [InlineData("InputObjectGraphType", "Validate(o => { })", "Validate", false)]
+    public async Task ParseAndValidateMethodCalled_ReportWhenIllegalBaseType(string baseType, string methodBody, string methodName, bool report)
+    {
+        string source =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test").{|#0:{{methodBody}}|};
+              }
+              """;
+
+        string fix =
+            $$"""
+              using System;
+              using System.Threading.Tasks;
+              using GraphQL;
+              using GraphQL.MicrosoftDI;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class MyGraphType : {{baseType}}
+              {
+                  public MyGraphType() =>
+                      Field<StringGraphType, string>("Test");
+              }
+              """;
+
+        if (report)
+        {
+            var expected = VerifyCS.Diagnostic(ResolverAnalyzer.IllegalMethodOrPropertyUsage)
+                .WithLocation(0).WithArguments(methodName, "IInputObjectGraphType");
+            await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
+        }
+        else
+        {
+            await VerifyCS.VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, source);
+        }
     }
 }

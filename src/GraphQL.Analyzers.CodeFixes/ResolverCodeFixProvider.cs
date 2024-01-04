@@ -14,7 +14,7 @@ namespace GraphQL.Analyzers;
 public class ResolverCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(ResolverAnalyzer.IllegalResolverUsage.Id);
+        ImmutableArray.Create(ResolverAnalyzer.IllegalMethodOrPropertyUsage.Id);
 
     public sealed override FixAllProvider GetFixAllProvider() =>
         WellKnownFixAllProviders.BatchFixer;
@@ -27,27 +27,27 @@ public class ResolverCodeFixProvider : CodeFixProvider
         {
             var diagnosticSpan = diagnostic.Location.SourceSpan;
 
-            var resolveInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
-            var resolveMemberAccess = (MemberAccessExpressionSyntax)resolveInvocationExpression.Expression;
+            var memberInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
+            var memberAccess = (MemberAccessExpressionSyntax)memberInvocationExpression.Expression;
 
-            const string codeFixTitle = "Remove invalid resolver";
+            const string codeFixTitle = "Remove invalid invocation";
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: codeFixTitle,
                     createChangedDocument: ct =>
-                        RemoveResolveMethodInvocationAsync(context.Document, resolveMemberAccess, ct),
+                        RemoveMemberAccessAsync(context.Document, memberAccess, ct),
                     equivalenceKey: codeFixTitle),
                 diagnostic);
         }
     }
 
-    private static async Task<Document> RemoveResolveMethodInvocationAsync(
+    private static async Task<Document> RemoveMemberAccessAsync(
         Document document,
-        MemberAccessExpressionSyntax resolveInvocationExpression,
+        MemberAccessExpressionSyntax memberAccessExpression,
         CancellationToken cancellationToken)
     {
         var docEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
-        docEditor.RemoveMethodPreservingTrailingTrivia(resolveInvocationExpression);
+        docEditor.RemoveMethodPreservingTrailingTrivia(memberAccessExpression);
 
         return docEditor.GetChangedDocument();
     }
