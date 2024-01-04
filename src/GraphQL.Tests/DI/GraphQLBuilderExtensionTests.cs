@@ -898,6 +898,73 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
+    #region - AddUnhandledExceptionHandler -
+    [Fact]
+    public async Task AddUnhandledExceptionHandler1()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler2()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 =>
+        {
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler3()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler4()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 => e2 = e1);
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+    #endregion
+
     #region - AddValidationRule -
     [Theory]
     [InlineData(true)]
