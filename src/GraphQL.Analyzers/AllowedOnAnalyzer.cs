@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace GraphQL.Analyzers;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class ResolverAnalyzer : DiagnosticAnalyzer
+public class AllowedOnAnalyzer : DiagnosticAnalyzer
 {
     // Violation: any of _forbiddenMethodNames used on type that doesn't implement _allowedInterfaces
     // Fixed:     remove the illegal method

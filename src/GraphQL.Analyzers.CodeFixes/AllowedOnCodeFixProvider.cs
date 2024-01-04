@@ -10,11 +10,11 @@ using Microsoft.CodeAnalysis.Editing;
 namespace GraphQL.Analyzers;
 
 [Shared]
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ResolverCodeFixProvider))]
-public class ResolverCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AllowedOnCodeFixProvider))]
+public class AllowedOnCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-        ImmutableArray.Create(ResolverAnalyzer.IllegalMethodOrPropertyUsage.Id);
+        ImmutableArray.Create(AllowedOnAnalyzer.IllegalMethodOrPropertyUsage.Id);
 
     public sealed override FixAllProvider GetFixAllProvider() =>
         WellKnownFixAllProviders.BatchFixer;
