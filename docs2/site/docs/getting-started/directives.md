@@ -494,7 +494,7 @@ of type [`ExecutableDirectiveLocation`](https://spec.graphql.org/October2021/#Ex
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about field middlewares see [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware).
+For more information about field middlewares see [Field Middleware](../field-middleware).
 
 # Existing implementations
 

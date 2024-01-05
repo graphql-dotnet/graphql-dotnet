@@ -229,7 +229,7 @@ for both human graph types. In both implementations, the client receives the Gra
 names in response to queries on the `appearsIn` field.
 
 If the field resolves a value which cannot be mapped to one of the enum's legal values,
-GraphQL.NET will trigger a [Processing Error](errors#ProcessingErrors).
+GraphQL.NET will trigger a [Processing Error](../errors#ProcessingErrors).
 
 ```csharp
 public class HumanString
