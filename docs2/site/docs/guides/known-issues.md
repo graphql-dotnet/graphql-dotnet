@@ -245,14 +245,14 @@ schema, it is not possible to register the graph types as scoped services while 
 the schema as a singleton. Instead, you will need to pull your scoped services from within
 the field resolver via the `IResolveFieldContext.RequestServices` property. Detailed
 information on this technique, its configuration requirements, and alternatives are outlined
-in the [Dependency Injection](../../getting-started/dependency-injection.md) documentation.
+in the [Dependency Injection](../../getting-started/dependency-injection) documentation.
 
 It is also possible to register the schema and all its graph types as scoped services.
 This is not recommended due to the overhead of building the schema for each request.
 
 Note that concurrency issues typically arise when using scoped services with a parallel
 execution strategy. Please read the section on this in the
-[documentation](../../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
+[documentation](../../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
 
 ### Entity Framework concurrency issues
 
