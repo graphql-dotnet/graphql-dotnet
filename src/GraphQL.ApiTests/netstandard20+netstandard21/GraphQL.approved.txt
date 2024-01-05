@@ -786,6 +786,26 @@ namespace GraphQL
         public static GraphQL.VariableName op_Implicit(string name) { }
     }
 }
+namespace GraphQL.Attributes
+{
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter, AllowMultiple=true)]
+    public class DirectiveAttribute : GraphQL.GraphQLAttribute
+    {
+        public System.Collections.Generic.Dictionary<string, object?> Arguments;
+        public DirectiveAttribute(string name) { }
+        public DirectiveAttribute(string name, params object[] argsAndValues) { }
+        public DirectiveAttribute(string name, string argumentName, object argumentValue) { }
+        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2) { }
+        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2, string argumentName3, object argumentValue3) { }
+        public string Name { get; }
+        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+}
 namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
@@ -2387,6 +2407,12 @@ namespace GraphQL.Types
         public PascalCaseAttribute() { }
         public override string ChangeEnumCase(string val) { }
     }
+    public class PatternMatchingDirective : GraphQL.Types.Directive
+    {
+        public PatternMatchingDirective() { }
+        public override bool? Introspectable { get; }
+        public override void Validate(GraphQL.Types.AppliedDirective applied) { }
+    }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {
         public PossibleTypes() { }
@@ -3024,6 +3050,12 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Utilities.Visitors
 {
+    public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public PatternMatchingVisitor() { }
+        public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+    }
     public sealed class RemoveDeprecationReasonsVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
     {
         protected override System.Threading.Tasks.ValueTask VisitDirectiveAsync(GraphQLParser.AST.GraphQLDirective directive, GraphQLParser.Visitors.NullVisitorContext context) { }
