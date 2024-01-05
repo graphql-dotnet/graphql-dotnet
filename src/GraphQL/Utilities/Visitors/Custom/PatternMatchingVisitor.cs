@@ -23,11 +23,18 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
 {
     /// <inheritdoc/>
     public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
+        => field.Validator += GetValidator(field);
+
+    /// <inheritdoc/>
+    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
+        => argument.Validator += GetValidator(argument);
+
+    private static Action<object?>? GetValidator(IMetadataReader fieldArgOrInputField)
     {
-        // look for @pattern directive applied to the field, and if found, use Validate to set the validation method
-        var applied = field.FindAppliedDirective("pattern");
+        // look for @pattern directive applied to the field argument or input field, and if found, use Validate to set the validation method
+        var applied = fieldArgOrInputField.FindAppliedDirective("pattern");
         if (applied?.FindArgument("regex")?.Value is not string regex)
-            return;
+            return null;
 
         // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
         // the regex (or pull from the static cache if already compiled)
@@ -35,30 +42,7 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
         var regexObject = new Regex($"^{regex}$",
             GlobalSwitches.DynamicallyCompileToObject ? RegexOptions.Compiled : RegexOptions.None);
 
-        // set the validation method
-        field.Validator += (value) =>
-        {
-            if (value is string stringValue && !regexObject.IsMatch(stringValue))
-            {
-                throw new ArgumentException($"Value '{stringValue}' does not match the regex pattern '{regex}'.");
-            }
-        };
-    }
-
-    /// <inheritdoc/>
-    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
-    {
-        // look for @pattern directive applied to the field, and if found, use Validate to set the validation method
-        var applied = argument.FindAppliedDirective("pattern");
-        if (applied?.FindArgument("regex")?.Value is not string regex)
-            return;
-
-        // compile the regex
-        var regexObject = new Regex(regex,
-            GlobalSwitches.DynamicallyCompileToObject ? RegexOptions.Compiled : RegexOptions.None);
-
-        // set the validation method
-        argument.Validator += (value) =>
+        return (value) =>
         {
             if (value is string stringValue && !regexObject.IsMatch(stringValue))
             {
