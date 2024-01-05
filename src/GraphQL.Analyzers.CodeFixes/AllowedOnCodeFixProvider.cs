@@ -30,7 +30,7 @@ public class AllowedOnCodeFixProvider : CodeFixProvider
             var memberInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
             var memberAccess = (MemberAccessExpressionSyntax)memberInvocationExpression.Expression;
 
-            const string codeFixTitle = "Remove invalid invocation";
+            const string codeFixTitle = "Remove illegal method invocation";
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: codeFixTitle,

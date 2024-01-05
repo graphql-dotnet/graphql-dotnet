@@ -45,15 +45,12 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
         ImmutableArray<ITypeSymbol>? allowedTypes = null;
         if (symbolInfo.Symbol != null)
         {
-            allowedTypes = symbolInfo.Symbol.GetAttributes()
-                .FirstOrDefault(a => a.AttributeClass?.Name == "AllowedOnAttribute")
-                ?.AttributeClass!.TypeArguments;
+            allowedTypes = GetAllowedTyped(symbolInfo.Symbol);
         }
         else if (symbolInfo.CandidateSymbols.Any())
         {
-            allowedTypes = symbolInfo.CandidateSymbols.SelectMany(s => s.GetAttributes()
-                .FirstOrDefault(a => a.AttributeClass?.Name == "AllowedOnAttribute")
-                ?.AttributeClass!.TypeArguments.Select(z => z))
+            allowedTypes = symbolInfo.CandidateSymbols
+                .SelectMany(symbol => GetAllowedTyped(symbol)?.Select(typeSymbol => typeSymbol))
                 .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
                 .ToImmutableArray();
         }
@@ -140,4 +137,9 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
 
         context.ReportDiagnostic(diagnostic);
     }
+
+    private static ImmutableArray<ITypeSymbol>? GetAllowedTyped(ISymbol symbol) =>
+        symbol.GetAttributes()
+            .FirstOrDefault(data => data.AttributeClass?.Name == Constants.MetadataNames.AllowedOnAttribute)
+            ?.AttributeClass!.TypeArguments;
 }
