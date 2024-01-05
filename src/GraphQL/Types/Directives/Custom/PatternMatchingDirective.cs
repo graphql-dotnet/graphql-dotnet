@@ -37,18 +37,11 @@ public class PatternMatchingDirective : Directive
     {
         Description = "Used to specify a regex pattern for an input field or argument.";
         Arguments = new QueryArguments(
-            new QueryArgument<IntGraphType>
+            new QueryArgument<NonNullGraphType<StringGraphType>>
             {
                 Name = "regex",
                 Description = "The regex pattern that the input field or argument must match."
             }
         );
-    }
-
-    /// <inheritdoc/>
-    public override void Validate(AppliedDirective applied)
-    {
-        _ = (applied.FindArgument("regex")?.Value)
-            ?? throw new ArgumentException("Argument 'regex' must be specified for @pattern directive.");
     }
 }

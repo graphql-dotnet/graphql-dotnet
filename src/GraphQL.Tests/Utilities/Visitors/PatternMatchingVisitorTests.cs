@@ -26,8 +26,7 @@ public class PatternMatchingVisitorTests
         result.ShouldBeSimilarTo("""{"data":{"hello":"HELLO"}}""");
 
         result = await schema.ExecuteAsync(o => o.Query = """{ hello(arg: "hello") }""");
-        result.ShouldBeSimilarTo(
-            """
+        result.ShouldBeSimilarTo("""
             {
                 "errors": [
                     {
