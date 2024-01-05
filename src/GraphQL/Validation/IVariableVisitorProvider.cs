@@ -9,7 +9,7 @@ namespace GraphQL.Validation
         /// <summary>
         /// Gets a visitor for the specified validation context.
         /// </summary>
-        IVariableVisitor GetVisitor(ValidationContext context);
+        IVariableVisitor? GetVisitor(ValidationContext context);
 
         /// <summary>
         /// Prepares and returns a node visitor to be used to validate a document (via a node walker) against this

@@ -1,9 +1,49 @@
+using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules
 {
+    internal class NoConnectionOver1000ValidationRule : IValidationRule, IVariableVisitorProvider, INodeVisitor
+    {
+        // do not run any visitors on the initial validation
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => default;
+
+        // only run this rule when there are argument values specify
+        ValueTask<INodeVisitor?> IVariableVisitorProvider.ValidateArgumentsAsync(ValidationContext context)
+            => context.ArgumentValues != null ? new(this) : default;
+
+        // not using IVariableVisitor
+        IVariableVisitor? IVariableVisitorProvider.GetVisitor(ValidationContext context) => null;
+
+        // look for connection arguments and validate the value
+        ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
+        {
+            // look for field nodes and find the field definition
+            if (node is not GraphQLField fieldNode)
+                return default;
+            var fieldDef = context.TypeInfo.GetFieldDef();
+            if (fieldDef == null)
+                return default;
+            // look for connection types
+            if (fieldDef.ResolvedType?.GetNamedType() is not IObjectGraphType connectionType || !connectionType.Name.EndsWith("Connection"))
+                return default;
+            // retrieve the arguments
+            if (!(context.ArgumentValues?.TryGetValue(fieldNode, out var args) ?? false))
+                return default;
+            // look for first and last arguments
+            ArgumentValue lastArg = default;
+            if (!args.TryGetValue("first", out var firstArg) && !args.TryGetValue("last", out lastArg))
+                return default;
+            var rows = (int?)firstArg.Value ?? (int?)lastArg.Value ?? 0;
+            if (rows > 1000)
+                context.ReportError(new ValidationError("Cannot return more than 1000 rows"));
+            return default;
+        }
+
+        ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context) => default;
+    }
     /// <summary>
     /// Validation rule that checks minimum and maximum length of provided values for input fields and
     /// arguments that marked with <see cref="LengthDirective"/> directive. Doesn't check default values.

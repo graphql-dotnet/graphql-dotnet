@@ -3100,7 +3100,7 @@ namespace GraphQL.Validation
     }
     public interface IVariableVisitorProvider
     {
-        GraphQL.Validation.IVariableVisitor GetVisitor(GraphQL.Validation.ValidationContext context);
+        GraphQL.Validation.IVariableVisitor? GetVisitor(GraphQL.Validation.ValidationContext context);
         System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateArgumentsAsync(GraphQL.Validation.ValidationContext context);
     }
     public class InvalidLiteralError : GraphQL.Validation.ValidationError
