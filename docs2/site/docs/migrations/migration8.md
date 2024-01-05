@@ -246,7 +246,7 @@ At this time GraphQL.NET does not directly support the `MaxLength` and similar a
 implement your own attributes as shown above, or call the `Validate` method to set a validation
 function.
 
-### 6. Validation rules can validate field arguments and directive arguments
+### 6. Validation rules can read or validate field arguments and directive arguments
 
 Validation rules can now read or validate field arguments and directive arguments. This is useful
 for edge cases, such as when a complexity analyzer needs to read the value of a field argument
