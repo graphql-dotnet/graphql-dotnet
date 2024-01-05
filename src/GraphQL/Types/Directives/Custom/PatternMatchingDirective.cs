@@ -35,10 +35,6 @@ public class PatternMatchingDirective : Directive
     public PatternMatchingDirective()
         : base("pattern", DirectiveLocation.InputFieldDefinition, DirectiveLocation.ArgumentDefinition)
     {
-        ObjectGraphType g = new();
-g.Field<StringGraphType, string>("Email")
-    .ApplyDirective("pattern", "regex", @".+\@.+\..+");
-
         Description = "Used to specify a regex pattern for an input field or argument.";
         Arguments = new QueryArguments(
             new QueryArgument<IntGraphType>

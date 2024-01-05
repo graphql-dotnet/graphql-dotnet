@@ -258,7 +258,11 @@ services.AddGraphQL(b => b
     .AddSchema<MyQuery>()
     .ConfigureSchema(s =>
     {
+        // add the directive to the schema
         s.Directives.Register(new PatternMatchingDirective());
+
+        // add the visitor to the schema, which will apply validation rules to all field
+        // arguments and input fields that have the @pattern directive applied
         s.RegisterVisitor(new PatternMatchingVisitor());
     }));
 ```

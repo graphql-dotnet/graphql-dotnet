@@ -29,7 +29,9 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
         if (applied?.FindArgument("regex")?.Value is not string regex)
             return;
 
-        // compile the regex
+        // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
+        // the regex (or pull from the static cache if already compiled)
+        // (note that GlobalSwitches.DynamicallyCompileToObject is false for AOT schemas and scoped schemas)
         var regexObject = new Regex($"^{regex}$",
             GlobalSwitches.DynamicallyCompileToObject ? RegexOptions.Compiled : RegexOptions.None);
 
