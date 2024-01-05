@@ -2411,7 +2411,6 @@ namespace GraphQL.Types
     {
         public PatternMatchingDirective() { }
         public override bool? Introspectable { get; }
-        public override void Validate(GraphQL.Types.AppliedDirective applied) { }
     }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {
