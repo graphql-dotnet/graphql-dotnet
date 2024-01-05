@@ -14,7 +14,7 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
     // Fixed:     remove the illegal method
     public static readonly DiagnosticDescriptor IllegalMethodUsage = new(
         id: DiagnosticIds.ILLEGAL_METHOD_USAGE,
-        title: "Illegal resolver usage",
+        title: "Illegal method usage",
         messageFormat: "'{0}' invocation is only allowed on types implementing {1}",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
