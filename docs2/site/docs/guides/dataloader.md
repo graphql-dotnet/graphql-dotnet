@@ -359,7 +359,8 @@ public class MyQuery : ObjectGraphType
 {
     public MyQuery()
     {
-        Field<OrderType, Order>("Order")
+        Field<OrderType, Order>()
+            .Name("Order")
             .Argument<IdGraphType>("id")
             .ResolveAsync(context =>
             {
@@ -381,7 +382,8 @@ public class OrderType : ObjectGraphType<Order>
     {
         Field(x => x.Id, type: typeof(IdGraphType));
         Field(x => x.ShipToName);
-        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>("Items")
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
+            .Name("Items")
             .ResolveAsync(context =>
             {
                 var loader = context.RequestServices.GetRequiredService<MyOrderItemsDataLoader>();
@@ -393,31 +395,6 @@ public class OrderType : ObjectGraphType<Order>
 
 You do not need to use `IDataLoaderContextAccessor` or `DataLoaderDocumentListener` and may remove those references
 from your code.
-
-You may also use the resolver builder feature of the `GraphQL.MicrosoftDI` package,
-as shown in the below example:
-
-```csharp
-    public class MyQuery : ObjectGraphType
-    {
-        public MyQuery()
-        {
-            Field<OrderType, Order>("Order")
-                .Argument<NonNullGraphType<IdGraphType>>("id")
-                .Resolve()
-                .WithService<MyOrderDataLoader>()
-                .ResolveAsync((context, loader) =>
-                {
-                    return loader.LoadAsync(context.GetArgument<int>("id"));
-                });
-        }
-    }
-```
-
-Note that if you attempt to create a service scope via `WithScope()` for a scoped
-data loader, each data loaded entry will exist in its own service scope, and none
-of the entries will be batch loaded. However, you can use a singleton data loader,
-creating a service scope for the load operation, as shown below.
 
 ## Singleton DI-based data loader instances
 
@@ -457,7 +434,8 @@ As a singleton, you can pull the singleton instance into your graphtype class in
     {
         public MyQuery(MyOrderDataLoader loader)
         {
-            Field<OrderType, Order>("Order")
+            Field<OrderType, Order>()
+                .Name("Order")
                 .Argument<IdGraphType>("id")
                 .ResolveAsync(context =>
                 {
