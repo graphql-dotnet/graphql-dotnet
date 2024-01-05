@@ -1258,4 +1258,68 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 #endif
     #endregion
+
+    #region - ConfigureUnhandledExceptionHandler -
+    /// <summary>
+    /// Configures the delegate to be called when an unhandled exception occurs during document execution.
+    /// This is typically used to log exceptions to a database for further review.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The service provider can be accessed via <see cref="IExecutionContext.RequestServices"/> or <see cref="ExecutionOptions.RequestServices"/>.
+    /// </para>
+    /// <para>
+    /// With APQ support, <see cref="ExecutionOptions.Query"/> may be <see langword="null"/>.
+    /// To retrieve the executed query as a string value use the following:
+    /// <code>
+    /// var query = options.Query ?? options.Document?.Source.ToString();
+    /// </code>
+    /// </para>
+    /// </remarks>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = unhandledExceptionDelegate);
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        var handler = (UnhandledExceptionContext context) =>
+        {
+            unhandledExceptionDelegate(context);
+            return Task.CompletedTask;
+        };
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
+        return builder;
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context =>
+        {
+            unhandledExceptionDelegate(context, settings);
+            return Task.CompletedTask;
+        });
+        return builder;
+    }
+    #endregion
 }
