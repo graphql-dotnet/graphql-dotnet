@@ -284,7 +284,7 @@ passed from another service. Therefore, the database context must remain scoped.
 
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
-[dependency injection documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
+[dependency injection documentation](../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
 
 Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/issues/1310) with related issues.
 
