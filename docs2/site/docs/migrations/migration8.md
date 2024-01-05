@@ -251,7 +251,7 @@ function.
 Validation rules can now read or validate field arguments and directive arguments. This is useful
 for edge cases, such as when a complexity analyzer needs to read the value of a field argument
 to determine the complexity of the field. While it could also be used within custom validation rules
-to validate the value of a field argument or directive argument, perhaps based on schema directives,
+to validate the value of field arguments or directive arguments, perhaps based on schema directives,
 it cannot be used to validate fields of input object graph types.
 
 Note that with the addition of `Validator` and `Parser` delegates, validation rules are no longer
@@ -280,11 +280,11 @@ public class NoConnectionOver1000ValidationRule : IValidationRule, IVariableVisi
     // do not run any visitors on the initial validation
     public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => default;
 
-    // only run this rule when there are argument values specified
+    // after argument parsing, run this rule only when there are argument values specified
     ValueTask<INodeVisitor?> IVariableVisitorProvider.ValidateArgumentsAsync(ValidationContext context)
         => context.ArgumentValues != null ? new(this) : default;
 
-    // not using IVariableVisitor
+    // IVariableVisitor is not used in this sample
     IVariableVisitor? IVariableVisitorProvider.GetVisitor(ValidationContext context) => null;
 
     // look for connection arguments and validate the value
