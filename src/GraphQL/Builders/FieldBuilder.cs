@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL.Builders
 {
@@ -138,6 +138,7 @@ namespace GraphQL.Builders
         /// Null values are not passed to this function.
         /// Applies only to input fields.
         /// </summary>
+        [AllowedOn<IInputObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> ParseValue(Func<object, object> parseValue)
         {
             FieldType.Parser = parseValue;
@@ -150,6 +151,7 @@ namespace GraphQL.Builders
         /// Null values are not passed to this function.
         /// Applies only to input fields.
         /// </summary>
+        [AllowedOn<IInputObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object> validation)
         {
             FieldType.Validator = FieldType.Validator == FieldType.DefaultValidator
@@ -162,6 +164,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver for the field.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(IFieldResolver? resolver)
         {
             FieldType.Resolver = resolver;
@@ -169,14 +172,17 @@ namespace GraphQL.Builders
         }
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolve)
             => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context))));
 
         /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveDelegate(Delegate? resolve)
         {
             IFieldResolver? resolver = null;
@@ -209,6 +215,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -242,6 +249,7 @@ namespace GraphQL.Builders
         /// </summary>
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, null);
@@ -252,6 +260,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument(typeof(TArgumentGraphType), name, configure);
@@ -263,6 +272,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="nullable">Indicates if the argument is optional or not.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable = false, Action<QueryArgument>? configure = null)
         {
             Type type;
@@ -287,6 +297,7 @@ namespace GraphQL.Builders
         /// <param name="nullable">Indicates if the argument is optional or not.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable, string? description, Action<QueryArgument>? configure = null)
             => Argument<TArgumentClrType>(name, nullable, b =>
             {
@@ -300,6 +311,7 @@ namespace GraphQL.Builders
         /// <param name="type">The graph type of the argument.</param>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Argument([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type, string name, Action<QueryArgument>? configure = null)
         {
             var arg = new QueryArgument(type)
@@ -316,6 +328,7 @@ namespace GraphQL.Builders
         /// Adds the specified collection of arguments to the field.
         /// </summary>
         /// <param name="arguments">Arguments to add.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Arguments(IEnumerable<QueryArgument> arguments)
         {
             if (arguments != null)
@@ -333,6 +346,7 @@ namespace GraphQL.Builders
         /// Adds the specified collection of arguments to the field.
         /// </summary>
         /// <param name="arguments">Arguments to add.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> Arguments(params QueryArgument[] arguments)
         {
             return Arguments((IEnumerable<QueryArgument>)arguments);
@@ -350,6 +364,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets a source stream resolver for the field.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveStream(Func<IResolveFieldContext<TSourceType>, IObservable<TReturnType?>> sourceStreamResolver)
         {
             FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(sourceStreamResolver);
@@ -360,6 +375,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets a source stream resolver for the field.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual FieldBuilder<TSourceType, TReturnType> ResolveStreamAsync(Func<IResolveFieldContext<TSourceType>, Task<IObservable<TReturnType?>>> sourceStreamResolver)
         {
             FieldType.StreamResolver = new SourceStreamResolver<TSourceType, TReturnType>(context => new ValueTask<IObservable<TReturnType?>>(sourceStreamResolver(context)));
@@ -410,7 +426,7 @@ namespace GraphQL.Builders
             => this.ApplyDirective(name, configure);
 
         /// <summary>
-        /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
+        /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
         /// </summary>
         /// <param name="impact">Field's complexity impact.</param>
         [Obsolete("Please use the WithComplexityImpact method")]

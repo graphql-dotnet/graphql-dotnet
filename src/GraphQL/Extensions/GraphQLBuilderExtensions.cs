@@ -398,81 +398,6 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.Configure(action);
         return builder;
     }
-
-    /// <summary>
-    /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-    /// dependency injection framework, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-    /// dependency injection framework, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
-    /// using the specified factory delegate, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
     #endregion
 
     #region - AddErrorInfoProvider
@@ -1267,5 +1192,69 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 #endif
+    #endregion
+
+    #region - ConfigureUnhandledExceptionHandler -
+    /// <summary>
+    /// Configures the delegate to be called when an unhandled exception occurs during document execution.
+    /// This is typically used to log exceptions to a database for further review.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The service provider can be accessed via <see cref="IExecutionContext.RequestServices"/> or <see cref="ExecutionOptions.RequestServices"/>.
+    /// </para>
+    /// <para>
+    /// With APQ support, <see cref="ExecutionOptions.Query"/> may be <see langword="null"/>.
+    /// To retrieve the executed query as a string value use the following:
+    /// <code>
+    /// var query = options.Query ?? options.Document?.Source.ToString();
+    /// </code>
+    /// </para>
+    /// </remarks>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, Task> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = unhandledExceptionDelegate);
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        var handler = (UnhandledExceptionContext context) =>
+        {
+            unhandledExceptionDelegate(context);
+            return Task.CompletedTask;
+        };
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
+        return builder;
+    }
+
+    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
+    {
+        if (unhandledExceptionDelegate == null)
+            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
+
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context =>
+        {
+            unhandledExceptionDelegate(context, settings);
+            return Task.CompletedTask;
+        });
+        return builder;
+    }
     #endregion
 }

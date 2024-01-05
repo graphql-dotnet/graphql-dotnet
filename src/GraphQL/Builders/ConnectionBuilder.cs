@@ -269,6 +269,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
@@ -287,6 +288,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
@@ -298,6 +300,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -314,6 +317,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue = default!)
             where TArgumentGraphType : IGraphType
@@ -332,6 +336,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue, Action<QueryArgument>? configure)
             where TArgumentGraphType : IGraphType
@@ -405,6 +410,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual ConnectionBuilder<TSourceType> Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
@@ -422,6 +428,7 @@ namespace GraphQL.Builders
         /// <summary>
         /// Sets the resolver method for the connection field.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual ConnectionBuilder<TSourceType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;

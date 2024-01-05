@@ -134,6 +134,7 @@ namespace GraphQL.Builders
         /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
         /// <param name="name">The name of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
         {
@@ -153,6 +154,7 @@ namespace GraphQL.Builders
         /// <param name="name">The name of the argument.</param>
         /// <param name="description">The description of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
             => Argument<TArgumentGraphType>(name, arg =>
@@ -170,6 +172,7 @@ namespace GraphQL.Builders
         /// <param name="description">The description of the argument.</param>
         /// <param name="defaultValue">The default value of the argument.</param>
         /// <param name="configure">A delegate to further configure the argument.</param>
+        [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
         public virtual ConnectionBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
             [AllowNull] TArgumentType defaultValue = default!, Action<QueryArgument>? configure = null)
             where TArgumentGraphType : IGraphType
@@ -237,6 +240,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual ConnectionBuilder<TSourceType, TReturnType> Resolve(Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
         {
             var isUnidirectional = !IsBidirectional;
@@ -255,6 +259,7 @@ namespace GraphQL.Builders
         /// Sets the resolver method for the connection field. This method must be called after
         /// <see cref="PageSize(int?)"/> and/or <see cref="Bidirectional"/> have been called.
         /// </summary>
+        [AllowedOn<IObjectGraphType>]
         public virtual ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
         {
             var isUnidirectional = !IsBidirectional;

@@ -340,19 +340,10 @@ public class GraphQLBuilderExtensionTests
 
     #region - AddComplexityAnalyzer -
     [Theory]
-    [InlineData(false, false, false, false, false)]
-    [InlineData(false, false, false, true, false)]
-    [InlineData(false, false, false, false, true)]
-    [InlineData(true, false, false, false, false)]
-    [InlineData(true, false, false, true, false)]
-    [InlineData(true, false, false, false, true)]
-    [InlineData(true, true, false, false, false)]
-    [InlineData(true, true, false, true, false)]
-    [InlineData(true, true, false, false, true)]
-    [InlineData(true, false, true, false, false)]
-    [InlineData(true, false, true, true, false)]
-    [InlineData(true, false, true, false, true)]
-    public void AddComplexityAnalyzer(bool typed, bool withFactory, bool withInstance, bool withAction, bool withAction2)
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void AddComplexityAnalyzer(bool withAction, bool withAction2)
     {
         var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
         MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
@@ -360,59 +351,17 @@ public class GraphQLBuilderExtensionTests
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-        Func<IServiceProvider, IComplexityAnalyzer> factory = null!;
-        MyComplexityAnalyzer instance = null!;
-        if (typed)
-        {
-            if (withFactory)
-            {
-                factory = MockSetupRegister<IComplexityAnalyzer>();
-            }
-            else if (withInstance)
-            {
-                instance = new MyComplexityAnalyzer();
-                MockSetupRegister<IComplexityAnalyzer>(instance);
-            }
-            else
-            {
-                MockSetupRegister<IComplexityAnalyzer, MyComplexityAnalyzer>();
-            }
-        }
         if (withAction)
         {
             var action = MockSetupConfigure1<ComplexityConfiguration>();
-            if (typed)
-            {
-                if (withFactory)
-                    _builder.AddComplexityAnalyzer(factory, action);
-                else if (withInstance)
-                    _builder.AddComplexityAnalyzer(instance, action);
-                else
-                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
-            }
-            else
-            {
-                _builder.AddComplexityAnalyzer(action);
-            }
+            _builder.AddComplexityAnalyzer(action);
         }
         else
         {
             var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
             if (!withAction2)
                 MockSetupConfigureNull<ComplexityConfiguration>();
-            if (typed)
-            {
-                if (withFactory)
-                    _builder.AddComplexityAnalyzer(factory, action!);
-                else if (withInstance)
-                    _builder.AddComplexityAnalyzer(instance, action!);
-                else
-                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action!);
-            }
-            else
-            {
-                _builder.AddComplexityAnalyzer(action!);
-            }
+            _builder.AddComplexityAnalyzer(action!);
         }
         var opts = getOpts();
         opts.ValidationRules.ShouldNotBeNull();
@@ -421,15 +370,6 @@ public class GraphQLBuilderExtensionTests
         mockServiceProvider.Verify();
         Verify();
     }
-
-    [Fact]
-    public void AddComplexityAnalyzer_Null()
-    {
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null!));
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null!));
-    }
-
-    private class MyComplexityAnalyzer : ComplexityAnalyzer { }
     #endregion
 
     #region - AddErrorInfoProvider -
@@ -940,6 +880,82 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
+    #region - AddUnhandledExceptionHandler -
+    [Fact]
+    public async Task AddUnhandledExceptionHandler1()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler2()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 =>
+        {
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler3()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler4()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 => e2 = e1);
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+
+    [Fact]
+    public void AddUnhandledExceptionHandler_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext, ExecutionOptions>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, Task>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, ExecutionOptions, Task>)null!));
+    }
+    #endregion
+
     #region - AddValidationRule -
     [Theory]
     [InlineData(true, ServiceLifetime.Singleton)]
@@ -1345,10 +1361,6 @@ public class GraphQLBuilderExtensionTests
     }
 
     private class TestDocumentExecuter : DocumentExecuter
-    {
-    }
-
-    private class TestComplexityAnalyzer : ComplexityAnalyzer
     {
     }
 

@@ -360,7 +360,22 @@ if you wish to define your own naming logic.
 
 The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.
 
-### 9. `IVariableVisitorProvider.ValidateArgumentsAsync` added
+### 9. DataLoader extension methods have been moved to the GraphQL namespace
+
+This change simplifies using extension methods for the data loaders. You may need to
+remove the `using GraphQL.DataLoader;` statement from your code to resolve any
+compiler warnings, and/or add `using GraphQL;`.
+
+### 10. The SchemaPrinter has been deprecated
+
+Please see the v7 migration document regarding the new `schema.ToAST()` and
+`schema.Print()` methods available for printing the schema (available since 7.6).
+
+For federated schemas, the `ServiceGraphType`'s `sdl` field will now use the
+new implementation to print the schema. Please raise an issue if this causes
+a problem for your federated schema.
+
+### 11. `IVariableVisitorProvider.ValidateArgumentsAsync` added
 
 The `IVariableVisitorProvider` interface has a new method `ValidateArgumentsAsync` that is
 called during validation. This method is called after all field arguments and directive

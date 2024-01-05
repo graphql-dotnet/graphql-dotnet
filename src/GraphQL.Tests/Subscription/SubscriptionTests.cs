@@ -5,6 +5,8 @@ namespace GraphQL.Tests.Subscription;
 
 public class SubscriptionTests
 {
+    private readonly DateTimeOffset DateConst = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     protected async Task<ExecutionResult> ExecuteSubscribeAsync(ExecutionOptions options)
     {
         var executer = new DocumentExecuter();
@@ -28,7 +30,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
 
         var chat = new Chat();
@@ -67,7 +69,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
 
         var chat = new Chat();
@@ -112,7 +114,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
         var chat = new Chat();
         var schema = new ChatSchema(chat);
@@ -127,13 +129,47 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams!.Values.First();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
-        message.ShouldNotBeNull();
-        message.ShouldBeOfType<ExecutionResult>();
-        message.Data.ShouldNotBeNull();
-        message.Data.ShouldNotBeAssignableTo<Task>();
+        message.ShouldBeSimilarTo("""
+            {"data":{"messageAdded":{"from":{"id":"1","displayName":"test"},"content":"test","sentAt":"2024-01-01T00:00:00\u002B00:00"}}}
+            """);
+    }
+
+    [Fact]
+    public async Task SubscribeInt()
+    {
+        /* Given */
+        var addedMessage = new Message
+        {
+            Content = "test",
+            From = new MessageFrom
+            {
+                DisplayName = "test",
+                Id = "1"
+            },
+            SentAt = DateConst
+        };
+        var chat = new Chat();
+        var schema = new ChatSchema(chat);
+
+        /* When */
+        var result = await ExecuteSubscribeAsync(new ExecutionOptions
+        {
+            Query = "subscription { messageCounter }",
+            Schema = schema
+        });
+
+        chat.AddMessage(addedMessage);
+
+        /* Then */
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
+        var message = await stream.FirstOrDefaultAsync();
+
+        message.ShouldBeSimilarTo("""
+            {"data":{"messageCounter":1}}
+            """);
     }
 
     [Fact]
@@ -148,7 +184,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
         var chat = new Chat();
         var schema = new ChatSchema(chat);
@@ -163,13 +199,12 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams!.Values.First();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
-        message.ShouldNotBeNull();
-        message.ShouldBeOfType<ExecutionResult>();
-        message.Data.ShouldNotBeNull();
-        message.Data.ShouldNotBeAssignableTo<Task>();
+        message.ShouldBeSimilarTo("""
+            {"data":{"messageAddedAsync":{"from":{"id":"1","displayName":"test"},"content":"test","sentAt":"2024-01-01T00:00:00\u002B00:00"}}}
+            """);
     }
 
     [Fact]
@@ -184,7 +219,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
         var chat = new Chat();
         var schema = new ChatSchema(chat);
@@ -203,12 +238,12 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams!.Values.First();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
-        message.ShouldNotBeNull();
-        message.ShouldBeOfType<ExecutionResult>();
-        message.Data.ShouldNotBeNull();
+        message.ShouldBeSimilarTo("""
+            {"data":{"messageAddedByUser":{"from":{"id":"1","displayName":"test"},"content":"test","sentAt":"2024-01-01T00:00:00\u002B00:00"}}}
+            """);
     }
 
     [Fact]
@@ -223,7 +258,7 @@ public class SubscriptionTests
                 DisplayName = "test",
                 Id = "1"
             },
-            SentAt = DateTime.Now.Date
+            SentAt = DateConst
         };
         var chat = new Chat();
         var schema = new ChatSchema(chat);
@@ -242,12 +277,12 @@ public class SubscriptionTests
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams!.Values.First();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
-        message.ShouldNotBeNull();
-        message.ShouldBeOfType<ExecutionResult>();
-        message.Data.ShouldNotBeNull();
+        message.ShouldBeSimilarTo("""
+            {"data":{"messageAddedByUserAsync":{"from":{"id":"1","displayName":"test"},"content":"test","sentAt":"2024-01-01T00:00:00\u002B00:00"}}}
+            """);
     }
 
     [Fact]
@@ -267,7 +302,7 @@ public class SubscriptionTests
         chat.AddError(new Exception("test"));
 
         /* Then */
-        var stream = result.Streams!.Values.First();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
         error.InnerException!.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });

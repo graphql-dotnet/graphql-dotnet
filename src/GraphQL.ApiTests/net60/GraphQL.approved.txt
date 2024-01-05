@@ -99,7 +99,7 @@ namespace GraphQL
         public DocumentExecuter(GraphQL.Execution.IDocumentBuilder documentBuilder, GraphQL.Validation.IDocumentValidator documentValidator, GraphQL.Execution.IExecutionStrategySelector executionStrategySelector, System.Collections.Generic.IEnumerable<GraphQL.DI.IConfigureExecution> configurations) { }
         protected virtual GraphQL.Execution.ExecutionContext BuildExecutionContext(GraphQL.ExecutionOptions options, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation, GraphQL.Validation.IValidationResult validationResult, GraphQL.Instrumentation.Metrics metrics) { }
         public virtual System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options) { }
-        protected virtual GraphQLParser.AST.GraphQLOperationDefinition? GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
+        protected virtual GraphQLParser.AST.GraphQLOperationDefinition GetOperation(string? operationName, GraphQLParser.AST.GraphQLDocument document) { }
         protected virtual GraphQL.Execution.IExecutionStrategy SelectExecutionStrategy(GraphQL.Execution.ExecutionContext context) { }
     }
     public static class DocumentExecuterExtensions
@@ -262,30 +262,6 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action) { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TAnalyzer> analyzerFactory, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This method will " +
-            "be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this GraphQL.DI.IGraphQLBuilder builder, TAnalyzer analyzer, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action)
-            where TAnalyzer :  class, GraphQL.Validation.Complexity.IComplexityAnalyzer { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
@@ -350,6 +326,10 @@ namespace GraphQL
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, TSerializer serializer)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
+        public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext> unhandledExceptionDelegate) { }
+        public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions> unhandledExceptionDelegate) { }
+        public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
+        public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, TValidationRule validationRule, bool useForCachedDocuments = false)
@@ -1360,9 +1340,19 @@ namespace GraphQL.Execution
         public InvalidOperationError(string message) { }
     }
     [System.Serializable]
+    public class InvalidOperationNameError : GraphQL.Execution.DocumentError
+    {
+        public InvalidOperationNameError(string operationName) { }
+    }
+    [System.Serializable]
     public class NoOperationError : GraphQL.Execution.DocumentError
     {
         public NoOperationError() { }
+    }
+    [System.Serializable]
+    public class NoOperationNameError : GraphQL.Execution.DocumentError
+    {
+        public NoOperationNameError() { }
     }
     public class NullExecutionNode : GraphQL.Execution.ExecutionNode
     {
@@ -2967,6 +2957,8 @@ namespace GraphQL.Utilities
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
     }
+    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
+        "d in v9.")]
     public class SchemaPrinter
     {
         public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
@@ -3083,6 +3075,8 @@ namespace GraphQL.Utilities.Federation
         public override GraphQL.Types.Schema Build(string typeDefinitions) { }
         protected override void PreConfigure(GraphQL.Types.Schema schema) { }
     }
+    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
+        "d in v9.")]
     public class FederatedSchemaPrinter : GraphQL.Utilities.SchemaPrinter
     {
         public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
@@ -3347,14 +3341,6 @@ namespace GraphQL.Validation
 }
 namespace GraphQL.Validation.Complexity
 {
-    [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This class will b" +
-        "e removed in v8.")]
-    public class ComplexityAnalyzer : GraphQL.Validation.Complexity.IComplexityAnalyzer
-    {
-        public ComplexityAnalyzer() { }
-        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
-        public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration complexityParameters, GraphQL.Types.ISchema? schema = null) { }
-    }
     public class ComplexityConfiguration
     {
         public ComplexityConfiguration() { }
@@ -3369,12 +3355,6 @@ namespace GraphQL.Validation.Complexity
         public double Complexity { get; set; }
         public System.Collections.Generic.Dictionary<GraphQLParser.AST.ASTNode, double> ComplexityMap { get; }
         public int TotalQueryDepth { get; set; }
-    }
-    [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This interface wi" +
-        "ll be removed in v8.")]
-    public interface IComplexityAnalyzer
-    {
-        void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityConfiguration parameters, GraphQL.Types.ISchema? schema = null);
     }
 }
 namespace GraphQL.Validation.Errors
@@ -3725,12 +3705,11 @@ namespace GraphQL.Validation.Rules
 }
 namespace GraphQL.Validation.Rules.Custom
 {
-    public class ComplexityValidationRule : GraphQL.Validation.IValidationRule
+    public class ComplexityValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
     {
         public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
-        [System.Obsolete("Please write a custom complexity analyzer as a validation rule. This constructor " +
-            "will be removed in v8.")]
-        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration, GraphQL.Validation.Complexity.IComplexityAnalyzer complexityAnalyzer) { }
+        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
+        public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Types.ISchema schema) { }
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class NoIntrospectionValidationRule : GraphQL.Validation.IValidationRule

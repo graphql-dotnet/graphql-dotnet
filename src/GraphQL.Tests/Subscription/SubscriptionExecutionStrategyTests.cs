@@ -31,6 +31,20 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     }
 
     [Fact]
+    public async Task BasicInt()
+    {
+        var result = await ExecuteAsync("subscription { testInt }");
+        result.ShouldBeSuccessful();
+        SubscriptionObj.ShouldNotBeNull();
+        result.Perf.ShouldBeNull();
+        Source.Next("1");
+        Source.Next("2");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testInt": 1 } }""");
+        Observer.ShouldHaveResult().ShouldBeSimilarTo("""{ "data": { "testInt": 2 } }""");
+        Observer.ShouldHaveNoMoreResults();
+    }
+
+    [Fact]
     public async Task NoMetricsForDataEvents()
     {
         var result = await ExecuteAsync("subscription { test }", o => o.EnableMetrics = true);
@@ -201,9 +215,17 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task NotSubscriptionField()
     {
-        var result = await ExecuteAsync("subscription { notSubscriptionField }");
-        result.ShouldNotBeSuccessful();
-        result.ShouldBeSimilarTo("""{"errors":[{"message":"Handled custom exception: Stream resolver not set for field \u0027notSubscriptionField\u0027.","locations":[{"line":1,"column":16}],"path":["notSubscriptionField"],"extensions":{"code":"INVALID_OPERATION","codes":["INVALID_OPERATION"]}}],"data":null}""");
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field<StringGraphType>("dummy");
+        var subscriptionType = new ObjectGraphType() { Name = "Subscription" };
+        subscriptionType.Field<StringGraphType>("notSubscriptionField");
+        var schema = new Schema()
+        {
+            Query = queryType,
+            Subscription = subscriptionType
+        };
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("The field 'notSubscriptionField' of the subscription root type 'Subscription' must have StreamResolver set.");
     }
 
     public int Counter = 0;
@@ -538,6 +560,9 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     {
         public static IObservable<string> Test([FromServices] IObservable<string> source) => source;
 
+        public static IObservable<int> TestInt([FromServices] IObservable<string> source)
+            => new ObservableSelect<string, int>(source, value => int.Parse(value));
+
         public static IObservable<string> TestWithInitialExtensions(IResolveFieldContext context, [FromServices] IObservable<string> source)
         {
             context.SetOutputExtension("alpha", "beta");
@@ -567,7 +592,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
 
         public static IObservable<string> TestObservableNull() => null!;
 
-        public static string NotSubscriptionField() => "testing";
+        //public static string NotSubscriptionField() => "testing";
     }
 
     private class MyWidget

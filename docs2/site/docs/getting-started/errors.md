@@ -163,6 +163,41 @@ options.UnhandledExecutionDelegate = ctx =>
 };
 ```
 
+When using the `IGraphQLBuilder` to configure your execution, you can use the `AddUnhandledExceptionHandler`
+method to register a delegate to handle unhandled exceptions, as shown in the example below:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema()
+    .AddUnhandledExceptionHandler(async (context, options) =>
+    {
+        try
+        {
+            // create dedicated scope to be sure database changes in the parent scope
+            // are not committed to the database
+            await using var scope = options.RequestServices!.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<MyDatabaseContext>();
+            var errorLog = new ErrorLog {
+                // when APQ is in use, pull the query from the document if necessary
+                Query = options.Query ?? options.Document?.Source.ToString(),
+                DateStamp = DateTime.UtcNow,
+                Message = context.Exception.Message,
+                Details = context.Exception.ToString()
+            };
+            db.ErrorLogs.Add(errorLog);
+            await db.SaveChangesAsync();
+            context.Exception.Data["errorLogId"] = errorLog.Id;
+        }
+        catch
+        {
+        }
+    })
+);
+```
+
+Please note that the unhandled exception handler is not called when the request's cancellation
+token is triggered, for instance when the client disconnects before execution is complete.
+
 ## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,

@@ -37,7 +37,6 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
               id: ID! @external
               username: String!
             }
-
             """;
         string expected = $$"""{ "_service": { "sdl" : "{{JsonEncodedText.Encode(sdl)}}" } }""";
 

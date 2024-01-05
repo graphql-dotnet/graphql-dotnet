@@ -23,7 +23,7 @@ namespace GraphQL.Utilities
     /// <br/>
     /// See <see href="https://spec.graphql.org/October2021/#sec-Type-System"/> for more information.
     /// </summary>
-    //todo: [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
+    [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
         private static readonly List<string> _builtInScalars = new()

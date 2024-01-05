@@ -1,5 +1,5 @@
 using GraphQL.Types;
-using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL;
 
@@ -11,7 +11,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     private const string COMPLEXITY_IMPACT = "__COMPLEXITY_IMPACT__";
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
+    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
     /// <param name="provider">Metadata provider which must implement <see cref="IMetadataWriter"/> interface.</param>
@@ -22,7 +22,7 @@ public static class ComplexityAnalayzerMetadataExtensions
         => provider.WithMetadata(COMPLEXITY_IMPACT, impact);
 
     /// <summary>
-    /// Get field's complexity impact which will be taken into account by <see cref="ComplexityAnalyzer"/>.
+    /// Get field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
     /// <param name="provider">Metadata provider which must implement <see cref="IProvideMetadata"/> interface.</param>
     /// <returns>Field's complexity impact.</returns>
