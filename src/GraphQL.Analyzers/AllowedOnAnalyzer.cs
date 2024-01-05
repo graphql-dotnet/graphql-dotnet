@@ -15,7 +15,7 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor IllegalMethodUsage = new(
         id: DiagnosticIds.ILLEGAL_METHOD_USAGE,
         title: "Illegal method usage",
-        messageFormat: "'{0}' invocation is only allowed on types implementing {1}",
+        messageFormat: "'{0}' method is only allowed on types implementing {1}",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -45,12 +45,12 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
         ImmutableArray<ITypeSymbol>? allowedTypes = null;
         if (symbolInfo.Symbol != null)
         {
-            allowedTypes = GetAllowedTyped(symbolInfo.Symbol);
+            allowedTypes = GetAllowedTypes(symbolInfo.Symbol);
         }
         else if (symbolInfo.CandidateSymbols.Any())
         {
             allowedTypes = symbolInfo.CandidateSymbols
-                .SelectMany(symbol => GetAllowedTyped(symbol)?.Select(typeSymbol => typeSymbol))
+                .SelectMany(symbol => GetAllowedTypes(symbol)?.Select(typeSymbol => typeSymbol))
                 .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
                 .ToImmutableArray();
         }
@@ -138,7 +138,7 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static ImmutableArray<ITypeSymbol>? GetAllowedTyped(ISymbol symbol) =>
+    private static ImmutableArray<ITypeSymbol>? GetAllowedTypes(ISymbol symbol) =>
         symbol.GetAttributes()
             .FirstOrDefault(data => data.AttributeClass?.Name == Constants.MetadataNames.AllowedOnAttribute)
             ?.AttributeClass!.TypeArguments;
