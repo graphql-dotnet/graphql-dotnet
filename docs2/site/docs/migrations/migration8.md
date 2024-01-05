@@ -360,7 +360,7 @@ if you wish to define your own naming logic.
 
 The `UseLegacyTypeNaming` option is deprecated and will be removed in GraphQL.NET v9.
 
-### 9. `IVariableVisitorProvider.ValidateArgumentAsync` added
+### 9. `IVariableVisitorProvider.ValidateArgumentsAsync` added
 
 The `IVariableVisitorProvider` interface has a new method `ValidateArgumentAsync` that is
 called during validation. This method is called after all field arguments and directive
