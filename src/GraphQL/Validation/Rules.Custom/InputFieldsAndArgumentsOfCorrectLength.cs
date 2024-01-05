@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQL.Utilities.Visitors;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -13,6 +14,10 @@ namespace GraphQL.Validation.Rules
     /// <see cref="ExecutionOptions.CachedDocumentValidationRules">ExecutionOptions.CachedDocumentValidationRules</see>
     /// needs to be set as well (if using caching).
     /// </summary>
+    /// <remarks>
+    /// Please copy the newer <see cref="PatternMatchingDirective"/> and <see cref="PatternMatchingVisitor"/>
+    /// when designing new custom directives that can be used to validate input fields and arguments.
+    /// </remarks>
     public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule, IVariableVisitorProvider
     {
         private sealed class FieldVisitor : BaseVariableVisitor

@@ -246,6 +246,48 @@ At this time GraphQL.NET does not directly support the `MaxLength` and similar a
 implement your own attributes as shown above, or call the `Validate` method to set a validation
 function.
 
+### 6. `@pattern` custom directive added for validating input values against a regular expression pattern
+
+This directive allows for specifying a regular expression pattern to validate the input value.
+It can also be used as sample code for designing new custom directives, and is now the preferred
+design over the older `InputFieldsAndArgumentsOfCorrectLength` validation rule.
+This directive is not enabled by default, and must be added to the schema as follows:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .ConfigureSchema(s =>
+    {
+        // add the directive to the schema
+        s.Directives.Register(new PatternMatchingDirective());
+
+        // add the visitor to the schema, which will apply validation rules to all field
+        // arguments and input fields that have the @pattern directive applied
+        s.RegisterVisitor(new PatternMatchingVisitor());
+    }));
+```
+
+You can then apply the directive to any input field or argument as follows:
+
+```csharp
+Field(x => x.FirstName)
+    .ApplyDirective("pattern", "regex", "[A-Z]+"); // uppercase only
+```
+
+### 7. DirectiveAttribute added to support applying directives to type-first graph types and fields
+
+For example:
+
+```csharp
+private class Query
+{
+    public static string Hello(
+        [Directive("pattern", "regex", "[A-Z]+")] // uppercase only
+        string arg)
+        => arg;
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
