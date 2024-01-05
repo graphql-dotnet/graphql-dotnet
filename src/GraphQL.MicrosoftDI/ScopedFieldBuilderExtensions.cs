@@ -1,4 +1,5 @@
 using GraphQL.Builders;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 
 namespace GraphQL.MicrosoftDI;
@@ -27,4 +28,10 @@ public static class ScopedFieldBuilderExtensions
     [AllowedOn<IObjectGraphType>]
     public static ResolverBuilder<TSourceType, TReturnType> Resolve<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
         => new(builder, false);
+
+    /// <summary>
+    /// Indicates that the resolver for this field will be returning a data loader.
+    /// </summary>
+    internal static FieldBuilder<TSourceType, IDataLoaderResult<TReturnType>> ReturnsDataLoader<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
+        => builder.Returns<IDataLoaderResult<TReturnType>>();
 }
