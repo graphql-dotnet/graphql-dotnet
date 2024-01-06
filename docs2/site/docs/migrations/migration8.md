@@ -248,11 +248,11 @@ function.
 
 ### 6. Validation rules can read or validate field arguments and directive arguments
 
-Validation rules can now read or validate field arguments and directive arguments. This is useful
+Validation rules can now read or validate field and directive arguments. This is useful
 for edge cases, such as when a complexity analyzer needs to read the value of a field argument
 to determine the complexity of the field. While it could also be used within custom validation rules
-to validate the value of field arguments or directive arguments, perhaps based on schema directives,
-it cannot be used to validate fields of input object graph types.
+to validate the value of field or directive arguments, perhaps based on schema directives,
+it cannot be used to validate fields of input objects.
 
 Note that with the addition of `Validator` and `Parser` delegates, validation rules are no longer
 required to validate input values. If you plan to store validation rules within schema directives,
