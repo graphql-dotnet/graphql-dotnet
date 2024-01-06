@@ -263,12 +263,12 @@ to validate the field arguments. This will be much more efficient, as the valida
 be called for every field argument on every field, nor will it require a dictionary lookup to find
 the validation rule for the field argument.
 
-To implement a validation rule that validates field arguments or directive arguments, implement
+To implement a validation rule that validates field or directive arguments, implement
 `IValidationRule` and `IVariableVisitorProvider`. The `IVariableVisitorProvider` interface has a
-new method `ValidateArgumentsAsync` that is called during validation. This method is called after
-all field arguments and directive arguments have been parsed, allowing a validation rule to validate
-parsed argument values. It will run even if there are no arguments to validate, so you should check
-for this case and return early if there are no arguments to validate. However it will not run if
+new method, `ValidateArgumentsAsync`, that is called during validation. This method is called after
+all the relevant arguments have been parsed, allowing a validation rule to validate
+parsed values. It will run even if there are no arguments to validate, so you should check
+for this case and return early if there is nothing to validate. However, it will not run if
 errors occur prior to parsing the arguments, such as if the field or directive is not found, or
 if an argument fails coercion or validation.
 
