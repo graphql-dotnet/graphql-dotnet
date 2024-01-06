@@ -446,8 +446,8 @@ a problem for your federated schema.
 
 ### 11. `IVariableVisitorProvider.ValidateArgumentsAsync` added
 
-The `IVariableVisitorProvider` interface has a new method `ValidateArgumentsAsync` that is
-called during validation. This method is called after all field arguments and directive
+The `IVariableVisitorProvider` interface has a new method, `ValidateArgumentsAsync`, that is
+called during validation. This method is called after all field and directive
 arguments have been parsed, allowing a validation rule to validate parsed argument values.
 
 No changes will be required to most validation rules which only implement `IValidationRule`.
