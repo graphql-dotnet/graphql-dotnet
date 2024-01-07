@@ -228,10 +228,11 @@ namespace GraphQL.Types
         private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
         /// <summary>
         /// Returns the value for the specified query argument, or <c>default(T)</c> if the argument
-        /// was not specified and no default argument value was specified.
+        /// was not specified and the argument is not configured with a default value.
         /// </summary>
         private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
         {
+            // note: if the query argument has a default value, TryGetArgumentExact will always return true
             return context.TryGetArgumentExact(typeof(T), queryArgument.Name, out var value)
                 ? (T?)value
                 : default;
