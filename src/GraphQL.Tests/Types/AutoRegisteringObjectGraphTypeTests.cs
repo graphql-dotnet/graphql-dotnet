@@ -254,6 +254,28 @@ public class AutoRegisteringObjectGraphTypeTests
         }
     }
 
+    [Fact]
+    public async Task DefaultValueIsCoerced()
+    {
+        var schema = new Schema
+        {
+            Query = new AutoRegisteringObjectGraphType<ArgumentTests>()
+        };
+        schema.Initialize();
+        var result = await schema.ExecuteAsync(o =>
+        {
+            o.Root = new ArgumentTests();
+            o.Query = """
+                query {
+                    withDefaultString
+                }
+                """;
+        });
+        result.ShouldBeSimilarTo("""
+            {"data":{"withDefaultString":"test"}}
+            """);
+    }
+
     [Theory]
     [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", "hello", null, "hello")]
     [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", "hello", null, "hello")]
@@ -261,7 +283,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(ArgumentTests.WithNullableString), null, null, null, null)]
     [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", "hello", null, "hello")]
     [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")]
+    //[InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")] //cannot occur -- TryGetArgumentExact returns true for args with default values
     [InlineData(nameof(ArgumentTests.WithCancellationToken), null, null, null, true)]
     [InlineData(nameof(ArgumentTests.WithFromServices), null, null, null, "testService")]
     [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", "hello", null, "hello")]

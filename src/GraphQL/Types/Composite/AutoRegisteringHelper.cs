@@ -227,20 +227,14 @@ namespace GraphQL.Types
 
         private static readonly MethodInfo _getArgumentMethod = typeof(AutoRegisteringHelper).GetMethod(nameof(GetArgumentInternal), BindingFlags.NonPublic | BindingFlags.Static)!;
         /// <summary>
-        /// Returns the value for the specified query argument, or the default value of the query argument
-        /// if a value was not specified in the request.
-        /// <br/><br/>
-        /// Unlike <see cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>,
-        /// the default value is not returned if <see langword="null"/> was explicitly supplied within the query.
-        /// The default value is only returned if no value was supplied to the query.
+        /// Returns the value for the specified query argument, or <c>default(T)</c> if the argument
+        /// was not specified and no default argument value was specified.
         /// </summary>
         private static T? GetArgumentInternal<T>(IResolveFieldContext context, QueryArgument queryArgument)
         {
-            // GetArgument changes null values to DefaultValue even if null is explicitly specified,
-            // so do not use GetArgument here
-            return context.TryGetArgument(typeof(T), queryArgument.Name, out var value)
+            return context.TryGetArgumentExact(typeof(T), queryArgument.Name, out var value)
                 ? (T?)value
-                : (T?)queryArgument.DefaultValue;
+                : default;
         }
 
         /// <summary>

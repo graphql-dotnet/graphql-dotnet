@@ -60,14 +60,25 @@ namespace GraphQL
             var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
             var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
 
+            return TryGetArgumentExact(context, argumentType, argumentName, out result);
+        }
+
+        internal static bool TryGetArgumentExact(this IResolveFieldContext context, Type argumentType, string argumentName, out object? result)
+        {
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
                 result = null;
                 return false;
             }
 
+            if (arg.Value == null || argumentType.IsInstanceOfType(arg.Value))
+            {
+                result = arg.Value;
+                return true;
+            }
+
             var resolvedType = context.FieldDefinition?.Arguments?.Find(argumentName)?.ResolvedType
-                ?? throw new InvalidOperationException($"Could not obtain graph type instance for argument '{name}'");
+                ?? throw new InvalidOperationException($"Could not obtain graph type instance for argument '{argumentName}'");
 
             if (arg.Value is IDictionary<string, object?> inputObject)
             {
