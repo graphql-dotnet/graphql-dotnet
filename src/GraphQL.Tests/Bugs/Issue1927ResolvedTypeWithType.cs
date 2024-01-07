@@ -7,7 +7,7 @@ public class Issue1927ResolvedTypeWithType
     [Fact]
     public void test_outputs()
     {
-        var innerObject = new ObjectGraphType();
+        var innerObject = new ObjectGraphType() { Name = "inner" };
         innerObject.AddField(new FieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
         var list = new ListGraphType(innerObject);
         var obj = new ObjectGraphType();
@@ -22,7 +22,7 @@ public class Issue1927ResolvedTypeWithType
     [Fact]
     public void test_inputs()
     {
-        var innerObject = new InputObjectGraphType();
+        var innerObject = new InputObjectGraphType() { Name = "inner" };
         innerObject.AddField(new FieldType { Name = "test", ResolvedType = new StringGraphType(), Type = typeof(StringGraphType) });
         var list = new ListGraphType(innerObject);
         var inputObj = new InputObjectGraphType();

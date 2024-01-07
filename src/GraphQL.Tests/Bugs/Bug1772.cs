@@ -8,10 +8,10 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
 {
     [Theory]
     [InlineData("")]
-    [InlineData((string)null)]
+    [InlineData(null)]
     [InlineData("firstQuery")]
     [InlineData("secondQuery")]
-    public async Task DocumentExecuter_works_for_valid_operation(string operationName)
+    public async Task DocumentExecuter_works_for_valid_operation(string? operationName)
     {
         var de = new DocumentExecuter();
         var valid = await de.ExecuteAsync(new ExecutionOptions
@@ -19,7 +19,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
             Query = "query firstQuery {test} query secondQuery {test}",
             Schema = Schema,
             OperationName = operationName,
-        }).ConfigureAwait(false);
+        });
         valid.ShouldNotBeNull();
         valid.Data.ShouldNotBeNull();
         valid.Errors.ShouldBeNull();
@@ -37,7 +37,7 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
             Query = "query firstQuery {test} query secondQuery {test}",
             Schema = Schema,
             OperationName = operationName
-        }).ConfigureAwait(false);
+        });
         result.ShouldNotBeNull();
         result.Data.ShouldBeNull();
         result.Errors.ShouldNotBeNull();
@@ -60,6 +60,6 @@ public class Bug1772Query : ObjectGraphType
 {
     public Bug1772Query()
     {
-        Field<StringGraphType>("Test", resolve: context => "ok");
+        Field<StringGraphType>("Test").Resolve(_ => "ok");
     }
 }

@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests;
 public class GraphQLBuilderTests
 {
     [Fact]
-    public void AddDataLoader()
+    public async Task AddDataLoader()
     {
         var instance = new DataLoaderDocumentListener(new DataLoaderContextAccessor());
         var mockRegister = new Mock<IServiceRegister>(MockBehavior.Strict);
@@ -20,18 +20,25 @@ public class GraphQLBuilderTests
         mockRegister.Setup(x => x.Register(typeof(DataLoaderDocumentListener), typeof(DataLoaderDocumentListener), ServiceLifetime.Singleton, false)).Returns(register).Verifiable();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(x => x.GetService(typeof(DataLoaderDocumentListener))).Returns(instance).Verifiable();
-        mockRegister.Setup(x => x.Register(typeof(IConfigureExecutionOptions), It.IsAny<object>(), false))
-            .Returns<Type, IConfigureExecutionOptions, bool>((_, action, _) =>
+        var actions = new List<IConfigureExecution>();
+        mockRegister.Setup(x => x.Register(typeof(IConfigureExecution), It.IsAny<IConfigureExecution>(), false))
+            .Returns<Type, IConfigureExecution, bool>((_, action, _) =>
             {
-                var options = new ExecutionOptions()
-                {
-                    RequestServices = mockServiceProvider.Object
-                };
-                action.ConfigureAsync(options).Wait();
-                options.Listeners.ShouldContain(instance);
+                actions.Add(action);
                 return register;
             }).Verifiable();
         builder.AddDataLoader();
+
+        var options = new ExecutionOptions()
+        {
+            RequestServices = mockServiceProvider.Object
+        };
+        foreach (var action in actions)
+        {
+            await action.ExecuteAsync(options, _ => Task.FromResult<ExecutionResult>(null!));
+        }
+        options.Listeners.ShouldContain(instance);
+
         mockServiceProvider.Verify();
         mockRegister.Verify();
     }

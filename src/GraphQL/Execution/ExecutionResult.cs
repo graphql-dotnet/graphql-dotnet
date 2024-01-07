@@ -77,11 +77,13 @@ namespace GraphQL
             if (result == null)
                 throw new ArgumentNullException(nameof(result));
 
+            Executed = result.Executed;
             Data = result.Data;
+            Streams = result.Streams;
             Errors = result.Errors;
             Query = result.Query;
-            Operation = result.Operation;
             Document = result.Document;
+            Operation = result.Operation;
             Perf = result.Perf;
             Extensions = result.Extensions;
         }

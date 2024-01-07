@@ -27,7 +27,7 @@ public class UppercaseDirectiveVisitor : BaseSchemaNodeVisitor
             var inner = field.Resolver ?? NameFieldResolver.Instance;
             field.Resolver = new FuncFieldResolver<object>(async context =>
             {
-                object result = await inner.ResolveAsync(context).ConfigureAwait(false);
+                object? result = await inner.ResolveAsync(context).ConfigureAwait(false);
 
                 return result is string str ? str.ToUpperInvariant() : result;
             });

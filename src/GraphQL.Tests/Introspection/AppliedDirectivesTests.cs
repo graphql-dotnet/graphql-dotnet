@@ -14,9 +14,9 @@ public class AppliedDirectivesTests
         {
             _.Schema = new AppliedSchema().EnableExperimentalIntrospectionFeatures(ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution);
             _.Query = "AppliedDirectives".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         json.ShouldBe("AppliedDirectivesResult".ReadJsonResult());
@@ -42,10 +42,9 @@ public class AppliedDirectivesTests
     {
         public RootMutation()
         {
-            Field<StringGraphType>(
-                "test",
-                arguments: new QueryArguments(new QueryArgument(typeof(StringGraphType)) { Name = "some" }.ApplyDirective("traits", "quality", "moderate"))
-            ).ApplyDirective("traits", "quality", "low");
+            Field<StringGraphType>("test")
+                .Argument<StringGraphType>("some", arg => arg.ApplyDirective("traits", "quality", "moderate"))
+                .Directive("traits", "quality", "low");
 
             this.ApplyDirective("traits"); // default arguments values used, therefore they will not be returned by introspection
         }

@@ -8,7 +8,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void Nullable_field_resolve_to_null_should_not_bubble_up_the_null()
     {
         const string QUERY = "{ nullableDataGraph { nullable } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": { ""nullable"": null } }";
+        const string EXPECTED = """{ "nullableDataGraph": { "nullable": null } }""";
         var data = new Data { Nullable = null };
         var errors = Array.Empty<ExecutionError>();
 
@@ -19,7 +19,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNull_field_resolve_with_non_null_value_should_not_throw_error()
     {
         const string QUERY = "{ nullableDataGraph { nonNullable } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": { ""nonNullable"": ""data"" } }";
+        const string EXPECTED = """{ "nullableDataGraph": { "nonNullable": "data" } }""";
         var data = new Data { NonNullable = "data" };
         var errors = Array.Empty<ExecutionError>();
 
@@ -30,7 +30,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNull_field_resolve_to_null_should_bubble_up_null_to_parent()
     {
         const string QUERY = "{ nullableDataGraph { nonNullable } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": null }";
+        const string EXPECTED = """{ "nullableDataGraph": null }""";
         var data = new Data { NonNullable = null };
         var errors = new[]
         {
@@ -48,7 +48,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNull_field_resolve_to_null_should_bubble_up_the_null_to_first_nullable_parent_in_chain_of_nullable()
     {
         const string QUERY = "{ nullableDataGraph { nullableNest { nonNullable } } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": { ""nullableNest"": null } }";
+        const string EXPECTED = """{ "nullableDataGraph": { "nullableNest": null } }""";
         var data = new Data { NullableNest = new Data { NonNullable = null } };
         var errors = new[]
         {
@@ -66,7 +66,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNull_field_resolve_to_null_should_bubble_up_the_null_to_first_nullable_parent_in_chain_of_non_null_fields()
     {
         const string QUERY = "{ nullableDataGraph { nonNullableNest { nonNullable } } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": null }";
+        const string EXPECTED = """{ "nullableDataGraph": null }""";
         var data = new Data { NonNullableNest = new Data { NonNullable = null } };
         var errors = new[]
         {
@@ -84,7 +84,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNull_field_resolve_to_null_should_null_the_top_level_if_no_nullable_parent_present()
     {
         const string QUERY = "{ nonNullableDataGraph { nonNullableNest { nonNullable } } }";
-        const string EXPECTED = null;
+        const string? EXPECTED = null;
         var data = new Data { NonNullableNest = new Data { NonNullable = null } };
         var errors = new[]
         {
@@ -102,8 +102,8 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void ListOfNonNull_containing_null_should_bubble_up_the_null()
     {
         const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
-        const string EXPECTED = @"{ ""nonNullableDataGraph"": { ""listOfNonNullable"": null } }";
-        var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
+        const string EXPECTED = """{ "nonNullableDataGraph": { "listOfNonNullable": null } }""";
+        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
@@ -126,7 +126,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNullList_resolve_to_null_should_bubble_up_the_null()
     {
         const string QUERY = "{ nullableDataGraph { nonNullableList } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": null }";
+        const string EXPECTED = """{ "nullableDataGraph": null }""";
         var data = new Data { ListOfStrings = null };
         var errors = new[]
         {
@@ -144,7 +144,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNullList_resolve_to_null_should_null_top_level_if_no_nullable_parent_found()
     {
         const string QUERY = "{ nonNullableDataGraph { nonNullableList } }";
-        const string EXPECTED = null;
+        const string? EXPECTED = null;
         var data = new Data { ListOfStrings = null };
         var errors = new[]
         {
@@ -162,8 +162,8 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NoNullListOfNonNull_contains_null_should_bubble_up_the_null()
     {
         const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": null }";
-        var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
+        const string EXPECTED = """{ "nullableDataGraph": null }""";
+        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
@@ -186,7 +186,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     public void NonNullListOfNonNull_resolve_to_null_should_bubble_up_the_null()
     {
         const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
-        const string EXPECTED = @"{ ""nullableDataGraph"": null }";
+        const string EXPECTED = """{ "nullableDataGraph": null }""";
         var data = new Data { ListOfStrings = null };
         var errors = new[]
         {
@@ -205,7 +205,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nonNullableListOfNonNullableDataGraph { nonNullableListOfNonNullableThrow } }";
         const string EXPECTED = "";
-        var data = new Data { ListOfStrings = new List<string> { "text", null, null } };
+        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullableThrow'.", new Exception(
@@ -218,7 +218,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
         AssertResult(QUERY, EXPECTED, data, errors);
     }
 
-    private void AssertResult(string query, string expected, Data data, IReadOnlyList<ExecutionError> errors, bool executed = true)
+    private void AssertResult(string query, string? expected, Data data, IReadOnlyList<ExecutionError> errors, bool executed = true)
     {
         ExecutionResult result =
             AssertQueryWithErrors(
@@ -228,7 +228,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
                 expectedErrorCount: errors.Count,
                 executed: executed);
 
-        ExecutionErrors actualErrors = result.Errors;
+        ExecutionErrors actualErrors = result.Errors!;
 
         if (errors.Count == 0)
         {
@@ -238,7 +238,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
         {
             actualErrors.Count.ShouldBe(errors.Count);
 
-            for (var i = 0; i < errors.Count; i++)
+            for (int i = 0; i < errors.Count; i++)
             {
                 ExecutionError actualError = actualErrors[i];
                 ExecutionError expectedError = errors[i];
@@ -267,71 +267,63 @@ public class BubbleNullSchema : Schema
     {
         var query = new ObjectGraphType();
 
-        query.Field<NonNullGraphType<DataGraphType>>(
-            "nonNullableDataGraph",
-            resolve: c => new DataGraphType { Data = c.Source as Data }
+        query.Field<NonNullGraphType<DataGraphType>>("nonNullableDataGraph")
+            .Resolve(c => new DataModel { Data = (c.Source as Data)! }
         );
 
-        query.Field<DataGraphType>(
-            "nullableDataGraph",
-            resolve: c => new DataGraphType { Data = c.Source as Data }
+        query.Field<DataGraphType>("nullableDataGraph")
+            .Resolve(c => new DataModel { Data = (c.Source as Data)! }
         );
 
-        query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>(
-           "nonNullableListOfNonNullableDataGraph",
-           resolve: c => new[] { new DataGraphType() });
+        query.Field<NonNullGraphType<ListGraphType<NonNullGraphType<DataGraphType>>>>("nonNullableListOfNonNullableDataGraph")
+            .Resolve(_ => new[] { new DataModel() });
 
         Query = query;
     }
 }
 
-public class DataGraphType : ObjectGraphType<DataGraphType>
+public class DataModel
+{
+    public Data Data { get; set; }
+}
+
+public class DataGraphType : ObjectGraphType<DataModel>
 {
     public DataGraphType()
     {
         Name = "dataType";
 
-        Field<StringGraphType>(
-            "nullable",
-            resolve: c => c.Source.Data.Nullable);
+        Field<StringGraphType>("nullable")
+            .Resolve(c => c.Source.Data.Nullable);
 
-        Field<NonNullGraphType<StringGraphType>>(
-            "nonNullable",
-            resolve: c => c.Source.Data.NonNullable);
+        Field<NonNullGraphType<StringGraphType>>("nonNullable")
+            .Resolve(c => c.Source.Data.NonNullable);
 
-        Field<ListGraphType<NonNullGraphType<StringGraphType>>>(
-            "listOfNonNullable",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<ListGraphType<NonNullGraphType<StringGraphType>>>("listOfNonNullable")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<StringGraphType>>>(
-            "nonNullableList",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<NonNullGraphType<ListGraphType<StringGraphType>>>("nonNullableList")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
-            "nonNullableListOfNonNullable",
-            resolve: c => c.Source.Data.ListOfStrings);
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("nonNullableListOfNonNullable")
+            .Resolve(c => c.Source.Data.ListOfStrings);
 
-        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>(
-            "nonNullableListOfNonNullableThrow",
-            resolve: c => throw new Exception("test"));
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("nonNullableListOfNonNullableThrow")
+            .Resolve(_ => throw new Exception("test"));
 
-        Field<NonNullGraphType<DataGraphType>>(
-            "nonNullableNest",
-            resolve: c => new DataGraphType { Data = c.Source.Data.NonNullableNest });
+        Field<NonNullGraphType<DataGraphType>>("nonNullableNest")
+            .Resolve(c => new DataModel { Data = c.Source.Data.NonNullableNest! });
 
-        Field<DataGraphType>(
-             "nullableNest",
-            resolve: c => new DataGraphType { Data = c.Source.Data.NullableNest });
+        Field<DataGraphType>("nullableNest")
+            .Resolve(c => new DataModel { Data = c.Source.Data.NullableNest! });
     }
-
-    public Data Data { get; set; }
 }
 
 public class Data
 {
-    public string Nullable { get; set; }
-    public Data NullableNest { get; set; }
-    public string NonNullable { get; set; }
-    public Data NonNullableNest { get; set; }
-    public List<string> ListOfStrings { get; set; }
+    public string? Nullable { get; set; }
+    public Data? NullableNest { get; set; }
+    public string? NonNullable { get; set; }
+    public Data? NonNullableNest { get; set; }
+    public List<string?>? ListOfStrings { get; set; }
 }

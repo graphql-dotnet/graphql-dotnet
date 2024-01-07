@@ -8,98 +8,98 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     [Fact]
     public void of_the_same_object()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment objectWithinObject on Dog { ...dogFragment }
                 fragment dogFragment on Dog { barkVolume }
-            ");
+            """);
     }
 
     [Fact]
     public void of_the_same_object_with_inline_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment objectWithinObjectAnon on Dog { ... on Dog { barkVolume } }
-            ");
+            """);
     }
 
     [Fact]
     public void object_into_an_implemented_interface()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment objectWithinInterface on Pet { ...dogFragment }
                 fragment dogFragment on Dog { barkVolume }
-            ");
+            """);
     }
 
     [Fact]
     public void object_into_containing_union()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment objectWithinUnion on CatOrDog { ...dogFragment }
                 fragment dogFragment on Dog { barkVolume }
-            ");
+            """);
     }
 
     [Fact]
     public void union_into_contained_object()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment unionWithinObject on Dog { ...catOrDogFragment }
                 fragment catOrDogFragment on CatOrDog { __typename }
-            ");
+            """);
     }
 
     [Fact]
     public void union_into_overlapping_interface()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment unionWithinInterface on Pet { ...catOrDogFragment }
                 fragment catOrDogFragment on CatOrDog { __typename }
-            ");
+            """);
     }
 
     [Fact]
     public void union_into_overlapping_union()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment unionWithinUnion on DogOrHuman { ...catOrDogFragment }
                 fragment catOrDogFragment on CatOrDog { __typename }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_into_implemented_object()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment interfaceWithinObject on Dog { ...petFragment }
                 fragment petFragment on Pet { name }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_into_overlapping_interface()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment interfaceWithinInterface on Pet { ...beingFragment }
                 fragment beingFragment on Being { name }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_into_overlapping_interface_in_inline_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment interfaceWithinInterface on Pet { ... on Being { name } }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_into_overlapping_union()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment interfaceWithinUnion on CatOrDog { ...petFragment }
                 fragment petFragment on Pet { name }
-            ");
+            """);
     }
 
     [Fact]
@@ -107,11 +107,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                     fragment invalidObjectWithinObject on Cat { ...dogFragment }
                     fragment dogFragment on Dog { barkVolume }
-                ";
-            error(_, "dogFragment", "Cat", "Dog", 2, 65);
+                """;
+            error(_, "dogFragment", "Cat", "Dog", 1, 49);
         });
     }
 
@@ -120,12 +120,12 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidObjectWithinObjectAnon on Cat {
                     ... on Dog { barkVolume }
                   }
-                ";
-            errorAnon(_, "Cat", "Dog", 3, 21);
+                """;
+            errorAnon(_, "Cat", "Dog", 2, 5);
         });
     }
 
@@ -134,11 +134,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidObjectWithinInterface on Pet { ...humanFragment }
                   fragment humanFragment on Human { pets { name } }
-                ";
-            error(_, "humanFragment", "Pet", "Human", 2, 66);
+                """;
+            error(_, "humanFragment", "Pet", "Human", 1, 50);
         });
     }
 
@@ -147,11 +147,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidObjectWithinUnion on CatOrDog { ...humanFragment }
                   fragment humanFragment on Human { pets { name } }
-                ";
-            error(_, "humanFragment", "CatOrDog", "Human", 2, 67);
+                """;
+            error(_, "humanFragment", "CatOrDog", "Human", 1, 51);
         });
     }
 
@@ -160,11 +160,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidUnionWithinObject on Human { ...catOrDogFragment }
                   fragment catOrDogFragment on CatOrDog { __typename }
-                ";
-            error(_, "catOrDogFragment", "Human", "CatOrDog", 2, 64);
+                """;
+            error(_, "catOrDogFragment", "Human", "CatOrDog", 1, 48);
         });
     }
 
@@ -173,11 +173,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidUnionWithinInterface on Pet { ...humanOrAlienFragment }
                   fragment humanOrAlienFragment on HumanOrAlien { __typename }
-                ";
-            error(_, "humanOrAlienFragment", "Pet", "HumanOrAlien", 2, 65);
+                """;
+            error(_, "humanOrAlienFragment", "Pet", "HumanOrAlien", 1, 49);
         });
     }
 
@@ -186,11 +186,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidUnionWithinUnion on CatOrDog { ...humanOrAlienFragment }
                   fragment humanOrAlienFragment on HumanOrAlien { __typename }
-                ";
-            error(_, "humanOrAlienFragment", "CatOrDog", "HumanOrAlien", 2, 66);
+                """;
+            error(_, "humanOrAlienFragment", "CatOrDog", "HumanOrAlien", 1, 50);
         });
     }
 
@@ -199,11 +199,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidInterfaceWithinObject on Cat { ...intelligentFragment }
                   fragment intelligentFragment on Intelligent { iq }
-                ";
-            error(_, "intelligentFragment", "Cat", "Intelligent", 2, 66);
+                """;
+            error(_, "intelligentFragment", "Cat", "Intelligent", 1, 50);
         });
     }
 
@@ -212,13 +212,13 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidInterfaceWithinInterface on Pet {
                     ...intelligentFragment
                   }
                   fragment intelligentFragment on Intelligent { iq }
-                ";
-            error(_, "intelligentFragment", "Pet", "Intelligent", 3, 21);
+                """;
+            error(_, "intelligentFragment", "Pet", "Intelligent", 2, 5);
         });
     }
 
@@ -227,12 +227,12 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidInterfaceWithinInterfaceAnon on Pet {
                     ...on Intelligent { iq }
                   }
-                ";
-            errorAnon(_, "Pet", "Intelligent", 3, 21);
+                """;
+            errorAnon(_, "Pet", "Intelligent", 2, 5);
         });
     }
 
@@ -241,11 +241,11 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   fragment invalidInterfaceWithinUnion on HumanOrAlien { ...petFragment }
                   fragment petFragment on Pet { name }
-                ";
-            error(_, "petFragment", "HumanOrAlien", "Pet", 2, 74);
+                """;
+            error(_, "petFragment", "HumanOrAlien", "Pet", 1, 58);
         });
     }
 

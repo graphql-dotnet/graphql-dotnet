@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -80,6 +81,9 @@ namespace GraphQL
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool { get; set; }
 
+        /// <inheritdoc/>
+        public ClaimsPrincipal? User { get; set; }
+
         /// <summary>
         /// Initializes a new instance with all fields set to their default values.
         /// </summary>
@@ -103,6 +107,7 @@ namespace GraphQL
             Document = context.Document;
             RootValue = context.RootValue;
             UserContext = context.UserContext;
+            User = context.User;
             Operation = context.Operation;
             Variables = context.Variables;
             CancellationToken = context.CancellationToken;
@@ -132,7 +137,7 @@ namespace GraphQL
         /// <exception cref="ArgumentException">Thrown if the <see cref="IResolveFieldContext.Source"/> property cannot be cast to <typeparamref name="TSource"/></exception>
         public ResolveFieldContext(IResolveFieldContext context) : base(context)
         {
-            if (context.Source != null && !(context.Source is TSource))
+            if (context.Source != null && context.Source is not TSource)
                 throw new ArgumentException($"IResolveFieldContext.Source must be an instance of type '{typeof(TSource).Name}'", nameof(context));
         }
 

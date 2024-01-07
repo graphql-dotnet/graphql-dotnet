@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
@@ -296,6 +294,19 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Count.ShouldBe(2);
     }
 
+    [Fact]
+    public void RegistersInitFields()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
+        graphType.Fields.Find(nameof(FieldTests.FieldWithInitSetter)).ShouldNotBeNull();
+
+        // also verify the data is injected into the class properly
+        var dic = new Dictionary<string, object?>() { { nameof(FieldTests.FieldWithInitSetter), "hello" } };
+        object obj = graphType.ParseDictionary(dic);
+        var fieldTests = obj.ShouldBeOfType<FieldTests>();
+        fieldTests.FieldWithInitSetter.ShouldBe("hello");
+    }
+
     private class FieldTests
     {
         [Name("Test1")]
@@ -310,9 +321,17 @@ public class AutoRegisteringInputObjectGraphTypeTests
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
         public string? Field5 { get; set; }
+#if NET48
         [InputType(typeof(IdGraphType))]
+#else
+        [InputType<IdGraphType>()]
+#endif
         public int? Field6 { get; set; }
+#if NET48
         [OutputType(typeof(IdGraphType))]
+#else
+        [OutputType<IdGraphType>()]
+#endif
         public int? Field7 { get; set; }
         [DefaultValue("hello")]
         public string? Field8 { get; set; }
@@ -349,6 +368,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public IEnumerable? NullableEnumerableField { get; set; }
         public ICollection? NullableCollectionField { get; set; }
         public int?[]?[]? ListOfListOfIntsField { get; set; }
+        public string FieldWithInitSetter { get; init; } = null!;
     }
 
     private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>

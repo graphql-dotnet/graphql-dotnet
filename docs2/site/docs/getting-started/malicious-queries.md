@@ -9,10 +9,8 @@ resolve queries that meet the set criteria and discard any overly complex and po
 malicious query that you don't expect your clients to make thus protecting your server
 resources against depletion by a denial of service attacks.
 
-These options are added to the `ExecutionOptions` via an instance of
-`GraphQL.Validation.Complexity.ComplexityConfiguration`. You can leave any of the options
-as `null` to go with the default value and disable that specific check. The available options
-are the following:
+`GraphQL.Validation.Complexity.ComplexityConfiguration` class represents these options
+that are used by `ComplexityValidationRule`. The available options are the following:
 
 ```csharp
 public class ComplexityConfiguration
@@ -20,15 +18,17 @@ public class ComplexityConfiguration
     public int? MaxDepth { get; set; }
     public int? MaxComplexity { get; set; }
     public double? FieldImpact { get; set; }
+    public int MaxRecursionCount { get; set; }
 }
 ```
 
+The easiest way to configure complexity checks for your schema is the following:
+
 ```csharp
-await schema.ExecuteAsync(_ =>
-{
-  _.Query = "...";
-  _.ComplexityConfiguration = new ComplexityConfiguration { MaxDepth = 15 };
-});
+IServiceCollection services = ...;
+services.AddGraphQL(builder => builder
+    .AddSchema<ComplexitySchema>()
+    .AddComplexityAnalyzer(opt => opt.MaxComplexity = 200));
 ```
 
 `MaxDepth` will enforce the total maximum nesting across all queries in a request.

@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DateTimeGraphTypeTests
 {
-    private readonly DateTimeGraphType _type = new DateTimeGraphType();
+    private readonly DateTimeGraphType _type = new();
 
     [Fact]
     public void coerces_valid_date()
@@ -14,9 +14,9 @@ public class DateTimeGraphTypeTests
         CultureTestHelper.UseCultures(() =>
         {
             var expected = DateTime.UtcNow;
-            var input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
+            string input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
 
-            var actual = _type.ParseValue(input);
+            object? actual = _type.ParseValue(input);
 
             actual.ShouldBe(expected);
         });
@@ -27,7 +27,7 @@ public class DateTimeGraphTypeTests
     {
         CultureTestHelper.UseCultures(() =>
         {
-            ((DateTime)_type.ParseValue("2015-11-21T19:59:32.987+0200")).Kind.ShouldBe(
+            ((DateTime)_type.ParseValue("2015-11-21T19:59:32.987+0200")!).Kind.ShouldBe(
                 DateTimeKind.Utc);
         });
     }

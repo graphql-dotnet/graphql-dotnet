@@ -7,27 +7,28 @@ public class Bug850MutationAlias : QueryTestBase<NestedMutationSchema>
     [Fact]
     public void supports_nested_objects()
     {
-        var inputs =
-           @"{  ""program"":
-                    {   ""name"": ""TEST Program"",
-                        ""modifiedBy"": ""TEST"",
-                        ""isActive"": true,
-                        ""description"": ""Testing from graphql explorer"",
-                        ""messageNamespace"": ""http://foo.bar"",
-                        ""messageRoot"": ""Foo"",
-                        ""steps"": [
-                                    { ""programStepDefinitionId"": 1,
-                                      ""sequenceOrder"": 1,
-                                      ""properties"": [ {""stepPropertyId"": 1, ""propertyValue"": ""60"" } ] },
-                                    { ""programStepDefinitionId"": 2,
-                                      ""sequenceOrder"": 2,
-                                      ""properties"": [] }
-                        ]  }}"
+        var inputs = """
+{  "program":
+    {   "name": "TEST Program",
+        "modifiedBy": "TEST",
+        "isActive": true,
+        "description": "Testing from graphql explorer",
+        "messageNamespace": "http://foo.bar",
+        "messageRoot": "Foo",
+        "steps": [
+                    { "programStepDefinitionId": 1,
+                        "sequenceOrder": 1,
+                        "properties": [ {"stepPropertyId": 1, "propertyValue": "60" } ] },
+                    { "programStepDefinitionId": 2,
+                        "sequenceOrder": 2,
+                        "properties": [] }
+        ]  }}
+"""
                 .ToInputs();
 
-        string query = @"mutation createProgram($program: ProgramInput!) { createProgram(program: $program) }";
+        const string query = "mutation createProgram($program: ProgramInput!) { createProgram(program: $program) }";
 
-        string expected = @"{ ""createProgram"": true }";
+        const string expected = """{ "createProgram": true }""";
 
         AssertQuerySuccess(query, expected, inputs);
     }
@@ -46,9 +47,9 @@ public class NestedMutation : ObjectGraphType
     public NestedMutation()
     {
         Name = "mutation";
-        Field<BooleanGraphType>("createProgram",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<ProgramInputType>> { Name = "program" }),
-            resolve: context =>
+        Field<BooleanGraphType>("createProgram")
+            .Argument<NonNullGraphType<ProgramInputType>>("program")
+            .Resolve(context =>
             {
                 var program = context.GetArgument<Program>("program");
                 program.Steps.Any(step => step.PropertyValues.Count > 0).ShouldBeTrue();

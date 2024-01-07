@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Complexity
     {
         public double AvgImpact { get; set; }
 
-        public double CurrentSubSelectionImpact { get; set; }
+        public double? CurrentSubSelectionImpact { get; set; }
 
         public double CurrentEndNodeImpact { get; set; }
 

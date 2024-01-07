@@ -8,16 +8,16 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
     [Fact]
     public void can_set_metadata_from_custom_attribute()
     {
-        var defs = @"
-                type Post {
-                    id: ID!
-                    title: String!
-                }
+        const string defs = """
+            type Post {
+              id: ID!
+              title: String!
+            }
 
-                type Query {
-                    post(id: ID!): Post
-                }
-            ";
+            type Query {
+              post(id: ID!): Post
+            }
+            """;
 
         Builder.Types.Include<PostWithExtraAttributesType>();
         Builder.Types.Include<Post>();
@@ -26,30 +26,30 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
         schema.Initialize();
 
         var query = schema.AllTypes["Query"] as IObjectGraphType;
-        var field = query.Fields.Single(x => x.Name == "post");
+        var field = query!.Fields.Single(x => x.Name == "post");
         field.GetMetadata<string>("Authorize").ShouldBe("SomePolicy");
     }
 
     [Fact]
     public void impl_type_sets_isTypeOfFunc()
     {
-        var defs = @"
-                interface IUniqueElement
-                {
-                    id: ID!
-                }
+        const string defs = """
+            interface IUniqueElement
+            {
+              id: ID!
+            }
 
-                type ABlog implements IUniqueElement
-                {
-                    id: ID!
-                    name: String!
-                }
+            type ABlog implements IUniqueElement
+            {
+              id: ID!
+              name: String!
+            }
 
-                type Query
-                {
-                    blog(id: ID!): ABlog
-                }
-            ";
+            type Query
+            {
+              blog(id: ID!): ABlog
+            }
+            """;
 
         Builder.Types.Include<ResolvingClassForABlog>();
 
@@ -58,30 +58,30 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
 
         var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
-        blog.IsTypeOf.ShouldNotBeNull();
+        blog!.IsTypeOf.ShouldNotBeNull();
         blog.IsTypeOf(new ResolvingClassForABlog()).ShouldBeTrue();
     }
 
     [Fact]
     public void impl_type_sets_default_isTypeOfFunc()
     {
-        var defs = @"
-                interface IUniqueElement
-                {
-                    id: ID!
-                }
+        const string defs = """
+            interface IUniqueElement
+            {
+              id: ID!
+            }
 
-                type ABlog implements IUniqueElement
-                {
-                    id: ID!
-                    name: String!
-                }
+            type ABlog implements IUniqueElement
+            {
+              id: ID!
+              name: String!
+            }
 
-                type Query
-                {
-                    blog(id: ID!): ABlog
-                }
-            ";
+            type Query
+            {
+              blog(id: ID!): ABlog
+            }
+            """;
 
         Builder.Types.Include<ABlog, ABlog>();
 
@@ -90,7 +90,7 @@ public class CustomGraphQLAttributeTests : SchemaBuilderTestBase
 
         var blog = schema.AllTypes["ABlog"] as IObjectGraphType;
 
-        blog.IsTypeOf.ShouldNotBeNull();
+        blog!.IsTypeOf.ShouldNotBeNull();
         blog.IsTypeOf(new ABlog()).ShouldBeTrue();
     }
 }
@@ -114,7 +114,7 @@ public class MyAuthorizeAttribute : GraphQLAttribute
 public class PostWithExtraAttributesType
 {
     [GraphQLMetadata("post"), MyAuthorize(Policy = "SomePolicy")]
-    public Post GetPostById(string id)
+    public Post? GetPostById(string id)
     {
         return PostData.Posts.FirstOrDefault(x => x.Id == id);
     }

@@ -12,13 +12,13 @@ public class ConnectionAdapterTests
     [Fact]
     public void NullBaseContextThrows()
     {
-        Should.Throw<ArgumentNullException>(() => new ScopedResolveConnectionContextAdapter<string>(null, null));
+        Should.Throw<ArgumentNullException>(() => new ScopedResolveConnectionContextAdapter<string>(null!, null!));
     }
 
     [Fact]
     public void AllowNullProvider()
     {
-        var adapter = new ScopedResolveConnectionContextAdapter<object>(new ResolveConnectionContext<object>(new ResolveFieldContext<object>(), false, null), null);
+        var adapter = new ScopedResolveConnectionContextAdapter<object>(new ResolveConnectionContext<object>(new ResolveFieldContext<object>(), false, null), null!);
         adapter.RequestServices.ShouldBeNull();
     }
 
@@ -31,8 +31,8 @@ public class ConnectionAdapterTests
         rccMock.SetupGet(x => x.CancellationToken).Returns((CancellationToken)default);
         rccMock.SetupGet(x => x.Document).Returns(new GraphQLDocument());
         rccMock.SetupGet(x => x.Errors).Returns(new ExecutionErrors());
-        rccMock.SetupGet(x => x.InputExtensions).Returns(new Dictionary<string, object>() { { "7", new object() } });
-        rccMock.SetupGet(x => x.OutputExtensions).Returns(new Dictionary<string, object>() { { "1", new object() } });
+        rccMock.SetupGet(x => x.InputExtensions).Returns(new Dictionary<string, object?>() { { "7", new object() } });
+        rccMock.SetupGet(x => x.OutputExtensions).Returns(new Dictionary<string, object?>() { { "1", new object() } });
         rccMock.SetupGet(x => x.FieldAst).Returns(new GraphQLField { Name = new GraphQLName("test") });
         rccMock.SetupGet(x => x.FieldDefinition).Returns(new FieldType());
         rccMock.SetupGet(x => x.Metrics).Returns(new Instrumentation.Metrics());
@@ -45,7 +45,7 @@ public class ConnectionAdapterTests
         rccMock.SetupGet(x => x.Schema).Returns(Mock.Of<ISchema>());
         rccMock.SetupGet(x => x.Source).Returns("hello");
         rccMock.SetupGet(x => x.SubFields).Returns(new Dictionary<string, (GraphQLField, FieldType)>());
-        rccMock.SetupGet(x => x.UserContext).Returns(new Dictionary<string, object>() { { "3", new object() } });
+        rccMock.SetupGet(x => x.UserContext).Returns(new Dictionary<string, object?>() { { "3", new object() } });
         rccMock.SetupGet(x => x.Variables).Returns(new Variables());
         rccMock.SetupGet(x => x.First).Returns(10);
         rccMock.SetupGet(x => x.Last).Returns(11);

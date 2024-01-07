@@ -15,9 +15,9 @@ public class QueryErrorTests : QueryTestBase<QueryErrorTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Code.ShouldBe("SYNTAX_ERROR");
         error.Locations.ShouldNotBeNull();
@@ -33,10 +33,7 @@ public class QueryErrorTests : QueryTestBase<QueryErrorTests.TestSchema>
         public TestQuery()
         {
             Name = "Query";
-            Field<StringGraphType>(
-                "firstSync",
-                resolve: _ => "3"
-            );
+            Field<StringGraphType>("firstSync").Resolve(_ => "3");
         }
     }
 

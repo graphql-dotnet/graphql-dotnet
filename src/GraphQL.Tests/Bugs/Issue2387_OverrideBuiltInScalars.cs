@@ -64,67 +64,68 @@ public class Issue2387_OverrideBuiltInScalars : QueryTestBase<Issue2387_Override
     public async Task schemafirst_output()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }").ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testOutput\": 124}}");
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testOutput }");
+        json.ShouldBeCrossPlatJson("""{"data":{"testOutput": 124}}""");
     }
 
     [Fact]
     public async Task schemafirst_parseliteral()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }").ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testInput(arg:123) }");
+        json.ShouldBeCrossPlatJson("""{"data":{"testInput": "122"}}""");
     }
 
     [Fact]
     public async Task schemafirst_parsevalue()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ =>
+        string json = await schema.ExecuteAsync(_ =>
         {
             _.Query = "query ($arg: Int!) { testInput(arg:$arg) }";
             _.Variables = "{\"arg\":123}".ToInputs();
-        }).ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testInput\": \"122\"}}");
+        });
+        json.ShouldBeCrossPlatJson("""{"data":{"testInput": "122"}}""");
     }
 
     [Fact]
     public async Task schemafirst_output_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }").ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testOutputString\": \"output-hello\"}}");
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testOutputString }");
+        json.ShouldBeCrossPlatJson("""{"data":{"testOutputString": "output-hello"}}""");
     }
 
     [Fact]
     public async Task schemafirst_parseliteral_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }").ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
+        string json = await schema.ExecuteAsync(_ => _.Query = "{ testInputString(arg:\"hello\") }");
+        json.ShouldBeCrossPlatJson("""{"data":{"testInputString": "input-hello"}}""");
     }
 
     [Fact]
     public async Task schemafirst_parsevalue_string()
     {
         var schema = BuildSchemaFirst();
-        var json = await schema.ExecuteAsync(_ =>
+        string json = await schema.ExecuteAsync(_ =>
         {
             _.Query = "query ($arg: String!) { testInputString(arg:$arg) }";
             _.Variables = "{\"arg\":\"hello\"}".ToInputs();
-        }).ConfigureAwait(false);
-        json.ShouldBeCrossPlatJson("{\"data\":{\"testInputString\": \"input-hello\"}}");
+        });
+        json.ShouldBeCrossPlatJson("""{"data":{"testInputString": "input-hello"}}""");
     }
 
     private Schema BuildSchemaFirst()
     {
-        var typeDefs = @"
-type Query {
-  testOutput: Int!
-  testInput(arg: Int!): ID!
-  testOutputString: String!
-  testInputString(arg: String!): ID!
-}";
+        const string typeDefs = """
+            type Query {
+              testOutput: Int!
+              testInput(arg: Int!): ID!
+              testOutputString: String!
+              testInputString(arg: String!): ID!
+            }
+            """;
         var schema = GraphQL.Types.Schema.For(typeDefs, config => config.Types.Include<SchemaFirstRoot>());
         schema.RegisterType(new MyIntGraphType());
         schema.RegisterType<MyStringGraphType>();
@@ -169,25 +170,18 @@ type Query {
     {
         public MyQuery()
         {
-            Field<IntGraphType>("testOutput", resolve: context => 123);
-            Field<IdGraphType>("testInput",
-                arguments: new QueryArguments {
-                    new QueryArgument<IntGraphType> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<int>("arg").ToString());
-            Field<NonNullGraphType<IntGraphType>>("testNonNullOutput", resolve: context => 123);
-            Field<IdGraphType>("testNonNullInput",
-                arguments: new QueryArguments {
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<int>("arg").ToString());
-            Field<StringGraphType>("testOutputString", resolve: context => "hello");
-            Field<IdGraphType>("testInputString",
-                arguments: new QueryArguments
-                {
-                    new QueryArgument<StringGraphType> { Name = "arg" }
-                },
-                resolve: context => context.GetArgument<string>("arg"));
+            Field<IntGraphType>("testOutput").Resolve(_ => 123);
+            Field<IdGraphType>("testInput")
+                .Argument<IntGraphType>("arg")
+                .Resolve(context => context.GetArgument<int>("arg").ToString());
+            Field<NonNullGraphType<IntGraphType>>("testNonNullOutput").Resolve(_ => 123);
+            Field<IdGraphType>("testNonNullInput")
+                .Argument<NonNullGraphType<IntGraphType>>("arg")
+                .Resolve(context => context.GetArgument<int>("arg").ToString());
+            Field<StringGraphType>("testOutputString").Resolve(_ => "hello");
+            Field<IdGraphType>("testInputString")
+                .Argument<StringGraphType>("arg")
+                .Resolve(context => context.GetArgument<string>("arg"));
         }
     }
 
@@ -198,16 +192,16 @@ type Query {
             Name = "Int";
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
-            var ret = base.ParseLiteral(value);
+            object? ret = base.ParseLiteral(value);
             return ret is int i ? i - 1 : ret;
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
             => value is int i ? i - 1 : base.ParseValue(value);
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
             => value is int i ? i + 1 : base.Serialize(value);
     }
 
@@ -218,13 +212,13 @@ type Query {
             Name = "String";
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
             => value is GraphQLStringValue s ? "input-" + s.Value : base.ParseLiteral(value);
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
             => value is string s ? "input-" + s : base.ParseValue(value);
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
             => value is string s ? "output-" + s : base.Serialize(value);
     }
 }

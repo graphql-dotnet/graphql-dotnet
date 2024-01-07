@@ -1,5 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using System.Collections;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,6 +23,7 @@ namespace GraphQL.Utilities
     /// <br/>
     /// See <see href="https://spec.graphql.org/October2021/#sec-Type-System"/> for more information.
     /// </summary>
+    //todo: [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
     public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
         private static readonly List<string> _builtInScalars = new()
@@ -199,7 +201,7 @@ namespace GraphQL.Utilities
             };
         }
 
-        public string PrintScalar(ScalarGraphType type)
+        public virtual string PrintScalar(ScalarGraphType type)
         {
             Schema?.Initialize();
 
@@ -229,7 +231,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
         }
 
-        public string PrintUnion(UnionGraphType type)
+        public virtual string PrintUnion(UnionGraphType type)
         {
             Schema?.Initialize();
 
@@ -237,7 +239,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "union {0} = {1}".ToFormat(type.Name, possibleTypes);
         }
 
-        public string PrintEnum(EnumerationGraphType type)
+        public virtual string PrintEnum(EnumerationGraphType type)
         {
             Schema?.Initialize();
 
@@ -245,7 +247,7 @@ namespace GraphQL.Utilities
             return FormatDescription(type.Description) + "enum {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, values);
         }
 
-        public string PrintInputObject(IInputObjectGraphType type)
+        public virtual string PrintInputObject(IInputObjectGraphType type)
         {
             Schema?.Initialize();
 
@@ -275,7 +277,7 @@ namespace GraphQL.Utilities
                     f => "{3}  {0}{1}: {2}{4}".ToFormat(f.Name, f.Args, f.Type, f.Description, f.Deprecation)));
         }
 
-        public string PrintArgs(FieldType field)
+        public virtual string PrintArgs(FieldType field)
         {
             Schema?.Initialize();
 
@@ -374,7 +376,7 @@ namespace GraphQL.Utilities
             return graphType switch
             {
                 NonNullGraphType nonNull => FormatDefaultValue(value, nonNull.ResolvedType!),
-                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable<object>)value).Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
+                ListGraphType list => "[{0}]".ToFormat(string.Join(", ", ((IEnumerable)value).Cast<object>().Select(i => FormatDefaultValue(i, list.ResolvedType!)))),
                 IInputObjectGraphType input => FormatInputObjectValue(value, input),
                 EnumerationGraphType enumeration => (enumeration.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for enumeration type '{enumeration.Name}'.")).Print(),
                 ScalarGraphType scalar => (scalar.ToAST(value) ?? throw new ArgumentOutOfRangeException(nameof(value), $"Unable to convert '{value}' to AST for scalar type '{scalar.Name}'.")).Print(),

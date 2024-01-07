@@ -17,21 +17,21 @@ namespace GraphQL.Introspection
         /// Returns a comparer for fields withing enclosing type.
         /// If this returns <see langword="null"/> then the original field ordering is preserved.
         /// </summary>
-        /// <param name="parent"> Parent type to which the fields belong. </param>
+        /// <param name="parent">Parent type to which the fields belong.</param>
         IComparer<IFieldType>? FieldComparer(IGraphType parent);
 
         /// <summary>
         /// Returns a comparer for field arguments.
         /// If this returns <see langword="null"/> then the original argument ordering is preserved.
         /// </summary>
-        /// <param name="field"> The field to which the arguments belong. </param>
+        /// <param name="field">The field to which the arguments belong.</param>
         IComparer<QueryArgument>? ArgumentComparer(IFieldType field);
 
         /// <summary>
         /// Returns a comparer for enum values.
         /// If this returns <see langword="null"/> then the original enum value ordering is preserved.
         /// </summary>
-        /// <param name="parent"> The enumeration to which the enum values belong. </param>
+        /// <param name="parent">The enumeration to which the enum values belong.</param>
         IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent);
 
         /// <summary>
@@ -67,11 +67,11 @@ namespace GraphQL.Introspection
     /// </summary>
     public class AlphabeticalSchemaComparer : ISchemaComparer
     {
-        private static readonly TypeByNameComparer _instance1 = new TypeByNameComparer();
-        private static readonly DirectiveByNameComparer _instance2 = new DirectiveByNameComparer();
-        private static readonly ArgumentByNameComparer _instance3 = new ArgumentByNameComparer();
-        private static readonly EnumValueByNameComparer _instance4 = new EnumValueByNameComparer();
-        private static readonly FieldByNameComparer _instance5 = new FieldByNameComparer();
+        private static readonly TypeByNameComparer _instance1 = new();
+        private static readonly DirectiveByNameComparer _instance2 = new();
+        private static readonly ArgumentByNameComparer _instance3 = new();
+        private static readonly EnumValueByNameComparer _instance4 = new();
+        private static readonly FieldByNameComparer _instance5 = new();
 
         private sealed class TypeByNameComparer : IComparer<IGraphType>
         {

@@ -1,5 +1,3 @@
-using GraphQL.MicrosoftDI;
-using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,9 +6,9 @@ namespace GraphQL.Tests.Types;
 public class AutoSchemaTests
 {
     [Theory]
-    [InlineData("{hero}", @"{""data"":{""hero"":""Luke Skywalker""}}")]
-    [InlineData(@"mutation {hero(name:""Darth Vader"")}", @"{""data"":{""hero"":""Darth Vader""}}")]
-    [InlineData("{droids{name}}", @"{""data"":{""droids"":[{""name"":""R2D2""},{""name"":""C3PO""}]}}")]
+    [InlineData("{hero}", """{"data":{"hero":"Luke Skywalker"}}""")]
+    [InlineData("""mutation {hero(name:"Darth Vader")}""", """{"data":{"hero":"Darth Vader"}}""")]
+    [InlineData("{droids{name}}", """{"data":{"droids":[{"name":"R2D2"},{"name":"C3PO"}]}}""")]
     public async Task AutoSchemaWorks(string query, string expectedResult)
     {
         // sample configuration of DI
@@ -26,8 +24,8 @@ public class AutoSchemaTests
             o.RequestServices = provider;
             o.Schema = provider.GetRequiredService<ISchema>();
             o.Query = query;
-        }).ConfigureAwait(false);
-        var resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
+        });
+        string resultString = provider.GetRequiredService<IGraphQLTextSerializer>().Serialize(result);
         resultString.ShouldBe(expectedResult);
     }
 

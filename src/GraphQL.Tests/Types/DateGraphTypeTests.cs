@@ -6,7 +6,7 @@ namespace GraphQL.Tests.Types;
 [Collection("StaticTests")]
 public class DateGraphTypeTests
 {
-    private readonly DateGraphType _type = new DateGraphType();
+    private readonly DateGraphType _type = new();
 
     [Fact]
     public void serialize_string_to_date_throws()
@@ -40,7 +40,7 @@ public class DateGraphTypeTests
         CultureTestHelper.UseCultures(() =>
         {
             var expected = DateTime.UtcNow;
-            var input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
+            string input = expected.ToLocalTime().ToString("O", DateTimeFormatInfo.InvariantInfo);
             Should.Throw<FormatException>(() => _type.ParseValue(input));
         });
     }
@@ -50,7 +50,7 @@ public class DateGraphTypeTests
     {
         CultureTestHelper.UseCultures(() =>
         {
-            ((DateTime)_type.ParseValue("2015-11-21")).Kind.ShouldBe(
+            ((DateTime)_type.ParseValue("2015-11-21")!).Kind.ShouldBe(
                 DateTimeKind.Utc);
         });
     }

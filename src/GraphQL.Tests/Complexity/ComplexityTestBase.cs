@@ -2,6 +2,7 @@ using GraphQL.Execution;
 using GraphQL.StarWars;
 using GraphQL.Tests.StarWars;
 using GraphQL.Validation.Complexity;
+using GraphQL.Validation.Rules.Custom;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
@@ -17,12 +18,14 @@ public class ComplexityTestBase
 
     protected ComplexityResult AnalyzeComplexity(string query) => Analyzer.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
 
-    public async Task<ExecutionResult> Execute(ComplexityConfiguration complexityConfig, string query) =>
+    public async Task<ExecutionResult> Execute(ComplexityConfiguration complexityConfig, string query, bool onlyComplexityRule = false) =>
         await StarWarsTestBase.Executer.ExecuteAsync(options =>
         {
             options.Schema = CreateSchema();
             options.Query = query;
-            options.ComplexityConfiguration = complexityConfig;
+            options.ValidationRules = onlyComplexityRule
+                ? new[] { new ComplexityValidationRule(complexityConfig) }
+                : GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
         }).ConfigureAwait(false);
 
     //ISSUE: manually created test instance with ServiceProvider

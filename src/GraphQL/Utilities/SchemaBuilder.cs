@@ -111,6 +111,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             var directives = new List<Directive>();
 
+            // process the schema definition first
             foreach (var def in document.Definitions)
             {
                 if (def is GraphQLSchemaDefinition schemaDef)
@@ -118,7 +119,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                     _schemaDef = schemaDef;
                     schema.SetAstType(schemaDef);
                 }
-                else if (def is GraphQLObjectTypeDefinition objDef)
+            }
+
+            foreach (var def in document.Definitions)
+            {
+                if (def is GraphQLObjectTypeDefinition objDef)
                 {
                     var type = ToObjectGraphType(objDef);
                     _types[type.Name] = type;
@@ -126,7 +131,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                 else if (def is GraphQLObjectTypeExtension ext)
                 {
                     //TODO: rewrite and add support for other extensions
-                    var typeDef = new GraphQLObjectTypeDefinition
+                    var typeDef = new GraphQLObjectTypeDefinition(ext.Name)
                     {
                         Comments = ext.Comments,
                         Description = null,
@@ -134,7 +139,6 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
                         Fields = ext.Fields,
                         Interfaces = ext.Interfaces,
                         Location = ext.Location,
-                        Name = ext.Name,
                     };
                     var type = ToObjectGraphType(typeDef, true);
                     _types[type.Name] = type;
@@ -168,7 +172,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             if (_schemaDef != null)
             {
-                schema.Description = _schemaDef.MergeComments();
+                schema.Description = _schemaDef.Description?.Value.ToString() ?? _schemaDef.MergeComments();
 
                 foreach (var operationTypeDef in _schemaDef.OperationTypes!)
                 {

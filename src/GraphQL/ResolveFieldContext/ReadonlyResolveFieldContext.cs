@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
@@ -70,7 +71,7 @@ namespace GraphQL
                     while (parent is ArrayExecutionNode)
                         parent = parent.Parent;
 
-                    if (parent != null && !(parent is RootExecutionNode))
+                    if (parent != null && parent is not RootExecutionNode)
                         _parent = new ReadonlyResolveFieldContext(parent, _executionContext);
                 }
 
@@ -100,7 +101,7 @@ namespace GraphQL
         public Variables Variables => _executionContext.Variables;
 
         /// <inheritdoc/>
-        public System.Threading.CancellationToken CancellationToken => _executionContext.CancellationToken;
+        public CancellationToken CancellationToken => _executionContext.CancellationToken;
 
         /// <inheritdoc/>
         public Metrics Metrics => _executionContext.Metrics;
@@ -115,7 +116,8 @@ namespace GraphQL
         public IEnumerable<object> ResponsePath => _executionNode.ResponsePath;
 
         /// <inheritdoc/>
-        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields
+            => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
 
         /// <inheritdoc/>
         public IDictionary<string, object?> UserContext => _executionContext.UserContext;
@@ -133,5 +135,8 @@ namespace GraphQL
 
         /// <inheritdoc/>
         public IExecutionArrayPool ArrayPool => _executionContext;
+
+        /// <inheritdoc/>
+        public ClaimsPrincipal? User => _executionContext.User;
     }
 }

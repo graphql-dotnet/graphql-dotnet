@@ -10,7 +10,7 @@ public static class AssertionExtensions
     /// <param name="actual">Actual value.</param>
     /// <param name="expected">Expected value.</param>
     /// <param name="customMessage">A custom message if they aren't the same.</param>
-    public static void ShouldBeCrossPlat(this string actual, string expected, string customMessage)
+    public static void ShouldBeCrossPlat(this string actual, string expected, string? customMessage)
         => Normalize(actual).ShouldBe(Normalize(expected), customMessage);
 
     /// <summary>
@@ -34,5 +34,6 @@ public static class AssertionExtensions
         JsonSerializer.Serialize(actualJsonDoc.RootElement).ShouldBe(JsonSerializer.Serialize(expectedJsonDoc.RootElement));
     }
 
-    private static string Normalize(this string value) => value?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
+    [return: NotNullIfNotNull("value")]
+    private static string? Normalize(this string? value) => value?.Replace("\r\n", "\n").Replace("\\r\\n", "\\n");
 }

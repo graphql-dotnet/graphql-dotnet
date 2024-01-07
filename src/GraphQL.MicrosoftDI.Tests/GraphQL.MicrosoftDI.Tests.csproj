@@ -1,23 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
-  <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1;net48</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net6;net5;netcoreapp3.1</TargetFrameworks>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.20" />
-    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
-    <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="Bogus" Version="34.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.*" />
+    <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
 
   <ItemGroup>

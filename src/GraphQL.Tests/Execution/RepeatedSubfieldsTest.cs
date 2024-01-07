@@ -42,7 +42,7 @@ public class RepeatedSubfieldsTests
     private GraphQLField SecondTestField { get; }
     private GraphQLField AliasedTestField { get; }
 
-    private Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
+    private static Dictionary<string, (GraphQLField Field, FieldType FieldType)> CollectFrom(ExecutionContext executionContext, IGraphType graphType, GraphQLSelectionSet selectionSet)
     {
         return new MyExecutionStrategy().MyCollectFrom(executionContext, graphType, selectionSet);
     }
@@ -79,8 +79,8 @@ public class RepeatedSubfieldsTests
         var fields = CollectFrom(context, query, outerSelection);
 
         fields.ContainsKey("test").ShouldBeTrue();
-        fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-        fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+        fields["test"].Field.SelectionSet!.Selections.ShouldContain(x => x == FirstInnerField);
+        fields["test"].Field.SelectionSet!.Selections.ShouldContain(x => x == SecondInnerField);
     }
 
     [Fact]
@@ -109,10 +109,10 @@ public class RepeatedSubfieldsTests
 
         var fields = CollectFrom(context, query, outerSelection);
 
-        fields["test"].Field.SelectionSet.Selections.ShouldHaveSingleItem();
-        fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-        fields["alias"].Field.SelectionSet.Selections.ShouldHaveSingleItem();
-        fields["alias"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+        fields["test"].Field.SelectionSet!.Selections.ShouldHaveSingleItem();
+        fields["test"].Field.SelectionSet!.Selections.ShouldContain(x => x == FirstInnerField);
+        fields["alias"].Field.SelectionSet!.Selections.ShouldHaveSingleItem();
+        fields["alias"].Field.SelectionSet!.Selections.ShouldContain(x => x == SecondInnerField);
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public class RepeatedSubfieldsTests
         var fields = CollectFrom(context, query, outerSelection);
 
         fields.ShouldHaveSingleItem();
-        fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == FirstInnerField);
-        fields["test"].Field.SelectionSet.Selections.ShouldContain(x => x == SecondInnerField);
+        fields["test"].Field.SelectionSet!.Selections.ShouldContain(x => x == FirstInnerField);
+        fields["test"].Field.SelectionSet!.Selections.ShouldContain(x => x == SecondInnerField);
     }
 }

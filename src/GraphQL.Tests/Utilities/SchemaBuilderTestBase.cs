@@ -45,16 +45,16 @@ public class SchemaBuilderTestBase
     {
         var runResult = Executer.ExecuteAsync(options).Result;
 
-        var writtenResult = Serializer.Serialize(runResult);
-        var expectedResult = Serializer.Serialize(expectedExecutionResult);
+        string writtenResult = Serializer.Serialize(runResult);
+        string expectedResult = Serializer.Serialize(expectedExecutionResult);
 
-        string additionalInfo = null;
+        string? additionalInfo = null;
 
         if (runResult.Errors?.Any() == true)
         {
             additionalInfo = string.Join(Environment.NewLine, runResult.Errors
                 .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                .Select(x => x.InnerException.Message));
+                .Select(x => x.InnerException!.Message));
         }
 
         writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);

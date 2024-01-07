@@ -19,9 +19,9 @@ public class SchemaIntrospectionTests
                 Query = new TestQuery()
             };
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
 
         ShouldBe(json, "IntrospectionResult".ReadJsonResult());
     }
@@ -39,9 +39,9 @@ public class SchemaIntrospectionTests
                 NameConverter = PascalCaseNameConverter.Instance,
             };
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
 
         ShouldBe(json, "IntrospectionResult".ReadJsonResult().Replace("\"test\"", "\"Test\""));
     }
@@ -67,10 +67,10 @@ public class SchemaIntrospectionTests
                 Query = TestQueryType(),
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
-        var scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        });
+        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
-        static string GetName(JsonElement el) => el.GetProperty("name").GetString();
+        static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
         var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
@@ -104,10 +104,10 @@ public class SchemaIntrospectionTests
                 Comparer = new AlphabeticalSchemaComparer()
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
-        var scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        });
+        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
 
-        static string GetName(JsonElement el) => el.GetProperty("name").GetString();
+        static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
         var json = JsonDocument.Parse(serializer.Serialize(executionResult));
 
@@ -160,9 +160,9 @@ public class SchemaIntrospectionTests
         {
             _.Schema = schema;
             _.Query = InputObjectBugQuery;
-        }).ConfigureAwait(false);
+        });
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         ShouldBe(json, InputObjectBugResult);
@@ -177,21 +177,22 @@ public class SchemaIntrospectionTests
             ignoreWhiteSpaceDifferences: true);
     }
 
-    public static readonly string InputObjectBugQuery = @"
-query test {
-    __type(name:""SomeInput"") {
-        inputFields {
-            type {
-                name,
-                description
-                ofType {
-                    kind,
-                    name
+    public static readonly string InputObjectBugQuery = """
+        query test {
+            __type(name:"SomeInput") {
+                inputFields {
+                    type {
+                        name,
+                        description
+                        ofType {
+                            kind,
+                            name
+                        }
+                    }
                 }
             }
         }
-    }
-}";
+        """;
 
     public static readonly string InputObjectBugResult = "{\r\n \"data\": {\r\n  \"__type\": {\r\n    \"inputFields\": [\r\n      {\r\n        \"type\": {\r\n          \"name\": \"String\",\r\n          \"description\": null,\r\n          \"ofType\": null\r\n        }\r\n      }\r\n    ]\r\n  }\r\n }\r\n}";
 
@@ -211,9 +212,8 @@ query test {
     {
         public RootMutation()
         {
-            Field<StringGraphType>(
-                "test",
-                arguments: new QueryArguments(new QueryArgument(typeof(SomeInputType)) { Name = "some" }));
+            Field<StringGraphType>("test")
+                .Argument(typeof(SomeInputType), "some");
         }
     }
 

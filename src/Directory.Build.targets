@@ -2,17 +2,29 @@
 
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>See https://github.com/graphql-dotnet/graphql-dotnet/releases and https://graphql-dotnet.github.io/docs/migrations/migration7</PackageReleaseNotes>
     <Nullable>enable</Nullable>
+    <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
+    <!--<EnableAotAnalyzer>true</EnableAotAnalyzer> PublishAot property enables it-->
+    <!--<ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors> does not work-->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2026;IL2055;IL2067;IL2070;IL2072;IL2075;IL2090;IL2091;IL2092;IL2095</WarningsNotAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsPackable)' != 'true'">
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(SignAssembly)' == 'true'">
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)graphql.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
   <ItemGroup Condition="'$(IsPackable)' == 'true'">
-    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" />
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+    <None Include="..\..\assets\logo.64x64.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\LICENSE.md" Pack="true" PackagePath="\" Visible="false" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <InternalsVisibleTo Condition="'$(SignAssembly)' == 'true'" Include="$(MSBuildProjectName).Tests, $(_FriendAssembliesPublicKey)"/>
+    <InternalsVisibleTo Condition="'$(SignAssembly)' != 'true'" Include="$(MSBuildProjectName).Tests"/>
   </ItemGroup>
 
   <!--Workaround for https://github.com/NuGet/Home/issues/5556 and https://github.com/NuGet/Home/issues/5525-->
@@ -30,5 +42,5 @@
       <_ProjectReferencesWithVersions Include="@(_ProjectReferenceWithReassignedVersion)" />
     </ItemGroup>
   </Target>
-  
+
 </Project>

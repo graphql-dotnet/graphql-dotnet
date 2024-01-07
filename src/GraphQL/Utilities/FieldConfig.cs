@@ -9,7 +9,7 @@ namespace GraphQL.Utilities
     public class FieldConfig : MetadataProvider
     {
         private readonly LightweightCache<string, ArgumentConfig> _arguments =
-           new LightweightCache<string, ArgumentConfig>(f => new ArgumentConfig(f));
+           new(f => new ArgumentConfig(f));
 
         /// <summary>
         /// Creates an instance of <see cref="FieldConfig"/> with the specified name.

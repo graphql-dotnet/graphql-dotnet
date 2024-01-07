@@ -13,21 +13,19 @@ public class OrderType : ObjectGraphType<Order>
         Field(x => x.OrderId);
         Field(x => x.OrderedOn);
 
-        Field<UserType, User>()
-            .Name("User")
+        Field<UserType, User>("User")
             .ResolveAsync(ctx =>
             {
-                var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUsersById",
+                var loader = accessor.Context!.GetOrAddBatchLoader<int, User>("GetUsersById",
                     users.GetUsersByIdAsync);
 
                 return loader.LoadAsync(ctx.Source.UserId);
             });
 
-        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
-            .Name("Items")
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>("Items")
             .ResolveAsync(ctx =>
             {
-                var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
+                var loader = accessor.Context!.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
                     orders.GetItemsByOrderIdAsync);
 
                 return loader.LoadAsync(ctx.Source.OrderId);

@@ -38,7 +38,7 @@ public class FloatGraphTypeBadValueTests : QueryTestBase<PR1781Schema>
             // assume it is a floating point value rather than a large integer
             Query = $"{{ test(arg:{_maxNumber}) }}",
             Schema = Schema,
-        }).ConfigureAwait(false);
+        });
         valid.ShouldNotBeNull();
         valid.Data.ShouldBeNull();
         valid.Errors.ShouldNotBeNull();
@@ -55,7 +55,7 @@ public class FloatGraphTypeBadValueTests : QueryTestBase<PR1781Schema>
         {
             Query = $"{{ test(arg:{_minNumber}) }}",
             Schema = Schema,
-        }).ConfigureAwait(false);
+        });
         valid.ShouldNotBeNull();
         valid.Data.ShouldBeNull();
         valid.Errors.ShouldNotBeNull();
@@ -76,10 +76,8 @@ public class PR1781Query : ObjectGraphType
 {
     public PR1781Query()
     {
-        Field<StringGraphType>("Test",
-            resolve: context => "ok",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(FloatGraphType)) { Name = "arg" }
-            ));
+        Field<StringGraphType>("Test")
+            .Resolve(_ => "ok")
+            .Argument(typeof(FloatGraphType), "arg");
     }
 }

@@ -2,21 +2,39 @@
   <Import Project="$(MSBuildThisFileDirectory)Tests.local.props" Condition="Exists('$(MSBuildThisFileDirectory)Tests.local.props')" />
 
   <PropertyGroup>
-    <NoWarn>$(NoWarn);IDE1006;CS0618</NoWarn>
+    <NoWarn>$(NoWarn);IDE1006;IDE0022;IDE0058;CS0618;RCS1090</NoWarn>
     <SingleTestPlatform Condition="'$(SingleTestPlatform)' == ''">false</SingleTestPlatform>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);CS8618</NoWarn>
+    <SingleFramework>net8.0</SingleFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
+    <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netcoreapp3.1;net48</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="coverlet.collector" Version="3.1.2">
+    <PackageReference Remove="PolySharp" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
-    <PackageReference Include="Shouldly" Version="4.0.3" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" />
-    <PackageReference Include="Moq" Version="4.18.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Shouldly" Version="4.2.1" />
+    <PackageReference Include="xunit" Version="2.6.4" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.6" Condition="'$(TargetFramework)' != 'netcoreapp3.1' And '$(TargetFramework)' != 'net5.0'" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5" Condition="'$(TargetFramework)' == 'netcoreapp3.1' Or '$(TargetFramework)' == 'net5.0'" />
+    <PackageReference Include="Moq" Version="4.20.70" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,7 +44,7 @@
 
   <ItemGroup>
     <Content Include="..\xunit.runner.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

@@ -9,19 +9,18 @@ namespace GraphQL.Tests.Bugs;
 public class Bug2839SystemTextJson
 {
     [Fact]
-    public void Bug2839Test()
+    public async Task Bug2839Test()
     {
         var schema = new Schema { Query = new TestQuery() };
         schema.ReplaceScalar(new MyDateTimeGraphType());
 
         var exec = new DocumentExecuter();
 
-        var result = exec.ExecuteAsync(options =>
+        var result = await exec.ExecuteAsync(options =>
         {
             options.Schema = schema;
             options.Query = "{ test { thisIsAString, thisIsADateTime } }";
-        }
-        ).Result;
+        });
 
         var writer = new GraphQLSerializer(options =>
         {
@@ -29,8 +28,8 @@ public class Bug2839SystemTextJson
             options.Converters.Add(new MyDateTimeConverter());
         });
 
-        var str = writer.Serialize(result);
-        str.ShouldBeCrossPlatJson("{\"data\":{\"TEST\":{\"THISISASTRING\":\"String Value\",\"THISISADATETIME\":\"2022-Jan-04\"}}}");
+        string str = writer.Serialize(result);
+        str.ShouldBeCrossPlatJson("""{"data":{"TEST":{"THISISASTRING":"String Value","THISISADATETIME":"2022-Jan-04"}}}""");
     }
 
     public class TestQuery : ObjectGraphType
@@ -40,9 +39,7 @@ public class Bug2839SystemTextJson
             Name = "testQuery";
             Description = "Test description";
 
-            Field<TestResponseType>(
-                name: "test",
-                resolve: context => new TestResponse());
+            Field<TestResponseType>("test").Resolve(_ => new TestResponse());
         }
     }
 
@@ -74,7 +71,7 @@ public class Bug2839SystemTextJson
             Name = "DateTime";
         }
 
-        public override object Serialize(object value) => value switch
+        public override object? Serialize(object? value) => value switch
         {
             DateTime _ => value,
             DateTimeOffset _ => value,

@@ -1,4 +1,6 @@
+using GraphQL.MicrosoftDI;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Initialization;
@@ -79,6 +81,55 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
         ShouldThrow<SchemaWithEnumWithoutValues1, InvalidOperationException>("An Enum type 'EnumWithoutValues' must define one or more unique enum values.");
         ShouldThrow<SchemaWithEnumWithoutValues2, InvalidOperationException>("An Enum type 'Enumeration' must define one or more unique enum values.");
     }
+
+    [Fact]
+    public void SchemaWithDirective_Should_Not_Throw()
+    {
+        ShouldNotThrow<SchemaWithDirective>();
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507
+    [Fact]
+    public void Passing_GraphType_InsteadOf_ClrType_Should_Produce_Friendly_Error()
+    {
+        Should.Throw<ArgumentException>(() => new Bug3507Schema()).Message.ShouldStartWith("The GraphQL type for argument 'updateDate.newDate' could not be derived implicitly from type 'DateGraphType'. The graph type 'DateGraphType' cannot be used as a CLR type.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/pull/3571
+    [Fact]
+    public void Deprecate_Required_Arguments_And_Input_Fields_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<Issue3571Schema1, InvalidOperationException>("The required argument 'flag' of field 'MyQuery.str' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+        ShouldThrow<Issue3571Schema2, InvalidOperationException>("The required input field 'age' of an Input Object 'PersonInput' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2994
+    [Fact]
+    public void StreamResolver_On_Wrong_Fields_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithFieldStreamResolverOnNonRootSubscriptionField, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInputObject, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/1176
+    [Fact]
+    public void Resolver_On_InputField_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithInputFieldResolver, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have Resolver set. You should set Resolver only for fields of object output types.");
+    }
+
+    [Fact]
+    public void Resolver_On_InterfaceField_Should_Produce_Friendly_Error()
+    {
+        ShouldThrow<SchemaWithFieldResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
+    }
+
+    [Fact]
+    public void SchemaWithTheSameRootOperationTypes_Should_Throw()
+    {
+        ShouldThrow<SchemaWithTheSameRootOperationTypes, InvalidOperationException>("The query, mutation, and subscription root types must all be different types if provided.");
+    }
 }
 
 public class EmptyQuerySchema : Schema
@@ -127,14 +178,11 @@ public class SchemaWithDuplicateArguments : Schema
 {
     public SchemaWithDuplicateArguments()
     {
-        Query = new ObjectGraphType { Name = "Dup" };
-        Query.Field(
-            "field",
-            new StringGraphType(),
-            arguments: new QueryArguments(
-                new QueryArgument<StringGraphType> { Name = "arg" },
-                new QueryArgument<StringGraphType> { Name = "arg" }
-            ));
+        var query = new ObjectGraphType { Name = "Dup" };
+        query.Field("field", new StringGraphType())
+            .Argument<StringGraphType>("arg")
+            .Argument<StringGraphType>("arg");
+        Query = query;
     }
 }
 
@@ -177,7 +225,7 @@ public class SchemaWithDeprecatedAppliedDirective : Schema
         var f = Query.AddField(new FieldType { Name = "field1", ResolvedType = new StringGraphType() }).ApplyDirective("deprecated", "reason", "aaa");
         f.DeprecationReason.ShouldBe("aaa");
         f.DeprecationReason = "bbb";
-        f.FindAppliedDirective("deprecated").FindArgument("reason").Value.ShouldBe("bbb");
+        f.FindAppliedDirective("deprecated").ShouldNotBeNull().FindArgument("reason").ShouldNotBeNull().Value.ShouldBe("bbb");
     }
 }
 
@@ -210,7 +258,7 @@ public class SchemaWithArgumentsOnInputField : Schema
     {
         public MyInputGraphType()
         {
-            Field<NonNullGraphType<StringGraphType>>("id", arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "x" }));
+            Field<NonNullGraphType<StringGraphType>>("id").Argument<StringGraphType>("x");
         }
     }
 
@@ -249,12 +297,11 @@ public class SchemaWithNotFullSpecifiedResolvedType : Schema
             ResolvedType = new NonNullGraphType<StringGraphType>()
         });
 
-        Query = new ObjectGraphType();
-        Query.Field(
-            "test",
-            new StringGraphType(),
-            arguments: new QueryArguments(new QueryArgument(stringFilterInputType) { Name = "a" }),
-            resolve: context => "ok");
+        var query = new ObjectGraphType();
+        query.Field("test", new StringGraphType())
+            .Arguments(new QueryArgument(stringFilterInputType) { Name = "a" })
+            .Resolve(_ => "ok");
+        Query = query;
     }
 }
 
@@ -263,14 +310,8 @@ public class SchemaWithInvalidDefault1 : Schema
     public SchemaWithInvalidDefault1()
     {
         var root = new ObjectGraphType();
-        root.Field<NonNullGraphType<StringGraphType>>(
-           "field",
-           arguments: new QueryArguments(
-               new QueryArgument<NonNullGraphType<SomeInputType>>
-               {
-                   Name = "argOne",
-                   DefaultValue = new SomeInput { Names = null }
-               }));
+        root.Field<NonNullGraphType<StringGraphType>>("field")
+            .Argument<NonNullGraphType<SomeInputType>>("argOne", arg => arg.DefaultValue = new SomeInput { Names = null });
         Query = root;
     }
 
@@ -285,7 +326,7 @@ public class SchemaWithInvalidDefault1 : Schema
 
     public class SomeInput
     {
-        public IList<string> Names { get; set; }
+        public IList<string?>? Names { get; set; }
     }
 }
 
@@ -294,14 +335,8 @@ public class SchemaWithInvalidDefault2 : Schema
     public SchemaWithInvalidDefault2()
     {
         var root = new ObjectGraphType();
-        root.Field<NonNullGraphType<StringGraphType>>(
-           "field",
-           arguments: new QueryArguments(
-               new QueryArgument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>
-               {
-                   Name = "argOne",
-                   DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string> { "a", null, "b" } }
-               }));
+        root.Field<NonNullGraphType<StringGraphType>>("field")
+            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string?> { "a", null, "b" } });
         Query = root;
     }
 }
@@ -325,5 +360,249 @@ public class SchemaWithEnumWithoutValues2 : Schema
     {
         var type = new EnumerationGraphType();
         RegisterType(type);
+    }
+}
+
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/3301
+public class SchemaWithDirective : Schema
+{
+    public class MaxLength : Directive
+    {
+        public MaxLength()
+          : base("maxLength", DirectiveLocation.Mutation, DirectiveLocation.InputFieldDefinition)
+        {
+            Description = "Used to specify the minimum and/or maximum length for an input field or argument.";
+            Arguments = new QueryArguments(
+                new QueryArgument<IntGraphType>
+                {
+                    Name = "min",
+                    Description = "If specified, specifies the minimum length that the input field or argument must have."
+                },
+                new QueryArgument<IntGraphType>
+                {
+                    Name = "max",
+                    Description = "If specified, specifies the maximum length that the input field or argument must have."
+                }
+          );
+        }
+    }
+
+    public class MaxLengthDirectiveVisitor : BaseSchemaNodeVisitor
+    {
+        public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
+        {
+            var applied = field.FindAppliedDirective("maxLength");
+            applied.ShouldBeNull();
+        }
+
+        public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
+        {
+            if (field.Name == "count")
+            {
+                var applied = field.FindAppliedDirective("maxLength");
+                applied.ShouldNotBeNull();
+                applied.ArgumentsCount.ShouldBe(2);
+            }
+        }
+    }
+
+    public class BookSummaryCreateArgInputType : InputObjectGraphType<BookSummaryCreateArg>
+    {
+        public BookSummaryCreateArgInputType()
+        {
+            Name = "BookSummaryCreateArg";
+            Field(_ => _.Count).Directive("maxLength", x =>
+                x.AddArgument(new DirectiveArgument("min") { Name = "min", Value = 1 })
+                .AddArgument(new DirectiveArgument("max") { Name = "max", Value = 10 }));
+        }
+    }
+
+    public class BookSummaryCreateArg
+    {
+        public int Count { get; set; }
+    }
+
+    public SchemaWithDirective()
+    {
+        var root = new ObjectGraphType();
+        root.Field<StringGraphType>("field").Argument<BookSummaryCreateArgInputType>("arg");
+        Query = root;
+
+        Directives.Register(new MaxLength());
+        this.RegisterVisitor<MaxLengthDirectiveVisitor>();
+    }
+}
+
+public class Bug3507Schema : Schema
+{
+    public Bug3507Schema()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<BooleanGraphType>("updateDate")
+            .Argument<DateGraphType>("newDate", true)
+            .Resolve()
+            .WithScope()
+            .ResolveAsync(_ => Task.FromResult((object?)true));
+        Query = type;
+    }
+}
+
+public class Issue3571Schema1 : Schema
+{
+    public Issue3571Schema1()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<NonNullGraphType<BooleanGraphType>>("flag", arg => arg.DeprecationReason = "Use some other argument.")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+}
+
+public class Issue3571Schema2 : Schema
+{
+    public Issue3571Schema2()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name);
+            Field(x => x.Age).DeprecationReason("Use some other input field.");
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}
+
+public class SchemaWithFieldStreamResolverOnNonRootSubscriptionField : Schema
+{
+    public SchemaWithFieldStreamResolverOnNonRootSubscriptionField()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .ResolveStream(_ => new Subscription.SampleObservable<string>())
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+}
+
+public class SchemaWithFieldStreamResolverOnFieldOfInterface : Schema
+{
+    public SchemaWithFieldStreamResolverOnFieldOfInterface()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<MyInterface>("hero");
+        Query = type;
+    }
+
+    private class MyInterface : InterfaceGraphType
+    {
+        public MyInterface()
+        {
+            Name = "My";
+
+            Field<StringGraphType>("id").ResolveStream(_ => new Subscription.SampleObservable<string>());
+        }
+    }
+}
+
+public class SchemaWithFieldResolverOnFieldOfInterface : Schema
+{
+    public SchemaWithFieldResolverOnFieldOfInterface()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<MyInterface>("hero").Resolve(_ => null);
+        Query = type;
+    }
+
+    private class MyInterface : InterfaceGraphType
+    {
+        public MyInterface()
+        {
+            Name = "My";
+
+            Field<StringGraphType>("id").Resolve(_ => "abc");
+        }
+    }
+}
+
+public class SchemaWithFieldStreamResolverOnFieldOfInputObject : Schema
+{
+    public SchemaWithFieldStreamResolverOnFieldOfInputObject()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name).ResolveStream(_ => new Subscription.SampleObservable<string>());
+            Field(x => x.Age);
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}
+
+public class SchemaWithInputFieldResolver : Schema
+{
+    public SchemaWithInputFieldResolver()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Argument<PersonInput>("person")
+            .Resolve(_ => "abc");
+        Query = type;
+    }
+
+    private class PersonInput : InputObjectGraphType<Person>
+    {
+        public PersonInput()
+        {
+            Field(x => x.Name).Resolve(_ => "abc");
+            Field(x => x.Age);
+        }
+    }
+
+    private class Person
+    {
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+    }
+}
+
+public class SchemaWithTheSameRootOperationTypes : Schema
+{
+    public SchemaWithTheSameRootOperationTypes()
+    {
+        var type = new ObjectGraphType { Name = "MyQuery" };
+        type.Field<StringGraphType>("str")
+            .Resolve(_ => "abc");
+        Query = type;
+        Mutation = type;
     }
 }

@@ -22,9 +22,9 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var delayResult = loader.LoadAsync();
 
-        await loader.DispatchAsync().ConfigureAwait(false);
+        await loader.DispatchAsync();
 
-        var result1 = await delayResult.GetResultAsync().ConfigureAwait(false);
+        var result1 = await delayResult.GetResultAsync();
 
         result1.ShouldNotBeNull();
         result1.Count().ShouldBe(2);
@@ -35,7 +35,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         task2.Status.ShouldBe(TaskStatus.RanToCompletion);
 
-        var result2 = await task2.ConfigureAwait(false);
+        var result2 = await task2;
 
         // Results should be the same instance
         result2.ShouldBeSameAs(result1);
@@ -48,30 +48,37 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
     {
         using var cts = new CancellationTokenSource();
 
-        var mock = new Mock<IUsersStore>();
+        var mock = new Mock<IUsersStore>(MockBehavior.Strict);
         var users = Fake.Users.Generate(2);
 
+        // mock store method to expect cancellation
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
             .Returns(async (CancellationToken ct) =>
             {
-                await Task.Delay(60000, ct).ConfigureAwait(false);
-                ct.ThrowIfCancellationRequested();
-
+                // wait for cancellation
+                await Task.Delay(60000, ct);
+                // should not occur
                 return users;
             });
 
         var usersStore = mock.Object;
 
+        // create loader
         var loader = new SimpleDataLoader<IEnumerable<User>>(usersStore.GetAllUsersAsync);
 
+        // start the pending load operation (will wait for GetResultAsync to be called)
         var result = loader.LoadAsync();
 
-        cts.CancelAfter(TimeSpan.FromMilliseconds(5));
-
+        // start reading result
         var task = result.GetResultAsync(cts.Token);
 
-        await Should.ThrowAsync<TaskCanceledException>(task).ConfigureAwait(false);
+        // trigger cancellation
+        cts.Cancel();
 
+        // ensure that the task is cancelled
+        await Should.ThrowAsync<OperationCanceledException>(task);
+
+        // ensure that the mock function was called with the proper token (and it was cancelled while running)
         mock.Verify(x => x.GetAllUsersAsync(cts.Token), Times.Once);
     }
 
@@ -83,7 +90,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
         var users = Fake.Users.Generate(2);
 
         mock.Setup(store => store.GetAllUsersAsync(cts.Token))
-            .ReturnsAsync(users, delay: TimeSpan.FromMilliseconds(20));
+            .ReturnsAsync(users);
 
         var usersStore = mock.Object;
 
@@ -93,7 +100,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         cts.Cancel();
 
-        await Should.ThrowAsync<OperationCanceledException>(() => result.GetResultAsync(cts.Token)).ConfigureAwait(false);
+        await Should.ThrowAsync<OperationCanceledException>(() => result.GetResultAsync(cts.Token));
 
         // Fetch delegate should not be called
         mock.VerifyNoOtherCalls();
@@ -119,7 +126,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var task = result.GetResultAsync();
 
-        var ex = await Should.ThrowAsync<Exception>(task).ConfigureAwait(false);
+        var ex = await Should.ThrowAsync<Exception>(task);
 
         ex.Message.ShouldBe("Deferred");
     }
@@ -138,7 +145,7 @@ public class SimpleDataLoaderTests : DataLoaderTestBase
 
         var result = loader.LoadAsync();
 
-        var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync()).ConfigureAwait(false);
+        var ex = await Should.ThrowAsync<Exception>(() => result.GetResultAsync());
 
         ex.Message.ShouldBe("Immediate");
     }

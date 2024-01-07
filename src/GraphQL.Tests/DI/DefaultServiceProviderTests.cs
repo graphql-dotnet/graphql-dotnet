@@ -7,7 +7,7 @@ public class DefaultServiceProviderTests
     [Fact]
     public void throws_for_null_service_type()
     {
-        Should.Throw<ArgumentNullException>(() => _serviceProvider.GetService(null));
+        Should.Throw<ArgumentNullException>(() => _serviceProvider.GetService(null!));
     }
 
     [Fact]

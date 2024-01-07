@@ -24,7 +24,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: [1, 2, 3]) }",
-            @"{ ""list"": [ 1, 2, 3] }");
+            """{ "list": [ 1, 2, 3] }""");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: 1) }",
-            @"{ ""list"": [ 1 ] }");
+            """{ "list": [ 1 ] }""");
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: []) }",
-            @"{ ""list"": [ ] }");
+            """{ "list": [ ] }""");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ listOfLists(ints: [1, [1, 2], [1, 2, 3], []]) }",
-            @"{ ""listOfLists"": [ [1], [1, 2], [1, 2, 3], [] ] }");
+            """{ "listOfLists": [ [1], [1, 2], [1, 2, 3], [] ] }""");
     }
 }
 
@@ -58,21 +58,21 @@ public class ListSchema : Schema
     {
         var query = new ObjectGraphType();
 
-        query.Field<ListGraphType<IntGraphType>>("list",
-            arguments: new QueryArguments(new QueryArgument<ListGraphType<IntGraphType>> { Name = "ints" }),
-            resolve: c =>
+        query.Field<ListGraphType<IntGraphType>>("list")
+            .Argument<ListGraphType<IntGraphType>>("ints")
+            .Resolve(c =>
             {
                 var list = c.GetArgument<List<int>>("ints");
                 return list;
             });
 
-        query.Field<ListGraphType<ListGraphType<IntGraphType>>>("listOfLists",
-           arguments: new QueryArguments(new QueryArgument<ListGraphType<ListGraphType<IntGraphType>>> { Name = "ints" }),
-           resolve: c =>
-           {
-               var list = c.GetArgument<List<List<int>>>("ints");
-               return list;
-           });
+        query.Field<ListGraphType<ListGraphType<IntGraphType>>>("listOfLists")
+            .Argument<ListGraphType<ListGraphType<IntGraphType>>>("ints")
+            .Resolve(c =>
+            {
+                var list = c.GetArgument<List<List<int>>>("ints");
+                return list;
+            });
 
         Query = query;
     }

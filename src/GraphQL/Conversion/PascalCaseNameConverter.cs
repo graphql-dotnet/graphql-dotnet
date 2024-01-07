@@ -10,7 +10,7 @@ namespace GraphQL.Conversion
         /// <summary>
         /// Static instance of <see cref="PascalCaseNameConverter"/> that can be reused instead of creating new.
         /// </summary>
-        public static readonly PascalCaseNameConverter Instance = new PascalCaseNameConverter();
+        public static readonly PascalCaseNameConverter Instance = new();
 
         /// <summary>
         /// Returns the field name converted to PascalCase.

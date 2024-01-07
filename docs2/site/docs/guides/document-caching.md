@@ -6,53 +6,27 @@ request may select a different operation or have different variables but still b
 document is executed repeatedly, caching can be enabled in order to increase throughput at the cost of memory use. As this may be
 detrimental for performance for certain workloads, it is disabled by default.
 
-Document caching is provided through the `IDocumentCache` interface. To enable document caching, you will need to construct the document
-executer instance with a `IDocumentCache` implementation. There is a memory-backed implementation called `MemoryDocumentCache` in the NuGet
+The recommended way to enable document caching is to inherit from `IConfigureExecution` interface and register your class as its
+implementation. There is a memory-backed implementation called `MemoryDocumentCache` in the NuGet
 [GraphQL.MemoryCache](https://www.nuget.org/packages/GraphQL.MemoryCache) package. The implementation is backed by
 `Microsoft.Extensions.Caching.Memory.IMemoryCache` and provides options for specifying the maximum amount of objects to cache
 (measured in total length of the cached queries), and/or the expiration time of cached queries.
 
-Below are samples of how to use the caching engine:
+Below is a sample of how to use the caching engine:
 
 ```csharp
-var memoryDocumentCache = new MemoryDocumentCache(new MemoryDocumentCacheOptions {
-    // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
-    // for 10MB maximum memory use by the cache - parsed AST and other stuff)
-    SizeLimit = 1000000,
-    // no expiration of cached queries (cached queries are only ejected when the cache is full)
-    SlidingExpiration = null,
-});
-
-var executer = new DocumentExecuter(
-    new GraphQLDocumentBuilder(),
-    new DocumentValidator(),
-    new ComplexityAnalyzer(),
-    memoryDocumentCache);
-```
-
-If you utilize dependency injection, register the memory cache and document executer as singletons. Below is a sample for the
-`Microsoft.Extensions.DependencyInjection` service provider:
-
-```csharp
-services.AddSingleton<IDocumentCache>(services =>
-{
-    return new MemoryDocumentCache(new MemoryDocumentCacheOptions {
+IServiceCollection services = ...;
+services.AddGraphQL(builder => builder
+    .AddSchema<StarWarsSchema>()
+    .AddSystemTextJson()
+    .UseMemoryCache(options =>
+    {
         // maximum total cached query length of 1,000,000 bytes (assume 10x memory usage
-        // for 10MB maximum memory use by the cache)
-        SizeLimit = 1000000,
+        // for 10MB maximum memory use by the cache - parsed AST and other stuff)
+        options.SizeLimit = 1000000;
         // no expiration of cached queries (cached queries are only ejected when the cache is full)
-        SlidingExpiration = null,
-    });
-});
-
-services.AddSingleton<IDocumentExecuter>(services =>
-{
-    return new DocumentExecuter(
-        new GraphQLDocumentBuilder(),
-        new DocumentValidator(),
-        new ComplexityAnalyzer(),
-        services.GetRequiredService<IDocumentCache>());
-});
+        options.SlidingExpiration = null;
+    })
 ```
 
 ## Notes

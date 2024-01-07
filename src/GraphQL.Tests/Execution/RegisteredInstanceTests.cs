@@ -18,18 +18,13 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         product.IsTypeOf = obj => obj is Product;
 
         var catalog = new ObjectGraphType { Name = "Catalog" };
-        catalog.Field("products", new ListGraphType(product), resolve: ctx =>
-        {
-            return new List<Product> {
-                new Product { Name = "Book" }
-            };
-        });
+        catalog.Field("products", new ListGraphType(product)).Resolve(_ => new List<Product> { new Product { Name = "Book" } });
 
         var retail = new ObjectGraphType { Name = "Retail" };
-        retail.Field("catalog", catalog, resolve: ctx => new { });
+        retail.Field("catalog", catalog).Resolve(_ => new { });
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("retail", retail, resolve: ctx => new { });
+        root.Field("retail", retail).Resolve(_ => new { });
 
         var schema = new Schema { Query = root };
         schema.RegisterTypes(retail);
@@ -37,8 +32,8 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         AssertQuerySuccess(
             schema,
-            @"{ retail { catalog { products { name } } } }",
-            @"{ ""retail"": { ""catalog"": { ""products"": [ { ""name"": ""Book"" }] } } }"
+            "{ retail { catalog { products { name } } } }",
+            """{ "retail": { "catalog": { "products": [ { "name": "Book" }] } } }"""
         );
     }
 
@@ -49,21 +44,19 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         var person = new ObjectGraphType { Name = "Person" };
         person.Field("name", new StringGraphType());
-        person.Field(
-            "friends",
-            new ListGraphType(new NonNullGraphType(person)),
-            resolve: ctx => new[] { new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" } });
+        person.Field("friends", new ListGraphType(new NonNullGraphType(person)))
+            .Resolve(_ => new[] { new SomeObject { Name = "Jaime" }, new SomeObject { Name = "Joe" } });
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("hero", person, resolve: ctx => ctx.RootValue);
+        root.Field("hero", person).Resolve(ctx => ctx.RootValue);
 
         schema.Query = root;
         schema.RegisterTypes(person);
 
         AssertQuerySuccess(
             schema,
-            @"{ hero { name friends { name } } }",
-            @"{ ""hero"": { ""name"": ""Quinn"", ""friends"": [ { ""name"": ""Jaime"" }, { ""name"": ""Joe"" }] } }",
+            "{ hero { name friends { name } } }",
+            """{ "hero": { "name": "Quinn", "friends": [ { "name": "Jaime" }, { "name": "Joe" }] } }""",
             root: new SomeObject { Name = "Quinn" });
     }
 
@@ -74,83 +67,91 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         var person = new ObjectGraphType { Name = "Person" };
         person.Field("name", new StringGraphType());
-        person.IsTypeOf = type => true;
+        person.IsTypeOf = _ => true;
 
         var robot = new ObjectGraphType { Name = "Robot" };
         robot.Field("name", new StringGraphType());
-        robot.IsTypeOf = type => true;
+        robot.IsTypeOf = _ => true;
 
         var personOrRobot = new UnionGraphType { Name = "PersonOrRobot" };
         personOrRobot.AddPossibleType(person);
         personOrRobot.AddPossibleType(robot);
 
         var root = new ObjectGraphType { Name = "Root" };
-        root.Field("hero", personOrRobot, resolve: ctx => ctx.RootValue);
+        root.Field("hero", personOrRobot).Resolve(ctx => ctx.RootValue);
 
         schema.Query = root;
 
         AssertQuerySuccess(
             schema,
-            @"{ hero {
+            """
+            { hero {
                     ... on Person { name }
                     ... on Robot { name }
-                } }",
-            @"{ ""hero"": { ""name"" : ""Quinn"" }}",
+                } }
+            """,
+            """{ "hero": { "name" : "Quinn" }}""",
             root: new SomeObject { Name = "Quinn" });
     }
 
     [Fact]
     public void build_nested_type_with_list()
     {
-        build_schema("list").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("list").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: [NestedObjType]
-}
-");
+            type root {
+              listOfObjField: [NestedObjType]
+            }
+
+            """);
     }
 
     [Fact]
     public void build_nested_type_with_non_null()
     {
-        build_schema("non-null").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("non-null").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: NestedObjType!
-}
-");
+            type root {
+              listOfObjField: NestedObjType!
+            }
+
+            """);
     }
 
     [Fact]
     public void build_nested_type_with_base()
     {
-        build_schema("none").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("none").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: NestedObjType
-}
-");
+            type root {
+              listOfObjField: NestedObjType
+            }
+
+            """);
     }
 
-    private string build_schema(string propType)
+    private static string build_schema(string propType)
     {
         var nestedObjType = new ObjectGraphType
         {
@@ -196,7 +197,7 @@ type root {
         {
             Query = rootType
         };
-        var schema = new SchemaPrinter(s).Print();
+        string schema = new SchemaPrinter(s).Print();
         return schema;
     }
 

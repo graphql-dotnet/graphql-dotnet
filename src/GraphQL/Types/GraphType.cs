@@ -8,21 +8,41 @@ namespace GraphQL.Types
     public abstract class GraphType : MetadataProvider, IGraphType
     {
         private string _name;
+        private bool _initialized;
 
         /// <summary>
         /// Initializes a new instance of the graph type.
         /// </summary>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         protected GraphType()
+            : this(null)
+        {
+        }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        internal GraphType(GraphType? cloneFrom)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            if (!IsTypeModifier) // specification requires name must be null for these types
+            if (cloneFrom == null)
             {
-                // GraphType must always have a valid name so set it to default name in constructor
-                // and skip validation only for well-known types including introspection.
-                // This name can be always changed later to any valid value.
-                SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                if (!IsTypeModifier) // specification requires name must be null for these types
+                {
+                    // GraphType must always have a valid name so set it to default name in constructor
+                    // and skip validation only for well-known types including introspection.
+                    // This name can be always changed later to any valid value.
+                    SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                }
+                return;
             }
+            _name = cloneFrom._name;
+            cloneFrom.CopyMetadataTo(this);
+        }
+
+        /// <inheritdoc/>
+        public virtual void Initialize(ISchema schema)
+        {
+            if (_initialized)
+                throw new InvalidOperationException($"This graph type '{GetType().GetFriendlyName()}' with name '{Name}' has already been initialized. Make sure that you do not use the same instance of a graph type in multiple schemas. It may be so if you registered this graph type as singleton; see https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/ for more info.");
+            _initialized = true;
         }
 
         private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
@@ -30,6 +50,9 @@ namespace GraphQL.Types
         private string GetDefaultName()
         {
             var type = GetType();
+
+            if (!GlobalSwitches.UseLegacyTypeNaming)
+                return type.GraphQLName();
 
             string name = type.Name;
             if (GlobalSwitches.UseDeclaringTypeNames)
@@ -42,7 +65,8 @@ namespace GraphQL.Types
                 }
             }
 
-            name = name.Replace('`', '_');
+            name = name.Replace('`', '_')
+                       .Replace('@', '_'); // https://github.com/graphql-dotnet/graphql-dotnet/issues/3472
             if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
                 name = name.Substring(0, name.Length - nameof(GraphType).Length);
 

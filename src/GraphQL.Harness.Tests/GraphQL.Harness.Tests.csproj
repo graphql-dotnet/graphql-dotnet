@@ -2,15 +2,19 @@
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net6</TargetFramework>
+    <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true'">
-    <TargetFrameworks>net6;net5</TargetFrameworks>
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Alba" Version="6.0.0" />
+    <PackageReference Include="Alba" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>

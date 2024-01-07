@@ -21,17 +21,19 @@ public class Bug2553
         var writer = new GraphQLSerializer(options);
         string json = writer.Serialize(executionResult);
 
-        json.ShouldBeCrossPlatJson(@"{
-                ""errors"": [{
-                    ""message"":""An error occurred."",
-                    ""extensions"": {
-                        ""violations"": {
-                            ""message"":""An error occurred on field Email."",
-                            ""field"":""Email""
+        json.ShouldBeCrossPlatJson("""
+            {
+                "errors": [{
+                    "message":"An error occurred.",
+                    "extensions": {
+                        "violations": {
+                            "message":"An error occurred on field Email.",
+                            "field":"Email"
                         }
                     }
                 }]
-            }");
+            }
+            """);
     }
 }
 
@@ -41,7 +43,7 @@ internal class TestErrorInfoProvider : ErrorInfoProvider
     {
         return base.GetInfo(executionError) with
         {
-            Extensions = new Dictionary<string, object>
+            Extensions = new Dictionary<string, object?>
             {
                 { "violations", new TestExecutionError("An error occurred on field Email.", "Email") }
             }

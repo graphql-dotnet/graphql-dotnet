@@ -8,7 +8,7 @@ namespace GraphQL.Types.Relay
     /// or has the same members.
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the result data set's data type.</typeparam>
-    public class EdgeType<TNodeType> : ObjectGraphType<object>
+    public class EdgeType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType> : ObjectGraphType<object>
         where TNodeType : IGraphType
     {
         /// <inheritdoc/>
@@ -19,12 +19,10 @@ namespace GraphQL.Types.Relay
             Description =
                 $"An edge in a connection from an object to another object of type `{graphQLTypeName}`.";
 
-            Field<NonNullGraphType<StringGraphType>>()
-                .Name("cursor")
+            Field<NonNullGraphType<StringGraphType>>("cursor")
                 .Description("A cursor for use in pagination");
 
-            Field<TNodeType>()
-                .Name("node")
+            Field<TNodeType>("node")
                 .Description("The item at the end of the edge");
         }
     }

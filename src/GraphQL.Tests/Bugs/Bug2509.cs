@@ -8,19 +8,21 @@ public class RecordTest : QueryTestBase<RecordSchema>
     [Fact]
     public void Record_Should_Return_As_Is()
     {
-        var query = @"
+        const string query = """
 {
   search(input: {})
   {
     id
   }
 }
-";
-        var expected = @"{
-  ""search"": {
-    ""id"": null
+""";
+        const string expected = """
+{
+  "search": {
+    "id": null
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }
@@ -55,10 +57,9 @@ public class RecordQuery : ObjectGraphType
 {
     public RecordQuery()
     {
-        Field<RecordType>(
-            "search",
-            arguments: new QueryArguments(new QueryArgument<RecordInput> { Name = "input" }),
-            resolve: ctx =>
+        Field<RecordType>("search")
+            .Argument<RecordInput>("input")
+            .Resolve(ctx =>
             {
                 var arg = ctx.GetArgument<RecordModel>("input");
                 return arg;

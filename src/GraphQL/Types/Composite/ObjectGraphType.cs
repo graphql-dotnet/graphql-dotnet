@@ -20,16 +20,31 @@ namespace GraphQL.Types
     /// Represents a default base class for all object (that is, having their own properties) output graph types.
     /// </summary>
     /// <typeparam name="TSourceType">Typically the type of the object that this graph represents. More specifically, the .NET type of the source property within field resolvers for this graph.</typeparam>
-    public class ObjectGraphType<TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
+    public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSourceType>, IObjectGraphType
     {
         /// <inheritdoc/>
         public Func<object, bool>? IsTypeOf { get; set; }
 
         /// <inheritdoc/>
         public ObjectGraphType()
+            : this(null)
         {
-            if (typeof(TSourceType) != typeof(object))
-                IsTypeOf = instance => instance is TSourceType;
+        }
+
+        internal ObjectGraphType(ObjectGraphType<TSourceType>? cloneFrom)
+            : base(cloneFrom)
+        {
+            if (cloneFrom == null)
+            {
+                if (typeof(TSourceType) != typeof(object))
+                    IsTypeOf = instance => instance is TSourceType;
+                Interfaces = new Interfaces();
+                return;
+            }
+            IsTypeOf = cloneFrom.IsTypeOf;
+            Interfaces = cloneFrom.Interfaces;
+            if (cloneFrom.ResolvedInterfaces.Count > 0)
+                throw new InvalidOperationException("Cannot clone ObjectGraphType when ResolvedInterfaces contains items.");
         }
 
         /// <inheritdoc/>
@@ -43,7 +58,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public Interfaces Interfaces { get; } = new Interfaces();
+        public Interfaces Interfaces { get; }
 
         /// <inheritdoc/>
         public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();

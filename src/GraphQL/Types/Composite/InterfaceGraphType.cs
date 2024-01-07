@@ -8,8 +8,29 @@ namespace GraphQL.Types
     }
 
     /// <inheritdoc cref="InterfaceGraphType"/>
-    public class InterfaceGraphType<TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
+    public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
     {
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        public InterfaceGraphType()
+            : this(null)
+        {
+        }
+
+        internal InterfaceGraphType(InterfaceGraphType<TSource>? copyFrom)
+            : base(copyFrom)
+        {
+            if (copyFrom != null)
+            {
+                if (copyFrom.PossibleTypes.Count != 0)
+                    throw new InvalidOperationException("Cannot clone interface containing possible types.");
+                if (copyFrom.ResolveType != null)
+                    throw new InvalidOperationException("Cannot clone interface with configured ResolveType property.");
+            }
+            // else { /* initialization logic */ }
+        }
+
         /// <inheritdoc/>
         public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
 

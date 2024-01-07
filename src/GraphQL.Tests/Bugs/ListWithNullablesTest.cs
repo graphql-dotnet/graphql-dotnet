@@ -7,16 +7,18 @@ public class ListWithNullablesTest : QueryTestBase<ListWithNullablesSchema>
     [Fact]
     public void Can_Accept_Null_List_From_Literal()
     {
-        var query = @"
-                query _ {
-                  list {
-                    value
-                  }
-                }";
-        var expected = @"
-                {
-                    ""list"": [{ ""value"": ""one""}, null, { ""value"": ""three"" }]
-                }";
+        const string query = """
+            query _ {
+                list {
+                value
+                }
+            }
+            """;
+        const string expected = """
+            {
+                "list": [{ "value": "one"}, null, { "value": "three" }]
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 }
@@ -35,9 +37,8 @@ public class ListWithNullablesQuery : ObjectGraphType
     {
         Name = "Query";
 
-        Field<ListGraphType<ListEntityGraphType>>(
-            "list",
-            resolve: context => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
+        Field<ListGraphType<ListEntityGraphType>>("list")
+            .Resolve(_ => new[] { new ListEntity { Value = "one" }, null, new ListEntity { Value = "three" } });
     }
 }
 

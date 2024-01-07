@@ -17,7 +17,7 @@ namespace GraphQL.Validation.Errors
         {
         }
 
-        internal static string UnknownTypeMessage(string type, string[] suggestedTypes)
+        internal static string UnknownTypeMessage(string type, params string[] suggestedTypes)
         {
             var message = $"Unknown type {type}.";
             if (suggestedTypes != null && suggestedTypes.Length > 0)

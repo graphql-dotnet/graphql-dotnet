@@ -4,7 +4,7 @@ namespace GraphQL.DataLoader
     /// Represents a pending operation that can return a value
     /// </summary>
     /// <typeparam name="T">The type of value that is returned</typeparam>
-    public interface IDataLoaderResult<T> : IDataLoaderResult
+    public interface IDataLoaderResult<[NotAGraphType] T> : IDataLoaderResult
     {
         /// <summary>
         /// Asynchronously executes the loader if it has not yet been executed; then returns the result

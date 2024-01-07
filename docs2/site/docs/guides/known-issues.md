@@ -15,7 +15,7 @@ generic class.
 Here is a sample of using an enumeration graph type:
 
 ```csharp
-Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn", "Which movie they appear in.");
+Field<ListGraphType<EnumerationGraphType<Episodes>>>("appearsIn").Description("Which movie they appear in.");
 ```
 
 Here is a sample of an auto registering input graph type:
@@ -27,11 +27,9 @@ class Person
     public int Age { get; set; }
 }
 
-Field<StringGraphType>("addPerson",
-    arguments: new QueryArguments(
-        new QueryArgument<AutoRegisteringInputObjectGraphType<Person>> { Name = "value" }
-    ),
-    resolve: context => {
+Field<StringGraphType>("addPerson")
+    .Arguments<AutoRegisteringInputObjectGraphType<Person>>("value")
+    .Resolve(context => {
         var person = context.GetArgument<Person>("value");
         db.Add(person);
         return "ok";
@@ -57,7 +55,7 @@ class ProductGraphType : AutoRegisteringObjectGraphType<Product>
     }
 }
 
-Field<ListGraphType<ProductGraphType>>("products", resolve: _ => db.Products);
+Field<ListGraphType<ProductGraphType>>("products").Resolve(_ => db.Products);
 ```
 
 Note that you may need to register the classes within your dependency injection framework:
@@ -132,39 +130,37 @@ enum MyFlags
 }
 
 // this returns the list ["GRUMPY", "HAPPY"]
-Field<ListGraphType<EnumerationGraphType<MyFlags>>>(
-    "getFlagEnum",
-    resolve: ctx => {
+Field<ListGraphType<EnumerationGraphType<MyFlags>>>("getFlagEnum")
+    .Resolve(ctx => {
         var myFlags = MyFlags.Grumpy | MyFlags.Happy;
         return myFlags.FromFlags()
     });
 
 // when calling convertEnumListToString(arg: [GRUMPY, HAPPY]), it returns the string "Grumpy, Happy"
-Field<StringGraphType>(
-    "convertEnumListToString",
-    arguments: new QueryArguments(
-        new QueryArgument<ListGraphType<EnumerationGraphType<MyFlags>>> { Name = "arg" }),
-    resolve: ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString()
-    );
+Field<StringGraphType>("convertEnumListToString")
+    .Argument<ListGraphType<EnumerationGraphType<MyFlags>>>("arg")
+    .Resolve(ctx => ctx.GetArgument<IEnumerable<MyFlags>>("arg").CombineFlags().ToString());
 ```
 
 ### Can custom scalars serialize non-null data to a null value and vice versa?
 
-No, that is not currently possible, as returning null from `Serialize`, `ParseLiteral` or `ParseValue`
-indicates a failed conversion. Further, upon output serialization, null values are not passed
-through the serializer.
+Yes; let's say you want to write a custom serializer for date/time data types where it changes
+strings of the format "MM-dd-yyyy" into `DateTime` values, and empty strings into null values. That
+functionality is possible with a custom scalar.
 
-For example, let's say you want to write a custom serializer for date/time data types where it changes
-strings of the format "MM-dd-yyyy" into `DateTime` values, and empty strings into null values. That is
-not possible. The custom scalar also cannot do the reverse: change null values back into an empty string.
+Custom scalars transform external representations into internal representations and vice versa.
+So an external representation might be `null` while the internal representation might be an
+empty string. The reverse is also possible; an external representation of an empty string having
+an internal representation of `null`.
 
-If this type of functionality is necessary for your data types, you will need to write code within your
-field resolvers to perform the conversion, as a custom scalar cannot do this. This is a limitation
-of GraphQL.NET.
+However, field arguments' default values are stored in their local representation, with the exception
+of a value of `null` indicates that the default value is not specified. So you cannot have a specified
+default value with a non-null external representation and a null internal representation. This is a
+limitation of GraphQL.NET.
 
 ### Should I use `AuthorizeAttribute` or the `AuthorizeWith` method?
 
-`AuthorizeAttribute` is only for use with the schema-first syntax. `AuthorizeWith` is for use
+`AuthorizeAttribute` is only for use with the schema-first or type-first syntax. `AuthorizeWith` is for use
 with the code-first approach.
 
 See [issue #68](https://github.com/graphql-dotnet/authorization/issues/68) and [issue #74](https://github.com/graphql-dotnet/authorization/issues/74)
@@ -180,67 +176,12 @@ This is done within your database queries; it is not a function of the dataloade
 `CollectionBatchDataLoader` as you would for a one-to-many relationship; then when you are loading
 data from your database within the fetch delegate, use an inner join to retrieve the proper data.
 
-### How to authenticate subscriptions?
-
-> Note. This question has more to do with the transport layer, not GraphQL.NET itself.
-
-GraphQL subscriptions usually work over WebSockets at the transport level. If the subscription is over
-WebSockets, then the handshake is still over HTTP(HTTPS) and handshake does not allow authorization headers.
-You should instead use [GQL_CONNECTION_INIT](https://github.com/apollographql/subscriptions-transport-ws/blob/master/PROTOCOL.md#gql_connection_init)
-message to send additional data to the server. If you are using [server project](https://github.com/graphql-dotnet/server)
-then you can write your `IOperationMessageListener` and add the listener as a transient service:
-
-```csharp
-public class AuthListener : IOperationMessageListener
-{
-    private readonly IHttpContextAccessor _accessor;
-
-    public AuthListener(IHttpContextAccessor accessor)
-    {
-        _accessor = accessor;
-    }
-
-    public Task BeforeHandleAsync(MessageHandlingContext context)
-    {
-        if (context.Message.Type == MessageType.GQL_CONNECTION_INIT)
-        {
-            // Extract the auth header and validate it.
-            // Then get the user and store it in the HttpContext (or something).
-            dynamic payload = context.Message.Payload;
-            string auth = payload["Authorization"];
-            _accessor.HttpContext.User = new ...
-        }
-        return Task.FromResult(true);
-    }
-
-    public Task HandleAsync(MessageHandlingContext context) => Task.CompletedTask;
-
-    public Task AfterHandleAsync(MessageHandlingContext context) => Task.CompletedTask;
-}
-
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddHttpContextAccessor();
-    services.AddTransient<IOperationMessageListener, AuthListener>();
-}
-```
-
-`GQL_CONNECTION_INIT` message looks like this:
-```json
-{
-  "type": "connection_init",
-  "payload": {
-    "Authorization": "Bearer eyJhbGciOiJIUzI..."
-  }
-}
-```
-
 ### Why does my saved `IResolveFieldContext` instance "change" after the field resolver executes?
 
 The `IResolveFieldContext` instance passed to field resolvers is re-used at the completion of the resolver. Be sure not to
 use this instance once the resolver finishes executing. To preserve a copy of the context, call `.Copy()` on the context
-to create a copy that is not re-used. Note that it is safe to use the field context within asynchronous field resolvers and
-data loaders. Once the asynchronous field resolver or data loader returns its final result, the context may be re-used.
+to create a copy that is not re-used. Note that it is safe to use the field context within asynchronous field resolvers,
+data loaders and list fields. Once the asynchronous field resolver or data loader returns its final result, the context may be re-used.
 Also, any calls to the configured `UnhandledExceptionDelegate` will receive a field context copy that will not be re-used,
 so it is safe to preserve these instances without calling `.Copy()`.
 
@@ -304,14 +245,14 @@ schema, it is not possible to register the graph types as scoped services while 
 the schema as a singleton. Instead, you will need to pull your scoped services from within
 the field resolver via the `IResolveFieldContext.RequestServices` property. Detailed
 information on this technique, its configuration requirements, and alternatives are outlined
-in the [Dependency Injection](../getting-started/dependency-injection.md) documentation.
+in the [Dependency Injection](../../getting-started/dependency-injection) documentation.
 
 It is also possible to register the schema and all its graph types as scoped services.
 This is not recommended due to the overhead of building the schema for each request.
 
 Note that concurrency issues typically arise when using scoped services with a parallel
 execution strategy. Please read the section on this in the
-[documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
+[documentation](../../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
 
 ### Entity Framework concurrency issues
 
@@ -343,6 +284,123 @@ passed from another service. Therefore, the database context must remain scoped.
 
 Finally, you can create a scope within each field resolver that relies on Entity Framework
 or your other scoped services. Please see the section on this in the
-[dependency injection documentation](../getting-started/dependency-injection.md#scoped-services-with-a-singleton-schema-lifetime).
+[dependency injection documentation](../../getting-started/dependency-injection#scoped-services-with-a-singleton-schema-lifetime).
 
 Also see discussion in [#1310](https://github.com/graphql-dotnet/graphql-dotnet/issues/1310) with related issues.
+
+### Enumeration members' case sensitivity
+
+Prior to GraphQL.NET version 5, enumeration values were case insensitive matches, which
+did not meet the GraphQL specification. This has been updated to match the spec; to revert to the prior
+behavior, please see [issue #3105](https://github.com/graphql-dotnet/graphql-dotnet/issues/3105#issuecomment-1109991628).
+
+### Multiple instances of same graph type error
+
+You may encounter errors of the following nature:
+
+> A different instance of the GraphType 'WidgetGraphType' with the name 'Widget' has already been registered within the
+> schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a
+> type instantiated elsewhere.
+
+This is caused when the same graph type class has multiple distinct instances used within the schema. This is a change
+in GraphQL.NET v7, and exists as protection to ensure that the schema is initialized properly. Note that this restriction
+does not apply to scalars.
+
+Below are some samples of what does not work in GraphQL.NET v7, along with solutions:
+
+```csharp
+// sample 1: manually creating instances without providing the same instance for each use
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        // creates an instance of WidgetGraphType
+        Field("field1", new WidgetGraphType());
+        // creates another instance of the same class
+        Field("field2", new WidgetGraphType());
+
+        // solution:
+        Field<WidgetGraphType>("field1");
+        Field<WidgetGraphType>("field2");
+    }
+}
+
+// sample 2: adding an instance to a union graph type
+public class MyUnionGraphType : UnionGraphType
+{
+    public MyUnionGraphType()
+    {
+        // creates an instance, which will be different than the one used elsewhere
+        AddPossibleType(new WidgetGraphType());
+
+        // solution:
+        Type<WidgetGraphType>();
+    }
+}
+
+// sample 3: pulling an instance from DI
+public class MyUnionGraphType : UnionGraphType
+{
+    public MyUnionGraphType(WidgetGraphType widgetType)
+    {
+        // Since graph types are typically registered as transients, this reference to
+        // WidgetGraphType will be different than other instances throughout the schema
+        // and the following code does not work.
+        AddPossibleType(widgetType);
+        ResolveType = obj => obj switch
+        {
+            string => widgetType,
+            _ => null,
+        };
+
+        // solution 1: register WidgetGraphType as a singleton manually within the DI provider
+
+        // solution 2: remove WidgetGraphType from the constructor and use the following code:
+        Type<WidgetGraphType>();
+        ResolveType = obj => obj switch
+        {
+            string => new GraphQLTypeReference("Widget"), // reference by name (newing each time is not nessessary)
+            _ => null,
+        };
+
+        // solution 3: remove ResolveType and rely on IObjectGraphType.IsTypeOf of each union member type
+    }
+}
+```
+
+However, within your schema, you may pull the query, mutation and/or subscription types from DI.
+This is normal as those types are not typically referenced anywhere else in the schema.
+
+```csharp
+public class MySchema : Schema
+{
+    // correct implementation for the schema class
+    public MySchema(IServiceProvider serviceProvider, MyQueryGraphType queryGraphType)
+        : base(serviceProvider)
+    {
+        Query = queryGraphType;
+    }
+}
+```
+
+Similar restrictions apply if creating a dynamic schema. You will need to maintain a list of
+graph type instances created by your schema and use those instances where necessary while
+building the other graph types. You may also use `GraphQLTypeReference` as desired to reference
+graph types by name.
+
+```csharp
+// create the graph types
+var queryType = new ObjectGraphType() { Name = "Query" };
+var widgetType = new ObjectGraphType() { Name = "Widget" };
+var manufacturerType = new ObjectGraphType() { Name = "Manufacturer" };
+
+// define the fields
+widgetType.Field("Manufacturer", manufacturerType);
+manufacturerType.Field("Widgets", new ListGraphType(widgetType));
+queryType.Field("Widgets", new ListGraphType(widgetType));
+queryType.Field("Manufacturers", new ListGraphType(manufactuerType));
+
+// create the schema
+var schema = new Schema();
+schema.Query = queryType;
+```

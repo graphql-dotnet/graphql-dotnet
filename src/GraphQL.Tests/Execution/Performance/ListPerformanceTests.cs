@@ -33,7 +33,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             Friends = new List<INamed>()
         };
 
-        for (var x = 0; x < PerformanceIterations; x++)
+        for (int x = 0; x < PerformanceIterations; x++)
         {
             var person = new Person
             {
@@ -73,32 +73,32 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_MultipleProperties_Are_Performant()
     {
-        var query = @"
-                query AQuery {
-                    people {
-                        name
-                        name1:name
-                        name2:name
-                        name3:name
-                        name4:name
-                        name5:name
-                        name6:name
-                        name7:name
-                        name8:name
-                        name9:name
-                        name10:name
-                        name11:name
-                        name12:name
-                        name13:name
-                        name14:name
-                        name15:name
-                        name16:name
-                        name17:name
-                        name18:name
-                        name19:name
-                    }
-                }
-            ";
+        const string query = """
+            query AQuery {
+              people {
+                name
+                name1:name
+                name2:name
+                name3:name
+                name4:name
+                name5:name
+                name6:name
+                name7:name
+                name8:name
+                name9:name
+                name10:name
+                name11:name
+                name12:name
+                name13:name
+                name14:name
+                name15:name
+                name16:name
+                name17:name
+                name18:name
+                name19:name
+              }
+            }
+            """;
 
         var smallListTimer = new Stopwatch();
 
@@ -111,10 +111,10 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        }).ConfigureAwait(false);
+        });
 
         smallListTimer.Stop();
 
@@ -127,13 +127,13 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_SimpleLists_Are_Performant()
     {
-        var query = @"
-                query AQuery {
-                    people {
-                        name
-                    }
-                }
-            ";
+        const string query = """
+            query AQuery {
+              people {
+                name
+              }
+            }
+            """;
 
         var smallListTimer = new Stopwatch();
 
@@ -146,10 +146,10 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        }).ConfigureAwait(false);
+        });
 
         smallListTimer.Stop();
 
@@ -162,25 +162,25 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     [Fact(Skip = "Benchmarks only, these numbers are machine dependant.")]
     public async Task Executes_UnionLists_Are_Performant()
     {
-        var query = @"
-                query AQuery {
-                    people {
-                      __typename
-                      name
-                      pets {
-                        __typename
-                        ... on Dog {
-                          name
-                          barks
-                        },
-                        ... on Cat {
-                          name
-                          meows
-                        }
-                      }
-                    }
+        const string query = """
+            query AQuery {
+              people {
+                __typename
+                name
+                pets {
+                  __typename
+                  ... on Dog {
+                    name
+                    barks
+                  },
+                  ... on Cat {
+                    name
+                    meows
+                  }
                 }
-            ";
+              }
+            }
+            """;
 
         var smallListTimer = new Stopwatch();
 
@@ -193,10 +193,10 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             _.Query = query;
             _.Root = PeopleList;
             _.Variables = null;
-            _.UserContext = null;
+            _.UserContext = null!;
             _.CancellationToken = default;
             _.ValidationRules = null;
-        }).ConfigureAwait(false);
+        });
 
         smallListTimer.Stop();
 

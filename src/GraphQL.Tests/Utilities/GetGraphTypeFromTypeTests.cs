@@ -76,7 +76,7 @@ public class GetGraphTypeFromTypeTests
     public void GetGraphTypeFromType_ForOpenGeneric_ThrowsArgumentOutOfRangeException() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => typeof(List<>).GetGraphTypeFromType(true));
 
-    [Theory]
+    [TheoryEx]
     //built-in mapping mode
     [InlineData(typeof(byte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(ByteGraphType))]
     [InlineData(typeof(sbyte), true, TypeMappingMode.UseBuiltInScalarMappings, typeof(SByteGraphType))]
@@ -136,6 +136,13 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
     [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>))]
     [InlineData(typeof(IEnumerable<IEnumerable<int>>), false, TypeMappingMode.UseBuiltInScalarMappings, typeof(NonNullGraphType<ListGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>))]
+    //built-in mapping mode - graph types
+    [InlineData(typeof(IntGraphType), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(IntGraphType), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.UseBuiltInScalarMappings, null)]
     //output mapping mode
     [InlineData(typeof(int), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<int>))]
     [InlineData(typeof(string), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<string>))]
@@ -178,10 +185,16 @@ public class GetGraphTypeFromTypeTests
     [InlineData(typeof(IReadOnlyCollection<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(typeof(List<int>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(typeof(int[]), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>))]
-    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))] //remove for v6
-    //[InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))] //enable for v6
+    [InlineData(typeof(IDictionary<int, string>), true, TypeMappingMode.OutputType, typeof(GraphQLClrOutputTypeReference<IDictionary<int, string>>))]
     [InlineData(typeof(IEnumerable<KeyValuePair<int, string>>), true, TypeMappingMode.OutputType, typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<KeyValuePair<int, string>>>>))]
     [InlineData(typeof(IEnumerable<int>), false, TypeMappingMode.OutputType, typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
+    //output mapping mode - graph types
+    [InlineData(typeof(IntGraphType), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), true, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(IntGraphType), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(NonNullGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
+    [InlineData(typeof(ListGraphType<IntGraphType>), false, TypeMappingMode.OutputType, null)]
     //input mapping mode
     [InlineData(typeof(int), true, TypeMappingMode.InputType, typeof(GraphQLClrInputTypeReference<int>))]
     //data loader compatibility
@@ -262,7 +275,7 @@ public class GetGraphTypeFromTypeTests
     public void OutputTypeIsDereferenced(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(referenceType, "test");
+        query.Field("test", referenceType);
         var schema = new Schema
         {
             Query = query
@@ -270,7 +283,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.Initialize();
-        schema.Query.Fields.Find("test").Type.ShouldBe(mappedType);
+        schema.Query.Fields.Find("test")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -291,11 +304,8 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_Argument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(referenceType) { Name = "arg" }
-            });
+        query.Field("test", typeof(IntGraphType))
+            .Argument(referenceType, "arg");
         var schema = new Schema
         {
             Query = query
@@ -304,7 +314,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Query.Fields.Find("test").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -325,7 +335,7 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_DirectiveArgument(Type referenceType, Type mappedType)
     {
         var query = new ObjectGraphType();
-        query.Field(typeof(StringGraphType), "test");
+        query.Field("test", typeof(StringGraphType));
         var schema = new Schema
         {
             Query = query
@@ -343,7 +353,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Directives.Find("MyDirective").Arguments.Find("arg").Type.ShouldBe(mappedType);
+        schema.Directives.Find("MyDirective")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
     }
 
     [Theory]
@@ -364,13 +374,10 @@ public class GetGraphTypeFromTypeTests
     public void InputTypeIsDereferenced_InputField(Type referenceType, Type mappedType)
     {
         var inputType = new InputObjectGraphType();
-        inputType.Field(referenceType, "field");
+        inputType.Field("field", referenceType);
         var query = new ObjectGraphType();
-        query.Field(typeof(IntGraphType), "test",
-            arguments: new QueryArguments
-            {
-                new QueryArgument(inputType) { Name = "arg" }
-            });
+        query.Field("test", typeof(IntGraphType))
+            .Arguments(new QueryArgument(inputType) { Name = "arg" });
         var schema = new Schema
         {
             Query = query
@@ -379,9 +386,26 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        var inputTypeActual = schema.Query.Fields.Find("test").Arguments.Find("arg").ResolvedType.ShouldBeOfType<InputObjectGraphType>();
+        var inputTypeActual = schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.ResolvedType.ShouldBeOfType<InputObjectGraphType>();
         inputTypeActual.ShouldBe(inputType);
-        inputTypeActual.Fields.Find("field").Type.ShouldBe(mappedType);
+        inputTypeActual.Fields.Find("field")!.Type.ShouldBe(mappedType);
+    }
+
+    [Fact]
+    public void GraphTypesAsClrTypesAreDisallowed()
+    {
+        var expectedMessage = "The graph type 'IntGraphType' cannot be used as a CLR type.";
+
+        Should.Throw<ArgumentOutOfRangeException>(() => typeof(IntGraphType).GetGraphTypeFromType())
+            .Message.ShouldStartWith(expectedMessage);
+
+        var graphType = new ObjectGraphType();
+        Should.Throw<ArgumentException>(() => graphType.Field<IntGraphType>("test", true))
+            .Message.ShouldStartWith("The GraphQL type for field 'Object.test' could not be derived implicitly from type 'IntGraphType'. " + expectedMessage);
+
+        var fieldBuilder = graphType.Field<string>("example");
+        Should.Throw<ArgumentException>(() => fieldBuilder.Argument<IntGraphType>("test", true))
+            .Message.ShouldStartWith("The GraphQL type for argument 'example.test' could not be derived implicitly from type 'IntGraphType'. " + expectedMessage);
     }
 
     private class MyClassObjectType : ObjectGraphType<MyClass>
@@ -435,13 +459,24 @@ public class GetGraphTypeFromTypeTests
     [GraphQLMetadata(OutputType = typeof(CustomOutputGraphType))]
     private class AttributeTest3 { }
 
+#if NET48
     [InputType(typeof(CustomInputGraphType))]
     [OutputType(typeof(CustomOutputGraphType))]
+#else
+    [InputType<CustomInputGraphType>()]
+    [OutputType<CustomOutputGraphType>()]
+#endif
     private class AttributeTest4 { }
-
+#if NET48
     [InputType(typeof(CustomInputGraphType))]
+#else
+    [InputType<CustomInputGraphType>()]
+#endif
     private class AttributeTest5 { }
-
+#if NET48
     [OutputType(typeof(CustomOutputGraphType))]
+#else
+    [OutputType<CustomOutputGraphType>()]
+#endif
     private class AttributeTest6 { }
 }

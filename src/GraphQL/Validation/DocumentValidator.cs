@@ -55,7 +55,7 @@ namespace GraphQL.Validation
         {
             options.Schema.Initialize();
 
-            var context = System.Threading.Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
+            var context = Interlocked.Exchange(ref _reusableValidationContext, null) ?? new ValidationContext();
             context.TypeInfo = new TypeInfo(options.Schema);
             context.Schema = options.Schema;
             context.Document = options.Document;
@@ -63,7 +63,9 @@ namespace GraphQL.Validation
             context.Variables = options.Variables;
             context.Extensions = options.Extensions;
             context.Operation = options.Operation;
+            context.Metrics = options.Metrics;
             context.RequestServices = options.RequestServices;
+            context.User = options.User;
             context.CancellationToken = options.CancellationToken;
 
             return ValidateAsyncCoreAsync(context, options.Rules ?? CoreRules);
@@ -117,7 +119,17 @@ namespace GraphQL.Validation
                 }
 
                 // can report errors even without rules enabled
-                variables = context.GetVariableValues(variableVisitors == null ? null : variableVisitors.Count == 1 ? variableVisitors[0] : new CompositeVariableVisitor(variableVisitors));
+                (variables, var errors) = await context.GetVariablesValuesAsync(variableVisitors == null
+                    ? null
+                    : variableVisitors.Count == 1
+                        ? variableVisitors[0]
+                        : new CompositeVariableVisitor(variableVisitors)).ConfigureAwait(false);
+
+                if (errors != null)
+                {
+                    foreach (var error in errors)
+                        context.ReportError(error);
+                }
 
                 return context.HasErrors
                     ? (new ValidationResult(context.Errors), variables)
@@ -128,7 +140,7 @@ namespace GraphQL.Validation
                 if (!context.HasErrors)
                 {
                     context.Reset();
-                    _ = System.Threading.Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
+                    _ = Interlocked.CompareExchange(ref _reusableValidationContext, context, null);
                 }
             }
         }

@@ -7,9 +7,9 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
     [Fact]
     public void Should_Return_Field_Description_From_Interface_If_Not_Overridden()
     {
-        var query = @"
+        const string query = """
 {
-  __type(name: ""Query"")
+  __type(name: "Query")
   {
     fields
     {
@@ -17,19 +17,24 @@ public class Issue1004 : QueryTestBase<DescriptionFromInterfaceSchema>
     }
   }
 }
-";
-        var expected = @"{
-  ""__type"": {
-    ""fields"": [
+""";
+        const string expected = """
+{
+  "__type": {
+    "fields": [
       {
-        ""description"": ""Very important field1""
+        "description": "Very important field1"
       },
       {
-        ""description"": ""Not so important""
+        "description": "Not so important"
+      },
+      {
+        "description": null
       }
     ]
   }
-}";
+}
+""";
         AssertQuerySuccess(query, expected, null);
     }
 }
@@ -48,8 +53,9 @@ public class Issue1004Query : ObjectGraphType
     {
         Name = "Query";
         IsTypeOf = o => true;
-        Field<StringGraphType>("field1", resolve: ctx => throw null);
-        Field<StringGraphType>("field2", description: "Not so important", resolve: ctx => throw null);
+        Field<StringGraphType>("field1").Resolve(_ => throw null!);
+        Field<StringGraphType>("field2").Description("Not so important").Resolve(_ => throw null!);
+        Field<StringGraphType>("nonInterfaceField").Resolve(_ => throw null!); // https://github.com/graphql-dotnet/graphql-dotnet/pull/3352
         Interface<Issue1004Interface>();
     }
 }
@@ -58,7 +64,7 @@ public class Issue1004Interface : InterfaceGraphType
 {
     public Issue1004Interface()
     {
-        Field<StringGraphType>("field1", "Very important field1");
-        Field<StringGraphType>("field2", "Very important field2");
+        Field<StringGraphType>("field1").Description("Very important field1");
+        Field<StringGraphType>("field2").Description("Very important field2");
     }
 }

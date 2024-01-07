@@ -14,9 +14,9 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Code.ShouldBe(code);
     }
@@ -31,9 +31,9 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Code.ShouldBe(code);
     }
@@ -44,10 +44,10 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ secondSync }";
-        }).ConfigureAwait(false);
+            _.Query = "{ secondSync }";
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Data["Foo"].ShouldBe("Bar");
     }
@@ -57,30 +57,24 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         public TestQuery()
         {
             Name = "Query";
-            Field<StringGraphType>(
-                "firstSync",
-                resolve: _ => throw new FirstException("Exception from synchronous resolver")
-            );
-            FieldAsync<StringGraphType>(
-                "firstAsync",
-                resolve: _ => throw new FirstException("Exception from asynchronous resolver")
-            );
-            Field<StringGraphType>(
-                "secondSync",
-                resolve: _ => throw new SecondTestException("Exception from synchronous resolver")
-            );
-            FieldAsync<StringGraphType>(
-                "secondAsync",
-                resolve: _ => throw new SecondTestException("Exception from asynchronous resolver")
-            );
-            Field<StringGraphType>(
-                "uncodedSync",
-                resolve: _ => throw new Exception("Exception from synchronous resolver")
-            );
-            FieldAsync<StringGraphType>(
-                "uncodedAsync",
-                resolve: _ => throw new Exception("Exception from asynchronous resolver")
-            );
+
+            Field<StringGraphType>("firstSync")
+                .Resolve(_ => throw new FirstException("Exception from synchronous resolver"));
+
+            Field<StringGraphType>("firstAsync")
+                .ResolveAsync(_ => throw new FirstException("Exception from asynchronous resolver"));
+
+            Field<StringGraphType>("secondSync")
+                .Resolve(_ => throw new SecondTestException("Exception from synchronous resolver"));
+
+            Field<StringGraphType>("secondAsync")
+                .ResolveAsync(_ => throw new SecondTestException("Exception from asynchronous resolver"));
+
+            Field<StringGraphType>("uncodedSync")
+                .Resolve(_ => throw new Exception("Exception from synchronous resolver"));
+
+            Field<StringGraphType>("uncodedAsync")
+                .ResolveAsync(_ => throw new Exception("Exception from asynchronous resolver"));
         }
     }
 

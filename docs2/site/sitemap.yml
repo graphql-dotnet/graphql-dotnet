@@ -44,6 +44,8 @@
             file: unions.md
           - title: Subscriptions
             file: subscriptions.md
+          - title: Transport
+            file: transport.md
           - title: Query Validation
             file: query-validation.md
           - title: Query Organization
@@ -85,9 +87,36 @@
             file: links.md
           - title: Document Caching
             file: document-caching.md
+      - title: Analyzers
+        dir: analyzers
+        items:
+          - title: Overview
+            file: overview.md
+          - title: GQL001
+            file: gql001.md
+          - title: GQL002
+            file: gql002.md
+          - title: GQL003
+            file: gql003.md
+          - title: GQL004
+            file: gql004.md
+          - title: GQL005
+            file: gql005.md
+          - title: GQL006
+            file: gql006.md
+          - title: GQL007
+            file: gql007.md
+          - title: GQL008
+            file: gql008.md
+          - title: GQL009
+            file: gql009.md
+          - title: GQL011
+            file: gql011.md
       - title: Migration Guides
         dir: migrations
         items:
+          - title: Migration Guide [v5 -> v7]
+            file: migration7.md
           - title: Migration Guide [v4 -> v5]
             file: migration5.md
           - title: Migration Guide [v3 -> v4]

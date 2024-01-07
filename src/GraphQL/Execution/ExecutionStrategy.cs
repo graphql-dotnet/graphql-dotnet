@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Collections;
+using System.Diagnostics;
 using GraphQL.DataLoader;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -150,11 +151,14 @@ namespace GraphQL.Execution
 
         /// <summary>
         /// Creates execution nodes for child fields of an object execution node. Only run if
-        /// the object execution node result is not <see langword="null"/>.
+        /// the object execution node result is not <see langword="null"/> or object execution
+        /// node is <see cref="RootExecutionNode"/>.
         /// </summary>
         protected virtual void SetSubFieldNodes(ExecutionContext context, ObjectExecutionNode parent)
         {
-            var parentType = parent.GetObjectGraphType(context.Schema)!;
+            Debug.Assert(parent.Result != null || parent is RootExecutionNode);
+
+            var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
             var fields = Interlocked.Exchange(ref context.ReusableFields, null);
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
 
@@ -224,7 +228,20 @@ namespace GraphQL.Execution
         /// <returns>A list of collected fields</returns>
         protected virtual Dictionary<string, (GraphQLField field, FieldType fieldType)> CollectFieldsFrom(ExecutionContext context, IGraphType specificType, GraphQLSelectionSet selectionSet, Dictionary<string, (GraphQLField field, FieldType fieldType)>? fields)
         {
+            //Debug.Assert(specificType is not IAbstractGraphType); //TODO: think about it
+
             fields ??= new();
+
+            // TODO: DESIGN REVIEW NEEDED
+            // https://github.com/graphql-dotnet/graphql-dotnet/pull/3416
+            // SetSubFieldNodes calls CollectFieldsFrom always with IComplexGraphType resolved type even for unions and interfaces since
+            // GetObjectGraphType works well when ExecutionNode.Result is already set. In case of GetSubFields (that is called usually
+            // from IResolveFieldContext.SubFields) we have a problem - there is no ExecutionNode.Result yet (resolver did not return yet)
+            // so GetObjectGraphType returns null in case of abstract graph type (interface or union) and we try to solve it by choosing
+            // an "approximate" type - interface/union type itself. For interface it works better than for union - at least we can return
+            // fields of interface, it makes sense. What should we return in case of union? First/last/random union member? Probably the
+            // best answer here - nothing. See 'GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)' call inside
+            // CollectFields that effectively filters out all unions allowing only __typename field.
 
             // optimization for majority of cases: 0 or 1 fragment spread in selection set, so nothing to track
             int countOfSpreads = GetFragmentSpreads(context, selectionSet);
@@ -259,9 +276,10 @@ namespace GraphQL.Execution
                         {
                             if (ShouldIncludeNode(context, field))
                             {
-                                var fieldType = GetFieldDefinition(context.Schema, (IComplexGraphType)specificType, field);
-                                if (fieldType == null)
-                                    throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
+                                // parentType argument for GetFieldDefinition may be null in case of union field, in that case
+                                // GetFieldDefinition will not throw only if field is __typename
+                                var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)
+                                    ?? throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
                                 Add(fields, field, fieldType);
                             }
@@ -294,10 +312,9 @@ namespace GraphQL.Execution
                 string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 
                 fields[name] = fields.TryGetValue(name, out var original)
-                    ? (new GraphQLField // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+                    ? (new GraphQLField(original.Field.Name) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                     {
                         Alias = original.Field.Alias,
-                        Name = original.Field.Name,
                         Arguments = original.Field.Arguments,
                         SelectionSet = Merge(original.Field.SelectionSet, field.SelectionSet),
                         Directives = original.Field.Directives,
@@ -315,10 +332,7 @@ namespace GraphQL.Execution
                 if (otherSelection == null)
                     return selection;
 
-                return new GraphQLSelectionSet
-                {
-                    Selections = selection.Selections.Union(otherSelection.Selections).ToList()
-                };
+                return new GraphQLSelectionSet(selection.Selections.Union(otherSelection.Selections).ToList());
             }
 
             static int GetFragmentSpreads(ExecutionContext context, GraphQLSelectionSet selectionSet)
@@ -451,11 +465,11 @@ namespace GraphQL.Execution
 
             try
             {
-                ReadonlyResolveFieldContext? resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+                var resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
                 resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
                 var resolver = SelectResolver(node, context);
-                var result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
+                object? result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);
 
                 node.Result = result;
 
@@ -610,10 +624,9 @@ namespace GraphQL.Execution
         /// </summary>
         protected virtual void ValidateNodeResult(ExecutionContext context, ExecutionNode node)
         {
-            var result = node.Result;
+            object? result = node.Result;
 
             IGraphType? fieldType = node.ResolvedType;
-            var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is NonNullGraphType nonNullType)
             {
@@ -623,13 +636,15 @@ namespace GraphQL.Execution
                         + $" Field: {node.Name}, Type: {nonNullType}.");
                 }
 
-                objectType = nonNullType.ResolvedType as IObjectGraphType;
+                fieldType = nonNullType.ResolvedType;
             }
 
             if (result == null)
             {
                 return;
             }
+
+            var objectType = fieldType as IObjectGraphType;
 
             if (fieldType is IAbstractGraphType abstractType)
             {
@@ -639,7 +654,7 @@ namespace GraphQL.Execution
                 {
                     throw new InvalidOperationException(
                         $"Abstract type {abstractType.Name} must resolve to an Object type at " +
-                        $"runtime for field {node.Parent?.GraphType?.Name}.{node.Name} " +
+                        $"runtime for field {(node.IndexInParentNode.HasValue ? node.Parent?.Parent : node.Parent)?.GraphType?.Name}.{node.FieldDefinition.Name} " +
                         $"with value '{result}', received 'null'.");
                 }
 

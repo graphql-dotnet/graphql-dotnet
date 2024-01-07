@@ -28,7 +28,7 @@ public class ScopedExecutionStrategyTests
         {
             Query = "subscription { widgets { value } }",
             RequestServices = provider,
-        }).ConfigureAwait(false);
+        });
         var stream = result.Streams.ShouldNotBeNull().ShouldHaveSingleItem().Value;
         var results = new List<string>();
         stream.Subscribe(x =>
@@ -42,7 +42,7 @@ public class ScopedExecutionStrategyTests
         lock (results)
         {
             results.Count.ShouldBe(2);
-            results[0].ShouldBe(@"{""data"":{""widgets"":{""value"":1}}}");
+            results[0].ShouldBe("""{"data":{"widgets":{"value":1}}}""");
             results[1].ShouldBe(@"{""data"":{""widgets"":{""value"":" + (scoped ? 1 : 2) + "}}}");
         }
     }

@@ -7,29 +7,33 @@ public class NullableInputListTests : QueryTestBase<TestSchema>
     [Fact]
     public void Can_Accept_Null_List_From_Literal()
     {
-        var query = @"
-                query _ {
-                  example(testInputs:null)
-                }";
-        var expected = @"
-                {
-                    ""example"": ""null""
-                }";
+        const string query = """
+            query _ {
+              example(testInputs:null)
+            }
+            """;
+        const string expected = """
+            {
+              "example": "null"
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
     [Fact]
     public void Can_Accept_Null_List_From_Input()
     {
-        var query = @"
-                query _($inputs:[TestInput]) {
-                  example(testInputs: $inputs)
-                }";
-        var expected = @"
-                {
-                    ""example"": ""null""
-                }";
-        AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object>
+        const string query = """
+            query _($inputs:[TestInput]) {
+              example(testInputs: $inputs)
+            }
+            """;
+        const string expected = """
+            {
+              "example": "null"
+            }
+            """;
+        AssertQuerySuccess(query, expected, variables: new Inputs(new Dictionary<string, object?>
         {
             { "inputs", null }
         }));
@@ -49,15 +53,9 @@ public class TestQuery : ObjectGraphType
     public TestQuery()
     {
         Name = "Query";
-        Field<StringGraphType>(
-            "example",
-            arguments: new QueryArguments(
-                new QueryArgument<ListGraphType<TestInputType>>
-                {
-                    Name = "testInputs"
-                }
-            ),
-            resolve: context =>
+        Field<StringGraphType>("example")
+            .Argument<ListGraphType<TestInputType>>("testInputs")
+            .Resolve(context =>
             {
                 var testInputs = context.GetArgument<List<TestInput>>("testInputs");
                 return testInputs == null

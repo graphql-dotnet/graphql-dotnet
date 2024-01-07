@@ -9,7 +9,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData("externalNull", null)] // parsing "externalNull" should return null
     [InlineData(null, "internalNull")] // parsing null should return "internalNull"
     [InlineData("hello", "hello")]     // parsing "hello" should return "hello"
-    public void ParseLiteral(string externalValue, string internalValue)
+    public void ParseLiteral(string? externalValue, string? internalValue)
     {
         var c = new CustomScalar();
         // try parsing literal AST
@@ -20,7 +20,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData("externalNull", null)] // parsing "externalNull" should return null
     [InlineData(null, "internalNull")] // parsing null should return "internalNull"
     [InlineData("hello", "hello")]     // parsing "hello" should return "hello"
-    public void ParseValue(string externalValue, string internalValue)
+    public void ParseValue(string? externalValue, string? internalValue)
     {
         var c = new CustomScalar();
         // try parsing value
@@ -31,7 +31,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData(null, "externalNull")] // serializing null should return "externalNull" (inverse of parsing)
     [InlineData("internalNull", null)] // serializing "internalNull" should return null (inverse of parsing)
     [InlineData("hello", "hello")]     // serializing "hello" should return "hello"
-    public void Serialize(string internalValue, string externalValue)
+    public void Serialize(string? internalValue, string? externalValue)
     {
         var c = new CustomScalar();
         // try serializing
@@ -42,7 +42,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData(null, "externalNull")] // serializing null should return "externalNull" (inverse of parsing)
     [InlineData("internalNull", null)] // serializing "internalNull" should return null (inverse of parsing)
     [InlineData("hello", "hello")]     // serializing "hello" should return "hello"
-    public void ToAST(string internalValue, string externalValue)
+    public void ToAST(string? internalValue, string? externalValue)
     {
         var c = new CustomScalar();
         // try converting internal value to AST
@@ -51,7 +51,7 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
         if (ast is GraphQLNullValue) // GraphQLNullValue.Value is 'null' ROM
             externalValue.ShouldBeNull();
         else
-            ast.ShouldBeAssignableTo<IHasValueNode>().Value.ShouldBe(externalValue);
+            ast.ShouldBeAssignableTo<IHasValueNode>()!.Value.ShouldBe(externalValue);
     }
 
     [Theory]
@@ -71,12 +71,12 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData("nonNullOutput", null, "externalNull", Response.Success)]         // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
     [InlineData("nonNullInput", "externalNull", null, Response.Success)]          // custom scalar coerces "externalNull" to null and string scalar returns null
     [InlineData("nonNullInput", null, "internalNull", Response.ErrorNoData)]      // custom scalar fails validation on null for non-null argument before execution begins
-    public void InOut_Literal(string field, string argumentValue, string expectedResponse, Response responseType)
+    public void InOut_Literal(string field, string? argumentValue, string? expectedResponse, Response responseType)
     {
         var expectedResult = new ExecutionResult();
         if (responseType == Response.Success || responseType == Response.Error)
         {
-            expectedResult.Data = new Dictionary<string, object>
+            expectedResult.Data = new Dictionary<string, object?>
             {
                 { field, expectedResponse },
             };
@@ -88,12 +88,12 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"{{ {field}(arg: {quotedArg}) }}", expectedResult,
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
         {
-            actualResult.Errors[0].Path.ShouldBe(new object[] { field });
+            actualResult.Errors![0].Path.ShouldBe(new object[] { field });
         }
     }
 
@@ -114,12 +114,12 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     [InlineData("nonNullOutput", null, "externalNull", "String", Response.Success)]               // string scalar receives null and non-null custom scalar returns "externalNull" for non-null field
     [InlineData("nonNullInput", "externalNull", null, "CustomScalar!", Response.Success)]         // custom scalar coerces "externalNull" to null and string scalar returns null
     [InlineData("nonNullInput", null, "internalNull", "CustomScalar!", Response.ErrorNoData)]     // custom scalar fails validation on null for non-null argument before execution begins
-    public void InOut_Variable(string field, string argumentValue, string expectedResponse, string argumentType, Response responseType)
+    public void InOut_Variable(string field, string? argumentValue, string? expectedResponse, string? argumentType, Response responseType)
     {
         var expectedResult = new ExecutionResult();
         if (responseType == Response.Success || responseType == Response.Error)
         {
-            expectedResult.Data = new Dictionary<string, object>
+            expectedResult.Data = new Dictionary<string, object?>
             {
                 { field, expectedResponse },
             };
@@ -131,12 +131,12 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
             expectedResult.Executed = true;
         }
 
-        var quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
+        string quotedArg = argumentValue == null ? "null" : $"\"{argumentValue}\"";
         var actualResult = AssertQueryIgnoreErrors($"query ($arg: {argumentType}) {{ {field}(arg: $arg) }}", expectedResult, $"{{ \"arg\": {quotedArg} }}".ToInputs(),
             expectedErrorCount: responseType == Response.Success ? 0 : 1);
         if (responseType == Response.ErrorDataNull || responseType == Response.Error)
         {
-            actualResult.Errors[0].Path.ShouldBe(new object[] { field });
+            actualResult.Errors![0].Path.ShouldBe(new object[] { field });
         }
     }
 
@@ -144,24 +144,24 @@ public class CustomScalarTests : QueryTestBase<CustomScalarSchema>
     public void List_works()
     {
         // verify that within lists, custom scalars are coerced to their proper values
-        AssertQuerySuccess("{ list }", @"{ ""list"": [""hello"", null, ""externalNull"" ]}");
+        AssertQuerySuccess("{ list }", """{ "list": ["hello", null, "externalNull" ]}""");
     }
 
     [Fact]
     public void List_NonNull_works_valid()
     {
         // here we are using a custom scalar to coerce a null value to a non-null value, which is valid for a non-null type
-        AssertQuerySuccess("{ listNonNullValid }", @"{ ""listNonNullValid"": [""hello"", ""externalNull"" ]}");
+        AssertQuerySuccess("{ listNonNullValid }", """{ "listNonNullValid": ["hello", "externalNull" ]}""");
     }
 
     [Fact]
     public void List_NonNull_works_invalid()
     {
         // verify that within lists of non-null values, errors are returned properly
-        var query = "{ listNonNullInvalid }";
-        var response = @"{ ""listNonNullInvalid"": null}";
+        const string query = "{ listNonNullInvalid }";
+        const string response = """{ "listNonNullInvalid": null}""";
         var result = AssertQueryWithErrors(query, response, expectedErrorCount: 1);
-        var errorIndex = 1;
+        const int errorIndex = 1;
         // index should be 1 here because custom scalar will convert ["hello", "internalNull"] to ["hello", null]
         result.Errors.ShouldNotBeNull();
         result.Errors.Count.ShouldBe(1);
@@ -202,27 +202,27 @@ public class CustomScalarQuery : ObjectGraphType
 {
     public CustomScalarQuery()
     {
-        Field(typeof(StringGraphType), "input",
-            arguments: new QueryArguments { new QueryArgument(typeof(CustomScalar)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "output",
-            arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(CustomScalar), "inputOutput",
-            arguments: new QueryArguments { new QueryArgument(typeof(CustomScalar)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(StringGraphType), "nonNullInput",
-            arguments: new QueryArguments { new QueryArgument(typeof(NonNullGraphType<CustomScalar>)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(NonNullGraphType<CustomScalar>), "nonNullOutput",
-            arguments: new QueryArguments { new QueryArgument(typeof(StringGraphType)) { Name = "arg" } },
-            resolve: context => context.GetArgument<string>("arg"));
-        Field(typeof(ListGraphType<CustomScalar>), "list",
-            resolve: context => new object[] { "hello", "internalNull", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullValid",
-            resolve: context => new object[] { "hello", null });
-        Field(typeof(ListGraphType<NonNullGraphType<CustomScalar>>), "listNonNullInvalid",
-            resolve: context => new object[] { "hello", "internalNull" });
+        Field("input", typeof(StringGraphType))
+            .Argument(typeof(CustomScalar), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("output", typeof(CustomScalar))
+            .Argument(typeof(StringGraphType), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("inputOutput", typeof(CustomScalar))
+            .Argument(typeof(CustomScalar), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("nonNullInput", typeof(StringGraphType))
+            .Argument(typeof(NonNullGraphType<CustomScalar>), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("nonNullOutput", typeof(NonNullGraphType<CustomScalar>))
+            .Argument(typeof(StringGraphType), "arg")
+            .Resolve(context => context.GetArgument<string>("arg"));
+        Field("list", typeof(ListGraphType<CustomScalar>))
+            .Resolve(_ => new object?[] { "hello", "internalNull", null });
+        Field("listNonNullValid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
+            .Resolve(_ => new object?[] { "hello", null });
+        Field("listNonNullInvalid", typeof(ListGraphType<NonNullGraphType<CustomScalar>>))
+            .Resolve(_ => new object[] { "hello", "internalNull" });
     }
 }
 
@@ -238,7 +238,7 @@ public class CustomScalar : ScalarGraphType
     //
     // Attempting to parse or serialize "error" results in an exception
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
     {
         if (value as string == "externalNull")
             return null;
@@ -252,7 +252,7 @@ public class CustomScalar : ScalarGraphType
         return value.ToString();
     }
 
-    public override object ParseLiteral(GraphQLValue value)
+    public override object? ParseLiteral(GraphQLValue value)
     {
         if (value is GraphQLStringValue stringValue)
         {
@@ -273,7 +273,7 @@ public class CustomScalar : ScalarGraphType
         throw new NotSupportedException();
     }
 
-    public override object Serialize(object value)
+    public override object? Serialize(object? value)
     {
         if (value == null)
             return "externalNull";

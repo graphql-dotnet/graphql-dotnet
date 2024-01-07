@@ -40,6 +40,24 @@ public class SchemaExtensionTests
     [Fact]
     public void RegisterTypeMappings_Null()
     {
-        Should.Throw<ArgumentNullException>(() => new Schema().RegisterTypeMappings(null));
+        Should.Throw<ArgumentNullException>(() => new Schema().RegisterTypeMappings(null!));
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507
+    [Fact]
+    public void RegisterTypeMapping_With_GraphType_Instead_Of_ClrType_Should_Throw()
+    {
+        var ex = Should.Throw<ArgumentException>(() => new Schema().RegisterTypeMapping<IntGraphType, IntGraphType>());
+        ex.ParamName.ShouldBe("clrType");
+        ex.Message.ShouldStartWith("GraphQL.Types.IntGraphType' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.");
+    }
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3507
+    [Fact]
+    public void RegisterTypeMapping_With_ClrType_Instead_Of_GraphType_Should_Throw()
+    {
+        var ex = Should.Throw<ArgumentException>(() => new Schema().RegisterTypeMapping(typeof(int), typeof(int)));
+        ex.ParamName.ShouldBe("graphType");
+        ex.Message.ShouldStartWith("System.Int32' must be a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify GraphType type instead of CLR type.");
     }
 }

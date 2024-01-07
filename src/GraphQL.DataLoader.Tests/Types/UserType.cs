@@ -15,29 +15,27 @@ public class UserType : ObjectGraphType<User>
         Field(x => x.LastName);
         Field(x => x.Email);
 
-        Field<ListGraphType<OrderType>, IEnumerable<Order>>()
-            .Name("Orders")
+        Field<ListGraphType<OrderType>, IEnumerable<Order>>("Orders")
             .ResolveAsync(ctx =>
             {
-                var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
+                var ordersLoader = accessor.Context!.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
                     orders.GetOrdersByUserIdAsync);
 
                 return ordersLoader.LoadAsync(ctx.Source.UserId);
             });
 
-        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
-            .Name("OrderedItems")
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>("OrderedItems")
             .ResolveAsync(ctx =>
             {
                 //obtain a reference to the GetOrdersByUserId batch loader
-                var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
+                var ordersLoader = accessor.Context!.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
                     orders.GetOrdersByUserIdAsync);
 
                 //wait for dataloader to pull the orders for this user
                 var ret = ordersLoader.LoadAsync(ctx.Source.UserId).Then(orderResults =>
                 {
                     //obtain a reference to the GetOrderItemsById batch loader
-                    var itemsLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
+                    var itemsLoader = accessor.Context!.GetOrAddCollectionBatchLoader<int, OrderItem>("GetOrderItemsById",
                         orders.GetItemsByOrderIdAsync);
 
                     //wait for dataloader to pull the items for each order

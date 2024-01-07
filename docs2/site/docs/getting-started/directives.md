@@ -149,15 +149,8 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>(
-            "human",
-            arguments: new QueryArguments(
-                new QueryArgument<IdGraphType>
-                {
-                    Name = "id"
-                }
-                .ApplyDirective("length", "min", 2, "max", 5)
-            ));
+        Field<Human>("human")
+            .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
     }
 }
 ```
@@ -243,7 +236,7 @@ Note that a schema visitor, unlike a directive, can be registered not only as an
 a type. In this case, when initializing the schema, schema visitor will be created according to how
 you configure the DI container. In other words, schema visitors support dependency injection. The
 library resolves a schema visitor only once and caches it for the lifetime of the `Schema`. For more
-information about lifetimes see [Schema Service Lifetime](dependency-injection#schema-service-lifetime). 
+information about lifetimes see [Schema Service Lifetime](../dependency-injection#schema-service-lifetime). 
 
 # Is it mandatory to create a schema visitor in addition to the directive
 
@@ -287,8 +280,9 @@ public class Query : ObjectGraphType
 {
     public Query()
     {
-        Field<Human>("human", resolve: context => GetHuman(context))
-            .ApplyDirective("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
+        Field<Human>("human")
+            .Resolve(context => GetHuman(context))
+            .Directive("author", "name", "Tom Pumpkin", "email", "ztx0673@gmail.com");
     }
 }
 ```
@@ -500,7 +494,7 @@ of type [`ExecutableDirectiveLocation`](https://spec.graphql.org/October2021/#Ex
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about field middlewares see [Field Middleware](https://graphql-dotnet.github.io/docs/getting-started/field-middleware).
+For more information about field middlewares see [Field Middleware](../field-middleware).
 
 # Existing implementations
 

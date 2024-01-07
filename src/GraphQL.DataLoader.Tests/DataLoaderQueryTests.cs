@@ -7,7 +7,7 @@ namespace GraphQL.DataLoader.Tests;
 public class DataLoaderQueryTests : QueryTestBase
 {
     [Fact]
-    public void SingleQueryRoot_Works()
+    public async Task SingleQueryRoot_Works()
     {
         var users = Fake.Users.Generate(2);
 
@@ -16,26 +16,26 @@ public class DataLoaderQueryTests : QueryTestBase
         usersMock.Setup(store => store.GetAllUsersAsync(default))
             .ReturnsAsync(users);
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ users { userId firstName } }",
-            expected: @"
-{ ""users"": [
+            expected: $$"""
+{ "users": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-");
+""");
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
 
     [Fact]
-    public void SingleQueryRootWithDelay_Works()
+    public async Task SingleQueryRootWithDelay_Works()
     {
         var users = Fake.Users.Generate(2);
 
@@ -44,26 +44,26 @@ public class DataLoaderQueryTests : QueryTestBase
         usersMock.Setup(store => store.GetAllUsersAsync(default))
             .ReturnsAsync(users);
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ usersWithDelay { userId firstName } }",
-            expected: @"
-{ ""usersWithDelay"": [
+            expected: $$"""
+{ "usersWithDelay": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-");
+""");
 
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
     }
 
     [Fact]
-    public void TwoLevel_SingleResult_Works()
+    public async Task TwoLevel_SingleResult_Works()
     {
         var users = Fake.Users.Generate(1);
 
@@ -79,28 +79,29 @@ public class DataLoaderQueryTests : QueryTestBase
         usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
-            query: @"
-{
-    order(orderId: 1) {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
-            expected: @"
-{
-    ""order"": {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
-        }
-    }
-}
-");
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
+            query: """
+            {
+                order(orderId: 1) {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
+            expected: $$"""
+            {
+                "order": {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                }
+            }
+            """);
 
         ordersMock.Verify(x => x.GetOrderByIdAsync(new[] { 1 }), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -110,7 +111,7 @@ public class DataLoaderQueryTests : QueryTestBase
     }
 
     [Fact]
-    public void TwoLevel_MultipleResults_OperationsAreBatched()
+    public async Task TwoLevel_MultipleResults_OperationsAreBatched()
     {
         var users = Fake.Users.Generate(2);
         var orders = Fake.GenerateOrdersForUsers(users, 1);
@@ -124,36 +125,37 @@ public class DataLoaderQueryTests : QueryTestBase
         usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
-            query: @"
-{
-    orders {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
-            expected: @"
-{
-    ""orders"": [
-    {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
-        }
-    },
-    {
-        ""orderId"": 2,
-        ""user"": {
-            ""userId"": 2,
-            ""firstName"": """ + users[1].FirstName + @"""
-        }
-    }]
-}
-");
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
+            query: """
+            {
+                orders {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
+            expected: $$"""
+            {
+                "orders": [
+                {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                },
+                {
+                    "orderId": 2,
+                    "user": {
+                        "userId": 2,
+                        "firstName": "{{users[1].FirstName}}"
+                    }
+                }]
+            }
+            """);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -163,7 +165,7 @@ public class DataLoaderQueryTests : QueryTestBase
     }
 
     [Fact]
-    public void TwoLevel_MultipleResults_OperationsAreBatched_SerialExecution()
+    public async Task TwoLevel_MultipleResults_OperationsAreBatched_SerialExecution()
     {
         var users = Fake.Users.Generate(2);
         var orders = Fake.GenerateOrdersForUsers(users, 1);
@@ -177,36 +179,37 @@ public class DataLoaderQueryTests : QueryTestBase
         usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
-            query: @"
-mutation {
-    orders {
-        orderId
-        user {
-            userId
-            firstName
-        }
-    }
-}",
-            expected: @"
-{
-    ""orders"": [
-    {
-        ""orderId"": 1,
-        ""user"": {
-            ""userId"": 1,
-            ""firstName"": """ + users[0].FirstName + @"""
-        }
-    },
-    {
-        ""orderId"": 2,
-        ""user"": {
-            ""userId"": 2,
-            ""firstName"": """ + users[1].FirstName + @"""
-        }
-    }]
-}
-");
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
+            query: """
+            mutation {
+                orders {
+                    orderId
+                    user {
+                        userId
+                        firstName
+                    }
+                }
+            }
+            """,
+            expected: $$"""
+            {
+                "orders": [
+                {
+                    "orderId": 1,
+                    "user": {
+                        "userId": 1,
+                        "firstName": "{{users[0].FirstName}}"
+                    }
+                },
+                {
+                    "orderId": 2,
+                    "user": {
+                        "userId": 2,
+                        "firstName": "{{users[1].FirstName}}"
+                    }
+                }]
+            }
+            """);
 
         ordersMock.Verify(x => x.GetAllOrdersAsync(), Times.Once);
         ordersMock.VerifyNoOtherCalls();
@@ -216,7 +219,7 @@ mutation {
     }
 
     [Fact]
-    public void Chained_DataLoaders_Works()
+    public async Task Chained_DataLoaders_Works()
     {
         var users = Fake.Users.Generate(2);
         var orders = Fake.GenerateOrdersForUsers(users, 2);
@@ -234,50 +237,51 @@ mutation {
         ordersMock.Setup(x => x.GetItemsByOrderIdAsync(It.IsAny<IEnumerable<int>>()))
             .ReturnsAsync(orderItems.ToLookup(x => x.OrderId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
-            query: @"
-{
-    users {
-        orderedItems {
-            orderItemId
-        }
-    }
-}",
-            expected: @"
-{
-    ""users"": [
-    {
-        ""orderedItems"": [
-        {
-            ""orderItemId"": 1
-        },
-        {
-            ""orderItemId"": 2
-        },
-        {
-            ""orderItemId"": 3
-        },
-        {
-            ""orderItemId"": 4
-        }]
-    },
-    {
-        ""orderedItems"": [
-        {
-            ""orderItemId"": 5
-        },
-        {
-            ""orderItemId"": 6
-        },
-        {
-            ""orderItemId"": 7
-        },
-        {
-            ""orderItemId"": 8
-        }]
-    }]
-}
-");
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
+            query: """
+            {
+                users {
+                    orderedItems {
+                        orderItemId
+                    }
+                }
+            }
+            """,
+            expected: $$"""
+            {
+                "users": [
+                {
+                    "orderedItems": [
+                    {
+                        "orderItemId": 1
+                    },
+                    {
+                        "orderItemId": 2
+                    },
+                    {
+                        "orderItemId": 3
+                    },
+                    {
+                        "orderItemId": 4
+                    }]
+                },
+                {
+                    "orderedItems": [
+                    {
+                        "orderItemId": 5
+                    },
+                    {
+                        "orderItemId": 6
+                    },
+                    {
+                        "orderItemId": 7
+                    },
+                    {
+                        "orderItemId": 8
+                    }]
+                }]
+            }
+            """);
         usersMock.Verify(x => x.GetAllUsersAsync(default), Times.Once);
         usersMock.VerifyNoOtherCalls();
 
@@ -312,36 +316,37 @@ mutation {
             .ReturnsAsync(products.ToDictionary(x => x.ProductId));
 
         var result = await ExecuteQueryAsync<DataLoaderTestSchema>(
-            query: @"
-{
-    orders {
-        orderId
-        orderedOn
-        user {
-            userId
-            firstName
-            lastName
-            email
-        }
-        items {
-            orderItemId
-            quantity
-            unitPrice
-            product {
-                productId
-                name
-                price
-                description
+            query: """
+            {
+                orders {
+                    orderId
+                    orderedOn
+                    user {
+                        userId
+                        firstName
+                        lastName
+                        email
+                    }
+                    items {
+                        orderItemId
+                        quantity
+                        unitPrice
+                        product {
+                            productId
+                            name
+                            price
+                            description
+                        }
+                    }
+                }
             }
-        }
-    }
-}").ConfigureAwait(false);
+            """);
 
         result.Errors.ShouldBeNull();
     }
 
     [Fact]
-    public void EnumerableDataLoaderResult_Works()
+    public async Task EnumerableDataLoaderResult_Works()
     {
         var users = Fake.Users.Generate(2);
 
@@ -350,27 +355,27 @@ mutation {
         usersMock.Setup(store => store.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ specifiedUsers(ids:[1, 2, 3]) { userId firstName } }",
-            expected: @"
-{ ""specifiedUsers"": [
+            expected: $$"""
+{ "specifiedUsers": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     },
     null
 ] }
-");
+""");
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
 
     [Fact]
-    public void EnumerableDataLoaderResult_WithThen_Works()
+    public async Task EnumerableDataLoaderResult_WithThen_Works()
     {
         var users = Fake.Users.Generate(2);
 
@@ -379,20 +384,20 @@ mutation {
         usersMock.Setup(store => store.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));
 
-        AssertQuerySuccess<DataLoaderTestSchema>(
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ specifiedUsersWithThen(ids:[1, 2, 3]) { userId firstName } }",
-            expected: @"
-{ ""specifiedUsersWithThen"": [
+            expected: $$"""
+{ "specifiedUsersWithThen": [
     {
-        ""userId"": 1,
-        ""firstName"": """ + users[0].FirstName + @"""
+        "userId": 1,
+        "firstName": "{{users[0].FirstName}}"
     },
     {
-        ""userId"": 2,
-        ""firstName"": """ + users[1].FirstName + @"""
+        "userId": 2,
+        "firstName": "{{users[1].FirstName}}"
     }
 ] }
-");
+""");
 
         usersMock.Verify(x => x.GetUsersByIdAsync(new int[] { 1, 2, 3 }, default), Times.Once);
     }
@@ -405,10 +410,10 @@ mutation {
     /// because it is not relevant, and that method is the only one that calls Execution.ExecutionNode.ResolvedType.
     /// </summary>
     [Fact]
-    public void ExerciseListsOfLists()
+    public async Task ExerciseListsOfLists()
     {
-        AssertQuerySuccess<DataLoaderTestSchema>(
+        await AssertQuerySuccessAsync<DataLoaderTestSchema>(
             query: "{ exerciseListsOfLists (values:[[1, 2], [3, 4, 5]]) }",
-            expected: @"{ ""exerciseListsOfLists"": [[1, 2], [3, 4, 5]] }");
+            expected: """{ "exerciseListsOfLists": [[1, 2], [3, 4, 5]] }""");
     }
 }

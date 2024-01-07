@@ -9,10 +9,10 @@ namespace GraphQL.Tests.Bugs;
 public class Bug1831 : QueryTestBase<Bug1831Schema>
 {
     [Fact]
-    public void TestVariableObject() => AssertQuerySuccess("query($arg: Bug1831Input!) { test1 (arg: $arg) }", @"{ ""test1"": ""ok"" }", @"{ ""arg"": { ""id"": ""id"", ""rows"": [{""id"": ""id1"", ""name"": ""name1""}, {""id"": ""id2"", ""name"": ""name2""}]} }".ToInputs());
+    public void TestVariableObject() => AssertQuerySuccess("query($arg: Bug1831Input!) { test1 (arg: $arg) }", """{ "test1": "ok" }""", """{ "arg": { "id": "id", "rows": [{"id": "id1", "name": "name1"}, {"id": "id2", "name": "name2"}]} }""".ToInputs());
 
     [Fact]
-    public void TestLiteralObject() => AssertQuerySuccess("{ test1 (arg: { id: \"id\", rows: [ {id: \"id1\", name: \"name1\"}, {id: \"id2\", name: \"name2\"}]}) }", @"{ ""test1"": ""ok"" }");
+    public void TestLiteralObject() => AssertQuerySuccess("""{ test1 (arg: { id: "id", rows: [ {id: "id1", name: "name1"}, {id: "id2", name: "name2"}]}) }""", """{ "test1": "ok" }""");
 
     [Theory]
     [InlineData("null")]
@@ -26,7 +26,7 @@ public class Bug1831 : QueryTestBase<Bug1831Schema>
         };
         error1.AddLocation(new Location(1, 7));
         var error2 = new ValidationError(default, KnownTypeNamesError.NUMBER,
-            KnownTypeNamesError.UnknownTypeMessage("abcdefg", null))
+            KnownTypeNamesError.UnknownTypeMessage("abcdefg"))
         {
             Code = "KNOWN_TYPE_NAMES"
         };
@@ -54,11 +54,9 @@ public class Bug1831Query : ObjectGraphType
 {
     public Bug1831Query()
     {
-        Field<StringGraphType>(
-            "test1",
-            arguments: new QueryArguments(
-                new QueryArgument(typeof(Bug1831InputGraphType)) { Name = "arg" }),
-            resolve: context =>
+        Field<StringGraphType>("test1")
+            .Argument(typeof(Bug1831InputGraphType), "arg")
+            .Resolve(context =>
             {
                 var arg = context.GetArgument<Bug1831Class>("arg");
                 arg.Id.ShouldBe("id");

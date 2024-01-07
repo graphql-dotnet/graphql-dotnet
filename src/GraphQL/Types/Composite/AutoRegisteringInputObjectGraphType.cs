@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
@@ -5,33 +6,71 @@ using System.Reflection;
 
 namespace GraphQL.Types
 {
+    internal static class AutoRegisteringInputObjectGraphType
+    {
+        public static ConcurrentDictionary<Type, IInputObjectGraphType> ReflectionCache { get; } = new();
+    }
+
     /// <summary>
     /// Allows you to automatically register the necessary fields for the specified input type.
     /// Supports <see cref="DescriptionAttribute"/>, <see cref="ObsoleteAttribute"/>, <see cref="DefaultValueAttribute"/> and <see cref="RequiredAttribute"/>.
     /// Also it can get descriptions for fields from the XML comments.
     /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
     /// </summary>
-    public class AutoRegisteringInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+    public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)][NotAGraphType] TSourceType> : InputObjectGraphType<TSourceType>
     {
         private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/>.
+        /// <br/><br/>
+        /// When <see cref="GlobalSwitches.EnableReflectionCaching"/> is enabled (typically for scoped schemas),
+        /// be sure to place any custom initialization code within <see cref="ConfigureGraph"/> or <see cref="ProvideFields"/>
+        /// so that the instance will be cached with the customizations.
         /// </summary>
         public AutoRegisteringInputObjectGraphType() : this(null) { }
 
         /// <summary>
         /// Creates a GraphQL type from <typeparamref name="TSourceType"/> by specifying fields to exclude from registration.
         /// </summary>
-        /// <param name="excludedProperties"> Expressions for excluding fields, for example 'o => o.Age'. </param>
+        /// <param name="excludedProperties">Expressions for excluding fields, for example 'o => o.Age'.</param>
         public AutoRegisteringInputObjectGraphType(params Expression<Func<TSourceType, object?>>[]? excludedProperties)
+            : this(
+                GlobalSwitches.EnableReflectionCaching && excludedProperties == null && AutoRegisteringInputObjectGraphType.ReflectionCache.TryGetValue(typeof(TSourceType), out var cacheEntry)
+                    ? (AutoRegisteringInputObjectGraphType<TSourceType>?)cacheEntry
+                    : null,
+                excludedProperties,
+                GlobalSwitches.EnableReflectionCaching)
         {
+        }
+
+        internal AutoRegisteringInputObjectGraphType(AutoRegisteringInputObjectGraphType<TSourceType>? cloneFrom, Expression<Func<TSourceType, object?>>[]? excludedProperties, bool cache)
+            : base(cloneFrom)
+        {
+            // if copying a cached instance, just return the instance
+            if (cloneFrom != null)
+                return;
+
             _excludedProperties = excludedProperties;
             Name = typeof(TSourceType).GraphQLName();
             ConfigureGraph();
             foreach (var fieldType in ProvideFields())
             {
                 _ = AddField(fieldType);
+            }
+
+            // cache the instance if reflection caching is enabled
+            if (cache && excludedProperties == null)
+            {
+                foreach (var f in Fields.List)
+                {
+                    if (f.ResolvedType != null)
+                        cache = false;
+                }
+
+                // cache the constructed object
+                if (cache)
+                    AutoRegisteringInputObjectGraphType.ReflectionCache[typeof(TSourceType)] = new AutoRegisteringInputObjectGraphType<TSourceType>(this, null, false);
             }
         }
 
@@ -44,41 +83,16 @@ namespace GraphQL.Types
             AutoRegisteringHelper.ApplyGraphQLAttributes<TSourceType>(this);
         }
 
-        /// <summary>
-        /// Returns a list of <see cref="FieldType"/> instances representing the fields ready to be
-        /// added to the graph type.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringHelper.ProvideFields(IEnumerable{MemberInfo}, Func{MemberInfo, FieldType?}, bool)"/>
         protected virtual IEnumerable<FieldType> ProvideFields()
-        {
-            foreach (var memberInfo in GetRegisteredMembers())
-            {
-                bool include = true;
-                foreach (var attr in memberInfo.GetCustomAttributes<GraphQLAttribute>())
-                {
-                    include = attr.ShouldInclude(memberInfo, true);
-                    if (!include)
-                        break;
-                }
-                if (!include)
-                    continue;
-                var fieldType = CreateField(memberInfo);
-                if (fieldType != null)
-                    yield return fieldType;
-            }
-        }
+            => AutoRegisteringHelper.ProvideFields(GetRegisteredMembers(), CreateField, true);
 
         /// <summary>
         /// Processes the specified property or field and returns a <see cref="FieldType"/>.
         /// May return <see langword="null"/> to skip a property.
         /// </summary>
         protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        {
-            var typeInformation = GetTypeInformation(memberInfo);
-            var graphType = typeInformation.ConstructGraphType();
-            var fieldType = AutoRegisteringHelper.CreateField(memberInfo, graphType, true);
-            AutoRegisteringHelper.ApplyFieldAttributes(memberInfo, fieldType, true);
-            return fieldType;
-        }
+            => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true);
 
         /// <summary>
         /// Returns a list of properties or fields that should have fields created for them.
@@ -90,25 +104,11 @@ namespace GraphQL.Types
                 typeof(TSourceType).GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(x => x.CanWrite),
                 _excludedProperties);
 
-        /// <summary>
-        /// Analyzes a property or field and returns an instance of <see cref="TypeInformation"/>
-        /// containing information necessary to select a graph type. Nullable reference annotations
-        /// are read, if they exist, as well as the <see cref="RequiredAttribute"/> attribute.
-        /// Then any <see cref="GraphQLAttribute"/> attributes marked on the property are applied.
-        /// <br/><br/>
-        /// Override this method to enforce specific graph types for specific CLR types, or to implement custom
-        /// attributes to change graph type selection behavior.
-        /// </summary>
+        /// <inheritdoc cref="AutoRegisteringHelper.GetTypeInformation(MemberInfo, bool)"/>
+        /// <remarks>
+        /// Only properties and fields are supported.
+        /// </remarks>
         protected virtual TypeInformation GetTypeInformation(MemberInfo memberInfo)
-        {
-            var typeInformation = memberInfo switch
-            {
-                PropertyInfo propertyInfo => new TypeInformation(propertyInfo, true),
-                FieldInfo fieldInfo => new TypeInformation(fieldInfo, true),
-                _ => throw new ArgumentOutOfRangeException(nameof(memberInfo), "Only properties and fields are supported."),
-            };
-            typeInformation.ApplyAttributes();
-            return typeInformation;
-        }
+            => AutoRegisteringHelper.GetTypeInformation(memberInfo, true);
     }
 }

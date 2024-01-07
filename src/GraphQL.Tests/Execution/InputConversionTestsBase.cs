@@ -74,25 +74,25 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void converts_small_numbers_to_int()
     {
-        var json = @"{""a"": 1}";
+        const string json = """{"a": 1}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1);
-        inputs["a"].GetType().ShouldBe(typeof(int));
+        inputs["a"]!.GetType().ShouldBe(typeof(int));
     }
 
     [Fact]
     public void converts_large_numbers_to_long()
     {
-        var json = @"{""a"": 1000000000000000001}";
+        const string json = """{"a": 1000000000000000001}""";
         var inputs = VariablesToInputs(json);
         inputs["a"].ShouldBe(1000000000000000001);
-        inputs["a"].GetType().ShouldBe(typeof(long));
+        inputs["a"]!.GetType().ShouldBe(typeof(long));
     }
 
     [Fact]
     public void can_convert_json_to_input_object_and_specific_object()
     {
-        var json = @"{""a"": 1, ""b"": ""2""}";
+        const string json = """{"a": 1, "b": "2"}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -110,7 +110,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_array()
     {
-        var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""]}";
+        const string json = """{"a": 1, "b": "2", "c": ["foo"]}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -132,7 +132,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_nullable_array()
     {
-        var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""], ""f"": [1,null]}";
+        const string json = """{"a": 1, "b": "2", "c": ["foo"], "f": [1,null]}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -150,7 +150,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_nested_nullable_array()
     {
-        var json = @"{""a"": 1, ""b"": ""2"", ""c"": [""foo""], ""g"": [[1,null], [null, 1]]}";
+        const string json = """{"a": 1, "b": "2", "c": ["foo"], "g": [[1,null], [null, 1]]}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -174,7 +174,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_nullable_int()
     {
-        var json = @"{""a"": 1, ""b"": ""2"", ""d"": ""5""}";
+        const string json = """{"a": 1, "b": "2", "d": "5"}""";
         var inputs = VariablesToInputs(json);
         inputs.ShouldNotBeNull();
         var myInput = inputs.ToObject<MyInput>();
@@ -185,7 +185,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_read_long()
     {
-        var json = @"{""j"": 89429901947254093 }";
+        const string json = """{"j": 89429901947254093 }""";
         var inputs = VariablesToInputs(json);
         inputs.ShouldNotBeNull();
         var myInput = inputs.ToObject<MyInput>();
@@ -196,7 +196,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_int_to_double()
     {
-        var json = @"{""i"": 1 }";
+        const string json = """{"i": 1 }""";
         var inputs = VariablesToInputs(json);
         inputs.ShouldNotBeNull();
         var myInput = inputs.ToObject<MyInput>();
@@ -207,7 +207,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_guid()
     {
-        var json = @"{""a"": 1, ""b"": ""2"", ""e"": ""920a1b6d-f75a-4594-8567-e2c457b29cc0""}";
+        const string json = """{"a": 1, "b": "2", "e": "920a1b6d-f75a-4594-8567-e2c457b29cc0"}""";
         var inputs = VariablesToInputs(json);
         inputs.ShouldNotBeNull();
         var myInput = inputs.ToObject<MyInput>();
@@ -218,7 +218,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_enum_string()
     {
-        var json = @"{""a"": ""three""}";
+        const string json = """{"a": "three"}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -234,7 +234,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_enum_string_exact()
     {
-        var json = @"{""a"": ""Two""}";
+        const string json = """{"a": "Two"}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -249,7 +249,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_enum_number()
     {
-        var json = @"{""a"": ""2""}";
+        const string json = """{"a": "2"}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -265,20 +265,20 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_enum_long_number()
     {
-        var json = @"{""a"": 2, ""b"": 2}";
+        const string json = """{"a": 2, "b": 2}""";
 
         var inputs = VariablesToInputs(json);
 
         var myInput = inputs.ToObject<EnumInput>();
 
         myInput.ShouldNotBeNull();
-        myInput.B.Value.ShouldBe(Numbers2.Three);
+        myInput.B!.Value.ShouldBe(Numbers2.Three);
     }
 
     [Fact]
     public void can_convert_json_to_input_object_with_child_object_list()
     {
-        var json = @"{""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}";
+        const string json = """{"a": "foo", "b":[{"a": "bar"}], "c": "baz"}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -292,7 +292,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_child_object()
     {
-        var json = @"{ ""input"": {""a"": ""foo"", ""b"":[{""a"": ""bar""}], ""c"": ""baz""}}";
+        const string json = """{ "input": {"a": "foo", "b":[{"a": "bar"}], "c": "baz"}}""";
 
         var inputs = VariablesToInputs(json);
 
@@ -306,7 +306,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_utc_date_to_datetime_with_correct_kind()
     {
-        var json = @"{ ""h"": ""2016-10-21T13:32:15.753Z"" }";
+        const string json = """{ "h": "2016-10-21T13:32:15.753Z" }""";
         var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15.753"), DateTimeKind.Utc);
 
         var inputs = VariablesToInputs(json);
@@ -319,7 +319,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_unspecified_date_to_datetime_with_correct_kind()
     {
-        var json = @"{ ""h"": ""2016-10-21T13:32:15"" }";
+        const string json = """{ "h": "2016-10-21T13:32:15" }""";
         var expected = DateTime.SpecifyKind(DateTime.Parse("2016-10-21T13:32:15"), DateTimeKind.Unspecified);
 
         var inputs = VariablesToInputs(json);
@@ -332,7 +332,7 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_custom_converter()
     {
-        var json = @"{ ""name1"": ""tom"", ""age1"": 10 }";
+        const string json = """{ "name1": "tom", "age1": 10 }""";
 
         var inputs = VariablesToInputs(json);
 
@@ -356,5 +356,5 @@ public abstract class InputConversionTestsBase
         person3.Age.ShouldBe(0);
     }
 
-    protected abstract Inputs VariablesToInputs(string variables);
+    protected abstract Inputs VariablesToInputs(string? variables);
 }

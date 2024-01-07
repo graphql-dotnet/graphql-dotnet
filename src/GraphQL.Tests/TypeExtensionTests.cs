@@ -13,8 +13,24 @@ public class TypeExtensionTests
     [InlineData(typeof(NonNullGraphType), false)]
     [InlineData(typeof(ListGraphType), false)]
     [InlineData(null, false)]
-    public void IsNamedGraphType(Type type, bool expected)
+    public void IsNamedGraphType(Type? type, bool expected)
     {
-        type.IsNamedType().ShouldBe(expected);
+        type!.IsNamedType().ShouldBe(expected);
+    }
+
+    [Theory]
+    [InlineData(typeof(Type), "Type")]
+    [InlineData(typeof(GraphType), "GraphType")]
+    [InlineData(typeof(Guid), "Guid")]
+    [InlineData(typeof(ScalarGraphType), "Scalar")]
+    [InlineData(typeof(NonNullGraphType<ListGraphType<IdGraphType>>), "Id")]
+    [InlineData(typeof(TestType), "Test")]
+    public void GraphQLName(Type type, string expected)
+    {
+        type.GraphQLName().ShouldBe(expected);
+    }
+
+    private class TestType
+    {
     }
 }

@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using GraphQL.Types;
+using GraphQL.Validation.Errors.Custom;
 using GraphQLParser;
 using GraphQLParser.AST;
 
@@ -7,24 +9,35 @@ namespace GraphQL.Validation.Complexity
     /// <summary>
     /// The default complexity analyzer.
     /// </summary>
+    [Obsolete("Please write a custom complexity analyzer as a validation rule. This class will be removed in v8.")]
     public class ComplexityAnalyzer : IComplexityAnalyzer
     {
         /// <inheritdoc/>
-        public void Validate(GraphQLDocument document, ComplexityConfiguration complexityParameters)
+        public void Validate(GraphQLDocument document, ComplexityConfiguration complexityParameters, ISchema? schema = null)
         {
             if (complexityParameters == null)
                 return;
-            var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f, complexityParameters.MaxRecursionCount);
+            var complexityResult = Analyze(document, complexityParameters.FieldImpact ?? 2.0f, complexityParameters.MaxRecursionCount, schema);
 
             Analyzed(document, complexityParameters, complexityResult);
 
             if (complexityResult.Complexity > complexityParameters.MaxComplexity)
-                throw new InvalidOperationException(
-                    $"Query is too complex to execute. The field with the highest complexity is: {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key}");
+                throw new ComplexityError(
+                    $"Query is too complex to execute. Complexity is {complexityResult.Complexity}, maximum allowed on this endpoint is {complexityParameters.MaxComplexity}. The field with the highest complexity is '{GetName(complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Key)}' with value {complexityResult.ComplexityMap.OrderByDescending(pair => pair.Value).First().Value}.");
 
             if (complexityResult.TotalQueryDepth > complexityParameters.MaxDepth)
-                throw new InvalidOperationException(
+                throw new ComplexityError(
                     $"Query is too nested to execute. Depth is {complexityResult.TotalQueryDepth} levels, maximum allowed on this endpoint is {complexityParameters.MaxDepth}.");
+
+            string GetName(ASTNode node)
+            {
+                return node switch
+                {
+                    GraphQLField f => f.Name.StringValue,
+                    GraphQLFragmentSpread fs => fs.FragmentName.Name.StringValue,
+                    _ => throw new NotSupportedException(node.ToString()),
+                };
+            }
         }
 
         /// <summary>
@@ -41,12 +54,10 @@ namespace GraphQL.Validation.Complexity
 #endif
         }
 
-        private static readonly ComplexityVisitor _visitor = new(); // stateless
-
         /// <summary>
         /// Analyzes the complexity of a document.
         /// </summary>
-        internal ComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount)
+        internal ComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
         {
             if (avgImpact <= 1)
                 throw new ArgumentOutOfRangeException(nameof(avgImpact));
@@ -55,9 +66,9 @@ namespace GraphQL.Validation.Complexity
             {
                 MaxRecursionCount = maxRecursionCount,
                 AvgImpact = avgImpact,
-                CurrentSubSelectionImpact = avgImpact,
                 CurrentEndNodeImpact = 1d
             };
+            var visitor = schema == null ? new ComplexityVisitor() : new ComplexityVisitor(schema);
 
             // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
             // Sort fragment definitions so that independent fragments go in front.
@@ -86,11 +97,11 @@ namespace GraphQL.Validation.Complexity
             }
 
             foreach (var frag in orderedFragments)
-                _visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
+                visitor.VisitAsync(frag, context).GetAwaiter().GetResult();
 
             context.FragmentMapAlreadyBuilt = true;
 
-            _visitor.VisitAsync(doc, context).GetAwaiter().GetResult();
+            visitor.VisitAsync(doc, context).GetAwaiter().GetResult();
 
             return context.Result;
         }
@@ -123,8 +134,14 @@ namespace GraphQL.Validation.Complexity
                 HashSet<GraphQLFragmentDefinition>? dependencies = null;
                 _selectionSetsToVisit.Push(def.SelectionSet);
 
+                int counter = 0;
+                const int MAX_ITERATIONS = 2000;
                 while (_selectionSetsToVisit.Count > 0)
                 {
+                    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+                    if (++counter > MAX_ITERATIONS)
+                        throw new ValidationError("It looks like document has fragment cycle. Please make sure you are using standard validation rules especially NoFragmentCycles one.");
+
                     foreach (var selection in _selectionSetsToVisit.Pop().Selections)
                     {
                         if (selection is GraphQLFragmentSpread spread)

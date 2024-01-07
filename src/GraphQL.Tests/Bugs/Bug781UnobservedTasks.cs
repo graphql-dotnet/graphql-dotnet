@@ -22,7 +22,7 @@ public class Bug781UnobservedTasks
                 options.Query = query;
                 options.CancellationToken = cts.Token;
                 options.ThrowOnUnhandledException = true; // required
-            }).ConfigureAwait(false);
+            });
         }
         catch (Exception ex)
         {
@@ -30,14 +30,14 @@ public class Bug781UnobservedTasks
         }
 
         GC.Collect(); // GC causes UnobservedTaskException event
-        await Task.Delay(1000).ConfigureAwait(false); // Wait some time for GC to complete
+        await Task.Delay(1000); // Wait some time for GC to complete
 
         TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
 
         _unobserved.ShouldBe(unobserved);
     }
 
-    private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         _unobserved = true;
         Console.WriteLine("Unobserved exception: " + e.Exception);
@@ -57,10 +57,9 @@ public class Bug781Query : ObjectGraphType
     public Bug781Query(CancellationTokenSource cts)
     {
         // First field with long calculation emulation
-        FieldAsync<StringGraphType>(
-            "do",
-            arguments: new QueryArguments(new QueryArgument<BooleanGraphType> { Name = "throwCanceled" }),
-            resolve: async ctx =>
+        Field<StringGraphType>("do")
+            .Argument<BooleanGraphType>("throwCanceled")
+            .ResolveAsync(async ctx =>
             {
                 await Task.Delay(10).ConfigureAwait(false);
                 cts.Token.WaitHandle.WaitOne();
@@ -72,17 +71,15 @@ public class Bug781Query : ObjectGraphType
             });
 
         // Second field causes cancellation of execution
-        Field<StringGraphType>(
-           "cancellation",
-           resolve: ctx =>
-           {
-               cts.Cancel();
-               return "cancelled";
-           });
+        Field<StringGraphType>("cancellation")
+            .Resolve(_ =>
+            {
+                cts.Cancel();
+                return "cancelled";
+            });
 
         // The third field is necessary for the control to fall on the context.CancellationToken.ThrowIfCancellationRequested() instruction.
-        Field<StringGraphType>(
-           "never",
-           resolve: ctx => throw new Exception("Never called"));
+        Field<StringGraphType>("never")
+            .Resolve(_ => throw new Exception("Never called"));
     }
 }

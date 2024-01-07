@@ -37,7 +37,7 @@ public class ShortGraphTypeTests : ScalarGraphTypeTest<ShortGraphType>
 
 public class ScalarGraphTypeTest<T> where T : ScalarGraphType, new()
 {
-    protected readonly T type = new T();
+    protected readonly T type = new();
 
     protected void AssertException<TArg>(object value) where TArg : Exception =>
         Should.Throw<TArg>(() => type.ParseValue(value));

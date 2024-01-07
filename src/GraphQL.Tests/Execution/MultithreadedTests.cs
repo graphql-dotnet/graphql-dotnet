@@ -19,14 +19,14 @@ public class MultithreadedTests
         });
 
         // prep a test execution using that middleware
-        StarWarsTestBase starWarsTest = null;
+        StarWarsTestBase starWarsTest = null!;
         Func<Task> testExecution = async () =>
         {
             var result = await starWarsTest.Executer.ExecuteAsync(new ExecutionOptions
             {
                 Query = "IntrospectionQuery".ReadGraphQLRequest(),
                 Schema = starWarsTest.Schema,
-            }).ConfigureAwait(false);
+            });
             result.Errors.ShouldBeNull();
         };
 
@@ -36,8 +36,8 @@ public class MultithreadedTests
         var builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
         starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
         starWarsTest.Schema.FieldMiddleware = middleware;
-        await testExecution().ConfigureAwait(false);
-        var correctCount = count;
+        await testExecution();
+        int correctCount = count;
 
         // test initializing the schema first, followed by 3 simultaneous executions
         starWarsTest = new StarWarsTestBase();
@@ -45,12 +45,12 @@ public class MultithreadedTests
         builder = new MicrosoftDI.GraphQLBuilder(new ServiceCollection(), b => starWarsTest.RegisterServices(b.Services));
         starWarsTest.ServiceProvider = builder.ServiceCollection.BuildServiceProvider();
         starWarsTest.Schema.FieldMiddleware = middleware;
-        await testExecution().ConfigureAwait(false);
+        await testExecution();
         count = 0;
         var t1 = Task.Run(testExecution);
         var t2 = Task.Run(testExecution);
         var t3 = Task.Run(testExecution);
-        await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
+        await Task.WhenAll(t1, t2, t3);
         count.ShouldBe(correctCount * 3, "Failed synchronized initialization");
 
         // test three simultaneous executions on an uninitialized schema
@@ -63,7 +63,7 @@ public class MultithreadedTests
         t1 = Task.Run(testExecution);
         t2 = Task.Run(testExecution);
         t3 = Task.Run(testExecution);
-        await Task.WhenAll(t1, t2, t3).ConfigureAwait(false);
+        await Task.WhenAll(t1, t2, t3);
         count.ShouldBe(correctCount * 3, "Failed multithreaded initialization");
     }
 }

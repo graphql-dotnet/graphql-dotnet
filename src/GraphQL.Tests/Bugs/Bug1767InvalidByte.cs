@@ -8,7 +8,7 @@ namespace GraphQL.Tests.Bugs;
 // https://github.com/graphql-dotnet/graphql-dotnet/pulls/1767
 public class Bug1767InvalidByte : QueryTestBase<Bug1767Schema>
 {
-    private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, string number = null, bool executed = true)
+    private void AssertQueryWithError(string query, string? result, string message, int line, int column, object[]? path, Exception? exception = null, string? code = null, string? inputs = null, string? number = null, bool executed = true)
     {
         ExecutionError error;
         if (number != null)
@@ -30,10 +30,10 @@ public class Bug1767InvalidByte : QueryTestBase<Bug1767Schema>
     }
 
     [Fact]
-    public void Input_Byte_Valid_Variable() => AssertQuerySuccess("query($arg: Byte!) { input(arg: $arg) }", @"{ ""input"": ""2"" }", "{\"arg\":2}".ToInputs());
+    public void Input_Byte_Valid_Variable() => AssertQuerySuccess("query($arg: Byte!) { input(arg: $arg) }", """{ "input": "2" }""", """{"arg":2}""".ToInputs());
 
     [Fact]
-    public void Input_Byte_Valid_Argument() => AssertQuerySuccess("query { input(arg: 2) }", @"{ ""input"": ""2"" }", "{\"arg\":2}".ToInputs());
+    public void Input_Byte_Valid_Argument() => AssertQuerySuccess("query { input(arg: 2) }", """{ "input": "2" }""", """{"arg":2}""".ToInputs());
 
     [Fact]
     public void Input_Byte_Invalid_Variable() => AssertQueryWithError("query($arg: Byte!) { input(arg: $arg) }", null, "Variable '$arg' is invalid. Unable to convert '300' to 'Byte'", 1, 7, null, new OverflowException(), "INVALID_VALUE", "{\"arg\":300}", "5.8", executed: false);
@@ -54,9 +54,8 @@ public class Bug1767Query : ObjectGraphType
 {
     public Bug1767Query()
     {
-        Field<StringGraphType>(
-            "input",
-            arguments: new QueryArguments(new QueryArgument<ByteGraphType> { Name = "arg" }),
-            resolve: ctx => ctx.GetArgument<byte>("arg").ToString());
+        Field<StringGraphType>("input")
+            .Argument<ByteGraphType>("arg")
+            .Resolve(ctx => ctx.GetArgument<byte>("arg").ToString());
     }
 }

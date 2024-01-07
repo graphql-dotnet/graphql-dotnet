@@ -54,28 +54,30 @@ public class SerializationBenchmark : IBenchmark
 
         _introspectionResult = ExecuteQuery(_schema, Queries.Introspection);
         _smallResult = ExecuteQuery(_schema, Queries.Hero);
-        _middleResult = ExecuteQuery(_schema, @"{
-  hero
-  {
-    name
-    id
-    friends
-    {
-      id
-      name
-      friends
-      {
-        id
-        name
-        friends
+        _middleResult = ExecuteQuery(_schema, """
         {
-          id
-          name
+          hero
+          {
+            name
+            id
+            friends
+            {
+              id
+              name
+              friends
+              {
+                id
+                name
+                friends
+                {
+                  id
+                  name
+                }
+              }
+            }
+          }
         }
-      }
-    }
-  }
-}");
+        """);
         _stream = Stream.Null;
     }
 

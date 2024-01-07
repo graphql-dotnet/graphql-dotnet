@@ -7,7 +7,7 @@ public class Bug1046
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void any_registration_order_should_work(bool order)
+    public async Task any_registration_order_should_work(bool order)
     {
         var schema = new Schema { Query = new QueryGraphType() };
 
@@ -22,17 +22,17 @@ public class Bug1046
             schema.RegisterType<ImplementationGraphType>();
         }
 
-        var response = new DocumentExecuter().ExecuteAsync(_ =>
+        var response = await new DocumentExecuter().ExecuteAsync(_ =>
         {
             _.Schema = schema;
-            _.Query = @"
+            _.Query = """
 query {
   inst {
     id
   }
 }
-";
-        }).Result;
+""";
+        });
         response.Data.ShouldNotBeNull();
     }
 }
@@ -41,7 +41,7 @@ public class QueryGraphType : ObjectGraphType
 {
     public QueryGraphType()
     {
-        Field<InterfaceGraphType>("inst", resolve: c => new Implementation());
+        Field<InterfaceGraphType>("inst").Resolve(_ => new Implementation());
     }
 }
 

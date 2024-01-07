@@ -5,7 +5,6 @@ using GraphQL.StarWars;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Complexity;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Benchmarks;
@@ -38,7 +37,7 @@ public class ExecutionBenchmark : IBenchmark
         _schema = _provider.GetRequiredService<ISchema>();
         _schema.Initialize();
         _executer = new DocumentExecuter();
-        _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new ComplexityAnalyzer(), new MemoryDocumentCache());
+        _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new DefaultExecutionStrategySelector(), new[] { new MemoryDocumentCache() });
     }
 
     [Benchmark]

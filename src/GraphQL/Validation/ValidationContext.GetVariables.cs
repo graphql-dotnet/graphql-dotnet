@@ -83,18 +83,34 @@ namespace GraphQL.Validation
                 if (node == null)
                     return;
 
-                context.Info.Enter(node, context.ValidationContext);
+                await context.Info.EnterAsync(node, context.ValidationContext).ConfigureAwait(false);
 
                 await base.VisitAsync(node, context).ConfigureAwait(false);
 
-                context.Info.Leave(node, context.ValidationContext);
+                await context.Info.LeaveAsync(node, context.ValidationContext).ConfigureAwait(false);
             }
 
             protected override ValueTask VisitVariableAsync(GraphQLVariable variable, GetVariablesVisitorContext context)
             {
                 // GraphQLVariable AST node represents both variable definition and variable usage so check parent node
-                if (context.Info.GetAncestor(1) is not GraphQLVariableDefinition)
-                    context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!));
+                var ancestor = context.Info.GetAncestor(1);
+                if (ancestor is not GraphQLVariableDefinition)
+                {
+                    bool lastHasDefault = false;
+                    if (ancestor is GraphQLArgument)
+                    {
+                        var arg = context.Info.GetArgument();
+                        if (arg != null && arg.DefaultValue != null)
+                            lastHasDefault = true;
+                    }
+                    if (ancestor is GraphQLObjectField)
+                    {
+                        var field = context.Info.GetFieldDef();
+                        if (field != null && field.DefaultValue != null)
+                            lastHasDefault = true;
+                    }
+                    context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!, lastHasDefault));
+                }
                 return default;
             }
         }

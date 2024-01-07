@@ -5,26 +5,26 @@ namespace GraphQL.Tests.Subscription;
 
 public static class SubscriptionSchemaWithReflection
 {
-    private const string TypeDefs = @"
-            type MessageFrom {
-                id: String
-                displayName: String
-            }
+    private const string TypeDefs = """
+        type MessageFrom {
+            id: String
+            displayName: String
+        }
 
-            type Message {
-                from: MessageFrom
-                content: String
-                sentAt: String
-            }
+        type Message {
+            from: MessageFrom
+            content: String
+            sentAt: String
+        }
 
-            type Subscription {
-                messageAdded : Message
-                messageAddedByUser(id: String!) : Message
-                messageAddedAsync : Message
-                messageAddedByUserAsync(id: String!) : Message
-                messageGetAll : [Message]
-            }
-        ";
+        type Subscription {
+            messageAdded : Message
+            messageAddedByUser(id: String!) : Message
+            messageAddedAsync : Message
+            messageAddedByUserAsync(id: String!) : Message
+            messageGetAll : [Message]
+        }
+        """;
 
     public static Chat Chat { get; set; }
     public static ISchema Schema { get; set; }
@@ -48,7 +48,7 @@ public class Subscription
     }
 
     [GraphQLMetadata(Name = "messageAdded")]
-    public Message ResolveMessageAdded(IResolveFieldContext context)
+    public Message? ResolveMessageAdded(IResolveFieldContext context)
     {
         return context.Source as Message;
     }
@@ -60,7 +60,7 @@ public class Subscription
     }
 
     [GraphQLMetadata(Name = "messageGetAll")]
-    public List<Message> ResolveMessageGetAll(IResolveFieldContext context)
+    public List<Message>? ResolveMessageGetAll(IResolveFieldContext context)
     {
         return context.Source as List<Message>;
     }
@@ -73,7 +73,7 @@ public class Subscription
     }
 
     [GraphQLMetadata(Name = "messageAddedByUser")]
-    public Message ResolveMessageAddedByUser(IResolveFieldContext context)
+    public Message? ResolveMessageAddedByUser(IResolveFieldContext context)
     {
         return context.Source as Message;
     }
@@ -85,7 +85,7 @@ public class Subscription
     }
 
     [GraphQLMetadata(Name = "messageAddedAsync")]
-    public Message ResolveMessageAddedAsync(IResolveFieldContext context)
+    public Message? ResolveMessageAddedAsync(IResolveFieldContext context)
     {
         return context.Source as Message;
     }
@@ -98,7 +98,7 @@ public class Subscription
     }
 
     [GraphQLMetadata(Name = "messageAddedByUserAsync")]
-    public Message ResolveMessageAddedByUserAsync(IResolveFieldContext context)
+    public Message? ResolveMessageAddedByUserAsync(IResolveFieldContext context)
     {
         return context.Source as Message;
     }

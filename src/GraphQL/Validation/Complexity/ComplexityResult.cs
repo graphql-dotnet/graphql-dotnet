@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Complexity
         /// <summary>
         /// Returns a dictionary of nodes and their complexity factors.
         /// </summary>
-        public Dictionary<ASTNode, double> ComplexityMap { get; } = new Dictionary<ASTNode, double>();
+        public Dictionary<ASTNode, double> ComplexityMap { get; } = new();
 
         /// <summary>
         /// Returns the total calculated document complexity factor over all executed nodes.

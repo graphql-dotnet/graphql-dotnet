@@ -4,10 +4,10 @@ using System.Reflection;
 namespace GraphQL.Types
 {
     /// <summary>
-    /// Contains information pertaining to a method parameter in preparation for buliding an
+    /// Contains information pertaining to a method parameter in preparation for building an
     /// expression or query argument for it.
     /// <br/><br/>
-    /// If <see cref="ArgumentInformation.Expression"/> is set, a query argument will not be added
+    /// If <see cref="Expression"/> is set, a query argument will not be added
     /// and the expression will be used to build the method resolver.
     /// <br/><br/>
     /// If not, a query argument will be generated and added to the field; the field resolver will
@@ -121,9 +121,13 @@ namespace GraphQL.Types
         /// The delegate must be of the type
         /// <see cref="Func{T, TResult}">Func</see>&lt;<see cref="IResolveFieldContext"/>, <typeparamref name="TParameterType"/>&gt;
         /// where <typeparamref name="TParameterType"/> matches <see cref="ParameterInfo">ParameterInfo</see>.<see cref="ParameterInfo.ParameterType">ParameterType</see>.
+        /// <br/><br/>
+        /// As of .NET 7, this method cannot be used in AOT compilation scenarios.
         /// </summary>
+        [RequiresDynamicCode("Please use the SetDelegateWithCast method when using with AOT compilation")]
         public void SetDelegate<TParameterType>(Func<IResolveFieldContext, TParameterType?> argumentDelegate)
         {
+            // TODO: Determine if this method can be used in AOT compilation scenarios with future versions of .NET.
             if (argumentDelegate == null)
                 throw new ArgumentNullException(nameof(argumentDelegate));
             if (typeof(TParameterType) != ParameterInfo.ParameterType)
@@ -133,11 +137,31 @@ namespace GraphQL.Types
         }
 
         /// <summary>
+        /// Sets a delegate to be used to populate this method argument while building the field resolver.
+        /// An expression is generated that calls <paramref name="argumentDelegate"/> and stored within <see cref="Expression"/>.
+        /// The result of the delegate is cast to the method parameter type.
+        /// <br/><br/>
+        /// See <see cref="SetDelegate{TParameterType}(Func{IResolveFieldContext, TParameterType})"/> for a
+        /// type-safe version of this method, recommended for use with <see cref="GraphQLAttribute.Modify{TParameterType}(ArgumentInformation)"/>.
+        /// </summary>
+        public void SetDelegateWithCast(Func<IResolveFieldContext, object?> argumentDelegate)
+        {
+            if (argumentDelegate == null)
+                throw new ArgumentNullException(nameof(argumentDelegate));
+
+            Expression<Func<IResolveFieldContext, object?>> expr = (IResolveFieldContext context) => argumentDelegate(context);
+            Expression = System.Linq.Expressions.Expression.Lambda(
+                System.Linq.Expressions.Expression.Convert(expr.Body, ParameterInfo.ParameterType),
+                expr.Parameters[0]);
+        }
+
+        /// <summary>
         /// Applies <see cref="GraphQLAttribute"/> attributes pulled from the <see cref="ArgumentInformation.ParameterInfo">ParameterInfo</see> onto this instance.
+        /// Also scans the parameter's owning module and assembly for globally-applied attributes.
         /// </summary>
         public virtual void ApplyAttributes()
         {
-            var attributes = ParameterInfo.GetCustomAttributes<GraphQLAttribute>();
+            var attributes = ParameterInfo.GetGraphQLAttributes();
             foreach (var attr in attributes)
             {
                 attr.Modify(this);

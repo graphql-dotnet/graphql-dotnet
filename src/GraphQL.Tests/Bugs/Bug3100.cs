@@ -1,4 +1,3 @@
-using GraphQL.MicrosoftDI;
 using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,11 +27,11 @@ public class Bug3100
         {
             Query = "{class2{id}}",
             RequestServices = provider,
-        }).ConfigureAwait(false);
-        var actual = serializer.Serialize(result);
+        });
+        string actual = serializer.Serialize(result);
 
         // verify the result
-        actual.ShouldBe(@"{""data"":{""class2"":[{""id"":""test""}]}}");
+        actual.ShouldBe("""{"data":{"class2":[{"id":"test"}]}}""");
     }
 
     private class MyAutoGraphType<T> : AutoRegisteringObjectGraphType<T>
@@ -52,10 +51,8 @@ public class Bug3100
     {
         public Query1()
         {
-            Field(
-                type: typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>),
-                name: "Class2",
-                resolve: context => new Class2[] { new Class2() });
+            Field("Class2", typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<Class2>>>>))
+                .Resolve(_ => new Class2[] { new Class2() });
         }
     }
 

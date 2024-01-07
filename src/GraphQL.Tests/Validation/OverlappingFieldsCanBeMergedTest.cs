@@ -10,112 +10,112 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Unique_fields_should_pass()
     {
-        const string query = @"
-                fragment uniqueFields on Dog {
-                    name
-                    nickname
-                }
-            ";
+        const string query = """
+            fragment uniqueFields on Dog {
+              name
+              nickname
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Identical_fields_should_pass()
     {
-        const string query = @"
-                fragment mergeIdenticalFields on Dog {
-                    name
-                    name
-                }
-            ";
+        const string query = """
+            fragment mergeIdenticalFields on Dog {
+              name
+              name
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Identical_fields_with_identical_args_should_pass()
     {
-        const string query = @"
-                fragment mergeIdenticalFieldsWithIdenticalArgs on Dog {
-                    doesKnowCommand(dogCommand: SIT)
-                    doesKnowCommand(dogCommand: SIT)
-                }
-            ";
+        const string query = """
+            fragment mergeIdenticalFieldsWithIdenticalArgs on Dog {
+              doesKnowCommand(dogCommand: SIT)
+              doesKnowCommand(dogCommand: SIT)
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Identical_fields_with_identical_directives_should_pass()
     {
-        const string query = @"
-                fragment mergeSameFieldsWithSameDirectives on Dog {
-                    name @include(if: true)
-                    name @include(if: true)
-                }
-            ";
+        const string query = """
+            fragment mergeSameFieldsWithSameDirectives on Dog {
+              name @include(if: true)
+              name @include(if: true)
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Different_args_with_different_aliases_should_pass()
     {
-        const string query = @"
-                fragment differentArgsWithDifferentAliases on Dog {
-                    knowsSit: doesKnowCommand(dogCommand: SIT)
-                    knowsDown: doesKnowCommand(dogCommand: DOWN)
-                }
-            ";
+        const string query = """
+            fragment differentArgsWithDifferentAliases on Dog {
+              knowsSit: doesKnowCommand(dogCommand: SIT)
+              knowsDown: doesKnowCommand(dogCommand: DOWN)
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Different_directives_with_different_aliases_should_pass()
     {
-        const string query = @"
-                fragment differentDirectivesWithDifferentAliases on Dog {
-                    nameIfTrue: name @include(if: true)
-                    nameIfFalse: name @include(if: false)
-                }
-            ";
+        const string query = """
+            fragment differentDirectivesWithDifferentAliases on Dog {
+              nameIfTrue: name @include(if: true)
+              nameIfFalse: name @include(if: false)
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Different_skip_or_include_directives_accepted_should_pass()
     {
-        const string query = @"
-                fragment differentDirectivesWithDifferentAliases on Dog {
-                    name @include(if: true)
-                    name @include(if: false)
-                }
-            ";
+        const string query = """
+            fragment differentDirectivesWithDifferentAliases on Dog {
+              name @include(if: true)
+              name @include(if: false)
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Same_aliases_allowed_on_non_overlapping_fields_should_pass()
     {
-        const string query = @"
-                fragment sameAliasesWithDifferentFieldTargets on Pet {
-                    ... on Dog {
-                        name
-                    }
-                    ... on Cat {
-                        name: nickname
-                    }
+        const string query = """
+            fragment sameAliasesWithDifferentFieldTargets on Pet {
+                ... on Dog {
+                    name
                 }
-            ";
+                ... on Cat {
+                    name: nickname
+                }
+            }
+            """;
         ShouldPassRule(query);
     }
 
     [Fact]
     public void Same_aliases_with_different_field_targets_should_fail()
     {
-        const string query = @"
-                fragment sameAliasesWithDifferentFieldTargets on Dog {
-                    fido: name
-                    fido: nickname
-                }
-            ";
+        const string query = """
+            fragment sameAliasesWithDifferentFieldTargets on Dog {
+                fido: name
+                fido: nickname
+            }
+            """;
         ShouldFailRule(config =>
         {
             config.Query = query;
@@ -128,8 +128,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "name and nickname are different fields"
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 5));
             });
         });
     }
@@ -137,12 +137,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Alias_masking_direct_field_access_should_fail()
     {
-        const string query = @"
-                fragment aliasMaskingDirectFieldAccess on Dog {
-                    name: nickname
-                    name
-                }
-            ";
+        const string query = """
+            fragment aliasMaskingDirectFieldAccess on Dog {
+                name: nickname
+                name
+            }
+            """;
         ShouldFailRule(config =>
         {
             config.Query = query;
@@ -155,8 +155,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "nickname and name are different fields"
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 5));
             });
         });
     }
@@ -164,12 +164,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Different_args_second_adds_an_argument_should_fail()
     {
-        const string query = @"
-                fragment conflictingArgs on Dog {
-                    doesKnowCommand
-                    doesKnowCommand(dogCommand: HEEL)
-                }
-            ";
+        const string query = """
+            fragment conflictingArgs on Dog {
+                doesKnowCommand
+                doesKnowCommand(dogCommand: HEEL)
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -183,8 +183,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 5));
             });
         });
     }
@@ -192,12 +192,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Different_args_second_missing_an_argument_should_fail()
     {
-        const string query = @"
-                fragment conflictingArgs on Dog {
-                    doesKnowCommand(dogCommand: SIT)
-                    doesKnowCommand
-                }
-            ";
+        const string query = """
+            fragment conflictingArgs on Dog {
+                doesKnowCommand(dogCommand: SIT)
+                doesKnowCommand
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -211,8 +211,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 5));
             });
         });
     }
@@ -220,12 +220,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Conflicting_args_should_fail()
     {
-        const string query = @"
-                fragment conflictingArgs on Dog {
-                    doesKnowCommand(dogCommand: SIT)
-                    doesKnowCommand(dogCommand: HEEL)
-                }
-            ";
+        const string query = """
+            fragment conflictingArgs on Dog {
+                doesKnowCommand(dogCommand: SIT)
+                doesKnowCommand(dogCommand: HEEL)
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -239,8 +239,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they have differing arguments"
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 5));
             });
         });
     }
@@ -252,16 +252,16 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Allows_different_args_where_no_conflict_is_possible_should_pass()
     {
-        const string query = @"
-                fragment conflictingArgs on Pet {
-                    ... on Dog {
-                        name(surname: true)
-                    }
-                    ... on Cat {
-                        name
-                    }
+        const string query = """
+            fragment conflictingArgs on Pet {
+                ... on Dog {
+                    name(surname: true)
                 }
-            ";
+                ... on Cat {
+                    name
+                }
+            }
+            """;
 
         ShouldPassRule(query);
     }
@@ -269,18 +269,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Encounters_conflict_in_fragments_should_fail()
     {
-        const string query = @"
-                {
-                    ...A
-                    ...B
-                }
-                fragment A on Type {
-                    x: a
-                }
-                fragment B on Type {
-                    x: b
-                }
-            ";
+        const string query = """
+            {
+                ...A
+                ...B
+            }
+            fragment A on Type {
+                x: a
+            }
+            fragment B on Type {
+                x: b
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -294,8 +294,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(7, 21));
-                e.Locations.Add(new Location(10, 21));
+                e.Locations.Add(new Location(6, 5));
+                e.Locations.Add(new Location(9, 5));
             });
         });
     }
@@ -303,29 +303,29 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Reports_each_conflict_once_should_fail()
     {
-        const string query = @"
-                {
-                    f1 {
-                        ...A
-                        ...B
-                    }
-                    f2 {
-                        ...B
-                        ...A
-                    }
-                    f3 {
-                        ...A
-                        ...B
-                        x: c
-                    }
+        const string query = """
+            {
+                f1 {
+                    ...A
+                    ...B
                 }
-                fragment A on Type {
-                    x: a
+                f2 {
+                    ...B
+                    ...A
                 }
-                fragment B on Type {
-                    x: b
+                f3 {
+                    ...A
+                    ...B
+                    x: c
                 }
-            ";
+            }
+            fragment A on Type {
+                x: a
+            }
+            fragment B on Type {
+                x: b
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -339,8 +339,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "a and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(18, 21));
-                e.Locations.Add(new Location(21, 21));
+                e.Locations.Add(new Location(17, 5));
+                e.Locations.Add(new Location(20, 5));
             });
 
             config.Error(e =>
@@ -352,8 +352,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "c and a are different fields"
                     }
                 });
-                e.Locations.Add(new Location(14, 25));
-                e.Locations.Add(new Location(18, 21));
+                e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(17, 5));
             });
 
             config.Error(e =>
@@ -365,8 +365,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "c and b are different fields"
                     }
                 });
-                e.Locations.Add(new Location(14, 25));
-                e.Locations.Add(new Location(21, 21));
+                e.Locations.Add(new Location(13, 9));
+                e.Locations.Add(new Location(20, 5));
             });
         });
     }
@@ -374,16 +374,16 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Deep_conflict()
     {
-        const string query = @"
-                {
-                    field {
-                        x: a
-                    },
-                    field {
-                        x: b
-                    }
+        const string query = """
+            {
+                field {
+                    x: a
+                },
+                field {
+                    x: b
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -407,10 +407,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(6, 21));
-                e.Locations.Add(new Location(7, 25));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 9));
+                e.Locations.Add(new Location(5, 5));
+                e.Locations.Add(new Location(6, 9));
             });
         });
     }
@@ -418,18 +418,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Deep_conflict_with_multiple_issues_should_fail()
     {
-        const string query = @"
-                {
-                    field {
-                        x: a
-                        y: c
-                    },
-                    field {
-                        x: b
-                        y: d
-                    }
+        const string query = """
+            {
+                field {
+                    x: a
+                    y: c
+                },
+                field {
+                    x: b
+                    y: d
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -461,12 +461,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(5, 25));
-                e.Locations.Add(new Location(7, 21));
-                e.Locations.Add(new Location(8, 25));
-                e.Locations.Add(new Location(9, 25));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 9));
+                e.Locations.Add(new Location(4, 9));
+                e.Locations.Add(new Location(6, 5));
+                e.Locations.Add(new Location(7, 9));
+                e.Locations.Add(new Location(8, 9));
             });
         });
     }
@@ -474,20 +474,20 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Very_deep_conflict_should_fail()
     {
-        const string query = @"
-                {
-                    field {
-                        deepField {
-                            x: a
-                        }
-                    },
-                    field {
-                        deepField {
-                            x: b
-                        }
+        const string query = """
+            {
+                field {
+                    deepField {
+                        x: a
+                    }
+                },
+                field {
+                    deepField {
+                        x: b
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -521,12 +521,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(8, 21));
-                e.Locations.Add(new Location(9, 25));
-                e.Locations.Add(new Location(10, 29));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(3, 9));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(7, 5));
+                e.Locations.Add(new Location(8, 9));
+                e.Locations.Add(new Location(9, 13));
             });
         });
     }
@@ -534,23 +534,23 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Reports_deep_conflict_to_nearest_common_ancestor_should_fail()
     {
-        const string query = @"
-                {
-                    field {
-                        deepField {
-                            x: a
-                        }
-                        deepField {
-                            x: b
-                        }
-                    },
-                    field {
-                        deepField {
-                            y
-                        }
+        const string query = """
+            {
+                field {
+                    deepField {
+                        x: a
+                    }
+                    deepField {
+                        x: b
+                    }
+                },
+                field {
+                    deepField {
+                        y
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -574,10 +574,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(4, 25));
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(7, 25));
-                e.Locations.Add(new Location(8, 29));
+                e.Locations.Add(new Location(3, 9));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(6, 9));
+                e.Locations.Add(new Location(7, 13));
             });
         });
     }
@@ -585,31 +585,31 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Reports_deep_conflict_to_nearest_common_ancestor_in_fragments()
     {
-        const string query = @"
-                {
-                    field {
-                        ...F
+        const string query = """
+            {
+                field {
+                    ...F
+                }
+                field {
+                    ...F
+                }
+            }
+            fragment F on T {
+                deepField {
+                    deeperField {
+                        x: a
                     }
-                    field {
-                        ...F
+                    deeperField {
+                        x: b
+                    }
+                },
+                deepField {
+                    deeperField {
+                        y
                     }
                 }
-                fragment F on T {
-                    deepField {
-                        deeperField {
-                            x: a
-                        }
-                        deeperField {
-                            x: b
-                        }
-                    },
-                    deepField {
-                        deeperField {
-                            y
-                        }
-                    }
-                }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -633,10 +633,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(12, 25));
-                e.Locations.Add(new Location(13, 29));
-                e.Locations.Add(new Location(15, 25));
-                e.Locations.Add(new Location(16, 29));
+                e.Locations.Add(new Location(11, 9));
+                e.Locations.Add(new Location(12, 13));
+                e.Locations.Add(new Location(14, 9));
+                e.Locations.Add(new Location(15, 13));
             });
         });
     }
@@ -644,30 +644,30 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Reports_deep_conflict_in_nested_fragments()
     {
-        const string query = @"
-                {
-                    field {
-                        ...F
-                    }
-                    field {
-                        ...I
-                    }
+        const string query = """
+            {
+                field {
+                    ...F
                 }
-                fragment F on T {
-                    x: a
-                    ...G
+                field {
+                    ...I
                 }
-                fragment G on T {
-                    y: c
-                }
-                fragment I on T {
-                    y: d
-                    ...J
-                }
-                fragment J on T {
-                    x: b
-                }
-            ";
+            }
+            fragment F on T {
+                x: a
+                ...G
+            }
+            fragment G on T {
+                y: c
+            }
+            fragment I on T {
+                y: d
+                ...J
+            }
+            fragment J on T {
+                x: b
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -699,12 +699,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(3, 21));
-                e.Locations.Add(new Location(11, 21));
-                e.Locations.Add(new Location(15, 21));
-                e.Locations.Add(new Location(6, 21));
-                e.Locations.Add(new Location(22, 21));
-                e.Locations.Add(new Location(18, 21));
+                e.Locations.Add(new Location(2, 5));
+                e.Locations.Add(new Location(10, 5));
+                e.Locations.Add(new Location(14, 5));
+                e.Locations.Add(new Location(5, 5));
+                e.Locations.Add(new Location(21, 5));
+                e.Locations.Add(new Location(17, 5));
             });
         });
     }
@@ -712,17 +712,17 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Ignores_unknown_fragments()
     {
-        const string query = @"
-                {
-                    field
-                    ...Unknown
-                    ...Known
-                }
-                fragment Known on T {
-                    field
-                    ...OtherUnknown
-                }
-            ";
+        const string query = """
+            {
+                field
+                ...Unknown
+                ...Known
+            }
+            fragment Known on T {
+                field
+                ...OtherUnknown
+            }
+            """;
 
         ShouldPassRule(query);
     }
@@ -730,15 +730,15 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Does_not_infinite_loop_on_recursive_fragment()
     {
-        const string query = @"
-                fragment fragA on Human {
+        const string query = """
+            fragment fragA on Human {
+                name,
+                relatives {
                     name,
-                    relatives {
-                        name,
-                        ...fragA
-                    }
+                    ...fragA
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(query);
     }
@@ -746,12 +746,12 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Does_not_infinite_loop_on_immediately_recursive_fragment()
     {
-        const string query = @"
-                fragment fragA on Human {
-                    name,
-                    ...fragA
-                }
-            ";
+        const string query = """
+            fragment fragA on Human {
+                name,
+                ...fragA
+            }
+            """;
 
         ShouldPassRule(query);
     }
@@ -759,11 +759,11 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Does_not_infinite_loop_on_transitively_recursive_fragment()
     {
-        const string query = @"
-                fragment fragA on Human { name, ...fragB }
-                fragment fragB on Human { name, ...fragC }
-                fragment fragC on Human { name, ...fragA }
-            ";
+        const string query = """
+            fragment fragA on Human { name, ...fragB }
+            fragment fragB on Human { name, ...fragC }
+            fragment fragC on Human { name, ...fragA }
+            """;
 
         ShouldPassRule(query);
     }
@@ -771,13 +771,13 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     [Fact]
     public void Finds_invalid_case_even_with_immediately_recursive_fragment()
     {
-        const string query = @"
-                fragment sameAliasesWithDifferentFieldTargets on Dog {
-                    ...sameAliasesWithDifferentFieldTargets
-                    fido: name
-                    fido: nickname
-                }
-            ";
+        const string query = """
+            fragment sameAliasesWithDifferentFieldTargets on Dog {
+                ...sameAliasesWithDifferentFieldTargets
+                fido: name
+                fido: nickname
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -791,8 +791,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "name and nickname are different fields"
                     }
                 });
-                e.Locations.Add(new Location(4, 21));
-                e.Locations.Add(new Location(5, 21));
+                e.Locations.Add(new Location(3, 5));
+                e.Locations.Add(new Location(4, 5));
             });
         });
     }
@@ -802,18 +802,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ...on IntBox {
-                            scalar
-                        }
-                        ...on NonNullStringBox1 {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ...on IntBox {
+                        scalar
+                    }
+                    ...on NonNullStringBox1 {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -828,8 +828,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they return conflicting types Int and String!"
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(8, 29));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(7, 13));
             });
         });
     }
@@ -839,22 +839,22 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on SomeBox {
-                            deepBox {
-                                unrelatedField
-                            }
+        const string query = """
+            {
+                someBox {
+                    ... on SomeBox {
+                        deepBox {
+                            unrelatedField
                         }
-                        ... on StringBox {
-                            deepBox {
-                                unrelatedField
-                            }
+                    }
+                    ... on StringBox {
+                        deepBox {
+                            unrelatedField
                         }
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(config =>
         {
@@ -868,18 +868,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            scalar
-                        }
-                        ... on StringBox {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        scalar
+                    }
+                    ... on StringBox {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -894,8 +894,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they return conflicting types Int and String"
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(8, 29));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(7, 13));
             });
         });
     }
@@ -905,50 +905,50 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            deepBox {
-                                ...X
-                            }
+        const string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        deepBox {
+                            ...X
                         }
-                    }
-                    someBox {
-                        ... on StringBox {
-                            deepBox {
-                                ...Y
-                            }
-                        }
-                    }
-                    memoed: someBox {
-                        ... on IntBox {
-                            deepBox {
-                                ...X
-                            }
-                        }
-                    }
-                    memoed: someBox {
-                        ... on StringBox {
-                            deepBox {
-                                ...Y
-                            }
-                        }
-                    }
-                    other: someBox {
-                        ...X
-                    }
-                    other: someBox {
-                        ...Y
                     }
                 }
-                fragment X on SomeBox {
-                    scalar
+                someBox {
+                    ... on StringBox {
+                        deepBox {
+                            ...Y
+                        }
+                    }
                 }
-                fragment Y on SomeBox {
-                    scalar: unrelatedField
+                memoed: someBox {
+                    ... on IntBox {
+                        deepBox {
+                            ...X
+                        }
+                    }
                 }
-            ";
+                memoed: someBox {
+                    ... on StringBox {
+                        deepBox {
+                            ...Y
+                        }
+                    }
+                }
+                other: someBox {
+                    ...X
+                }
+                other: someBox {
+                    ...Y
+                }
+            }
+            fragment X on SomeBox {
+                scalar
+            }
+            fragment Y on SomeBox {
+                scalar: unrelatedField
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -973,10 +973,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(31, 21));
-                e.Locations.Add(new Location(39, 21));
-                e.Locations.Add(new Location(34, 21));
-                e.Locations.Add(new Location(42, 21));
+                e.Locations.Add(new Location(30, 5));
+                e.Locations.Add(new Location(38, 5));
+                e.Locations.Add(new Location(33, 5));
+                e.Locations.Add(new Location(41, 5));
             });
         });
     }
@@ -986,18 +986,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on NonNullStringBox1 {
-                            scalar
-                        }
-                        ... on StringBox {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ... on NonNullStringBox1 {
+                        scalar
+                    }
+                    ... on StringBox {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -1012,8 +1012,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they return conflicting types String! and String"
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(8, 29));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(7, 13));
             });
         });
     }
@@ -1023,22 +1023,22 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            box: listStringBox {
-                                scalar
-                            }
+        string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        box: listStringBox {
+                            scalar
                         }
-                        ... on StringBox {
-                            box: stringBox {
-                                scalar
-                            }
+                    }
+                    ... on StringBox {
+                        box: stringBox {
+                            scalar
                         }
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -1053,27 +1053,27 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they return conflicting types [StringBox] and StringBox"
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(10, 29));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(9, 13));
             });
         });
 
-        query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            box: stringBox {
-                                scalar
-                            }
+        query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        box: stringBox {
+                            scalar
                         }
-                        ... on StringBox {
-                            box: listStringBox {
-                                scalar
-                            }
+                    }
+                    ... on StringBox {
+                        box: listStringBox {
+                            scalar
                         }
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -1088,11 +1088,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "they return conflicting types StringBox and [StringBox]"
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(10, 29));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(9, 13));
             });
         });
-
     }
 
     [Fact]
@@ -1100,23 +1099,23 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            box: stringBox {
-                                val: scalar
-                                val: unrelatedField
-                            }
+        const string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        box: stringBox {
+                            val: scalar
+                            val: unrelatedField
                         }
-                        ... on StringBox {
-                            box: stringBox {
-                                val: scalar
-                            }
+                    }
+                    ... on StringBox {
+                        box: stringBox {
+                            val: scalar
                         }
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -1131,8 +1130,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         Msg = "scalar and unrelatedField are different fields"
                     }
                 });
-                e.Locations.Add(new Location(6, 33));
-                e.Locations.Add(new Location(7, 33));
+                e.Locations.Add(new Location(5, 17));
+                e.Locations.Add(new Location(6, 17));
             });
         });
     }
@@ -1142,22 +1141,22 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            box: stringBox {
-                                scalar
-                            }
+        const string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        box: stringBox {
+                            scalar
                         }
-                        ... on StringBox {
-                            box: intBox {
-                                scalar
-                            }
+                    }
+                    ... on StringBox {
+                        box: intBox {
+                            scalar
                         }
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldFailRule(config =>
         {
@@ -1182,10 +1181,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                         }
                     }
                 });
-                e.Locations.Add(new Location(5, 29));
-                e.Locations.Add(new Location(6, 33));
-                e.Locations.Add(new Location(10, 29));
-                e.Locations.Add(new Location(11, 33));
+                e.Locations.Add(new Location(4, 13));
+                e.Locations.Add(new Location(5, 17));
+                e.Locations.Add(new Location(9, 13));
+                e.Locations.Add(new Location(10, 17));
             });
         });
     }
@@ -1195,18 +1194,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ... on IntBox {
-                            scalar: unrelatedField
-                        }
-                        ... on StringBox {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ... on IntBox {
+                        scalar: unrelatedField
+                    }
+                    ... on StringBox {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(config =>
         {
@@ -1220,18 +1219,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ...on NonNullStringBox1 {
-                            scalar
-                        }
-                        ...on NonNullStringBox2 {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ...on NonNullStringBox1 {
+                        scalar
+                    }
+                    ...on NonNullStringBox2 {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(config =>
         {
@@ -1245,14 +1244,14 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
+        const string query = """
+            {
+                a
+                ... {
                     a
-                    ... {
-                        a
-                    }
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(config =>
         {
@@ -1266,18 +1265,18 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
     {
         ISchema schema = new ResultTypeValidationSchema();
 
-        const string query = @"
-                {
-                    someBox {
-                        ...on UnknownType {
-                            scalar
-                        }
-                        ...on NonNullStringBox2 {
-                            scalar
-                        }
+        const string query = """
+            {
+                someBox {
+                    ...on UnknownType {
+                        scalar
+                    }
+                    ...on NonNullStringBox2 {
+                        scalar
                     }
                 }
-            ";
+            }
+            """;
 
         ShouldPassRule(config =>
         {

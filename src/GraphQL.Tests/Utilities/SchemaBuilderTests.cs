@@ -6,14 +6,57 @@ namespace GraphQL.Tests.Utilities;
 
 public class SchemaBuilderTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void should_read_schema_description(bool ignoreComments)
+    {
+        const string definitions = """
+            #test
+            "Sample schema"
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = ignoreComments);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("Sample schema");
+    }
+
+    [Fact]
+    public void should_read_schema_description_from_comments()
+    {
+        const string definitions = """
+            #test
+            schema {
+              query: Query
+            }
+            "Sample query"
+            type Query {
+              id: String
+            }
+            """;
+
+        var schema = Schema.For(definitions, c => c.IgnoreComments = false);
+        schema.Initialize();
+
+        schema.Description.ShouldBe("test");
+    }
+
     [Fact]
     public void should_set_query_by_name()
     {
-        var definitions = @"
-                type Query {
-                    id: String
-                }
-            ";
+        const string definitions = """
+            type Query {
+              id: String
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -29,11 +72,11 @@ public class SchemaBuilderTests
     [Fact]
     public void should_set_mutation_by_name()
     {
-        var definitions = @"
-                type Mutation {
-                    mutate: String
-                }
-            ";
+        const string definitions = """
+            type Mutation {
+              mutate: String
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -49,13 +92,13 @@ public class SchemaBuilderTests
     [Fact]
     public void should_set_subscription_by_name()
     {
-        var definitions = @"
-                type Subscription {
-                    subscribe: String
-                }
-            ";
+        const string definitions = """
+            type Subscription {
+              subscribe: String
+            }
+            """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("Subscription"));
         schema.Initialize();
 
         var subscription = schema.Subscription;
@@ -66,30 +109,39 @@ public class SchemaBuilderTests
         subscription.Fields.Single().Name.ShouldBe("subscribe");
     }
 
+    private class DummySubscription
+    {
+        [GraphQLMetadata("subscribe")]
+        public string SubscribeResolver(IResolveFieldContext context) => (string)context.Source!;
+
+        [GraphQLMetadata(ResolverType = ResolverType.StreamResolver)]
+        public IObservable<string> Subscribe() => throw new NotImplementedException();
+    }
+
     [Fact]
     public void configures_schema_from_schema_type()
     {
-        var definitions = @"
-                type MyQuery {
-                    id: String
-                }
+        const string definitions = """
+            type MyQuery {
+              id: String
+            }
 
-                type MyMutation {
-                    mutate: String
-                }
+            type MyMutation {
+              mutate: String
+            }
 
-                type MySubscription {
-                    subscribe: String
-                }
+            type MySubscription {
+              subscribe: String
+            }
 
-                schema {
-                  query: MyQuery
-                  mutation: MyMutation
-                  subscription: MySubscription
-                }
-            ";
+            schema {
+              query: MyQuery
+              mutation: MyMutation
+              subscription: MySubscription
+            }
+            """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("MySubscription"));
         schema.Initialize();
 
         var query = schema.Query;
@@ -114,27 +166,27 @@ public class SchemaBuilderTests
     [Fact]
     public void configures_schema_from_schema_type_and_directives()
     {
-        var definitions = @"
-                type MyQuery  {
-                    id: String
-                }
+        const string definitions = """
+            type MyQuery  {
+              id: String
+            }
 
-                type MyMutation @requireAuth(role: ""Admin"") {
-                    mutate: String
-                }
+            type MyMutation @requireAuth(role: "Admin") {
+              mutate: String
+            }
 
-                type MySubscription @requireAuth {
-                    subscribe: String @traits(volatile: true, documented: false, enumerated: DESC) @some @some
-                }
+            type MySubscription @requireAuth {
+              subscribe: String @traits(volatile: true, documented: false, enumerated: DESC) @some @some
+            }
 
-                schema @public {
-                  query: MyQuery
-                  mutation: MyMutation
-                  subscription: MySubscription
-                }
-            ";
+            schema @public {
+              query: MyQuery
+              mutation: MyMutation
+              subscription: MySubscription
+            }
+            """;
 
-        var schema = Schema.For(definitions);
+        var schema = Schema.For(definitions, b => b.Types.Include<DummySubscription>("MySubscription"));
         schema.Directives.Register(new Directive("public", DirectiveLocation.Schema));
         schema.Directives.Register(new Directive("requireAuth", DirectiveLocation.Object) { Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "role" }) });
         schema.Directives.Register(new Directive("traits", DirectiveLocation.FieldDefinition) { Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>> { Name = "volatile" }, new QueryArgument<BooleanGraphType> { Name = "documented" }, new QueryArgument<EnumerationGraphType<TestEnum>> { Name = "enumerated" }) });
@@ -143,10 +195,10 @@ public class SchemaBuilderTests
         schema.Initialize();
 
         schema.HasAppliedDirectives().ShouldBeTrue();
-        schema.GetAppliedDirectives().Count.ShouldBe(1);
-        schema.GetAppliedDirectives().Find("public").ShouldNotBeNull();
-        schema.GetAppliedDirectives().Find("public").ArgumentsCount.ShouldBe(0);
-        schema.GetAppliedDirectives().Find("public").List.ShouldBeNull();
+        schema.GetAppliedDirectives()!.Count.ShouldBe(1);
+        schema.GetAppliedDirectives()!.Find("public").ShouldNotBeNull();
+        schema.GetAppliedDirectives()!.Find("public")!.ArgumentsCount.ShouldBe(0);
+        schema.GetAppliedDirectives()!.Find("public")!.List.ShouldBeNull();
 
         var query = schema.Query;
         query.ShouldNotBeNull();
@@ -158,46 +210,46 @@ public class SchemaBuilderTests
         mutation.ShouldNotBeNull();
         mutation.Name.ShouldBe("MyMutation");
         mutation.HasAppliedDirectives().ShouldBeTrue();
-        mutation.GetAppliedDirectives().Count.ShouldBe(1);
-        mutation.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
-        mutation.GetAppliedDirectives().Find("requireAuth").List.Count.ShouldBe(1);
-        mutation.GetAppliedDirectives().Find("requireAuth").List[0].Name.ShouldBe("role");
-        mutation.GetAppliedDirectives().Find("requireAuth").List[0].Value.ShouldBe("Admin");
+        mutation.GetAppliedDirectives()!.Count.ShouldBe(1);
+        mutation.GetAppliedDirectives()!.Find("requireAuth").ShouldNotBeNull();
+        mutation.GetAppliedDirectives()!.Find("requireAuth")!.List!.Count.ShouldBe(1);
+        mutation.GetAppliedDirectives()!.Find("requireAuth")!.List![0].Name.ShouldBe("role");
+        mutation.GetAppliedDirectives()!.Find("requireAuth")!.List![0].Value.ShouldBe("Admin");
 
         var subscription = schema.Subscription;
         subscription.ShouldNotBeNull();
         subscription.Name.ShouldBe("MySubscription");
-        subscription.GetAppliedDirectives().Count.ShouldBe(1);
-        subscription.GetAppliedDirectives().Find("requireAuth").ShouldNotBeNull();
-        subscription.GetAppliedDirectives().Find("requireAuth").ArgumentsCount.ShouldBe(0);
-        subscription.GetAppliedDirectives().Find("requireAuth").List.ShouldBeNull();
+        subscription.GetAppliedDirectives()!.Count.ShouldBe(1);
+        subscription.GetAppliedDirectives()!.Find("requireAuth")!.ShouldNotBeNull();
+        subscription.GetAppliedDirectives()!.Find("requireAuth")!.ArgumentsCount.ShouldBe(0);
+        subscription.GetAppliedDirectives()!.Find("requireAuth")!.List.ShouldBeNull();
 
         var field = subscription.Fields.Find("subscribe");
         field.ShouldNotBeNull();
-        field.GetAppliedDirectives().Count.ShouldBe(3);
-        field.GetAppliedDirectives().Find("traits").ShouldNotBeNull();
-        field.GetAppliedDirectives().Find("traits").List.Count.ShouldBe(3);
-        field.GetAppliedDirectives().Find("traits").List[0].Name.ShouldBe("volatile");
-        field.GetAppliedDirectives().Find("traits").List[0].Value.ShouldBe(true);
-        field.GetAppliedDirectives().Find("traits").List[1].Name.ShouldBe("documented");
-        field.GetAppliedDirectives().Find("traits").List[1].Value.ShouldBe(false);
-        field.GetAppliedDirectives().Find("traits").List[2].Name.ShouldBe("enumerated");
-        field.GetAppliedDirectives().Find("traits").List[2].Value.ShouldBe("DESC");
-        field.GetAppliedDirectives().Find("some").ShouldNotBeNull();
-        field.GetAppliedDirectives().Find("some").ArgumentsCount.ShouldBe(0);
+        field.GetAppliedDirectives()!.Count.ShouldBe(3);
+        field.GetAppliedDirectives()!.Find("traits").ShouldNotBeNull();
+        field.GetAppliedDirectives()!.Find("traits")!.List!.Count.ShouldBe(3);
+        field.GetAppliedDirectives()!.Find("traits")!.List![0].Name.ShouldBe("volatile");
+        field.GetAppliedDirectives()!.Find("traits")!.List![0].Value.ShouldBe(true);
+        field.GetAppliedDirectives()!.Find("traits")!.List![1].Name.ShouldBe("documented");
+        field.GetAppliedDirectives()!.Find("traits")!.List![1].Value.ShouldBe(false);
+        field.GetAppliedDirectives()!.Find("traits")!.List![2].Name.ShouldBe("enumerated");
+        field.GetAppliedDirectives()!.Find("traits")!.List![2].Value.ShouldBe("DESC");
+        field.GetAppliedDirectives()!.Find("some").ShouldNotBeNull();
+        field.GetAppliedDirectives()!.Find("some")!.ArgumentsCount.ShouldBe(0);
     }
 
     [Fact]
     public void builds_type_with_arguments()
     {
-        var definitions = @"
+        const string definitions = """"
                 type Query {
-                  """"""
+                  """
                   Post description
-                  """"""
-                  post(""ID description"" id: ID = 1, ""Val description"" val: String): String
+                  """
+                  post("ID description" id: ID = 1, "Val description" val: String): String
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").Description = "Some argument");
         schema.Initialize();
@@ -207,34 +259,34 @@ public class SchemaBuilderTests
 
         var field = query.Fields.Single();
         field.Name.ShouldBe("post");
-        field.Arguments.Count.ShouldBe(2);
-        field.ResolvedType.Name.ShouldBe("String");
+        field.Arguments!.Count.ShouldBe(2);
+        field.ResolvedType!.Name.ShouldBe("String");
         field.Description.ShouldBe("Post description");
 
         var arg = field.Arguments.First();
         arg.Name.ShouldBe("id");
         arg.DefaultValue.ShouldBe(1);
-        arg.ResolvedType.Name.ShouldBe("ID");
+        arg.ResolvedType!.Name.ShouldBe("ID");
         arg.Description.ShouldBe("Some argument");
 
         arg = field.Arguments.Last();
         arg.Name.ShouldBe("val");
-        arg.ResolvedType.Name.ShouldBe("String");
+        arg.ResolvedType!.Name.ShouldBe("String");
         arg.Description.ShouldBe("Val description");
     }
 
     [Fact]
     public void builds_type_with_arguments_with_dependent_default_values()
     {
-        var definitions = @"
-                type Query {
-                  post(arg: [SomeInputType] = [{ name: ""John"" }]): String
-                }
-                input SomeInputType {
-                  id: ID! = 1
-                  name: String!
-                }
-            ";
+        const string definitions = """
+            type Query {
+              post(arg: [SomeInputType] = [{ name: "John" }]): String
+            }
+            input SomeInputType {
+              id: ID! = 1
+              name: String!
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -244,14 +296,14 @@ public class SchemaBuilderTests
 
         var field = query.Fields.Single();
         field.Name.ShouldBe("post");
-        field.Arguments.Count.ShouldBe(1);
+        field.Arguments!.Count.ShouldBe(1);
 
         var arg = field.Arguments.First();
         arg.Name.ShouldBe("arg");
         var list = arg.DefaultValue.ShouldBeAssignableTo<IEnumerable<object>>();
-        list.Count().ShouldBe(1);
-        var item = list.First().ShouldBeAssignableTo<IDictionary<string, object>>();
-        item.Count.ShouldBe(2);
+        list!.Count().ShouldBe(1);
+        var item = list!.First().ShouldBeAssignableTo<IDictionary<string, object>>();
+        item!.Count.ShouldBe(2);
         item["name"].ShouldBeOfType<string>().ShouldBe("John");
         item["id"].ShouldBeOfType<int>().ShouldBe(1);
     }
@@ -259,17 +311,17 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_interface()
     {
-        var definitions = @"
-                """"""
+        const string definitions = """"
+                """
                 Example description
-                """"""
+                """
                 interface Pet {
-                    """"""
+                    """
                     ID description
-                    """"""
+                    """
                     id: ID
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -281,25 +333,25 @@ public class SchemaBuilderTests
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("id");
-        field.ResolvedType.Name.ShouldBe("ID");
+        field.ResolvedType!.Name.ShouldBe("ID");
         field.Description.ShouldBe("ID description");
     }
 
     [Fact]
     public void builds_enum()
     {
-        var definitions = @"
-                """"""
+        const string definitions = """"
+                """
                 Example description
-                """"""
+                """
                 enum PetKind {
-                    """"""
+                    """
                     Cat description
-                    """"""
+                    """
                     CAT
                     DOG
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -309,7 +361,7 @@ public class SchemaBuilderTests
         type.Description.ShouldBe("Example description");
 
         type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
-        type.Values.Select(x => x.Value.ToString()).ShouldBe(new[] { "CAT", "DOG" });
+        type.Values.Select(x => x.Value!.ToString()).ShouldBe(new[] { "CAT", "DOG" });
         type.Values.Select(x => x.Description).ShouldBe(new[] { "Cat description", null });
     }
 
@@ -319,15 +371,26 @@ public class SchemaBuilderTests
         Dog
     }
 
+    private enum PetKindType
+    {
+        Cat,
+        Dog
+    }
+
+    private class Query
+    {
+        public PetKindType kind() => PetKindType.Cat;
+    }
+
     [Fact]
     public void builds_case_insensitive_typed_enum()
     {
-        var definitions = @"
-                enum PetKind {
-                    CAT
-                    DOG
-                }
-            ";
+        const string definitions = """
+            enum PetKind {
+              CAT
+              DOG
+            }
+            """;
 
         var schema = Schema.For(definitions, c => c.Types.Include<PetKind>());
         schema.Initialize();
@@ -336,19 +399,85 @@ public class SchemaBuilderTests
         type.ShouldNotBeNull();
 
         type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
-        type.Values.Select(x => (PetKind)x.Value).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
+        type.Values.Select(x => (PetKind)x.Value!).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
+    }
+
+    [Fact]
+    public async Task builds_case_insensitive_typed_enum_with_custom_name_executed_ok()
+    {
+        const string definitions = """
+            type Query {
+              kind: PetKindType
+            }
+
+            enum PetKindType {
+              CAT
+              DOG
+            }
+            """;
+
+        var schema = Schema.For(definitions, c =>
+        {
+            c.Types.Include<PetKindType>("PetKindType");
+            c.Types.Include<Query>();
+        });
+        schema.Initialize();
+
+        var result = await schema.ExecuteAsync(opt =>
+        {
+            opt.Query = "{ kind }";
+            opt.ThrowOnUnhandledException = true;
+        });
+
+        result.ShouldBeCrossPlatJson(
+            """
+            {
+              "data": {
+                "kind": "CAT"
+              }
+            }
+            """);
+    }
+
+    [Fact]
+    public async Task builds_case_insensitive_typed_enum_without_custom_name_throws()
+    {
+        const string definitions = """
+            type Query {
+              kind: PetKindType
+            }
+
+            enum PetKindType {
+              CAT
+              DOG
+            }
+            """;
+
+        var schema = Schema.For(definitions, c =>
+        {
+            c.Types.Include<PetKindType>(); // type.GraphQLName() inside truncates 'Type' suffix from 'PetKindType'
+            c.Types.Include<Query>();
+        });
+        schema.Initialize();
+
+        var ex = await Should.ThrowAsync<InvalidOperationException>(() => schema.ExecuteAsync(opt =>
+        {
+            opt.Query = "{ kind }";
+            opt.ThrowOnUnhandledException = true;
+        }));
+        ex.Message.ShouldBe("Unable to serialize 'Cat' value of type 'PetKindType' to the enumeration type 'PetKindType'. Enumeration does not contain such value. Available values: 'CAT' of type 'String', 'DOG' of type 'String'.");
     }
 
     [Fact]
     public void builds_scalars()
     {
-        var definitions = @"
-                scalar CustomScalar
+        const string definitions = """
+            scalar CustomScalar
 
-                type Query {
-                    search: CustomScalar
-                }
-            ";
+            type Query {
+              search: CustomScalar
+            }
+            """;
 
         var customScalar = new CustomScalarType();
 
@@ -369,18 +498,18 @@ public class SchemaBuilderTests
     [Fact]
     public void references_other_types()
     {
-        var definitions = @"
-                type Post {
-                  id: ID!
-                  title: String
-                  votes: Int
-                }
+        const string definitions = """
+            type Post {
+              id: ID!
+              title: String
+              votes: Int
+            }
 
-                type Query {
-                  posts: [Post]
-                  post(id: ID = 1): Post
-                }
-            ";
+            type Query {
+              posts: [Post]
+              post(id: ID = 1): Post
+            }
+            """;
 
         var schema = Schema.For(definitions, builder => builder.Types.For("Query").FieldFor("post").ArgumentFor("id").DefaultValue = 999);
         schema.Initialize();
@@ -393,14 +522,14 @@ public class SchemaBuilderTests
 
         var posts = query.Fields.First();
         posts.Name.ShouldBe("posts");
-        posts.ResolvedType.ToString().ShouldBe("[Post]");
-        query.Fields.Last().ResolvedType.Name.ShouldBe("Post");
+        posts.ResolvedType!.ToString().ShouldBe("[Post]");
+        query.Fields.Last().ResolvedType!.Name.ShouldBe("Post");
 
         var post = schema.AllTypes["Post"] as IObjectGraphType;
         post.ShouldNotBeNull();
         post.Fields.Count.ShouldBe(3);
 
-        var arg = query.Fields.Last().Arguments.Single();
+        var arg = query.Fields.Last().Arguments!.Single();
         arg.Name.ShouldBe("id");
         arg.DefaultValue.ShouldBe(999);
         arg.Description.ShouldBeNull();
@@ -409,7 +538,7 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_unions()
     {
-        var definitions = @"
+        const string definitions = """"
                 type Human {
                     name: String
                 }
@@ -418,10 +547,11 @@ public class SchemaBuilderTests
                     name: String
                 }
 
-                """"""
+                """
                 Example description
-                """"""
-                union SearchResult = Human | Droid";
+                """
+                union SearchResult = Human | Droid
+                """";
 
         var schema = Schema.For(definitions, _ =>
         {
@@ -432,25 +562,25 @@ public class SchemaBuilderTests
         schema.Initialize();
 
         var searchResult = schema.AllTypes["SearchResult"] as UnionGraphType;
-        searchResult.Description.ShouldBe("Example description");
+        searchResult!.Description.ShouldBe("Example description");
         searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] { "Human", "Droid" });
     }
 
     [Fact]
     public void builds_input_types()
     {
-        var definitions = @"
-                """"""
+        const string definitions = """"
+                """
                 Example description
-                """"""
+                """
                 input ReviewInput {
-                  """"""
+                  """
                   Stars description
-                  """"""
+                  """
                   stars: Int!
                   commentary: String
                 }
-            ";
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -465,11 +595,11 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types_with_default_values()
     {
-        var definitions = @"
-                input ReviewInput {
-                  stars: Int! = 23
-                }
-            ";
+        const string definitions = """
+            input ReviewInput {
+              stars: Int! = 23
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -483,15 +613,15 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_input_types_with_dependent_default_values()
     {
-        var definitions = @"
-                input SomeInputType1 {
-                  test: SomeInputType2! = { arg1: 22 }
-                }
-                input SomeInputType2 {
-                  arg1: Int
-                  arg2: Int = 30
-                }
-            ";
+        const string definitions = """
+            input SomeInputType1 {
+              test: SomeInputType2! = { arg1: 22 }
+            }
+            input SomeInputType2 {
+              arg1: Int
+              arg2: Int = 30
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -501,8 +631,8 @@ public class SchemaBuilderTests
         inputType1.Fields.Count.ShouldBe(1);
         inputType1.Fields.First().Name.ShouldBe("test");
         var value1 = inputType1.Fields.First().DefaultValue.ShouldBeAssignableTo<IDictionary<string, object>>();
-        value1.ShouldContainKeyAndValue("arg1", 22);
-        value1.ShouldContainKeyAndValue("arg2", 30);
+        value1!.ShouldContainKeyAndValue("arg1", 22);
+        value1!.ShouldContainKeyAndValue("arg2", 30);
 
         var inputType2 = schema.AllTypes["SomeInputType2"] as InputObjectGraphType;
         inputType2.ShouldNotBeNull();
@@ -514,11 +644,11 @@ public class SchemaBuilderTests
     [Fact]
     public void input_types_default_value_loops_throw1()
     {
-        var definitions = @"
-                input SomeInputType1 {
-                  test: SomeInputType1 = { }
-                }
-            ";
+        const string definitions = """
+            input SomeInputType1 {
+              test: SomeInputType1 = { }
+            }
+            """;
 
         var schema = Schema.For(definitions);
         Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType1'.");
@@ -527,17 +657,17 @@ public class SchemaBuilderTests
     [Fact]
     public void input_types_default_value_loops_throw2()
     {
-        var definitions = @"
-                input SomeInputType1 {
-                  test: SomeInputType2 = { }
-                }
-                input SomeInputType2 {
-                  test: SomeInputType3 = { }
-                }
-                input SomeInputType3 {
-                  test: SomeInputType1 = { }
-                }
-            ";
+        const string definitions = """
+            input SomeInputType1 {
+              test: SomeInputType2 = { }
+            }
+            input SomeInputType2 {
+              test: SomeInputType3 = { }
+            }
+            input SomeInputType3 {
+              test: SomeInputType1 = { }
+            }
+            """;
 
         var schema = Schema.For(definitions);
         Should.Throw<InvalidOperationException>(() => schema.Initialize()).Message.ShouldBe("Default values in input types cannot contain a circular dependency loop. Please resolve dependency loop between the following types: 'SomeInputType3', 'SomeInputType2', 'SomeInputType1'.");
@@ -548,11 +678,11 @@ public class SchemaBuilderTests
     {
         // see: https://github.com/graphql-dotnet/graphql-dotnet/pull/2696#discussion_r764975585
 
-        var definitions = @"
-                input SomeInputType1 {
-                  test: SomeInputType1 = { test: null }
-                }
-            ";
+        const string definitions = """
+            input SomeInputType1 {
+              test: SomeInputType1 = { test: null }
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -561,14 +691,14 @@ public class SchemaBuilderTests
     [Fact]
     public void builds_directives()
     {
-        var definitions = @"
-                """"""
-                Example description
-                """"""
-                directive @myDirective(
-                  if: Boolean!
-                ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
-            ";
+        const string definitions = """"
+            """
+            Example description
+            """
+            directive @myDirective(
+              if: Boolean!
+            ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+            """";
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -577,9 +707,9 @@ public class SchemaBuilderTests
         directive.ShouldNotBeNull();
         directive.Description.ShouldBe("Example description");
 
-        directive.Arguments.Count.ShouldBe(1);
+        directive.Arguments!.Count.ShouldBe(1);
         var argument = directive.Arguments.Find("if");
-        argument.ResolvedType.ToString().ShouldBe("Boolean!");
+        argument!.ResolvedType!.ToString().ShouldBe("Boolean!");
 
         directive.Locations.ShouldBe(new[]
         {
@@ -592,11 +722,11 @@ public class SchemaBuilderTests
     [Fact]
     public void custom_deprecation_on_type_field()
     {
-        var definitions = @"
-                type Query {
-                  stars: Int @deprecated(reason: ""a reason"")
-                }
-            ";
+        const string definitions = """
+            type Query {
+              stars: Int @deprecated(reason: "a reason")
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -610,11 +740,11 @@ public class SchemaBuilderTests
     [Fact]
     public void default_deprecation_on_type_field()
     {
-        var definitions = @"
-                type Query {
-                  stars: Int @deprecated
-                }
-            ";
+        const string definitions = """
+            type Query {
+              stars: Int @deprecated
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -628,12 +758,12 @@ public class SchemaBuilderTests
     [Fact]
     public void deprecate_enum_value()
     {
-        var definitions = @"
-                enum PetKind {
-                    CAT @deprecated(reason: ""dogs rule"")
-                    DOG
-                }
-            ";
+        const string definitions = """
+            enum PetKind {
+              CAT @deprecated(reason: "dogs rule")
+              DOG
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
@@ -648,11 +778,11 @@ public class SchemaBuilderTests
     [Fact]
     public void deprecated_prefers_metadata_values()
     {
-        var definitions = @"
-                type Movie {
-                  movies: Int @deprecated
-                }
-            ";
+        const string definitions = """
+            type Movie {
+              movies: Int @deprecated
+            }
+            """;
 
         var schema = Schema.For(definitions, _ => _.Types.Include<Movie>());
         schema.Initialize();
@@ -666,66 +796,89 @@ public class SchemaBuilderTests
     [Fact]
     public void build_extension_type()
     {
-        var definitions = @"
-                type Query {
-                    author(id: Int): String
-                }
+        const string definitions = """
+            type Query {
+              author(id: Int): String
+            }
 
-                extend type Query {
-                    book(id: Int): String
-                }
-            ";
+            extend type Query {
+              book(id: Int): String
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
         var type = schema.AllTypes["Query"] as IObjectGraphType;
-        type.Fields.Count.ShouldBe(2);
+        type!.Fields.Count.ShouldBe(2);
     }
 
     [Fact]
     public void build_extension_type_out_of_order()
     {
-        var definitions = @"
-                extend type Query {
-                    author(id: Int): String
-                }
+        const string definitions = """
+            extend type Query {
+              author(id: Int): String
+            }
 
-                type Query {
-                    book(id: Int): String
-                }
-            ";
+            type Query {
+              book(id: Int): String
+            }
+            """;
 
         var schema = Schema.For(definitions);
         schema.Initialize();
-        var type = (IObjectGraphType)schema.AllTypes["Query"];
+        var type = (IObjectGraphType)schema.AllTypes["Query"]!;
         type.Fields.Count.ShouldBe(2);
+    }
+
+    [Fact]
+    public void reads_directives_from_types_or_extension_types()
+    {
+        var schema = Schema.For("""
+            extend type Query @directiveA {
+              field1: String
+            }
+
+            type Query @directiveB {
+              field2: String
+            }
+
+            directive @directiveA on OBJECT
+            directive @directiveB on OBJECT
+            """);
+
+        schema.Initialize();
+        var type = schema.AllTypes["Query"].ShouldNotBeNull();
+        var directives = type.GetAppliedDirectives()?.List.ShouldNotBeNull();
+        directives!.Where(x => x.Name == "directiveA").ShouldHaveSingleItem();
+        directives!.Where(x => x.Name == "directiveB").ShouldHaveSingleItem();
     }
 
     [Fact]
     public async Task builds_with_customized_clr_type()
     {
-        var definitions = @"
-                type Query {
-                    test: MyTestType
-                }
+        const string definitions = """
+            type Query {
+              test: MyTestType
+            }
 
-                type MyTestType {
-                    myTestField: ID
-                }
-            ";
+            type MyTestType {
+              myTestField: ID
+            }
+            """;
 
         var schema = Schema.For(definitions, b => b.Types.Include<TestType>());
         schema.Initialize();
 
         var graphType = schema.AllTypes["MyTestType"].ShouldNotBeNull().ShouldBeAssignableTo<ObjectGraphType>();
-        graphType.Description.ShouldBe("Test1");
+        graphType!.Description.ShouldBe("Test1");
         graphType.DeprecationReason.ShouldBe("Test2");
         var fieldType = graphType.Fields.Find("myTestField").ShouldNotBeNull();
         fieldType.Description.ShouldBe("Test3");
         fieldType.DeprecationReason.ShouldBe("Test4");
         fieldType.ResolvedType.ShouldBeOfType<IdGraphType>();
         var context = new ResolveFieldContext() { Source = new TestType() };
-        (await fieldType.Resolver.ResolveAsync(context).ConfigureAwait(false)).ShouldBeOfType<string>().ShouldBe("value");
+        (await fieldType.Resolver!.ResolveAsync(context)).ShouldBeOfType<string>().ShouldBe("value");
     }
 
     [GraphQLMetadata("MyTestType", Description = "Test1", DeprecationReason = "Test2")]
@@ -748,8 +901,8 @@ public class SchemaBuilderTests
             Name = "CustomScalar";
         }
 
-        public override object ParseValue(object value) => throw new System.NotImplementedException();
+        public override object? ParseValue(object? value) => throw new System.NotImplementedException();
 
-        public override object ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
+        public override object? ParseLiteral(GraphQLValue value) => throw new System.NotImplementedException();
     }
 }

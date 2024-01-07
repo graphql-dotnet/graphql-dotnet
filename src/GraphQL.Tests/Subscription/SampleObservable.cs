@@ -1,10 +1,8 @@
-#nullable enable
-
 namespace GraphQL.Tests.Subscription;
 
 internal class SampleObservable<T> : IObservable<T>
 {
-    private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
+    private readonly List<IObserver<T>> _observers = new();
 
     public void Next(T data)
     {
