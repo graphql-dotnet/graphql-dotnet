@@ -1339,7 +1339,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Registers <paramref name="schemaVisitor"/> within the schema configuration.
     /// </summary>
-    public static IGraphQLBuilder AddSchemaVisitor(this IGraphQLBuilder builder, ISchemaNodeVisitor schemaVisitor)
+    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder, TSchemaVisitor schemaVisitor)
+        where TSchemaVisitor : class, ISchemaNodeVisitor
     {
         if (schemaVisitor == null)
             throw new ArgumentNullException(nameof(schemaVisitor));
