@@ -1322,4 +1322,41 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
     #endregion
+
+    #region - AddSchemaVisitor -
+    /// <summary>
+    /// Registers <typeparamref name="TSchemaVisitor"/> with the dependency injection framework as
+    /// a singleton and registers <typeparamref name="TSchemaVisitor"/> within the schema configuration.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder)
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
+        builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers <paramref name="schemaVisitor"/> within the schema configuration.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor(this IGraphQLBuilder builder, ISchemaNodeVisitor schemaVisitor)
+    {
+        if (schemaVisitor == null)
+            throw new ArgumentNullException(nameof(schemaVisitor));
+        builder.ConfigureSchema(schema => schema.RegisterVisitor(schemaVisitor));
+        return builder;
+    }
+
+    /// <summary>
+    /// Configures the schema to use the supplied factory delegate to create an instance of <see cref="ISchemaNodeVisitor"/>
+    /// and register it to the schema.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor(this IGraphQLBuilder builder, Func<IServiceProvider, ISchemaNodeVisitor> schemaVisitorFactory)
+    {
+        if (schemaVisitorFactory == null)
+            throw new ArgumentNullException(nameof(schemaVisitorFactory));
+        builder.ConfigureSchema((schema, services) => schema.RegisterVisitor(schemaVisitorFactory(services)));
+        return builder;
+    }
+    #endregion
 }
