@@ -1257,4 +1257,44 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
     #endregion
+
+    #region - AddSchemaVisitor -
+    /// <summary>
+    /// Registers <typeparamref name="TSchemaVisitor"/> with the dependency injection framework as
+    /// a singleton and registers <typeparamref name="TSchemaVisitor"/> within the schema configuration.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder)
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
+        builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers <paramref name="schemaVisitor"/> within the schema configuration.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder, TSchemaVisitor schemaVisitor)
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        if (schemaVisitor == null)
+            throw new ArgumentNullException(nameof(schemaVisitor));
+        builder.ConfigureSchema(schema => schema.RegisterVisitor(schemaVisitor));
+        return builder;
+    }
+
+    /// <summary>
+    /// Registers <typeparamref name="TSchemaVisitor"/> within the dependency injection framework as a singleton
+    /// using the supplied factory delegate and registers <typeparamref name="TSchemaVisitor"/> within the schema configuration.
+    /// </summary>
+    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder, Func<IServiceProvider, TSchemaVisitor> schemaVisitorFactory)
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        if (schemaVisitorFactory == null)
+            throw new ArgumentNullException(nameof(schemaVisitorFactory));
+        builder.Services.Register(schemaVisitorFactory, ServiceLifetime.Singleton);
+        builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
+        return builder;
+    }
+    #endregion
 }
