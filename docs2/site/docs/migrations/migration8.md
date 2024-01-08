@@ -371,25 +371,31 @@ method during schema initialization, as shown below:
 services.AddGraphQL(b => b
     .AddSchema<MySchema>()
     .ConfigureSchema(s => s.RegisterVisitor(new NoConnectionOver1000Visitor())));
-
+    
 public class NoConnectionOver1000Visitor : BaseSchemaNodeVisitor
 {
     public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
+        => argument.Validator += GetValidator(argument, field);
+
+    public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema)
+        => field.Validator += GetValidator(argument, field);
+
+    private static Action<object?>? GetValidator(QueryArgument argument, FieldType field)
     {
         // identify fields that return a connection type
         if (!field.ResolvedType!.GetNamedType().Name.EndsWith("Connection"))
-            return;
+            return null;
 
         // identify the first and last arguments
         if (argument.Name != "first" && argument.Name != "last")
-            return;
+            return null;
 
         // apply the validation rule
-        argument.Validate(value =>
+        return value =>
         {
             if (value is int intValue && intValue > 1000)
                 throw new ArgumentException("Cannot return more than 1000 rows.");
-        });
+        };
     }
 }
 ```
