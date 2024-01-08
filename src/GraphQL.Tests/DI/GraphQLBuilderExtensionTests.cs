@@ -6,6 +6,7 @@ using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
@@ -974,6 +975,57 @@ public class GraphQLBuilderExtensionTests
     }
     #endregion
 
+    #region - AddSchemaVisitor -
+    [Fact]
+    public void AddSchemaVisitor_Type()
+    {
+        MockSetupRegister<TestSchemaVisitor, TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor<TestSchemaVisitor>();
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Instance()
+    {
+        var visitor = new TestSchemaVisitor();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(visitor)).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitor);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Factory()
+    {
+        var visitorFactory = MockSetupRegister<TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitorFactory);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((ISchemaNodeVisitor)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((Func<IServiceProvider, ISchemaNodeVisitor>)null!));
+    }
+    #endregion
+
     #region - AddValidationRule -
     [Theory]
     [InlineData(true)]
@@ -1320,6 +1372,10 @@ public class GraphQLBuilderExtensionTests
     }
 
     private class TestSchema : Schema
+    {
+    }
+
+    private class TestSchemaVisitor : BaseSchemaNodeVisitor
     {
     }
 
