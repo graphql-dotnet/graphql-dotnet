@@ -6,6 +6,7 @@ using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
@@ -793,7 +794,7 @@ public class GraphQLBuilderExtensionTests
             .ConfigureSchema<TestConfigureSchema>()
             .ConfigureSchema<TestConfigureSchema>());
         var provider = services.BuildServiceProvider();
-        var configurations = provider.GetRequiredService<IEnumerable<IConfigureSchema>>();
+        var configurations = provider.GetService<IEnumerable<IConfigureSchema>>().ShouldNotBeNull();
         configurations.Count().ShouldBe(1);
     }
 
@@ -869,7 +870,7 @@ public class GraphQLBuilderExtensionTests
             .ConfigureExecution<TestConfigureExecution>()
             .ConfigureExecution<TestConfigureExecution>());
         var provider = services.BuildServiceProvider();
-        var configurations = provider.GetRequiredService<IEnumerable<IConfigureExecution>>();
+        var configurations = provider.GetService<IEnumerable<IConfigureExecution>>().ShouldNotBeNull();
         configurations.Where(x => x.GetType() == typeof(TestConfigureExecution)).Count().ShouldBe(1);
     }
 
@@ -953,6 +954,57 @@ public class GraphQLBuilderExtensionTests
         Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext, ExecutionOptions>)null!));
         Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, Task>)null!));
         Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, ExecutionOptions, Task>)null!));
+    }
+    #endregion
+
+    #region - AddSchemaVisitor -
+    [Fact]
+    public void AddSchemaVisitor_Type()
+    {
+        MockSetupRegister<TestSchemaVisitor, TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor<TestSchemaVisitor>();
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Instance()
+    {
+        var visitor = new TestSchemaVisitor();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(visitor)).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitor);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Factory()
+    {
+        var visitorFactory = MockSetupRegister<TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitorFactory);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((ISchemaNodeVisitor)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((Func<IServiceProvider, ISchemaNodeVisitor>)null!));
     }
     #endregion
 
@@ -1349,6 +1401,10 @@ public class GraphQLBuilderExtensionTests
     }
 
     private class TestSchema : Schema
+    {
+    }
+
+    private class TestSchemaVisitor : BaseSchemaNodeVisitor
     {
     }
 

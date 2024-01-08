@@ -320,6 +320,12 @@ namespace GraphQL
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchema> schemaFactory, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder)
+            where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSchemaVisitor> schemaVisitorFactory)
+            where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
+        public static GraphQL.DI.IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this GraphQL.DI.IGraphQLBuilder builder, TSchemaVisitor schemaVisitor)
+            where TSchemaVisitor :  class, GraphQL.Utilities.ISchemaNodeVisitor { }
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSerializer>(this GraphQL.DI.IGraphQLBuilder builder)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TSerializer> serializerFactory)
