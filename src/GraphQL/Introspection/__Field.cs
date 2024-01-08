@@ -44,7 +44,7 @@ namespace GraphQL.Introspection
                     {
                         var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
 
-                        bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                        bool includeDeprecated = !deprecationOfInputValues || context.GetArgument<bool>("includeDeprecated");
 
                         int index = 0;
                         foreach (var argument in source.Arguments.List!)

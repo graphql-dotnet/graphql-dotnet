@@ -65,6 +65,9 @@ namespace GraphQL
 
         internal static bool TryGetArgumentExact(this IResolveFieldContext context, Type argumentType, string argumentName, out object? result)
         {
+            if (context.FieldDefinition!.Arguments?.Find(argumentName) == null)
+                throw new InvalidOperationException("abcd");
+
             if (context.Arguments == null || !context.Arguments.TryGetValue(argumentName, out var arg))
             {
                 result = null;

@@ -53,7 +53,7 @@ namespace GraphQL.Builders
         {
             get
             {
-                var last = this.GetArgument<int?>("last");
+                var last = (Arguments?.ContainsKey("last") ?? false) ? this.GetArgument<int?>("last") : null;
                 return last.HasValue ? (int?)Math.Abs(last.Value) : null;
             }
         }
@@ -62,7 +62,7 @@ namespace GraphQL.Builders
         public string? After => this.GetArgument<string>("after");
 
         /// <inheritdoc/>
-        public string? Before => this.GetArgument<string>("before");
+        public string? Before => (Arguments?.ContainsKey("before") ?? false) ? this.GetArgument<string>("before") : null;
 
         /// <inheritdoc/>
         public int? PageSize => First ?? Last ?? _defaultPageSize;
