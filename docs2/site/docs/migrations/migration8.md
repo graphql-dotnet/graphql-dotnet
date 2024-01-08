@@ -376,12 +376,15 @@ public class NoConnectionOver1000Visitor : BaseSchemaNodeVisitor
 {
     public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
     {
-        if (field.ResolvedType?.GetNamedType() is not IObjectGraphType connectionType || !connectionType.Name.EndsWith("Connection"))
+        // identify fields that return a connection type
+        if (!field.ResolvedType!.GetNamedType().Name.EndsWith("Connection"))
             return;
 
+        // identify the first and last arguments
         if (argument.Name != "first" && argument.Name != "last")
             return;
 
+        // apply the validation rule
         argument.Validate(value =>
         {
             if (value is int intValue && intValue > 1000)
