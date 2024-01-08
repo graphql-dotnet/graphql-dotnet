@@ -370,7 +370,7 @@ method during schema initialization, as shown below:
 ```csharp
 services.AddGraphQL(b => b
     .AddSchema<MySchema>()
-    .ConfigureSchema(s => s.RegisterVisitor(new NoConnectionOver1000Visitor())));
+    .AddSchemaVisitor<NoConnectionOver1000Visitor>());
     
 public class NoConnectionOver1000Visitor : BaseSchemaNodeVisitor
 {
