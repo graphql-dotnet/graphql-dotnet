@@ -2480,6 +2480,11 @@ namespace GraphQL.Types
         public PascalCaseAttribute() { }
         public override string ChangeEnumCase(string val) { }
     }
+    public class PatternMatchingDirective : GraphQL.Types.Directive
+    {
+        public PatternMatchingDirective() { }
+        public override bool? Introspectable { get; }
+    }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {
         public PossibleTypes() { }
@@ -3117,6 +3122,12 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Utilities.Visitors
 {
+    public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public PatternMatchingVisitor() { }
+        public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+    }
     public sealed class RemoveDeprecationReasonsVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
     {
         protected override System.Threading.Tasks.ValueTask VisitDirectiveAsync(GraphQLParser.AST.GraphQLDirective directive, GraphQLParser.Visitors.NullVisitorContext context) { }
