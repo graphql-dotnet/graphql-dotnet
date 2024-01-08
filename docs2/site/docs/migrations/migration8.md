@@ -303,7 +303,8 @@ to consider adding a schema initialization visitor to walk the schema, applying 
 to the appropriate fields arguments via the `Validate` method, rather than using a validation rule
 to validate the field arguments. This will be much more efficient, as the validation rule will not
 be called for every field argument on every field, nor will it require a dictionary lookup to find
-the validation rule for the field argument.
+the validation rule for the field argument. A sample of a schema initialization visitor is provided
+below for comparison.
 
 To implement a validation rule that validates field or directive arguments, implement
 `IValidationRule` and `IVariableVisitorProvider`. The `IVariableVisitorProvider` interface has a
@@ -317,6 +318,10 @@ if an argument fails coercion or validation.
 Sample code for a validation rule that ensures that connections do not request over 1000 rows:
 
 ```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddValidationRule<NoConnectionOver1000ValidationRule>());
+
 public class NoConnectionOver1000ValidationRule : IValidationRule, IVariableVisitorProvider, INodeVisitor
 {
     // do not run any visitors on the initial validation
@@ -360,7 +365,35 @@ public class NoConnectionOver1000ValidationRule : IValidationRule, IVariableVisi
 
 The above is sample functionality, although in this situation it would be more efficient to
 have a schema visitor apply this validation rule to the appropriate fields via the `Validate`
-method during schema initialization.
+method during schema initialization, as shown below:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .ConfigureSchema(s => s.RegisterVisitor(new NoConnectionOver1000Visitor())));
+
+public class NoConnectionOver1000Visitor : BaseSchemaNodeVisitor
+{
+    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
+    {
+        if (field.ResolvedType?.GetNamedType() is not IObjectGraphType connectionType || !connectionType.Name.EndsWith("Connection"))
+            return;
+
+        if (argument.Name != "first" && argument.Name != "last")
+            return;
+
+        argument.Validate(value =>
+        {
+            if (value is int intValue && intValue > 1000)
+                throw new ArgumentException("Cannot return more than 1000 rows.");
+        });
+    }
+}
+```
+
+With the visitor approach, the validation is only evaluated at runtime when the applicable
+field is requested, with no performance penalty otherwise. It is also considerably simpler
+to implement.
 
 ## Breaking Changes
 
