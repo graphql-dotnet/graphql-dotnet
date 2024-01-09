@@ -22,7 +22,6 @@ public class ChatSubscriptions : ObjectGraphType
     public ChatSubscriptions(IChat chat)
     {
         _chat = chat;
-
         Field<MessageType, Message>("messageAdded")
             .ResolveStream(Subscribe);
 
