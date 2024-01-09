@@ -31,12 +31,8 @@ public class ChatSubscriptions : ObjectGraphType
   {
     _chat = chat;
 
-    AddField(new FieldType
-    {
-      Name = "messageAdded",
-      Type = typeof(MessageType),
-      StreamResolver = new SourceStreamResolver<Message>(ResolveStream)
-    });
+    Field<MessageType, Message>("messageAdded")
+      .ResolveStream(ResolveStream);
   }
 
   private IObservable<Message> ResolveStream(IResolveFieldContext context)
