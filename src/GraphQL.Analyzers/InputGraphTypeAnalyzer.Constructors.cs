@@ -1,5 +1,6 @@
 using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -18,40 +19,50 @@ public partial class InputGraphTypeAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR);
 
-    private static void AnalyzeSourceTypeConstructors(
+    private static IMethodSymbol? AnalyzeSourceTypeConstructors(
         SyntaxNodeAnalysisContext context,
         BaseTypeDeclarationSyntax inputObjectDeclarationSyntax,
         ITypeSymbol sourceTypeSymbol)
     {
-        if (!AnalyzeSourceTypeConstructors(sourceTypeSymbol))
+        if (!TryResolveSourceTypeConstructor(context, sourceTypeSymbol, out var ctor))
         {
             var location = FindSourceSymbolUsageLocation(context, inputObjectDeclarationSyntax, sourceTypeSymbol);
             ReportConstructorDiagnostic(context, sourceTypeSymbol, location);
         }
+
+        return ctor;
     }
 
-    private static void AnalyzeSourceTypeConstructors(
+    private static IMethodSymbol? AnalyzeSourceTypeConstructors(
         SyntaxNodeAnalysisContext context,
         GenericNameSyntax autoRegisteringInputGenericName,
         ITypeSymbol sourceTypeSymbol)
     {
-        if (!AnalyzeSourceTypeConstructors(sourceTypeSymbol))
+        if (!TryResolveSourceTypeConstructor(context, sourceTypeSymbol, out var ctor))
         {
             var location = FindSourceSymbolUsageLocation(context, autoRegisteringInputGenericName, sourceTypeSymbol);
             ReportConstructorDiagnostic(context, sourceTypeSymbol, location);
         }
+
+        return ctor;
     }
 
-    private static bool AnalyzeSourceTypeConstructors(ITypeSymbol sourceTypeSymbol)
+    // Mimic the AutoRegisteringHelper.GetConstructorOrDefault behavior
+    private static bool TryResolveSourceTypeConstructor(
+        SyntaxNodeAnalysisContext context,
+        ITypeSymbol sourceTypeSymbol,
+        out IMethodSymbol? ctor)
     {
         // MyInput<SourceType> : InputObjectGraphType<SourceType>
         if (sourceTypeSymbol is ITypeParameterSymbol)
         {
+            ctor = null;
             return true;
         }
 
         if (sourceTypeSymbol.IsAbstract)
         {
+            ctor = null;
             return false;
         }
 
@@ -65,32 +76,50 @@ public partial class InputGraphTypeAnalyzer
             })
             .ToList();
 
-        // no public constructor
+        // if there are no public constructors, return null
         if (constructors.Count == 0)
         {
+            ctor = null;
             return false;
         }
 
-        // single public or implicit default constructor
+        // if there is only one public constructor, return it
         if (constructors.Count == 1)
         {
+            ctor = constructors[0];
             return true;
         }
 
-        // explicit default constructor
-        if (constructors.Any(ctor => ctor.Parameters.Length == 0))
+        var graphQlConstructorAttribute = context.Compilation
+            .GetTypeByMetadataName(Constants.MetadataNames.GraphQLConstructorAttribute);
+
+        // if there are multiple public constructors, return the one marked with
+        // GraphQLConstructorAttribute, or the parameterless constructor, or null
+        IMethodSymbol? match = null;
+        IMethodSymbol? parameterless = null;
+        foreach (var constructor in constructors)
         {
-            return true;
+            if (HasGraphQLAttribute(constructor, graphQlConstructorAttribute))
+            {
+                // when multiple constructors decorated with [GraphQLConstructor]
+                // we ignore all the constructors in this analyzer
+                if (match != null)
+                {
+                    ctor = null;
+                    return false;
+                }
+
+                match = constructor;
+            }
+
+            if (constructor.Parameters.Length == 0)
+            {
+                parameterless = constructor;
+            }
         }
 
-        // one constructor with [GraphQLConstructor] attribute
-        if (constructors.Count(HasGraphQLAttribute) == 1)
-        {
-            return true;
-        }
-
-        // no default constructors and (no [GraphQLConstructor] attribute, or multiple [GraphQLConstructor] attributes)
-        return false;
+        ctor = match ?? parameterless;
+        return ctor != null;
     }
 
     private static void ReportConstructorDiagnostic(
@@ -127,14 +156,13 @@ public partial class InputGraphTypeAnalyzer
             .TypeArgumentList.Arguments
             .FirstOrDefault(arg =>
             {
-                var argType = context.SemanticModel.GetTypeInfo(arg).Type;
+                var argType = context.SemanticModel.GetTypeInfo(arg, context.CancellationToken).Type;
                 return argType != null && SymbolEqualityComparer.Default.Equals(argType, sourceTypeSymbol);
             })
             ?.GetLocation();
 
-    private static bool HasGraphQLAttribute(IMethodSymbol constructor) =>
+    private static bool HasGraphQLAttribute(ISymbol constructor, ISymbol? graphQlConstructorAttribute) =>
         constructor
             .GetAttributes()
-            .Any(attr => attr.AttributeClass?.Name == Constants.Types.GraphQLConstructorAttribute &&
-                         attr.AttributeClass.IsGraphQLSymbol());
+            .Any(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, graphQlConstructorAttribute));
 }

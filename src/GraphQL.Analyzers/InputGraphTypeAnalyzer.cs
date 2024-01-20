@@ -10,6 +10,8 @@ namespace GraphQL.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 {
+    private static readonly char[] _forceTypesAnalysisSeparator = [','];
+
     public static string ForceTypesAnalysisOption => "dotnet_diagnostic.input_graph_type_analyzer.force_types_analysis";
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
@@ -29,7 +31,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
     private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
     {
         var classDeclaration = (ClassDeclarationSyntax)context.Node;
-        var inputTypeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
+        var inputTypeSymbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration, context.CancellationToken);
         if (inputTypeSymbol == null)
         {
             return;
@@ -41,8 +43,13 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeSourceTypeConstructors(context, classDeclaration, sourceTypeSymbol);
-        AnalyzeInputGraphTypeFields(context, classDeclaration, sourceTypeSymbol);
+        var sourceTypeMembers = sourceTypeSymbol is ITypeParameterSymbol parameterSymbol
+            ? GetSourceTypeMembers(parameterSymbol.ConstraintTypes)
+            : GetSourceTypeMembers(sourceTypeSymbol);
+
+        var ctor = AnalyzeSourceTypeConstructors(context, classDeclaration, sourceTypeSymbol);
+
+        AnalyzeInputGraphTypeFields(context, classDeclaration, sourceTypeSymbol, sourceTypeMembers, ctor);
     }
 
     private void AnalyzeGenericName(SyntaxNodeAnalysisContext context)
@@ -64,7 +71,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var type = context.SemanticModel.GetSymbolInfo(genericName);
+        var type = context.SemanticModel.GetSymbolInfo(genericName, context.CancellationToken);
         if (type.Symbol is not INamedTypeSymbol inputTypeSymbol)
         {
             return;
@@ -76,7 +83,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeSourceTypeConstructors(context, genericName, sourceTypeSymbol);
+        var ctor = AnalyzeSourceTypeConstructors(context, genericName, sourceTypeSymbol);
     }
 
     private static ITypeSymbol? GetSourceTypeSymbol(
@@ -96,7 +103,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 
         string? forceTypesAnalysisOption = context.Options.GetStringOption(ForceTypesAnalysisOption, context.Node.SyntaxTree);
         var forceTypesAnalysis = forceTypesAnalysisOption
-            ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            ?.Split(_forceTypesAnalysisSeparator, StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
 
@@ -122,5 +129,26 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
         }
 
         return null;
+    }
+
+    private static IEnumerable<ISymbol> GetSourceTypeMembers(IEnumerable<ITypeSymbol> sourceTypeSymbols) =>
+        sourceTypeSymbols.SelectMany(GetSourceTypeMembers);
+
+    private static IEnumerable<ISymbol> GetSourceTypeMembers(ITypeSymbol sourceTypeSymbol)
+    {
+        var symbols = Enumerable.Empty<ISymbol>();
+
+        var nullableSourceTypeSymbol = sourceTypeSymbol;
+        while (nullableSourceTypeSymbol != null)
+        {
+            var fieldsOrProperties = nullableSourceTypeSymbol
+                .GetMembers()
+                .Where(symbol => !symbol.IsImplicitlyDeclared && symbol is IPropertySymbol or IFieldSymbol);
+
+            symbols = symbols.Concat(fieldsOrProperties);
+            nullableSourceTypeSymbol = nullableSourceTypeSymbol.BaseType;
+        }
+
+        return symbols;
     }
 }

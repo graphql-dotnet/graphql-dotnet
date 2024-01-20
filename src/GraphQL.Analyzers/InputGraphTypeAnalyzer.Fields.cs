@@ -31,14 +31,12 @@ public partial class InputGraphTypeAnalyzer
     private static void AnalyzeInputGraphTypeFields(
         SyntaxNodeAnalysisContext context,
         BaseTypeDeclarationSyntax inputObjectDeclarationSyntax,
-        ITypeSymbol sourceTypeSymbol)
+        ITypeSymbol sourceTypeSymbol,
+        IEnumerable<ISymbol> sourceTypeMembers,
+        IMethodSymbol? constructor)
     {
-        var graphQlConstructorAttribute = context.Compilation
-            .GetTypeByMetadataName(Constants.MetadataNames.GraphQLConstructorAttribute);
-
-        var allowedSymbols = (sourceTypeSymbol is ITypeParameterSymbol parameterSymbol
-                ? GetAllowedFieldNames(parameterSymbol.ConstraintTypes, graphQlConstructorAttribute)
-                : GetAllowedFieldNames(sourceTypeSymbol, graphQlConstructorAttribute))
+        var allowedSymbols = sourceTypeMembers
+            .Concat(constructor?.Parameters ?? Enumerable.Empty<ISymbol>())
             .GroupBy(symbol => symbol.Name, StringComparer.InvariantCultureIgnoreCase)
             .ToDictionary(
                 group => group.Key,
@@ -72,16 +70,16 @@ public partial class InputGraphTypeAnalyzer
                 ?.Expression;
 
             // don't analyze name for Field("FirstName", source => source.Name), only the accessibility
-            if (expressionArg is SimpleLambdaExpressionSyntax { Body: MemberAccessExpressionSyntax mem })
+            if (expressionArg is SimpleLambdaExpressionSyntax { Body: MemberAccessExpressionSyntax memberAccessExpression })
             {
-                var expressionSymbol = context.SemanticModel.GetSymbolInfo(mem);
-                if (expressionSymbol.Symbol != null)
+                var memberAccessExpressionSymbol = context.SemanticModel.GetSymbolInfo(memberAccessExpression);
+                if (memberAccessExpressionSymbol.Symbol != null)
                 {
-                    var symbols = new List<ISymbol> { expressionSymbol.Symbol };
+                    var symbols = new List<ISymbol> { memberAccessExpressionSymbol.Symbol };
                     AnalyzeAccessibility(
                         context,
-                        nameArg ?? mem,
-                        fieldName ?? expressionSymbol.Symbol.Name,
+                        nameArg ?? memberAccessExpression,
+                        fieldName ?? memberAccessExpressionSymbol.Symbol.Name,
                         symbols);
                 }
                 continue;
@@ -92,88 +90,6 @@ public partial class InputGraphTypeAnalyzer
                 AnalyzeFieldName(context, nameArg, fieldName, allowedSymbols, sourceTypeSymbol);
             }
         }
-    }
-
-    private static IEnumerable<ISymbol> GetAllowedFieldNames(
-        IEnumerable<ITypeSymbol> sourceTypeSymbols,
-        INamedTypeSymbol? graphQlConstructorAttribute) =>
-        sourceTypeSymbols.SelectMany(sourceTypeSymbol =>
-            GetAllowedFieldNames(sourceTypeSymbol, graphQlConstructorAttribute));
-
-    private static IEnumerable<ISymbol> GetAllowedFieldNames(
-        ITypeSymbol sourceTypeSymbol,
-        INamedTypeSymbol? graphQlConstructorAttribute)
-    {
-        // consider ctor params on the type itself but not base classes
-        var symbols = FindConstructor(sourceTypeSymbol, graphQlConstructorAttribute)
-            ?.Parameters ?? Enumerable.Empty<ISymbol>();
-
-        var nullableSourceTypeSymbol = sourceTypeSymbol;
-        while (nullableSourceTypeSymbol != null)
-        {
-            var fieldsOrProperties = nullableSourceTypeSymbol
-                .GetMembers()
-                .Where(symbol => !symbol.IsImplicitlyDeclared && symbol is IPropertySymbol or IFieldSymbol);
-
-            symbols = symbols.Concat(fieldsOrProperties);
-            nullableSourceTypeSymbol = nullableSourceTypeSymbol.BaseType;
-        }
-
-        return symbols;
-    }
-
-    // Mimic the AutoRegisteringHelper.GetConstructorOrDefault behavior
-    private static IMethodSymbol? FindConstructor(
-        ITypeSymbol sourceTypeSymbol,
-        ISymbol? graphQlConstructorAttribute)
-    {
-        var constructors = sourceTypeSymbol
-            .GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(method => method is
-            {
-                MethodKind: MethodKind.Constructor,
-                DeclaredAccessibility: Accessibility.Public
-            })
-            .ToList();
-
-        // if there are no public constructors, return null
-        if (constructors.Count == 0)
-        {
-            return null;
-        }
-
-        // if there is only one public constructor, return it
-        if (constructors.Count == 1)
-        {
-            return constructors[0];
-        }
-
-        // if there are multiple public constructors, return the one marked with
-        // GraphQLConstructorAttribute, or the parameterless constructor, or null
-        IMethodSymbol? match = null;
-        IMethodSymbol? parameterless = null;
-        foreach (var constructor in constructors)
-        {
-            if (constructor.GetAttributes().Any(attr =>
-                    SymbolEqualityComparer.Default.Equals(attr.AttributeClass, graphQlConstructorAttribute)))
-            {
-                // when multiple constructors decorated with [GraphQLConstructor]
-                // we ignore all the constructors in this analyzer
-                if (match != null)
-                {
-                    return null;
-                }
-                match = constructor;
-            }
-
-            if (constructor.Parameters.Length == 0)
-            {
-                parameterless = constructor;
-            }
-        }
-
-        return match ?? parameterless;
     }
 
     private static IEnumerable<InvocationExpressionSyntax> GetDeclaredFields(BaseTypeDeclarationSyntax classDeclaration)
@@ -205,7 +121,7 @@ public partial class InputGraphTypeAnalyzer
         SyntaxNodeAnalysisContext context,
         ExpressionSyntax nameExpression,
         string fieldName,
-        IDictionary<string, List<ISymbol>> allowedSymbols,
+        Dictionary<string, List<ISymbol>> allowedSymbols,
         ISymbol sourceTypeSymbol)
     {
         if (allowedSymbols.TryGetValue(fieldName, out var symbols))
@@ -255,12 +171,12 @@ public partial class InputGraphTypeAnalyzer
 
             if (symbol.DeclaredAccessibility != Accessibility.Public)
             {
-                (reasons ??= new List<string>()).Add("not 'public'");
+                (reasons ??= []).Add("not 'public'");
             }
 
             if (symbol.IsStatic)
             {
-                (reasons ??= new List<string>()).Add("'static'");
+                (reasons ??= []).Add("'static'");
             }
 
             switch (symbol)
@@ -272,7 +188,7 @@ public partial class InputGraphTypeAnalyzer
                     symbolType = "property";
                     if (property.SetMethod is not { DeclaredAccessibility: Accessibility.Public })
                     {
-                        (reasons ??= new List<string>()).Add("doesn't have a public setter");
+                        (reasons ??= []).Add("doesn't have a public setter");
                     }
                     break;
                 }
@@ -286,7 +202,7 @@ public partial class InputGraphTypeAnalyzer
                     }
                     else if (field.IsReadOnly)
                     {
-                        (reasons ??= new List<string>()).Add("'readonly'");
+                        (reasons ??= []).Add("'readonly'");
                     }
                     break;
                 }
