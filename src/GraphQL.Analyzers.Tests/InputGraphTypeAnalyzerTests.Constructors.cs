@@ -151,6 +151,7 @@ public partial class InputGraphTypeAnalyzerTests
               {
                   public CustomInputObjectGraphType()
                   {
+                      Field<IntGraphType>("Num");
                       Field<StringGraphType>("Name");
                   }
               }
@@ -161,6 +162,7 @@ public partial class InputGraphTypeAnalyzerTests
                   public MySource(int num) { }
                   {{attribute2}}
                   public MySource(string name) { }
+                  public int Num { get; set; }
                   public string Name { get; set; }
               }
 
@@ -276,5 +278,226 @@ public partial class InputGraphTypeAnalyzerTests
             .WithLocation(0).WithArguments("MySource");
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task ConstructorRequiresThreeArguments_OnlyOneFiledDefined_GQL013()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : InputObjectGraphType<{|#0:MySource|}>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public class MySource
+            {
+                public MySource(string name, int age, string email) { }
+                public string Name { get; }
+                public int Age { get; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotFulfillConstructorParameters)
+            .WithLocation(0).WithArguments("MySource", "age, email");
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task ConstructorRequiresTwoArguments_OneMandatoryOneOptional_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : InputObjectGraphType<MySource>
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public class MySource
+            {
+                public MySource(string name, int age = 0) { }
+                public string Name { get; }
+                public int Age { get; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task BaseInputOpenGeneric_NoFieldForConstructorArgument_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+                where TSourceType : MyBaseSource
+            {
+                public BaseInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public class MyBaseSource
+            {
+                public MyBaseSource(string age) {}
+                public string Name { get; set; }
+                public int Age { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact(Skip = "Need to refactor the analyzer implementation")]
+    public async Task FieldsForConstructorArgumentsDefinedOnTheBaseInputType_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class MyInputObjectGraphType : BaseInputObjectGraphType<MySource>
+            {
+                public MyInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Email");
+                }
+            }
+
+            public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType<TSourceType>
+                where TSourceType : MyBaseSource
+            {
+                public BaseInputObjectGraphType()
+                {
+                    Field<StringGraphType>("Name");
+                    Field<IntGraphType>("Age");
+                }
+            }
+
+            public class MySource : MyBaseSource
+            {
+                public MySource(int age, string name, string email) : base(age) {}
+                public string Email { get; set; }
+            }
+
+            public class MyBaseSource
+            {
+                public MyBaseSource(int age) {}
+                public string Name { get; set; }
+                public int Age { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task AutoRegistering_ConstructorRequiresThreeArguments_OnlyOneFiledDefined_GQL013()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : InputObjectGraphType
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<AutoRegisteringInputObjectGraphType<{|#0:MySource|}>>("MyInputField");
+                }
+            }
+
+            public class MySource
+            {
+                public MySource(string name, int age, string email) {}
+                public string Name { get; }
+            }
+            """;
+
+        var expected = VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotFulfillConstructorParameters)
+            .WithLocation(0).WithArguments("MySource", "age, email");
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Fact]
+    public async Task AutoRegistering_ConstructorRequiresTwoArguments_OneMandatoryOneOptional_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+            using System.Collections.Generic;
+
+            namespace Sample.Server;
+
+            public class CustomInputObjectGraphType : InputObjectGraphType
+            {
+                public CustomInputObjectGraphType()
+                {
+                    Field<AutoRegisteringInputObjectGraphType<{|#0:MySource|}>>("MyInputField");
+                }
+            }
+
+            public class MySource
+            {
+                public MySource(string name, int age = 0) { }
+                public string Name { get; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task AutoRegistering_BaseInputOpenGeneric_NoFieldForConstructorArgument_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class BaseInputObjectGraphType<TSourceType> : InputObjectGraphType
+                where TSourceType : MyBaseSource
+            {
+                public BaseInputObjectGraphType()
+                {
+                    Field<AutoRegisteringInputObjectGraphType<{|#0:TSourceType|}>>("MyInputField");
+                }
+            }
+
+            public class MyBaseSource
+            {
+                public MyBaseSource(string age) {}
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
     }
 }

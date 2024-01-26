@@ -7,6 +7,7 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 GQL010 | Usage | Error | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql010)
 GQL012 | Usage | Error | AllowedOnAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql012)
+GQL013 | Usage | Error | InputGraphTypeAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql013)
 
 ### Removed Rules
 

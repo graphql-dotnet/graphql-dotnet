@@ -164,6 +164,11 @@ public static class ExpressionExtensions
         => symbol.Name == WellKnownMemberNames.GetAwaiter &&
         VerifyGetAwaiter(symbol);
 
+    public static bool IsAutoProperty(this IPropertySymbol property)
+        => property.ContainingType
+            .GetMembers()
+            .Any(member => member is IFieldSymbol field && SymbolEqualityComparer.Default.Equals(field.AssociatedSymbol, property));
+
     private static bool VerifyGetAwaiter(IMethodSymbol getAwaiter)
     {
         var returnType = getAwaiter.ReturnType;

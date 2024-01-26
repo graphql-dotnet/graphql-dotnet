@@ -28,7 +28,7 @@ public partial class InputGraphTypeAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.CAN_NOT_SET_SOURCE_FIELD);
 
-    private static void AnalyzeInputGraphTypeFields(
+    private static HashSet<string>? AnalyzeInputGraphTypeFields(
         SyntaxNodeAnalysisContext context,
         BaseTypeDeclarationSyntax inputObjectDeclarationSyntax,
         ITypeSymbol sourceTypeSymbol,
@@ -43,6 +43,7 @@ public partial class InputGraphTypeAnalyzer
                 group => group.ToList(),
                 StringComparer.InvariantCultureIgnoreCase);
 
+        HashSet<string>? declaredFiledNames = null;
         foreach (var fieldInvocationExpression in GetDeclaredFields(inputObjectDeclarationSyntax))
         {
             var nameArg = fieldInvocationExpression
@@ -76,10 +77,12 @@ public partial class InputGraphTypeAnalyzer
                 if (memberAccessExpressionSymbol.Symbol != null)
                 {
                     var symbols = new List<ISymbol> { memberAccessExpressionSymbol.Symbol };
+                    fieldName ??= memberAccessExpressionSymbol.Symbol.Name;
+                    (declaredFiledNames ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(fieldName);
                     AnalyzeAccessibility(
                         context,
                         nameArg ?? memberAccessExpression,
-                        fieldName ?? memberAccessExpressionSymbol.Symbol.Name,
+                        fieldName,
                         symbols);
                 }
                 continue;
@@ -87,9 +90,12 @@ public partial class InputGraphTypeAnalyzer
 
             if (nameArg != null && fieldName != null)
             {
+                (declaredFiledNames ??= new HashSet<string>(StringComparer.OrdinalIgnoreCase)).Add(fieldName);
                 AnalyzeFieldName(context, nameArg, fieldName, allowedSymbols, sourceTypeSymbol);
             }
         }
+
+        return declaredFiledNames;
     }
 
     private static IEnumerable<InvocationExpressionSyntax> GetDeclaredFields(BaseTypeDeclarationSyntax classDeclaration)

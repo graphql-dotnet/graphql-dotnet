@@ -14,4 +14,5 @@ public static class HelpLinks
     public const string CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR = $"{DOCS_URL}/gql010";
     public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = $"{DOCS_URL}/gql011";
     public const string ILLEGAL_METHOD_USAGE = $"{DOCS_URL}/gql012";
+    public const string CAN_NOT_FULFILL_CONSTRUCTOR_PARAMETERS = $"{DOCS_URL}/gql013";
 }

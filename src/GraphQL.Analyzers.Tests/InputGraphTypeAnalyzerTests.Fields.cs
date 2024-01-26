@@ -135,6 +135,7 @@ public partial class InputGraphTypeAnalyzerTests
                   public MyInputGraphType()
                   {
                       Field<StringGraphType>({|#0:"FirstName"|});
+                      Field<IntGraphType>("Age");
                   }
               }
 
@@ -143,6 +144,7 @@ public partial class InputGraphTypeAnalyzerTests
                   {{ctorAccessibility}} MySourceType({{ctorParams}}) { }
 
                   public string Name { get; set; }
+                  public int Age { get; set; }
               }
               """;
 
@@ -344,6 +346,7 @@ public partial class InputGraphTypeAnalyzerTests
                 public MyInputGraphType()
                 {
                     Field<StringGraphType>({|#0:"FirstName"|});
+                    Field<StringGraphType>("AnotherName");
                 }
             }
 
