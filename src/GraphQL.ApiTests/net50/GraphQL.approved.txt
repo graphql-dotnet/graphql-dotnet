@@ -3697,7 +3697,7 @@ namespace GraphQL.Validation.Rules
     {
         public static readonly GraphQL.Validation.Rules.UniqueFragmentNames Instance;
         public UniqueFragmentNames() { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> ValidateAsync(GraphQL.Validation.ValidationContext context) { }
+        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueInputFieldNames : GraphQL.Validation.ValidationRuleBase
     {
