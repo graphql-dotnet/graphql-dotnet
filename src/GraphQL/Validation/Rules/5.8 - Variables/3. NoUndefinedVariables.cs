@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL operation is only valid if all variables encountered, both directly
     /// and via fragment spreads, are defined by that operation.
     /// </summary>
-    public class NoUndefinedVariables : IValidationRule
+    public class NoUndefinedVariables : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUndefinedVariablesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>

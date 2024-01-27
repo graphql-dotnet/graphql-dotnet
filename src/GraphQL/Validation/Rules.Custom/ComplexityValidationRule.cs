@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules.Custom;
 /// <summary>
 /// Analyzes a document to determine if its complexity exceeds a threshold.
 /// </summary>
-public class ComplexityValidationRule : IValidationRule, INodeVisitor
+public class ComplexityValidationRule : ValidationRuleBase, INodeVisitor
 {
     private ComplexityConfiguration ComplexityConfiguration { get; }
 
@@ -23,7 +23,7 @@ public class ComplexityValidationRule : IValidationRule, INodeVisitor
     }
 
     /// <inheritdoc/>
-    public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(this);
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(this);
 
     ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context) => default;
 

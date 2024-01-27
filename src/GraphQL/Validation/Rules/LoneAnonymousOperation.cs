@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if when it contains an anonymous operation
     /// (the query short-hand) that it contains only that one operation definition.
     /// </summary>
-    public class LoneAnonymousOperation : IValidationRule
+    public class LoneAnonymousOperation : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="LoneAnonymousOperationError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
         {

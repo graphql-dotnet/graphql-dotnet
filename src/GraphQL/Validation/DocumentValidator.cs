@@ -86,36 +86,17 @@ namespace GraphQL.Validation
                         context.TypeInfo
                     };
 
-                    if (rules is List<IValidationRule> list) //TODO:allocation - optimization for List+Enumerator<IvalidationRule>
+                    foreach (var rule in rules)
                     {
-                        foreach (var rule in list)
-                        {
-                            if (rule is IVariableVisitorProvider provider)
-                            {
-                                var variableVisitor = provider.GetVisitor(context);
-                                if (variableVisitor != null)
-                                    (variableVisitors ??= new()).Add(variableVisitor);
-                            }
-                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
-                            if (visitor != null)
-                                visitors.Add(visitor);
-                        }
+                        var visitor = await rule.GetPreNodeVisitorAsync(context).ConfigureAwait(false);
+                        if (visitor != null)
+                            visitors.Add(visitor);
+
+                        var variableVisitor = await rule.GetVariableVisitorAsync(context).ConfigureAwait(false);
+                        if (variableVisitor != null)
+                            (variableVisitors ??= new()).Add(variableVisitor);
                     }
-                    else
-                    {
-                        foreach (var rule in rules)
-                        {
-                            if (rule is IVariableVisitorProvider provider)
-                            {
-                                var variableVisitor = provider.GetVisitor(context);
-                                if (variableVisitor != null)
-                                    (variableVisitors ??= new()).Add(variableVisitor);
-                            }
-                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
-                            if (visitor != null)
-                                visitors.Add(visitor);
-                        }
-                    }
+
                     await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
                 }
 
@@ -164,14 +145,11 @@ namespace GraphQL.Validation
 
                     foreach (var rule in rules)
                     {
-                        if (rule is IVariableVisitorProvider provider)
+                        var visitor = await rule.GetPostNodeVisitorAsync(context).ConfigureAwait(false);
+                        if (visitor != null)
                         {
-                            var visitor = await provider.ValidateArgumentsAsync(context).ConfigureAwait(false);
-                            if (visitor != null)
-                            {
-                                visitors ??= [context.TypeInfo];
-                                visitors.Add(visitor);
-                            }
+                            visitors ??= [context.TypeInfo];
+                            visitors.Add(visitor);
                         }
                     }
 

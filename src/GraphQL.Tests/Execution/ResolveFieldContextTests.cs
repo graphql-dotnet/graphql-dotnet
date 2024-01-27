@@ -256,11 +256,11 @@ public class ResolveFieldContextTests
         }
     }
 
-    private class VerifyUserValidationRule : IValidationRule
+    private class VerifyUserValidationRule : ValidationRuleBase
     {
         public bool ShouldBeAuthenticated { get; set; }
 
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
         {
             context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
             return default;

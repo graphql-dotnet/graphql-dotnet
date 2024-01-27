@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL field is only valid if all supplied arguments are defined by
     /// that field.
     /// </summary>
-    public class KnownArgumentNames : IValidationRule
+    public class KnownArgumentNames : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownArgumentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((node, context) =>
         {

@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Rules
     /// <summary>
     /// Variables passed to field arguments conform to type.
     /// </summary>
-    public class VariablesInAllowedPosition : IValidationRule
+    public class VariablesInAllowedPosition : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -16,7 +16,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="VariablesInAllowedPositionError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLVariableDefinition>(

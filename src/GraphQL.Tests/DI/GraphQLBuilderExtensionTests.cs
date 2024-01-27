@@ -1456,8 +1456,7 @@ public class GraphQLBuilderExtensionTests
     {
     }
 
-    private class MyValidationRule : IValidationRule
+    private class MyValidationRule : ValidationRuleBase
     {
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
     }
 }

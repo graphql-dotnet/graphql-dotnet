@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     ///
     /// A GraphQL document is only valid if it does not contain fragment cycles.
     /// </summary>
-    public class NoFragmentCycles : IValidationRule
+    public class NoFragmentCycles : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,8 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoFragmentCyclesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
+            => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
         {

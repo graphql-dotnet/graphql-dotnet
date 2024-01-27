@@ -88,9 +88,9 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// A dictionary of fields, and for each field, a dictionary of arguments defined for the field with their values.
-        /// During validation rule execution via <see cref="IValidationRule.ValidateAsync(ValidationContext)"/>,
+        /// During validation rule execution via <see cref="IValidationRule.GetPreNodeVisitorAsync(ValidationContext)"/>,
         /// this value will be <see langword="null"/>. While executing variable validation via
-        /// <see cref="IVariableVisitorProvider.ValidateArgumentsAsync(ValidationContext)"/>, this value will be initialized
+        /// <see cref="IValidationRule.GetPostNodeVisitorAsync(ValidationContext)"/>, this value will be initialized
         /// unless no field arguments were found, in which case the value will be <see langword="null"/>.
         /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
         /// </summary>
@@ -98,9 +98,9 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// A dictionary of fields, and for each field, a dictionary of directives defined for the field with their values.
-        /// During validation rule execution via <see cref="IValidationRule.ValidateAsync(ValidationContext)"/>,
+        /// During validation rule execution via <see cref="IValidationRule.GetPreNodeVisitorAsync(ValidationContext)"/>,
         /// this value will be <see langword="null"/>. While executing variable validation via
-        /// <see cref="IVariableVisitorProvider.ValidateArgumentsAsync(ValidationContext)"/>, this value will be initialized
+        /// <see cref="IValidationRule.GetPostNodeVisitorAsync(ValidationContext)"/>, this value will be initialized
         /// unless no field arguments were found, in which case the value will be <see langword="null"/>.
         /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
         /// </summary>

@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A field or directive is only valid if all required (non-null) field arguments
     /// have been provided.
     /// </summary>
-    public class ProvidedNonNullArguments : IValidationRule
+    public class ProvidedNonNullArguments : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ProvidedNonNullArgumentsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLField>(leave: (node, context) =>

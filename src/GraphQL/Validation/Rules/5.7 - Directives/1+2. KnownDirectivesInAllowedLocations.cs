@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// For each usage of a directive, the directive must be available on that server and
     /// must be used in a location that the server has declared support for.
     /// </summary>
-    public class KnownDirectivesInAllowedLocations : IValidationRule
+    public class KnownDirectivesInAllowedLocations : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownDirectivesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLDirective>((node, context) =>
         {

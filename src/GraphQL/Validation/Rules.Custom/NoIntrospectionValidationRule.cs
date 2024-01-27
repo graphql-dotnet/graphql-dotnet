@@ -6,7 +6,7 @@ namespace GraphQL.Validation.Rules.Custom;
 /// <summary>
 /// Analyzes the document for any introspection fields and reports an error if any are found.
 /// </summary>
-public class NoIntrospectionValidationRule : IValidationRule
+public class NoIntrospectionValidationRule : ValidationRuleBase
 {
     private static readonly MatchingNodeVisitor<GraphQLField> _visitor = new(
         (field, context) =>
@@ -16,6 +16,5 @@ public class NoIntrospectionValidationRule : IValidationRule
         });
 
     /// <inheritdoc/>
-    public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
-        => new(_visitor);
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_visitor);
 }

@@ -12,7 +12,7 @@ namespace GraphQL.Validation.Rules
     /// be <see langword="true"/>: if there is a non-empty intersection of the
     /// possible parent types, and possible types which pass the type condition.
     /// </summary>
-    public class PossibleFragmentSpreads : IValidationRule
+    public class PossibleFragmentSpreads : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -21,7 +21,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="PossibleFragmentSpreadsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
