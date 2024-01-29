@@ -311,6 +311,10 @@ public interface IValidationRule
 This allows for a single validation rule to validate AST structure, read variable values,
 and/or validate coerced field and directive arguments.
 
+To simplify the creation of validation rules, the `ValidationRuleBase` class has been added,
+which implements the `IValidationRule` interface and provides default implementations for
+all three methods.
+
 ## Breaking Changes
 
 ### 1. Query type is required
