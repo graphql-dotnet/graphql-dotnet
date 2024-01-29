@@ -39,20 +39,21 @@ namespace GraphQL.Validation
             _ancestorStack.Clear();
             _directive = null;
             _argument = null;
-            NoFragmentCycles_VisitedFrags?.Clear();
-            NoFragmentCycles_SpreadPath?.Clear();
-            NoFragmentCycles_SpreadPathIndexByName?.Clear();
-            NoUndefinedVariables_VariableNameDefined?.Clear();
-            NoUnusedFragments_OperationDefs?.Clear();
-            NoUnusedFragments_FragmentDefs?.Clear();
-            NoUnusedVariables_VariableDefs?.Clear();
-            UniqueArgumentNames_KnownArgs?.Clear();
-            UniqueFragmentNames_KnownFragments?.Clear();
-            UniqueInputFieldNames_KnownNameStack?.Clear();
-            UniqueInputFieldNames_KnownNames?.Clear();
-            UniqueOperationNames_Frequency?.Clear();
-            UniqueVariableNames_KnownVariables?.Clear();
-            VariablesInAllowedPosition_VarDefMap?.Clear();
+            // these will not be needed for post-variable-coercion validation rules
+            NoFragmentCycles_VisitedFrags = null;
+            NoFragmentCycles_SpreadPath = null;
+            NoFragmentCycles_SpreadPathIndexByName = null;
+            NoUndefinedVariables_VariableNameDefined = null;
+            NoUnusedFragments_OperationDefs = null;
+            NoUnusedFragments_FragmentDefs = null;
+            NoUnusedVariables_VariableDefs = null;
+            UniqueArgumentNames_KnownArgs = null;
+            UniqueFragmentNames_KnownFragments = null;
+            UniqueInputFieldNames_KnownNameStack = null;
+            UniqueInputFieldNames_KnownNames = null;
+            UniqueOperationNames_Frequency = null;
+            UniqueVariableNames_KnownVariables = null;
+            VariablesInAllowedPosition_VarDefMap = null;
         }
 
         private static T? PeekElement<T>(Stack<T> from, int index)

@@ -315,6 +315,9 @@ To simplify the creation of validation rules, the `ValidationRuleBase` class has
 which implements the `IValidationRule` interface and provides default implementations for
 all three methods.
 
+Documentation has been added to the 'Query Validation' section of the documentation to
+explain how to use the revised `IValidationRule` interface and the `ValidationRuleBase` class.
+
 ## Breaking Changes
 
 ### 1. Query type is required
