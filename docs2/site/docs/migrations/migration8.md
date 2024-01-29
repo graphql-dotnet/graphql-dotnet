@@ -290,119 +290,26 @@ private class Query
 
 ### 8. Validation rules can read or validate field arguments and directive arguments
 
-Validation rules can now read or validate field and directive arguments. This is useful
-for edge cases, such as when a complexity analyzer needs to read the value of a field argument
-to determine the complexity of the field. While it could also be used within custom validation rules
-to validate the value of field or directive arguments, perhaps based on schema directives,
-it cannot be used to validate fields of input objects.
+Validation rules can now execute validation code either before or after field arguments
+have been read. This is useful for edge cases, such as when a complexity analyzer needs
+to read the value of a field argument to determine the complexity of the field.
 
-Note that with the addition of `Validator` and `Parser` delegates, validation rules are no longer
-required to validate input values. If you plan to store validation rules within schema directives,
-such that they may be read by clients (see `ExperimentalFeatures.AppliedDirectives`), you may wish
-to consider adding a schema initialization visitor to walk the schema, applying the validation rules
-to the appropriate fields arguments via the `Validate` method, rather than using a validation rule
-to validate the field arguments. This will be much more efficient, as the validation rule will not
-be called for every field argument on every field, nor will it require a dictionary lookup to find
-the validation rule for the field argument. A sample of a schema initialization visitor is provided
-below for comparison.
-
-To implement a validation rule that validates field or directive arguments, implement
-`IValidationRule` and `IVariableVisitorProvider`. The `IVariableVisitorProvider` interface has a
-new method, `ValidateArgumentsAsync`, that is called during validation. This method is called after
-all the relevant arguments have been parsed, allowing a validation rule to validate
-parsed values. It will run even if there are no arguments to validate, so you should check
-for this case and return early if there is nothing to validate. However, it will not run if
-errors occur prior to parsing the arguments, such as if the field or directive is not found, or
-if an argument fails coercion or validation.
-
-Sample code for a validation rule that ensures that connections do not request over 1000 rows:
+The `ValidateAsync` method on `IValidationRule` has been changed to `GetPreNodeVisitorAsync`,
+and a new method `GetPostNodeVisitorAsync` has been added. Also, the `IVariableVisitorProvider`
+interface has been combined with `IValidationRule` and now has a new method `GetVariableVisitorAsync`.
+So the new `IValidationRule` interface looks like this:
 
 ```csharp
-services.AddGraphQL(b => b
-    .AddSchema<MySchema>()
-    .AddValidationRule<NoConnectionOver1000ValidationRule>());
-
-public class NoConnectionOver1000ValidationRule : IValidationRule, IVariableVisitorProvider, INodeVisitor
+public interface IValidationRule
 {
-    // do not run any visitors on the initial validation
-    public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => default;
-
-    // after argument parsing, run this rule only when there are argument values specified
-    ValueTask<INodeVisitor?> IVariableVisitorProvider.ValidateArgumentsAsync(ValidationContext context)
-        => context.ArgumentValues != null ? new(this) : default;
-
-    // IVariableVisitor is not used in this sample
-    IVariableVisitor? IVariableVisitorProvider.GetVisitor(ValidationContext context) => null;
-
-    // look for connection arguments and validate the value
-    ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
-    {
-        // look for field nodes and find the field definition
-        if (node is not GraphQLField fieldNode)
-            return default;
-        var fieldDef = context.TypeInfo.GetFieldDef();
-        if (fieldDef == null)
-            return default;
-        // look for connection types
-        if (fieldDef.ResolvedType?.GetNamedType() is not IObjectGraphType connectionType || !connectionType.Name.EndsWith("Connection"))
-            return default;
-        // retrieve the arguments
-        if (!(context.ArgumentValues?.TryGetValue(fieldNode, out var args) ?? false))
-            return default;
-        // look for first and last arguments
-        ArgumentValue lastArg = default;
-        if (!args.TryGetValue("first", out var firstArg) && !args.TryGetValue("last", out lastArg))
-            return default;
-        var rows = (int?)firstArg.Value ?? (int?)lastArg.Value ?? 0;
-        if (rows > 1000)
-            context.ReportError(new ValidationError("Cannot return more than 1000 rows"));
-        return default;
-    }
-
-    ValueTask INodeVisitor.LeaveAsync(ASTNode node, ValidationContext context) => default;
+    ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context);
+    ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context);
+    ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context);
 }
 ```
 
-The above is sample functionality, although in this situation it would be more efficient to
-have a schema visitor apply this validation rule to the appropriate fields via the `Validate`
-method during schema initialization, as shown below:
-
-```csharp
-services.AddGraphQL(b => b
-    .AddSchema<MySchema>()
-    .AddSchemaVisitor<NoConnectionOver1000Visitor>());
-    
-public class NoConnectionOver1000Visitor : BaseSchemaNodeVisitor
-{
-    public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
-        => argument.Validator += GetValidator(argument, field);
-
-    public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema)
-        => field.Validator += GetValidator(argument, field);
-
-    private static Action<object?>? GetValidator(QueryArgument argument, FieldType field)
-    {
-        // identify fields that return a connection type
-        if (!field.ResolvedType!.GetNamedType().Name.EndsWith("Connection"))
-            return null;
-
-        // identify the first and last arguments
-        if (argument.Name != "first" && argument.Name != "last")
-            return null;
-
-        // apply the validation rule
-        return value =>
-        {
-            if (value is int intValue && intValue > 1000)
-                throw new ArgumentException("Cannot return more than 1000 rows.");
-        };
-    }
-}
-```
-
-With the visitor approach, the validation is only evaluated at runtime when the applicable
-field is requested, with no performance penalty otherwise. It is also considerably simpler
-to implement.
+This allows for a single validation rule to validate AST structure, read variable values,
+and/or validate coerced field and directive arguments.
 
 ## Breaking Changes
 
@@ -528,12 +435,18 @@ For federated schemas, the `ServiceGraphType`'s `sdl` field will now use the
 new implementation to print the schema. Please raise an issue if this causes
 a problem for your federated schema.
 
-### 11. `IVariableVisitorProvider.ValidateArgumentsAsync` added
+### 11. `IVariableVisitorProvider` removed and `IValidationRule` changed
 
-The `IVariableVisitorProvider` interface has a new method, `ValidateArgumentsAsync`, that is
-called during validation. This method is called after all field and directive
-arguments have been parsed, allowing a validation rule to validate parsed argument values.
+The `ValidateAsync` method on `IValidationRule` has been changed to `GetPreNodeVisitorAsync`,
+and a new method `GetPostNodeVisitorAsync` has been added. Also, the `IVariableVisitorProvider`
+interface has been combined with `IValidationRule` and now has a new method `GetVariableVisitorAsync`.
+So the new `IValidationRule` interface looks like this:
 
-No changes will be required to most validation rules which only implement `IValidationRule`.
-But for any validation rule which also implements `IVariableVisitorProvider`, you will need
-to add an implementation for this new method.
+```csharp
+public interface IValidationRule
+{
+    ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context);
+    ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context);
+    ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context);
+}
+```
