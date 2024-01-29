@@ -27,7 +27,6 @@ await schema.ExecuteAsync(_ =>
 });
 ```
 
-
 ## Setting validation rules on input arguments or input object fields
 
 When defining a schema, you can set validation rules on input arguments or input object fields.
@@ -136,7 +135,6 @@ At this time GraphQL.NET does not directly support the `MaxLength` and similar a
 `System.ComponentModel.DataAnnotations`, but this may be added in a future version. You can
 implement your own attributes as shown above, or call the `Validate` method to set a validation
 function.
-
 
 ## Custom Validation Rules
 
