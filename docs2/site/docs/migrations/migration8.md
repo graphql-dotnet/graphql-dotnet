@@ -308,7 +308,7 @@ public interface IValidationRule
 }
 ```
 
-This allows for a single validation rule to validate AST structure, read variable values,
+This allows for a single validation rule to validate AST structure, validate variable values,
 and/or validate coerced field and directive arguments.
 
 To simplify the creation of validation rules, the `ValidationRuleBase` class has been added,
