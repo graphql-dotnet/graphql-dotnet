@@ -311,12 +311,13 @@ public interface IValidationRule
 This allows for a single validation rule to validate AST structure, validate variable values,
 and/or validate coerced field and directive arguments.
 
-To simplify the creation of validation rules, the `ValidationRuleBase` class has been added,
-which implements the `IValidationRule` interface and provides default implementations for
-all three methods.
+To simplify the creation of validation rules, the abstract `ValidationRuleBase` class has
+been added, which implements the `IValidationRule` interface and provides default implementations
+for all three methods.
 
-Documentation has been added to the 'Query Validation' section of the documentation to
-explain how to use the revised `IValidationRule` interface and the `ValidationRuleBase` class.
+Documentation has been added to the [Query Validation](https://graphql-dotnet.github.io/docs/getting-started/query-validation/)
+section of the documentation to explain how to create custom validation rules using the
+revised `IValidationRule` interface and related classes.
 
 ## Breaking Changes
 
