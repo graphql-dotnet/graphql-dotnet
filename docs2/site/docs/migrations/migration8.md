@@ -454,3 +454,6 @@ public interface IValidationRule
     ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context);
 }
 ```
+
+It is recommended to inherit from `ValidationRuleBase` for custom validation rules
+and override only the methods you need to implement.
