@@ -14,22 +14,6 @@ namespace GraphQL
     public static class TypeExtensions
     {
         /// <summary>
-        /// Determines whether this instance is a concrete type.
-        /// </summary>
-        /// <param name="type">The type to check.</param>
-        /// <returns>
-        ///   <see langword="true"/> if the specified type is neither abstract nor an interface; otherwise, <see langword="false"/>.
-        /// </returns>
-        [Obsolete("This method will be removed in a future version of GraphQL.NET.")]
-        public static bool IsConcrete(this Type type)
-        {
-            if (type == null)
-                return false;
-
-            return !type.IsAbstract && !type.IsInterface; // && !type.IsGenericTypeDefinition; ??
-        }
-
-        /// <summary>
         /// Determines whether the indicated type implements IGraphType.
         /// </summary>
         /// <param name="type">The type.</param>

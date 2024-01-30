@@ -129,25 +129,6 @@ namespace GraphQL.Validation
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
         /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
-        /// <see cref="ValidationError"/> is added to the <see cref="Errors"/>.
-        /// </summary>
-        [Obsolete("This method can repeatedly add the same error into ValidationContext.Errors collection when called multiple times. Use GetVariablesValuesAsync method instead.")]
-        public async ValueTask<Variables> GetVariableValuesAsync(IVariableVisitor? visitor = null)
-        {
-            (var variables, var errors) = await GetVariablesValuesAsync(visitor).ConfigureAwait(false);
-
-            if (errors != null)
-            {
-                foreach (var error in errors)
-                    ReportError(error);
-            }
-
-            return variables;
-        }
-
-        /// <summary>
-        /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
-        /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
         /// <see cref="ValidationError"/> is returned within the list of errors.
         /// </summary>
         public async ValueTask<(Variables Variables, List<ValidationError>? Errors)> GetVariablesValuesAsync(IVariableVisitor? visitor = null)

@@ -411,3 +411,30 @@ Please see the v7 migration document regarding the new `schema.ToAST()` and
 For federated schemas, the `ServiceGraphType`'s `sdl` field will now use the
 new implementation to print the schema. Please raise an issue if this causes
 a problem for your federated schema.
+
+### 11. Removed deprecated methods.
+
+The following GraphQL DI builder methods have been removed:
+
+| Method | Replacement |
+|--------|-------------|
+| `AddApolloTracing` | `UseApolloTracing` |
+| `AddMiddleware` | `UseMiddleware` |
+| `AddAutomaticPersistedQueries` | `UseAutomaticPersistedQueries` |
+| `AddMemoryCache` | `UseMemoryCache` |
+
+The following methods have been removed:
+
+| Method | Comment |
+|--------|---------|
+| `TypeExtensions.IsConcrete` | Use `!type.IsAbstract` |
+| `GraphQLTelemetryProvider.StartActivityAsync` | Use `StartActivity` |
+| `AutoRegisteringInterfaceGraphType.BuildMemberInstanceExpression` | Interfaces cannot contain resolvers so this method was unused |
+| `ValidationContext.GetVariableValuesAsync` | Use `GetVariablesValuesAsync` |
+
+The following constructors have been removed:
+
+| Class | Comment |
+|-------|---------|
+| `Variable` | Use new constructor with `definition` argument |
+| `VariableUsage` | Use new constructor with `hasDefault` argument |

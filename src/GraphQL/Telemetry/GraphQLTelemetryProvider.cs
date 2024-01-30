@@ -74,9 +74,7 @@ public class GraphQLTelemetryProvider : IConfigureExecution
     private async Task<ExecutionResult> ExecuteInternalAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         // start the Activity, in fact Activity.Stop() will be called from within Activity.Dispose() at the end of using block
-#pragma warning disable CS0618 // Type or member is obsolete
-        using var activity = await StartActivityAsync(options).ConfigureAwait(false);
-#pragma warning restore CS0618 // Type or member is obsolete
+        using var activity = StartActivity(options);
 
         // do not record any telemetry if there are no listeners or it decided not to sample the current request
         if (activity == null)
@@ -117,11 +115,6 @@ public class GraphQLTelemetryProvider : IConfigureExecution
         // return the result
         return result;
     }
-
-    /// <inheritdoc cref="StartActivity"/>
-    [Obsolete("Use the sync method 'StartActivity'. This method will be removed in v8.")]
-    protected virtual ValueTask<Activity?> StartActivityAsync(ExecutionOptions options)
-        => new(StartActivity(options));
 
     /// <summary>
     /// Creates an <see cref="Activity"/> for the specified <see cref="ExecutionOptions"/> and starts it.
