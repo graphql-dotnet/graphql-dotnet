@@ -4,7 +4,7 @@ using GraphQLParser.AST;
 namespace GraphQL.Validation
 {
     /// <summary>
-    /// Visitor which methods are called when parsing the inputs into variables in <see cref="ValidationContext.GetVariableValuesAsync"/>.
+    /// Visitor whose methods are called when parsing the inputs into variables in <see cref="ValidationContext.GetVariablesValuesAsync(IVariableVisitor?)"/>.
     /// </summary>
     public interface IVariableVisitor
     {

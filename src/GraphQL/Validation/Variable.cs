@@ -6,16 +6,6 @@ namespace GraphQL.Validation
     public class Variable
     {
         /// <summary>
-        /// Initializes a new instance with the specified name.
-        /// </summary>
-        [Obsolete("Please specify the variable definition when constructing a variable.")]
-        public Variable(string name)
-        {
-            Name = name;
-            Definition = null!;
-        }
-
-        /// <summary>
         /// Initializes a new instance with the specified name and definition.
         /// </summary>
         public Variable(string name, GraphQLParser.AST.GraphQLVariableDefinition definition)

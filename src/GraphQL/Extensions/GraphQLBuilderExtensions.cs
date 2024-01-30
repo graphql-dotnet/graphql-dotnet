@@ -631,30 +631,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     #endregion
 
     #region - UseMiddleware -
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, bool, ServiceLifetime)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware<TMiddleware>(builder, install, serviceLifetime);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, Func{IServiceProvider, ISchema, bool}, ServiceLifetime)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware<TMiddleware>(builder, installPredicate, serviceLifetime);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, bool)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware(builder, middleware, install);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, Func{IServiceProvider, ISchema, bool})"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware(builder, middleware, installPredicate);
-
     /// <summary>
     /// Registers <typeparamref name="TMiddleware"/> with the dependency injection framework as both <typeparamref name="TMiddleware"/> and
     /// <see cref="IFieldMiddleware"/>. If <paramref name="install"/> is <see langword="true"/>, installs the middleware by configuring schema
@@ -980,16 +956,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     #endregion
 
     #region - UseApolloTracing -
-    /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, bool)"/>
-    [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
-        => UseApolloTracing(builder, enableMetrics);
-
-    /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, Func{ExecutionOptions, bool})"/>
-    [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
-        => UseApolloTracing(builder, enableMetricsPredicate);
-
     /// <summary>
     /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
     /// configures it to be installed within the schema, and configures responses to include Apollo

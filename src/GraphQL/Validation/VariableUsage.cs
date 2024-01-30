@@ -28,18 +28,6 @@ namespace GraphQL.Validation
         /// </summary>
         /// <param name="node">A variable reference node.</param>
         /// <param name="type">A graph type.</param>
-        [Obsolete("Please specify whether the field has a default value when constructing this variable usage.")]
-        public VariableUsage(GraphQLVariable node, IGraphType type)
-        {
-            Node = node;
-            Type = type;
-        }
-
-        /// <summary>
-        /// Initializes a new instance with the specified parameters.
-        /// </summary>
-        /// <param name="node">A variable reference node.</param>
-        /// <param name="type">A graph type.</param>
         /// <param name="hasDefault">Indicates if the field has a default value.</param>
         public VariableUsage(GraphQLVariable node, IGraphType type, bool hasDefault)
         {
