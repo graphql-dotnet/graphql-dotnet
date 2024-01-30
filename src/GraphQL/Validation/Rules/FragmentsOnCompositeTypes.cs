@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// can only be spread into a composite type (object, interface, or union), the
     /// type condition must also be a composite type.
     /// </summary>
-    public class FragmentsOnCompositeTypes : IValidationRule
+    public class FragmentsOnCompositeTypes : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="FragmentsOnCompositeTypesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>

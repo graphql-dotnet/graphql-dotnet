@@ -18,7 +18,7 @@ namespace GraphQL.Validation.Rules
     /// Please copy the newer <see cref="PatternMatchingDirective"/> and <see cref="PatternMatchingVisitor"/>
     /// when designing new custom directives that can be used to validate input fields and arguments.
     /// </remarks>
-    public class InputFieldsAndArgumentsOfCorrectLength : IValidationRule, IVariableVisitorProvider
+    public class InputFieldsAndArgumentsOfCorrectLength : ValidationRuleBase
     {
         private sealed class FieldVisitor : BaseVariableVisitor
         {
@@ -49,7 +49,7 @@ namespace GraphQL.Validation.Rules
         }
 
         /// <inheritdoc/>
-        public IVariableVisitor GetVisitor(ValidationContext _) => FieldVisitor.Instance;
+        public override ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context) => new(FieldVisitor.Instance);
 
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -58,7 +58,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="InputFieldsAndArgumentsOfCorrectLengthError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLArgument>((arg, context) => CheckLength(arg, arg.Value, context.TypeInfo.GetArgument(), context)),

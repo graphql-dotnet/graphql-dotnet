@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if referenced types (specifically
     /// variable definitions and fragment conditions) are defined by the type schema.
     /// </summary>
-    public class KnownTypeNames : IValidationRule
+    public class KnownTypeNames : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownTypeNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLNamedType>(leave: (node, context) =>
         {

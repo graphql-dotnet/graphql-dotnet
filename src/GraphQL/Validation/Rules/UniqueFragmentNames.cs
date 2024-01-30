@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     ///
     /// A GraphQL document is only valid if all defined fragments have unique names.
     /// </summary>
-    public class UniqueFragmentNames : IValidationRule
+    public class UniqueFragmentNames : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,8 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueFragmentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 1 ? _nodeVisitor : null);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
+            => new(context.Document.FragmentsCount() > 1 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((fragmentDefinition, context) =>
             {

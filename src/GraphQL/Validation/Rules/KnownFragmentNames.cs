@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if all <c>...Fragment</c> fragment spreads refer
     /// to fragments defined in the same document.
     /// </summary>
-    public class KnownFragmentNames : IValidationRule
+    public class KnownFragmentNames : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="KnownFragmentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentSpread>((node, context) =>
         {

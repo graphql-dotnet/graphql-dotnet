@@ -22,10 +22,38 @@ namespace GraphQL.Validation
         /// <summary>
         /// Initializes a new instance for the specified schema.
         /// </summary>
-        /// <param name="schema"></param>
         public TypeInfo(ISchema schema)
         {
             _schema = schema;
+        }
+
+        /// <summary>
+        /// Clears information about the current state of the AST tree.
+        /// </summary>
+        public void Clear()
+        {
+            _typeStack.Clear();
+            _inputTypeStack.Clear();
+            _parentTypeStack.Clear();
+            _fieldDefStack.Clear();
+            _ancestorStack.Clear();
+            _directive = null;
+            _argument = null;
+            // these will not be needed for post-variable-coercion validation rules
+            NoFragmentCycles_VisitedFrags = null;
+            NoFragmentCycles_SpreadPath = null;
+            NoFragmentCycles_SpreadPathIndexByName = null;
+            NoUndefinedVariables_VariableNameDefined = null;
+            NoUnusedFragments_OperationDefs = null;
+            NoUnusedFragments_FragmentDefs = null;
+            NoUnusedVariables_VariableDefs = null;
+            UniqueArgumentNames_KnownArgs = null;
+            UniqueFragmentNames_KnownFragments = null;
+            UniqueInputFieldNames_KnownNameStack = null;
+            UniqueInputFieldNames_KnownNames = null;
+            UniqueOperationNames_Frequency = null;
+            UniqueVariableNames_KnownVariables = null;
+            VariablesInAllowedPosition_VarDefMap = null;
         }
 
         private static T? PeekElement<T>(Stack<T> from, int index)

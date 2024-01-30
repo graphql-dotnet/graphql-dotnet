@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL field or directive is only valid if all supplied arguments at a given field
     /// are uniquely named.
     /// </summary>
-    public class UniqueArgumentNames : IValidationRule
+    public class UniqueArgumentNames : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="UniqueArgumentNamesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLField>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),

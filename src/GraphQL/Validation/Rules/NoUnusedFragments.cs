@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if all fragment definitions are spread
     /// within operations, or spread within other fragment spreads within operations.
     /// </summary>
-    public class NoUnusedFragments : IValidationRule
+    public class NoUnusedFragments : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,8 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="NoUnusedFragmentsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
+            => new(context.Document.FragmentsCount() > 0 ? _nodeVisitor : null);
 
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLOperationDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new(1)).Add(node)),

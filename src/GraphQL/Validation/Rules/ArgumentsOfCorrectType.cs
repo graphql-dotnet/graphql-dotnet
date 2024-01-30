@@ -9,7 +9,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if all field argument literal values are
     /// of the type expected by their position.
     /// </summary>
-    public class ArgumentsOfCorrectType : IValidationRule
+    public class ArgumentsOfCorrectType : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -18,7 +18,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentsOfCorrectTypeError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLArgument>((argAst, context) =>
         {

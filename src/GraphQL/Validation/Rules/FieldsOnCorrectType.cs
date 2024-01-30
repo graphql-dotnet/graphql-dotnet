@@ -11,7 +11,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is only valid if all fields selected are defined by the
     /// parent type, or are an allowed meta field such as __typename.
     /// </summary>
-    public class FieldsOnCorrectType : IValidationRule
+    public class FieldsOnCorrectType : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -20,7 +20,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="FieldsOnCorrectTypeError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLField>((node, context) =>
         {

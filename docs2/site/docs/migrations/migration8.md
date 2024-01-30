@@ -288,6 +288,37 @@ private class Query
 }
 ```
 
+### 8. Validation rules can read or validate field arguments and directive arguments
+
+Validation rules can now execute validation code either before or after field arguments
+have been read. This is useful for edge cases, such as when a complexity analyzer needs
+to read the value of a field argument to determine the complexity of the field.
+
+The `ValidateAsync` method on `IValidationRule` has been changed to `GetPreNodeVisitorAsync`,
+and a new method `GetPostNodeVisitorAsync` has been added. Also, the `IVariableVisitorProvider`
+interface has been combined with `IValidationRule` and now has a new method `GetVariableVisitorAsync`.
+So the new `IValidationRule` interface looks like this:
+
+```csharp
+public interface IValidationRule
+{
+    ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context);
+    ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context);
+    ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context);
+}
+```
+
+This allows for a single validation rule to validate AST structure, validate variable values,
+and/or validate coerced field and directive arguments.
+
+To simplify the creation of validation rules, the abstract `ValidationRuleBase` class has
+been added, which implements the `IValidationRule` interface and provides default implementations
+for all three methods.
+
+Documentation has been added to the [Query Validation](https://graphql-dotnet.github.io/docs/getting-started/query-validation/)
+section of the documentation to explain how to create custom validation rules using the
+revised `IValidationRule` interface and related classes.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -438,3 +469,22 @@ The following constructors have been removed:
 |-------|---------|
 | `Variable` | Use new constructor with `definition` argument |
 | `VariableUsage` | Use new constructor with `hasDefault` argument |
+
+### 12. `IVariableVisitorProvider` removed and `IValidationRule` changed
+
+The `ValidateAsync` method on `IValidationRule` has been changed to `GetPreNodeVisitorAsync`,
+and a new method `GetPostNodeVisitorAsync` has been added. Also, the `IVariableVisitorProvider`
+interface has been combined with `IValidationRule` and now has a new method `GetVariableVisitorAsync`.
+So the new `IValidationRule` interface looks like this:
+
+```csharp
+public interface IValidationRule
+{
+    ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context);
+    ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context);
+    ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context);
+}
+```
+
+It is recommended to inherit from `ValidationRuleBase` for custom validation rules
+and override only the methods you need to implement.

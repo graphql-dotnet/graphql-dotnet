@@ -7,7 +7,7 @@ namespace GraphQL.Validation.Rules
     /// <summary>
     /// Subscription operations must have exactly one root field.
     /// </summary>
-    public class SingleRootFieldSubscriptions : IValidationRule
+    public class SingleRootFieldSubscriptions : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -16,7 +16,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="SingleRootFieldSubscriptionsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((operation, context) =>
         {

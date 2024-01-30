@@ -13,7 +13,7 @@ namespace GraphQL.Validation.Rules
     /// any two field selections which might both be encountered for the same object are only valid
     /// if they are equivalent.
     /// </summary>
-    public class OverlappingFieldsCanBeMerged : IValidationRule
+    public class OverlappingFieldsCanBeMerged : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -22,7 +22,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="OverlappingFieldsCanBeMergedError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
         {
             //TODO: make static instance when enabling this rule
             var comparedFragmentPairs = new PairSet();

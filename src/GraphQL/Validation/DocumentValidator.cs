@@ -86,36 +86,17 @@ namespace GraphQL.Validation
                         context.TypeInfo
                     };
 
-                    if (rules is List<IValidationRule> list) //TODO:allocation - optimization for List+Enumerator<IvalidationRule>
+                    foreach (var rule in rules)
                     {
-                        foreach (var rule in list)
-                        {
-                            if (rule is IVariableVisitorProvider provider)
-                            {
-                                var variableVisitor = provider.GetVisitor(context);
-                                if (variableVisitor != null)
-                                    (variableVisitors ??= new()).Add(variableVisitor);
-                            }
-                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
-                            if (visitor != null)
-                                visitors.Add(visitor);
-                        }
+                        var visitor = await rule.GetPreNodeVisitorAsync(context).ConfigureAwait(false);
+                        if (visitor != null)
+                            visitors.Add(visitor);
+
+                        var variableVisitor = await rule.GetVariableVisitorAsync(context).ConfigureAwait(false);
+                        if (variableVisitor != null)
+                            (variableVisitors ??= new()).Add(variableVisitor);
                     }
-                    else
-                    {
-                        foreach (var rule in rules)
-                        {
-                            if (rule is IVariableVisitorProvider provider)
-                            {
-                                var variableVisitor = provider.GetVisitor(context);
-                                if (variableVisitor != null)
-                                    (variableVisitors ??= new()).Add(variableVisitor);
-                            }
-                            var visitor = await rule.ValidateAsync(context).ConfigureAwait(false);
-                            if (visitor != null)
-                                visitors.Add(visitor);
-                        }
-                    }
+
                     await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
                 }
 
@@ -145,19 +126,50 @@ namespace GraphQL.Validation
                 // parse all field arguments
                 using var parseArgumentVisitorContext = new ParseArgumentVisitor.Context(context, variables);
                 await ParseArgumentVisitor.Instance.VisitAsync(context.Document, parseArgumentVisitorContext).ConfigureAwait(false);
-                var argumentValues = parseArgumentVisitorContext.ArgumentValues;
-                var directiveValues = parseArgumentVisitorContext.DirectiveValues;
+                context.ArgumentValues = parseArgumentVisitorContext.ArgumentValues;
+                context.DirectiveValues = parseArgumentVisitorContext.DirectiveValues;
 
-                // todo: execute validation rules that need to be able to read field arguments/directives
+                if (context.HasErrors)
+                {
+                    return new ValidationResult(context.Errors)
+                    {
+                        Variables = variables,
+                        ArgumentValues = context.ArgumentValues,
+                        DirectiveValues = context.DirectiveValues,
+                    };
+                }
 
-                if (!context.HasErrors && variables == Variables.None && argumentValues == null && directiveValues == null)
+                if (rules.Any())
+                {
+                    List<INodeVisitor>? visitors = null;
+
+                    foreach (var rule in rules)
+                    {
+                        var visitor = await rule.GetPostNodeVisitorAsync(context).ConfigureAwait(false);
+                        if (visitor != null)
+                        {
+                            visitors ??= [context.TypeInfo];
+                            visitors.Add(visitor);
+                        }
+                    }
+
+                    if (visitors != null)
+                    {
+                        // clear state of TypeInfo structure to be sure that it is not polluted by previous validation
+                        context.TypeInfo.Clear();
+
+                        await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);
+                    }
+                }
+
+                if (!context.HasErrors && variables == Variables.None && context.ArgumentValues == null && context.DirectiveValues == null)
                     return SuccessfullyValidatedResult.Instance;
 
                 return new ValidationResult(context.Errors)
                 {
                     Variables = variables,
-                    ArgumentValues = argumentValues,
-                    DirectiveValues = directiveValues,
+                    ArgumentValues = context.ArgumentValues,
+                    DirectiveValues = context.DirectiveValues,
                 };
             }
             finally

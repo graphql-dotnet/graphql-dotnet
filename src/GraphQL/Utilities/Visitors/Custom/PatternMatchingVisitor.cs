@@ -29,6 +29,10 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
     public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
         => argument.Validator += GetValidator(argument);
 
+    /// <inheritdoc/>
+    public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema)
+        => field.Validator += GetValidator(argument);
+
     private static Action<object?>? GetValidator(IMetadataReader fieldArgOrInputField)
     {
         // look for @pattern directive applied to the field argument or input field, and if found, use Validate to set the validation method

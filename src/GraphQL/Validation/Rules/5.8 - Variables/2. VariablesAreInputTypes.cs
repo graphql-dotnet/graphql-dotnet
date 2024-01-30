@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL operation is only valid if all the variables it defines are of
     /// input types (scalar, enum, or input object).
     /// </summary>
-    public class VariablesAreInputTypes : IValidationRule
+    public class VariablesAreInputTypes : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="VariablesAreInputTypesError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
         {

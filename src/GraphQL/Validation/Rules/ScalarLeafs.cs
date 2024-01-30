@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules
     /// A GraphQL document is valid only if all leaf fields (fields without
     /// sub selections) are of scalar or enum types.
     /// </summary>
-    public class ScalarLeafs : IValidationRule
+    public class ScalarLeafs : ValidationRuleBase
     {
         /// <summary>
         /// Returns a static instance of this validation rule.
@@ -19,7 +19,7 @@ namespace GraphQL.Validation.Rules
 
         /// <inheritdoc/>
         /// <exception cref="ScalarLeafsError"/>
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => new(_nodeVisitor);
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
 
         private static readonly INodeVisitor _nodeVisitor =
             new MatchingNodeVisitor<GraphQLField>((f, context) => Field(context.TypeInfo.GetLastType(), f, context));
