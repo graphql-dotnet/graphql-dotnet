@@ -2442,16 +2442,16 @@ namespace GraphQL.Types
     {
         public ObjectGraphType() { }
     }
-    [System.Obsolete("This class will be removed in v9.")]
+    [System.Obsolete("This class will be removed in v8.")]
     public static class ObjectGraphTypeExtensions
     {
         [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
             "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v9.")]
+            "n v8.")]
         public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, object?>? resolve = null) { }
         [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
             "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v9.")]
+            "n v8.")]
         public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object?>>? resolve = null) { }
     }
     public class ObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
