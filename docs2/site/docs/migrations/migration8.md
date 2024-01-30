@@ -427,7 +427,7 @@ The following methods have been removed:
 
 | Method | Comment |
 |--------|---------|
-| `TypeExtensions.IsConcrete` | Was equivalent to `!type.IsAbstract && !type.IsInterface` but did not account for generic types |
+| `TypeExtensions.IsConcrete` | Use `!type.IsAbstract` |
 | `GraphQLTelemetryProvider.StartActivityAsync` | Use `StartActivity` |
 | `AutoRegisteringInterfaceGraphType.BuildMemberInstanceExpression` | Interfaces cannot contain resolvers so this method was unused |
 | `ValidationContext.GetVariableValuesAsync` | Use `GetVariablesValuesAsync` |
