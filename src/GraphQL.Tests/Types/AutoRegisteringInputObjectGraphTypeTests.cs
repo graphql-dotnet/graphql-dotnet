@@ -373,9 +373,9 @@ public class AutoRegisteringInputObjectGraphTypeTests
         schema.Initialize();
         // verify that during input coercion, the value is converted to an integer
         inputType.Fields.First().ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
-        inputType.Fields.First().Parser("123").ShouldBe(123);
+        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
-        Should.Throw<FormatException>(() => inputType.Fields.First().Parser("abc"));
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc"));
     }
 
     private class Class3
