@@ -63,9 +63,9 @@ public class QueryArgumentTests
             if (value is string)
                 throw new InvalidOperationException();
         });
-        arg.Validator(Guid.NewGuid());
-        Should.Throw<ArgumentException>(() => arg.Validator(123));
-        Should.Throw<InvalidOperationException>(() => arg.Validator("abc"));
+        arg.Validator.ShouldNotBeNull().Invoke(Guid.NewGuid());
+        Should.Throw<ArgumentException>(() => arg.Validator.ShouldNotBeNull().Invoke(123));
+        Should.Throw<InvalidOperationException>(() => arg.Validator.ShouldNotBeNull().Invoke("abc"));
     }
 
     [Fact]
@@ -79,6 +79,6 @@ public class QueryArgumentTests
                 return "789";
             return value;
         });
-        arg.Parser("123").ShouldBeOfType<string>().ShouldBe("789");
+        arg.Parser.ShouldNotBeNull().Invoke("123").ShouldBeOfType<string>().ShouldBe("789");
     }
 }

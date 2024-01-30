@@ -244,10 +244,6 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
-        [System.Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
-        [System.Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddApolloTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enableMetricsPredicate) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
             "ler.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
@@ -302,18 +298,6 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        [System.Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, bool install = true, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
-            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
-        [System.Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate, GraphQL.DI.ServiceLifetime serviceLifetime = 2)
-            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
-        [System.Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
-            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
-        [System.Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-        public static GraphQL.DI.IGraphQLBuilder AddMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
-            where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
@@ -791,8 +775,6 @@ namespace GraphQL
         public static System.Type GetGraphTypeFromType(this System.Type type, bool isNullable = false, GraphQL.TypeMappingMode mode = 0) { }
         public static string GraphQLName(this System.Type type) { }
         public static bool ImplementsGenericType(this System.Type type, System.Type genericType) { }
-        [System.Obsolete("This method will be removed in a future version of GraphQL.NET.")]
-        public static bool IsConcrete(this System.Type type) { }
         public static bool IsGraphType(this System.Type type) { }
         public static string? ObsoleteMessage(this System.Reflection.MemberInfo memberInfo) { }
     }
@@ -1806,8 +1788,6 @@ namespace GraphQL.Telemetry
         protected virtual System.Threading.Tasks.Task SetOperationTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions options, GraphQL.Types.ISchema schema, GraphQLParser.AST.GraphQLDocument document, GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         protected virtual System.Threading.Tasks.Task SetResultTagsAsync(System.Diagnostics.Activity activity, GraphQL.ExecutionOptions executionOptions, GraphQL.ExecutionResult result) { }
         protected virtual System.Diagnostics.Activity? StartActivity(GraphQL.ExecutionOptions options) { }
-        [System.Obsolete("Use the sync method \'StartActivity\'. This method will be removed in v8.")]
-        protected virtual System.Threading.Tasks.ValueTask<System.Diagnostics.Activity?> StartActivityAsync(GraphQL.ExecutionOptions options) { }
     }
 }
 namespace GraphQL.Transport
@@ -1905,9 +1885,6 @@ namespace GraphQL.Types
         public AutoRegisteringInterfaceGraphType(params System.Linq.Expressions.Expression<System.Func<TSourceType, object?>>[]? excludedProperties) { }
         protected virtual void ApplyArgumentAttributes(System.Reflection.ParameterInfo parameterInfo, GraphQL.Types.QueryArgument queryArgument) { }
         protected void BuildFieldType(GraphQL.Types.FieldType fieldType, System.Reflection.MemberInfo memberInfo) { }
-        [System.Obsolete("Interface graph types do not support field resolvers; use of this method is unnec" +
-            "essary.")]
-        protected virtual System.Linq.Expressions.LambdaExpression BuildMemberInstanceExpression(System.Reflection.MemberInfo memberInfo) { }
         protected virtual void ConfigureGraph() { }
         protected virtual GraphQL.Types.FieldType? CreateField(System.Reflection.MemberInfo memberInfo) { }
         protected virtual GraphQL.Types.ArgumentInformation GetArgumentInformation<TParameterType>(GraphQL.Types.FieldType fieldType, System.Reflection.ParameterInfo parameterInfo) { }
@@ -2207,12 +2184,12 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object, object> Parser { get; set; }
+        public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
-        public System.Action<object> Validator { get; set; }
+        public System.Action<object>? Validator { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2513,10 +2490,10 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object, object> Parser { get; set; }
+        public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public System.Type? Type { get; }
-        public System.Action<object> Validator { get; set; }
+        public System.Action<object>? Validator { get; set; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType
@@ -3292,9 +3269,6 @@ namespace GraphQL.Validation
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetRecursiveVariables(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(GraphQLParser.AST.GraphQLOperationDefinition operation) { }
         public System.Collections.Generic.List<GraphQLParser.AST.GraphQLFragmentDefinition>? GetRecursivelyReferencedFragments(System.Collections.Generic.List<GraphQLParser.AST.GraphQLOperationDefinition> operations) { }
-        [System.Obsolete("This method can repeatedly add the same error into ValidationContext.Errors colle" +
-            "ction when called multiple times. Use GetVariablesValuesAsync method instead.")]
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.Variables> GetVariableValuesAsync(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public System.Collections.Generic.List<GraphQL.Validation.VariableUsage>? GetVariables<TNode>(TNode node)
             where TNode : GraphQLParser.AST.ASTNode, GraphQLParser.AST.IHasSelectionSetNode { }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string?[]?[] {
@@ -3351,8 +3325,6 @@ namespace GraphQL.Validation
     }
     public class Variable
     {
-        [System.Obsolete("Please specify the variable definition when constructing a variable.")]
-        public Variable(string name) { }
         public Variable(string name, GraphQLParser.AST.GraphQLVariableDefinition definition) { }
         public GraphQLParser.AST.GraphQLVariableDefinition Definition { get; set; }
         public bool IsDefault { get; set; }
@@ -3362,9 +3334,6 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
-        [System.Obsolete("Please specify whether the field has a default value when constructing this varia" +
-            "ble usage.")]
-        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type) { }
         public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault) { }
         public bool HasDefault { get; }
         public GraphQLParser.AST.GraphQLVariable Node { get; }
