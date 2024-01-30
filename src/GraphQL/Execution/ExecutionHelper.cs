@@ -84,9 +84,10 @@ namespace GraphQL.Execution
                     {
                         try
                         {
-                            parsedValue = arg.Parser(parsedValue);
-                            if (parsedValue != null)
-                                arg.Validator(parsedValue);
+                            if (arg.Parser != null)
+                                parsedValue = arg.Parser(parsedValue);
+                            if (parsedValue != null && arg.Validator != null)
+                                arg.Validator.Invoke(parsedValue);
                         }
                         catch (Exception ex)
                         {
@@ -278,8 +279,9 @@ namespace GraphQL.Execution
                             {
                                 try
                                 {
-                                    parsedValue = field.Parser(parsedValue);
-                                    if (parsedValue != null)
+                                    if (field.Parser != null)
+                                        parsedValue = field.Parser(parsedValue);
+                                    if (parsedValue != null && field.Validator != null)
                                         field.Validator(parsedValue);
                                 }
                                 catch (Exception ex) when (context.Document != null && context.ParentNode != null)

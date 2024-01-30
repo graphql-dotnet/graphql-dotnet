@@ -25,10 +25,7 @@ public static class QueryArgumentExtensions
     /// </summary>
     public static QueryArgument Validate(this QueryArgument argument, Action<object> validator)
     {
-        argument.Validator = argument.Validator == QueryArgument.DefaultValidator
-            ? validator
-            : argument.Validator + validator;
-
+        argument.Validator += validator;
         return argument;
     }
 }

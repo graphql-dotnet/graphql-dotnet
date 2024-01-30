@@ -573,7 +573,7 @@ public class AutoRegisteringObjectGraphTypeTests
         var fieldType = queryType.Fields.First();
         var argument = fieldType.Arguments.ShouldNotBeNull().First();
         argument.ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
-        argument.Parser("123").ShouldBe(123);
+        argument.Parser!("123").ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
         Should.Throw<FormatException>(() => argument.Parser("abc"));
         // perform end-to-end test for bad argument
@@ -606,7 +606,7 @@ public class AutoRegisteringObjectGraphTypeTests
         var fieldType = queryType.Fields.First();
         var argument = fieldType.Arguments.ShouldNotBeNull().First();
         argument.ResolvedType.ShouldBeOfType<NonNullGraphType<StringGraphType>>();
-        argument.Validator("abc");
+        argument.Validator.ShouldNotBeNull().Invoke("abc");
         // verify that during input coercion, parsing errors throw an exception
         Should.Throw<ArgumentException>(() => argument.Validator("abcdef"));
         // perform end-to-end test for bad argument

@@ -2207,12 +2207,12 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object, object> Parser { get; set; }
+        public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
-        public System.Action<object> Validator { get; set; }
+        public System.Action<object>? Validator { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -2513,10 +2513,10 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public string Name { get; set; }
-        public System.Func<object, object> Parser { get; set; }
+        public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public System.Type? Type { get; }
-        public System.Action<object> Validator { get; set; }
+        public System.Action<object>? Validator { get; set; }
     }
     public class QueryArgument<TType> : GraphQL.Types.QueryArgument
         where TType : GraphQL.Types.IGraphType

@@ -246,7 +246,7 @@ public class InputObjectGraphTypeTests
                     throw new InvalidOperationException();
             })
             .FieldType;
-        fieldDef.Validator(Guid.NewGuid());
+        fieldDef.Validator.ShouldNotBeNull().Invoke(Guid.NewGuid());
         Should.Throw<ArgumentException>(() => fieldDef.Validator(123));
         Should.Throw<InvalidOperationException>(() => fieldDef.Validator("abc"));
     }
@@ -264,7 +264,7 @@ public class InputObjectGraphTypeTests
                 return value;
             })
             .FieldType;
-        fieldDef.Parser("123").ShouldBeOfType<string>().ShouldBe("789");
+        fieldDef.Parser.ShouldNotBeNull().Invoke("123").ShouldBeOfType<string>().ShouldBe("789");
     }
 
     [Fact]
@@ -278,9 +278,9 @@ public class InputObjectGraphTypeTests
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         // verify that during input coercion, the value is converted to an integer
-        inputType.Fields.First().Parser("123").ShouldBe(123);
+        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
-        Should.Throw<FormatException>(() => inputType.Fields.First().Parser("abc"));
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc"));
     }
 
     private class Class3
