@@ -14,7 +14,7 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// Prepares and returns a visitor which methods are called when parsing the inputs into variables in
-        /// <see cref="ValidationContext.GetVariableValuesAsync"/>.
+        /// <see cref="ValidationContext.GetVariablesValuesAsync(IVariableVisitor?)"/>.
         /// </summary>
         ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context);
 
