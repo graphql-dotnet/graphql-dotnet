@@ -60,8 +60,8 @@ Field(x => x.Password)
 ```
 
 The `Validator` delegate is called during the validation stage, prior to execution of the request.
-Null values are not passed to the validation function. Supplying an invalid value will produce
-a response similar to the following:
+Null values are not passed to the validation function. Throwing an exception from the `Validator`
+delegate will produce a response similar to the following:
 
 ```json
 {
