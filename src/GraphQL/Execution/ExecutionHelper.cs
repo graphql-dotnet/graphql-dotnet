@@ -87,7 +87,7 @@ namespace GraphQL.Execution
                             if (arg.Parser != null)
                                 parsedValue = arg.Parser(parsedValue);
                             if (parsedValue != null && arg.Validator != null)
-                                arg.Validator.Invoke(parsedValue);
+                                arg.Validator(parsedValue);
                         }
                         catch (Exception ex)
                         {
