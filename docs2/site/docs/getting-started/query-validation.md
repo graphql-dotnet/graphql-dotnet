@@ -87,6 +87,10 @@ delegate will produce a response similar to the following:
 }
 ```
 
+For additional control over the error message, you can throw a `ValidationError` or derived
+exception class with a custom error message. The `locations` property will be automatically
+set to the location of the input field or argument, but the message will remain the same.
+
 For type-first schemas, you may define your own attributes to perform validation, either on input
 fields or on output field arguments. For example:
 

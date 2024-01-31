@@ -157,7 +157,7 @@ public class InputObjectGraphTypeTests
                 {"errors":[
                     {
                         "message":"Invalid value for argument \u0027input\u0027 of field \u0027test\u0027. Invalid URI: The format of the URI could not be determined.",
-                        "locations":[{"line":1,"column":15}],
+                        "locations":[{"line":1,"column":22}],
                         "extensions":{
                             "code":"INVALID_VALUE",
                             "codes":["INVALID_VALUE","URI_FORMAT"],
@@ -214,7 +214,7 @@ public class InputObjectGraphTypeTests
                 {"errors":[
                     {
                         "message":"Invalid value for argument \u0027input\u0027 of field \u0027test\u0027. String must be a length of 5 characters.",
-                        "locations":[{"line":1,"column":15}],
+                        "locations":[{"line":1,"column":25}],
                         "extensions":{
                             "code":"INVALID_VALUE",
                             "codes":["INVALID_VALUE","ARGUMENT"],

@@ -104,6 +104,18 @@ namespace GraphQL.Validation
         }
 
         /// <summary>
+        /// Ensures that the specified node's location is specified in the error's locations.
+        /// </summary>
+        internal void AddNode(ROM source, ASTNode node)
+        {
+            if (!_nodes.Contains(node))
+            {
+                _nodes.Add(node);
+                AddLocation(Location.FromLinearPosition(source, node.Location.Start));
+            }
+        }
+
+        /// <summary>
         /// Returns a list of AST nodes that this error applies to.
         /// </summary>
         public IEnumerable<ASTNode> Nodes => _nodes;

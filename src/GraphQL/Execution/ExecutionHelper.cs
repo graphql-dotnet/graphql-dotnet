@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Execution
@@ -88,6 +89,18 @@ namespace GraphQL.Execution
                                 parsedValue = arg.Parser(parsedValue);
                             if (parsedValue != null && arg.Validator != null)
                                 arg.Validator(parsedValue);
+                        }
+                        catch (ValidationError ex)
+                        {
+                            if (argNode != null)
+                                ex.AddNode(document.Source, argNode);
+                            throw;
+                        }
+                        catch (ExecutionError ex)
+                        {
+                            if (argNode != null)
+                                ex.AddLocation(Location.FromLinearPosition(document.Source, argNode.Location.Start));
+                            throw;
                         }
                         catch (Exception ex)
                         {
@@ -284,9 +297,19 @@ namespace GraphQL.Execution
                                     if (parsedValue != null && field.Validator != null)
                                         field.Validator(parsedValue);
                                 }
+                                catch (ValidationError ex) when (context.Document != null)
+                                {
+                                    ex.AddNode(context.Document.Source, objectField);
+                                    throw;
+                                }
+                                catch (ExecutionError ex) when (context.Document != null)
+                                {
+                                    ex.AddLocation(Location.FromLinearPosition(context.Document.Source, objectField.Value.Location.Start));
+                                    throw;
+                                }
                                 catch (Exception ex) when (context.Document != null && context.ParentNode != null)
                                 {
-                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, input, ex);
+                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, objectField.Value, ex);
                                 }
                             }
                             obj[field.Name] = parsedValue;
