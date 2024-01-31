@@ -390,6 +390,27 @@ namespace GraphQL.Validation
                         // Note: we always call ParseValue even for null values, and if it
                         // is a non-null graph type, the NonNullGraphType.ParseValue method will throw an error
                         object? parsedFieldValue = await ParseValueAsync(field.ResolvedType!, variableDef, childFieldVariableName, fieldValue, visitor).ConfigureAwait(false);
+                        try
+                        {
+                            if (parsedFieldValue != null && field.Parser != null)
+                                parsedFieldValue = field.Parser(parsedFieldValue);
+                            if (parsedFieldValue != null && field.Validator != null)
+                                field.Validator(parsedFieldValue);
+                        }
+                        catch (ValidationError ex)
+                        {
+                            ex.AddNode(Document.Source, variableDef);
+                            throw;
+                        }
+                        catch (ExecutionError ex)
+                        {
+                            ex.AddLocation(GraphQLParser.Location.FromLinearPosition(Document.Source, variableDef.Location.Start));
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidVariableError(this, variableDef, childFieldVariableName, ex.Message, ex);
+                        }
                         if (visitor != null)
                             await visitor.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue).ConfigureAwait(false);
                         newDictionary[field.Name] = parsedFieldValue;

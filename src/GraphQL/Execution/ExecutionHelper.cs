@@ -304,12 +304,12 @@ namespace GraphQL.Execution
                                 }
                                 catch (ExecutionError ex) when (context.Document != null)
                                 {
-                                    ex.AddLocation(Location.FromLinearPosition(context.Document.Source, objectField.Location.Start));
+                                    ex.AddLocation(Location.FromLinearPosition(context.Document.Source, objectField.Value.Location.Start));
                                     throw;
                                 }
                                 catch (Exception ex) when (context.Document != null && context.ParentNode != null)
                                 {
-                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, objectField, ex);
+                                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, objectField.Value, ex);
                                 }
                             }
                             obj[field.Name] = parsedValue;
