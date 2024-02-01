@@ -2097,6 +2097,12 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class DefaultGraphTypeFactory<TGraphType> : GraphQL.Types.IGraphTypeFactory<TGraphType>
+        where TGraphType : GraphQL.Types.IGraphType
+    {
+        public DefaultGraphTypeFactory() { }
+        public TGraphType Create() { }
+    }
     public class DeprecatedDirective : GraphQL.Types.Directive
     {
         public DeprecatedDirective() { }
@@ -2269,6 +2275,11 @@ namespace GraphQL.Types
     public interface IGraphType : GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         void Initialize(GraphQL.Types.ISchema schema);
+    }
+    public interface IGraphTypeFactory<out TGraphType>
+        where out TGraphType : GraphQL.Types.IGraphType
+    {
+        TGraphType Create();
     }
     public interface IGraphTypeMappingProvider
     {

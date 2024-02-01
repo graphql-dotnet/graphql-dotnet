@@ -23,7 +23,17 @@ public class SchemaBuilderTestBase
         configure(config);
 
         var schema = Builder.Build(config.Definitions);
+
+        return AssertQuery(configure, schema);
+    }
+
+    public ExecutionResult AssertQuery(Action<ExecuteConfig> configure, ISchema schema)
+    {
+        var config = new ExecuteConfig();
+        configure(config);
+
         config.ConfigureBuildedSchema?.Invoke(schema);
+
         schema.Initialize();
 
         var queryResult = CreateQueryResult(config.ExpectedResult);

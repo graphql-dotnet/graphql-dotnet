@@ -266,9 +266,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
+            var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<ObjectGraphType>)) as IGraphTypeFactory<ObjectGraphType>;
             var type = _types.TryGetValue(name, out var t)
                 ? t as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType")
-                : new ObjectGraphType { Name = name };
+                : typeFactory?.Create() ?? new ObjectGraphType();
+
+            type.Name = name;
 
             if (!isExtensionType)
             {
@@ -374,7 +377,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
-                ResolvedType = ToGraphType(fieldDef.Type!),
+                ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver
             };
 
@@ -406,9 +409,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? fieldDef.Description?.Value.ToString() ?? fieldDef.MergeComments(),
-                ResolvedType = ToGraphType(fieldDef.Type!),
+                ResolvedType = ToGraphType(fieldDef.Type),
                 Resolver = fieldConfig.Resolver,
-                StreamResolver = fieldConfig.StreamResolver,
+                StreamResolver = fieldConfig.StreamResolver
             };
 
             fieldConfig.CopyMetadataTo(field);
@@ -439,9 +442,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             {
                 Name = fieldConfig.Name,
                 Description = fieldConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
-                ResolvedType = ToGraphType(inputDef.Type!),
+                ResolvedType = ToGraphType(inputDef.Type),
                 DefaultValue = fieldConfig.DefaultValue ?? inputDef.DefaultValue
-            }.SetAstType(inputDef);
+            };
+
+            field.SetAstType(inputDef);
 
             OverrideDeprecationReason(field, fieldConfig.DeprecationReason);
 
@@ -458,12 +463,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var type = new InterfaceGraphType
-            {
-                Name = name,
-                Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.MergeComments(),
-                ResolveType = typeConfig.ResolveType,
-            }.SetAstType(interfaceDef);
+            var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<InterfaceGraphType>)) as IGraphTypeFactory<InterfaceGraphType>;
+            var type = typeFactory?.Create() ?? new InterfaceGraphType();
+
+            type.Name = name;
+            type.Description = typeConfig.Description ?? interfaceDef.Description?.Value.ToString() ?? interfaceDef.MergeComments();
+            type.ResolveType = typeConfig.ResolveType;
+            type.SetAstType(interfaceDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -472,7 +478,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (interfaceDef.Fields != null)
             {
                 foreach (var f in interfaceDef.Fields)
+                {
                     type.AddField(ToFieldType(type.Name, f));
+                }
             }
 
             return type;
@@ -488,12 +496,13 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var type = new UnionGraphType
-            {
-                Name = name,
-                Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.MergeComments(),
-                ResolveType = typeConfig.ResolveType,
-            }.SetAstType(unionDef);
+            var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<UnionGraphType>)) as IGraphTypeFactory<UnionGraphType>;
+            var type = typeFactory?.Create() ?? new UnionGraphType();
+
+            type.Name = name;
+            type.Description = typeConfig.Description ?? unionDef.Description?.Value.ToString() ?? unionDef.MergeComments();
+            type.ResolveType = typeConfig.ResolveType;
+            type.SetAstType(unionDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -521,11 +530,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var type = new InputObjectGraphType
-            {
-                Name = name,
-                Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments(),
-            }.SetAstType(inputDef);
+            var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<InputObjectGraphType>)) as IGraphTypeFactory<InputObjectGraphType>;
+            var type = typeFactory?.Create() ?? new InputObjectGraphType();
+
+            type.Name = name;
+            type.Description = typeConfig.Description ?? inputDef.Description?.Value.ToString() ?? inputDef.MergeComments();
+            type.SetAstType(inputDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
@@ -534,7 +544,9 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             if (inputDef.Fields != null)
             {
                 foreach (var f in inputDef.Fields)
+                {
                     type.AddField(ToFieldType(type.Name, f));
+                }
             }
 
             return type;
@@ -550,18 +562,21 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
 
             AssertKnownType(typeConfig);
 
-            var type = new EnumerationGraphType
-            {
-                Name = name,
-                Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.MergeComments(),
-            }.SetAstType(enumDef);
+            var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<EnumerationGraphType>)) as IGraphTypeFactory<EnumerationGraphType>;
+            var type = typeFactory?.Create() ?? new EnumerationGraphType();
+
+            type.Name = name;
+            type.Description = typeConfig.Description ?? enumDef.Description?.Value.ToString() ?? enumDef.MergeComments();
+            type.SetAstType(enumDef);
 
             OverrideDeprecationReason(type, typeConfig.DeprecationReason);
 
             if (enumDef.Values?.Count > 0) // just in case
             {
                 foreach (var value in enumDef.Values)
-                    type.Add(ToEnumValue(value, typeConfig.Type!));
+                {
+                    type.Add(ToEnumValue(value, typeConfig.Type));
+                }
             }
 
             return type;
@@ -590,7 +605,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             return result;
         }
 
-        private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type enumType)
+        private EnumValueDefinition ToEnumValue(GraphQLEnumValueDefinition valDef, Type? enumType)
         {
             var name = (string)valDef.Name; //TODO:alloc
             return new EnumValueDefinition(name, enumType == null ? name : Enum.Parse(enumType, name, true))
