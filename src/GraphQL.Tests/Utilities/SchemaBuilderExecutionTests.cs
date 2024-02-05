@@ -1,5 +1,7 @@
 using GraphQL.Execution;
 using GraphQL.Types;
+using GraphQLParser;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Utilities;
 
@@ -291,6 +293,68 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
             _.Variables = variables;
             _.ExpectedResult = expected;
         });
+    }
+
+    [Fact]
+    public void can_use_custom_graph_types_via_IGraphTypeFactory()
+    {
+        const string defs = """
+                enum PetKind {
+                  CAT
+                  DOG
+                }
+
+                interface Pet {
+                  name: String!
+                }
+
+                type Dog implements Pet {
+                  name: String!
+                  barks: Boolean!
+                }
+
+                type Cat implements Pet {
+                  name: String!
+                  meows: Boolean!
+                }
+
+                type Query {
+                  pet(type: PetKind = DOG): Pet
+                }
+                """;
+
+        const string query = "query GetCat($type: PetKind!) { pet(type: $type) { name } }";
+        const string variables = """{ "type": "cAt" }""";
+        const string expected = """{ "pet": { "name" : "Biscuit" } }""";
+
+        var serviceCollection = new ServiceCollection()
+            .AddScoped<PetQueryType>()
+            .AddSingleton<IGraphTypeFactory<EnumerationGraphType>, DefaultGraphTypeFactory<CaseInsensitiveEnumerationGraphType>>()
+            .AddGraphQL(b => b
+                .AddSchema(services =>
+                {
+                    Builder.ServiceProvider = services;
+                    Builder.Types.For("Dog").IsTypeOf<Dog>();
+                    Builder.Types.For("Cat").IsTypeOf<Cat>();
+                    Builder.Types.Include<PetQueryType>();
+                    return Builder.Build(defs);
+                })
+            );
+
+        var sp = serviceCollection.BuildServiceProvider(new ServiceProviderOptions()
+        {
+            ValidateOnBuild = true
+        });
+
+        AssertQuery(
+            _ =>
+            {
+                _.Query = query;
+                _.Variables = variables;
+                _.ExpectedResult = expected;
+            },
+            sp.GetRequiredService<ISchema>()
+        );
     }
 
     [Fact]
@@ -865,4 +929,46 @@ internal class MyUserContext : Dictionary<string, object?>
 }
 internal class ChildMyUserContext : MyUserContext
 {
+}
+
+internal class CaseInsensitiveEnumerationGraphType : EnumerationGraphType
+{
+    protected override EnumValuesBase CreateValues() => new CaseInsensitiveEnumValues();
+}
+
+internal class CaseInsensitiveEnumValues : EnumValues
+{
+    private readonly IDictionary<string, EnumValueDefinition> _aliasValues = new Dictionary<string, EnumValueDefinition>();
+
+    /// <inheritdoc />
+    public override void Add(EnumValueDefinition value)
+    {
+        base.Add(value);
+        _aliasValues[value.Name.ToUpperInvariant()] = value;
+        _aliasValues[value.Name.ToConstantCase()] = value;
+    }
+
+    /// <inheritdoc />
+    public override EnumValueDefinition? FindByName(ROM name)
+    {
+        var value = base.FindByName(name);
+
+        if (value != null)
+        {
+            return value;
+        }
+
+        var strName = name.ToString();
+
+        _aliasValues.TryGetValue(strName.ToUpperInvariant(), out value);
+
+        if (value != null)
+        {
+            return value;
+        }
+
+        _aliasValues.TryGetValue(strName.ToConstantCase(), out value);
+
+        return value;
+    }
 }
