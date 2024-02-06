@@ -638,7 +638,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, true, ServiceLifetime.Singleton)]
     [InlineData(true, true, ServiceLifetime.Transient)]
     [InlineData(true, true, ServiceLifetime.Singleton)]
-    public void AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
+    public async Task AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
     {
         var instance = new MyMiddleware();
         MockSetupRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime);
@@ -674,7 +674,7 @@ public class GraphQLBuilderExtensionTests
         {
             fieldResolver = middlewareTransform(fieldResolver);
         }
-        fieldResolver(null!);
+        await fieldResolver(null!);
         instance.RanMiddleware.ShouldBe(install);
         mockServiceProvider.Verify();
         Verify();
@@ -685,7 +685,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public void AddMiddleware_Instance(bool install, bool usePredicate)
+    public async Task AddMiddleware_Instance(bool install, bool usePredicate)
     {
         var instance = new MyMiddleware();
         MockSetupRegister<IFieldMiddleware>(instance);
@@ -717,7 +717,7 @@ public class GraphQLBuilderExtensionTests
         {
             fieldResolver = middlewareTransform(fieldResolver);
         }
-        fieldResolver(null!);
+        await fieldResolver(null!);
         instance.RanMiddleware.ShouldBe(install);
         mockServiceProvider.Verify();
         Verify();
