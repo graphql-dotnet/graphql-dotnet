@@ -1,33 +1,32 @@
-namespace GraphQL.Utilities
+namespace GraphQL.Utilities;
+
+/// <summary>
+/// Indicates a field, type, argument, enum or directive.
+/// </summary>
+public enum NamedElement
 {
     /// <summary>
-    /// Indicates a field, type, argument, enum or directive.
+    /// A field
     /// </summary>
-    public enum NamedElement
-    {
-        /// <summary>
-        /// A field
-        /// </summary>
-        Field,
+    Field,
 
-        /// <summary>
-        /// A type
-        /// </summary>
-        Type,
+    /// <summary>
+    /// A type
+    /// </summary>
+    Type,
 
-        /// <summary>
-        /// An argument
-        /// </summary>
-        Argument,
+    /// <summary>
+    /// An argument
+    /// </summary>
+    Argument,
 
-        /// <summary>
-        /// An enum value
-        /// </summary>
-        EnumValue,
+    /// <summary>
+    /// An enum value
+    /// </summary>
+    EnumValue,
 
-        /// <summary>
-        /// A directive
-        /// </summary>
-        Directive,
-    }
+    /// <summary>
+    /// A directive
+    /// </summary>
+    Directive,
 }

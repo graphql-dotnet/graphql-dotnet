@@ -2,38 +2,37 @@ using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
 
-namespace GraphQL.Validation.Rules
+namespace GraphQL.Validation.Rules;
+
+/// <summary>
+/// Unique operation names:
+///
+/// A GraphQL document is only valid if all defined operations have unique names.
+/// </summary>
+public class UniqueOperationNames : ValidationRuleBase
 {
     /// <summary>
-    /// Unique operation names:
-    ///
-    /// A GraphQL document is only valid if all defined operations have unique names.
+    /// Returns a static instance of this validation rule.
     /// </summary>
-    public class UniqueOperationNames : ValidationRuleBase
+    public static readonly UniqueOperationNames Instance = new();
+
+    /// <inheritdoc/>
+    /// <exception cref="UniqueOperationNamesError"/>
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
+        => new(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
+
+    private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
     {
-        /// <summary>
-        /// Returns a static instance of this validation rule.
-        /// </summary>
-        public static readonly UniqueOperationNames Instance = new();
-
-        /// <inheritdoc/>
-        /// <exception cref="UniqueOperationNamesError"/>
-        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
-            => new(context.Document.OperationsCount() < 2 ? null : _nodeVisitor);
-
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
+        if (op.Name is null)
         {
-            if (op.Name is null)
-            {
-                return;
-            }
+            return;
+        }
 
-            var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new();
+        var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new();
 
-            if (!frequency.Add(op.Name))
-            {
-                context.ReportError(new UniqueOperationNamesError(context, op));
-            }
-        });
-    }
+        if (!frequency.Add(op.Name))
+        {
+            context.ReportError(new UniqueOperationNamesError(context, op));
+        }
+    });
 }

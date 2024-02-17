@@ -1,92 +1,91 @@
 using GraphQL.Types;
 
-namespace GraphQL.Introspection
+namespace GraphQL.Introspection;
+
+/// <summary>
+/// The <see cref="__Schema"/> introspection type allows querying the schema for available types and directives.
+/// </summary>
+public class __Schema : ObjectGraphType<ISchema>
 {
     /// <summary>
-    /// The <see cref="__Schema"/> introspection type allows querying the schema for available types and directives.
+    /// Initializes a new instance of the <see cref="__Schema"/> introspection type.
     /// </summary>
-    public class __Schema : ObjectGraphType<ISchema>
+    /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+    public __Schema(bool allowAppliedDirectives = false)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="__Schema"/> introspection type.
-        /// </summary>
-        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
-        public __Schema(bool allowAppliedDirectives = false)
-        {
-            SetName(nameof(__Schema), validate: false);
+        SetName(nameof(__Schema), validate: false);
 
-            Description =
-                "A GraphQL Schema defines the capabilities of a GraphQL server. It " +
-                "exposes all available types and directives on the server, as well as " +
-                "the entry points for query, mutation, and subscription operations.";
+        Description =
+            "A GraphQL Schema defines the capabilities of a GraphQL server. It " +
+            "exposes all available types and directives on the server, as well as " +
+            "the entry points for query, mutation, and subscription operations.";
 
-            Field<StringGraphType>("description")
-                .Resolve(context => context.Schema.Description);
+        Field<StringGraphType>("description")
+            .Resolve(context => context.Schema.Description);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>("types")
-                .Description("A list of all types supported by this server.")
-                .ResolveAsync(async context =>
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>("types")
+            .Description("A list of all types supported by this server.")
+            .ResolveAsync(async context =>
+            {
+                var types = context.ArrayPool.Rent<IGraphType>(context.Schema.AllTypes.Count);
+
+                int index = 0;
+                foreach (var item in context.Schema.AllTypes.Dictionary)
                 {
-                    var types = context.ArrayPool.Rent<IGraphType>(context.Schema.AllTypes.Count);
+                    if (await context.Schema.Filter.AllowType(item.Value).ConfigureAwait(false))
+                        types[index++] = item.Value;
+                }
 
-                    int index = 0;
-                    foreach (var item in context.Schema.AllTypes.Dictionary)
-                    {
-                        if (await context.Schema.Filter.AllowType(item.Value).ConfigureAwait(false))
-                            types[index++] = item.Value;
-                    }
+                var comparer = context.Schema.Comparer.TypeComparer;
+                if (comparer != null)
+                    Array.Sort(types, 0, index, comparer);
 
-                    var comparer = context.Schema.Comparer.TypeComparer;
-                    if (comparer != null)
-                        Array.Sort(types, 0, index, comparer);
+                return types.Constrained(index);
+            });
 
-                    return types.Constrained(index);
-                });
+        Field<NonNullGraphType<__Type>>("queryType")
+            .Description("The type that query operations will be rooted at.")
+            .Resolve(context => context.Schema.Query);
 
-            Field<NonNullGraphType<__Type>>("queryType")
-                .Description("The type that query operations will be rooted at.")
-                .Resolve(context => context.Schema.Query);
+        Field<__Type>("mutationType")
+            .Description("If this server supports mutation, the type that mutation operations will be rooted at.")
+            .ResolveAsync(async context =>
+            {
+                return context.Schema.Mutation != null && await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
+                    ? context.Schema.Mutation
+                    : null;
+            });
 
-            Field<__Type>("mutationType")
-                .Description("If this server supports mutation, the type that mutation operations will be rooted at.")
-                .ResolveAsync(async context =>
+        Field<__Type>("subscriptionType")
+            .Description("If this server supports subscription, the type that subscription operations will be rooted at.")
+            .ResolveAsync(async context =>
+            {
+                return context.Schema.Subscription != null && await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
+                    ? context.Schema.Subscription
+                    : null;
+            });
+
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>("directives")
+            .Description("A list of all directives supported by this server.")
+            .ResolveAsync(async context =>
+            {
+                var directives = context.ArrayPool.Rent<Directive>(context.Schema.Directives.Count);
+
+                int index = 0;
+                foreach (var directive in context.Schema.Directives.List)
                 {
-                    return context.Schema.Mutation != null && await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
-                        ? context.Schema.Mutation
-                        : null;
-                });
+                    if (await context.Schema.Filter.AllowDirective(directive).ConfigureAwait(false))
+                        directives[index++] = directive;
+                }
 
-            Field<__Type>("subscriptionType")
-                .Description("If this server supports subscription, the type that subscription operations will be rooted at.")
-                .ResolveAsync(async context =>
-                {
-                    return context.Schema.Subscription != null && await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
-                        ? context.Schema.Subscription
-                        : null;
-                });
+                var comparer = context.Schema.Comparer.DirectiveComparer;
+                if (comparer != null)
+                    Array.Sort(directives, 0, index, comparer);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>("directives")
-                .Description("A list of all directives supported by this server.")
-                .ResolveAsync(async context =>
-                {
-                    var directives = context.ArrayPool.Rent<Directive>(context.Schema.Directives.Count);
+                return directives.Constrained(index);
+            });
 
-                    int index = 0;
-                    foreach (var directive in context.Schema.Directives.List)
-                    {
-                        if (await context.Schema.Filter.AllowDirective(directive).ConfigureAwait(false))
-                            directives[index++] = directive;
-                    }
-
-                    var comparer = context.Schema.Comparer.DirectiveComparer;
-                    if (comparer != null)
-                        Array.Sort(directives, 0, index, comparer);
-
-                    return directives.Constrained(index);
-                });
-
-            if (allowAppliedDirectives)
-                this.AddAppliedDirectivesField("schema");
-        }
+        if (allowAppliedDirectives)
+            this.AddAppliedDirectivesField("schema");
     }
 }
