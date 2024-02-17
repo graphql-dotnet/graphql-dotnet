@@ -1,24 +1,23 @@
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Types;
+
+/// <summary>
+/// Used to conditionally skip (exclude) fields or fragments.
+/// </summary>
+public class SkipDirective : Directive
 {
     /// <summary>
-    /// Used to conditionally skip (exclude) fields or fragments.
+    /// Initializes a new instance of the 'skip' directive.
     /// </summary>
-    public class SkipDirective : Directive
+    public SkipDirective()
+        : base("skip", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
     {
-        /// <summary>
-        /// Initializes a new instance of the 'skip' directive.
-        /// </summary>
-        public SkipDirective()
-            : base("skip", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
+        Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
+        Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
         {
-            Description = "Directs the executor to skip this field or fragment when the 'if' argument is true.";
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
-            {
-                Name = "if",
-                Description = "Skipped when true."
-            });
-        }
+            Name = "if",
+            Description = "Skipped when true."
+        });
     }
 }

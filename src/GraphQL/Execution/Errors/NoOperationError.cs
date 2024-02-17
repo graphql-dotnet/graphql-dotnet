@@ -1,18 +1,17 @@
-namespace GraphQL.Execution
+namespace GraphQL.Execution;
+
+/// <summary>
+/// Represents an error triggered when the document does not include any operations.
+/// </summary>
+[Serializable]
+public class NoOperationError : DocumentError
 {
     /// <summary>
-    /// Represents an error triggered when the document does not include any operations.
+    /// Initializes a new instance of the <see cref="NoOperationError"/> class.
     /// </summary>
-    [Serializable]
-    public class NoOperationError : DocumentError
+    public NoOperationError()
+        : base("Document does not contain any operations.")
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NoOperationError"/> class.
-        /// </summary>
-        public NoOperationError()
-            : base("Document does not contain any operations.")
-        {
-            Code = "NO_OPERATION";
-        }
+        Code = "NO_OPERATION";
     }
 }

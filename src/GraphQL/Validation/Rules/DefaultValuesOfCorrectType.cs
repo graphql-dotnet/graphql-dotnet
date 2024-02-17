@@ -1,38 +1,37 @@
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
-namespace GraphQL.Validation.Rules
+namespace GraphQL.Validation.Rules;
+
+/// <summary>
+/// Variable default values of correct type:
+///
+/// A GraphQL document is only valid if all variable default values are of the
+/// type expected by their definition.
+/// </summary>
+public class DefaultValuesOfCorrectType : ValidationRuleBase
 {
     /// <summary>
-    /// Variable default values of correct type:
-    ///
-    /// A GraphQL document is only valid if all variable default values are of the
-    /// type expected by their definition.
+    /// Returns a static instance of this validation rule.
     /// </summary>
-    public class DefaultValuesOfCorrectType : ValidationRuleBase
+    public static readonly DefaultValuesOfCorrectType Instance = new();
+
+    /// <inheritdoc/>
+    /// <exception cref="DefaultValuesOfCorrectTypeError"/>
+    public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
+
+    private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLVariableDefinition>((varDefAst, context) =>
     {
-        /// <summary>
-        /// Returns a static instance of this validation rule.
-        /// </summary>
-        public static readonly DefaultValuesOfCorrectType Instance = new();
+        var defaultValue = varDefAst.DefaultValue;
+        var inputType = context.TypeInfo.GetInputType();
 
-        /// <inheritdoc/>
-        /// <exception cref="DefaultValuesOfCorrectTypeError"/>
-        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context) => new(_nodeVisitor);
-
-        private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLVariableDefinition>((varDefAst, context) =>
+        if (inputType != null && defaultValue != null)
         {
-            var defaultValue = varDefAst.DefaultValue;
-            var inputType = context.TypeInfo.GetInputType();
-
-            if (inputType != null && defaultValue != null)
+            var errors = context.IsValidLiteralValue(inputType, defaultValue);
+            if (errors != null)
             {
-                var errors = context.IsValidLiteralValue(inputType, defaultValue);
-                if (errors != null)
-                {
-                    context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
-                }
+                context.ReportError(new DefaultValuesOfCorrectTypeError(context, varDefAst, inputType, errors));
             }
-        });
-    }
+        }
+    });
 }

@@ -1,18 +1,17 @@
 using GraphQL.Types;
 
-namespace GraphQL.Utilities.Federation
+namespace GraphQL.Utilities.Federation;
+
+/// <summary>
+/// Represents a type unknown within this portion of the federated schema.
+/// </summary>
+public class AnyScalarGraphType : ComplexScalarGraphType
 {
     /// <summary>
-    /// Represents a type unknown within this portion of the federated schema.
+    /// Initializes a new instance of this class.
     /// </summary>
-    public class AnyScalarGraphType : ComplexScalarGraphType
+    public AnyScalarGraphType()
     {
-        /// <summary>
-        /// Initializes a new instance of this class.
-        /// </summary>
-        public AnyScalarGraphType()
-        {
-            Name = "_Any";
-        }
+        Name = "_Any";
     }
 }

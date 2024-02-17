@@ -1,42 +1,41 @@
 using GraphQL.Resolvers;
 
-namespace GraphQL.Instrumentation
+namespace GraphQL.Instrumentation;
+
+/// <summary>
+/// Default implementation of <see cref="IFieldMiddlewareBuilder"/>.
+/// </summary>
+public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
 {
-    /// <summary>
-    /// Default implementation of <see cref="IFieldMiddlewareBuilder"/>.
-    /// </summary>
-    public class FieldMiddlewareBuilder : IFieldMiddlewareBuilder
+    private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? _middleware;
+
+    /// <inheritdoc/>
+    public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
     {
-        private Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? _middleware;
+        if (middleware == null)
+            throw new ArgumentNullException(nameof(middleware));
 
-        /// <inheritdoc/>
-        public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+        if (_middleware == null)
         {
-            if (middleware == null)
-                throw new ArgumentNullException(nameof(middleware));
-
-            if (_middleware == null)
-            {
-                _middleware = middleware;
-            }
-            else
-            {
-                var firstMiddleware = _middleware;
-                _middleware = next => firstMiddleware(middleware(next));
-            }
-
-            return this;
+            _middleware = middleware;
+        }
+        else
+        {
+            var firstMiddleware = _middleware;
+            _middleware = next => firstMiddleware(middleware(next));
         }
 
-        private static readonly FieldMiddlewareDelegate _defaultDelegate = context => NameFieldResolver.Instance.ResolveAsync(context);
+        return this;
+    }
 
-        /// <inheritdoc/>
-        public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
-        {
-            if (_middleware == null)
-                return null;
+    private static readonly FieldMiddlewareDelegate _defaultDelegate = context => NameFieldResolver.Instance.ResolveAsync(context);
 
-            return start => _middleware(start ?? _defaultDelegate);
-        }
+    /// <inheritdoc/>
+    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
+    {
+        if (_middleware == null)
+            return null;
+
+        return start => _middleware(start ?? _defaultDelegate);
     }
 }
