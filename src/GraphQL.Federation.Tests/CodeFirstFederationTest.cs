@@ -2,7 +2,6 @@ using System.Text.Json;
 using GraphQL.DataLoader;
 using GraphQL.Federation.Tests.Fixtures;
 using GraphQL.SystemTextJson;
-using GraphQL.Tests;
 
 namespace GraphQL.Federation.Tests;
 
@@ -30,7 +29,7 @@ query {
         sdl
     }
 }";
-        }).ConfigureAwait(false);
+        });
 
         var sdl = JsonDocument.Parse(json).RootElement
             .GetProperty("data")
@@ -38,7 +37,48 @@ query {
             .GetProperty("sdl")
             .GetString();
 
-        sdl.ShouldBeCrossPlat("schema {\n  query: TestQuery\n}\n\ntype DirectivesTestDto @key(fields: \"id\") @shareable @inaccessible {\n  id: Int!\n  shareable: String @shareable\n  inaccessible: String @inaccessible\n  override: String @override(from: \"OtherSubgraph\")\n  external: String @external\n  provides: String @provides(fields: \"foo bar\")\n  requires: String @requires(fields: \"foo bar\")\n}\n\ntype ExternalResolvableTestDto @key(fields: \"id\") {\n  id: Int!\n  external: String @external\n  extended: String! @requires(fields: \"external\")\n}\n\ntype ExternalTestDto @key(fields: \"id\", resolvable: false) {\n  id: Int!\n}\n\ntype FederatedTestDto @key(fields: \"id\") {\n  id: Int!\n  name: String @deprecated(reason: \"Test deprecation reason 01.\")\n  externalTestId: Int!\n  externalResolvableTestId: Int!\n  externalTest: ExternalTestDto! @deprecated(reason: \"Test deprecation reason 02.\")\n  externalResolvableTest: ExternalResolvableTestDto! @provides(fields: \"external\")\n}\n\ntype TestQuery {\n  directivesTest: DirectivesTestDto!\n}\n\n\nextend schema @link(url: \"https://specs.apollo.dev/federation/v2.0\", import: [\"@key\", \"@shareable\", \"@inaccessible\", \"@override\", \"@external\", \"@provides\", \"@requires\"])");
+        sdl.ShouldBe("""
+            schema {
+              query: TestQuery
+            }
+
+            type DirectivesTestDto @key(fields: "id") @shareable @inaccessible {
+              id: Int!
+              shareable: String @shareable
+              inaccessible: String @inaccessible
+              override: String @override(from: "OtherSubgraph")
+              external: String @external
+              provides: String @provides(fields: "foo bar")
+              requires: String @requires(fields: "foo bar")
+            }
+
+            type ExternalResolvableTestDto @key(fields: "id") {
+              id: Int!
+              external: String @external
+              extended: String! @requires(fields: "external")
+            }
+
+            type ExternalTestDto @key(fields: "id", resolvable: false) {
+              id: Int!
+            }
+
+            type FederatedTestDto @key(fields: "id") {
+              id: Int!
+              name: String @deprecated(reason: "Test deprecation reason 01.")
+              externalTestId: Int!
+              externalResolvableTestId: Int!
+              externalTest: ExternalTestDto! @deprecated(reason: "Test deprecation reason 02.")
+              externalResolvableTest: ExternalResolvableTestDto! @provides(fields: "external")
+            }
+
+            type TestQuery {
+              directivesTest: DirectivesTestDto!
+            }
+
+
+            extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"])
+            """,
+            StringCompareShould.IgnoreLineEndings);
     }
 
     [Fact]
@@ -70,8 +110,10 @@ query {
         }
     }
 }";
-        }).ConfigureAwait(false);
+        });
 
-        json.ShouldBeCrossPlatJson("{\"data\":{\"_entities\":[{\"name\":\"111\",\"externalTest\":{\"id\":4},\"externalResolvableTest\":{\"id\":7,\"external\":\"external-7\",\"extended\":\"external-7\"}},{\"name\":\"333\",\"externalTest\":{\"id\":6},\"externalResolvableTest\":{\"id\":9,\"external\":\"external-9\",\"extended\":\"external-9\"}},{\"id\":123,\"extended\":\"asdfgh\"}]}}");
+        json.ShouldBe(
+            """{"data":{"_entities":[{"name":"111","externalTest":{"id":4},"externalResolvableTest":{"id":7,"external":"external-7","extended":"external-7"}},{"name":"333","externalTest":{"id":6},"externalResolvableTest":{"id":9,"external":"external-9","extended":"external-9"}},{"id":123,"extended":"asdfgh"}]}}""",
+            StringCompareShould.IgnoreLineEndings);
     }
 }

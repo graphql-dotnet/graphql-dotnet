@@ -25,8 +25,7 @@ public class SchemaFirstFixture
                 | FederationDirectiveEnum.External
                 | FederationDirectiveEnum.Provides
                 | FederationDirectiveEnum.Requires,
-                addFields: true,
-                schemaPrinterOptions: new() { IncludeDeprecationReasons = true }));
+                addFields: true));
 
         Services = sc.BuildServiceProvider();
 
@@ -67,7 +66,7 @@ public class SchemaFirstFixture
                 builder.Types.For(nameof(SchemaFirstFederatedTestDto))
                     .ResolveReference<SchemaFirstFederatedTestDto>((ctx, rep) =>
                     {
-                        var accessor = ctx.RequestServices.GetRequiredService<IDataLoaderContextAccessor>();
+                        var accessor = ctx.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>();
                         return accessor.Context.GetOrAddBatchLoader<int, SchemaFirstFederatedTestDto>(
                             "SchemaFirstFederatedTestDto.ResolveReference",
                             (items) =>

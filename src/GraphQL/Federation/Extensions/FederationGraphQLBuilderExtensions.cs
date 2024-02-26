@@ -16,15 +16,15 @@ public static class FederationGraphQLBuilderExtensions
     /// <param name="builder"> <see cref="IGraphQLBuilder"/> instance. </param>
     /// <param name="import"> Flags enum used to specify which Federation directives are used by subgraph. </param>
     /// <param name="addFields"> Pass false to skip adding Federation fields to Query (true by default). </param>
-    /// <param name="schemaPrinterOptions"> SchemaPrinterOptions used to print _services { sdl }. </param>
+    /// <param name="printOptions"> <see cref="PrintOptions"/> used to print _services { sdl }. </param>
     public static IGraphQLBuilder AddFederation(
         this IGraphQLBuilder builder,
         FederationDirectiveEnum import,
         bool addFields = true,
-        SchemaPrinterOptions? schemaPrinterOptions = null)
+        PrintOptions? printOptions = null)
     {
         builder.Services
-            .Register(new ServiceGraphType(schemaPrinterOptions))
+            .Register(new ServiceGraphType(printOptions))
             .Register<Utilities.Federation.AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityType>(ServiceLifetime.Singleton)
             .Register<NeverType>(ServiceLifetime.Singleton)

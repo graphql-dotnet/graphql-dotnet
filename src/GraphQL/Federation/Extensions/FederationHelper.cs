@@ -37,49 +37,32 @@ internal static class FederationHelper
     {
         var linkSchemaExtension = new GraphQLSchemaExtension
         {
-            Directives = new()
-            {
-                Items = new()
+            Directives = new([
+                new GraphQLDirective(new("link"))
                 {
-                    new GraphQLDirective
-                    {
-                        Name = new("link"),
-                        Arguments = new()
+                    Arguments = new([
+                        new(new("url"), new GraphQLStringValue("https://specs.apollo.dev/federation/v2.0")),
+                        new(new("import"), new GraphQLListValue()
                         {
-                            Items = new()
-                            {
-                                new()
-                                {
-                                    Name = new("url"),
-                                    Value = new GraphQLStringValue("https://specs.apollo.dev/federation/v2.0")
-                                },
-                                new()
-                                {
-                                    Name = new("import"),
-                                    Value = new GraphQLListValue()
-                                    {
-                                        Values = Enum.GetValues(typeof(FederationDirectiveEnum))
-                                            .Cast<FederationDirectiveEnum>()
-                                            .Where(x => import.HasFlag(x))
-                                            .Select(x => new GraphQLStringValue(FederationDirectiveEnumMap[x]))
-                                            .Cast<GraphQLValue>()
-                                            .ToList()
-                                    }
-                                }
-                            }
-                        }
-                    }
+                            Values = Enum.GetValues(typeof(FederationDirectiveEnum))
+                                .Cast<FederationDirectiveEnum>()
+                                .Where(x => import.HasFlag(x))
+                                .Select(x => new GraphQLStringValue(FederationDirectiveEnumMap[x]))
+                                .Cast<GraphQLValue>()
+                                .ToList()
+                        })
+                    ])
                 }
-            }
+            ])
         };
         schema.Metadata[LINK_SCHEMA_EXTENSION_METADATA] = linkSchemaExtension;
     }
 
     public static IHasDirectivesNode BuildAstMetadata(this IProvideMetadata type)
     {
-        var astMetadata = type.GetMetadata<IHasDirectivesNode>(AST_METAFIELD, () => new GraphQLObjectTypeDefinition()
+        var astMetadata = type.GetMetadata<IHasDirectivesNode>(AST_METAFIELD, () => new GraphQLObjectTypeDefinition(new("dummy"))
         {
-            Directives = new() { Items = new() }
+            Directives = new(new())
         });
         type.Metadata[AST_METAFIELD] = astMetadata;
         return astMetadata;
@@ -87,31 +70,19 @@ internal static class FederationHelper
 
     public static void AddFieldsArgument(this GraphQLDirective directive, string fields)
     {
-        ((directive.Arguments ??= new()).Items ??= new()).Add(new()
-        {
-            Name = new(FIELDS_ARGUMENT),
-            Value = new GraphQLStringValue(fields)
-        });
+        (directive.Arguments ??= new([])).Items.Add(new(new(FIELDS_ARGUMENT), new GraphQLStringValue(fields)));
     }
 
     public static void AddFromArgument(this GraphQLDirective directive, string from)
     {
-        ((directive.Arguments ??= new()).Items ??= new()).Add(new()
-        {
-            Name = new(FROM_ARGUMENT),
-            Value = new GraphQLStringValue(from)
-        });
+        (directive.Arguments ??= new([])).Items.Add(new(new(FROM_ARGUMENT), new GraphQLStringValue(from)));
     }
 
     public static void AddResolvableArgument(this GraphQLDirective directive, bool resolvable)
     {
         if (!resolvable)
         {
-            ((directive.Arguments ??= new()).Items ??= new()).Add(new()
-            {
-                Name = new(RESOLVABLE_ARGUMENT),
-                Value = new GraphQLFalseBooleanValue()
-            });
+            (directive.Arguments ??= new([])).Items.Add(new(new(RESOLVABLE_ARGUMENT), new GraphQLFalseBooleanValue()));
         }
     }
 }

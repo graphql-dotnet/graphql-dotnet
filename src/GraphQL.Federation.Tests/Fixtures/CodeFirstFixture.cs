@@ -29,11 +29,10 @@ public class CodeFirstFixture
                 | FederationDirectiveEnum.External
                 | FederationDirectiveEnum.Provides
                 | FederationDirectiveEnum.Requires,
-                addFields: true,
-                schemaPrinterOptions: new() { IncludeDeprecationReasons = true }));
+                addFields: true));
 
         Services = sc.BuildServiceProvider();
 
-        Schema = Services.GetService<TestSchema>();
+        Schema = Services.GetRequiredService<TestSchema>();
     }
 }

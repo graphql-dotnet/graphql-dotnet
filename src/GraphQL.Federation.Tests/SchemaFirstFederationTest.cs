@@ -2,7 +2,6 @@ using System.Text.Json;
 using GraphQL.DataLoader;
 using GraphQL.Federation.Tests.Fixtures;
 using GraphQL.SystemTextJson;
-using GraphQL.Tests;
 
 namespace GraphQL.Federation.Tests;
 
@@ -24,20 +23,48 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
         {
             options.Listeners.Add(new DataLoaderDocumentListener(new DataLoaderContextAccessor()));
             options.ThrowOnUnhandledException = true;
-            options.Query = @"
+            options.Query = """
                 query {
                     _service {
                         sdl
                     }
-                }";
-        }).ConfigureAwait(false);
+                }
+                """;
+        });
 
         var sdl = JsonDocument.Parse(json).RootElement
             .GetProperty("data")
             .GetProperty("_service")
             .GetProperty("sdl")
             .GetString();
-        sdl.ShouldBeCrossPlat("type Query {\n  _noop: String\n}\n\ntype SchemaFirstExternalResolvableTestDto @key(fields: \"id\") {\n  id: Int!\n  external: String @external\n  extended: String! @requires(fields: \"external\")\n}\n\ntype SchemaFirstExternalTestDto @key(fields: \"id\", resolvable: false) {\n  id: Int!\n}\n\ntype SchemaFirstFederatedTestDto @key(fields: \"id\") {\n  id: Int!\n  name: String @deprecated(reason: \"Test deprecation reason 03.\")\n  externalTestId: Int!\n  externalResolvableTestId: Int!\n  externalTest: SchemaFirstExternalTestDto! @deprecated(reason: \"Test deprecation reason 04.\")\n  externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: \"external\")\n}\n\n\nextend schema @link(url: \"https://specs.apollo.dev/federation/v2.0\", import: [\"@key\", \"@shareable\", \"@inaccessible\", \"@override\", \"@external\", \"@provides\", \"@requires\"])");
+        sdl.ShouldBe("""
+            type Query {
+              _noop: String
+            }
+
+            type SchemaFirstExternalResolvableTestDto @key(fields: "id") {
+              id: Int!
+              external: String @external
+              extended: String! @requires(fields: "external")
+            }
+
+            type SchemaFirstExternalTestDto @key(fields: "id", resolvable: false) {
+              id: Int!
+            }
+
+            type SchemaFirstFederatedTestDto @key(fields: "id") {
+              id: Int!
+              name: String @deprecated(reason: "Test deprecation reason 03.")
+              externalTestId: Int!
+              externalResolvableTestId: Int!
+              externalTest: SchemaFirstExternalTestDto! @deprecated(reason: "Test deprecation reason 04.")
+              externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: "external")
+            }
+
+
+            extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"])
+            """,
+            StringCompareShould.IgnoreLineEndings);
     }
 
     [Fact]
@@ -50,9 +77,9 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
             options.RequestServices = Services;
             options.Listeners.Add(new DataLoaderDocumentListener(new DataLoaderContextAccessor()));
             options.ThrowOnUnhandledException = true;
-            options.Query = @"
+            options.Query = """
                 query {
-                    _entities(representations: [{ __typename: ""SchemaFirstFederatedTestDto"", id: 1 }, { __typename: ""SchemaFirstFederatedTestDto"", id: 3 }, { __typename: ""SchemaFirstExternalResolvableTestDto"", id: 321, external: ""zxcvbn"" }]) {
+                    _entities(representations: [{ __typename: "SchemaFirstFederatedTestDto", id: 1 }, { __typename: "SchemaFirstFederatedTestDto", id: 3 }, { __typename: "SchemaFirstExternalResolvableTestDto", id: 321, external: "zxcvbn" }]) {
                         ... on SchemaFirstFederatedTestDto {
                             name
                             externalTest {
@@ -69,9 +96,12 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
                             extended
                         }
                     }
-                }";
-        }).ConfigureAwait(false);
+                }
+                """;
+        });
 
-        json.ShouldBeCrossPlatJson("{\"data\":{\"_entities\":[{\"name\":\"111\",\"externalTest\":{\"id\":4},\"externalResolvableTest\":{\"id\":7,\"external\":\"qwerty\",\"extended\":\"qwerty\"}},{\"name\":\"333\",\"externalTest\":{\"id\":6},\"externalResolvableTest\":{\"id\":9,\"external\":\"qwerty\",\"extended\":\"qwerty\"}},{\"id\":321,\"extended\":\"zxcvbn\"}]}}");
+        json.ShouldBe(
+            """{"data":{"_entities":[{"name":"111","externalTest":{"id":4},"externalResolvableTest":{"id":7,"external":"qwerty","extended":"qwerty"}},{"name":"333","externalTest":{"id":6},"externalResolvableTest":{"id":9,"external":"qwerty","extended":"qwerty"}},{"id":321,"extended":"zxcvbn"}]}}""",
+            StringCompareShould.IgnoreLineEndings);
     }
 }

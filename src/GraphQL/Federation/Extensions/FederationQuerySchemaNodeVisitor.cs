@@ -54,13 +54,10 @@ internal class FederationQuerySchemaNodeVisitor : BaseSchemaNodeVisitor
         {
             var typeName = repMap["__typename"].ToString();
             var graphTypeInstance = context.Schema.AllTypes[typeName]!;
-            var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA);
-            if (resolver == null)
-            {
-                throw new NotImplementedException($"ResolveReference() was not provided for {graphTypeInstance.Name}.");
-            }
+            var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
+                ?? throw new NotImplementedException($"ResolveReference() was not provided for {graphTypeInstance.Name}.");
 
-            var rep = repMap!.ToObject(resolver.SourceType);
+            var rep = repMap!.ToObject(resolver.SourceType, graphTypeInstance);
             var result = resolver.Resolve(context, rep);
             results.Add(result);
         }

@@ -42,7 +42,7 @@ public static partial class FederationGraphTypeExtensions
     public static void Key(this IObjectGraphType graphType, string fields, bool resolvable = true)
     {
         var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(KEY_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(KEY_DIRECTIVE));
         directive.AddFieldsArgument(fields.ToCamelCase());
         directive.AddResolvableArgument(resolvable);
         astMetadata!.Directives!.Items.Add(directive);
@@ -56,7 +56,7 @@ public static partial class FederationGraphTypeExtensions
         if (graphType.IsInputType())
             throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Input types are not supported.");
         var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(SHAREABLE_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(SHAREABLE_DIRECTIVE));
         astMetadata!.Directives!.Items.Add(directive);
     }
 
@@ -68,7 +68,7 @@ public static partial class FederationGraphTypeExtensions
         if (graphType.IsInputType())
             throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Input types are not supported.");
         var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(INACCESSIBLE_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(INACCESSIBLE_DIRECTIVE));
         astMetadata!.Directives!.Items.Add(directive);
     }
 

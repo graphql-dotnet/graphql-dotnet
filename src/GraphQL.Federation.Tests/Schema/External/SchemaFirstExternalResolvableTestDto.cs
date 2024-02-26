@@ -7,5 +7,5 @@ public class SchemaFirstExternalResolvableTestDto
     public string External { get; set; }
 
     public string Extended(IResolveFieldContext ctx) =>
-        ((SchemaFirstExternalResolvableTestDto)ctx.Source).External;
+        ((SchemaFirstExternalResolvableTestDto)ctx.Source!).External;
 }

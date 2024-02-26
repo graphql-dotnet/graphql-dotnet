@@ -52,7 +52,7 @@ public static class FederationFieldExtensions
     public static void Shareable(this FieldType fieldType)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(SHAREABLE_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(SHAREABLE_DIRECTIVE));
         astMetadata!.Directives!.Items.Add(directive);
     }
 
@@ -62,7 +62,7 @@ public static class FederationFieldExtensions
     public static void Inaccessible(this FieldType fieldType)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(INACCESSIBLE_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(INACCESSIBLE_DIRECTIVE));
         astMetadata!.Directives!.Items.Add(directive);
     }
 
@@ -72,7 +72,7 @@ public static class FederationFieldExtensions
     public static void Override(this FieldType fieldType, string from)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(OVERRIDE_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(OVERRIDE_DIRECTIVE));
         directive.AddFromArgument(from);
         astMetadata!.Directives!.Items.Add(directive);
     }
@@ -83,7 +83,7 @@ public static class FederationFieldExtensions
     public static void External(this FieldType fieldType)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(EXTERNAL_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(EXTERNAL_DIRECTIVE));
         astMetadata!.Directives!.Items.Add(directive);
     }
 
@@ -99,7 +99,7 @@ public static class FederationFieldExtensions
     public static void Provides(this FieldType fieldType, string fields)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(PROVIDES_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(PROVIDES_DIRECTIVE));
         directive.AddFieldsArgument(fields.ToCamelCase());
         astMetadata!.Directives!.Items.Add(directive);
     }
@@ -116,7 +116,7 @@ public static class FederationFieldExtensions
     public static void Requires(this FieldType fieldType, string fields)
     {
         var astMetadata = fieldType.BuildAstMetadata();
-        var directive = new GraphQLDirective { Name = new(REQUIRES_DIRECTIVE) };
+        var directive = new GraphQLDirective(new(REQUIRES_DIRECTIVE));
         directive.AddFieldsArgument(fields.ToCamelCase());
         astMetadata!.Directives!.Items.Add(directive);
     }

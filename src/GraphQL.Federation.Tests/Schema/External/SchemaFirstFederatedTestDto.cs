@@ -12,13 +12,13 @@ public class SchemaFirstFederatedTestDto
     public SchemaFirstExternalTestDto ExternalTest(IResolveFieldContext ctx) =>
         new()
         {
-            Id = ((SchemaFirstFederatedTestDto)ctx.Source).ExternalTestId
+            Id = ((SchemaFirstFederatedTestDto)ctx.Source!).ExternalTestId
         };
 
     public SchemaFirstExternalResolvableTestDto ExternalResolvableTest(IResolveFieldContext ctx) =>
         new()
         {
-            Id = ((SchemaFirstFederatedTestDto)ctx.Source).ExternalResolvableTestId,
+            Id = ((SchemaFirstFederatedTestDto)ctx.Source!).ExternalResolvableTestId,
             External = "qwerty"
         };
 }
