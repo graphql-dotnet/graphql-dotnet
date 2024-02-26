@@ -23,12 +23,13 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
         {
             options.Listeners.Add(new DataLoaderDocumentListener(new DataLoaderContextAccessor()));
             options.ThrowOnUnhandledException = true;
-            options.Query = @"
-query {
-    _service {
-        sdl
-    }
-}";
+            options.Query = """
+                query {
+                    _service {
+                        sdl
+                    }
+                }
+                """;
         });
 
         var sdl = JsonDocument.Parse(json).RootElement
@@ -90,26 +91,27 @@ query {
         {
             options.Listeners.Add(new DataLoaderDocumentListener(new DataLoaderContextAccessor()));
             options.ThrowOnUnhandledException = true;
-            options.Query = @"
-query {
-    _entities(representations: [{ __typename: ""FederatedTestDto"", id: 1 }, { __typename: ""FederatedTestDto"", id: 3 }, { __typename: ""ExternalResolvableTestDto"", id: 123, external: ""asdfgh"" }]) {
-        ... on FederatedTestDto {
-            name
-            externalTest {
-                id
-            }
-            externalResolvableTest {
-                id
-                external
-                extended
-            }
-        }
-        ... on ExternalResolvableTestDto {
-            id
-            extended
-        }
-    }
-}";
+            options.Query = """
+                query {
+                    _entities(representations: [{ __typename: "FederatedTestDto", id: 1 }, { __typename: "FederatedTestDto", id: 3 }, { __typename: "ExternalResolvableTestDto", id: 123, external: "asdfgh" }]) {
+                        ... on FederatedTestDto {
+                            name
+                            externalTest {
+                                id
+                            }
+                            externalResolvableTest {
+                                id
+                                external
+                                extended
+                            }
+                        }
+                        ... on ExternalResolvableTestDto {
+                            id
+                            extended
+                        }
+                    }
+                }
+                """;
         });
 
         json.ShouldBe(
