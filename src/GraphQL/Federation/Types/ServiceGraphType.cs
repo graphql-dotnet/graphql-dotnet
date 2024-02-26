@@ -9,6 +9,7 @@ internal class ServiceGraphType : ObjectGraphType
     {
         Name = "_Service";
 
+        printOptions ??= new() { IncludeFederationTypes = false };
         Field<StringGraphType>("sdl")
             .Resolve(context => context.Schema.Print(printOptions));
     }

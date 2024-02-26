@@ -27,7 +27,6 @@ public static class FederationGraphQLBuilderExtensions
             .Register(new ServiceGraphType(printOptions))
             .Register<Utilities.Federation.AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityType>(ServiceLifetime.Singleton)
-            .Register<NeverType>(ServiceLifetime.Singleton)
             .Register<FederationEntitiesSchemaNodeVisitor>(ServiceLifetime.Singleton)
             .Register<FederationQuerySchemaNodeVisitor>(ServiceLifetime.Singleton);
         return builder
@@ -37,7 +36,6 @@ public static class FederationGraphQLBuilderExtensions
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<Utilities.Federation.AnyScalarGraphType>();
                 schema.RegisterType<EntityType>();
-                schema.RegisterType<NeverType>();
                 schema.RegisterVisitor<FederationEntitiesSchemaNodeVisitor>();
                 if (addFields)
                 {

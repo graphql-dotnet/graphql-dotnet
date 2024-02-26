@@ -29,26 +29,27 @@ public class SchemaFirstFixture
 
         Services = sc.BuildServiceProvider();
 
-        Schema = FederatedSchemaHelper.For(@"
+        Schema = FederatedSchemaHelper.For("""
             type Query {
                 _noop: String
             }
-            type SchemaFirstExternalResolvableTestDto @key(fields: ""id"") {
+            type SchemaFirstExternalResolvableTestDto @key(fields: "id") {
                 id: Int!
                 external: String @external
-                extended: String! @requires(fields: ""external"")
+                extended: String! @requires(fields: "external")
             }
-            type SchemaFirstExternalTestDto @key(fields: ""id"", resolvable: false) {
+            type SchemaFirstExternalTestDto @key(fields: "id", resolvable: false) {
                 id: Int!
             }
-            type SchemaFirstFederatedTestDto @key(fields: ""id"") {
+            type SchemaFirstFederatedTestDto @key(fields: "id") {
                 id: Int!
                 name: String
                 externalTestId: Int!
                 externalResolvableTestId: Int!
-                externalTest: SchemaFirstExternalTestDto! @deprecated(reason: ""Test deprecation reason 04."")
-                externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: ""external"")
-            }",
+                externalTest: SchemaFirstExternalTestDto! @deprecated(reason: "Test deprecation reason 04.")
+                externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: "external")
+            }
+            """,
             builder =>
             {
                 builder.ServiceProvider = Services;

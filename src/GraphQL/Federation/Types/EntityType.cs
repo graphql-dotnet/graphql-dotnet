@@ -7,6 +7,5 @@ internal class EntityType : UnionGraphType
     public EntityType()
     {
         Name = "_Entity";
-        Type<NeverType>();
     }
 }
