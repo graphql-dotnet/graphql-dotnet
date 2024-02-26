@@ -313,7 +313,7 @@ public partial class ValidationContext : IProvideUserContext
             }
             catch (Exception ex)
             {
-                throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value}' to '{scalarGraphType.Name}'", ex);
+                throw new InvalidVariableError(this, variableDef, variableName, $"Unable to convert '{value.ToSafeString()}' to '{scalarGraphType.Name}'", ex);
             }
         }
 
