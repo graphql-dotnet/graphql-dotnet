@@ -35,6 +35,6 @@ public sealed class FederatedTestType : AutoRegisteringObjectGraphType<Federated
                 Id = ctx.Source.ExternalResolvableTestId,
                 External = $"external-{ctx.Source.ExternalResolvableTestId}"
             })
-            .Provides(nameof(ExternalResolvableTestDto.External));
+            .Provides("external");
     }
 }

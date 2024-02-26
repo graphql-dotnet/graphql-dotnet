@@ -2,7 +2,7 @@ using GraphQL.Federation.Attributes;
 
 namespace GraphQL.Federation.Tests.Schema.External;
 
-[Key(nameof(Id))]
+[Key("id")]
 public class ExternalResolvableTestDto
 {
     public int Id { get; set; }

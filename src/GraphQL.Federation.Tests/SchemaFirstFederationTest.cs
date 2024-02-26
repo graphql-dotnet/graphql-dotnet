@@ -37,7 +37,12 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
             .GetProperty("_service")
             .GetProperty("sdl")
             .GetString();
+
         sdl.ShouldBe("""
+            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"]) {
+              query: Query
+            }
+
             type Query {
               _noop: String
             }
@@ -60,9 +65,6 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
               externalTest: SchemaFirstExternalTestDto! @deprecated(reason: "Test deprecation reason 04.")
               externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: "external")
             }
-
-
-            extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"])
             """,
             StringCompareShould.IgnoreLineEndings);
     }

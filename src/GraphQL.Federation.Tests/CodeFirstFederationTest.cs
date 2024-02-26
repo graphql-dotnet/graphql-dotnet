@@ -39,45 +39,44 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
             .GetString();
 
         sdl.ShouldBe("""
-            schema {
+            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"]) {
               query: TestQuery
+            }
+
+            type TestQuery {
+              directivesTest: DirectivesTestDto!
+              _service: _Service!
+              _entities(representations: [_Any!]!): [_Entity]!
             }
 
             type DirectivesTestDto @key(fields: "id") @shareable @inaccessible {
               id: Int!
-              shareable: String @shareable
-              inaccessible: String @inaccessible
-              override: String @override(from: "OtherSubgraph")
-              external: String @external
-              provides: String @provides(fields: "foo bar")
-              requires: String @requires(fields: "foo bar")
-            }
-
-            type ExternalResolvableTestDto @key(fields: "id") {
-              id: Int!
-              external: String @external
-              extended: String! @requires(fields: "external")
-            }
-
-            type ExternalTestDto @key(fields: "id", resolvable: false) {
-              id: Int!
+              shareable: String! @shareable
+              inaccessible: String! @inaccessible
+              override: String! @override(from: "OtherSubgraph")
+              external: String! @external
+              provides: String! @provides(fields: "foo bar")
+              requires: String! @requires(fields: "foo bar")
             }
 
             type FederatedTestDto @key(fields: "id") {
               id: Int!
-              name: String @deprecated(reason: "Test deprecation reason 01.")
+              name: String! @deprecated(reason: "Test deprecation reason 01.")
               externalTestId: Int!
               externalResolvableTestId: Int!
               externalTest: ExternalTestDto! @deprecated(reason: "Test deprecation reason 02.")
               externalResolvableTest: ExternalResolvableTestDto! @provides(fields: "external")
             }
 
-            type TestQuery {
-              directivesTest: DirectivesTestDto!
+            type ExternalTestDto @key(fields: "id", resolvable: false) {
+              id: Int!
             }
 
-
-            extend schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"])
+            type ExternalResolvableTestDto @key(fields: "id") {
+              id: Int!
+              external: String! @external
+              extended: String! @requires(fields: "External")
+            }
             """,
             StringCompareShould.IgnoreLineEndings);
     }

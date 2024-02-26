@@ -2,7 +2,7 @@ using GraphQL.Federation.Attributes;
 
 namespace GraphQL.Federation.Tests.Schema.Output;
 
-[Key(nameof(Id))]
+[Key("id")]
 [Shareable]
 [Inaccessible]
 public class DirectivesTestDto
@@ -16,7 +16,7 @@ public class DirectivesTestDto
     public string Override { get; set; }
     [External]
     public string External { get; set; }
-    [Provides("Foo", "Bar")]
+    [Provides("foo", "bar")]
     public string Provides { get; set; }
     [Requires("foo bar")]
     public string Requires { get; set; }
