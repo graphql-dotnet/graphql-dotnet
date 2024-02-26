@@ -78,7 +78,7 @@ public delegate ValueTask<object?> FieldMiddlewareDelegate(IResolveFieldContext 
 
 ## Field Middleware and Dependency Injection
 
-First, you are advised to read the article about [Dependency Injection](Dependency-Injection).
+First, you are advised to read the article about [Dependency Injection](../dependency-injection).
 
 Typically you will want to set the middleware within the schema constructor.
 
@@ -187,4 +187,4 @@ Options are also possible using transient lifetime, but are not given here (not 
 You can think of a Field Middleware as something global that controls how all fields of all types
 in the schema are resolved. A directive, at the same time, would only affect specific schema elements
 and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about directives see [Directives](https://graphql-dotnet.github.io/docs/getting-started/directives).
+For more information about directives see [Directives](../directives).

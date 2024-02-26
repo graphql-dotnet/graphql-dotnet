@@ -12,7 +12,7 @@ public class ApplyCounterMiddlewareBuilder : IFieldMiddlewareBuilder
     public int AppliedCount;
     private readonly FieldMiddlewareBuilder overriddenBuilder = new();
 
-    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> Build()
+    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build()
     {
         AppliedCount++;
         return overriddenBuilder.Build();
@@ -40,7 +40,7 @@ public class Bug252ExecutorAppliesBuilderOnceTests
     }
 
     [Fact]
-    public void apply_to_called_once()
+    public async Task apply_to_called_once()
     {
         var docExec = new DocumentExecuter();
         var schema = new Schema();
@@ -52,13 +52,13 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
         schema.FieldMiddleware = mockMiddleware;
 
-        docExec.ExecuteAsync(execOptions).Wait();
+        await docExec.ExecuteAsync(execOptions);
 
         mockMiddleware.AppliedCount.ShouldBe(1);
     }
 
     [Fact]
-    public void apply_to_called_once_with_multiple_execute()
+    public async Task apply_to_called_once_with_multiple_execute()
     {
         var docExec = new DocumentExecuter();
         var schema = new Schema();
@@ -70,8 +70,8 @@ public class Bug252ExecutorAppliesBuilderOnceTests
         var mockMiddleware = new ApplyCounterMiddlewareBuilder();
         schema.FieldMiddleware = mockMiddleware;
 
-        docExec.ExecuteAsync(execOptions).Wait();
-        docExec.ExecuteAsync(execOptions).Wait();
+        await docExec.ExecuteAsync(execOptions);
+        await docExec.ExecuteAsync(execOptions);
 
         mockMiddleware.AppliedCount.ShouldBe(1);
     }

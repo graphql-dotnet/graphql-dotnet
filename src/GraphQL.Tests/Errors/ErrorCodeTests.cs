@@ -14,9 +14,9 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Code.ShouldBe(code);
     }
@@ -31,9 +31,9 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         {
             _.Schema = Schema;
             _.Query = query;
-        }).ConfigureAwait(false);
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Code.ShouldBe(code);
     }
@@ -44,10 +44,10 @@ public class ErrorCodeTests : QueryTestBase<ErrorCodeTests.TestSchema>
         var result = await Executer.ExecuteAsync(_ =>
         {
             _.Schema = Schema;
-            _.Query = @"{ secondSync }";
-        }).ConfigureAwait(false);
+            _.Query = "{ secondSync }";
+        });
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
         error.Data["Foo"].ShouldBe("Bar");
     }

@@ -16,7 +16,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
 
     protected IServiceProvider Services { get; }
 
-    public QueryTestBase()
+    protected QueryTestBase()
     {
         var services = new ServiceCollection();
         ConfigureServices(services);
@@ -29,6 +29,7 @@ public abstract class QueryTestBase : DataLoaderTestBase
         services.AddSingleton<DataLoaderTestSchema>();
         services.AddSingleton<SubscriptionType>();
         services.AddSingleton<QueryType>();
+        services.AddSingleton<MutationType>();
         services.AddSingleton<OrderType>();
         services.AddSingleton<UserType>();
         services.AddSingleton<OrderItemType>();
@@ -51,8 +52,8 @@ public abstract class QueryTestBase : DataLoaderTestBase
     public Task<ExecutionResult> AssertQuerySuccessAsync<TSchema>(
         string query,
         string expected,
-        Inputs variables = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default)
         where TSchema : ISchema
     {
@@ -81,16 +82,16 @@ public abstract class QueryTestBase : DataLoaderTestBase
 
         foreach (var writer in GraphQLSerializersTestData.AllWriters)
         {
-            var writtenResult = writer.Serialize(runResult);
-            var expectedResult = writer.Serialize(expectedExecutionResult);
+            string writtenResult = writer.Serialize(runResult);
+            string expectedResult = writer.Serialize(expectedExecutionResult);
 
-            string additionalInfo = null;
+            string? additionalInfo = null;
 
             if (runResult.Errors?.Any() == true)
             {
                 additionalInfo = string.Join(Environment.NewLine, runResult.Errors
                     .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                    .Select(x => x.InnerException.Message));
+                    .Select(x => x.InnerException!.Message));
             }
 
             writtenResult.ShouldBe(expectedResult, additionalInfo);
@@ -109,18 +110,15 @@ public abstract class QueryTestBase : DataLoaderTestBase
         {
             opts.Schema = schema;
             opts.Query = query;
-            foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
-            {
-                opts.Listeners.Add(listener);
-            }
+            opts.Listeners.AddRange(Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>());
         });
     }
 
     public Task<ExecutionResult> AssertQueryAsync<TSchema>(
         string query,
         ExecutionResult expectedExecutionResult,
-        Inputs variables = null,
-        IDictionary<string, object> userContext = null,
+        Inputs? variables = null,
+        IDictionary<string, object?>? userContext = null,
         CancellationToken cancellationToken = default)
         where TSchema : ISchema
     {
@@ -129,20 +127,16 @@ public abstract class QueryTestBase : DataLoaderTestBase
             {
                 opts.Query = query;
                 opts.Variables = variables;
-                opts.UserContext = userContext;
+                opts.UserContext = userContext ?? new Dictionary<string, object?>();
                 opts.CancellationToken = cancellationToken;
-
-                foreach (var listener in Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>())
-                {
-                    opts.Listeners.Add(listener);
-                }
+                opts.Listeners.AddRange(Services.GetRequiredService<IEnumerable<IDocumentExecutionListener>>());
             },
             expectedExecutionResult);
     }
 
-    public ExecutionResult CreateQueryResult(string result, bool executed = true)
+    public static ExecutionResult CreateQueryResult(string result, bool executed = true)
     {
-        object expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Deserialize<Inputs>(result);
+        object? expected = string.IsNullOrWhiteSpace(result) ? null : new GraphQLSerializer().Deserialize<Inputs>(result);
         return new ExecutionResult { Data = expected, Executed = executed };
     }
 }

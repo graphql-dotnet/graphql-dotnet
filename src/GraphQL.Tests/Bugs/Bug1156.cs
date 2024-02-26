@@ -7,7 +7,7 @@ public class Bug1156 : QueryTestBase<Bug1156Schema>
     [Fact]
     public void duplicated_type_names_should_throw_error()
     {
-        var query = """
+        const string query = """
 {
     type1 {
         field1A
@@ -21,8 +21,8 @@ public class Bug1156 : QueryTestBase<Bug1156Schema>
 }
 """;
         var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
-        result.Errors[0].Message.ShouldBe("Error executing document.");
-        result.Errors[0].InnerException.Message.ShouldBe("Unable to register GraphType 'Type2' with the name 'MyType'. The name 'MyType' is already registered to 'Type1'. Check your schema configuration.");
+        result.Errors.ShouldHaveSingleItem().Message.ShouldBe("Error executing document.");
+        result.Errors.ShouldHaveSingleItem().InnerException.ShouldNotBeNull().Message.ShouldBe("Unable to register GraphType 'Type2' with the name 'MyType'. The name 'MyType' is already registered to 'Type1'. Check your schema configuration.");
     }
 }
 

@@ -10,49 +10,49 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
     [Fact]
     public void test_parseliteral_string()
     {
-        AssertQuerySuccess(@"{ input(arg: ""1,2,3"") }", @"{ ""input"": ""=1=2=3="" }");
+        AssertQuerySuccess("""{ input(arg: "1,2,3") }""", """{ "input": "=1=2=3=" }""");
     }
 
     [Fact]
     public void test_parseliteral_structured()
     {
-        AssertQuerySuccess(@"{ input(arg: {x:1,y:2,z:3}) }", @"{ ""input"": ""=1=2=3="" }");
+        AssertQuerySuccess("{ input(arg: {x:1,y:2,z:3}) }", """{ "input": "=1=2=3=" }""");
     }
 
     [Fact]
     public void test_parsevalue_string()
     {
-        AssertQuerySuccess(@"query($arg: Vector3) { input(arg: $arg) }", @"{ ""input"": ""=1=2=3="" }", @"{ ""arg"": ""1,2,3"" }".ToInputs());
+        AssertQuerySuccess("query($arg: Vector3) { input(arg: $arg) }", """{ "input": "=1=2=3=" }""", """{ "arg": "1,2,3" }""".ToInputs());
     }
 
     [Fact]
     public void test_parsevalue_structured()
     {
-        AssertQuerySuccess(@"query($arg: Vector3) { input(arg: $arg) }", @"{ ""input"": ""=1=2=3="" }", @"{ ""arg"": { ""x"": 1, ""y"": 2, ""z"": 3 } }".ToInputs());
+        AssertQuerySuccess("query($arg: Vector3) { input(arg: $arg) }", """{ "input": "=1=2=3=" }""", """{ "arg": { "x": 1, "y": 2, "z": 3 } }""".ToInputs());
     }
 
     [Fact]
     public void test_default()
     {
-        AssertQuerySuccess(@"{ input }", @"{ ""input"": ""=7=8=9="" }");
+        AssertQuerySuccess("{ input }", """{ "input": "=7=8=9=" }""");
     }
 
     [Fact]
     public void test_output()
     {
-        AssertQuerySuccess(@"{ output }", @"{ ""output"": { ""x"": 4, ""y"": 5, ""z"": 6 } }");
+        AssertQuerySuccess("{ output }", """{ "output": { "x": 4, "y": 5, "z": 6 } }""");
     }
 
     [Fact]
     public void test_loopback_with_value()
     {
-        AssertQuerySuccess(@"{ loopback(arg: ""11,12,13"") }", @"{ ""loopback"": { ""x"": 11, ""y"": 12, ""z"": 13 } }");
+        AssertQuerySuccess("""{ loopback(arg: "11,12,13") }""", """{ "loopback": { "x": 11, "y": 12, "z": 13 } }""");
     }
 
     [Fact]
     public void test_loopback_with_null()
     {
-        AssertQuerySuccess(@"{ loopback }", @"{ ""loopback"": null }");
+        AssertQuerySuccess("{ loopback }", """{ "loopback": null }""");
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
         var scalar = new Vector3Type();
         var input = new Vector3(1, 2, 3);
         var ast = scalar.ToAST(input);
-        var value = scalar.ParseLiteral(ast);
+        object? value = scalar.ParseLiteral(ast);
         var output = value.ShouldBeOfType<Vector3>();
         output.X.ShouldBe(input.X);
         output.Y.ShouldBe(input.Y);
@@ -121,7 +121,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             Name = "Vector3";
         }
 
-        public override object ParseValue(object value)
+        public override object? ParseValue(object? value)
         {
             if (value == null)
                 return null;
@@ -130,10 +130,10 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             {
                 try
                 {
-                    var vector3Parts = vector3InputString.Split(','); // strings allocations
-                    var x = float.Parse(vector3Parts[0]);
-                    var y = float.Parse(vector3Parts[1]);
-                    var z = float.Parse(vector3Parts[2]);
+                    string[] vector3Parts = vector3InputString.Split(','); // strings allocations
+                    float x = float.Parse(vector3Parts[0]);
+                    float y = float.Parse(vector3Parts[1]);
+                    float z = float.Parse(vector3Parts[2]);
                     return new Vector3(x, y, z);
                 }
                 catch
@@ -149,17 +149,17 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
                     // no strings allocations
                     var span = vector3InputROM.Span;
 
-                    var i = span.IndexOf(',');
-                    var x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    int i = span.IndexOf(',');
+                    float x = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                     span = span.Slice(i + 1);
 
                     i = span.IndexOf(',');
-                    var y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    float y = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
 
                     span = span.Slice(i + 1);
 
-                    var z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
+                    float z = float.Parse(span.Slice(0, i).ToString()); // string conversion for NET48
                     return new Vector3(x, y, z);
                 }
                 catch
@@ -172,9 +172,9 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             {
                 try
                 {
-                    var x = Convert.ToSingle(dictionary["x"]);
-                    var y = Convert.ToSingle(dictionary["y"]);
-                    var z = Convert.ToSingle(dictionary["z"]);
+                    float x = Convert.ToSingle(dictionary["x"]);
+                    float y = Convert.ToSingle(dictionary["y"]);
+                    float z = Convert.ToSingle(dictionary["z"]);
                     if (dictionary.Count > 3)
                         return ThrowValueConversionError(value);
                     return new Vector3(x, y, z);
@@ -188,7 +188,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             return ThrowValueConversionError(value);
         }
 
-        public override object ParseLiteral(GraphQLValue value)
+        public override object? ParseLiteral(GraphQLValue value)
         {
             if (value is GraphQLNullValue)
                 return null;
@@ -198,19 +198,19 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
 
             if (value is GraphQLObjectValue objectValue)
             {
-                var entries = objectValue.Fields.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
+                var entries = objectValue.Fields!.ToDictionary(x => x.Name.Value, x => _floatScalar.ParseLiteral(x.Value));
                 if (entries.Count != 3)
                     return ThrowLiteralConversionError(value);
-                var x = (double)entries["x"];
-                var y = (double)entries["y"];
-                var z = (double)entries["z"];
+                double x = (double)entries["x"]!;
+                double y = (double)entries["y"]!;
+                double z = (double)entries["z"]!;
                 return new Vector3((float)x, (float)y, (float)z);
             }
 
             return ThrowLiteralConversionError(value);
         }
 
-        public override object Serialize(object value)
+        public override object? Serialize(object? value)
         {
             if (value == null)
                 return null;
@@ -228,7 +228,7 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
             return ThrowSerializationError(value);
         }
 
-        public override GraphQLValue ToAST(object value)
+        public override GraphQLValue ToAST(object? value)
         {
             if (value == null)
                 return new GraphQLNullValue();

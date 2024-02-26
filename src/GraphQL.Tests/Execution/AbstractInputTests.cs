@@ -7,14 +7,14 @@ public class AbstractInputTests : QueryTestBase<AbstractInputSchema>
     [Fact]
     public void throws_literals()
     {
-        var query = @"
-mutation M {
-  run(input: { id: ""123"" })
-}
-";
-        var expected = @"{ ""run"": null }";
+        const string query = """
+            mutation M {
+              run(input: { id: "123" })
+            }
+            """;
+        const string expected = """{ "run": null }""";
         var res = AssertQueryWithErrors(query, expected, expectedErrorCount: 1);
-        res.Errors[0].Code.ShouldBe("INVALID_OPERATION");
+        res.Errors![0].Code.ShouldBe("INVALID_OPERATION");
     }
 }
 

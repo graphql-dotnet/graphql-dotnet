@@ -18,22 +18,22 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             ctx.SubFields.Keys.ShouldContain("friends");
             return new List<Human>();
         });
-        var query = @"
-                {
-                    listOfHumans {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+        const string query = """
+            {
+              listOfHumans {
+                id
+                friends {
+                  name
                 }
-            ";
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                    ""listOfHumans"": []
-                }
-            ";
+        const string expected = """
+            {
+              "listOfHumans": []
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -48,21 +48,21 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return null;
         });
 
-        var query = @"
-                {
-                    singleHuman {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+        const string query = """
+            {
+              singleHuman {
+                id
+                friends {
+                  name
                 }
-            ";
-        var expected = @"
-                {
-                    ""singleHuman"": null
-                }
-            ";
+              }
+            }
+            """;
+        const string expected = """
+            {
+              "singleHuman": null
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -76,22 +76,22 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             ctx.SubFields.Keys.ShouldContain("friends");
             return new List<Human>();
         });
-        var query = @"
-                {
-                    listOfCharacters {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+        const string query = """
+            {
+              listOfCharacters {
+                id
+                friends {
+                  name
                 }
-            ";
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                    ""listOfCharacters"": []
-                }
-            ";
+        const string expected = """
+            {
+              "listOfCharacters": []
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -103,24 +103,24 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
            ctx.SubFields.ShouldNotBeNull();
            ctx.SubFields.Keys.ShouldContain("id");
            ctx.SubFields.Keys.ShouldContain("friends");
-           return Task.FromResult<object>(null);
+           return Task.FromResult<object?>(null);
        });
-        var query = @"
-                {
-                    singleCharacter {
-                        id
-                        friends {
-                            name
-                        }
-                    }
+        const string query = """
+            {
+              singleCharacter {
+                id
+                friends {
+                  name
                 }
-            ";
+              }
+            }
+            """;
 
-        var expected = @"
-                {
-                    ""singleCharacter"": null
-                }
-            ";
+        const string expected = """
+            {
+              "singleCharacter": null
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -133,16 +133,16 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return 1;
         });
 
-        var query = @"
-                {
-                    someNumber
-                }
-            ";
-        var expected = @"
-                {
-                    ""someNumber"": 1
-                }
-            ";
+        const string query = """
+            {
+              someNumber
+            }
+            """;
+        const string expected = """
+            {
+              "someNumber": 1
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -155,16 +155,16 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { 1, 2 };
         });
 
-        var query = @"
-                {
-                    someNumbers
-                }
-            ";
-        var expected = @"
-                {
-                    ""someNumbers"": [1,2]
-                }
-            ";
+        const string query = """
+            {
+              someNumbers
+            }
+            """;
+        const string expected = """
+            {
+              "someNumbers": [1,2]
+            }
+            """;
         AssertQuerySuccess(query, expected);
     }
 
@@ -179,27 +179,27 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new Human { Id = "1", Name = "Luke" };
         });
 
-        var query = @"
-                query Luke {
-                    luke {
-                        ...HumanData
-                    }
-                }
+        const string query = """
+            query Luke {
+              luke {
+                ...HumanData
+              }
+            }
 
-                fragment HumanData on Human {
-                    id
-                    name
-                }
-            ";
+            fragment HumanData on Human {
+              id
+              name
+            }
+            """;
 
-        var expected = @"
-                {
-                    ""luke"": {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    }
-                }
-            ";
+        const string expected = """
+            {
+              "luke": {
+                "id": "1",
+                "name": "Luke"
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -215,26 +215,26 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new Human { Id = "1", Name = "Luke" };
         });
 
-        var query = @"
-                query Luke {
-                    luke {
-                        ...on Human
-                        {
-                            id
-                            name
-                        }
-                    }
-                }
-            ";
-
-        var expected = @"
+        const string query = """
+            query Luke {
+              luke {
+                ...on Human
                 {
-                    ""luke"": {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    }
+                  id
+                  name
                 }
-            ";
+              }
+            }
+            """;
+
+        const string expected = """
+            {
+              "luke": {
+                "id": "1",
+                "name": "Luke"
+              }
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -250,32 +250,33 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
         });
 
-        var query = @"
-                query Luke {
-                    lukes {
-                        ...HumanData
-                    }
-                }
+        const string query = """
+            query Luke {
+              lukes {
+                ...HumanData
+              }
+            }
 
-                fragment HumanData on Human {
-                    id
-                    name
-                }
-            ";
+            fragment HumanData on Human {
+              id
+              name
+            }
+            """;
 
-        var expected = @"
+        const string expected = """
+            {
+              "lukes": [
                 {
-                    ""lukes"": [
-                    {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    },
-                    {
-                        ""id"": ""2"",
-                        ""name"": ""Luke Copy""
-                    }
-                ]}
-            ";
+                  "id": "1",
+                  "name": "Luke"
+                },
+                {
+                  "id": "2",
+                  "name": "Luke Copy"
+                }
+              ]
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }
@@ -291,31 +292,32 @@ public class StarWarsSubFieldsTests : StarWarsTestBase
             return new[] { new Human { Id = "1", Name = "Luke" }, new Human { Id = "2", Name = "Luke Copy" } };
         });
 
-        var query = @"
-                query Luke {
-                    lukes {
-                        ... on Human
-                        {
-                            id
-                            name
-                        }
-                    }
-                }
-            ";
-
-        var expected = @"
+        const string query = """
+            query Luke {
+              lukes {
+                ... on Human
                 {
-                    ""lukes"": [
-                    {
-                        ""id"": ""1"",
-                        ""name"": ""Luke""
-                    },
-                    {
-                        ""id"": ""2"",
-                        ""name"": ""Luke Copy""
-                    }
-                ]}
-            ";
+                  id
+                  name
+                }
+              }
+            }
+            """;
+
+        const string expected = """
+            {
+              "lukes": [
+                {
+                  "id": "1",
+                  "name": "Luke"
+                },
+                {
+                  "id": "2",
+                  "name": "Luke Copy"
+                }
+              ]
+            }
+            """;
 
         AssertQuerySuccess(query, expected);
     }

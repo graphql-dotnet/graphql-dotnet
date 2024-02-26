@@ -14,9 +14,9 @@ public class AppliedDirectivesTests
         {
             _.Schema = new AppliedSchema().EnableExperimentalIntrospectionFeatures(ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution);
             _.Query = "AppliedDirectives".ReadGraphQLRequest();
-        }).ConfigureAwait(false);
+        });
 
-        var json = serializer.Serialize(executionResult);
+        string json = serializer.Serialize(executionResult);
         executionResult.Errors.ShouldBeNull();
 
         json.ShouldBe("AppliedDirectivesResult".ReadJsonResult());

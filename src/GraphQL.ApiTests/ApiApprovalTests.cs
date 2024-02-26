@@ -37,7 +37,7 @@ public class ApiApprovalTests
         (string tfm, string content)[] publicApi = actualTfmDirs.Select(tfmDir => (new DirectoryInfo(tfmDir).Name.Replace(".", ""), Assembly.LoadFile(Path.Combine(tfmDir, projectName + ".dll")).GeneratePublicApi(new ApiGeneratorOptions
         {
             IncludeAssemblyAttributes = false,
-            //WhitelistedNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
+            //AllowNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
             ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute", "System.Diagnostics.CodeAnalysis.AllowNullAttribute" }
         }) + Environment.NewLine)).ToArray();
 

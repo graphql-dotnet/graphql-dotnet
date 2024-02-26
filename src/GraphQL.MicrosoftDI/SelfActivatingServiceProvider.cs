@@ -10,12 +10,12 @@ namespace GraphQL.MicrosoftDI;
 /// <br/><br/>
 /// To use this, simply register the <see cref="ISchema"/> itself as follows:
 /// <br/><br/>
-/// <code>services.AddSingleton&lt;ISchema, MySchema&gt;(services => new MySchema(new SelfActivatingServiceProvider(services)));</code>
+/// <c>services.AddSingleton&lt;ISchema, MySchema&gt;(services => new MySchema(new SelfActivatingServiceProvider(services)));</c>
 /// <br/><br/>
 /// Within your <see cref="Schema"/> constructor, you may need to set your <see cref="Schema.Query"/>, <see cref="Schema.Mutation"/> and
 /// <see cref="Schema.Subscription"/> fields to pull from the <see cref="SelfActivatingServiceProvider"/>:
 /// <br/><br/>
-/// <code>Query = services.GetRequiredService&lt;MyQuery&gt;();</code>
+/// <c>Query = services.GetRequiredService&lt;MyQuery&gt;();</c>
 /// <br/><br/>
 /// None of the graph types will need to be registered. Note that if any of the graph types implement
 /// <see cref="IDisposable"/>, be sure to register those types with your dependency injection provider,
@@ -36,7 +36,7 @@ public class SelfActivatingServiceProvider : IServiceProvider
     }
 
     /// <inheritdoc cref="ActivatorUtilities.GetServiceOrCreateInstance(IServiceProvider, Type)"/>
-    public object GetService(Type serviceType)
+    public object? GetService(Type serviceType)
     {
         // if the type is an interface, attempt to retrieve the interface registration from the
         // underlying service provider or else return null. (May trigger an exception in a method

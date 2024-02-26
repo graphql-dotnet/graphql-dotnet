@@ -26,7 +26,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
     }
 
     [Fact]
-    public void WithScope0()
+    public async Task WithScope0()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -34,12 +34,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .Resolve(context => "hello")
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope1()
+    public async Task WithScope1()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -48,12 +48,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .Resolve((context, value) => value)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope2()
+    public async Task WithScope2()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -63,12 +63,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .Resolve((context, value, v2) => value + v2)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope3()
+    public async Task WithScope3()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -79,12 +79,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .Resolve((context, value, v2, v3) => value + v2 + v3)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope4()
+    public async Task WithScope4()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -96,12 +96,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope5()
+    public async Task WithScope5()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -114,12 +114,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<long>()
             .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope2Alt()
+    public async Task WithScope2Alt()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -128,12 +128,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int>()
             .Resolve((context, value, v2) => value + v2)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello2");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope3Alt()
+    public async Task WithScope3Alt()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -142,12 +142,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short>()
             .Resolve((context, value, v2, v3) => value + v2 + v3)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello23");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello23");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope4Alt()
+    public async Task WithScope4Alt()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -156,12 +156,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short, byte>()
             .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello234");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello234");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithScope5Alt()
+    public async Task WithScope5Alt()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -170,24 +170,24 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short, byte, long>()
             .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).Result.ShouldBe("hello2345");
+        (await field.Resolver!.ResolveAsync(_scopedContext)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
     [Fact]
-    public void WithoutScope0()
+    public async Task WithoutScope0()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .Resolve(context => "hello")
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope1()
+    public async Task WithoutScope1()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -195,12 +195,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .Resolve((context, value) => value)
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope2()
+    public async Task WithoutScope2()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -209,12 +209,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .Resolve((context, value, v2) => value + v2)
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello2");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello2");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope3()
+    public async Task WithoutScope3()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -224,12 +224,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .Resolve((context, value, v2, v3) => value + v2 + v3)
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello23");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello23");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope4()
+    public async Task WithoutScope4()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -240,12 +240,12 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello234");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello234");
         VerifyUnscoped();
     }
 
     [Fact]
-    public void WithoutScope5()
+    public async Task WithoutScope5()
     {
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
@@ -257,7 +257,7 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<long>()
             .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).Result.ShouldBe("hello2345");
+        (await field.Resolver!.ResolveAsync(_unscopedContext)).ShouldBe("hello2345");
         VerifyUnscoped();
     }
 
@@ -268,9 +268,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
         var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithScope()
-            .ResolveAsync(context => Task.FromResult<object>("hello"))
+            .ResolveAsync(context => Task.FromResult<object?>("hello"))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -282,9 +282,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithService<string>()
             .WithScope()
-            .ResolveAsync((context, value) => Task.FromResult<object>(value))
+            .ResolveAsync((context, value) => Task.FromResult<object?>(value))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -297,9 +297,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .WithScope()
-            .ResolveAsync((context, value, v2) => Task.FromResult<object>(value + v2))
+            .ResolveAsync((context, value, v2) => Task.FromResult<object?>(value + v2))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello2");
         VerifyScoped();
     }
 
@@ -313,9 +313,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .WithScope()
-            .ResolveAsync((context, value, v2, v3) => Task.FromResult<object>(value + v2 + v3))
+            .ResolveAsync((context, value, v2, v3) => Task.FromResult<object?>(value + v2 + v3))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello23");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello23");
         VerifyScoped();
     }
 
@@ -330,9 +330,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .WithScope()
-            .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4))
+            .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object?>(value + v2 + v3 + v4))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello234");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello234");
         VerifyScoped();
     }
 
@@ -348,9 +348,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .WithService<long>()
             .WithScope()
-            .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5))
+            .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object?>(value + v2 + v3 + v4 + v5))
             .FieldType;
-        field.Resolver.ResolveAsync(_scopedContext).ShouldBeTask("hello2345");
+        field.Resolver!.ResolveAsync(_scopedContext).ShouldBeTask("hello2345");
         VerifyScoped();
     }
 
@@ -360,9 +360,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
         var graph = new ObjectGraphType();
         var field = graph.Field<StringGraphType>("_")
             .Resolve()
-            .ResolveAsync(context => Task.FromResult<object>("hello"))
+            .ResolveAsync(context => Task.FromResult<object?>("hello"))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello");
         VerifyUnscoped();
     }
 
@@ -373,9 +373,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
         var field = graph.Field<StringGraphType>("_")
             .Resolve()
             .WithService<string>()
-            .ResolveAsync((context, value) => Task.FromResult<object>(value))
+            .ResolveAsync((context, value) => Task.FromResult<object?>(value))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello");
         VerifyUnscoped();
     }
 
@@ -387,9 +387,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .Resolve()
             .WithService<string>()
             .WithService<int>()
-            .ResolveAsync((context, value, v2) => Task.FromResult<object>(value + v2))
+            .ResolveAsync((context, value, v2) => Task.FromResult<object?>(value + v2))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello2");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello2");
         VerifyUnscoped();
     }
 
@@ -402,9 +402,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .WithService<int>()
             .WithService<short>()
-            .ResolveAsync((context, value, v2, v3) => Task.FromResult<object>(value + v2 + v3))
+            .ResolveAsync((context, value, v2, v3) => Task.FromResult<object?>(value + v2 + v3))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello23");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello23");
         VerifyUnscoped();
     }
 
@@ -418,9 +418,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .WithService<short>()
             .WithService<byte>()
-            .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object>(value + v2 + v3 + v4))
+            .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object?>(value + v2 + v3 + v4))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello234");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello234");
         VerifyUnscoped();
     }
 
@@ -435,9 +435,9 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .WithService<byte>()
             .WithService<long>()
-            .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object>(value + v2 + v3 + v4 + v5))
+            .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object?>(value + v2 + v3 + v4 + v5))
             .FieldType;
-        field.Resolver.ResolveAsync(_unscopedContext).ShouldBeTask("hello2345");
+        field.Resolver!.ResolveAsync(_unscopedContext).ShouldBeTask("hello2345");
         VerifyUnscoped();
     }
 }

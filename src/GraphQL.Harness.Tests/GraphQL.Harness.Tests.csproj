@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net7</TargetFramework>
+    <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true'">
-    <TargetFrameworks>net7;net6;net5</TargetFrameworks>
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup>

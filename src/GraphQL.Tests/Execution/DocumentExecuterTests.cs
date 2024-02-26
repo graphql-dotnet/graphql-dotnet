@@ -23,18 +23,20 @@ public class DocumentExecuterTests
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
             selector,
-            new IConfigureExecution[] { });
+            Array.Empty<IConfigureExecution>());
         var schema = new Schema();
-        var graphType = new AutoRegisteringObjectGraphType<SampleGraph>();
-        schema.Query = graphType;
-        schema.Mutation = graphType;
+        var graphType1 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        var graphType2 = new AutoRegisteringObjectGraphType<SampleGraph>();
+        graphType2.Name += "Mutation";
+        schema.Query = graphType1;
+        schema.Mutation = graphType2;
         schema.Initialize();
         var ret = await executer.ExecuteAsync(new ExecutionOptions()
         {
             Schema = schema,
             Query = "{hero}",
             Root = new SampleGraph(),
-        }).ConfigureAwait(false);
+        });
         ret.Errors.ShouldBeNull();
         queryStrategy.Executed.ShouldBeTrue();
         ret = await executer.ExecuteAsync(new ExecutionOptions()
@@ -42,7 +44,7 @@ public class DocumentExecuterTests
             Schema = schema,
             Query = "mutation{hero}",
             Root = new SampleGraph(),
-        }).ConfigureAwait(false);
+        });
         ret.Errors.ShouldBeNull();
         mutationStrategy.Executed.ShouldBeTrue();
     }
@@ -60,17 +62,17 @@ public class DocumentExecuterTests
 
         // verify executing with Schema1 works with custom class
         var executer1 = provider.GetRequiredService<StringExecuter<Schema1>>();
-        var result1 = await executer1.ExecuteAsync("{hero}").ConfigureAwait(false);
+        string result1 = await executer1.ExecuteAsync("{hero}");
         result1.ShouldBe("{\"data\":{\"hero\":\"hello\"}}");
 
         // verify executing with Schema2 works with IDocumentExecuter<> directly
         var executer2 = provider.GetRequiredService<IDocumentExecuter<Schema2>>();
-        var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider }).ConfigureAwait(false);
+        var result2 = await executer2.ExecuteAsync(new ExecutionOptions { Query = "{hero}", RequestServices = provider });
         var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
         serializer.Serialize(result2).ShouldBe("{\"data\":{\"hero\":\"hello2\"}}");
 
         // verify that you cannot specify Schema with this implementation
-        var err = await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }).ConfigureAwait(false)).ConfigureAwait(false);
+        var err = await Should.ThrowAsync<InvalidOperationException>(async () => await executer2.ExecuteAsync(new ExecutionOptions { Schema = new Schema1(provider), Query = "{hero}", RequestServices = provider }));
         err.Message.ShouldBe("ExecutionOptions.Schema must be null when calling this typed IDocumentExecuter<> implementation; it will be pulled from the dependency injection provider.");
     }
 
@@ -91,7 +93,7 @@ public class DocumentExecuterTests
         );
         using var provider = services.BuildServiceProvider();
         var executer = provider.GetRequiredService<IDocumentExecuter>();
-        var ret = await executer.ExecuteAsync(new()).ConfigureAwait(false);
+        var ret = await executer.ExecuteAsync(new());
         ret.ShouldBeNull(); // validates that all configured executions have run, as normally this would never be null
     }
 
@@ -179,7 +181,7 @@ public class DocumentExecuterTests
 
     private class TestQueryExecutionStrategy : ParallelExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();
@@ -190,7 +192,7 @@ public class DocumentExecuterTests
 
     private class TestMutationExecutionStrategy : SerialExecutionStrategy
     {
-        public bool Executed = false;
+        public bool Executed;
         public override Task<ExecutionResult> ExecuteAsync(GraphQL.Execution.ExecutionContext context)
         {
             Executed.ShouldBeFalse();

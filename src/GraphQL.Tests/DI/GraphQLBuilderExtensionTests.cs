@@ -6,6 +6,7 @@ using GraphQL.NewtonsoftJson;
 using GraphQL.Types;
 using GraphQL.Types.Collections;
 using GraphQL.Types.Relay;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
@@ -48,7 +49,7 @@ public class GraphQLBuilderExtensionTests
     private Func<IServiceProvider, TService> MockSetupRegister<TService>(ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, bool replace = false)
         where TService : class
     {
-        Func<IServiceProvider, TService> factory = _ => null;
+        Func<IServiceProvider, TService> factory = _ => null!;
         _builderMock.Setup(b => b.Register(typeof(TService), factory, serviceLifetime, replace)).Returns(_builder).Verifiable();
         return factory;
     }
@@ -62,11 +63,11 @@ public class GraphQLBuilderExtensionTests
         where TOptions : class, new()
     {
         int ran = 0;
-        Action<TOptions> action = options => ran++;
+        Action<TOptions> action = _ => ran++;
         _builderMock.Setup(b => b.Configure(It.IsAny<Action<TOptions, IServiceProvider>>())).Returns<Action<TOptions, IServiceProvider>>(action2 =>
         {
             ran.ShouldBe(0);
-            action2(null, null);
+            action2(null!, null!);
             ran.ShouldBe(1);
             return _builder;
         }).Verifiable();
@@ -76,7 +77,7 @@ public class GraphQLBuilderExtensionTests
     private Action<TOptions, IServiceProvider> MockSetupConfigure2<TOptions>()
         where TOptions : class, new()
     {
-        Action<TOptions, IServiceProvider> action = (opts, _) => { };
+        Action<TOptions, IServiceProvider> action = (_, _) => { };
         _builderMock.Setup(b => b.Configure(action)).Returns(_builder).Verifiable();
         return action;
     }
@@ -84,10 +85,10 @@ public class GraphQLBuilderExtensionTests
     private void MockSetupConfigureNull<TOptions>()
         where TOptions : class, new()
     {
-        _builderMock.Setup(b => b.Configure((Action<TOptions, IServiceProvider>)null)).Returns(_builder).Verifiable();
+        _builderMock.Setup(b => b.Configure((Action<TOptions, IServiceProvider>)null!)).Returns(_builder).Verifiable();
     }
 
-    private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider serviceProvider = null)
+    private Func<ExecutionOptions> MockSetupConfigureExecution(IServiceProvider? serviceProvider = null)
     {
         Action<ExecutionOptions> actions = _ => { };
         _builderMock.Setup(b => b.Register(typeof(IConfigureExecution), It.IsAny<object>(), false))
@@ -112,7 +113,7 @@ public class GraphQLBuilderExtensionTests
         };
     }
 
-    private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider serviceProvider = null)
+    private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider? serviceProvider = null)
     {
         Action<ISchema, IServiceProvider> actions = (_, _) => { };
         _builderMock.Setup(b => b.Register(typeof(IConfigureSchema), It.IsAny<object>(), false))
@@ -126,7 +127,7 @@ public class GraphQLBuilderExtensionTests
                 };
                 return _builder;
             }).Verifiable();
-        return () => actions(schema, serviceProvider);
+        return () => actions(schema, serviceProvider!);
     }
 
     #region - Overloads for Register, TryRegister, ConfigureDefaults and Configure -
@@ -135,7 +136,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(true)]
     public void Register(bool replace)
     {
-        _builderMock.Setup(x => x.Services.Register(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+        _builderMock.Setup(x => x.Services.Register(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null!).Verifiable();
         _builder.Services.Register<Class1>(ServiceLifetime.Transient, replace);
         Verify();
     }
@@ -145,7 +146,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(true)]
     public void Register_Implementation(bool replace)
     {
-        _builderMock.Setup(x => x.Services.Register(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+        _builderMock.Setup(x => x.Services.Register(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, replace)).Returns((IGraphQLBuilderAndServiceRegister)null!).Verifiable();
         _builder.Services.Register<Interface1, Class1>(ServiceLifetime.Transient, replace);
         Verify();
     }
@@ -174,14 +175,14 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void Register_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationInstance: null));
-        Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationInstance: null!));
+        Should.Throw<ArgumentNullException>(() => _builder.Services.Register<Class1>(implementationFactory: null!, ServiceLifetime.Singleton));
     }
 
     [Fact]
     public void TryRegister()
     {
-        _builderMock.Setup(x => x.Services.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+        _builderMock.Setup(x => x.Services.TryRegister(typeof(Class1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null!).Verifiable();
         _builder.Services.TryRegister<Class1>(ServiceLifetime.Transient);
         Verify();
     }
@@ -189,7 +190,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void TryRegisterImplementation()
     {
-        _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
+        _builderMock.Setup(x => x.Services.TryRegister(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns((IGraphQLBuilderAndServiceRegister)null!).Verifiable();
         _builder.Services.TryRegister<Interface1, Class1>(ServiceLifetime.Transient);
         Verify();
     }
@@ -206,7 +207,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void TryRegister_Factory()
     {
-        Func<IServiceProvider, Class1> factory = _ => null;
+        Func<IServiceProvider, Class1> factory = _ => null!;
         _builderMock.Setup(b => b.Services.TryRegister(typeof(Class1), factory, ServiceLifetime.Transient, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.Services.TryRegister(factory, ServiceLifetime.Transient);
         Verify();
@@ -215,8 +216,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void TryRegister_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationInstance: null));
-        Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationFactory: null, ServiceLifetime.Singleton));
+        Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationInstance: null!));
+        Should.Throw<ArgumentNullException>(() => _builder.Services.TryRegister<Class1>(implementationFactory: null!, ServiceLifetime.Singleton));
     }
 
     [Fact]
@@ -225,9 +226,9 @@ public class GraphQLBuilderExtensionTests
         _builderMock.Setup(x => x.Services.Configure(It.IsAny<Action<Class1, IServiceProvider>>())).Returns<Action<Class1, IServiceProvider>>(a =>
         {
             var c = new Class1();
-            a(c, null);
+            a(c, null!);
             c.Value.ShouldBe(1);
-            return null;
+            return null!;
         }).Verifiable();
         _builder.Services.Configure<Class1>(x => x.Value = 1);
         Verify();
@@ -236,8 +237,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void ConfigureNull()
     {
-        _builderMock.Setup(x => x.Services.Configure<Class1>(null)).Returns((IGraphQLBuilderAndServiceRegister)null).Verifiable();
-        Action<Class1> arg = null;
+        _builderMock.Setup(x => x.Services.Configure<Class1>(null)).Returns((IGraphQLBuilderAndServiceRegister)null!).Verifiable();
+        Action<Class1> arg = null!;
         _builder.Services.Configure(arg);
         Verify();
     }
@@ -257,7 +258,7 @@ public class GraphQLBuilderExtensionTests
     public void AddSchema_Transient()
     {
         Should.Throw<InvalidOperationException>(() => _builder.AddSchema<TestSchema>(ServiceLifetime.Transient));
-        Should.Throw<InvalidOperationException>(() => _builder.AddSchema<TestSchema>(_ => null, ServiceLifetime.Transient));
+        Should.Throw<InvalidOperationException>(() => _builder.AddSchema<TestSchema>(_ => null!, ServiceLifetime.Transient));
     }
 
     [Fact]
@@ -272,7 +273,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddSchema_Factory()
     {
-        Func<IServiceProvider, TestSchema> factory = _ => null;
+        Func<IServiceProvider, TestSchema> factory = _ => null!;
         _builderMock.Setup(b => b.Register(typeof(TestSchema), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.TryRegister(typeof(ISchema), factory, ServiceLifetime.Singleton, RegistrationCompareMode.ServiceType)).Returns(_builder).Verifiable();
         _builder.AddSchema(factory);
@@ -292,13 +293,13 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddSchema_InstanceNull()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddSchema((TestSchema)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchema((TestSchema)null!));
     }
 
     [Fact]
     public void AddSchema_FactoryNull()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddSchema((Func<IServiceProvider, TestSchema>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchema((Func<IServiceProvider, TestSchema>)null!));
     }
     #endregion
 
@@ -331,8 +332,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddDocumentExecuter_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((TestDocumentExecuter)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((Func<IServiceProvider, TestDocumentExecuter>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((TestDocumentExecuter)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentExecuter((Func<IServiceProvider, TestDocumentExecuter>)null!));
     }
     #endregion
 
@@ -358,8 +359,8 @@ public class GraphQLBuilderExtensionTests
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
-        Func<IServiceProvider, IComplexityAnalyzer> factory = null;
-        MyComplexityAnalyzer instance = null;
+        Func<IServiceProvider, IComplexityAnalyzer> factory = null!;
+        MyComplexityAnalyzer instance = null!;
         if (typed)
         {
             if (withFactory)
@@ -401,15 +402,15 @@ public class GraphQLBuilderExtensionTests
             if (typed)
             {
                 if (withFactory)
-                    _builder.AddComplexityAnalyzer(factory, action);
+                    _builder.AddComplexityAnalyzer(factory, action!);
                 else if (withInstance)
-                    _builder.AddComplexityAnalyzer(instance, action);
+                    _builder.AddComplexityAnalyzer(instance, action!);
                 else
-                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action);
+                    _builder.AddComplexityAnalyzer<MyComplexityAnalyzer>(action!);
             }
             else
             {
-                _builder.AddComplexityAnalyzer(action);
+                _builder.AddComplexityAnalyzer(action!);
             }
         }
         var opts = getOpts();
@@ -423,8 +424,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddComplexityAnalyzer_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((IComplexityAnalyzer)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddComplexityAnalyzer((Func<IServiceProvider, IComplexityAnalyzer>)null!));
     }
 
     private class MyComplexityAnalyzer : ComplexityAnalyzer { }
@@ -455,7 +456,7 @@ public class GraphQLBuilderExtensionTests
         MockSetupConfigureNull<ErrorInfoProviderOptions>();
         MockSetupRegister<IErrorInfoProvider, ErrorInfoProvider>();
         _builder.AddErrorInfoProvider();
-        _builder.AddErrorInfoProvider((Action<ErrorInfoProviderOptions, IServiceProvider>)null);
+        _builder.AddErrorInfoProvider((Action<ErrorInfoProviderOptions, IServiceProvider>)null!);
         Verify();
     }
 
@@ -487,8 +488,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddErrorInfoProvider_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((IErrorInfoProvider)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((Func<IServiceProvider, IErrorInfoProvider>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((IErrorInfoProvider)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddErrorInfoProvider((Func<IServiceProvider, IErrorInfoProvider>)null!));
     }
     #endregion
 
@@ -559,7 +560,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddGraphTypes_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddGraphTypes(null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddGraphTypes(null!));
     }
     #endregion
 
@@ -611,7 +612,7 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddClrTypeMappings_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddClrTypeMappings(null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddClrTypeMappings(null!));
     }
     #endregion
 
@@ -662,7 +663,7 @@ public class GraphQLBuilderExtensionTests
     public void AddDocumentListener_Factory()
     {
         var instance = new MyDocumentListener();
-        Func<IServiceProvider, MyDocumentListener> factory = services => instance;
+        Func<IServiceProvider, MyDocumentListener> factory = _ => instance;
         _builderMock.Setup(b => b.Register(typeof(IDocumentExecutionListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         _builderMock.Setup(b => b.Register(typeof(MyDocumentListener), factory, ServiceLifetime.Singleton, false)).Returns(_builder).Verifiable();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -680,8 +681,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddDocumentListener_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((MyDocumentListener)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((Func<IServiceProvider, MyDocumentListener>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((MyDocumentListener)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddDocumentListener((Func<IServiceProvider, MyDocumentListener>)null!));
     }
     #endregion
 
@@ -695,14 +696,14 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, true, ServiceLifetime.Singleton)]
     [InlineData(true, true, ServiceLifetime.Transient)]
     [InlineData(true, true, ServiceLifetime.Singleton)]
-    public void AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
+    public async Task AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
     {
         var instance = new MyMiddleware();
         MockSetupRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime);
         MockSetupRegister<MyMiddleware, MyMiddleware>(serviceLifetime);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         var schema = new TestSchema();
-        Action runSchemaConfigs = null;
+        Action? runSchemaConfigs = null;
         if (install || usePredicate)
         {
             runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
@@ -711,14 +712,14 @@ public class GraphQLBuilderExtensionTests
         {
             mockServiceProvider.Setup(sp => sp.GetService(typeof(MyMiddleware))).Returns(instance).Verifiable();
         }
-        if (install == true && usePredicate == false && serviceLifetime == ServiceLifetime.Transient)
+        if (install && !usePredicate && serviceLifetime == ServiceLifetime.Transient)
         {
-            //verify that defaults parameters are configured appropriately
+            // verify that defaults parameters are configured appropriately
             _builder.UseMiddleware<MyMiddleware>();
         }
         else if (usePredicate)
         {
-            _builder.UseMiddleware<MyMiddleware>((services, schema) => install, serviceLifetime);
+            _builder.UseMiddleware<MyMiddleware>((_, _) => install, serviceLifetime);
         }
         else
         {
@@ -731,7 +732,7 @@ public class GraphQLBuilderExtensionTests
         {
             fieldResolver = middlewareTransform(fieldResolver);
         }
-        fieldResolver(null);
+        await fieldResolver(null!);
         instance.RanMiddleware.ShouldBe(install);
         mockServiceProvider.Verify();
         Verify();
@@ -742,26 +743,26 @@ public class GraphQLBuilderExtensionTests
     [InlineData(true, false)]
     [InlineData(false, true)]
     [InlineData(true, true)]
-    public void AddMiddleware_Instance(bool install, bool usePredicate)
+    public async Task AddMiddleware_Instance(bool install, bool usePredicate)
     {
         var instance = new MyMiddleware();
         MockSetupRegister<IFieldMiddleware>(instance);
         MockSetupRegister(instance);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         var schema = new TestSchema();
-        Action runSchemaConfigs = null;
+        Action? runSchemaConfigs = null;
         if (install || usePredicate)
         {
             runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
         }
-        if (install == true && usePredicate == false)
+        if (install && !usePredicate)
         {
             //verify that defaults parameters are configured appropriately
             _builder.UseMiddleware(instance);
         }
         else if (usePredicate)
         {
-            _builder.UseMiddleware(instance, (services, schema) => install);
+            _builder.UseMiddleware(instance, (_, _) => install);
         }
         else
         {
@@ -774,7 +775,7 @@ public class GraphQLBuilderExtensionTests
         {
             fieldResolver = middlewareTransform(fieldResolver);
         }
-        fieldResolver(null);
+        await fieldResolver(null!);
         instance.RanMiddleware.ShouldBe(install);
         mockServiceProvider.Verify();
         Verify();
@@ -790,10 +791,10 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddMiddleware_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware<MyMiddleware>(installPredicate: null));
-        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null));
-        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware(new MyMiddleware(), installPredicate: null));
-        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null, (_, _) => true));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware<MyMiddleware>(installPredicate: null!));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware(new MyMiddleware(), installPredicate: null!));
+        Should.Throw<ArgumentNullException>(() => _builder.UseMiddleware((MyMiddleware)null!, (_, _) => true));
     }
     #endregion
 
@@ -829,8 +830,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddSerializer_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddSerializer((SystemTextJson.GraphQLSerializer)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddSerializer((Func<IServiceProvider, SystemTextJson.GraphQLSerializer>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSerializer((SystemTextJson.GraphQLSerializer)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSerializer((Func<IServiceProvider, SystemTextJson.GraphQLSerializer>)null!));
     }
     #endregion
 
@@ -857,7 +858,7 @@ public class GraphQLBuilderExtensionTests
         bool ran = false;
         var schema = new TestSchema();
         var execute = MockSetupConfigureSchema(schema);
-        _builder.ConfigureSchema((schema2, services) =>
+        _builder.ConfigureSchema((schema2, _) =>
         {
             schema2.ShouldBe(schema);
             ran = true;
@@ -887,14 +888,141 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void ConfigureSchema_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema>)null));
-        Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema, IServiceProvider>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.ConfigureSchema((Action<ISchema, IServiceProvider>)null!));
     }
 
     [Fact]
     public void ConfigureExecution_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecutionOptions(null));
+        Should.Throw<ArgumentNullException>(() => _builder.ConfigureExecutionOptions(null!));
+    }
+    #endregion
+
+    #region - AddUnhandledExceptionHandler -
+    [Fact]
+    public async Task AddUnhandledExceptionHandler1()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler2()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 =>
+        {
+            e2 = e1;
+            return Task.CompletedTask;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler3()
+    {
+        ExecutionOptions? o2 = null;
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler((e1, o1) =>
+        {
+            o2 = o1;
+            e2 = e1;
+        });
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+        o2.ShouldBe(opts);
+    }
+
+    [Fact]
+    public async Task AddUnhandledExceptionHandler4()
+    {
+        UnhandledExceptionContext? e2 = null;
+        var execute = MockSetupConfigureExecution();
+        _builder.AddUnhandledExceptionHandler(e1 => e2 = e1);
+        var opts = execute();
+        var e = new UnhandledExceptionContext(null, null, new Exception());
+        await opts.UnhandledExceptionDelegate(e);
+        e2.ShouldBe(e);
+    }
+
+    [Fact]
+    public void AddUnhandledExceptionHandler_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Action<UnhandledExceptionContext, ExecutionOptions>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, Task>)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddUnhandledExceptionHandler((Func<UnhandledExceptionContext, ExecutionOptions, Task>)null!));
+    }
+    #endregion
+
+    #region - AddSchemaVisitor -
+    [Fact]
+    public void AddSchemaVisitor_Type()
+    {
+        MockSetupRegister<TestSchemaVisitor, TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor<TestSchemaVisitor>();
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Instance()
+    {
+        var visitor = new TestSchemaVisitor();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(visitor)).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitor);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Factory()
+    {
+        var visitorFactory = MockSetupRegister<TestSchemaVisitor>();
+        var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
+        schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
+        var schema = schemaMock.Object;
+        var execute = MockSetupConfigureSchema(schema);
+        _builder.AddSchemaVisitor(visitorFactory);
+        execute();
+        schemaMock.Verify();
+        Verify();
+    }
+
+    [Fact]
+    public void AddSchemaVisitor_Null()
+    {
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((ISchemaNodeVisitor)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddSchemaVisitor((Func<IServiceProvider, ISchemaNodeVisitor>)null!));
     }
     #endregion
 
@@ -1010,8 +1138,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddValidationRule_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((MyValidationRule)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((Func<IServiceProvider, MyValidationRule>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((MyValidationRule)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddValidationRule((Func<IServiceProvider, MyValidationRule>)null!));
     }
     #endregion
 
@@ -1044,8 +1172,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddExecutionStrategySelector_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((TestExecutionStrategySelector)null));
-        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((Func<IServiceProvider, TestExecutionStrategySelector>)null));
+        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((TestExecutionStrategySelector)null!));
+        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategySelector((Func<IServiceProvider, TestExecutionStrategySelector>)null!));
     }
     #endregion
 
@@ -1088,7 +1216,7 @@ public class GraphQLBuilderExtensionTests
     public void AddExecutionStrategy_Factory()
     {
         var instance = new TestExecutionStrategy();
-        Func<IServiceProvider, IExecutionStrategy> func = (provider) => instance;
+        Func<IServiceProvider, IExecutionStrategy> func = _ => instance;
         _builderMock.Setup(x => x.Register(typeof(ExecutionStrategyRegistration), It.IsAny<Func<IServiceProvider, object>>(), ServiceLifetime.Singleton, false))
             .Returns<Type, Func<IServiceProvider, object>, ServiceLifetime, bool>((_, factory, _, _) =>
             {
@@ -1105,8 +1233,8 @@ public class GraphQLBuilderExtensionTests
     [Fact]
     public void AddExecutionStrategy_Null()
     {
-        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((TestExecutionStrategy)null, OperationType.Mutation));
-        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((Func<IServiceProvider, TestExecutionStrategy>)null, OperationType.Mutation));
+        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((TestExecutionStrategy)null!, OperationType.Mutation));
+        Should.Throw<ArgumentNullException>(() => _builder.AddExecutionStrategy((Func<IServiceProvider, TestExecutionStrategy>)null!, OperationType.Mutation));
     }
     #endregion
 
@@ -1247,6 +1375,10 @@ public class GraphQLBuilderExtensionTests
     {
     }
 
+    private class TestSchemaVisitor : BaseSchemaNodeVisitor
+    {
+    }
+
     private class TestExecutionStrategySelector : DefaultExecutionStrategySelector
     {
     }
@@ -1286,8 +1418,9 @@ public class GraphQLBuilderExtensionTests
 
     private class MyMiddleware : IFieldMiddleware
     {
-        public bool RanMiddleware { get; set; } = false;
-        public ValueTask<object> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        public bool RanMiddleware { get; set; }
+
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             RanMiddleware = true;
             return next(context);
@@ -1300,6 +1433,6 @@ public class GraphQLBuilderExtensionTests
 
     private class MyValidationRule : IValidationRule
     {
-        public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context) => throw new NotImplementedException();
     }
 }

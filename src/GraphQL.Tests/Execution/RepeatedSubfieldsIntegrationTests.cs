@@ -25,7 +25,7 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
         public string State { get; set; }
     }
 
-    public ISchema build_schema()
+    public static ISchema build_schema()
     {
         var schema = new Schema();
 
@@ -47,7 +47,7 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
 
         var query = new ObjectGraphType { Name = "Query" };
         query.Field("person", person)
-            .Resolve(ctx =>
+            .Resolve(_ =>
             {
                 return new Person
                 {
@@ -78,27 +78,30 @@ public class RepeatedSubfieldsIntegrationTests : BasicQueryTestBase
         AssertQuerySuccess(_ =>
         {
             _.Schema = schema;
-            _.Query = @"
+            _.Query = """
                 {
                   person {
                     business { id name }
                     business { id address { id street city state } }
                   }
-                }";
-        },
-        @"{
-              ""person"": {
-                ""business"": {
-                  ""id"": ""4"",
-                  ""name"": ""Stuntman Express"",
-                  ""address"": {
-                    ""id"": ""123"",
-                    ""street"": ""Las Vegas Blvd"",
-                    ""city"": ""Las Vegas"",
-                    ""state"": ""NV""
-                  }
                 }
+                """;
+        },
+        """
+        {
+          "person": {
+            "business": {
+              "id": "4",
+              "name": "Stuntman Express",
+              "address": {
+              "id": "123",
+              "street": "Las Vegas Blvd",
+              "city": "Las Vegas",
+              "state": "NV"
               }
-            }");
+            }
+          }
+        }
+        """);
     }
 }

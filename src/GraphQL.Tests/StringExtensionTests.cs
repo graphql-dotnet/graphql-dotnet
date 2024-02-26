@@ -16,6 +16,7 @@ public class StringExtensionTests
     [InlineData("ABc", "A_BC")]
     [InlineData("Abc", "ABC")]
     [InlineData("ABC", "ABC")]
+    [InlineData("abc", "ABC")]
     [InlineData("aBC", "A_BC")]
     [InlineData("TestABCHelloTest", "TEST_ABC_HELLO_TEST")]
     [InlineData("AbCDefGh", "AB_C_DEF_GH")]

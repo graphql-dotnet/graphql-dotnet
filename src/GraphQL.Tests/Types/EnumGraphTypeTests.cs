@@ -56,7 +56,7 @@ public class EnumGraphTypeTests
     public void adds_values_from_enum_with_obsolete_attribute()
     {
         type.Values.Count.ShouldBe(5);
-        type.Values["YELLOW"].DeprecationReason.ShouldBe("No more yellow");
+        type.Values["YELLOW"]!.DeprecationReason.ShouldBe("No more yellow");
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class EnumGraphTypeTests
     [Fact]
     public void adds_values_from_enum_custom_casing_should_throw()
     {
-        Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' to the scalar type 'Colors'");
+        Should.Throw<InvalidOperationException>(() => type.ParseValue("rED")).Message.ShouldBe("Unable to convert 'rED' value of type 'String' to the scalar type 'Colors'");
     }
 
     [Fact]
@@ -110,13 +110,13 @@ public class EnumGraphTypeTests
     public void parse_native_clr_enum_value_when_not_defined()
     {
         type.CanParseValue((Colors)100500).ShouldBeFalse();
-        Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' to the scalar type 'Colors'");
+        Should.Throw<InvalidOperationException>(() => type.ParseValue((Colors)100500)).Message.ShouldBe("Unable to convert '100500' value of type 'Colors' to the scalar type 'Colors'");
     }
 
     [Fact]
     public void does_not_allow_nulls_to_be_added()
     {
-        Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null));
+        Assert.Throws<ArgumentNullException>(() => new EnumerationGraphType().Add(null!));
     }
 
     [Fact]
@@ -179,8 +179,8 @@ public class EnumGraphTypeTests
     {
         var e = new EnumerationGraphType<MyEnum>();
         e.Values.Count.ShouldBe(2);
-        e.Values.FindByValue(MyEnum.TestHello).Name.ShouldBe("TEST_HELLO");
-        e.Values.FindByValue(MyEnum.Hello1).Name.ShouldBe("HELLO_1");
+        e.Values.FindByValue(MyEnum.TestHello)!.Name.ShouldBe("TEST_HELLO");
+        e.Values.FindByValue(MyEnum.Hello1)!.Name.ShouldBe("HELLO_1");
     }
 
     private enum MyEnum
@@ -194,23 +194,23 @@ public class EnumGraphTypeTests
     {
         EnumerationGraphType e = new EnumerationGraphType<ConstantCaseEnum>();
         e.Values.Count.ShouldBe(2);
-        e.Values.FindByValue(ConstantCaseEnum.OneOne).Name.ShouldBe("ONE_ONE");
-        e.Values.FindByValue(ConstantCaseEnum.TwoTwo).Name.ShouldBe("TWO_TWO");
+        e.Values.FindByValue(ConstantCaseEnum.OneOne)!.Name.ShouldBe("ONE_ONE");
+        e.Values.FindByValue(ConstantCaseEnum.TwoTwo)!.Name.ShouldBe("TWO_TWO");
 
         e = new EnumerationGraphType<CamelCaseEnum>();
         e.Values.Count.ShouldBe(2);
-        e.Values.FindByValue(CamelCaseEnum.OneOne).Name.ShouldBe("oneOne");
-        e.Values.FindByValue(CamelCaseEnum.TwoTwo).Name.ShouldBe("twoTwo");
+        e.Values.FindByValue(CamelCaseEnum.OneOne)!.Name.ShouldBe("oneOne");
+        e.Values.FindByValue(CamelCaseEnum.TwoTwo)!.Name.ShouldBe("twoTwo");
 
         e = new EnumerationGraphType<PascalCaseEnum>();
         e.Values.Count.ShouldBe(2);
-        e.Values.FindByValue(PascalCaseEnum.OneOne).Name.ShouldBe("OneOne");
-        e.Values.FindByValue(PascalCaseEnum.TwoTwo).Name.ShouldBe("TwoTwo");
+        e.Values.FindByValue(PascalCaseEnum.OneOne)!.Name.ShouldBe("OneOne");
+        e.Values.FindByValue(PascalCaseEnum.TwoTwo)!.Name.ShouldBe("TwoTwo");
 
         e = new EnumerationGraphType<AsIsCaseEnum>();
         e.Values.Count.ShouldBe(2);
-        e.Values.FindByValue(AsIsCaseEnum.oneOne).Name.ShouldBe("oneOne");
-        e.Values.FindByValue(AsIsCaseEnum.TwoTwo).Name.ShouldBe("TwoTwo");
+        e.Values.FindByValue(AsIsCaseEnum.oneOne)!.Name.ShouldBe("oneOne");
+        e.Values.FindByValue(AsIsCaseEnum.TwoTwo)!.Name.ShouldBe("TwoTwo");
     }
 
     [ConstantCase]

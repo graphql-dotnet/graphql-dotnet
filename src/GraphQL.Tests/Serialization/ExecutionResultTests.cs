@@ -16,41 +16,43 @@ public class ExecutionResultTests
         var executionResult = new ExecutionResult
         {
             Executed = true,
-            Data = @"{ ""someType"": { ""someProperty"": ""someValue"" } }".ToDictionary().ToExecutionTree(),
+            Data = """{ "someType": { "someProperty": "someValue" } }""".ToDictionary().ToExecutionTree(),
             Errors = new ExecutionErrors
             {
                 new ExecutionError("some error 1"),
                 new ExecutionError("some error 2"),
             },
-            Extensions = new Dictionary<string, object>
+            Extensions = new Dictionary<string, object?>
             {
-                { "someExtension", new { someProperty = "someValue", someOtherPropery = 1 } }
+                { "someExtension", new { someProperty = "someValue", someOtherProperty = 1 } }
             }
         };
 
-        var expected = @"{
-              ""errors"": [
-                {
-                  ""message"": ""some error 1""
-                },
-                {
-                  ""message"": ""some error 2""
-                }
+        const string expected = """
+            {
+              "errors": [
+              {
+                "message": "some error 1"
+              },
+              {
+                "message": "some error 2"
+              }
               ],
-              ""data"": {
-                ""someType"": {
-                    ""someProperty"": ""someValue""
+              "data": {
+                "someType": {
+                  "someProperty": "someValue"
                 }
               },
-              ""extensions"": {
-                ""someExtension"": {
-                  ""someProperty"": ""someValue"",
-                  ""someOtherPropery"": 1
+              "extensions": {
+                "someExtension": {
+                  "someProperty": "someValue",
+                  "someOtherProperty": 1
                 }
               }
-            }";
+            }
+            """;
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -61,11 +63,9 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult { Executed = true };
 
-        var expected = @"{
-              ""data"": null
-            }";
+        const string expected = """{"data": null}""";
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -86,11 +86,13 @@ public class ExecutionResultTests
             }
         };
 
-        var expected = @"{
-              ""errors"": [{""message"":""some error 1""},{""message"":""some error 2""}]
-            }";
+        const string expected = """
+            {
+              "errors": [{"message":"some error 1"},{"message":"some error 2"}]
+            }
+            """;
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -101,15 +103,15 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult
         {
-            Data = new Dictionary<string, object>().ToExecutionTree(),
+            Data = new Dictionary<string, object?>().ToExecutionTree(),
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = true
         };
 
-        var expected = @"{ ""data"": {} }";
+        const string expected = """{ "data": {} }""";
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -120,15 +122,15 @@ public class ExecutionResultTests
     {
         var executionResult = new ExecutionResult
         {
-            Data = new Dictionary<string, object>().ToExecutionTree(),
+            Data = new Dictionary<string, object?>().ToExecutionTree(),
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = false
         };
 
-        var expected = @"{ }";
+        const string expected = "{ }";
 
-        var actual = writer.Serialize(executionResult);
+        string actual = writer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -141,13 +143,13 @@ public class ExecutionResultTests
         {
             Data = null,
             Errors = new ExecutionErrors(),
-            Extensions = new Dictionary<string, object>(),
+            Extensions = new Dictionary<string, object?>(),
             Executed = true
         };
 
-        var expected = @"{ ""data"": null }";
+        const string expected = """{ "data": null }""";
 
-        var actual = serializer.Serialize(executionResult);
+        string actual = serializer.Serialize(executionResult);
 
         actual.ShouldBeCrossPlatJson(expected);
     }
@@ -163,11 +165,11 @@ public class ExecutionResultTests
         {
             Schema = schema,
             Query = "IntrospectionQuery".ReadGraphQLRequest()
-        }).ConfigureAwait(false);
-        var syncResult = serializer.Serialize(result);
+        });
+        string syncResult = serializer.Serialize(result);
         var stream = new System.IO.MemoryStream();
-        await serializer.WriteAsync(stream, result).ConfigureAwait(false);
-        var asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+        await serializer.WriteAsync(stream, result);
+        string asyncResult = System.Text.Encoding.UTF8.GetString(stream.ToArray());
         syncResult.ShouldBe(asyncResult);
     }
 }

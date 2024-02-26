@@ -5,28 +5,28 @@ namespace GraphQL.Tests.Bugs;
 
 public class Issue1189 : SchemaBuilderTestBase
 {
-    private const string _typeDefinitions = @"
-                  type Droid {
-                    id: String!
-                    name: String!
-                    friend: Character
-                  }
+    private const string _typeDefinitions = """
+        type Droid {
+          id: String!
+          name: String!
+          friend: Character
+        }
 
-                  type Character {
-                    name: String!
-                  }
+        type Character {
+          name: String!
+        }
 
-                  type Query {
-                    hero: Droid
-                  }
-                ";
+        type Query {
+          hero: Droid
+        }
+        """;
 
     private const string _query = "{ hero { id name friend { name } } }";
 
     [Theory]
     [InlineData(typeof(Issue1189_DroidType_ExecutionError), "Error Message", null)]
     [InlineData(typeof(Issue1189_DroidType_Exception), "Error trying to resolve field 'friend'.", "")]
-    public void Issue1189_Should_Work(Type resolverType, string errorMessage, string code)
+    public void Issue1189_Should_Work(Type resolverType, string errorMessage, string? code)
     {
         Builder.Types.Include<Issue1189_Query>();
         Builder.Types.For("Character").Type = typeof(Issue1189_Character);

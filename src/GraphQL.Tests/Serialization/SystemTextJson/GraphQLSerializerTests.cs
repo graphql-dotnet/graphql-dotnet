@@ -52,13 +52,13 @@ public class GraphQLSerializerTests
         {
             Schema = new Schema { Query = new AutoRegisteringObjectGraphType<Query>() },
             Query = "{hero}"
-        }).ConfigureAwait(false);
+        });
 
         // typically a value of 1.0000m would be serialized as 1.0000
-        new GraphQLSerializer().Serialize(result).ShouldBe(@"{""data"":{""hero"":1.0000}}");
+        new GraphQLSerializer().Serialize(result).ShouldBe("""{"data":{"hero":1.0000}}""");
 
         // tests that a custom converter can be registered for the decimal data type; here it serializes 1.0000m as 1
-        new GraphQLSerializer(o => o.Converters.Add(new SampleDecimalConverter())).Serialize(result).ShouldBe(@"{""data"":{""hero"":1}}");
+        new GraphQLSerializer(o => o.Converters.Add(new SampleDecimalConverter())).Serialize(result).ShouldBe("""{"data":{"hero":1}}""");
     }
 
     private class SampleDecimalConverter : JsonConverter<decimal>

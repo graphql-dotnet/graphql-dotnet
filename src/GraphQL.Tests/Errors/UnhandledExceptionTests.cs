@@ -9,11 +9,11 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void rethrows_unhandled_exception()
     {
-        var def = @"
-                type Query {
-                  hello: Int
-                }
-            ";
+        const string def = """
+            type Query {
+              hello: Int
+            }
+            """;
 
         Builder.Types.Include<Query>();
 
@@ -31,11 +31,11 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_exception()
     {
-        var def = @"
-                type Query {
-                  hello2: Int
-                }
-            ";
+        const string def = """
+            type Query {
+              hello2: Int
+            }
+            """;
 
         Builder.Types.Include<Query>();
 
@@ -55,18 +55,18 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
+        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_message_from_field_resolver()
     {
-        var def = @"
-                type Query {
-                  hello2: Int
-                }
-            ";
+        const string def = """
+            type Query {
+              hello2: Int
+            }
+            """;
 
         Builder.Types.Include<Query>();
 
@@ -86,18 +86,18 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object)null }, Executed = true });
+        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
     [Fact]
     public void unhandled_exception_delegate_can_rethrow_custom_message_from_document_listener()
     {
-        var def = @"
-                type Query {
-                  hello2: Int
-                }
-            ";
+        const string def = """
+            type Query {
+              hello2: Int
+            }
+            """;
 
         Builder.Types.Include<Query>();
 

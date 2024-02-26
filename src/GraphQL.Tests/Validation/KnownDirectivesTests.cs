@@ -18,7 +18,7 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
     [Fact]
     public void with_no_directives()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Foo {
                 name
                 ...Frag
@@ -26,13 +26,13 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
               fragment Frag on Dog {
                 name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void with_known_directives()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               {
                 dog @include(if: true) {
                   name
@@ -41,7 +41,7 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
                   name
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
@@ -49,14 +49,14 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   {
-                    dog @unknown(directive: ""value"") {
+                    dog @unknown(directive: "value") {
                       name
                     }
                   }
-                ";
-            unknownDirective(_, "unknown", 3, 25);
+                """;
+            unknownDirective(_, "unknown", 2, 9);
         });
     }
 
@@ -65,29 +65,29 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   {
-                    dog @unknown(directive: ""value"") {
+                    dog @unknown(directive: "value") {
                       name
                     }
-                    human @unknown(directive: ""value"") {
+                    human @unknown(directive: "value") {
                       name
-                      pets @unknown(directive: ""value"") {
+                      pets @unknown(directive: "value") {
                         name
                       }
                     }
                   }
-                ";
-            unknownDirective(_, "unknown", 3, 25);
-            unknownDirective(_, "unknown", 6, 27);
-            unknownDirective(_, "unknown", 8, 28);
+                """;
+            unknownDirective(_, "unknown", 2, 9);
+            unknownDirective(_, "unknown", 5, 11);
+            unknownDirective(_, "unknown", 7, 12);
         });
     }
 
     [Fact]
     public void with_well_placed_directives()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               query Foo @onQuery {
                 name @include(if: true)
                 ...Frag @include(if: true)
@@ -98,7 +98,7 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
               mutation Bar @onMutation {
                 someField
               }
-            ");
+            """);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   query Foo @include(if: true) {
                     name @onQuery
                     ...Frag @onQuery
@@ -115,21 +115,22 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
                   mutation Bar @onQuery {
                     someField
                   }
-                ";
+                """;
 
-            misplacedDirective(_, "include", DirectiveLocation.Query, 2, 29);
-            misplacedDirective(_, "onQuery", DirectiveLocation.Field, 3, 26);
-            misplacedDirective(_, "onQuery", DirectiveLocation.FragmentSpread, 4, 29);
-            misplacedDirective(_, "onQuery", DirectiveLocation.Mutation, 7, 32);
+            misplacedDirective(_, "include", DirectiveLocation.Query, 1, 13);
+            misplacedDirective(_, "onQuery", DirectiveLocation.Field, 2, 10);
+            misplacedDirective(_, "onQuery", DirectiveLocation.FragmentSpread, 3, 13);
+            misplacedDirective(_, "onQuery", DirectiveLocation.Mutation, 6, 16);
         });
     }
 
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/2864
     [Fact]
-    public void within_schema_language_well_placed_directives()
+    public void within_schema_language_unknown_directives()
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
+            _.Query = """
                   type MyObj implements MyInterface @onObject {
                     myField(myArg: Int @onArgumentDefinition): String @onFieldDefinition
                   }
@@ -153,20 +154,20 @@ public class KnownDirectivesTests : ValidationTestBase<KnownDirectivesInAllowedL
                   schema @onSchema {
                     query: MyQuery
                   }
-                ";
-            unknownDirective(_, "onObject", 2, 53);
-            unknownDirective(_, "onArgumentDefinition", 3, 40);
-            unknownDirective(_, "onFieldDefinition", 3, 71);
-            unknownDirective(_, "onScalar", 6, 35);
-            unknownDirective(_, "onInterface", 8, 41);
-            unknownDirective(_, "onArgumentDefinition", 9, 40);
-            unknownDirective(_, "onFieldDefinition", 9, 71);
-            unknownDirective(_, "onUnion", 12, 33);
-            unknownDirective(_, "onEnum", 14, 31);
-            unknownDirective(_, "onEnumValue", 15, 30);
-            unknownDirective(_, "onInputObject", 18, 33);
-            unknownDirective(_, "onInputFieldDefinition", 19, 34);
-            unknownDirective(_, "onSchema", 22, 26);
+                """;
+            unknownDirective(_, "onObject", 1, 37);
+            unknownDirective(_, "onArgumentDefinition", 2, 24);
+            unknownDirective(_, "onFieldDefinition", 2, 55);
+            unknownDirective(_, "onScalar", 5, 19);
+            unknownDirective(_, "onInterface", 7, 25);
+            unknownDirective(_, "onArgumentDefinition", 8, 24);
+            unknownDirective(_, "onFieldDefinition", 8, 55);
+            unknownDirective(_, "onUnion", 11, 17);
+            unknownDirective(_, "onEnum", 13, 15);
+            unknownDirective(_, "onEnumValue", 14, 14);
+            unknownDirective(_, "onInputObject", 17, 17);
+            unknownDirective(_, "onInputFieldDefinition", 18, 18);
+            unknownDirective(_, "onSchema", 21, 10);
         });
     }
 }

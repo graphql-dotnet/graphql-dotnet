@@ -18,8 +18,8 @@ namespace GraphQL.Validation.Errors
 
         internal static string InvalidNumberOfRootFieldMessage(GraphQLName? name)
         {
-            string prefix = name is not null ? $"Subscription '{name}'" : "Anonymous Subscription";
-            return $"{prefix} must select only one top level field.";
+            string prefix = name is null ? "Anonymous Subscription" : $"Subscription '{name}'";
+            return $"{prefix} must have exactly one root field and that field must not be an introspection field.";
         }
     }
 }

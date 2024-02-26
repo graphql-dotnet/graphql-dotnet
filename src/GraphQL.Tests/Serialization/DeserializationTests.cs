@@ -8,7 +8,7 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void StringToInputs(IGraphQLTextSerializer serializer)
     {
-        var actual = serializer.Deserialize<Inputs>(ExampleJson);
+        var actual = serializer.Deserialize<Inputs>(ExampleJson)!;
         Verify(actual);
     }
 
@@ -16,8 +16,8 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void FromJson(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         Verify(actual.Variables);
     }
@@ -26,8 +26,8 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void FromJson_Null(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"query\":\"hello\",\"variables\":null}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        const string test = "{\"query\":\"hello\",\"variables\":null}";
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         actual.Variables.ShouldBeNull();
     }
@@ -36,8 +36,8 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void FromJson_Missing(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"query\":\"hello\"}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        const string test = "{\"query\":\"hello\"}";
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         actual.Variables.ShouldBeNull();
     }
@@ -46,32 +46,32 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void FromJson_IsCaseInsensitive_Element(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass2>(test);
+        string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
+        var actual = serializer.Deserialize<TestClass2>(test)!;
         actual.Query.ShouldBe("hello");
         var variables = serializer.ReadNode<Inputs>(actual.Variables);
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void FromJson_IsCaseInsensitive_Inputs(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
-        var actual = serializer.Deserialize<TestClass1>(test);
+        string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
+        var actual = serializer.Deserialize<TestClass1>(test)!;
         actual.Query.ShouldBe("hello");
         var variables = actual.Variables;
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
     public async Task FromJsonStream(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
+        string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
         var testData = new MemoryStream(Encoding.UTF8.GetBytes(test));
-        var actual = await serializer.ReadAsync<TestClass1>(testData).ConfigureAwait(false);
-        actual.Query.ShouldBe("hello");
+        var actual = await serializer.ReadAsync<TestClass1>(testData);
+        actual!.Query.ShouldBe("hello");
         Verify(actual.Variables);
         // verify that the stream has not been disposed
         testData.ReadByte().ShouldBe(-1);
@@ -83,11 +83,11 @@ public class DeserializationTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void ElementToInputs(IGraphQLTextSerializer serializer)
     {
-        var test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
+        string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
         var actual = serializer.Deserialize<TestClass2>(test);
-        actual.Query.ShouldBe("hello");
+        actual!.Query.ShouldBe("hello");
         var variables = serializer.ReadNode<Inputs>(actual.Variables);
-        Verify(variables);
+        Verify(variables!);
     }
 
     [Theory]
@@ -95,8 +95,8 @@ public class DeserializationTests : DeserializationTestBase
     public void InputsDecodesDatesAsStrings(IGraphQLTextSerializer serializer)
     {
         var date = new DateTimeOffset(2022, 2, 6, 12, 26, 53, TimeSpan.FromHours(-5));
-        var dateStr = date.ToString("O");
-        var actual = serializer.Deserialize<Inputs>($"{{\"date\":\"{dateStr}\"}}");
+        string dateStr = date.ToString("O");
+        var actual = serializer.Deserialize<Inputs>($"{{\"date\":\"{dateStr}\"}}")!;
         actual.ShouldContainKeyAndValue("date", dateStr);
     }
 

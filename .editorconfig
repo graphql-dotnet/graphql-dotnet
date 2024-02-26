@@ -4,16 +4,16 @@
 # https://docs.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options
 
 # .NET coding convention settings for EditorConfig
-# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference?view=vs-2019
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-code-style-settings-reference
 
 # Language conventions
-# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions?view=vs-2019
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-language-conventions
 
 # Formatting conventions
-# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions?view=vs-2019
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions
 
 # .NET naming conventions for EditorConfig
-# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions?view=vs-2019
+# https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-naming-conventions
 
 # Top-most EditorConfig file
 root = true
@@ -137,8 +137,8 @@ csharp_style_deconstructed_variable_declaration = true:suggestion
 csharp_style_pattern_local_over_anonymous_function = true:suggestion
 csharp_using_directive_placement = outside_namespace:warning
 csharp_prefer_static_local_function = true:suggestion
-csharp_prefer_simple_using_statement = false:suggestion
-csharp_style_prefer_switch_expression = true:suggestion
+csharp_prefer_simple_using_statement = true:warning
+csharp_style_prefer_switch_expression = true:warning
 
 # .NET formatting settings - Organize using directives
 # https://docs.microsoft.com/en-us/visualstudio/ide/editorconfig-formatting-conventions?view=vs-2019#organize-using-directives
@@ -263,13 +263,20 @@ dotnet_diagnostic.IDE0005.severity = error
 # Enforce formatting https://docs.microsoft.com/en-us/dotnet/fundamentals/code-analysis/style-rules/formatting-rules#rule-id-ide0055-fix-formatting
 dotnet_diagnostic.IDE0055.severity = error
 
+# https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS0060.md
+dotnet_diagnostic.RCS0060.severity = warning
+roslynator_blank_line_after_file_scoped_namespace_declaration = true
+
+# https://github.com/JosefPihrt/Roslynator/blob/main/docs/analyzers/RCS1080.md
+dotnet_diagnostic.RCS1080.severity = warning
+
 # ConfigureAwait https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1090.md
 dotnet_diagnostic.RCS1090.severity = warning
 roslynator_configure_await = true
 
-# https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1194.md
-dotnet_diagnostic.RCS1194.severity = suggestion
-
 # https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1102.md
 # TODO: NullabilityInfo issue in Patching.cs in internal class SR
 dotnet_diagnostic.RCS1102.severity = suggestion
+
+# https://github.com/JosefPihrt/Roslynator/blob/master/docs/analyzers/RCS1194.md
+dotnet_diagnostic.RCS1194.severity = suggestion

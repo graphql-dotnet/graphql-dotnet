@@ -8,41 +8,42 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
     [Fact]
     public void valid_scalar_selection()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment scalarSelection on Dog {
                   barks
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void object_type_missing_selection()
     {
-        var query = @"
+        const string query = """
                 query directQueryOnObjectWithoutSubFields{
                   human
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: RequiredSubselectionMessage("human", "Human"),
-                line: 3,
-                column: 19);
+                line: 2,
+                column: 3);
         });
     }
 
     [Fact]
     public void interface_type_missing_selection()
     {
-        var query = @"{
+        const string query = """
+                {
                   human {
                     pets
                   }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
@@ -50,112 +51,112 @@ public class ScalarLeafTests : ValidationTestBase<ScalarLeafs, ValidationSchema>
             _.Error(
                 message: RequiredSubselectionMessage("pets", "[Pet]"),
                 line: 3,
-                column: 21);
+                column: 5);
         });
     }
 
     [Fact]
     public void valid_scalar_selection_with_args()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
                 fragment scalarSelectionWithArgs on Dog {
                   doesKnowCommand(dogCommand: SIT)
                 }
-                ");
+                """);
     }
 
     [Fact]
     public void scalar_selection_not_allowed_on_boolean()
     {
-        var query = @"
+        const string query = """
                 fragment scalarSelectionNotAllowedOnBoolean on Dog {
                   barks { sinceWhen }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: NoSubselectionAllowedMessage("barks", "Boolean"),
-                line: 3,
-                column: 25);
+                line: 2,
+                column: 9);
         });
     }
 
     [Fact]
     public void scalar_selection_not_allowed_on_enum()
     {
-        var query = @"
+        const string query = """
                 fragment scalarSelectionsNotAllowedOnEnum on Cat {
                   furColor { inHexdec }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: NoSubselectionAllowedMessage("furColor", "FurColor"),
-                line: 3,
-                column: 28);
+                line: 2,
+                column: 12);
         });
     }
 
     [Fact]
     public void scalar_selection_not_allowed_with_args()
     {
-        var query = @"
+        const string query = """
                 fragment scalarSelectionWithArgs on Dog {
                   doesKnowCommand(dogCommand: SIT) { sinceWhen }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
-                line: 3,
-                column: 52);
+                line: 2,
+                column: 36);
         });
     }
 
     [Fact]
     public void scalar_selection_not_allowed_with_directives()
     {
-        var query = @"
+        const string query = """
                 fragment scalarSelectionsNotAllowedWithDirectives on Dog {
                   name @include(if: true) { isAlsoHumanName }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: NoSubselectionAllowedMessage("name", "String"),
-                line: 3,
-                column: 43);
+                line: 2,
+                column: 27);
         });
     }
 
     [Fact]
     public void scalar_selection_not_allowed_with_directives_and_args()
     {
-        var query = @"
+        const string query = """
                 fragment scalarSelectionsNotAllowedWithDirectivesAndArgs on Dog {
                   doesKnowCommand(dogCommand: SIT) @include(if: true) { sinceWhen }
                 }
-                ";
+                """;
 
         ShouldFailRule(_ =>
         {
             _.Query = query;
             _.Error(
                 message: NoSubselectionAllowedMessage("doesKnowCommand", "Boolean"),
-                line: 3,
-                column: 71);
+                line: 2,
+                column: 55);
         });
     }
 

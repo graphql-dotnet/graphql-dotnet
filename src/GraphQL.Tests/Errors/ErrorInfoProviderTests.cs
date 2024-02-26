@@ -10,7 +10,7 @@ public class ErrorInfoProviderTests
     public void null_executionError_throws()
     {
         var provider = new ErrorInfoProvider();
-        Should.Throw<ArgumentNullException>(() => provider.GetInfo(null));
+        Should.Throw<ArgumentNullException>(() => provider.GetInfo(null!));
     }
 
     [Fact]
@@ -26,7 +26,7 @@ public class ErrorInfoProviderTests
     [Fact]
     public void null_message_ok()
     {
-        var error = new ExecutionError(null); // create executionerror with a default message
+        var error = new ExecutionError(null!); // create executionerror with a default message
         error.Message.ShouldNotBeNull();
 
         var info = new ErrorInfoProvider().GetInfo(error);
@@ -42,7 +42,7 @@ public class ErrorInfoProviderTests
             { "test2", 15 },
             { "test3", new Dictionary<string, object>() { { "test4", "object4" } } },
         };
-        var error = new ExecutionError(null, data);
+        var error = new ExecutionError(null!, data);
         error.Data.ShouldNotBeNull();
         error.Data.Count.ShouldBe(3);
         error.Data["test1"].ShouldBe("object1");
@@ -66,7 +66,7 @@ public class ErrorInfoProviderTests
             { "test2", 15 },
             { "test3", new Dictionary<string, object>() { { "test4", "object4" } } },
         };
-        var error = new ExecutionError(null, data);
+        var error = new ExecutionError(null!, data);
         error.Data.ShouldNotBeNull();
         error.Data.Count.ShouldBe(3);
         error.Data["test1"].ShouldBe("object1");
@@ -81,7 +81,7 @@ public class ErrorInfoProviderTests
     [Fact]
     public void message_and_code()
     {
-        var error = new ExecutionError(null) { Code = "test code" };
+        var error = new ExecutionError(null!) { Code = "test code" };
 
         var info = new ErrorInfoProvider().GetInfo(error);
         info.Message.ShouldBe(error.Message);
@@ -113,7 +113,7 @@ public class ErrorInfoProviderTests
     [Fact]
     public void drops_extensions_when_no_data()
     {
-        var error = new ExecutionError(null);
+        var error = new ExecutionError(null!);
         error.Code.ShouldBeNull();
         error.Data.ShouldNotBeNull();
         error.Data.Count.ShouldBe(0);
@@ -152,7 +152,7 @@ public class ErrorInfoProviderTests
 
         var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true, ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message }).GetInfo(error);
         info.Message.ShouldBe(error.ToString());
-        info.Extensions.TryGetValue("details", out _).ShouldBeFalse();
+        info.Extensions!.TryGetValue("details", out _).ShouldBeFalse();
     }
 
     [Fact]
@@ -163,7 +163,7 @@ public class ErrorInfoProviderTests
 
         var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
-        info.Extensions["details"].ShouldNotBeNull();
+        info.Extensions!["details"].ShouldNotBeNull();
     }
 
     [Fact]
@@ -214,13 +214,13 @@ public class ErrorInfoProviderTests
 
         var info = new ErrorInfoProvider(new ErrorInfoProviderOptions { ExposeExceptionDetails = true }).GetInfo(error);
         info.Message.ShouldBe(error.Message);
-        info.Extensions["details"].ShouldNotBeNull();
+        info.Extensions!["details"].ShouldNotBeNull();
     }
 
     [Fact]
     public void blank_codes_do_serialize()
     {
-        var error = new ExecutionError(null)
+        var error = new ExecutionError(null!)
         {
             Code = "",
         };
@@ -251,7 +251,7 @@ public class ErrorInfoProviderTests
     [Fact]
     public void codes_with_blank_code_always_serialize()
     {
-        var error = new ExecutionError(null, new Exception(null, new ArgumentNullException("param")));
+        var error = new ExecutionError(null!, new Exception(null, new ArgumentNullException("param")));
         error.Code.ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
 
         var info = new ErrorInfoProvider().GetInfo(error);
@@ -409,7 +409,7 @@ public class ErrorInfoProviderTests
     [Fact]
     public void geterrorcode_null_throws()
     {
-        Assert.Throws<ArgumentNullException>(() => ErrorInfoProvider.GetErrorCode((Type)null));
+        Assert.Throws<ArgumentNullException>(() => ErrorInfoProvider.GetErrorCode((Type)null!));
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Instrumentation;
@@ -74,6 +75,7 @@ namespace GraphQL.Types
         private bool _disposed;
         private IServiceProvider _services;
         private SchemaTypes? _allTypes;
+        private ExceptionDispatchInfo? _initializationException;
         private readonly object _allTypesInitializationLock = new();
 
         private List<Type>? _additionalTypes;
@@ -109,19 +111,8 @@ namespace GraphQL.Types
         /// <see cref="IConfigureSchema"/> instances from <paramref name="services"/> and executes them.
         /// </summary>
         public Schema(IServiceProvider services, bool runConfigurations = true)
+            : this(services, (runConfigurations ? services.GetService(typeof(IEnumerable<IConfigureSchema>)) as IEnumerable<IConfigureSchema> : null)!)
         {
-            _services = services;
-
-            Directives = new SchemaDirectives();
-            Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
-
-            if (runConfigurations && services.GetService(typeof(IEnumerable<IConfigureSchema>)) is IEnumerable<IConfigureSchema> configurations)
-            {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
-            }
         }
 
         /// <summary>
@@ -136,12 +127,9 @@ namespace GraphQL.Types
             Directives = new SchemaDirectives();
             Directives.Register(Directives.Include, Directives.Skip, Directives.Deprecated);
 
-            if (configurations != null)
+            foreach (var configuration in configurations ?? Array.Empty<IConfigureSchema>())
             {
-                foreach (var configuration in configurations)
-                {
-                    configuration.Configure(this, services);
-                }
+                configuration.Configure(this, services);
             }
         }
 
@@ -201,9 +189,19 @@ namespace GraphQL.Types
                 if (Initialized)
                     return;
 
-                CreateAndInitializeSchemaTypes();
+                _initializationException?.Throw();
 
-                Initialized = true;
+                try
+                {
+                    CreateAndInitializeSchemaTypes();
+
+                    Initialized = true;
+                }
+                catch (Exception ex)
+                {
+                    _initializationException = ExceptionDispatchInfo.Capture(ex);
+                    throw;
+                }
             }
         }
 
@@ -313,7 +311,7 @@ namespace GraphQL.Types
         }
 
         /// <inheritdoc/>
-        public void RegisterType(Type type)
+        public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
         {
             CheckDisposed();
             CheckInitialized();
@@ -352,9 +350,29 @@ namespace GraphQL.Types
         private List<(Type clrType, Type graphType)>? _clrToGraphTypeMappings;
 
         /// <inheritdoc/>
-        public void RegisterTypeMapping(Type clrType, Type graphType)
+        public void RegisterTypeMapping(
+            Type clrType,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
+            Type graphType)
         {
-            (_clrToGraphTypeMappings ??= new()).Add((clrType ?? throw new ArgumentNullException(nameof(clrType)), graphType ?? throw new ArgumentNullException(nameof(graphType))));
+            (_clrToGraphTypeMappings ??= new()).Add((
+                CheckClrType(clrType ?? throw new ArgumentNullException(nameof(clrType))),
+                CheckGraphType(graphType ?? throw new ArgumentNullException(nameof(graphType)))
+            ));
+
+            Type CheckClrType(Type clrType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(clrType)
+                    ? throw new ArgumentOutOfRangeException(nameof(clrType), $"{clrType.FullName}' is already a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify CLR type instead of GraphType.")
+                    : clrType;
+            }
+
+            Type CheckGraphType(Type graphType)
+            {
+                return typeof(IGraphType).IsAssignableFrom(graphType)
+                    ? graphType
+                    : throw new ArgumentOutOfRangeException(nameof(graphType), $"{graphType.FullName}' must be a GraphType (i.e. not CLR type like System.DateTime or System.String). You must specify GraphType type instead of CLR type.");
+            }
         }
 
         /// <inheritdoc/>

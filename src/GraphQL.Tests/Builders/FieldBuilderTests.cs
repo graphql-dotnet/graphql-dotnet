@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using GraphQL.DataLoader;
 using GraphQL.Execution;
+using GraphQL.MicrosoftDI;
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 
@@ -60,8 +62,8 @@ public class FieldBuilderTests
         fields[0].Type.ShouldBe(typeof(StringGraphType));
 
         var context = new ResolveFieldContext();
-        object result = await fields[0].Resolver.ResolveAsync(context).ConfigureAwait(false);
-        result.GetType().ShouldBe(typeof(string));
+        object? result = await fields[0].Resolver.ShouldNotBeNull().ResolveAsync(context);
+        result.ShouldNotBeNull().GetType().ShouldBe(typeof(string));
         result.ShouldBe("SomeString");
     }
 
@@ -105,7 +107,7 @@ public class FieldBuilderTests
             .Argument<BooleanGraphType>("arg4", cfg => cfg.WithMetadata("useBefore", new DateTime(2030, 1, 2)).DefaultValue = true);
 
         var field = objectType.Fields.First();
-        field.Arguments.Count.ShouldBe(4);
+        field.Arguments.ShouldNotBeNull().Count.ShouldBe(4);
 
         field.Arguments[0].Name.ShouldBe("arg1");
         field.Arguments[0].Description.ShouldBe("desc1");
@@ -145,19 +147,19 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        field.Arguments.Count.ShouldBe(1);
+        field.Arguments.ShouldNotBeNull().Count.ShouldBe(1);
 
         field.Arguments[0].Name.ShouldBe("arg1");
         field.Arguments[0].Description.ShouldBe("desc1");
         field.Arguments[0].Type.ShouldBe(typeof(StringGraphType));
         field.Arguments[0].DefaultValue.ShouldBe("12345");
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 { "arg1", new ArgumentValue("abc", ArgumentSource.Literal) }
             }
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -173,11 +175,11 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -193,11 +195,11 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -213,14 +215,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 { "skip", new ArgumentValue(1, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -258,14 +260,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 { "skip", ArgumentValue.NullLiteral }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -281,11 +283,11 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -301,14 +303,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 {"episode", new ArgumentValue("JEDI", ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -324,11 +326,11 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -344,14 +346,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -367,14 +369,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 {"episodes", new ArgumentValue(new object[] {"JEDI", "EMPIRE" }, ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -390,14 +392,14 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>
             {
                 { "arg1", new ArgumentValue("arg1value", ArgumentSource.Literal) }
             },
             FieldDefinition = field
-        }).ConfigureAwait(false);
+        });
     }
 
     [Fact]
@@ -413,9 +415,23 @@ public class FieldBuilderTests
             });
 
         var field = objectType.Fields.First();
-        await field.Resolver.ResolveAsync(new ResolveFieldContext
+        await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext
         {
             Source = 12345
-        }).ConfigureAwait(false);
+        });
+    }
+
+    [Fact]
+    public async Task microsoft_di_resolve_works_with_dataloader()
+    {
+        var objectType = new ObjectGraphType<Tuple<string>>();
+        var fieldType = objectType.Field(x => x.Item1)
+            .Resolve()
+            .ResolveAsync(_ => new DataLoaderResult<string>(Task.FromResult("abc")))
+            .FieldType;
+
+        var result = await fieldType.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
+        var loadedResult = await result.ShouldBeAssignableTo<IDataLoaderResult<string>>()!.GetResultAsync();
+        loadedResult.ShouldBe("abc");
     }
 }

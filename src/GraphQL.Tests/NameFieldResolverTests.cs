@@ -20,11 +20,13 @@ public class NameFieldResolverTests
     [InlineData("FULLINFOWITHPARAM", "test Anyone 20")]
     [InlineData("FullInfoWithContext", "Anyone 20")]
     [InlineData("FromService", "hello")]
+    [InlineData("FromSource", "Anyone")]
+    [InlineData("FromUserContext", "Anyone 30")]
     [InlineData("AmbiguousExample", "", true)]
     [InlineData("ShadowedName", "Anyone")]
     [InlineData("BaseName", "Base")]
     [InlineData("BaseMethod", "Base2")]
-    public async Task resolve_should_work_with_properties_and_methods(string name, object expected, bool throws = false)
+    public async Task resolve_should_work_with_properties_and_methods(string? name, object? expected, bool throws = false)
     {
         var person = new Person
         {
@@ -34,23 +36,24 @@ public class NameFieldResolverTests
 
         var services = new ServiceCollection();
         services.AddSingleton(new Class1());
-        Func<ValueTask<object>> result = () => NameFieldResolver.Instance.ResolveAsync(
+        Func<ValueTask<object?>> result = () => NameFieldResolver.Instance.ResolveAsync(
             new ResolveFieldContext
             {
                 Source = person,
-                FieldDefinition = new GraphQL.Types.FieldType { Name = name },
-                FieldAst = new GraphQLField { Name = name == null ? default : new GraphQLName(name) },
+                FieldDefinition = new GraphQL.Types.FieldType { Name = name! },
+                FieldAst = new GraphQLField { Name = name == null ? default! : new GraphQLName(name) },
                 Arguments = new Dictionary<string, ArgumentValue>()
                 {
                     { "prefix", new ArgumentValue("test ", ArgumentSource.Literal) }
                 },
                 RequestServices = services.BuildServiceProvider(),
+                UserContext = new Dictionary<string, object?> { { "name", "Anyone 30" } },
             });
 
         if (throws)
-            await Should.ThrowAsync<InvalidOperationException>(async () => await result().ConfigureAwait(false)).ConfigureAwait(false);
+            await Should.ThrowAsync<InvalidOperationException>(async () => await result());
         else
-            (await result().ConfigureAwait(false)).ShouldBe(expected);
+            (await result()).ShouldBe(expected);
     }
 
     public class PersonBase
@@ -72,9 +75,13 @@ public class NameFieldResolverTests
 
         public string FullInfoWithParam(string prefix) => prefix + FullInfo();
 
-        public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source).FullInfo();
+        public string FullInfoWithContext(IResolveFieldContext context) => ((Person)context.Source!).FullInfo();
 
         public string FromService([FromServices] Class1 obj) => obj.Value;
+
+        public string FromSource([FromSource] Person person) => person.Name;
+
+        public string FromUserContext([FromUserContext] IDictionary<string, object> userContext) => (string)userContext["name"];
 
         public string AmbiguousExample() => "";
 

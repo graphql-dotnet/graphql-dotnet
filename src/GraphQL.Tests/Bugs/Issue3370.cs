@@ -9,7 +9,7 @@ public class Issue3370_LiteralObjectsWithNoEntriesDoNotValidate
     {
         var schema = new Schema { Query = new TestQuery() };
 
-        var result1 = await schema.ExecuteAsync(options => options.Query = "{test(input: {}) { stringValue }}").ConfigureAwait(false);
+        string result1 = await schema.ExecuteAsync(options => options.Query = "{test(input: {}) { stringValue }}");
         result1.ShouldBeCrossPlatJson("""{"errors":[{"message":"Argument \u0027input\u0027 has invalid value. Missing required field \u0027prop1\u0027 of type \u0027String\u0027.","locations":[{"line":1,"column":7}],"extensions":{"code":"ARGUMENTS_OF_CORRECT_TYPE","codes":["ARGUMENTS_OF_CORRECT_TYPE"],"number":"5.6.1"}}]}""");
     }
 
@@ -18,11 +18,11 @@ public class Issue3370_LiteralObjectsWithNoEntriesDoNotValidate
     {
         var schema = new Schema { Query = new TestQuery() };
 
-        var result2 = await schema.ExecuteAsync(options =>
+        string result2 = await schema.ExecuteAsync(options =>
         {
             options.Query = "query($input: TestInputType!){test(input: $input) { stringValue }}";
-            options.Variables = @"{ ""input"": {}}".ToInputs();
-        }).ConfigureAwait(false);
+            options.Variables = """{ "input": {}}""".ToInputs();
+        });
         result2.ShouldBeCrossPlatJson("""{"errors":[{"message":"Variable \u0027$input.prop1\u0027 is invalid. No value provided for a non-null variable.","locations":[{"line":1,"column":7}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE"],"number":"5.8"}}]}""");
     }
 

@@ -5,26 +5,28 @@ public class ComplexityTests : ComplexityTestBase
     [Fact]
     public void inline_fragments_test()
     {
-        var withFrag = AnalyzeComplexity(@"
-query withInlineFragment {
-  profiles(handles: [""dnetguru""]) {
-    handle
-    ... on User {
-      friends {
-        count
-      }
-    }
-  }
-}");
-        var woFrag = AnalyzeComplexity(@"
-query withoutFragments {
-  profiles(handles: [""dnetguru""]) {
-    handle
-    friends {
-      count
-    }
-  }
-}");
+        var withFrag = AnalyzeComplexity("""
+            query withInlineFragment {
+              profiles(handles: ["dnetguru"]) {
+                handle
+                ... on User {
+                  friends {
+                    count
+                  }
+                }
+              }
+            }
+            """);
+        var woFrag = AnalyzeComplexity("""
+            query withoutFragments {
+              profiles(handles: ["dnetguru"]) {
+                handle
+                friends {
+                  count
+                }
+              }
+            }
+            """);
 
         withFrag.Complexity.ShouldBe(woFrag.Complexity);
         withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
@@ -33,40 +35,42 @@ query withoutFragments {
     [Fact]
     public void fragments_test()
     {
-        var withFrag = AnalyzeComplexity(@"
-{
-  leftComparison: hero(episode: EMPIRE) {
-    ...comparisonFields
-  }
-  rightComparison: hero(episode: JEDI) {
-    ...comparisonFields
-  }
-}
+        var withFrag = AnalyzeComplexity("""
+            {
+              leftComparison: hero(episode: EMPIRE) {
+                ...comparisonFields
+              }
+              rightComparison: hero(episode: JEDI) {
+                ...comparisonFields
+              }
+            }
 
-fragment comparisonFields on Character {
-  name
-  appearsIn
-  friends {
-    name
-  }
-}");
-        var woFrag = AnalyzeComplexity(@"
-{
-  leftComparison: hero(episode: EMPIRE) {
-    name
-    appearsIn
-    friends {
-      name
-    }
-  }
-  rightComparison: hero(episode: JEDI) {
-    name
-    appearsIn
-    friends {
-      name
-    }
-  }
-}");
+            fragment comparisonFields on Character {
+              name
+              appearsIn
+              friends {
+                name
+              }
+            }
+            """);
+        var woFrag = AnalyzeComplexity("""
+            {
+              leftComparison: hero(episode: EMPIRE) {
+                name
+                appearsIn
+                friends {
+                  name
+                }
+              }
+              rightComparison: hero(episode: JEDI) {
+                name
+                appearsIn
+                friends {
+                  name
+                }
+              }
+            }
+            """);
 
         withFrag.Complexity.ShouldBe(woFrag.Complexity);
         withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
@@ -75,35 +79,37 @@ fragment comparisonFields on Character {
     [Fact]
     public void fragment_test_nested()
     {
-        var withFrag = AnalyzeComplexity(@"
-			{
-			  A {
-			    W {
-			      ...X
-			    }
-			  }
-			}
+        var withFrag = AnalyzeComplexity("""
+            {
+              A {
+                W {
+                  ...X
+                }
+              }
+            }
 
-			fragment X on Y {
-			  B
-			  C
-			  D {
-			    E
-			  }
-			}");
+            fragment X on Y {
+              B
+              C
+              D {
+                E
+              }
+            }
+            """);
 
-        var woFrag = AnalyzeComplexity(@"
-			{
-			  A {
-			    W {
-			      B
-			      C
-			      D {
-			        E
-			      }
-			    }
-			  }
-		    }");
+        var woFrag = AnalyzeComplexity("""
+            {
+              A {
+                W {
+                  B
+                  C
+                  D {
+                    E
+                  }
+                }
+              }
+            }
+            """);
 
         withFrag.Complexity.ShouldBe(woFrag.Complexity);
         withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
@@ -113,31 +119,35 @@ fragment comparisonFields on Character {
     [Fact]
     public void nested_fragments()
     {
-        var withFrag = AnalyzeComplexity(@"query SomeDroids {
-                  droid(id: ""3"") {
-                    ...DroidFragment
-                  }
-               }
+        var withFrag = AnalyzeComplexity("""
+            query SomeDroids {
+              droid(id: "3") {
+                ...DroidFragment
+              }
+            }
 
-               fragment DroidFragment on Droid {
-                 name
-                 ... nestedNameFragment1
-               }
+            fragment DroidFragment on Droid {
+              name
+              ... nestedNameFragment1
+            }
 
-               fragment nestedNameFragment1 on Droid {
-                 ... nestedNameFragment2
-                 name
-               }
+            fragment nestedNameFragment1 on Droid {
+              ... nestedNameFragment2
+              name
+            }
 
-               fragment nestedNameFragment2 on Droid {
-                 name
-            }");
+            fragment nestedNameFragment2 on Droid {
+              name
+            }
+            """);
 
-        var woFrag = AnalyzeComplexity(@"query SomeDroids {
-                  droid(id: ""3"") {
-                    name
-                  }
-               }");
+        var woFrag = AnalyzeComplexity("""
+            query SomeDroids {
+              droid(id: "3") {
+                name
+              }
+            }
+            """);
 
         withFrag.Complexity.ShouldBe(4/*woFrag.Complexity*/); // TODO: 4 != 2 but may be OK
         withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
@@ -147,57 +157,58 @@ fragment comparisonFields on Character {
     [Fact]
     public void nested_fragments_2()
     {
-        var result = AnalyzeComplexity(@"
-{
-  car(id: 1)
-  {
-    ...lastUpdated
-    ...optionsOnCar
-  }
-}
+        var result = AnalyzeComplexity("""
+            {
+              car(id: 1)
+              {
+                ...lastUpdated
+                ...optionsOnCar
+              }
+            }
 
-fragment optionsOnCar on Car
-{
-  options
-  {
-    edges
-    {
-      node
-      {
-        ...optionDetail
-      }
-    }
-  }
-}
+            fragment optionsOnCar on Car
+            {
+              options
+              {
+                edges
+                {
+                  node
+                  {
+                    ...optionDetail
+                  }
+                }
+              }
+            }
 
-fragment optionPrice on Option
-{
-  price
-}
+            fragment optionPrice on Option
+            {
+              price
+            }
 
-fragment lastUpdated on Car
-{
-  updatedAt
-}
+            fragment lastUpdated on Car
+            {
+              updatedAt
+            }
 
-fragment optionDetail on Option
-{
-  name
-  ...optionPrice
-  optionContents(first: 9999999)
-  {
-    edges
-    {
-      node
-      {
-        optionContent
-        {
-          name
-        }
-      }
-    }
-  }
-}");
+            fragment optionDetail on Option
+            {
+              name
+              ...optionPrice
+              optionContents(first: 9999999)
+              {
+                edges
+                {
+                  node
+                  {
+                    optionContent
+                    {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+            """);
 
         result.Complexity.ShouldBe(1839999848); // WOW! :)
     }
@@ -208,40 +219,40 @@ fragment optionDetail on Option
     [InlineData(false)]
     public void nested_fragments_3(bool reverse)
     {
-        var frag1 = @"
-fragment frag1 on QueryType
-{
-  ...frag4
-}
-";
-        var frag2 = @"
-fragment frag2 on QueryType
-{
-  ...frag3
-}
-";
-        var otherFrags = @"
-fragment frag3 on QueryType
-{
-  ...frag5
-}
+        const string frag1 = """
+            fragment frag1 on QueryType
+            {
+              ...frag4
+            }
+            """;
+        const string frag2 = """
+            fragment frag2 on QueryType
+            {
+              ...frag3
+            }
+            """;
+        const string otherFrags = """
+            fragment frag3 on QueryType
+            {
+              ...frag5
+            }
 
-fragment frag5 on QueryType
-{
-  __typename
-}
+            fragment frag5 on QueryType
+            {
+              __typename
+            }
 
-fragment frag4 on QueryType
-{
-  __typename
-}
+            fragment frag4 on QueryType
+            {
+              __typename
+            }
 
-query fragmentTest
-{
-  ...frag1
-  ...frag2
-}
-";
+            query fragmentTest
+            {
+              ...frag1
+              ...frag2
+            }
+            """;
         var result = AnalyzeComplexity(reverse
             ? frag1 + frag2 + otherFrags
             : frag2 + frag1 + otherFrags);
@@ -252,28 +263,28 @@ query fragmentTest
     [Fact]
     public void duplicate_fragment_ok()
     {
-        var query = @"
-query carFragmentTest
-{
-  car(id: 1)
-  {
-    name
-    ... carInfo
-    ... carInfo
-  }
-}
+        const string query = """
+            query carFragmentTest
+            {
+              car(id: 1)
+              {
+                name
+                ... carInfo
+                ... carInfo
+              }
+            }
 
-fragment carInfo on Car
-{
-    ...pricing
-    ...pricing
-}
+            fragment carInfo on Car
+            {
+                ...pricing
+                ...pricing
+            }
 
-fragment pricing on Car
-{
-  msrp
-}
-";
+            fragment pricing on Car
+            {
+              msrp
+            }
+            """;
         var result = AnalyzeComplexity(query);
 
         result.Complexity.ShouldBe(6);
@@ -283,36 +294,37 @@ fragment pricing on Car
     [Fact]
     public void no_fragment_cycle()
     {
-        var query = @"
-query carFragmentTest
-{
-  car(id: 1)
-  {
-    name
-    ... carInfo
-  }
-}
+        const string query = """
+            query carFragmentTest
+            {
+              car(id: 1)
+              {
+                name
+                ... carInfo
+              }
+            }
 
-fragment carInfo on Car
-{
-    ...pricing
-    ... detail
-}
+            fragment carInfo on Car
+            {
+                ...pricing
+                ... detail
+            }
 
-fragment pricing on Car
-{
-  msrp
-}
+            fragment pricing on Car
+            {
+              msrp
+            }
 
-fragment detail on Car
-{
-  ... furtherDetail
-}
+            fragment detail on Car
+            {
+              ... furtherDetail
+            }
 
-fragment furtherDetail on Car
-{
-  ... pricing
-}";
+            fragment furtherDetail on Car
+            {
+              ... pricing
+            }
+            """;
         var result = AnalyzeComplexity(query);
 
         result.Complexity.ShouldBe(4);

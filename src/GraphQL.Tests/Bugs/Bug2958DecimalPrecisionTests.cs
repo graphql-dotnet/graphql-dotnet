@@ -16,11 +16,11 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    [Theory]
+    [TheoryEx]
     [ClassData(typeof(Bug2958DecimalPrecisionTestData))]
     public void double_to_decimal_does_not_lose_precision(IGraphQLTextSerializer serializer)
     {
-        string request = """
+        const string request = """
 {
   "operationName": "TestMutation",
   "variables": {
@@ -32,12 +32,12 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
 }
 """;
 
-        var inputs = serializer.Deserialize<GraphQLRequest>(request);
+        var inputs = serializer.Deserialize<GraphQLRequest>(request)!;
         inputs.Variables.ShouldNotBeNull();
         inputs.Variables.Count.ShouldBe(1);
         var inner = inputs.Variables["input"].ShouldBeOfType<Dictionary<string, object>>();
         inner.Count.ShouldBe(1);
-        var value = inner["discount"];
+        object value = inner["discount"];
         value.ShouldBeOfType<decimal>().ShouldBe(12345678901234.56m);
     }
 }

@@ -8,55 +8,55 @@ public class FragmentsOnCompositeTypesTests : ValidationTestBase<FragmentsOnComp
     [Fact]
     public void object_is_valid_fragment_type()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment validFragment on Dog {
                 barks
               }
-            ");
+            """);
     }
 
     [Fact]
     public void interface_is_valid_fragment_type()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment validFragment on Pet {
                 name
               }
-            ");
+            """);
     }
 
     [Fact]
     public void object_is_valid_inline_fragment_type()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment validFragment on Pet {
                 ... on Dog {
                   barks
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void inline_fragment_without_type_is_valid()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment validFragment on Pet {
                 ... {
                   name
                 }
               }
-            ");
+            """);
     }
 
     [Fact]
     public void union_is_valid_fragment_type()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
               fragment validFragment on CatOrDog {
                 __typename
               }
-            ");
+            """);
     }
 
     [Fact]
@@ -64,12 +64,12 @@ public class FragmentsOnCompositeTypesTests : ValidationTestBase<FragmentsOnComp
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment scalarFragment on Boolean {
-                    bad
-                  }
-                ";
-            error(_, "scalarFragment", "Boolean", 2, 46);
+            _.Query = """
+                fragment scalarFragment on Boolean {
+                  bad
+                }
+                """;
+            error(_, "scalarFragment", "Boolean", 1, 28);
         });
     }
 
@@ -78,12 +78,12 @@ public class FragmentsOnCompositeTypesTests : ValidationTestBase<FragmentsOnComp
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment scalarFragment on FurColor {
-                    bad
-                  }
-                ";
-            error(_, "scalarFragment", "FurColor", 2, 46);
+            _.Query = """
+                fragment scalarFragment on FurColor {
+                  bad
+                }
+                """;
+            error(_, "scalarFragment", "FurColor", 1, 28);
         });
     }
 
@@ -92,12 +92,12 @@ public class FragmentsOnCompositeTypesTests : ValidationTestBase<FragmentsOnComp
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment inputFragment on ComplexInput {
-                    stringField
-                  }
-                ";
-            error(_, "inputFragment", "ComplexInput", 2, 45);
+            _.Query = """
+                fragment inputFragment on ComplexInput {
+                  stringField
+                }
+                """;
+            error(_, "inputFragment", "ComplexInput", 1, 27);
         });
     }
 
@@ -106,14 +106,14 @@ public class FragmentsOnCompositeTypesTests : ValidationTestBase<FragmentsOnComp
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-                  fragment invalidFragment on Pet {
-                    ... on String {
-                      barks
-                    }
+            _.Query = """
+                fragment invalidFragment on Pet {
+                  ... on String {
+                    barks
                   }
-                ";
-            _.Error(FragmentsOnCompositeTypesError.InlineFragmentOnNonCompositeErrorMessage("String"), 3, 28);
+                }
+                """;
+            _.Error(FragmentsOnCompositeTypesError.InlineFragmentOnNonCompositeErrorMessage("String"), 2, 10);
         });
     }
 

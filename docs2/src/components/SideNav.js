@@ -1,9 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Link from 'gatsby-link'
+import { Link } from 'gatsby'
 import classnames from 'classnames'
 
-const createMenuList = (listData, location) => (
+const createMenuList = (listData, pathName) => (
   <nav>
     <ul>
       {listData.map( element => (
@@ -12,7 +12,7 @@ const createMenuList = (listData, location) => (
             <Link
               to={element.url || element.href}
               className={classnames([
-                location.pathname === element.url && 'active'
+                pathName === element.url && 'active'
               ])}
             >
               {element.title}
@@ -21,16 +21,16 @@ const createMenuList = (listData, location) => (
           {!element.file && (
             <span>{element.title}</span>
           )}
-          {element.items && element.items.length > 0 && createMenuList(element.items, location)}
+          {element.items && element.items.length > 0 && createMenuList(element.items, pathName)}
         </li>
       ))}
     </ul>
   </nav>
 )
 
-const SideNav = ({ activeItem, location }) => (
+const SideNav = ({ activeItem, pathName }) => (
   <div className="nav">
-    {createMenuList(activeItem.sidemenu, location)}
+    {createMenuList(activeItem.sidemenu, pathName)}
   </div>
 )
 
@@ -38,7 +38,7 @@ SideNav.propTypes = {
   activeItem: PropTypes.shape({
     sidemenu: PropTypes.array
   }),
-  location: PropTypes.object
+  pathName: PropTypes.string
 }
 
 export default SideNav

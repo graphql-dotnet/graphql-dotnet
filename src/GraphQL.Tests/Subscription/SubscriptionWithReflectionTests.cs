@@ -43,13 +43,13 @@ public class SubscriptionWithReflectionTests
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
             Schema = schema
-        }).ConfigureAwait(false);
+        });
 
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
-        var message = await stream.FirstOrDefaultAsync();
+        var stream = result.Streams!.Values.First();
+        var message = await stream.FirstAsync()!;
 
         message.ShouldNotBeNull();
         message.ShouldBeOfType<ExecutionResult>();
@@ -80,13 +80,13 @@ public class SubscriptionWithReflectionTests
         {
             Query = "subscription MessageAdded { messageAddedAsync { from { id displayName } content sentAt } }",
             Schema = schema
-        }).ConfigureAwait(false);
+        });
 
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
-        var message = await stream.FirstOrDefaultAsync();
+        var stream = result.Streams!.Values.First();
+        var message = await stream.FirstAsync();
 
         message.ShouldNotBeNull();
         message.ShouldBeOfType<ExecutionResult>();
@@ -117,17 +117,17 @@ public class SubscriptionWithReflectionTests
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUser(id: $id) { from { id displayName } content sentAt } }",
             Schema = schema,
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
-        }).ConfigureAwait(false);
+        });
 
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
-        var message = await stream.FirstOrDefaultAsync();
+        var stream = result.Streams!.Values.First();
+        var message = await stream.FirstAsync();
 
         message.ShouldNotBeNull();
         message.ShouldBeOfType<ExecutionResult>();
@@ -157,16 +157,16 @@ public class SubscriptionWithReflectionTests
         {
             Query = "subscription MessageAddedByUser($id:String!) { messageAddedByUserAsync(id: $id) { from { id displayName } content sentAt } }",
             Schema = schema,
-            Variables = new Inputs(new Dictionary<string, object>
+            Variables = new Inputs(new Dictionary<string, object?>
             {
                 ["id"] = "1"
             })
-        }).ConfigureAwait(false);
+        });
 
         chat.AddMessage(addedMessage);
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
+        var stream = result.Streams!.Values.First();
         var message = await stream.FirstOrDefaultAsync();
 
         message.ShouldNotBeNull();
@@ -186,14 +186,14 @@ public class SubscriptionWithReflectionTests
         {
             Query = "subscription MessageAdded { messageAdded { from { id displayName } content sentAt } }",
             Schema = schema
-        }).ConfigureAwait(false);
+        });
 
         chat.AddError(new Exception("test"));
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
-        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync()).ConfigureAwait(false);
-        error.InnerException.Message.ShouldBe("test");
+        var stream = result.Streams!.Values.First();
+        var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
+        error.InnerException!.Message.ShouldBe("test");
         error.Path.ShouldBe(new[] { "messageAdded" });
     }
 }

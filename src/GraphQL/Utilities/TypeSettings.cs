@@ -74,7 +74,7 @@ namespace GraphQL.Utilities
         /// </summary>
         public void Include(string name, Type type)
         {
-            _typeConfigurations[name].Type = type;
+            For(name).Type = type;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace GraphQL.Utilities
         /// </summary>
         public void Include(string name, Type type, Type typeOfType)
         {
-            var config = _typeConfigurations[name];
+            var config = For(name);
             config.Type = type;
             config.IsTypeOfFunc = obj => obj?.GetType().IsAssignableFrom(typeOfType) ?? false;
         }

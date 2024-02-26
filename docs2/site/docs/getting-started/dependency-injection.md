@@ -31,11 +31,11 @@ You can override the default implementation by passing a `IServiceProvider` to t
 ```csharp
 public class StarWarsSchema : GraphQL.Types.Schema
 {
-    public StarWarsSchema(IServiceProvider provider)
+    public StarWarsSchema(IServiceProvider provider, StarWarsQuery query, StarWarsMutation mutation)
         : base(provider)
     {
-        Query = provider.GetRequiredService<StarWarsQuery>();
-        Mutation = provider.GetRequiredService<StarWarsMutation>();
+        Query = query;
+        Mutation = mutation;
     }
 }
 ```
@@ -86,9 +86,11 @@ A list of the available extension methods is below:
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
+| `AddSchemaVisitor<>`    | Registers the specified schema visitor and configures it to be used at schema initialization | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
+| `AddUnhandledExceptionHandler` | Configures the unhandled exception handler | |
 | `AddValidationRule<>`   | Registers the specified validation rule and configures it to be used at runtime | |
 | `ConfigureExecution`    | Configures execution middleware to monitor or modify both options and the result | |
 | `ConfigureExecutionOptions` | Configures execution options at runtime | |
@@ -98,6 +100,7 @@ A list of the available extension methods is below:
 | `UseAutomaticPersistedQueries` | Enables Automatic Persisted Queries support | GraphQL.MemoryCache |
 | `UseMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
+| `UseTelemetry`          | Creates telemetry events based on the System.Diagnostics.Activity API, primarily for use with OpenTelemetry | .NET 5+ |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.
@@ -161,8 +164,7 @@ to manually pull in those dependencies from the `SelfActivatingServiceProvider` 
 ```csharp
 public class StarWarsSchema : Schema
 {
-    public StarWarsSchema(IServiceProvider serviceProvider)
-        : base(serviceProvider)
+    public StarWarsSchema(IServiceProvider serviceProvider) : base(serviceProvider)
     {
         Query = serviceProvider.GetRequiredService<StarWarsQuery>();
         Mutation = serviceProvider.GetRequiredService<StarWarsMutation>();

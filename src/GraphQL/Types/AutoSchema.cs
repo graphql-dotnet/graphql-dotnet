@@ -7,7 +7,7 @@ namespace GraphQL.Types;
 /// of <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
 /// with <typeparamref name="TQueryClrType"/> as the query clr type.
 /// </summary>
-public class AutoSchema<TQueryClrType> : Schema
+public class AutoSchema<[NotAGraphType] TQueryClrType> : Schema
 {
     /// <summary>
     /// Initializes a new instance from the specified service provider.

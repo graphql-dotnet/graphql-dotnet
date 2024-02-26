@@ -1,5 +1,5 @@
 using GraphQL.Builders;
-using GraphQL.Utilities;
+using GraphQL.DataLoader;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI;
@@ -63,6 +63,30 @@ public class ResolverBuilder<TSourceType, TReturnType>
     /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
     public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
         => _scoped ? _builder.ResolveScopedAsync(resolver) : _builder.ResolveAsync(resolver);
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="Resolve(Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
 }
 
 /// <summary>
@@ -73,7 +97,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -112,6 +136,30 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
 
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>, T1> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
 }
 
 /// <summary>
@@ -122,7 +170,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -163,6 +211,30 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
 
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>, T1, T2> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
 }
 
 /// <summary>
@@ -173,7 +245,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -216,6 +288,30 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
 
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>, T1, T2, T3> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
 }
 
 /// <summary>
@@ -226,7 +322,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -271,6 +367,30 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
 
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>, T1, T2, T3, T4> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
 }
 
 /// <summary>
@@ -281,7 +401,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
     private readonly FieldBuilder<TSourceType, TReturnType> _builder;
     private bool _scoped;
 
-    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolverBuilder(FieldBuilder{TSourceType, TReturnType}, bool)"/>
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, bool)"/>
     public ResolverBuilder(FieldBuilder<TSourceType, TReturnType> builder, bool scoped)
     {
         _builder = builder;
@@ -323,5 +443,29 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
                 context.RequestServices.GetRequiredService<T5>());
 
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
+    }
+
+    private ResolverBuilder<TSourceType, IDataLoaderResult<TReturnType>, T1, T2, T3, T4, T5> ReturnsDataLoader()
+        => new(_builder.ReturnsDataLoader(), _scoped);
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, IDataLoaderResult<TReturnType>?> resolver)
+    {
+        ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, IDataLoaderResult<IDataLoaderResult<TReturnType>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
+    }
+
+    /// <inheritdoc cref="ResolverBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})"/>
+    public FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, T1, T2, T3, T4, T5, IDataLoaderResult<IDataLoaderResult<IDataLoaderResult<TReturnType>>>?> resolver)
+    {
+        ReturnsDataLoader().ReturnsDataLoader().ReturnsDataLoader().Resolve(resolver);
+        return _builder;
     }
 }

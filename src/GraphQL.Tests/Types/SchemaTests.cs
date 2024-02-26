@@ -89,8 +89,8 @@ public class SchemaTests
     public void throw_error_on_null_with_register_types()
     {
         var schema = new Schema();
-        Type[] types = null;
-        Should.Throw<ArgumentNullException>(() => schema.RegisterTypes(types));
+        Type[]? types = null;
+        Should.Throw<ArgumentNullException>(() => schema.RegisterTypes(types!));
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class SchemaTests
 
     private void ContainsTypeNames(ISchema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes[typeName];
             type.ShouldNotBeNull($"Did not find {typeName} in type lookup.");
@@ -142,7 +142,7 @@ public class SchemaTests
 
     private void DoesNotContainTypeNames(Schema schema, params string[] typeNames)
     {
-        foreach (var typeName in typeNames)
+        foreach (string typeName in typeNames)
         {
             var type = schema.AllTypes.SingleOrDefault(x => x.Name == typeName);
             type.ShouldBe(null, $"Found {typeName} in type lookup.");
@@ -158,7 +158,7 @@ public class SchemaTests
             schema.AllTypes.Count.ShouldNotBe(0);
             return async context =>
             {
-                var res = await next(context).ConfigureAwait(false);
+                object? res = await next(context);
                 return "One " + res;
             };
         });
@@ -225,7 +225,7 @@ public class SchemaTests
         query.AddField(field);
         schema.Query = query;
         schema.Initialize();
-        schema.Query.Fields.Find("test").Arguments[0].ResolvedType.ShouldBeOfType<AutoRegisteringInputObjectGraphType<CustomData>>();
+        schema.Query.Fields.Find("test")!.Arguments![0].ResolvedType.ShouldBeOfType<AutoRegisteringInputObjectGraphType<CustomData>>();
     }
 }
 
@@ -247,7 +247,7 @@ public class CustomSchemaTypes : SchemaTypes
     {
     }
 
-    protected override Type GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider> typeMappings)
+    protected override Type? GetGraphTypeFromClrType(Type clrType, bool isInputType, IEnumerable<IGraphTypeMappingProvider>? typeMappings)
     {
         var ret = base.GetGraphTypeFromClrType(clrType, isInputType, typeMappings);
 

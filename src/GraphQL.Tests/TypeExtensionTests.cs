@@ -13,9 +13,9 @@ public class TypeExtensionTests
     [InlineData(typeof(NonNullGraphType), false)]
     [InlineData(typeof(ListGraphType), false)]
     [InlineData(null, false)]
-    public void IsNamedGraphType(Type type, bool expected)
+    public void IsNamedGraphType(Type? type, bool expected)
     {
-        type.IsNamedType().ShouldBe(expected);
+        type!.IsNamedType().ShouldBe(expected);
     }
 
     [Theory]

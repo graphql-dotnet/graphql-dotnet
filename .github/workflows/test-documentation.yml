@@ -12,23 +12,27 @@ on:
       - .github/workflows/**
 
 env:
-  NODE_VERSION: '10.x'   # Node 10 LTS
+  NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
 
 jobs:
   buildcheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: yarn
-        run: yarn
       - name: yarn docs2
         working-directory: docs2
         run: yarn
       - name: yarn gatsby build
         working-directory: docs2
         run: yarn gatsby build
+      - name: Upload docs as workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Documentation
+          path: docs2/public/**
+          if-no-files-found: error

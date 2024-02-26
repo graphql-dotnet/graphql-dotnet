@@ -26,13 +26,13 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(2);
 
         // Dispatch loading
-        await loader.DispatchAsync().ConfigureAwait(false);
+        await loader.DispatchAsync();
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
-        var user1Orders = await task1.ConfigureAwait(false);
-        var user2Orders = await task2.ConfigureAwait(false);
+        var user1Orders = await task1;
+        var user2Orders = await task2;
 
         user1Orders.ShouldNotBeNull();
         user2Orders.ShouldNotBeNull();
@@ -67,13 +67,13 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(2);
 
         // Dispatch loading
-        await loader.DispatchAsync().ConfigureAwait(false);
+        await loader.DispatchAsync();
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
-        var user1Orders = await task1.ConfigureAwait(false);
-        var user2Orders = await task2.ConfigureAwait(false);
+        var user1Orders = await task1;
+        var user2Orders = await task2;
 
         user1Orders.ShouldNotBeNull();
         user2Orders.ShouldNotBeNull();
@@ -94,11 +94,11 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         //task3.Status.ShouldNotBe(TaskStatus.RanToCompletion, "Result should already be cached");
 
         // Dispatch loading
-        await loader.DispatchAsync().ConfigureAwait(false);
+        await loader.DispatchAsync();
 
-        var user1bOrders = await task1b.ConfigureAwait(false);
-        var user2bOrders = await task2b.ConfigureAwait(false);
-        var user3Orders = await task3.ConfigureAwait(false);
+        var user1bOrders = await task1b;
+        var user2bOrders = await task2b;
+        var user3Orders = await task3;
 
         user1bOrders.ShouldNotBeNull();
         user2bOrders.ShouldNotBeNull();
@@ -134,30 +134,32 @@ public class CollectionBatchLoaderTests : DataLoaderTestBase
         var result2 = loader.LoadAsync(1);
 
         // Dispatch loading
-        await loader.DispatchAsync().ConfigureAwait(false);
+        await loader.DispatchAsync();
 
         var task1 = result1.GetResultAsync();
         var task2 = result2.GetResultAsync();
 
         // Now await tasks
-        var user1Orders = await task1.ConfigureAwait(false);
-        var user1bOrders = await task2.ConfigureAwait(false);
+        var user1Orders = await task1;
+        var user1bOrders = await task2;
 
         mock.Verify(x => x.GetOrdersByUserIdAsync(new[] { 1 }, default), Times.Once,
             "The keys passed to the fetch delegate should be de-duplicated");
     }
 
+#nullable disable
     [Fact]
     public async Task Returns_Null_For_Null_Reference_Types()
     {
         var loader = new CollectionBatchDataLoader<object, string>((_, _) => throw new Exception());
-        (await loader.LoadAsync(null).GetResultAsync().ConfigureAwait(false)).ShouldBeNull();
+        (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
     }
 
     [Fact]
     public async Task Returns_Null_For_Null_Value_Types()
     {
         var loader = new CollectionBatchDataLoader<int?, string>((_, _) => throw new Exception());
-        (await loader.LoadAsync(null).GetResultAsync().ConfigureAwait(false)).ShouldBeNull();
+        (await loader.LoadAsync(null).GetResultAsync()).ShouldBeNull();
     }
+#nullable enable
 }

@@ -32,8 +32,8 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         AssertQuerySuccess(
             schema,
-            @"{ retail { catalog { products { name } } } }",
-            @"{ ""retail"": { ""catalog"": { ""products"": [ { ""name"": ""Book"" }] } } }"
+            "{ retail { catalog { products { name } } } }",
+            """{ "retail": { "catalog": { "products": [ { "name": "Book" }] } } }"""
         );
     }
 
@@ -55,8 +55,8 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         AssertQuerySuccess(
             schema,
-            @"{ hero { name friends { name } } }",
-            @"{ ""hero"": { ""name"": ""Quinn"", ""friends"": [ { ""name"": ""Jaime"" }, { ""name"": ""Joe"" }] } }",
+            "{ hero { name friends { name } } }",
+            """{ "hero": { "name": "Quinn", "friends": [ { "name": "Jaime" }, { "name": "Joe" }] } }""",
             root: new SomeObject { Name = "Quinn" });
     }
 
@@ -67,11 +67,11 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         var person = new ObjectGraphType { Name = "Person" };
         person.Field("name", new StringGraphType());
-        person.IsTypeOf = type => true;
+        person.IsTypeOf = _ => true;
 
         var robot = new ObjectGraphType { Name = "Robot" };
         robot.Field("name", new StringGraphType());
-        robot.IsTypeOf = type => true;
+        robot.IsTypeOf = _ => true;
 
         var personOrRobot = new UnionGraphType { Name = "PersonOrRobot" };
         personOrRobot.AddPossibleType(person);
@@ -84,66 +84,74 @@ public class RegisteredInstanceTests : BasicQueryTestBase
 
         AssertQuerySuccess(
             schema,
-            @"{ hero {
+            """
+            { hero {
                     ... on Person { name }
                     ... on Robot { name }
-                } }",
-            @"{ ""hero"": { ""name"" : ""Quinn"" }}",
+                } }
+            """,
+            """{ "hero": { "name" : "Quinn" }}""",
             root: new SomeObject { Name = "Quinn" });
     }
 
     [Fact]
     public void build_nested_type_with_list()
     {
-        build_schema("list").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("list").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: [NestedObjType]
-}
-");
+            type root {
+              listOfObjField: [NestedObjType]
+            }
+
+            """);
     }
 
     [Fact]
     public void build_nested_type_with_non_null()
     {
-        build_schema("non-null").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("non-null").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: NestedObjType!
-}
-");
+            type root {
+              listOfObjField: NestedObjType!
+            }
+
+            """);
     }
 
     [Fact]
     public void build_nested_type_with_base()
     {
-        build_schema("none").ShouldBeCrossPlat(@"schema {
-  query: root
-}
+        build_schema("none").ShouldBeCrossPlat("""
+            schema {
+              query: root
+            }
 
-type NestedObjType {
-  intField: Int
-}
+            type NestedObjType {
+              intField: Int
+            }
 
-type root {
-  listOfObjField: NestedObjType
-}
-");
+            type root {
+              listOfObjField: NestedObjType
+            }
+
+            """);
     }
 
-    private string build_schema(string propType)
+    private static string build_schema(string propType)
     {
         var nestedObjType = new ObjectGraphType
         {
@@ -189,7 +197,7 @@ type root {
         {
             Query = rootType
         };
-        var schema = new SchemaPrinter(s).Print();
+        string schema = new SchemaPrinter(s).Print();
         return schema;
     }
 

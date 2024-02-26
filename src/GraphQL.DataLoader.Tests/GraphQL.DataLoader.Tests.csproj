@@ -1,18 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Tests.props" />
 
-  <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
-    <TargetFramework>net7</TargetFramework>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net7;net6;net5;netcoreapp3.1;net48</TargetFrameworks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net7;net6;net5;netcoreapp3.1</TargetFrameworks>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\GraphQL.Tests\GraphQLSerializersTestData.cs" Link="GraphQLSerializersTestData.cs" />
   </ItemGroup>
@@ -20,13 +8,14 @@
   <ItemGroup>
     <PackageReference Include="Bogus" Version="34.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.*" />
-    <PackageReference Include="System.Reactive" Version="5.*" />
+    <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj" />
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
+    <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
   </ItemGroup>
 
 </Project>

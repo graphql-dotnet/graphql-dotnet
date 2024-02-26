@@ -26,11 +26,11 @@ public class DataLoaderSubscriptionTest : QueryTestBase
         ordersMock.Setup(x => x.GetOrderObservable()).Returns(orderStream);
         orderStream.OnNext(order);
 
-        var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }").ConfigureAwait(false);
+        var result = await ExecuteSubscribeAsync("subscription OrderAdded { orderAdded { orderId } }");
 
         /* Then */
-        var stream = result.Streams.Values.FirstOrDefault();
-        var message = await stream.FirstOrDefaultAsync();
+        var stream = result.Streams.ShouldNotBeNull().Values.First();
+        var message = await stream.FirstAsync();
 
         ordersMock.Verify(x => x.GetOrderObservable(), Times.Once);
         ordersMock.VerifyNoOtherCalls();

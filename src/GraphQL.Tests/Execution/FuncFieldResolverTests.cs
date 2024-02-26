@@ -12,7 +12,7 @@ public class FuncFieldResolverTests
     private class OkDataLoader : IDataLoaderResult<string>
     {
         Task<string> IDataLoaderResult<string>.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult("ok");
-        Task<object> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult<object>("ok");
+        Task<object?> IDataLoaderResult.GetResultAsync(CancellationToken cancellationToken) => Task.FromResult<object?>("ok");
     }
 
     public FuncFieldResolverTests()
@@ -21,20 +21,20 @@ public class FuncFieldResolverTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             Errors = new ExecutionErrors(),
-            OutputExtensions = new Dictionary<string, object>(),
+            OutputExtensions = new Dictionary<string, object?>(),
         };
     }
 
     [Fact]
     public async Task Pass_Through_Object_Source()
     {
-        IResolveFieldContext<object> rfc1 = null;
+        IResolveFieldContext<object>? rfc1 = null;
         var ffr1 = new FuncFieldResolver<object, string>(context =>
         {
             rfc1 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldBeSameAs(_context);
     }
@@ -42,8 +42,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Shares_Complete_Typed()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, string>(context =>
         {
             rfc1 = context;
@@ -54,8 +54,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -66,8 +66,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Shares_Complete_Untyped()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, object>(context =>
         {
             rfc1 = context;
@@ -78,8 +78,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return "ok";
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -90,8 +90,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Failed_Typed()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         Func<IResolveFieldContext<int?>, string> func1 = context =>
         {
             rfc1 = context;
@@ -105,10 +105,10 @@ public class FuncFieldResolverTests
         });
         try
         {
-            await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+            await ffr1.ResolveAsync(_context);
         }
         catch { }
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -119,8 +119,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Failed_Untyped()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, object>(context =>
         {
             rfc1 = context;
@@ -133,10 +133,10 @@ public class FuncFieldResolverTests
         });
         try
         {
-            await ffr1.ResolveAsync(_context).ConfigureAwait(false);
+            await ffr1.ResolveAsync(_context);
         }
         catch { }
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -147,8 +147,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Dataloader_Typed()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, IDataLoaderResult>(context =>
         {
             rfc1 = context;
@@ -159,8 +159,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return _okDataLoader;
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -171,8 +171,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Dataloader_Untyped()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, object>(context =>
         {
             rfc1 = context;
@@ -183,8 +183,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return _okDataLoader;
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -195,8 +195,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Enumerable_Typed()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, IEnumerable<int>>(context =>
         {
             rfc1 = context;
@@ -207,8 +207,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return new[] { 1, 2 };
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();
@@ -219,8 +219,8 @@ public class FuncFieldResolverTests
     [Fact]
     public async Task Does_Not_Share_Enumerable_Untyped()
     {
-        IResolveFieldContext<int?> rfc1 = null;
-        IResolveFieldContext<int?> rfc2 = null;
+        IResolveFieldContext<int?>? rfc1 = null;
+        IResolveFieldContext<int?>? rfc2 = null;
         var ffr1 = new FuncFieldResolver<int?, object>(context =>
         {
             rfc1 = context;
@@ -231,8 +231,8 @@ public class FuncFieldResolverTests
             rfc2 = context;
             return new[] { 1, 2 };
         });
-        await ffr1.ResolveAsync(_context).ConfigureAwait(false);
-        await ffr2.ResolveAsync(_context).ConfigureAwait(false);
+        await ffr1.ResolveAsync(_context);
+        await ffr2.ResolveAsync(_context);
         rfc1.ShouldNotBeNull();
         rfc1.ShouldNotBeSameAs(_context);
         rfc2.ShouldNotBeNull();

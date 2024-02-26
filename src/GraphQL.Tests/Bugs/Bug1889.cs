@@ -7,8 +7,8 @@ public class Bug1889WithCovariant : QueryTestBase<CovariantSchema>
     [Fact]
     public void supports_covariant_schemas()
     {
-        string query = "query { a { r { value } } }";
-        string expected = """{ "a": { "r": { "value": "spec" } } }""";
+        const string query = "query { a { r { value } } }";
+        const string expected = """{ "a": { "r": { "value": "spec" } } }""";
 
         AssertQuerySuccess(query, expected);
     }
@@ -58,7 +58,7 @@ public class RGraphInterface : InterfaceGraphType<R>
     {
         Name = "RInterface";
 
-        Field<NonNullGraphType<StringGraphType>>("Value").Resolve(ctx => ctx.Source.Value);
+        Field<NonNullGraphType<StringGraphType>>("Value");
     }
 }
 
@@ -78,7 +78,7 @@ public class AGraphInterface : InterfaceGraphType<A>
     {
         Name = "AInterface";
 
-        Field<NonNullGraphType<RGraphInterface>>("R").Resolve(ctx => ctx.Source.methodUsedToGetRValue());
+        Field<NonNullGraphType<RGraphInterface>>("R");
     }
 }
 

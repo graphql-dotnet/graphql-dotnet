@@ -1,4 +1,7 @@
 using GraphQL.Execution;
+#if NET5_0_OR_GREATER
+using GraphQL.Telemetry;
+#endif
 using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Validation;
@@ -18,6 +21,7 @@ namespace GraphQL.DI
         /// Does not include <see cref="IGraphQLSerializer"/>, and the default <see cref="IDocumentExecuter"/>
         /// implementation does not support subscriptions.
         /// </summary>
+        [DynamicDependency(DynamicallyAccessedMemberTypes.PublicConstructors, typeof(ErrorInfoProviderOptions))] // TODO: this should be preserved by the call to Configure<ErrorInfoProviderOptions>(), but it is not
         protected virtual void RegisterDefaultServices()
         {
             // configure an error to be displayed when no IGraphQLSerializer is registered
@@ -71,6 +75,15 @@ namespace GraphQL.DI
 
             // configure mapping for IOptions<ErrorInfoProviderOptions>
             Services.Configure<ErrorInfoProviderOptions>();
+
+#if NET5_0_OR_GREATER
+            if (OpenTelemetry.AutoInstrumentation.Initializer.Enabled)
+            {
+                // this will run prior to any other calls to UseTelemetry
+                // it will also cause telemetry to be called first in the pipeline
+                this.ConfigureExecution(GraphQLTelemetryProvider.AutoTelemetryProvider);
+            }
+#endif
         }
 
         /// <inheritdoc />

@@ -20,7 +20,7 @@ public class InputsConverterTests
     [Fact]
     public void Throws_For_Deep_Objects()
     {
-        var value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
+        string value = "{\"a\":" + new string('[', 65) + new string(']', 65) + "}";
         Should.Throw<JsonException>(() => JsonSerializer.Deserialize<Inputs>(value, _options));
     }
 
@@ -43,16 +43,16 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_SimpleValues()
     {
-        string json = @"
-                {
-                    ""int"": 123,
-                    ""double"": 123.456,
-                    ""string"": ""string"",
-                    ""bool"": true
-                }
-            ";
+        const string json = """
+            {
+              "int": 123,
+              "double": 123.456,
+              "string": "string",
+              "bool": true
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["int"].ShouldBe(123);
         actual["double"].ShouldBe(123.456);
@@ -63,13 +63,13 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Simple_Null()
     {
-        string json = @"
-                {
-                    ""string"": null
-                }
-            ";
+        const string json = """
+            {
+              "string": null
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["string"].ShouldBeNull();
     }
@@ -77,13 +77,13 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array()
     {
-        string json = @"
-                {
-                    ""values"": [1, 2, 3]
-                }
-            ";
+        const string json = """
+            {
+              "values": [1, 2, 3]
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["values"].ShouldNotBeNull();
     }
@@ -91,36 +91,35 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Array_in_Array()
     {
-        string json = @"
-                {
-                    ""values"": [[1,2,3]]
-                }
-            ";
+        const string json = """
+            {
+              "values": [[1,2,3]]
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
-        actual["values"].ShouldNotBeNull();
-        object values = actual["values"];
+        object values = actual["values"].ShouldNotBeNull();
         values.ShouldBeAssignableTo<IEnumerable<object>>();
     }
 
     [Fact]
     public void Deserialize_ComplexValue()
     {
-        string json = @"
-                {
-                    ""complex"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    }
-                }
-            ";
+        const string json = """
+            {
+              "complex": {
+                "int": 123,
+                "double": 123.456,
+                "string": "string",
+                "bool": true
+              }
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -130,25 +129,25 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_MixedValue()
     {
-        string json = @"
-                {
-                    ""int"": 123,
-                    ""complex"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    },
-                    ""bool"": true
-                }
-            ";
+        const string json = """
+            {
+              "int": 123,
+              "complex": {
+                "int": 123,
+                "double": 123.456,
+                "string": "string",
+                "bool": true
+              },
+              "bool": true
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Inputs>(json, _options);
+        var actual = JsonSerializer.Deserialize<Inputs>(json, _options)!;
 
         actual["int"].ShouldBe(123);
         actual["bool"].ShouldBe(true);
 
-        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>();
+        var complex = actual["complex"].ShouldBeAssignableTo<IDictionary<string, object>>()!;
         complex["int"].ShouldBe(123);
         complex["double"].ShouldBe(123.456);
         complex["string"].ShouldBe("string");
@@ -158,20 +157,20 @@ public class InputsConverterTests
     [Fact]
     public void Deserialize_Nested_SimpleValues()
     {
-        string json = @"
-                {
-                    ""value1"": ""string"",
-                    ""dictionary"": {
-                        ""int"": 123,
-                        ""double"": 123.456,
-                        ""string"": ""string"",
-                        ""bool"": true
-                    },
-                    ""value2"": 123
-                }
-            ";
+        const string json = """
+            {
+              "value1": "string",
+              "dictionary": {
+                "int": 123,
+                "double": 123.456,
+                "string": "string",
+                "bool": true
+              },
+              "value2": 123
+            }
+            """;
 
-        var actual = JsonSerializer.Deserialize<Nested>(json, _options);
+        var actual = JsonSerializer.Deserialize<Nested>(json, _options)!;
 
         actual.Value1.ShouldBe("string");
         actual.Value2.ShouldBe(123);
@@ -188,12 +187,13 @@ public class InputsConverterTests
 
         string json = JsonSerializer.Serialize(source, _options);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""value1"": null,
-  ""dictionary"": null,
-  ""value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "value1": null,
+              "dictionary": null,
+              "value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string"
@@ -212,15 +212,16 @@ public class InputsConverterTests
 
         string json = JsonSerializer.Serialize(source, _options);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
-    ""int"": 123,
-    ""string"": ""string""
-  },
-  ""value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "value1": "string",
+              "dictionary": {
+                "int": 123,
+                "string": "string"
+              },
+              "value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -228,7 +229,7 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["string"] = null
             }.ToInputs(),
@@ -238,14 +239,15 @@ public class InputsConverterTests
 
         string json = JsonSerializer.Serialize(source, _options);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
-    ""string"": null
-  },
-  ""value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "value1": "string",
+              "dictionary": {
+                "string": null
+              },
+              "value2": 123
+            }
+            """.Trim());
     }
 
     [Fact]
@@ -253,11 +255,11 @@ public class InputsConverterTests
     {
         var source = new Nested
         {
-            Dictionary = new Dictionary<string, object>
+            Dictionary = new Dictionary<string, object?>
             {
                 ["int"] = 123,
                 ["string"] = "string",
-                ["complex"] = new Dictionary<string, object>
+                ["complex"] = new Dictionary<string, object?>
                 {
                     ["double"] = 1.123d
                 }
@@ -268,23 +270,24 @@ public class InputsConverterTests
 
         string json = JsonSerializer.Serialize(source, _options);
 
-        json.ShouldBeCrossPlatJson(
-            @"{
-  ""value1"": ""string"",
-  ""dictionary"": {
-    ""int"": 123,
-    ""string"": ""string"",
-    ""complex"": {
-      ""double"": 1.123
-    }
-  },
-  ""value2"": 123
-}".Trim());
+        json.ShouldBeCrossPlatJson("""
+            {
+              "value1": "string",
+              "dictionary": {
+                "int": 123,
+                "string": "string",
+                "complex": {
+                  "double": 1.123
+                }
+              },
+              "value2": 123
+            }
+            """.Trim());
     }
 
     private class Nested
     {
-        public string Value1 { get; set; }
+        public string? Value1 { get; set; }
 
         public Inputs Dictionary { get; set; }
 

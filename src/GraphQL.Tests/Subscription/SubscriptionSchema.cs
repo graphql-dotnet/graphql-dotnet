@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Subscription;
@@ -23,67 +22,43 @@ public class ChatSubscriptions : ObjectGraphType
     public ChatSubscriptions(IChat chat)
     {
         _chat = chat;
-        AddField(new FieldType
-        {
-            Name = "messageAdded",
-            Type = typeof(MessageType),
-            StreamResolver = new SourceStreamResolver<Message>(Subscribe)
-        });
+        Field<MessageType, Message>("messageAdded")
+            .ResolveStream(Subscribe);
 
-        AddField(new FieldType
-        {
-            Name = "messageAddedByUser",
-            Arguments = new QueryArguments(
-                new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
-            ),
-            Type = typeof(MessageType),
-            StreamResolver = new SourceStreamResolver<Message>(SubscribeById)
-        });
+        Field<MessageType, Message>("messageAddedByUser")
+            .Argument<NonNullGraphType<StringGraphType>>("id")
+            .ResolveStream(SubscribeById);
 
-        AddField(new FieldType
-        {
-            Name = "messageAddedAsync",
-            Type = typeof(MessageType),
-            StreamResolver = new SourceStreamResolver<Message>(SubscribeAsync)
-        });
+        Field<MessageType, Message>("messageAddedAsync")
+            .ResolveStreamAsync(SubscribeAsync);
 
-        AddField(new FieldType
-        {
-            Name = "messageAddedByUserAsync",
-            Arguments = new QueryArguments(
-                new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id" }
-            ),
-            Type = typeof(MessageType),
-            StreamResolver = new SourceStreamResolver<Message>(SubscribeByIdAsync)
-        });
+        Field<MessageType, Message>("messageAddedByUserAsync")
+            .Argument<NonNullGraphType<StringGraphType>>("id")
+            .ResolveStreamAsync(SubscribeByIdAsync);
 
-        AddField(new FieldType
-        {
-            Name = "messageGetAll",
-            Type = typeof(ListGraphType<MessageType>),
-            StreamResolver = new SourceStreamResolver<List<Message>>(_ => _chat.MessagesGetAll())
-        });
+        Field<ListGraphType<MessageType>, List<Message>>("messageGetAll")
+            .ResolveStream(_ => _chat.MessagesGetAll());
 
-        AddField(new FieldType
-        {
-            Name = "newMessageContent",
-            Type = typeof(StringGraphType),
-            StreamResolver = new SourceStreamResolver<string>(context => Subscribe(context).Select(message => message.Content))
-        });
+        Field<StringGraphType>("newMessageContent")
+            .ResolveStream(context => Subscribe(context).Select(message => message.Content));
+
+        int counter = 0;
+        Field<IntGraphType, int>("messageCounter")
+            .ResolveStream(context => Subscribe(context).Select(_ => ++counter));
     }
 
     private IObservable<Message> SubscribeById(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = _chat.Messages();
 
         return messages.Where(message => message.From.Id == id);
     }
 
-    private async ValueTask<IObservable<Message>> SubscribeByIdAsync(IResolveFieldContext context)
+    private async Task<IObservable<Message?>> SubscribeByIdAsync(IResolveFieldContext context)
     {
-        var id = context.GetArgument<string>("id");
+        string id = context.GetArgument<string>("id");
 
         var messages = await _chat.MessagesAsync().ConfigureAwait(false);
         return messages.Where(message => message.From.Id == id);
@@ -94,7 +69,7 @@ public class ChatSubscriptions : ObjectGraphType
         return _chat.Messages();
     }
 
-    private async ValueTask<IObservable<Message>> SubscribeAsync(IResolveFieldContext context)
+    private async Task<IObservable<Message?>> SubscribeAsync(IResolveFieldContext context)
     {
         return await _chat.MessagesAsync().ConfigureAwait(false);
     }
@@ -145,7 +120,7 @@ public class MessageInputType : InputObjectGraphType
     {
         Field<StringGraphType>("fromId");
         Field<StringGraphType>("content");
-        Field<DateGraphType>("sentAt");
+        Field<DateTimeOffsetGraphType>("sentAt");
     }
 }
 
@@ -164,7 +139,7 @@ public class Message
 
     public string Content { get; set; }
 
-    public DateTime SentAt { get; set; }
+    public DateTimeOffset SentAt { get; set; }
 }
 
 public class MessageFrom
@@ -180,7 +155,7 @@ public class ReceivedMessage
 
     public string Content { get; set; }
 
-    public DateTime SentAt { get; set; }
+    public DateTimeOffset SentAt { get; set; }
 }
 
 public interface IChat
@@ -218,7 +193,7 @@ public class Chat : IChat
 
     public Message AddMessage(ReceivedMessage message)
     {
-        if (!Users.TryGetValue(message.FromId, out var displayName))
+        if (!Users.TryGetValue(message.FromId, out string? displayName))
         {
             displayName = "(unknown)";
         }

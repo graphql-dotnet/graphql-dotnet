@@ -15,59 +15,59 @@ public class ResolveFieldContextTests
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
             Errors = new ExecutionErrors(),
-            OutputExtensions = new Dictionary<string, object>(),
+            OutputExtensions = new Dictionary<string, object?>(),
         };
     }
 
     [Fact]
     public void argument_converts_int_to_long()
     {
-        int val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<long>("a");
+        const int val = 1;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        long result = _context.GetArgument<long>("a");
         result.ShouldBe(1);
     }
 
     [Fact]
     public void argument_converts_long_to_int()
     {
-        long val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<int>("a");
+        const long val = 1;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        int result = _context.GetArgument<int>("a");
         result.ShouldBe(1);
     }
 
     [Fact]
     public void long_to_int_should_throw_for_out_of_range()
     {
-        long val = 89429901947254093;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        const long val = 89429901947254093;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         Should.Throw<OverflowException>(() => _context.GetArgument<int>("a"));
     }
 
     [Fact]
     public void argument_returns_boxed_string_uncast()
     {
-        var val = "one";
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<object>("a");
+        const string val = "one";
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        object result = _context.GetArgument<object>("a");
         result.ShouldBe("one");
     }
 
     [Fact]
     public void argument_returns_long()
     {
-        long val = 1000000000000001;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
-        var result = _context.GetArgument<long>("a");
+        const long val = 1000000000000001;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        long result = _context.GetArgument<long>("a");
         result.ShouldBe(1000000000000001);
     }
 
     [Fact]
     public void argument_returns_enum()
     {
-        var val = SomeEnum.Two;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        const SomeEnum val = SomeEnum.Two;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
     }
@@ -75,8 +75,8 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_returns_enum_from_string()
     {
-        var val = "two";
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        const string val = "two";
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
     }
@@ -84,8 +84,8 @@ public class ResolveFieldContextTests
     [Fact]
     public void argument_returns_enum_from_number()
     {
-        var val = 1;
-        _context.Arguments["a"] = new ArgumentValue(val, ArgumentSource.Literal);
+        const int val = 1;
+        _context.Arguments!["a"] = new ArgumentValue(val, ArgumentSource.Literal);
         var result = _context.GetArgument<SomeEnum>("a");
         result.ShouldBe(SomeEnum.Two);
     }
@@ -119,7 +119,7 @@ public class ResolveFieldContextTests
     [Fact]
     public void resolveFieldContextAdapter_throws_error_when_null()
     {
-        Should.Throw<ArgumentNullException>(() => _ = new ResolveFieldContextAdapter<object>(null));
+        Should.Throw<ArgumentNullException>(() => _ = new ResolveFieldContextAdapter<object>(null!));
     }
 
     [Fact]
@@ -155,13 +155,16 @@ public class ResolveFieldContextTests
     [Fact]
     public void GetSetExtension_Should_Throw_On_Null()
     {
-        IResolveFieldContext context = null;
+        IResolveFieldContext context = null!;
         Should.Throw<ArgumentNullException>(() => context.GetOutputExtension("e"));
+        Should.Throw<ArgumentNullException>(() => context.GetInputExtension("e"));
         Should.Throw<ArgumentNullException>(() => context.SetOutputExtension("e", 1));
 
         context = new ResolveFieldContext();
         context.GetOutputExtension("a").ShouldBe(null);
         context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+        context.GetInputExtension("a").ShouldBe(null);
+        context.GetInputExtension("a.b.c.d").ShouldBe(null);
         Should.Throw<ArgumentException>(() => context.SetOutputExtension("e", 1));
     }
 
@@ -176,11 +179,33 @@ public class ResolveFieldContextTests
 
         _context.SetOutputExtension("a.b.c.d", "value");
         _context.GetOutputExtension("a.b.c.d").ShouldBe("value");
-        var d = _context.GetOutputExtension("a.b").ShouldBeOfType<Dictionary<string, object>>();
+        var d = _context.GetOutputExtension("a.b").ShouldBeOfType<Dictionary<string, object?>>();
         d.Count.ShouldBe(1);
 
         _context.SetOutputExtension("a.b.c", "override");
         _context.GetOutputExtension("a.b.c.d").ShouldBe(null);
+    }
+
+    [Fact]
+    public void GetInputExtension_Should_Return_Value()
+    {
+        var context = new ResolveFieldContext
+        {
+            InputExtensions = new Dictionary<string, object?>
+            {
+                ["a"] = 1,
+                ["b"] = new Dictionary<string, object?>
+                {
+                    ["c"] = true
+                },
+                ["d"] = new object()
+            }
+        };
+        context.GetInputExtension("a").ShouldBe(1);
+        context.GetInputExtension("b.c").ShouldBe(true);
+        context.GetInputExtension("a.x").ShouldBe(null);
+        context.GetInputExtension("b.x").ShouldBe(null);
+        context.GetInputExtension("d").ShouldBeOfType<object>();
     }
 
     [Theory]
@@ -202,9 +227,9 @@ public class ResolveFieldContextTests
             User = new ClaimsPrincipal(new ClaimsIdentity(isAuthenticated ? "Bearer" : null)),
         };
         options.Listeners.Add(new VerifyUserDocumentListener { ShouldBeAuthenticated = isAuthenticated });
-        var result = await executer.ExecuteAsync(options).ConfigureAwait(false);
-        var resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
-        resultText.ShouldBe(isAuthenticated ? @"{""data"":{""isAuthenticated"":true}}" : @"{""data"":{""isAuthenticated"":false}}");
+        var result = await executer.ExecuteAsync(options);
+        string resultText = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultText.ShouldBe(isAuthenticated ? """{"data":{"isAuthenticated":true}}""" : """{"data":{"isAuthenticated":false}}""");
     }
 
     private class VerifyUserDocumentListener : DocumentExecutionListenerBase
@@ -222,7 +247,7 @@ public class ResolveFieldContextTests
     {
         public bool ShouldBeAuthenticated { get; set; }
 
-        public ValueTask<INodeVisitor> ValidateAsync(ValidationContext context)
+        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
         {
             context.User.ShouldNotBeNull().Identity.ShouldNotBeNull().IsAuthenticated.ShouldBe(ShouldBeAuthenticated);
             return default;
@@ -249,7 +274,7 @@ public class ResolveFieldContextTests
                 _context.Errors.Add(new ExecutionError("test"));
         });
 
-        await Task.WhenAll(t1, t2).ConfigureAwait(false);
+        await Task.WhenAll(t1, t2);
 
         _context.Errors.Count.ShouldBe(10);
     }

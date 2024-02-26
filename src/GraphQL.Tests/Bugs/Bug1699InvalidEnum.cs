@@ -8,10 +8,10 @@ namespace GraphQL.Tests.Bugs;
 // https://github.com/graphql-dotnet/graphql-dotnet/issues/1699
 public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
 {
-    private void AssertQueryWithError(string query, string result, string message, int line, int column, string path, Exception exception = null, string code = null, string inputs = null, string number = null)
+    private void AssertQueryWithError(string query, string result, string message, int line, int column, string path, Exception? exception = null, string? code = null, string? inputs = null, string? number = null)
         => AssertQueryWithError(query, result, message, line, column, new object[] { path }, exception, code, inputs, number);
 
-    private void AssertQueryWithError(string query, string result, string message, int line, int column, object[] path, Exception exception = null, string code = null, string inputs = null, string number = null, bool executed = true)
+    private void AssertQueryWithError(string query, string? result, string message, int line, int column, object[]? path, Exception? exception = null, string? code = null, string? inputs = null, string? number = null, bool executed = true)
     {
         ExecutionError error;
         if (number != null)

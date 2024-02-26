@@ -12,8 +12,21 @@ namespace GraphQL.Introspection
         /// </summary>
         /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
         public __Field(bool allowAppliedDirectives = false)
+            : this(allowAppliedDirectives, false)
         {
-            Name = nameof(__Field);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="__Field"/> introspection type.
+        /// </summary>
+        /// <param name="allowAppliedDirectives">Allows 'appliedDirectives' field for this type. It is an experimental feature.</param>
+        /// <param name="deprecationOfInputValues">
+        /// Allows deprecation of input values - arguments on a field or input fields on an input type.
+        /// This feature is from a working draft of the specification.
+        /// </param>
+        public __Field(bool allowAppliedDirectives = false, bool deprecationOfInputValues = false)
+        {
+            SetName(nameof(__Field), validate: false);
 
             Description =
                 "Object and Interface types are described by a list of Fields, each of " +
@@ -23,7 +36,7 @@ namespace GraphQL.Introspection
 
             Field<StringGraphType>("description").Resolve(context => context.Source.Description);
 
-            Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
+            var argsField = Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
                 .ResolveAsync(async context =>
                 {
                     var source = context.Source;
@@ -31,10 +44,12 @@ namespace GraphQL.Introspection
                     {
                         var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
 
+                        bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+
                         int index = 0;
                         foreach (var argument in source.Arguments.List!)
                         {
-                            if (await context.Schema.Filter.AllowArgument(source, argument).ConfigureAwait(false))
+                            if ((includeDeprecated || string.IsNullOrWhiteSpace(argument.DeprecationReason)) && await context.Schema.Filter.AllowArgument(source, argument).ConfigureAwait(false))
                                 arguments[index++] = argument;
                         }
 
@@ -47,6 +62,8 @@ namespace GraphQL.Introspection
 
                     return Array.Empty<QueryArgument>();
                 });
+            if (deprecationOfInputValues)
+                argsField.Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False);
 
             Field<NonNullGraphType<__Type>>("type").Resolve(context => context.Source.ResolvedType);
 

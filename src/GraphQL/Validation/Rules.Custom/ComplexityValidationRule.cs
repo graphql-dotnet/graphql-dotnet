@@ -1,5 +1,6 @@
 using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Errors.Custom;
+using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules.Custom;
 
@@ -35,16 +36,49 @@ public class ComplexityValidationRule : IValidationRule
 
     /// <inheritdoc/>
     public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
+        => new(new PostponeComplexityValidationVisitor(_complexityConfiguration, _complexityAnalyzer));
+
+    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+    private sealed class PostponeComplexityValidationVisitor : INodeVisitor
     {
-        try
+        private readonly ComplexityConfiguration _complexityConfiguration;
+#pragma warning disable CS0618 // Type or member is obsolete
+        private readonly IComplexityAnalyzer _complexityAnalyzer;
+#pragma warning restore CS0618 // Type or member is obsolete
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        public PostponeComplexityValidationVisitor(ComplexityConfiguration complexityConfiguration, IComplexityAnalyzer complexityAnalyzer)
         {
-            using (context.Metrics.Subject("document", "Analyzing complexity"))
-                _complexityAnalyzer.Validate(context.Document, _complexityConfiguration, context.Schema);
+            _complexityConfiguration = complexityConfiguration;
+            _complexityAnalyzer = complexityAnalyzer;
         }
-        catch (ComplexityError ex)
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        public ValueTask EnterAsync(ASTNode node, ValidationContext context) => default;
+
+        public ValueTask LeaveAsync(ASTNode node, ValidationContext context)
         {
-            context.ReportError(ex);
+            // Complexity analysis should run at the very end.
+            if (node is GraphQLDocument)
+            {
+                // Fast return here to avoid all possible problems with complexity analysis.
+                // For example, document may contain fragment cycles, see https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+                // Note, that ComplexityValidationRule/ComplexityAnalyzer still checks for fragment cycles since there may be no standard rules configured.
+                if (context.HasErrors)
+                    return default;
+
+                try
+                {
+                    using (context.Metrics.Subject("document", "Analyzing complexity"))
+                        _complexityAnalyzer.Validate(context.Document, _complexityConfiguration, context.Schema);
+                }
+                catch (ComplexityError ex)
+                {
+                    context.ReportError(ex);
+                }
+            }
+
+            return default;
         }
-        return default;
     }
 }

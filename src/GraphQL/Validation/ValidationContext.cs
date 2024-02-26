@@ -128,38 +128,84 @@ namespace GraphQL.Validation
 
         /// <summary>
         /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
+        /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
+        /// <see cref="ValidationError"/> is added to the <see cref="Errors"/>.
         /// </summary>
+        [Obsolete("This method can repeatedly add the same error into ValidationContext.Errors collection when called multiple times. Use GetVariablesValuesAsync method instead.")]
         public async ValueTask<Variables> GetVariableValuesAsync(IVariableVisitor? visitor = null)
+        {
+            (var variables, var errors) = await GetVariablesValuesAsync(visitor).ConfigureAwait(false);
+
+            if (errors != null)
+            {
+                foreach (var error in errors)
+                    ReportError(error);
+            }
+
+            return variables;
+        }
+
+        /// <summary>
+        /// Returns all of the variable values defined for the operation from the attached <see cref="Variables"/> object.
+        /// Only correctly validated variables are returned. If the variable is specified incorrectly, then an instance of
+        /// <see cref="ValidationError"/> is returned within the list of errors.
+        /// </summary>
+        public async ValueTask<(Variables Variables, List<ValidationError>? Errors)> GetVariablesValuesAsync(IVariableVisitor? visitor = null)
         {
             var variableDefinitions = Operation?.Variables;
 
             if ((variableDefinitions?.Count ?? 0) == 0)
             {
-                return Validation.Variables.None;
+                return (Validation.Variables.None, null);
             }
 
+            var usages = GetRecursiveVariables(Operation!);
+
+            List<ValidationError>? errors = null;
             var variablesObj = new Variables(variableDefinitions!.Count);
 
             if (variableDefinitions != null)
             {
                 foreach (var variableDef in variableDefinitions.Items)
                 {
-                    var variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
+                    string variableDefName = variableDef.Variable.Name.StringValue; //ISSUE:allocation
                     // find the IGraphType instance for the variable type
                     var graphType = variableDef.Type.GraphTypeFromType(Schema);
 
                     if (graphType == null)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
+                        (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
                         continue;
                     }
 
                     // create a new variable object
-                    var variable = new Variable(variableDefName);
+                    var variable = new Variable(variableDefName, variableDef);
 
                     // attempt to retrieve the variable value from the inputs
-                    if (Variables.TryGetValue(variableDefName, out var variableValue))
+                    if (Variables.TryGetValue(variableDefName, out object? variableValue))
                     {
+                        // for nullable variable types that are supplied (not default value),
+                        if (graphType is not NonNullGraphType)
+                        {
+                            // determine if a non-null value is required
+                            //   (it may have passed validation for a nullable type if the variable definition,
+                            //    argument definition, or input object field definition includes a default value)
+                            bool requiresNonNull = false;
+                            if (usages != null)
+                            {
+                                foreach (var usage in usages)
+                                {
+                                    if (usage.Node.Name == variableDef.Variable.Name && usage.Type is NonNullGraphType)
+                                    {
+                                        requiresNonNull = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (requiresNonNull)
+                                graphType = new NonNullGraphType(graphType);
+                        }
+
                         // parse the variable via ParseValue (for scalars) and ParseDictionary (for objects) as applicable
                         try
                         {
@@ -167,7 +213,7 @@ namespace GraphQL.Validation
                         }
                         catch (ValidationError error)
                         {
-                            ReportError(error);
+                            (errors ??= new()).Add(error);
                             continue;
                         }
                     }
@@ -182,14 +228,14 @@ namespace GraphQL.Validation
                         }
                         catch (Exception ex)
                         {
-                            ReportError(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
+                            (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, "Error coercing default value.", ex));
                             continue;
                         }
                         variable.IsDefault = true;
                     }
                     else if (graphType is NonNullGraphType)
                     {
-                        ReportError(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
+                        (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
                         continue;
                     }
 
@@ -201,7 +247,7 @@ namespace GraphQL.Validation
             }
 
             // return the list of parsed variables defined for the operation
-            return variablesObj;
+            return (variablesObj, errors);
         }
 
         /// <summary>
@@ -222,17 +268,16 @@ namespace GraphQL.Validation
             {
                 if (type is IInputObjectGraphType inputObjectGraphType)
                 {
-                    var parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    object? parsedValue = await ParseValueObjectAsync(inputObjectGraphType, variableDef, variableName, value, visitor).ConfigureAwait(false);
                     if (visitor != null)
                         await visitor.VisitObjectAsync(this, variableDef, variableName, inputObjectGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
                 }
                 else if (type is NonNullGraphType nonNullGraphType)
                 {
-                    if (value == null)
-                        throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.");
-
-                    return await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
+                    return value == null
+                        ? throw new InvalidVariableError(this, variableDef, variableName, "Received a null input for a non-null variable.")
+                        : await ParseValueAsync(nonNullGraphType.ResolvedType!, variableDef, variableName, value, visitor).ConfigureAwait(false);
                 }
                 else if (type is ListGraphType listGraphType)
                 {
@@ -243,7 +288,7 @@ namespace GraphQL.Validation
                 }
                 else if (type is ScalarGraphType scalarGraphType)
                 {
-                    var parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
+                    object? parsedValue = ParseValueScalar(scalarGraphType, variableDef, variableName, value);
                     if (visitor != null)
                         await visitor.VisitScalarAsync(this, variableDef, variableName, scalarGraphType, value, parsedValue).ConfigureAwait(false);
                     return parsedValue;
@@ -329,7 +374,7 @@ namespace GraphQL.Validation
                 {
                     var childFieldVariableName = new VariableName(variableName, field.Name);
 
-                    if (dic.TryGetValue(field.Name, out var fieldValue))
+                    if (dic.TryGetValue(field.Name, out object? fieldValue))
                     {
                         // RULE: If the value null was provided for an input object field, and
                         // the field’s type is not a non‐null type, an entry in the coerced
@@ -369,7 +414,7 @@ namespace GraphQL.Validation
                 // map must not contain any entries with names not defined by a field
                 // of this input object type, ***otherwise an error must be thrown.***
                 List<string>? unknownFields = null;
-                foreach (var key in dic.Keys)
+                foreach (string key in dic.Keys)
                 {
                     bool match = false;
 
@@ -408,12 +453,9 @@ namespace GraphQL.Validation
 
                 if (valueAst == null || valueAst is GraphQLNullValue)
                 {
-                    if (ofType != null)
-                    {
-                        return $"Expected '{ofType.Name}!', found null.";
-                    }
-
-                    return "Expected non-null value, found null";
+                    return ofType == null
+                        ? "Expected non-null value, found null"
+                        : $"Expected '{ofType.Name}!', found null.";
                 }
 
                 return IsValidLiteralValue(ofType, valueAst);

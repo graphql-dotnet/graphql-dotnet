@@ -1,0 +1,35 @@
+name: Check formatting
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - src/**
+      - .github/workflows/**
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 7.0.x
+          source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Install dependencies
+        working-directory: src
+        run: dotnet restore
+      - name: Check formatting
+        working-directory: src
+        run: |
+          dotnet format --no-restore --verify-no-changes --severity error --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)

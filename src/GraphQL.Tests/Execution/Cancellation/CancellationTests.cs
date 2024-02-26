@@ -21,7 +21,7 @@ public class CancellationTestType : ObjectGraphType
         Field<StringGraphType>("three").ResolveAsync(async context => await GetThreeAsync(context).ConfigureAwait(false));
     }
 
-    public Task<string> GetOneAsync(IResolveFieldContext<object> context)
+    public Task<string> GetOneAsync(IResolveFieldContext<object?> context)
     {
         if (!context.CancellationToken.CanBeCanceled)
         {
@@ -31,17 +31,17 @@ public class CancellationTestType : ObjectGraphType
         return Task.FromResult("one");
     }
 
-    public Task<string> GetTwoAsync(IResolveFieldContext<object> context)
+    public Task<string> GetTwoAsync(IResolveFieldContext<object?> context)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
 
         return Task.FromResult("two");
     }
 
-    public async Task<string> GetThreeAsync(IResolveFieldContext<object> context)
+    public async Task<string> GetThreeAsync(IResolveFieldContext<object?> context)
     {
         await Task.Yield();
-        ((CancellationTokenSource)context.RootValue).Cancel();
+        ((CancellationTokenSource)context.RootValue!).Cancel();
         await Task.Delay(1000, context.CancellationToken).ConfigureAwait(false);
         // should never execute
         return "three";
@@ -54,7 +54,7 @@ public class CancellationTests : QueryTestBase<CancellationSchema>
     public void cancellation_token_in_context()
     {
         using var tokenSource = new CancellationTokenSource();
-        AssertQuerySuccess("{one}", @"{ ""one"": ""one"" }", cancellationToken: tokenSource.Token);
+        AssertQuerySuccess("{one}", """{ "one": "one" }""", cancellationToken: tokenSource.Token);
     }
 
     [Fact]

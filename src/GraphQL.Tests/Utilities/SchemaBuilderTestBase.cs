@@ -23,7 +23,17 @@ public class SchemaBuilderTestBase
         configure(config);
 
         var schema = Builder.Build(config.Definitions);
+
+        return AssertQuery(configure, schema);
+    }
+
+    public ExecutionResult AssertQuery(Action<ExecuteConfig> configure, ISchema schema)
+    {
+        var config = new ExecuteConfig();
+        configure(config);
+
         config.ConfigureBuildedSchema?.Invoke(schema);
+
         schema.Initialize();
 
         var queryResult = CreateQueryResult(config.ExpectedResult);
@@ -45,16 +55,16 @@ public class SchemaBuilderTestBase
     {
         var runResult = Executer.ExecuteAsync(options).Result;
 
-        var writtenResult = Serializer.Serialize(runResult);
-        var expectedResult = Serializer.Serialize(expectedExecutionResult);
+        string writtenResult = Serializer.Serialize(runResult);
+        string expectedResult = Serializer.Serialize(expectedExecutionResult);
 
-        string additionalInfo = null;
+        string? additionalInfo = null;
 
         if (runResult.Errors?.Any() == true)
         {
             additionalInfo = string.Join(Environment.NewLine, runResult.Errors
                 .Where(x => x.InnerException is GraphQLSyntaxErrorException)
-                .Select(x => x.InnerException.Message));
+                .Select(x => x.InnerException!.Message));
         }
 
         writtenResult.ShouldBeCrossPlat(expectedResult, additionalInfo);

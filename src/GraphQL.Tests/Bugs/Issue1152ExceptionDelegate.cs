@@ -7,14 +7,16 @@ public class Issue1152ExceptionDelegate : QueryTestBase<Issue1152Schema>
     [Fact]
     public void Issue1152_Should_Intercept_Unhandled_Exceptions()
     {
-        var query = @"
-query {
-  somefield
-}
-";
-        var expected = @"{
-  ""somefield"": null
-}";
+        const string query = """
+        query {
+          somefield
+        }
+        """;
+        const string expected = """
+        {
+          "somefield": null
+        }
+        """;
 
         var list = new List<Exception>();
 
@@ -28,7 +30,7 @@ query {
         list.Count.ShouldBe(1);
         list[0].ShouldBeOfType<InvalidTimeZoneException>().StackTrace.ShouldNotBeNull();
 
-        result.Errors.Count.ShouldBe(1);
+        result.Errors!.Count.ShouldBe(1);
         result.Errors[0].InnerException.ShouldBeOfType<InvalidOperationException>().StackTrace.ShouldBeNull();
     }
 }

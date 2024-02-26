@@ -2,6 +2,9 @@ using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Utilities.Visitors;
+using GraphQLParser.AST;
+using GraphQLParser.Visitors;
 
 namespace GraphQL
 {
@@ -27,7 +30,7 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
-        public static void RegisterType<T>(this ISchema schema)
+        public static void RegisterType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T>(this ISchema schema)
             where T : IGraphType
         {
             schema.RegisterType(typeof(T));
@@ -40,6 +43,7 @@ namespace GraphQL
         /// <see cref="ISchema.Mutation"/> and <see cref="ISchema.Subscription"/> graphs, creating
         /// instances of <see cref="IGraphType"/>s referenced therein as necessary.
         /// </summary>
+        [RequiresUnreferencedCode("Please ensure that the graph types' constructors are not trimmed by the compiler.")]
         public static TSchema RegisterTypes<TSchema>(this TSchema schema, params Type[] types)
             where TSchema : ISchema
         {
@@ -81,10 +85,56 @@ namespace GraphQL
         /// </summary>
         /// <typeparam name="TClrType">The CLR property type from which to infer the GraphType.</typeparam>
         /// <typeparam name="TGraphType">Inferred GraphType.</typeparam>
-        public static void RegisterTypeMapping<TClrType, TGraphType>(this ISchema schema)
+        public static void RegisterTypeMapping<TClrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(this ISchema schema)
             where TGraphType : IGraphType
         {
+            Preserve<GraphQLClrInputTypeReference<TClrType>>();
+            Preserve<GraphQLClrOutputTypeReference<TClrType>>();
             schema.RegisterTypeMapping(typeof(TClrType), typeof(TGraphType));
+        }
+
+        /// <summary>
+        /// Prevents <typeparamref name="T"/> from being trimmed by the linker.
+        /// </summary>
+        private static void Preserve<T>() => GC.KeepAlive(typeof(T));
+
+        /// <summary>
+        /// Prints the schema to a string using the specified options.
+        /// </summary>
+        public static string Print(this ISchema schema, PrintOptions? options = null)
+        {
+            using var writer = new StringWriter();
+#pragma warning disable CA2012 // Use ValueTasks correctly
+            schema.PrintAsync(writer, options).GetAwaiter().GetResult();
+#pragma warning restore CA2012 // Use ValueTasks correctly
+            return writer.ToString();
+        }
+
+        /// <summary>
+        /// Prints the schema to a specified <see cref="TextWriter"/>.
+        /// </summary>
+        public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, PrintOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var sdl = schema.ToAST();
+            options ??= new();
+            if (!options.IncludeDeprecationReasons)
+            {
+                RemoveDeprecationReasonsVisitor.Visit(sdl);
+            }
+            if (!options.IncludeDescriptions)
+            {
+                RemoveDescriptionsVisitor.Visit(sdl);
+            }
+            if (!options.IncludeFederationTypes)
+            {
+                RemoveFederationTypesVisitor.Visit(sdl);
+            }
+            if (options.StringComparison != null)
+            {
+                SDLSorter.Sort(sdl, new(options.StringComparison.Value));
+            }
+            var printer = new SDLPrinter(options);
+            return printer.PrintAsync(sdl, writer, cancellationToken);
         }
 
         /// <summary>
@@ -99,6 +149,7 @@ namespace GraphQL
         /// <param name="schema">The schema for which the mapping is registered.</param>
         /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
+        [RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are not trimmed by the compiler.")]
         public static void AutoRegister(this ISchema schema, Type clrType, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
             if (mode.HasFlag(AutoRegisteringMode.Output))
@@ -121,7 +172,10 @@ namespace GraphQL
         /// <param name="mode">Which registering mode to use - input only, output only or both.</param>
         public static void AutoRegister<TClrType>(this ISchema schema, AutoRegisteringMode mode = AutoRegisteringMode.Both)
         {
-            schema.AutoRegister(typeof(TClrType), mode);
+            if (mode.HasFlag(AutoRegisteringMode.Output))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringObjectGraphType<TClrType>>();
+            if (mode.HasFlag(AutoRegisteringMode.Input))
+                schema.RegisterTypeMapping<TClrType, AutoRegisteringInputObjectGraphType<TClrType>>();
         }
 
         /// <summary>
@@ -137,8 +191,9 @@ namespace GraphQL
         /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder)"/> as it will precompute
         /// the mappings prior to execution.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this ISchema schema)
-        => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
+            => schema.RegisterTypeMappings(Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,
@@ -153,6 +208,7 @@ namespace GraphQL
         /// <see cref="GraphQLBuilderExtensions.AddClrTypeMappings(DI.IGraphQLBuilder, Assembly)"/> as it will
         /// precompute the mappings prior to execution.
         /// </remarks>
+        [RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are not trimmed by the compiler.")]
         public static void RegisterTypeMappings(this ISchema schema, Assembly assembly)
         {
             if (assembly == null)
@@ -167,7 +223,7 @@ namespace GraphQL
         /// <summary>
         /// Enables some experimental features that are not in the official specification, i.e. ability to expose
         /// user-defined meta-information via introspection. See https://github.com/graphql/graphql-spec/issues/300
-        /// for more information.
+        /// for more information. This method must be called before schema initialization.
         /// <br/><br/>
         /// Keep in mind that the implementation of experimental features can change over time, up to their complete
         /// removal, if the official specification is supplemented with all the missing features.
@@ -184,6 +240,7 @@ namespace GraphQL
 
             schema.Features.AppliedDirectives = true;
             schema.Features.RepeatableDirectives = true;
+            schema.Features.DeprecationOfInputValues = true;
 
             if (mode == ExperimentalIntrospectionFeaturesMode.IntrospectionAndExecution)
                 schema.Filter = new ExperimentalIntrospectionFeaturesSchemaFilter();
@@ -339,6 +396,13 @@ namespace GraphQL
                     provider.ResolvedType = _replacement;
             }
         }
+
+
+        /// <summary>
+        /// Exports the specified schema as a <see cref="GraphQLDocument"/>.
+        /// </summary>
+        public static GraphQLDocument ToAST(this ISchema schema)
+            => new SchemaExporter(schema).Export();
     }
 
     /// <summary>

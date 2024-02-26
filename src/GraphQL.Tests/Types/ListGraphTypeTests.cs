@@ -24,7 +24,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: [1, 2, 3]) }",
-            @"{ ""list"": [ 1, 2, 3] }");
+            """{ "list": [ 1, 2, 3] }""");
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: 1) }",
-            @"{ ""list"": [ 1 ] }");
+            """{ "list": [ 1 ] }""");
     }
 
     [Fact]
@@ -40,7 +40,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ list(ints: []) }",
-            @"{ ""list"": [ ] }");
+            """{ "list": [ ] }""");
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ListGraphTypeTests : QueryTestBase<ListSchema>
     {
         AssertQuerySuccess(
             "{ listOfLists(ints: [1, [1, 2], [1, 2, 3], []]) }",
-            @"{ ""listOfLists"": [ [1], [1, 2], [1, 2, 3], [] ] }");
+            """{ "listOfLists": [ [1], [1, 2], [1, 2, 3], [] ] }""");
     }
 }
 

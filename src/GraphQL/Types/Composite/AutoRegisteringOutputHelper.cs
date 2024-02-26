@@ -24,16 +24,25 @@ internal static class AutoRegisteringOutputHelper
     public static void BuildFieldType(
         MemberInfo memberInfo,
         FieldType fieldType,
-        Func<MemberInfo, LambdaExpression> BuildMemberInstanceExpression,
+        Func<MemberInfo, LambdaExpression>? buildMemberInstanceExpressionFunc,
         Func<Type, Func<FieldType, ParameterInfo, ArgumentInformation>> getTypedArgumentInfoMethod,
-        Action<ParameterInfo, QueryArgument> ApplyArgumentAttributes)
+        Action<ParameterInfo, QueryArgument> applyArgumentAttributesFunc)
     {
+        // Note: If buildMemberInstanceExpressionFunc is null, then it is assumed this is for
+        // an interface graph type and the field resolver will be set to always throw an exception.
+
+        if (fieldType == null)
+            throw new ArgumentNullException(nameof(fieldType));
+
         if (memberInfo is PropertyInfo propertyInfo)
         {
-            var resolver = new MemberResolver(propertyInfo, BuildMemberInstanceExpression(memberInfo));
             fieldType.Arguments = null;
-            fieldType.Resolver = resolver;
-            fieldType.StreamResolver = null;
+            if (buildMemberInstanceExpressionFunc != null)
+            {
+                var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
+                fieldType.Resolver = resolver;
+                fieldType.StreamResolver = null;
+            }
         }
         else if (memberInfo is MethodInfo methodInfo)
         {
@@ -46,7 +55,7 @@ internal static class AutoRegisteringOutputHelper
                 var (queryArgument, expression) = argumentInfo.ConstructQueryArgument();
                 if (queryArgument != null)
                 {
-                    ApplyArgumentAttributes(parameterInfo, queryArgument);
+                    applyArgumentAttributesFunc(parameterInfo, queryArgument);
                     queryArguments.Add(queryArgument);
                 }
                 expression ??= AutoRegisteringHelper.GetParameterExpression(
@@ -54,27 +63,33 @@ internal static class AutoRegisteringOutputHelper
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }
-            var memberInstanceExpression = BuildMemberInstanceExpression(methodInfo);
-            if (IsObservable(methodInfo.ReturnType))
+            if (buildMemberInstanceExpressionFunc != null)
             {
-                var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = resolver;
-            }
-            else
-            {
-                var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
-                fieldType.Resolver = resolver;
-                fieldType.StreamResolver = null;
+                var memberInstanceExpression = buildMemberInstanceExpressionFunc(methodInfo);
+                if (IsObservableOrAsyncEnumerable(methodInfo.ReturnType))
+                {
+                    var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
+                    fieldType.Resolver = resolver;
+                    fieldType.StreamResolver = resolver;
+                }
+                else
+                {
+                    var resolver = new MemberResolver(methodInfo, memberInstanceExpression, expressions);
+                    fieldType.Resolver = resolver;
+                    fieldType.StreamResolver = null;
+                }
             }
             fieldType.Arguments = queryArguments;
         }
         else if (memberInfo is FieldInfo fieldInfo)
         {
-            var resolver = new MemberResolver(fieldInfo, BuildMemberInstanceExpression(memberInfo));
             fieldType.Arguments = null;
-            fieldType.Resolver = resolver;
-            fieldType.StreamResolver = null;
+            if (buildMemberInstanceExpressionFunc != null)
+            {
+                var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
+                fieldType.Resolver = resolver;
+                fieldType.StreamResolver = null;
+            }
         }
         else if (memberInfo == null)
         {
@@ -84,21 +99,28 @@ internal static class AutoRegisteringOutputHelper
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
         }
+        if (buildMemberInstanceExpressionFunc == null)
+        {
+            // interface types do not set resolvers
+            fieldType.Resolver = null;
+            fieldType.StreamResolver = null;
+        }
     }
 
     /// <summary>
     /// Determines if the type is an <see cref="IObservable{T}"/> or task that returns an <see cref="IObservable{T}"/>.
+    /// Also checks for <see cref="IAsyncEnumerable{T}"/> and task that returns an <see cref="IAsyncEnumerable{T}"/>.
     /// </summary>
-    private static bool IsObservable(Type type)
+    private static bool IsObservableOrAsyncEnumerable(Type type)
     {
         if (!type.IsGenericType)
             return false;
 
         var g = type.GetGenericTypeDefinition();
-        if (g == typeof(IObservable<>))
+        if (g == typeof(IObservable<>) || g == typeof(IAsyncEnumerable<>))
             return true;
         if (g == typeof(Task<>) || g == typeof(ValueTask<>))
-            return IsObservable(type.GetGenericArguments()[0]);
+            return IsObservableOrAsyncEnumerable(type.GetGenericArguments()[0]);
         return false;
     }
 
@@ -140,12 +162,21 @@ internal static class AutoRegisteringOutputHelper
                     x.ReturnType != typeof(void) &&                          // exclude methods which do not return a value
                     x.ReturnType != typeof(Task) &&                          // exclude methods which do not return a value
                     x.GetBaseDefinition().DeclaringType != typeof(object) && // exclude methods inherited from object (e.g. GetHashCode)
-                                                                             // exclude methods generated for record types: bool Equals(TSourceType)
-                    !(x.Name == "Equals" && !x.IsStatic && x.GetParameters().Length == 1 && x.GetParameters()[0].ParameterType == typeof(TSourceType) && x.ReturnType == typeof(bool)) &&
-                    x.Name != "<Clone>$");                                   // exclude methods generated for record types
+                    !IsRecordEqualsMethod<TSourceType>(x) &&                 // exclude methods generated for record types: public virtual/override bool Equals(RECORD_TYPE)
+                    x.Name != "<Clone>$");                                   // exclude methods generated for record types: public [new] virtual RECORD_TYPE <Clone>$()
             return properties.Concat<MemberInfo>(methods);
         }
     }
+
+    private static bool IsRecordEqualsMethod<TSourceType>(MethodInfo method) =>
+        method.Name == "Equals"
+        && !method.IsStatic
+        && method.GetParameters().Length == 1
+        && IsTypeSourceOrAncestor(typeof(TSourceType), method.GetParameters()[0].ParameterType)
+        && method.ReturnType == typeof(bool);
+
+    private static bool IsTypeSourceOrAncestor(Type sourceType, Type type) =>
+        sourceType == type || sourceType.BaseType != typeof(object) && sourceType.BaseType is not null && IsTypeSourceOrAncestor(sourceType.BaseType, type);
 
     /// <summary>
     /// Analyzes a method parameter and returns an instance of <see cref="ArgumentInformation"/>

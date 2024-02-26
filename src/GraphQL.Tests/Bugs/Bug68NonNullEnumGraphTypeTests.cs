@@ -97,28 +97,28 @@ public class EnumType<T> : EnumerationGraphType
         var type = typeof(T);
         Name = DeriveGraphQlName(type.Name);
 
-        foreach (var enumName in type.GetEnumNames())
+        foreach (string enumName in type.GetEnumNames())
         {
             var enumMember = type
               .GetMember(enumName, BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly)
               .First();
 
-            var name = DeriveEnumValueName(enumMember.Name);
+            string name = DeriveEnumValueName(enumMember.Name);
 
             Add(name, Enum.Parse(type, enumName));
         }
     }
 
-    public override object ParseValue(object value)
+    public override object? ParseValue(object? value)
     {
         var found = Values.FirstOrDefault(
           v =>
             StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Name), PureValue(value)) ||
-            StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Value.ToString()), PureValue(value)));
+            StringComparer.OrdinalIgnoreCase.Equals(PureValue(v.Value?.ToString()), PureValue(value)));
         return found?.Name;
     }
 
-    public object GetValue(object value)
+    public object? GetValue(object? value)
     {
         var found =
           Values.FirstOrDefault(
@@ -126,9 +126,9 @@ public class EnumType<T> : EnumerationGraphType
         return found?.Value;
     }
 
-    private static string PureValue(object value)
+    private static string? PureValue(object? value)
     {
-        return value.ToString().Replace("\"", "").Replace("'", "").Replace("_", "");
+        return value?.ToString()?.Replace("\"", "").Replace("'", "").Replace("_", "");
     }
 
     private static string DeriveGraphQlName(string name)
@@ -141,7 +141,7 @@ public class EnumType<T> : EnumerationGraphType
     private static string DeriveEnumValueName(string name)
     {
         return Regex
-          .Replace(name, @"([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
+          .Replace(name, "([A-Z])([A-Z][a-z])|([a-z0-9])([A-Z])", "$1$3_$2$4")
           .ToUpperInvariant();
     }
 }

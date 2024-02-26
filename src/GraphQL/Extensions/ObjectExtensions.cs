@@ -23,24 +23,24 @@ namespace GraphQL
             where T : class
             => (T)ToObject(source, typeof(T));
 
-        private static readonly List<object> _emptyValues = new();
+        private static readonly List<object?> _emptyValues = new();
 
         /// <summary>
         /// Creates a new instance of the indicated type, populating it with the dictionary.
         /// Can use any constructor of the indicated type, provided that there are keys in the
-        /// dictionary that correspond (case sensitive) to the names of the constructor parameters.
+        /// dictionary that correspond (case insensitive) to the names of the constructor parameters.
         /// </summary>
         /// <param name="source">The source of values.</param>
         /// <param name="type">The type to create.</param>
         /// <param name="mappedType">
         /// GraphType for matching dictionary keys with <paramref name="type"/> property names.
         /// GraphType contains information about this matching in Metadata property.
-        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         public static object ToObject(this IDictionary<string, object?> source, Type type, IGraphType? mappedType = null)
         {
-            // Given Field(x => x.FName).Name("FirstName") and key == "FirstName" returns "FName"
+            // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
             string GetPropertyName(string key, out FieldType? field)
             {
                 var complexType = mappedType?.GetNamedType() as IComplexGraphType;
@@ -51,14 +51,14 @@ namespace GraphQL
             }
 
             // Returns values (from source or defaults) that match constructor signature + used keys from source
-            (List<object>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
+            (List<object?>?, List<string>?) GetValuesAndUsedKeys(ParameterInfo[] parameters)
             {
                 // parameterless constructors are the most common use case
                 if (parameters.Length == 0)
                     return (_emptyValues, null);
 
                 // otherwise we have to iterate over the parameters - worse performance but this is rather rare case
-                List<object>? values = null;
+                List<object?>? values = null;
                 List<string>? keys = null;
 
                 if (parameters.All(p =>
@@ -109,7 +109,7 @@ namespace GraphQL
 
             ConstructorInfo? targetCtor = null;
             ParameterInfo[]? ctorParameters = null;
-            List<object>? values = null;
+            List<object?>? values = null;
             List<string>? usedKeys = null;
 
             foreach (var ctor in ctorCandidates)
@@ -201,7 +201,7 @@ namespace GraphQL
         /// <param name="mappedType">
         /// GraphType for matching dictionary keys with <paramref name="fieldType"/> property names.
         /// GraphType contains information about this matching in Metadata property.
-        /// In case of configuring field as Field(x => x.FName).Name("FirstName") source dictionary
+        /// In case of configuring field as Field("FirstName", x => x.FName) source dictionary
         /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
         /// </param>
         /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>

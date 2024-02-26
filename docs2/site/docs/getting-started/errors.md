@@ -109,7 +109,7 @@ of type `IntGraphType`, and
 system cannot perform the conversion.
 
 Processing errors can be thrown back to the caller of `DocumentExecuter.ExecuteAsync` by setting the
-`ExecutionOptions.ThrowOnUnhandledExceptions` property to `true`. When this property is set to `false`,
+`ExecutionOptions.ThrowOnUnhandledException` property to `true`. When this property is set to `false`,
 the default setting, unhandled exceptions are wrapped in an `UnhandledError` and added with a generic
 error message to the `ExecutionResult.Errors` property. Error codes are dynamically generated from the
 inner exceptions of the wrapped exception and also returned along with data contained within the inner
@@ -119,7 +119,7 @@ You can also handle these processing exceptions by setting a delegate within the
 `ExecutionOptions.UnhandledExceptionDelegate` property. Within the delegate you can log the error message
 and stack trace for debugging needs. You can also override the generic error message with a more specific
 message, wrap or replace the exception with your own `ExecutionError` class, and/or set the codes and data
-as necessary. Note that if `ThrowOnUnhandledExceptions` is `true`, the `UnhandledExceptionDelegate` will not be called.
+as necessary. Note that if `ThrowOnUnhandledException` is `true`, the `UnhandledExceptionDelegate` will not be called.
 
 Here is a sample of a typical unhandled exception delegate which logs the error to a database.
 It also returns the log id along with the error message:
@@ -163,6 +163,41 @@ options.UnhandledExecutionDelegate = ctx =>
 };
 ```
 
+When using the `IGraphQLBuilder` to configure your execution, you can use the `AddUnhandledExceptionHandler`
+method to register a delegate to handle unhandled exceptions, as shown in the example below:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema()
+    .AddUnhandledExceptionHandler(async (context, options) =>
+    {
+        try
+        {
+            // create dedicated scope to be sure database changes in the parent scope
+            // are not committed to the database
+            await using var scope = options.RequestServices!.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<MyDatabaseContext>();
+            var errorLog = new ErrorLog {
+                // when APQ is in use, pull the query from the document if necessary
+                Query = options.Query ?? options.Document?.Source.ToString(),
+                DateStamp = DateTime.UtcNow,
+                Message = context.Exception.Message,
+                Details = context.Exception.ToString()
+            };
+            db.ErrorLogs.Add(errorLog);
+            await db.SaveChangesAsync();
+            context.Exception.Data["errorLogId"] = errorLog.Id;
+        }
+        catch
+        {
+        }
+    })
+);
+```
+
+Please note that the unhandled exception handler is not called when the request's cancellation
+token is triggered, for instance when the client disconnects before execution is complete.
+
 ## Error Serialization
 
 After the `DocumentExecuter` has returned a `ExecutionResult` containing the data and/or errors,
@@ -171,7 +206,7 @@ object tree into json. The `IGraphQLSerializer` implementations provided by the 
 and `GraphQL.NewtonsoftJson` packages allow you to configure error serialization by providing an
 `IErrorInfoProvider` implementation. If you are using a dependency injection framework, you can register
 the `IErrorInfoProvider` instance and it will be consumed by the `IGraphQLSerializer` implementation
-automatically. Please review the [serialization](../guides/serialization) documentation for more details.
+automatically. Please review the [serialization](../../guides/serialization) documentation for more details.
 
 ## <a name="ValidationErrors"></a>Validation error reference list
 

@@ -1,10 +1,11 @@
-const GraphQLJson = require('graphql-type-json')
+import GraphQLJSON from 'graphql-type-json'
 
-module.exports = ({ type }) => {
+export default ({ type }) => {
+  console.log(type)
   if (type.name !== 'DocsMenu') {
     return
   }
   return {
-    pages: { type: GraphQLJson }
+    pages: { type: GraphQLJSON }
   }
 }

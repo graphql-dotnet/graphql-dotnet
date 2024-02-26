@@ -84,6 +84,7 @@ namespace GraphQL
                 throw new InvalidOperationException("Cannot execute request if no schema is specified");
             if (options.Query == null && options.Document == null)
                 return new ExecutionResult { Errors = new ExecutionErrors { new QueryMissingError() } };
+            options.CancellationToken.ThrowIfCancellationRequested();
 
             var metrics = (options.EnableMetrics ? new Metrics() : Metrics.None).Start(options.OperationName);
 
@@ -113,11 +114,8 @@ namespace GraphQL
                     throw new NoOperationError();
                 }
 
-                var operation = GetOperation(options.OperationName, document);
-                if (operation == null)
-                {
-                    throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
-                }
+                var operation = GetOperation(options.OperationName, document)
+                    ?? throw new InvalidOperationError($"Query does not contain operation '{options.OperationName}'.");
                 metrics.SetOperationName(operation.Name);
 
                 IValidationResult validationResult;

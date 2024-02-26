@@ -16,21 +16,11 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void should_throw_error_if_name_is_null_or_empty(string fieldName)
+    public void should_throw_error_if_name_is_null_or_empty(string? fieldName)
     {
         var type = new ObjectGraphType();
         ArgumentOutOfRangeException exception;
-        // race condition with does_not_throw_with_filtering_nameconverter test
-        try
-        {
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
-        }
-        catch (ShouldAssertException)
-        {
-            System.Threading.Thread.Sleep(100); // wait a bit and retry
-            exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>().Name(fieldName));
-        }
-
+        exception = Should.Throw<ArgumentOutOfRangeException>(() => type.Connection<ObjectGraphType>(fieldName!));
         exception.Message.ShouldStartWith("A field name can not be null or empty.");
     }
 
@@ -61,57 +51,76 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     [Fact]
     public void should_resolve_in_query()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection1 {
-                    totalCount
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  }
-                }}",
-            @"{ ""parent"": {
-                ""connection1"": {
-                  ""totalCount"": 3,
-                  ""edges"": [
-                    { ""cursor"": ""1"", ""node"": { ""field1"": ""one"", ""field2"": 1 } },
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""two"", ""field2"": 2 } },
-                    { ""cursor"": ""3"", ""node"": { ""field1"": ""three"", ""field2"": 3 } }
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection1 {
+                  totalCount
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection1": {
+                  "totalCount": 3,
+                  "edges": [
+                    { "cursor": "1", "node": { "field1": "one", "field2": 1 } },
+                    { "cursor": "2", "node": { "field1": "two", "field2": 2 } },
+                    { "cursor": "3", "node": { "field1": "three", "field2": 3 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""one"", ""field2"": 1 },
-                    { ""field1"": ""two"", ""field2"": 2 },
-                    { ""field1"": ""three"", ""field2"": 3 }
+                  "items": [
+                    { "field1": "one", "field2": 1 },
+                    { "field1": "two", "field2": 2 },
+                    { "field1": "three", "field2": 3 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]
     public void should_yield_pagination_information()
     {
-        AssertQuerySuccess(
-            @"{ parent {
-                  connection2(first: 1, after: ""1"") {
-                    totalCount
-                    pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
-                    edges { cursor node { field1 field2 } }
-                    items { field1 field2 }
-                  } }}",
-            @"{ ""parent"": {
-                ""connection2"": {
-                  ""totalCount"": 3,
-                  ""pageInfo"": {
-                    ""hasNextPage"": true,
-                    ""hasPreviousPage"": true,
-                    ""startCursor"": ""2"",
-                    ""endCursor"": ""2""
+        AssertQuerySuccess("""
+            {
+              parent {
+                connection2(first: 1, after: "1") {
+                  totalCount
+                  pageInfo { hasNextPage hasPreviousPage startCursor endCursor }
+                  edges { cursor node { field1 field2 } }
+                  items { field1 field2 }
+                }
+              }
+            }
+            """,
+            """
+            {
+              "parent": {
+                "connection2": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": true,
+                    "hasPreviousPage": true,
+                    "startCursor": "2",
+                    "endCursor": "2"
                   },
-                  ""edges"": [
-                    { ""cursor"": ""2"", ""node"": { ""field1"": ""TWO"", ""field2"": 22 } }
+                  "edges": [
+                    { "cursor": "2", "node": { "field1": "TWO", "field2": 22 } }
                   ],
-                  ""items"": [
-                    { ""field1"": ""TWO"", ""field2"": 22 }
+                  "items": [
+                    { "field1": "TWO", "field2": 22 }
                   ]
-                } } }");
+                }
+              }
+            }
+            """
+        );
     }
 
     [Fact]
@@ -119,9 +128,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     {
         var type = new ObjectGraphType();
 
-        type.Connection<ObjectGraphType>()
-            .Name("testConnection")
-            .Resolve(resArgs =>
+        type.Connection<ObjectGraphType>("testConnection")
+            .Resolve(_ =>
                 new Connection<Child>
                 {
                     TotalCount = 1,
@@ -149,21 +157,21 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var result = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false) as Connection<Child>;
+        var result = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext()) as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
         }
     }
 
@@ -193,30 +201,29 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 },
             },
         };
-        type.Connection<ObjectGraphType>()
-            .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+        type.Connection<ObjectGraphType>("testConnection")
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ObjectGraphType, EdgeType<ObjectGraphType>>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as Connection<Child>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
         }
     }
 
@@ -247,30 +254,29 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 },
             },
         };
-        type.Connection<ChildType, ParentChildrenEdgeType>()
-            .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+        type.Connection<ChildType, ParentChildrenEdgeType>("testConnection")
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ConnectionType<ChildType, ParentChildrenEdgeType>));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as Connection<Child, ParentChildrenEdge>;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(1);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(1);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(1);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
         }
     }
@@ -324,30 +330,29 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
             },
             ConnectionField1 = ConnectionField1Value
         };
-        type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>()
-            .Name("testConnection")
-            .ResolveAsync(resArgs => Task.FromResult<object>(connection));
+        type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>("testConnection")
+            .ResolveAsync(_ => Task.FromResult<object?>(connection));
 
         var field = type.Fields.Single();
         field.Name.ShouldBe("testConnection");
         field.Type.ShouldBe(typeof(ParentChildrenConnectionType));
 
-        var boxedResult = await field.Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false);
+        object? boxedResult = await field.Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext());
         var result = boxedResult as ParentChildrenConnection;
 
         result.ShouldNotBeNull();
         if (result != null)
         {
             result.TotalCount.ShouldBe(1);
-            result.PageInfo.HasNextPage.ShouldBe(true);
+            result.PageInfo.ShouldNotBeNull().HasNextPage.ShouldBe(true);
             result.PageInfo.HasPreviousPage.ShouldBe(false);
             result.PageInfo.StartCursor.ShouldBe("01");
             result.PageInfo.EndCursor.ShouldBe("01");
-            result.Edges.Count.ShouldBe(3);
-            result.Edges.First().Cursor.ShouldBe("01");
-            result.Edges.First().Node.Field1.ShouldBe("abcd");
-            result.Items.Count.ShouldBe(3);
-            result.Items.First().Field1.ShouldBe("abcd");
+            result.Edges.ShouldNotBeNull().Count.ShouldBe(3);
+            result.Edges[0].Cursor.ShouldBe("01");
+            result.Edges[0].Node.ShouldNotBeNull().Field1.ShouldBe("abcd");
+            result.Items.ShouldNotBeNull().Count.ShouldBe(3);
+            result.Items[0].ShouldNotBeNull().Field1.ShouldBe("abcd");
             result.Edges.ShouldAllBe(c => c.FriendedAt == FriendedAt);
             result.HighestField2.ShouldBe(10);
             result.ConnectionField1.ShouldBe(ConnectionField1Value);
@@ -358,56 +363,53 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
     public void unidirectional_creates_proper_arguments()
     {
         var graph = new ParentType();
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "after").ShouldBe(1);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "first").ShouldBe(1);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "before").ShouldBe(0);
-        graph.Fields.Find("connection1").Arguments.Count(x => x.Name == "last").ShouldBe(0);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "after").ShouldBe(1);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "first").ShouldBe(1);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "before").ShouldBe(0);
+        graph.Fields.Find("connection1")!.Arguments!.Count(x => x.Name == "last").ShouldBe(0);
     }
 
     [Fact]
     public void bidirectional_creates_proper_arguments()
     {
         var graph = new ParentType();
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "after").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "first").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "before").ShouldBe(1);
-        graph.Fields.Find("connection2").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "after").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "first").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "before").ShouldBe(1);
+        graph.Fields.Find("connection2")!.Arguments!.Count(x => x.Name == "last").ShouldBe(1);
     }
 
     [Fact]
     public void bidirectional_called_twice_creates_proper_arguments()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .Description("RandomDescription")
             .Bidirectional()
             .Bidirectional();
 
-        graph.Fields.Find("connection").Arguments.Count(x => x.Name == "before").ShouldBe(1);
-        graph.Fields.Find("connection").Arguments.Count(x => x.Name == "last").ShouldBe(1);
+        graph.Fields.Find("connection")!.Arguments!.Count(x => x.Name == "before").ShouldBe(1);
+        graph.Fields.Find("connection")!.Arguments!.Count(x => x.Name == "last").ShouldBe(1);
     }
 
     [Fact]
     public async Task should_use_pagesize()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .PageSize(10)
             .Resolve(context => context.First);
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
+        (await graph.Fields.Find("connection").ShouldNotBeNull().Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
     }
 
     [Fact]
     public async Task should_use_pagesize_async()
     {
         var graph = new ObjectGraphType();
-        graph.Connection<ChildType>()
-            .Name("connection")
+        graph.Connection<ChildType>("connection")
             .PageSize(10)
-            .ResolveAsync(context => Task.FromResult<object>(context.First));
-        (await graph.Fields.Find("connection").Resolver.ResolveAsync(new ResolveFieldContext()).ConfigureAwait(false)).ShouldBe(10);
+            .ResolveAsync(context => Task.FromResult<object?>(context.First));
+        (await graph.Fields.Find("connection").ShouldNotBeNull().Resolver.ShouldNotBeNull().ResolveAsync(new ResolveFieldContext())).ShouldBe(10);
     }
 
     public class ParentChildrenConnection : Connection<Child, ParentChildrenEdge>
@@ -452,13 +454,11 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
         {
             Name = "Parent";
 
-            Connection<ChildType>()
-                .Name("connection1")
+            Connection<ChildType>("connection1")
                 .DeprecationReason("Deprecated")
                 .Resolve(context => context.Source.Connection1);
 
-            Connection<ChildType>()
-                .Name("connection2")
+            Connection<ChildType>("connection2")
                 .Description("RandomDescription")
                 .Bidirectional()
                 .Resolve(context => context.Source.Connection2);

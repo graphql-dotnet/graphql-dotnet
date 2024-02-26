@@ -7,70 +7,75 @@ public class InputsTests : QueryTestBase<EnumMutationSchema>
     [Fact]
     public void mutation_input()
     {
-        AssertQuerySuccess(
-            @"
-                 mutation createUser {
-                  createUser(userInput:{
-                    profileImage:""myimage.png"",
-                    gender: Female
-                  }){
-                    id
-                    gender
-                    profileImage
-                  }
-                }
-                ",
-            @"{
-                  ""createUser"": {
-                    ""id"": 1,
-                    ""gender"": ""Female"",
-                    ""profileImage"": ""myimage.png""
-                  }
-                }");
+        AssertQuerySuccess("""
+            mutation createUser {
+              createUser(userInput: {
+                profileImage:"myimage.png",
+                gender: Female
+              }){
+                id
+                gender
+                profileImage
+              }
+            }
+            """,
+            """
+            {
+              "createUser": {
+                "id": 1,
+                "gender": "Female",
+                "profileImage": "myimage.png"
+              }
+            }
+            """);
     }
 
     [Fact]
     public void mutation_input_from_variables()
     {
-        var inputs = @"{ ""userInput"": { ""profileImage"": ""myimage.png"", ""gender"": ""Female"" } }".ToInputs();
+        var inputs = """{ "userInput": { "profileImage": "myimage.png", "gender": "Female" } }""".ToInputs();
 
-        AssertQuerySuccess(
-            @"
-                mutation createUser($userInput: UserInput!) {
-                  createUser(userInput: $userInput){
-                    id
-                    gender
-                    profileImage
-                  }
-                }
-                ",
-            @"{
-                  ""createUser"": {
-                    ""id"": 1,
-                    ""gender"": ""Female"",
-                    ""profileImage"": ""myimage.png""
-                   }
-                }", inputs);
+        AssertQuerySuccess("""
+            mutation createUser($userInput: UserInput!) {
+              createUser(userInput: $userInput) {
+                id
+                gender
+                profileImage
+              }
+            }
+            """,
+            """
+            {
+              "createUser": {
+                "id": 1,
+                "gender": "Female",
+                "profileImage": "myimage.png"
+              }
+            }
+            """,
+            inputs);
     }
 
     [Fact]
     public void query_can_get_enum_argument()
     {
         AssertQuerySuccess(
-            @"{ user { id, gender, printGender(g: Male) }}",
-            @"{
-                  ""user"": {
-                    ""id"": 1,
-                    ""gender"": ""Male"",
-                    ""printGender"": ""gender: Male""
-                  }
-                }");
+            "{ user { id, gender, printGender(g: Male) }}",
+            """
+            {
+              "user": {
+                "id": 1,
+                "gender": "Male",
+                "printGender": "gender: Male"
+                }
+            }
+            """);
     }
 
     [Fact]
     public void query_can_get_long_variable()
     {
-        var inputs = @"{ ""userId"": 1000000000000000001 }".ToInputs();
+        var inputs = """{ "userId": 1000000000000000001 }""".ToInputs();
 
         AssertQuerySuccess(
             "query aQuery($userId: Long!) { getLongUser(userId: $userId) { idLong }}",
@@ -80,33 +85,39 @@ public class InputsTests : QueryTestBase<EnumMutationSchema>
                 "idLong": 1000000000000000001
                 }
             }
-            """, inputs);
+            """,
+            inputs);
     }
 
     [Fact]
     public void query_can_get_long_inline()
     {
         AssertQuerySuccess(
-            @"query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
-            @"{
-                  ""getLongUser"": {
-                    ""idLong"": 1000000000000000001
-                  }
-                }");
+            "query aQuery { getLongUser(userId: 1000000000000000001) { idLong }}",
+            """
+            {
+              "getLongUser": {
+                "idLong": 1000000000000000001
+              }
+            }
+            """);
     }
 
     [Fact]
     public void query_can_get_int_variable()
     {
-        var inputs = @"{ ""userId"": 3 }".ToInputs();
+        var inputs = """{ "userId": 3 }""".ToInputs();
 
         AssertQuerySuccess(
-            @"query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
-            @"{
-                  ""getIntUser"": {
-                    ""id"": 3
-                  }
-                }", inputs);
+            "query aQuery($userId: Int!) { getIntUser(userId: $userId) { id }}",
+            """
+            {
+              "getIntUser": {
+                "id": 3
+              }
+            }
+            """,
+            inputs);
     }
 }
 
@@ -135,7 +146,7 @@ public class UserQuery : ObjectGraphType
             .Argument<NonNullGraphType<IntGraphType>>("userId", "user id")
             .Resolve(context =>
             {
-                var id = context.GetArgument<int>("userId");
+                int id = context.GetArgument<int>("userId");
                 return new User
                 {
                     Id = id
@@ -148,7 +159,7 @@ public class UserQuery : ObjectGraphType
             .Argument<NonNullGraphType<LongGraphType>>("userId", "user id")
             .Resolve(context =>
             {
-                var id = context.GetArgument<long>("userId");
+                long id = context.GetArgument<long>("userId");
                 return new User
                 {
                     IdLong = id

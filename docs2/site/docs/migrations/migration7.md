@@ -106,7 +106,7 @@ This property is similar in nature to the ASP.NET Core `HttpContext.User` proper
 used by the GraphQL.NET engine internally but merely being a convenience property similar to
 `RequestServices` and `UserContext` for use by separate authentication packages.
 
-### 9. `Field<TReturnType>` and `Argument<TArgumentClrType> overloads to create field and argument builders with inferred graph types
+### 9. `Field<TReturnType>` and `Argument<TArgumentClrType>` overloads to create field and argument builders with inferred graph types
 
 To define a field with a field builder, previously the graph type was always required, like this:
 
@@ -240,6 +240,55 @@ exception details were located along with exception message. To use old behavior
 `ExposeExceptionStackTrace` property to `true`. To better reflect the meaning of these changes
 we have added a new `ErrorInfoProviderOptions.ExposeExceptionDetails` property and marked
 `ErrorInfoProviderOptions.ExposeExceptionStackTrace` property as obsolete.
+
+### 12. Allow deprecation of input values
+
+Since 7.4 you can also deprecate arguments on a field and input fields on an input type. It
+was done to conform the draft GraphQL spec. See https://github.com/graphql-dotnet/graphql-dotnet/pull/3571.
+
+Since this feature may be potentially breaking for your app, clients or tooling it was done as opt-in.
+Either set `schema.Features.DeprecationOfInputValues = true;` or call `schema.EnableExperimentalIntrospectionFeatures()`
+method before initializing a schema.
+
+### 13. Add `SchemaExporter` to export schema to SDL with new `schema.ToAST()` and `schema.Print()` methods
+
+Since 7.6 you can use `schema.ToAST()` to export a schema to a `GraphQLDocument` instance
+containing a SDL representation of the schema. You can also use `schema.Print()` and
+`schema.PrintAsync()` to print a schema to a string or `TextWriter`. These methods use the
+new `SchemaExporter` class along with the GraphQLParser library's `SDLPrinter` class to
+write the SDL representation of the schema. Some of the prior options for printing a schema
+via `SchemaPrinter` are still available, but the default values have changed as follows:
+
+| Option | Old Default Value | New Default Value |
+|-|-|-|
+| IncludeDescriptions | `false` | `true` |
+| IncludeDeprecationReasons | `false` | `true` |
+| IncludeFederationTypes | n/a | `true` |
+| OldImplementsSyntax | `false` | n/a |
+| PrintDescriptionsAsComments | `false` | n/a |
+
+In addition, the `Comparer` property has been removed and replaced with the `StringComparison`
+property to sort the schema. This is performed by the GraphQLParser library's `SDLSorter` class.
+Any custom sorting logic can be implemented by creating a custom AST vistior.
+
+The new defaults will ensure a more accurate SDL representation of the schema, but may
+not be desired when using the schema printer to check for breaking schema changes. For those
+purposes, you may wish to set `IncludeDescriptions` and `IncludeDeprecationReasons` to `false`,
+and set the `StringComparison` property to sort the SDL.
+
+With the removal of the `OldImplementsSyntax` and `PrintDescriptionsAsComments` properties, the
+new SDL printer is only compatible with the GraphQL June 2018 or newer specification.
+
+Finally, federated schema subgraphs can be printed in Federation v1 format by setting the
+`IncludeFederationTypes` to `false` (defaults to `true`). This removes federation-specific
+types and fields from the printed SDL and is compatible with Apollo Federation v1 or v2
+schemas. Note that Apollo Federation v2 does not require these types to be removed from the SDL.
+This replaces the need for the `FederatedSchemaPrinter` class.
+
+Please note that the `SchemaExporter` class will export type defintions as type extensions
+(e.g. `extend type MyType { ... }`) only when it was read as such by the `SchemaBuilder`.
+
+Please see the `SchemaExtensions.PrintAsync` source code implementation specifics.
 
 ## Breaking Changes
 
@@ -453,10 +502,10 @@ Field<NonNullGraphType<StringGraphType>>("name")
 
 
 // GraphQL 5.x
-FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+FieldAsync<CharacterInterface>("hero", resolve: async context => await data.GetDroidByIdAsync("3"));
 
 // GraphQL 7.x
-Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3").ConfigureAwait(false));
+Field<CharacterInterface>("hero").ResolveAsync(async context => await data.GetDroidByIdAsync("3"));
 
 
 
@@ -466,13 +515,13 @@ FieldAsync<HumanType>(
   arguments: new QueryArguments(
       new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "id", Description = "id of the human" }
   ),
-  resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false)
+  resolve: async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"))
 );
 
 // GraphQL 7.x
 Field<HumanType>("human")
   .Argument<NonNullGraphType<StringGraphType>>("id", "id of the human")
-  .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id")).ConfigureAwait(false));
+  .ResolveAsync(async context => await data.GetHumanByIdAsync(context.GetArgument<string>("id"));
 
 
 
@@ -567,7 +616,7 @@ will now throw an exception if a graph type is used as a data model:
 - `AutoRegisteringObjectGraphType<TSourceType>`
 - `AutoRegisteringInputObjectGraphType<TSourceType>`
 - `AutoRegisteringInterfaceGraphType<TSourceType>`
-- 
+
 If it is necessary to do so, you can derive from the `ObjectGraphType` or `InputObjectGraphType` classes
 instead of the generic version.
 
@@ -578,3 +627,23 @@ This prevents the situation where some graph types are not initialized and throw
 If this is causing a problem (perhaps with graph types that are dynamically generated, for instance),
 create and pull from a dictionary of instantiated types, or use `GraphQLTypeReference` to reference
 the graph type by name.
+
+### 16. Values returned from interface fields must resolve to an GraphQL object type
+
+In certain situations, validation of values returned from fields returning interface types did not
+require them to resolve to GraphQL Object types. GraphQL.NET 7.2+ now enforces this validation in all cases.
+
+### 17. `AutoRegisteringInterfaceGraphType` does not generate resolvers
+
+Due to the above validation, resolvers defined on fields of interface types are never be used by
+GraphQL.NET. As such, resolvers are not generated for fields of `AutoRegisteringInterfaceGraphType`s
+in version 7.2+.
+
+### 18. `SchemaValidationVisitor` has more runtime checks
+
+Starting with version 7.4, the `StreamResolver` property should be set exclusively for root fields
+in subscriptions, while the `Resolver` property should only be assigned to object output types'
+fields. Fields within interface types and input object types should not set these
+properties. This modification may lead to potential disruptions in your applications, as the
+schema may trigger an exception during initialization. To eliminate this exception, simply
+cease assigning these properties for the fields specified in the exception message.

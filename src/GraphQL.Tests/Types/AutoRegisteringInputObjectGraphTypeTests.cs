@@ -1,5 +1,3 @@
-#nullable enable
-
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
@@ -304,7 +302,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
 
         // also verify the data is injected into the class properly
         var dic = new Dictionary<string, object?>() { { nameof(FieldTests.FieldWithInitSetter), "hello" } };
-        var obj = graphType.ParseDictionary(dic);
+        object obj = graphType.ParseDictionary(dic);
         var fieldTests = obj.ShouldBeOfType<FieldTests>();
         fieldTests.FieldWithInitSetter.ShouldBe("hello");
     }

@@ -23,10 +23,10 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [Fact]
     public async Task Ordinary_Request_Should_Work()
     {
-        var result = await _fixture.ExecuteAsync(opt => opt.Query = "query { ping }").ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Query = "query { ping }");
 
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
     }
 
     private void AssertError(ExecutionResult result, string code, string message)
@@ -40,7 +40,7 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [Fact]
     public async Task Without_Query_And_Hash_Should_Throw_Error()
     {
-        var result = await _fixture.ExecuteAsync().ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync();
         AssertError(result, "QUERY_MISSING", "GraphQL query is missing.");
     }
 
@@ -49,18 +49,20 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("2")]
     public async Task Wrong_Version_Should_Be_Detected(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "1",
                 ["version"] = version
             }
         });
 
-        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
-        AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "Automatic persisted queries protocol of version '2' is not supported.");
+        AssertError(result, "PERSISTED_QUERY_UNSUPPORTED_VERSION", "PersistedQueryNotSupported");
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType<PersistedQueryUnsupportedVersionError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object?>("reason", "Automatic persisted queries protocol version '2' is not supported."));
     }
 
     [Theory]
@@ -68,18 +70,20 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Not_Saved_Query_Should_Return_Not_Found_Code(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "1",
                 ["version"] = version
             }
         });
 
-        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        var result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
 
-        AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "Persisted query with '1' hash was not found.");
+        AssertError(result, "PERSISTED_QUERY_NOT_FOUND", "PersistedQueryNotFound");
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType<PersistedQueryNotFoundError>()
+            .Extensions.ShouldHaveSingleItem().ShouldBe(new KeyValuePair<string, object?>("reason", "Persisted query with hash '1' was not found."));
     }
 
     [Theory]
@@ -87,9 +91,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Bad_Hash_Should_Be_Detected(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "badHash",
                 ["version"] = version
@@ -99,9 +103,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             opt.Query = "query { ping }";
             opt.Extensions = extentions;
-        }).ConfigureAwait(false);
+        });
 
-        AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The 'badHash' hash doesn't correspond to a query.");
+        AssertError(result, "PERSISTED_QUERY_BAD_HASH", "The hash 'badHash' doesn't correspond to the provided query.");
     }
 
     [Theory]
@@ -109,9 +113,9 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
     [InlineData("1")]
     public async Task Persisted_Query_Should_Work(object version)
     {
-        var extentions = new Inputs(new Dictionary<string, object>
+        var extentions = new Inputs(new Dictionary<string, object?>
         {
-            ["persistedQuery"] = new Dictionary<string, object>
+            ["persistedQuery"] = new Dictionary<string, object?>
             {
                 ["sha256Hash"] = "d7b0dfafc61a1f0618f4f346911d5aa87bef97b134f2943383223bdac4410134",
                 ["version"] = version
@@ -122,13 +126,13 @@ public class AutomaticPersistedQueriesTests : IClassFixture<AutomaticPersistedQu
         {
             opt.Query = "query { ping }";
             opt.Extensions = extentions;
-        }).ConfigureAwait(false);
+        });
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
 
-        result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions).ConfigureAwait(false);
+        result = await _fixture.ExecuteAsync(opt => opt.Extensions = extentions);
         result.Errors.ShouldBeNull();
-        _fixture.Serialize(result).ShouldBe(@"{""data"":{""ping"":""pong""}}");
+        _fixture.Serialize(result).ShouldBe("""{"data":{"ping":"pong"}}""");
     }
 }
 
@@ -167,7 +171,7 @@ public class AutomaticPersistedQueriesFixture : IDisposable
         _serializer = Provider.GetRequiredService<IGraphQLTextSerializer>();
     }
 
-    public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions> configure = null)
+    public Task<ExecutionResult> ExecuteAsync(Action<ExecutionOptions>? configure = null)
     {
         var options = new ExecutionOptions
         {

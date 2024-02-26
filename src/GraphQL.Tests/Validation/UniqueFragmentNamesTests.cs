@@ -8,30 +8,30 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
     [Fact]
     public void no_fragments()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           field
         }
-      ");
+        """);
     }
 
     [Fact]
     public void one_fragment()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           ...fragA
         }
         fragment fragA on Type {
           field
         }
-      ");
+        """);
     }
 
     [Fact]
     public void many_fragments()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           ...fragA
           ...fragB
@@ -46,13 +46,13 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
         fragment fragC on Type {
           fieldC
         }
-      ");
+        """);
     }
 
     [Fact]
     public void inline_fragments_are_always_unique()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         {
           ...on Type {
             fieldA
@@ -61,20 +61,20 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
             fieldB
           }
         }
-      ");
+        """);
     }
 
     [Fact]
     public void fragment_and_operation_named_the_same()
     {
-        ShouldPassRule(@"
+        ShouldPassRule("""
         query Foo {
           ...Foo
         }
         fragment Foo on Type {
           field
         }
-      ");
+        """);
     }
 
     [Fact]
@@ -82,19 +82,19 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          {
-            ...fragA
-          }
-          fragment fragA on Type {
-            fieldA
-          }
-          fragment fragA on Type {
-            fieldB
-          }
-        ";
+            _.Query = """
+            {
+              ...fragA
+            }
+            fragment fragA on Type {
+              fieldA
+            }
+            fragment fragA on Type {
+              fieldB
+            }
+            """;
             // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-            duplicateFrag(_, "fragA", 5, 11, 8, 11);
+            duplicateFrag(_, "fragA", 4, 1, 7, 1);
         });
     }
 
@@ -103,16 +103,16 @@ public class UniqueFragmentNamesTests : ValidationTestBase<UniqueFragmentNames, 
     {
         ShouldFailRule(_ =>
         {
-            _.Query = @"
-          fragment fragA on Type {
-            fieldA
-          }
-          fragment fragA on Type {
-            fieldB
-          }
-        ";
+            _.Query = """
+            fragment fragA on Type {
+              fieldA
+            }
+            fragment fragA on Type {
+              fieldB
+            }
+            """;
             // Note: this is failing on "fragment"; graphql-js fails on the fragment name.
-            duplicateFrag(_, "fragA", 2, 11, 5, 11);
+            duplicateFrag(_, "fragA", 1, 1, 4, 1);
         });
     }
 

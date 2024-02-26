@@ -214,7 +214,7 @@ public class UserType : ObjectGraphType<User>
                 // Asynchronously authenticate
                 var valid = await users.CanViewOrders(context.Source.UserId);
                 if (!valid) return null;
-                
+
                 // Get or add a collection batch loader with the key "GetOrdersByUserId"
                 // The loader will call GetOrdersByUserIdAsync with a batch of keys
                 var ordersLoader = accessor.Context.GetOrAddCollectionBatchLoader<int, Order>("GetOrdersByUserId",
@@ -332,7 +332,7 @@ public class MyOrderItemsDataLoader : DataLoaderBase<int, IEnumerable<OrderItem>
         _dbContext = dataContext;
     }
 
-    protected override Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<OrderItem>>> list, CancellationToken cancellationToken)
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<OrderItem>>> list, CancellationToken cancellationToken)
     {
         IEnumerable<int> ids = list.Select(pair => pair.Key);
         IEnumerable<OrderItem> data = await _dbContext.OrderItems.Where(orderItem => ids.Contains(orderItem.OrderId)).ToListAsync(cancellationToken);
@@ -359,8 +359,7 @@ public class MyQuery : ObjectGraphType
 {
     public MyQuery()
     {
-        Field<OrderType, Order>()
-            .Name("Order")
+        Field<OrderType, Order>("Order")
             .Argument<IdGraphType>("id")
             .ResolveAsync(context =>
             {
@@ -382,8 +381,7 @@ public class OrderType : ObjectGraphType<Order>
     {
         Field(x => x.Id, type: typeof(IdGraphType));
         Field(x => x.ShipToName);
-        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>()
-            .Name("Items")
+        Field<ListGraphType<OrderItemType>, IEnumerable<OrderItem>>("Items")
             .ResolveAsync(context =>
             {
                 var loader = context.RequestServices.GetRequiredService<MyOrderItemsDataLoader>();
@@ -395,6 +393,31 @@ public class OrderType : ObjectGraphType<Order>
 
 You do not need to use `IDataLoaderContextAccessor` or `DataLoaderDocumentListener` and may remove those references
 from your code.
+
+You may also use the resolver builder feature of the `GraphQL.MicrosoftDI` package,
+as shown in the below example:
+
+```csharp
+    public class MyQuery : ObjectGraphType
+    {
+        public MyQuery()
+        {
+            Field<OrderType, Order>("Order")
+                .Argument<NonNullGraphType<IdGraphType>>("id")
+                .Resolve()
+                .WithService<MyOrderDataLoader>()
+                .ResolveAsync((context, loader) =>
+                {
+                    return loader.LoadAsync(context.GetArgument<int>("id"));
+                });
+        }
+    }
+```
+
+Note that if you attempt to create a service scope via `WithScope()` for a scoped
+data loader, each data loaded entry will exist in its own service scope, and none
+of the entries will be batch loaded. However, you can use a singleton data loader,
+creating a service scope for the load operation, as shown below.
 
 ## Singleton DI-based data loader instances
 
@@ -434,8 +457,7 @@ As a singleton, you can pull the singleton instance into your graphtype class in
     {
         public MyQuery(MyOrderDataLoader loader)
         {
-            Field<OrderType, Order>()
-                .Name("Order")
+            Field<OrderType, Order>("Order")
                 .Argument<IdGraphType>("id")
                 .ResolveAsync(context =>
                 {
@@ -458,7 +480,7 @@ public class MyOrderDataLoader : DataLoaderBase<int, Order>
     private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheEntryOptions _memoryCacheEntryOptions;
     private const string CACHE_PREFIX = "ORDER_";
-        
+
     public MyOrderDataLoader(IServiceProvider serviceProvider, IMemoryCache memoryCache) : base(false)
     {
         _rootServiceProvider = serviceProvider;

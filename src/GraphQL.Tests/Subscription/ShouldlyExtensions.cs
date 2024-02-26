@@ -1,5 +1,3 @@
-#nullable enable
-
 using GraphQL.SystemTextJson;
 
 namespace GraphQL.Tests.Subscription;
@@ -12,8 +10,8 @@ public static class ShouldlyExtensions
     {
         if (expected is string str)
             expected = _serializer.Deserialize<Inputs>(str);
-        var expectedJson = _serializer.Serialize(expected);
-        var actualJson = _serializer.Serialize(actual);
+        string expectedJson = _serializer.Serialize(expected);
+        string actualJson = _serializer.Serialize(actual);
         actualJson.ShouldBe(expectedJson, customMessage);
     }
 
@@ -22,7 +20,7 @@ public static class ShouldlyExtensions
         observer.ShouldNotBeNull();
         observer.Events.ShouldNotBeNull();
         observer.Events.TryDequeue(out var result).ShouldBeTrue("Observable sequence should have another result but did not");
-        return result;
+        return result!;
     }
 
     public static void ShouldHaveNoMoreResults(this SampleObserver? observer)

@@ -51,46 +51,46 @@ public class Bug2159 : QueryTestBase<Bug2159Schema>
     public void HasArgument_NoDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": false }""");
 
     [Fact]
-    public void HasArgument_NoDefault_Set() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: true) }", @"{ ""hasArgumentNoDefault"": true }");
+    public void HasArgument_NoDefault_Set() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: true) }", """{ "hasArgumentNoDefault": true }""");
 
     [Fact]
-    public void HasArgument_NoDefault_DefaultVariable() => AssertQuerySuccess("query($input: Boolean = true) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }");
+    public void HasArgument_NoDefault_DefaultVariable() => AssertQuerySuccess("query($input: Boolean = true) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": true }""");
 
     [Fact]
-    public void HasArgument_NoDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }", "{\"input\":true}".ToInputs());
+    public void HasArgument_NoDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": true }""", """{"input":true}""".ToInputs());
 
     [Fact]
-    public void HasArgument_NoDefault_SetNull() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: null) }", @"{ ""hasArgumentNoDefault"": true }");
+    public void HasArgument_NoDefault_SetNull() => AssertQuerySuccess("{ hasArgumentNoDefault(arg: null) }", """{ "hasArgumentNoDefault": true }""");
 
     [Fact]
-    public void HasArgument_NoDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }");
+    public void HasArgument_NoDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": true }""");
 
     [Fact]
-    public void HasArgument_NoDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", @"{ ""hasArgumentNoDefault"": true }", "{\"input\":null}".ToInputs());
+    public void HasArgument_NoDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentNoDefault(arg: $input) }", """{ "hasArgumentNoDefault": true }""", """{"input":null}""".ToInputs());
 
     [Fact]
-    public void HasArgument_WithDefault_None() => AssertQuerySuccess("{ hasArgumentWithDefault }", @"{ ""hasArgumentWithDefault"": false }");
+    public void HasArgument_WithDefault_None() => AssertQuerySuccess("{ hasArgumentWithDefault }", """{ "hasArgumentWithDefault": false }""");
 
     [Fact]
-    public void HasArgument_WithDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": false }");
+    public void HasArgument_WithDefault_UnsetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", """{ "hasArgumentWithDefault": false }""");
 
     [Fact]
-    public void HasArgument_WithDefault_Set() => AssertQuerySuccess("{ hasArgumentWithDefault(arg: true) }", @"{ ""hasArgumentWithDefault"": true }");
+    public void HasArgument_WithDefault_Set() => AssertQuerySuccess("{ hasArgumentWithDefault(arg: true) }", """{ "hasArgumentWithDefault": true }""");
 
     [Fact]
-    public void HasArgument_WithDefault_DefaultVariable() => AssertQuerySuccess("query($input: Boolean = true) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }");
+    public void HasArgument_WithDefault_DefaultVariable() => AssertQuerySuccess("query($input: Boolean = true) { hasArgumentWithDefault(arg: $input) }", """{ "hasArgumentWithDefault": true }""");
 
     [Fact]
-    public void HasArgument_WithDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":true}".ToInputs());
+    public void HasArgument_WithDefault_SetVariable() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", """{ "hasArgumentWithDefault": true }""", """{"input":true}""".ToInputs());
 
     [Fact]
-    public void HasArgument_WithDefault_SetNull() => AssertQuerySuccess("{ hasArgumentWithDefault(arg: null) }", @"{ ""hasArgumentWithDefault"": true }");
+    public void HasArgument_WithDefault_SetNull() => AssertQuerySuccess("{ hasArgumentWithDefault(arg: null) }", """{ "hasArgumentWithDefault": true }""");
 
     [Fact]
-    public void HasArgument_WithDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }");
+    public void HasArgument_WithDefault_DefaultVariableNull() => AssertQuerySuccess("query($input: Boolean = null) { hasArgumentWithDefault(arg: $input) }", """{ "hasArgumentWithDefault": true }""");
 
     [Fact]
-    public void HasArgument_WithDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", @"{ ""hasArgumentWithDefault"": true }", "{\"input\":null}".ToInputs());
+    public void HasArgument_WithDefault_SetVariableNull() => AssertQuerySuccess("query($input: Boolean) { hasArgumentWithDefault(arg: $input) }", """{ "hasArgumentWithDefault": true }""", """{"input":null}""".ToInputs());
 
     [Fact]
     public void CheckRequiredObjectFieldAreRequired_Variable() => AssertQueryWithErrors("query($input: Bug2159ReqObj) { testReqObjField(arg: $input) }", "null", "{\"input\":{\"value2\":null}}".ToInputs(), expectedErrorCount: 1, executed: false);

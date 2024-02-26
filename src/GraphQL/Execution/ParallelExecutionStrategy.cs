@@ -23,12 +23,12 @@ namespace GraphQL.Execution
         /// </summary>
         public override async Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode)
         {
-            var pendingNodes = System.Threading.Interlocked.Exchange(ref _reusablePendingNodes, null) ?? new Queue<ExecutionNode>();
+            var pendingNodes = Interlocked.Exchange(ref _reusablePendingNodes, null) ?? new Queue<ExecutionNode>();
             pendingNodes.Enqueue(rootNode);
-            var pendingDataLoaders = System.Threading.Interlocked.Exchange(ref _reusablePendingDataLoaders, null) ?? new Queue<ExecutionNode>();
+            var pendingDataLoaders = Interlocked.Exchange(ref _reusablePendingDataLoaders, null) ?? new Queue<ExecutionNode>();
 
-            var currentTasks = System.Threading.Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? new List<Task>();
-            var currentNodes = System.Threading.Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? new List<ExecutionNode>();
+            var currentTasks = Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? new List<Task>();
+            var currentNodes = Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? new List<ExecutionNode>();
 
             try
             {
@@ -65,7 +65,6 @@ namespace GraphQL.Execution
                                 currentTasks.Add(pendingNodeTask);
                                 currentNodes.Add(pendingNode);
                             }
-
                         }
 
                         // Await tasks for this execution step
@@ -121,10 +120,10 @@ namespace GraphQL.Execution
                 currentTasks.Clear();
                 currentNodes.Clear();
 
-                System.Threading.Interlocked.CompareExchange(ref _reusablePendingNodes, pendingNodes, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusablePendingDataLoaders, pendingDataLoaders, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusableCurrentTasks, currentTasks, null);
-                System.Threading.Interlocked.CompareExchange(ref _reusableCurrentNodes, currentNodes, null);
+                _ = Interlocked.CompareExchange(ref _reusablePendingNodes, pendingNodes, null);
+                _ = Interlocked.CompareExchange(ref _reusablePendingDataLoaders, pendingDataLoaders, null);
+                _ = Interlocked.CompareExchange(ref _reusableCurrentTasks, currentTasks, null);
+                _ = Interlocked.CompareExchange(ref _reusableCurrentNodes, currentNodes, null);
             }
         }
     }

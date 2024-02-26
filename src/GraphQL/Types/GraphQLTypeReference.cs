@@ -57,7 +57,7 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Output type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    public sealed class GraphQLClrOutputTypeReference<T> : InterfaceGraphType, IObjectGraphType
+    public sealed class GraphQLClrOutputTypeReference<[NotAGraphType] T> : InterfaceGraphType, IObjectGraphType
     {
         private GraphQLClrOutputTypeReference()
         {
@@ -76,7 +76,7 @@ namespace GraphQL.Types
     /// Represents a placeholder for another GraphQL Input type, referenced by CLR type. Must be replaced with a
     /// reference to the actual GraphQL type before using the reference.
     /// </summary>
-    public sealed class GraphQLClrInputTypeReference<T> : InputObjectGraphType
+    public sealed class GraphQLClrInputTypeReference<[NotAGraphType] T> : InputObjectGraphType
     {
         private GraphQLClrInputTypeReference()
         {

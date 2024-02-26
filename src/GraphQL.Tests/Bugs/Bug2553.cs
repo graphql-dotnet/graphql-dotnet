@@ -43,7 +43,7 @@ internal class TestErrorInfoProvider : ErrorInfoProvider
     {
         return base.GetInfo(executionError) with
         {
-            Extensions = new Dictionary<string, object>
+            Extensions = new Dictionary<string, object?>
             {
                 { "violations", new TestExecutionError("An error occurred on field Email.", "Email") }
             }

@@ -27,8 +27,8 @@ public class Bug3100
         {
             Query = "{class2{id}}",
             RequestServices = provider,
-        }).ConfigureAwait(false);
-        var actual = serializer.Serialize(result);
+        });
+        string actual = serializer.Serialize(result);
 
         // verify the result
         actual.ShouldBe("""{"data":{"class2":[{"id":"test"}]}}""");
