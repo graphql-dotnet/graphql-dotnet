@@ -29,7 +29,7 @@ public class SchemaFirstFixture
 
         Services = sc.BuildServiceProvider();
 
-        Schema = FederatedSchemaHelper.For("""
+        Schema = GraphQL.Types.Schema.For("""
             type Query {
                 _noop: String
             }

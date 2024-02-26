@@ -1,30 +1,22 @@
 using GraphQL.Federation.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser.AST;
 using static GraphQL.Federation.Extensions.FederationHelper;
 
 namespace GraphQL.Federation.Extensions;
 
 internal class FederationEntitiesSchemaNodeVisitor : BaseSchemaNodeVisitor
 {
-    private readonly EntityType _entityType;
-
-
-    public FederationEntitiesSchemaNodeVisitor(EntityType entityType)
-    {
-        _entityType = entityType;
-    }
-
-
     public override void VisitObject(IObjectGraphType type, ISchema schema)
     {
-        var astMetafield = type.GetMetadata<IHasDirectivesNode>(AST_METAFIELD);
-        if (astMetafield?.Directives?.Items?.Any(x =>
-            x.Name == KEY_DIRECTIVE
-            && !x.Arguments!.Any(y => y.Name == RESOLVABLE_ARGUMENT && y.Value is GraphQLFalseBooleanValue)) == true)
+        var directives = type.GetAppliedDirectives();
+        if (directives == null)
+            return;
+        if (type.GetAppliedDirectives()?.Any(d => d.Name == KEY_DIRECTIVE && !d.Any(arg => arg.Name == RESOLVABLE_ARGUMENT && (arg.Value is bool b && !b))) == true)
         {
-            _entityType.AddPossibleType(type);
+            var entityType = schema.AllTypes["_Entity"] as UnionGraphType
+                ?? throw new InvalidOperationException("The _Entity type is not defined in the schema.");
+            entityType.AddPossibleType(type);
         }
     }
 }

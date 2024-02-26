@@ -18,7 +18,7 @@ public class ProvidesAttribute : GraphQLAttribute
     }
     /// <summary> .ctor </summary>
     public ProvidesAttribute(params string[] fields)
-        : this(string.Join(" ", fields.Select(x => x.ToCamelCase())))
+        : this(string.Join(" ", fields))
     { }
 
     /// <inheritdoc/>

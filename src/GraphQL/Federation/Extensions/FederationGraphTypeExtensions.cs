@@ -3,7 +3,6 @@ using GraphQL.DataLoader;
 using GraphQL.Federation.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser.AST;
 using static GraphQL.Federation.Extensions.FederationHelper;
 
 namespace GraphQL.Federation.Extensions;
@@ -11,7 +10,7 @@ namespace GraphQL.Federation.Extensions;
 /// <summary>
 /// Federation extensions for Graph Types.
 /// </summary>
-public static partial class FederationGraphTypeExtensions
+public static class FederationGraphTypeExtensions
 {
     /// <summary>
     /// Adds "_service" field. Intended to use on Query in conjunction with .AddFederation(..., addFields = false).
@@ -28,48 +27,6 @@ public static partial class FederationGraphTypeExtensions
         return graphType.Field<NonNullGraphType<ListGraphType<EntityType>>>("_entities")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<Utilities.Federation.AnyScalarGraphType>>>>("representations")
             .Resolve(FederationQuerySchemaNodeVisitor.ResolveEntities);
-    }
-
-    /// <summary>
-    /// Adds "@key" directive.
-    /// </summary>
-    public static void Key(this IObjectGraphType graphType, string[] fields, bool resolvable = true) =>
-        graphType.Key(string.Join(" ", fields.Select(x => x.ToCamelCase())), resolvable);
-
-    /// <summary>
-    /// Adds "@key" directive.
-    /// </summary>
-    public static void Key(this IObjectGraphType graphType, string fields, bool resolvable = true)
-    {
-        var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective(new(KEY_DIRECTIVE));
-        directive.AddFieldsArgument(fields.ToCamelCase());
-        directive.AddResolvableArgument(resolvable);
-        astMetadata!.Directives!.Items.Add(directive);
-    }
-
-    /// <summary>
-    /// Adds "@shareable" directive.
-    /// </summary>
-    public static void Shareable(this IGraphType graphType)
-    {
-        if (graphType.IsInputType())
-            throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Input types are not supported.");
-        var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective(new(SHAREABLE_DIRECTIVE));
-        astMetadata!.Directives!.Items.Add(directive);
-    }
-
-    /// <summary>
-    /// Adds "@inaccessible" directive.
-    /// </summary>
-    public static void Inaccessible(this IGraphType graphType)
-    {
-        if (graphType.IsInputType())
-            throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Input types are not supported.");
-        var astMetadata = graphType.BuildAstMetadata();
-        var directive = new GraphQLDirective(new(INACCESSIBLE_DIRECTIVE));
-        astMetadata!.Directives!.Items.Add(directive);
     }
 
     /// <summary>

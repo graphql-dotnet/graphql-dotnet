@@ -12,14 +12,17 @@ public class ShareableAttribute : GraphQLAttribute
     /// <inheritdoc/>
     public override void Modify(IGraphType graphType)
     {
-        graphType.Shareable();
+        if (graphType is IObjectGraphType objectGraphType)
+            objectGraphType.Shareable();
+        else
+            throw new ArgumentOutOfRangeException(nameof(graphType), "Only object types are supported.");
     }
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
     {
         if (isInputType)
-            throw new ArgumentOutOfRangeException(nameof(isInputType), isInputType, "Input types are not supported.");
+            throw new ArgumentOutOfRangeException(nameof(isInputType), "Input types are not supported.");
         fieldType.Shareable();
     }
 }

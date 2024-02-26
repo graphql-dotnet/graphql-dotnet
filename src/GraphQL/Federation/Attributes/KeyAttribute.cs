@@ -14,7 +14,6 @@ public class KeyAttribute : GraphQLAttribute
     /// <summary> Resolvable. </summary>
     public bool Resolvable { get; set; } = true;
 
-
     /// <summary> .ctor </summary>
     public KeyAttribute(string fields)
     {
@@ -22,10 +21,12 @@ public class KeyAttribute : GraphQLAttribute
             throw new ArgumentNullException(nameof(fields));
         _fields = fields;
     }
+
     /// <summary> .ctor </summary>
     public KeyAttribute(params string[] fields)
-        : this(string.Join(" ", fields.Select(x => x.ToCamelCase())))
-    { }
+        : this(string.Join(" ", fields))
+    {
+    }
 
     /// <inheritdoc/>
     public override void Modify(IGraphType graphType)

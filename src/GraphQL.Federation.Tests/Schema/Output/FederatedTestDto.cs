@@ -2,7 +2,7 @@ using GraphQL.Federation.Attributes;
 
 namespace GraphQL.Federation.Tests.Schema.Output;
 
-[Key(nameof(Id))]
+[Key("id")]
 public class FederatedTestDto
 {
     public int Id { get; set; }

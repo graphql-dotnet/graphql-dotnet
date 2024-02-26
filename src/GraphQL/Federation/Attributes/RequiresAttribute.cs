@@ -20,7 +20,7 @@ public class RequiresAttribute : GraphQLAttribute
     }
     /// <summary> .ctor </summary>
     public RequiresAttribute(params string[] fields)
-        : this(string.Join(" ", fields.Select(x => x.ToCamelCase())))
+        : this(string.Join(" ", fields))
     { }
 
     /// <inheritdoc/>
