@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
+using System.Globalization;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
@@ -488,4 +490,46 @@ public static partial class ObjectExtensions
 
         return false;
     }
+
+    /// <summary>
+    /// Returns a string representation of the object, as follows:
+    /// <list type="bullet">
+    /// <item>Null values are returned as &quot;(null)&quot;</item>
+    /// <item>Arrays are returned as &quot;(array)&quot;</item>
+    /// <item>Strings are returned unchanged</item>
+    /// <item>Intrinsic numbers are formatted and returned</item>
+    /// <item>Date and time formats are formatted and returned</item>
+    /// <item>Dictionaries and any other types are returned as &quot;(object)&quot;</item>
+    /// </list>
+    /// </summary>
+    internal static string ToSafeString(this object? value) => value switch
+    {
+        null => "(null)",
+        string str => str, // must appear before IEnumerable
+        IDictionary => "(object)", // must appear before IEnumerable
+        IEnumerable => "(array)",
+        bool b => b.ToString(CultureInfo.InvariantCulture),
+        char c => c.ToString(CultureInfo.InvariantCulture),
+        sbyte sb => sb.ToString(CultureInfo.InvariantCulture),
+        byte b => b.ToString(CultureInfo.InvariantCulture),
+        short s => s.ToString(CultureInfo.InvariantCulture),
+        ushort us => us.ToString(CultureInfo.InvariantCulture),
+        int i => i.ToString(CultureInfo.InvariantCulture),
+        uint i => i.ToString(CultureInfo.InvariantCulture),
+        long l => l.ToString(CultureInfo.InvariantCulture),
+        ulong l => l.ToString(CultureInfo.InvariantCulture),
+        float f => f.ToString(CultureInfo.InvariantCulture),
+        double d => d.ToString(CultureInfo.InvariantCulture),
+        decimal d => d.ToString(CultureInfo.InvariantCulture),
+        BigInteger bi => bi.ToString(CultureInfo.InvariantCulture),
+        Guid g => g.ToString(),
+        DateTime dt => dt.ToString("o", CultureInfo.InvariantCulture),
+        DateTimeOffset dto => dto.ToString("o", CultureInfo.InvariantCulture),
+        TimeSpan ts => ts.ToString("c", CultureInfo.InvariantCulture),
+#if NET6_0_OR_GREATER
+        DateOnly d => d.ToString("o", CultureInfo.InvariantCulture),
+        TimeOnly t => t.ToString("o", CultureInfo.InvariantCulture),
+#endif
+        _ => "(object)"
+    };
 }
