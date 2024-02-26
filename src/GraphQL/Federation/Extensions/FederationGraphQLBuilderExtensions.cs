@@ -27,11 +27,16 @@ public static class FederationGraphQLBuilderExtensions
             .Register(new ServiceGraphType(printOptions))
             .Register<Utilities.Federation.AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityType>(ServiceLifetime.Singleton)
+            .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
+            .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
+            .Register<FieldSetGraphType>(ServiceLifetime.Singleton)
             .Register<FederationEntitiesSchemaNodeVisitor>(ServiceLifetime.Singleton)
             .Register<FederationQuerySchemaNodeVisitor>(ServiceLifetime.Singleton);
+
         return builder
             .ConfigureSchema((schema, services) =>
             {
+                schema.AddFederationDirectives(import);
                 schema.BuildLinkExtension(import);
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<Utilities.Federation.AnyScalarGraphType>();
