@@ -47,9 +47,9 @@ public class RequestServicesTests
         resultString.ShouldBe("""{"errors":[{"message":"Num is 1","extensions":{"code":"VALIDATION_ERROR","codes":["VALIDATION_ERROR"]}}]}""");
     }
 
-    private class MyValidationRule : IValidationRule
+    private class MyValidationRule : ValidationRuleBase
     {
-        public ValueTask<INodeVisitor?> ValidateAsync(ValidationContext context)
+        public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
         {
             int num = context.RequestServices!.GetRequiredService<Class1>().GetNum;
             context.ReportError(new ValidationError($"Num is {num}"));

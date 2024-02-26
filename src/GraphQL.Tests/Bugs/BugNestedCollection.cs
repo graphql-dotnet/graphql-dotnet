@@ -38,6 +38,7 @@ public class NestedMutationSchema : Schema
 {
     public NestedMutationSchema()
     {
+        Query = new DummyType();
         Mutation = new NestedMutation();
     }
 }

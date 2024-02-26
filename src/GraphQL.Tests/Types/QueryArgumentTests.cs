@@ -48,4 +48,37 @@ public class QueryArgumentTests
         Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument(typeof(ObjectGraphType)));
         Should.Throw<ArgumentOutOfRangeException>(() => new QueryArgument<ObjectGraphType<int>>());
     }
+
+    [Fact]
+    public void validation_method_compounds_existing_validation()
+    {
+        var arg = new QueryArgument<StringGraphType>();
+        arg.Validate(value =>
+        {
+            if (value is int)
+                throw new ArgumentException();
+        });
+        arg.Validate(value =>
+        {
+            if (value is string)
+                throw new InvalidOperationException();
+        });
+        arg.Validator.ShouldNotBeNull().Invoke(Guid.NewGuid());
+        Should.Throw<ArgumentException>(() => arg.Validator.ShouldNotBeNull().Invoke(123));
+        Should.Throw<InvalidOperationException>(() => arg.Validator.ShouldNotBeNull().Invoke("abc"));
+    }
+
+    [Fact]
+    public void parsevalue_method_replaces_validation()
+    {
+        var arg = new QueryArgument<StringGraphType>();
+        arg.ParseValue(value => "456");
+        arg.ParseValue(value =>
+        {
+            if ((string)value == "123")
+                return "789";
+            return value;
+        });
+        arg.Parser.ShouldNotBeNull().Invoke("123").ShouldBeOfType<string>().ShouldBe("789");
+    }
 }

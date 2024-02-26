@@ -609,6 +609,10 @@ public class SchemaBuilderExecutionTests : SchemaBuilderTestBase
     public void can_use_null_as_default_value()
     {
         var schema = Schema.For("""
+            type Query {
+              dummy: String
+            }
+
             input HumanInput {
               name: String!
               homePlanet: String = null

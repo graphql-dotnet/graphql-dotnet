@@ -122,7 +122,7 @@ public class EnumGraphTypeTests
     [Fact]
     public void parse_literal_from_name()
     {
-        type.ParseLiteral(new GraphQLEnumValue { Name = new GraphQLName("RED") }).ShouldBe(Colors.Red);
+        type.ParseLiteral(new GraphQLEnumValue(new GraphQLName("RED"))).ShouldBe(Colors.Red);
     }
 
     [Fact]

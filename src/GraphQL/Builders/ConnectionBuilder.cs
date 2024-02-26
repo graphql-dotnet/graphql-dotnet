@@ -2,446 +2,465 @@ using GraphQL.Types;
 using GraphQL.Types.Relay;
 using GraphQL.Types.Relay.DataObjects;
 
-namespace GraphQL.Builders
+namespace GraphQL.Builders;
+
+/// <summary>
+/// Static methods to create connection field builders.
+/// </summary>
+public static class ConnectionBuilder
 {
     /// <summary>
-    /// Static methods to create connection field builders.
+    /// Returns a builder for new connection field for the specified node type.
+    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
     /// </summary>
-    public static class ConnectionBuilder
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>()
+        where TNodeType : IGraphType
+        => ConnectionBuilder<TSourceType>.Create<TNodeType>();
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node type.
+    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>(string name)
+        where TNodeType : IGraphType
+        => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node and edge type.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>()
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node and edge type.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>(string name)
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node, edge and connection type.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>()
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node, edge and connection type.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>(string name)
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>(name);
+}
+
+/// <summary>
+/// Builds a connection field for graphs that have the specified source type.
+/// </summary>
+// TODO: Remove in v5
+public class ConnectionBuilder<[NotAGraphType] TSourceType> : IMetadataWriter
+{
+    internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
+
+    private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
+
+    private int? PageSizeFromMetadata
     {
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>()
-            where TNodeType : IGraphType
-            => ConnectionBuilder<TSourceType>.Create<TNodeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>(string name)
-            where TNodeType : IGraphType
-            => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>(string name)
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>(string name)
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-            => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>(name);
+        get => FieldType.GetMetadata<int?>(PAGE_SIZE_METADATA_KEY);
+        set => FieldType.WithMetadata(PAGE_SIZE_METADATA_KEY, value);
     }
 
     /// <summary>
-    /// Builds a connection field for graphs that have the specified source type.
+    /// Returns the generated field.
     /// </summary>
-    // TODO: Remove in v5
-    public class ConnectionBuilder<[NotAGraphType] TSourceType>
+    public FieldType FieldType { get; protected set; }
+
+    /// <summary>
+    /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
+    /// </summary>
+    protected ConnectionBuilder(FieldType fieldType)
     {
-        internal const string PAGE_SIZE_METADATA_KEY = "__ConnectionBuilder_PageSize";
+        FieldType = fieldType;
+    }
 
-        private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node type.
+    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType>()
+        where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>();
 
-        private int? PageSizeFromMetadata
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node type.
+    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
+        where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node and edge type.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>()
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>();
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node and edge type.
+    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node, edge and connection type.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>()
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        where TConnectionType : ConnectionType<TNodeType, TEdgeType> =>
+        Create<TNodeType, TEdgeType, TConnectionType>("default");
+
+    /// <summary>
+    /// Returns a builder for new connection field for the specified node, edge and connection type.
+    /// </summary>
+    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
+    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
+    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
+    /// <param name="name">The name of the connection.</param>
+    public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
+        where TNodeType : IGraphType
+        where TEdgeType : EdgeType<TNodeType>
+        where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+    {
+        var fieldType = new FieldType
         {
-            get => FieldType.GetMetadata<int?>(PAGE_SIZE_METADATA_KEY);
-            set => FieldType.WithMetadata(PAGE_SIZE_METADATA_KEY, value);
-        }
-
-        /// <summary>
-        /// Returns the generated field.
-        /// </summary>
-        public FieldType FieldType { get; protected set; }
-
-        /// <summary>
-        /// Initializes a new instance for the specified <see cref="Types.FieldType"/>.
-        /// </summary>
-        protected ConnectionBuilder(FieldType fieldType)
+            Name = name,
+            Type = typeof(TConnectionType),
+            Arguments = new QueryArguments(),
+        };
+        fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
         {
-            FieldType = fieldType;
-        }
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType>()
-            where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node type.
-        /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType>(string name)
-            where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>();
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node and edge type.
-        /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>(string name)
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        [Obsolete("Please use the overload that accepts the mandatory name argument.")]
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>()
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType> =>
-            Create<TNodeType, TEdgeType, TConnectionType>("default");
-
-        /// <summary>
-        /// Returns a builder for new connection field for the specified node, edge and connection type.
-        /// </summary>
-        /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-        /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-        /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-        /// <param name="name">The name of the connection.</param>
-        public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>(string name)
-            where TNodeType : IGraphType
-            where TEdgeType : EdgeType<TNodeType>
-            where TConnectionType : ConnectionType<TNodeType, TEdgeType>
+            Name = "after",
+            Description = "Only return edges after the specified cursor.",
+        });
+        fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
         {
-            var fieldType = new FieldType
-            {
-                Name = name,
-                Type = typeof(TConnectionType),
-                Arguments = new QueryArguments(),
-            };
-            fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
-            {
-                Name = "after",
-                Description = "Only return edges after the specified cursor.",
-            });
-            fieldType.Arguments.Add(new QueryArgument(typeof(IntGraphType))
-            {
-                Name = "first",
-                Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
-            });
-            return new ConnectionBuilder<TSourceType>(fieldType);
-        }
+            Name = "first",
+            Description = "Specifies the maximum number of edges to return, starting after the cursor specified by 'after', or the first number of edges if 'after' is not specified.",
+        });
+        return new ConnectionBuilder<TSourceType>(fieldType);
+    }
 
-        /// <summary>
-        /// Configure the connection to be bi-directional.
-        /// </summary>
-        public ConnectionBuilder<TSourceType> Bidirectional()
+    /// <summary>
+    /// Configure the connection to be bi-directional.
+    /// </summary>
+    public ConnectionBuilder<TSourceType> Bidirectional()
+    {
+        if (IsBidirectional)
         {
-            if (IsBidirectional)
-            {
-                return this;
-            }
-
-            Argument<StringGraphType, string>("before",
-                "Only return edges prior to the specified cursor.");
-            Argument<IntGraphType, int?>("last",
-                "Specifies the maximum number of edges to return, starting prior to the cursor specified by 'before', or the last number of edges if 'before' is not specified.");
-
             return this;
         }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
-        [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
-        public virtual ConnectionBuilder<TSourceType> Name(string name)
-        {
-            FieldType.Name = name;
-            return this;
-        }
+        Argument<StringGraphType, string>("before",
+            "Only return edges prior to the specified cursor.");
+        Argument<IntGraphType, int?>("last",
+            "Specifies the maximum number of edges to return, starting prior to the cursor specified by 'before', or the last number of edges if 'before' is not specified.");
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
-        public virtual ConnectionBuilder<TSourceType> Description(string? description)
-        {
-            FieldType.Description = description;
-            return this;
-        }
+        return this;
+    }
 
-        /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
-        public virtual ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason)
-        {
-            FieldType.DeprecationReason = deprecationReason;
-            return this;
-        }
+    /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
+    [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
+    public virtual ConnectionBuilder<TSourceType> Name(string name)
+    {
+        FieldType.Name = name;
+        return this;
+    }
 
-        /// <summary>
-        /// Sets the default page size.
-        /// </summary>
-        public virtual ConnectionBuilder<TSourceType> PageSize(int pageSize)
-        {
-            PageSizeFromMetadata = pageSize;
-            return this;
-        }
+    /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Description(string)"/>
+    public virtual ConnectionBuilder<TSourceType> Description(string? description)
+    {
+        FieldType.Description = description;
+        return this;
+    }
 
-        /// <summary>
-        /// Clears the default page size, so all records are returned by default.
-        /// </summary>
-        public virtual ConnectionBuilder<TSourceType> ReturnAll()
-        {
-            PageSizeFromMetadata = null;
-            return this;
-        }
+    /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.DeprecationReason(string)"/>
+    public virtual ConnectionBuilder<TSourceType> DeprecationReason(string? deprecationReason)
+    {
+        FieldType.DeprecationReason = deprecationReason;
+        return this;
+    }
 
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
-            where TArgumentGraphType : IGraphType
+    /// <summary>
+    /// Sets the default page size.
+    /// </summary>
+    public virtual ConnectionBuilder<TSourceType> PageSize(int pageSize)
+    {
+        PageSizeFromMetadata = pageSize;
+        return this;
+    }
+
+    /// <summary>
+    /// Clears the default page size, so all records are returned by default.
+    /// </summary>
+    public virtual ConnectionBuilder<TSourceType> ReturnAll()
+    {
+        PageSizeFromMetadata = null;
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an argument to the connection field.
+    /// </summary>
+    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="configure">A delegate to further configure the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, Action<QueryArgument>? configure = null)
+        where TArgumentGraphType : IGraphType
+    {
+        var arg = new QueryArgument(typeof(TArgumentGraphType))
         {
-            var arg = new QueryArgument(typeof(TArgumentGraphType))
-            {
-                Name = name,
-            };
+            Name = name,
+        };
+        configure?.Invoke(arg);
+        FieldType.Arguments!.Add(arg);
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an argument to the connection field.
+    /// </summary>
+    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="description">The description of the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
+        where TArgumentGraphType : IGraphType
+        => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
+
+    /// <summary>
+    /// Adds an argument to the connection field.
+    /// </summary>
+    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="description">The description of the argument.</param>
+    /// <param name="configure">A delegate to further configure the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure)
+        where TArgumentGraphType : IGraphType
+        => Argument<TArgumentGraphType>(name, arg =>
+        {
+            arg.Description = description;
             configure?.Invoke(arg);
-            FieldType.Arguments!.Add(arg);
-            return this;
-        }
+        });
 
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg => arg.Description = description);
-
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg =>
-            {
-                arg.Description = description;
-                configure?.Invoke(arg);
-            });
-
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        /// <param name="defaultValue">The default value of the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
-            [AllowNull] TArgumentType defaultValue = default!)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg =>
-            {
-                arg.Description = description;
-                arg.DefaultValue = defaultValue;
-            });
-
-        /// <summary>
-        /// Adds an argument to the connection field.
-        /// </summary>
-        /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-        /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
-        /// <param name="name">The name of the argument.</param>
-        /// <param name="description">The description of the argument.</param>
-        /// <param name="defaultValue">The default value of the argument.</param>
-        /// <param name="configure">A delegate to further configure the argument.</param>
-        public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
-            [AllowNull] TArgumentType defaultValue, Action<QueryArgument>? configure)
-            where TArgumentGraphType : IGraphType
-            => Argument<TArgumentGraphType>(name, arg =>
-            {
-                arg.Description = description;
-                arg.DefaultValue = defaultValue;
-                configure?.Invoke(arg);
-            });
-
-        /// <summary>
-        /// Runs a configuration delegate for the connection field.
-        /// </summary>
-        public virtual ConnectionBuilder<TSourceType> Configure(Action<FieldType> configure)
+    /// <summary>
+    /// Adds an argument to the connection field.
+    /// </summary>
+    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+    /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="description">The description of the argument.</param>
+    /// <param name="defaultValue">The default value of the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
+        [AllowNull] TArgumentType defaultValue = default!)
+        where TArgumentGraphType : IGraphType
+        => Argument<TArgumentGraphType>(name, arg =>
         {
-            configure(FieldType);
-            return this;
-        }
+            arg.Description = description;
+            arg.DefaultValue = defaultValue;
+        });
 
-        /// <summary>
-        /// Apply directive to connection field without specifying arguments. If the directive
-        /// declaration has arguments, then their default values (if any) will be used.
-        /// </summary>
-        /// <param name="name">Directive name.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name)
+    /// <summary>
+    /// Adds an argument to the connection field.
+    /// </summary>
+    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
+    /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="description">The description of the argument.</param>
+    /// <param name="defaultValue">The default value of the argument.</param>
+    /// <param name="configure">A delegate to further configure the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
+        [AllowNull] TArgumentType defaultValue, Action<QueryArgument>? configure)
+        where TArgumentGraphType : IGraphType
+        => Argument<TArgumentGraphType>(name, arg =>
         {
-            FieldType.ApplyDirective(name);
-            return this;
-        }
+            arg.Description = description;
+            arg.DefaultValue = defaultValue;
+            configure?.Invoke(arg);
+        });
 
-        /// <summary>
-        /// Apply directive to connection field specifying one argument. If the directive
-        /// declaration has other arguments, then their default values (if any) will be used.
-        /// </summary>
-        /// <param name="name">Directive name.</param>
-        /// <param name="argumentName">Argument name.</param>
-        /// <param name="argumentValue">Argument value.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue)
-        {
-            FieldType.ApplyDirective(name, argumentName, argumentValue);
-            return this;
-        }
+    /// <summary>
+    /// Runs a configuration delegate for the connection field.
+    /// </summary>
+    public virtual ConnectionBuilder<TSourceType> Configure(Action<FieldType> configure)
+    {
+        configure(FieldType);
+        return this;
+    }
 
-        /// <summary>
-        /// Apply directive to connection field specifying configuration delegate.
-        /// </summary>
-        /// <param name="name">Directive name.</param>
-        /// <param name="configure">Configuration delegate.</param>
-        public virtual ConnectionBuilder<TSourceType> Directive(string name, Action<AppliedDirective> configure)
-        {
-            FieldType.ApplyDirective(name, configure);
-            return this;
-        }
+    /// <summary>
+    /// Apply directive to connection field without specifying arguments. If the directive
+    /// declaration has arguments, then their default values (if any) will be used.
+    /// </summary>
+    /// <param name="name">Directive name.</param>
+    public virtual ConnectionBuilder<TSourceType> Directive(string name)
+    {
+        FieldType.ApplyDirective(name);
+        return this;
+    }
 
-        /// <summary>
-        /// Specifies the return data type of the connection resolver. Typically this would be <see cref="Connection{TNode}"/>
-        /// or <see cref="Connection{TNode, TEdge}"/>, but it can be any type that returns the proper fields for the
-        /// connection graph type.
-        /// <br/><br/>
-        /// For instance, to specify a return type for a Widget you might write:
-        /// <br/><br/>
-        /// <code>
-        /// .Returns&lt;Connection&lt;Widget&gt;&gt;()
-        /// </code>
-        /// </summary>
-        public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
-        {
-            return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
-        }
+    /// <summary>
+    /// Apply directive to connection field specifying one argument. If the directive
+    /// declaration has other arguments, then their default values (if any) will be used.
+    /// </summary>
+    /// <param name="name">Directive name.</param>
+    /// <param name="argumentName">Argument name.</param>
+    /// <param name="argumentValue">Argument value.</param>
+    public virtual ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue)
+    {
+        FieldType.ApplyDirective(name, argumentName, argumentValue);
+        return this;
+    }
 
-        /// <summary>
-        /// Sets the resolver method for the connection field.
-        /// </summary>
-        public virtual void Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
-        {
-            var isUnidirectional = !IsBidirectional;
-            var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
-            {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
-                CheckForErrors(connectionContext);
-                return resolver(connectionContext);
-            });
-        }
+    /// <summary>
+    /// Apply directive to connection field specifying configuration delegate.
+    /// </summary>
+    /// <param name="name">Directive name.</param>
+    /// <param name="configure">Configuration delegate.</param>
+    public virtual ConnectionBuilder<TSourceType> Directive(string name, Action<AppliedDirective> configure)
+    {
+        FieldType.ApplyDirective(name, configure);
+        return this;
+    }
 
-        /// <summary>
-        /// Sets the resolver method for the connection field.
-        /// </summary>
-        public virtual void ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
-        {
-            var isUnidirectional = !IsBidirectional;
-            var pageSize = PageSizeFromMetadata;
-            FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
-            {
-                var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
-                CheckForErrors(connectionContext);
-                return new ValueTask<object?>(resolver(connectionContext));
-            });
-        }
+    /// <summary>
+    /// Specifies the return data type of the connection resolver. Typically this would be <see cref="Connection{TNode}"/>
+    /// or <see cref="Connection{TNode, TEdge}"/>, but it can be any type that returns the proper fields for the
+    /// connection graph type.
+    /// <br/><br/>
+    /// For instance, to specify a return type for a Widget you might write:
+    /// <br/><br/>
+    /// <code>
+    /// .Returns&lt;Connection&lt;Widget&gt;&gt;()
+    /// </code>
+    /// </summary>
+    public virtual ConnectionBuilder<TSourceType, TNewReturnType> Returns<[NotAGraphType] TNewReturnType>()
+    {
+        return new ConnectionBuilder<TSourceType, TNewReturnType>(FieldType);
+    }
 
-        private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+    /// <summary>
+    /// Sets the resolver method for the connection field.
+    /// </summary>
+    [AllowedOn<IObjectGraphType>]
+    public virtual ConnectionBuilder<TSourceType> Resolve(Func<IResolveConnectionContext<TSourceType>, object?> resolver)
+    {
+        var isUnidirectional = !IsBidirectional;
+        var pageSize = PageSizeFromMetadata;
+        FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
         {
-            if (context.First.HasValue && context.Last.HasValue)
-            {
-                throw new ArgumentException("Cannot specify both `first` and `last`.");
-            }
-            if (context.IsUnidirectional && context.Last.HasValue)
-            {
-                throw new ArgumentException("Cannot use `last` with unidirectional connections.");
-            }
+            var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
+            CheckForErrors(connectionContext);
+            return resolver(connectionContext);
+        });
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the resolver method for the connection field.
+    /// </summary>
+    [AllowedOn<IObjectGraphType>]
+    public virtual ConnectionBuilder<TSourceType> ResolveAsync(Func<IResolveConnectionContext<TSourceType>, Task<object?>> resolver)
+    {
+        var isUnidirectional = !IsBidirectional;
+        var pageSize = PageSizeFromMetadata;
+        FieldType.Resolver = new Resolvers.FuncFieldResolver<object>(context =>
+        {
+            var connectionContext = new ResolveConnectionContext<TSourceType>(context, isUnidirectional, pageSize);
+            CheckForErrors(connectionContext);
+            return new ValueTask<object?>(resolver(connectionContext));
+        });
+
+        return this;
+    }
+
+    private static void CheckForErrors(IResolveConnectionContext<TSourceType> context)
+    {
+        if (context.First.HasValue && context.Last.HasValue)
+        {
+            throw new ArgumentException("Cannot specify both `first` and `last`.");
+        }
+        if (context.IsUnidirectional && context.Last.HasValue)
+        {
+            throw new ArgumentException("Cannot use `last` with unidirectional connections.");
         }
     }
+
+    // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
+    // exposing metadata methods directly on the field builder; users can always use the FieldType property
+    // to access the underlying metadata directly.
+    Dictionary<string, object?> IProvideMetadata.Metadata => FieldType.Metadata;
+    IMetadataReader IMetadataWriter.MetadataReader => FieldType;
+    TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
+    TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
+    bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
 }

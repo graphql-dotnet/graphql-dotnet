@@ -24,6 +24,7 @@ These are additional scalars provided by this project.
 |------------------|---------------------------------|--------------------|-------|---------|
 | `BigInt` | `BigIntGraphType` | `BigInteger` | number |
 | `Byte` | `ByteGraphType` | `byte` | number |
+| `Complex` | `ComplexScalarGraphType` | `object` | raw | |
 | `Date`           | `DateGraphType`                 | `DateTime`         | ISO-8601: yyyy-MM-dd |
 | `DateOnly` | `DateOnlyGraphType` | `DateOnly`                           | ISO-8601: yyyy-MM-dd | .NET6 and higher |
 | `DateTime`       | `DateTimeGraphType`             | `DateTime`         | ISO-8601, assume UTC |

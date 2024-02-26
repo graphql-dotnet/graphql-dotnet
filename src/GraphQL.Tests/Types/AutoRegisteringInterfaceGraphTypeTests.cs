@@ -1,6 +1,5 @@
 using System.Collections;
 using System.ComponentModel;
-using System.Linq.Expressions;
 using System.Reflection;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
@@ -521,19 +520,6 @@ public class AutoRegisteringInterfaceGraphTypeTests
             ThrowOnUnhandledException = true,
         }));
         ex.Message.ShouldBe("Abstract type IAnimal must resolve to an Object type at runtime for field TestQuery3.find with value 'GraphQL.Tests.Types.AutoRegisteringInterfaceGraphTypeTests+Cat', received 'null'.");
-    }
-
-    [Fact]
-    public void BuildsWithoutMemberInstanceExpression()
-    {
-        var type = new NoMemberInstanceExpression<IAnimal>();
-        type.Fields.Find("Id").ShouldNotBeNull();
-    }
-
-    public class NoMemberInstanceExpression<T> : AutoRegisteringInterfaceGraphType<T>
-    {
-        [Obsolete]
-        protected override LambdaExpression BuildMemberInstanceExpression(MemberInfo memberInfo) => null!;
     }
 
     [Fact]

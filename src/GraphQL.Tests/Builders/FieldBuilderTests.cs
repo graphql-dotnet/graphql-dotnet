@@ -207,7 +207,11 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType>("skip", "desc1", arg => arg.DefaultValue = 1)
+            .Argument<IntGraphType>("skip", "desc1", arg =>
+            {
+                arg.DefaultValue = 1;
+                arg.ResolvedType = new IntGraphType();
+            })
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(1);
@@ -252,7 +256,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType, int?>("skip", "desc1")
+            .Argument<IntGraphType>("skip", c => c.ResolvedType = new IntGraphType())
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(null);
@@ -295,7 +299,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+            .Argument<EpisodeEnum>("episode", configure => configure.ResolvedType = new EpisodeEnum())
             .Resolve(context =>
             {
                 context.GetArgument<Episodes>("episode").ShouldBe(Episodes.JEDI);
@@ -338,7 +342,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
+            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", c => c.ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))))
             .Resolve(context =>
             {
                 context.GetArgument<IEnumerable<string>>("episodes").ShouldBe(new List<string> { "JEDI", "EMPIRE" });
@@ -361,7 +365,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", "episodes")
+            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", c => c.ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))))
             .Resolve(context =>
             {
                 context.GetArgument<Collection<string>>("episodes").ShouldBe(new Collection<string> { "JEDI", "EMPIRE" });
@@ -384,7 +388,11 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<StringGraphType>("arg1", "desc1", arg => arg.DefaultValue = "default")
+            .Argument<StringGraphType>("arg1", "desc1", arg =>
+            {
+                arg.DefaultValue = "default";
+                arg.ResolvedType = new StringGraphType();
+            })
             .Resolve(context =>
             {
                 context.GetArgument("arg1", "default2").ShouldBe("arg1value");

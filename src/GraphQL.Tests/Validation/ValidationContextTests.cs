@@ -365,8 +365,8 @@ public class ValidationContextTests
             Operation = document.Operation(),
             Variables = variables.ToInputs(),
         });
-        ret.validationResult.IsValid.ShouldBeFalse();
-        ret.validationResult.Errors.Count.ShouldBe(1);
-        ret.validationResult.Errors[0].Message.ShouldBe(errorMessage);
+        ret.IsValid.ShouldBeFalse();
+        ret.Errors.Count.ShouldBe(1);
+        ret.Errors[0].Message.ShouldBe(errorMessage);
     }
 }

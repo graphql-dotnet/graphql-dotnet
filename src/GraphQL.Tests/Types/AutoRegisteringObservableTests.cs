@@ -221,6 +221,7 @@ public class AutoRegisteringObservableTests
             RequestServices = new ServiceCollection().BuildServiceProvider(),
             Schema = new Schema
             {
+                Query = new DummyType(),
                 Subscription = new AutoRegisteringObjectGraphType<TestClass>(),
             },
             Variables = new Dictionary<string, object?>() { { "n", 2 } }.ToInputs(),

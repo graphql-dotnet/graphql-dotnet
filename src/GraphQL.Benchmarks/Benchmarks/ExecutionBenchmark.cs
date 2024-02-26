@@ -2,7 +2,6 @@ using BenchmarkDotNet.Attributes;
 using GraphQL.Caching;
 using GraphQL.Execution;
 using GraphQL.StarWars;
-using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,15 +22,10 @@ public class ExecutionBenchmark : IBenchmark
     {
         var services = new ServiceCollection();
 
+        services.AddGraphQL(b => b
+            .AddSchema<StarWarsSchema>()
+            .AddGraphTypes(typeof(StarWarsQuery).Assembly));
         services.AddSingleton<StarWarsData>();
-        services.AddSingleton<StarWarsQuery>();
-        services.AddSingleton<StarWarsMutation>();
-        services.AddSingleton<HumanType>();
-        services.AddSingleton<HumanInputType>();
-        services.AddSingleton<DroidType>();
-        services.AddSingleton<CharacterInterface>();
-        services.AddSingleton<EpisodeEnum>();
-        services.AddSingleton<ISchema, StarWarsSchema>();
 
         _provider = services.BuildServiceProvider();
         _schema = _provider.GetRequiredService<ISchema>();

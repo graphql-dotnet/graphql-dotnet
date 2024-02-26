@@ -8,5 +8,6 @@ public interface IDataLoaderContextAccessor
     /// <summary>
     /// The current <seealso cref="DataLoaderContext"/>
     /// </summary>
-    DataLoaderContext? Context { get; set; }
+    [AllowNull]
+    DataLoaderContext Context { get; set; }
 }

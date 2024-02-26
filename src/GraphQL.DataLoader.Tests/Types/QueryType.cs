@@ -14,7 +14,7 @@ public class QueryType : ObjectGraphType
             .Description("Get all Users")
             .ResolveAsync(_ =>
             {
-                var loader = accessor.Context!.GetOrAddLoader("GetAllUsers",
+                var loader = accessor.Context.GetOrAddLoader("GetAllUsers",
                     users.GetAllUsersAsync);
 
                 return loader.LoadAsync();
@@ -26,7 +26,7 @@ public class QueryType : ObjectGraphType
             {
                 await Task.Delay(20).ConfigureAwait(false);
 
-                var loader = accessor.Context!.GetOrAddLoader("GetAllUsersWithDelay",
+                var loader = accessor.Context.GetOrAddLoader("GetAllUsersWithDelay",
                     users.GetAllUsersAsync);
 
                 return loader.LoadAsync();
@@ -37,7 +37,7 @@ public class QueryType : ObjectGraphType
             .Argument<NonNullGraphType<IntGraphType>>("orderId", "")
             .ResolveAsync(ctx =>
             {
-                var loader = accessor.Context!.GetOrAddBatchLoader<int, Order>("GetOrderById",
+                var loader = accessor.Context.GetOrAddBatchLoader<int, Order>("GetOrderById",
                     orders.GetOrderByIdAsync, x => x.OrderId);
 
                 return loader.LoadAsync(ctx.GetArgument<int>("orderId"));
@@ -47,7 +47,7 @@ public class QueryType : ObjectGraphType
             .Description("Get all Orders")
             .ResolveAsync(_ =>
             {
-                var loader = accessor.Context!.GetOrAddLoader("GetAllOrders",
+                var loader = accessor.Context.GetOrAddLoader("GetAllOrders",
                     orders.GetAllOrdersAsync);
 
                 return loader.LoadAsync();
@@ -58,7 +58,7 @@ public class QueryType : ObjectGraphType
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
             .Resolve(ctx =>
             {
-                var loader = accessor.Context!.GetOrAddBatchLoader<int, User>("GetUserById",
+                var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUserById",
                     users.GetUsersByIdAsync);
 
                 var ids = ctx.GetArgument<IEnumerable<int>>("ids");
@@ -71,7 +71,7 @@ public class QueryType : ObjectGraphType
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>>("ids")
             .Resolve(ctx =>
             {
-                var loader = accessor.Context!.GetOrAddBatchLoader<int, User>("GetUserById",
+                var loader = accessor.Context.GetOrAddBatchLoader<int, User>("GetUserById",
                     users.GetUsersByIdAsync);
 
                 var ids = ctx.GetArgument<IEnumerable<int>>("ids");

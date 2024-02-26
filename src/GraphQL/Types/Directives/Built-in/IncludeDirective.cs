@@ -1,24 +1,23 @@
 using GraphQLParser.AST;
 
-namespace GraphQL.Types
+namespace GraphQL.Types;
+
+/// <summary>
+/// Used to conditionally include fields or fragments.
+/// </summary>
+public class IncludeDirective : Directive
 {
     /// <summary>
-    /// Used to conditionally include fields or fragments.
+    /// Initializes a new instance of the 'include' directive.
     /// </summary>
-    public class IncludeDirective : Directive
+    public IncludeDirective()
+        : base("include", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
     {
-        /// <summary>
-        /// Initializes a new instance of the 'include' directive.
-        /// </summary>
-        public IncludeDirective()
-            : base("include", DirectiveLocation.Field, DirectiveLocation.FragmentSpread, DirectiveLocation.InlineFragment)
+        Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
+        Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
         {
-            Description = "Directs the executor to include this field or fragment only when the 'if' argument is true.";
-            Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<BooleanGraphType>>
-            {
-                Name = "if",
-                Description = "Included when true."
-            });
-        }
+            Name = "if",
+            Description = "Included when true."
+        });
     }
 }

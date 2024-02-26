@@ -58,8 +58,8 @@ that removes these incorrect usages.
 
 ### 4. InputGraphTypeAnalyzer
 
-The analyzer detects input graph type fields that can't be mapped to the source
-type during deserialization process.
+The analyzer verifies the input source type can be constructed and input graph
+type fields can be mapped to the source type during deserialization process.
 
 ### 5. FieldArgumentAnalyzer
 

@@ -684,6 +684,12 @@ public class MySchema : Schema
 }
 ```
 
+Alternatively, you may register the type within your DI engine.
+
+```csharp
+services.AddSingleton<BooleanGraphType, MyBooleanGraphType>();
+```
+
 For schema-first schemas, register it immediately after calling `Schema.For` to create the schema.
 Immediately after calling `Schema.For` the schema is not yet initialized, therefore allowing registration of types.
 

@@ -10,4 +10,10 @@
     <ProjectReference Include="..\GraphQL\GraphQL.csproj" PackageVersion="[$(Version),$(NextVersion))" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\GraphQL\CodeAnalysis\**">
+      <Link>CodeAnalysis\%(RecursiveDir)%(Filename)%(Extension)</Link>
+    </Compile>
+  </ItemGroup>
+
 </Project>

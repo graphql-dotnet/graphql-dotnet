@@ -6,6 +6,10 @@ namespace GraphQL.Tests.Subscription;
 public static class SubscriptionSchemaWithReflection
 {
     private const string TypeDefs = """
+        type Query {
+            dummy: String
+        }
+
         type MessageFrom {
             id: String
             displayName: String

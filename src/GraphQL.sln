@@ -115,6 +115,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\migration4.md = ..\docs2\site\docs\migrations\migration4.md
 		..\docs2\site\docs\migrations\migration5.md = ..\docs2\site\docs\migrations\migration5.md
 		..\docs2\site\docs\migrations\migration7.md = ..\docs2\site\docs\migrations\migration7.md
+		..\docs2\site\docs\migrations\migration8.md = ..\docs2\site\docs\migrations\migration8.md
 		..\docs2\site\docs\migrations\v0_11_0.md = ..\docs2\site\docs\migrations\v0_11_0.md
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
@@ -179,7 +180,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\gql007.md = ..\docs2\site\docs\analyzers\gql007.md
 		..\docs2\site\docs\analyzers\gql008.md = ..\docs2\site\docs\analyzers\gql008.md
 		..\docs2\site\docs\analyzers\gql009.md = ..\docs2\site\docs\analyzers\gql009.md
+		..\docs2\site\docs\analyzers\gql010.md = ..\docs2\site\docs\analyzers\gql010.md
 		..\docs2\site\docs\analyzers\gql011.md = ..\docs2\site\docs\analyzers\gql011.md
+		..\docs2\site\docs\analyzers\gql012.md = ..\docs2\site\docs\analyzers\gql012.md
 		..\docs2\site\docs\analyzers\overview.md = ..\docs2\site\docs\analyzers\overview.md
 	EndProjectSection
 EndProject

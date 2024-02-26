@@ -17,7 +17,7 @@ public class OrderItemType : ObjectGraphType<OrderItem>
         Field<ProductType, Product>("Product")
             .ResolveAsync(ctx =>
             {
-                var loader = accessor.Context!.GetOrAddBatchLoader<int, Product>("GetProductById",
+                var loader = accessor.Context.GetOrAddBatchLoader<int, Product>("GetProductById",
                     products.GetProductsByIdAsync);
 
                 return loader.LoadAsync(ctx.Source.ProductId);

@@ -63,6 +63,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(FloatGraphType))]
     [InlineData(typeof(DecimalGraphType))]
     [InlineData(typeof(EnumerationGraphType))]
+    [InlineData(typeof(ComplexScalarGraphType))]
     public void allow_null(Type graphType)
     {
         var g = Create(graphType);
@@ -104,6 +105,7 @@ public class AllScalarGraphTypeTests
     [InlineData(typeof(FloatGraphType))]
     [InlineData(typeof(DecimalGraphType))]
     [InlineData(typeof(EnumerationGraphType))]
+    [InlineData(typeof(ComplexScalarGraphType))]
     public void no_parsevalue_null(Type graphType)
     {
         var g = Create(graphType);

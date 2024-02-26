@@ -239,21 +239,9 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
                 {
                     Fields = new List<GraphQLObjectField>
                     {
-                        new GraphQLObjectField
-                        {
-                            Name = new GraphQLName("x"),
-                            Value = new GraphQLFloatValue(vector3.X.ToString())
-                        },
-                        new GraphQLObjectField
-                        {
-                            Name = new GraphQLName("y"),
-                            Value = new GraphQLFloatValue(vector3.Y.ToString())
-                        },
-                        new GraphQLObjectField
-                        {
-                            Name = new GraphQLName("z"),
-                            Value = new GraphQLFloatValue(vector3.Z.ToString())
-                        }
+                        new GraphQLObjectField(new GraphQLName("x"), new GraphQLFloatValue(vector3.X.ToString())),
+                        new GraphQLObjectField(new GraphQLName("y"), new GraphQLFloatValue(vector3.Y.ToString())),
+                        new GraphQLObjectField(new GraphQLName("z"), new GraphQLFloatValue(vector3.Z.ToString())),
                     }
                 };
             }

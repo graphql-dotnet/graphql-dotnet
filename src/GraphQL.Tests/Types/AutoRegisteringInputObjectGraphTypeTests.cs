@@ -2,6 +2,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
 using GraphQL.Types;
+using GraphQL.Utilities.Federation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types;
 
@@ -180,10 +182,10 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NotNullEnumerableNotNullIntField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>>))]
     [InlineData(nameof(FieldTests.NullableEnumerableNullableIntField), typeof(ListGraphType<GraphQLClrInputTypeReference<int>>))]
     [InlineData(nameof(FieldTests.NullableEnumerableNotNullIntField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>))]
-    [InlineData(nameof(FieldTests.NotNullArrayNullableTupleField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>))]
-    [InlineData(nameof(FieldTests.NotNullArrayNotNullTupleField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>>))]
-    [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>))]
-    [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<Tuple<int, string>>>>))]
+    [InlineData(nameof(FieldTests.NotNullArrayNullableTupleField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>))]
+    [InlineData(nameof(FieldTests.NotNullArrayNotNullTupleField), typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>>))]
+    [InlineData(nameof(FieldTests.NullableArrayNullableTupleField), typeof(ListGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>))]
+    [InlineData(nameof(FieldTests.NullableArrayNotNullTupleField), typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<InputTuple<int, string>>>>))]
     [InlineData(nameof(FieldTests.IdField), typeof(NonNullGraphType<IdGraphType>))]
     [InlineData(nameof(FieldTests.NullableIdField), typeof(IdGraphType))]
     [InlineData(nameof(FieldTests.EnumerableField), typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<object>>>))]
@@ -191,7 +193,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
     [InlineData(nameof(FieldTests.NullableEnumerableField), typeof(ListGraphType<GraphQLClrInputTypeReference<object>>))]
     [InlineData(nameof(FieldTests.NullableCollectionField), typeof(ListGraphType<GraphQLClrInputTypeReference<object>>))]
     [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrInputTypeReference<int>>>))]
-    public void Field_DectectsProperType(string fieldName, Type expectedGraphType)
+    public void Field_DetectsProperType(string fieldName, Type expectedGraphType)
     {
         var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
@@ -254,12 +256,20 @@ public class AutoRegisteringInputObjectGraphTypeTests
     {
         var dic = new Dictionary<string, object?>()
         {
-            { "Field1", 11 },
-            { "Field3", 13 },
-            { "Field5", 15 },
-            { "Field6AltName", 16 },
+            { "field1", 11 },
+            { "field3", 13 },
+            { "field5", 15 },
+            { "field6AltName", 16 },
         };
         var graph = new TestFieldSupport<TestClass>();
+
+        // initialize schema
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("test");
+        var schema = new Schema() { Query = queryType };
+        schema.RegisterType(graph);
+        schema.Initialize();
+
         var actual = graph.ParseDictionary(dic).ShouldBeOfType<TestClass>();
         actual.Field1.ShouldBe(11);
         actual.Field3Value.ShouldBe(13);
@@ -300,11 +310,83 @@ public class AutoRegisteringInputObjectGraphTypeTests
         var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
         graphType.Fields.Find(nameof(FieldTests.FieldWithInitSetter)).ShouldNotBeNull();
 
+        // initialize graphType
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("test");
+        new ServiceCollection()
+            .AddSingleton<AnyScalarGraphType>()
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(s =>
+                {
+                    s.RegisterType(graphType);
+                    s.RegisterTypeMapping<object, AnyScalarGraphType>();
+                }))
+            .BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
+
         // also verify the data is injected into the class properly
-        var dic = new Dictionary<string, object?>() { { nameof(FieldTests.FieldWithInitSetter), "hello" } };
+        var dic = new Dictionary<string, object?>() { { nameof(FieldTests.FieldWithInitSetter).ToCamelCase(), "hello" } };
         object obj = graphType.ParseDictionary(dic);
         var fieldTests = obj.ShouldBeOfType<FieldTests>();
         fieldTests.FieldWithInitSetter.ShouldBe("hello");
+    }
+
+    [Fact]
+    public void RegistersConstructorProperties()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<ReadOnlyClass>();
+        var idField = graphType.Fields.Find(nameof(ReadOnlyClass.Id)).ShouldNotBeNull();
+        idField.Name.ShouldBe("Id");
+        idField.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+        var nameField = graphType.Fields.Find(nameof(ReadOnlyClass.Name)).ShouldNotBeNull();
+        nameField.Name.ShouldBe("Name");
+        nameField.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>));
+
+        // initialize graphType
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("test");
+        new ServiceCollection()
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(s => s.RegisterType(graphType)))
+            .BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
+
+        // also verify the data is injected into the class properly
+        var dic = new Dictionary<string, object?>() {
+            { nameof(ReadOnlyClass.Id).ToCamelCase(), "123" },
+            { nameof(ReadOnlyClass.Name).ToCamelCase(), "John Doe" },
+        };
+        object obj = graphType.ParseDictionary(dic);
+        var data = obj.ShouldBeOfType<ReadOnlyClass>();
+        data.Id.ShouldBe(123);
+        data.Name.ShouldBe("John Doe");
+    }
+
+    [Fact]
+    public void ParserSetProperly()
+    {
+        var inputType = new AutoRegisteringInputObjectGraphType<Class3>();
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field<StringGraphType>("test")
+            .Argument<int>("input", configure: arg => arg.ResolvedType = inputType);
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is converted to an integer
+        inputType.Fields.First().ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
+        inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<FormatException>(() => inputType.Fields.First().Parser.ShouldNotBeNull().Invoke("abc"));
+    }
+
+    private class Class3
+    {
+        [Id]
+        public int Id { get; set; }
+    }
+
+    private class Class1
+    {
+        public string? Sample { get; set; }
     }
 
     private class FieldTests
@@ -355,10 +437,10 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; } = null!;
         public IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
         public IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
-        public Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; } = null!;
-        public Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; } = null!;
-        public Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
-        public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
+        public InputTuple<int, string>?[] NotNullArrayNullableTupleField { get; set; } = null!;
+        public InputTuple<int, string>[] NotNullArrayNotNullTupleField { get; set; } = null!;
+        public InputTuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
+        public InputTuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
         [Id]
         public int IdField { get; set; }
         [Id]
@@ -369,6 +451,12 @@ public class AutoRegisteringInputObjectGraphTypeTests
         public ICollection? NullableCollectionField { get; set; }
         public int?[]?[]? ListOfListOfIntsField { get; set; }
         public string FieldWithInitSetter { get; init; } = null!;
+    }
+
+    private class InputTuple<T1, T2>
+    {
+        public T1? Item1 { get; set; }
+        public T2? Item2 { get; set; }
     }
 
     private class TestChangingFieldList<T> : AutoRegisteringInputObjectGraphType<T>
@@ -471,5 +559,18 @@ public class AutoRegisteringInputObjectGraphTypeTests
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
+    }
+
+    private class ReadOnlyClass
+    {
+        public ReadOnlyClass(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        [Id]
+        public int Id { get; }
+        public string Name { get; }
     }
 }

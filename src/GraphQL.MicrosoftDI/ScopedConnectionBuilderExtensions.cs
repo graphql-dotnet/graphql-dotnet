@@ -14,11 +14,11 @@ public static class ScopedConnectionBuilderExtensions
     /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.PageSize(int?)">PageSize</see> and/or
     /// <see cref="ConnectionBuilder{TSourceType, TReturnType}.Bidirectional">Bidirectional</see> have been called.
     /// </summary>
-    public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
+    public static ConnectionBuilder<TSourceType> ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
     {
         if (resolver == null)
             throw new ArgumentNullException(nameof(resolver));
-        builder.Resolve(context =>
+        return builder.Resolve(context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
             return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
@@ -26,11 +26,11 @@ public static class ScopedConnectionBuilderExtensions
     }
 
     /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
+    public static ConnectionBuilder<TSourceType> ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
     {
         if (resolver == null)
             throw new ArgumentNullException(nameof(resolver));
-        builder.ResolveAsync(async context =>
+        return builder.ResolveAsync(async context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
             return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
@@ -46,11 +46,11 @@ public static class ScopedConnectionBuilderExtensions
         => new(builder.Returns<object>(), false);
 
     /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, TReturnType})"/>
-    public static void ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
+    public static ConnectionBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, TReturnType?> resolver)
     {
         if (resolver == null)
             throw new ArgumentNullException(nameof(resolver));
-        builder.Resolve(context =>
+        return builder.Resolve(context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
             return resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider));
@@ -58,11 +58,11 @@ public static class ScopedConnectionBuilderExtensions
     }
 
     /// <inheritdoc cref="ResolveScopedAsync{TSourceType, TReturnType}(ConnectionBuilder{TSourceType}, Func{IResolveConnectionContext{TSourceType}, Task{TReturnType}})"/>
-    public static void ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
+    public static ConnectionBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this ConnectionBuilder<TSourceType, TReturnType> builder, Func<IResolveConnectionContext<TSourceType>, Task<TReturnType?>> resolver)
     {
         if (resolver == null)
             throw new ArgumentNullException(nameof(resolver));
-        builder.ResolveAsync(async context =>
+        return builder.ResolveAsync(async context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
             return await resolver(new ScopedResolveConnectionContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);

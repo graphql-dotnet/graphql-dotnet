@@ -234,7 +234,7 @@ public class DetailedBenchmark : IBenchmark
                 Schema = Schema,
                 Document = Document,
                 Variables = Inputs ?? Inputs.Empty,
-            }).Result.validationResult;
+            }).Result;
         }
 
         private static readonly ParallelExecutionStrategy _parallelExecutionStrategy = new();

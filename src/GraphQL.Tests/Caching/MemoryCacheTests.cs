@@ -17,7 +17,7 @@ public class MemoryCacheTests
     [Fact]
     public async Task Validate_Entry_Is_Cached()
     {
-        var doc = new GraphQLDocument();
+        var doc = new GraphQLDocument(new());
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
@@ -30,7 +30,7 @@ public class MemoryCacheTests
     [Fact]
     public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
     {
-        var doc = new GraphQLDocument();
+        var doc = new GraphQLDocument(new());
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
@@ -59,7 +59,7 @@ public class MemoryCacheTests
     [InlineData(true, false, true, true, false, false, false)]
     public async Task ExecuteAsync(bool querySet, bool docSet, bool getCalled, bool getReturned, bool executed, bool exectuedSetDocument, bool setCalled)
     {
-        var mockDocument = new GraphQLDocument();
+        var mockDocument = new GraphQLDocument(new());
         var options = new ExecutionOptions
         {
             Query = querySet ? "Some Query" : null,

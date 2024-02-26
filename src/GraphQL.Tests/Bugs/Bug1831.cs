@@ -31,14 +31,8 @@ public class Bug1831 : QueryTestBase<Bug1831Schema>
             Code = "KNOWN_TYPE_NAMES"
         };
         error2.AddLocation(new Location(1, 13));
-        var error3 = new ValidationError(default, "5.8",
-           "Variable \u0027$arg\u0027 is invalid. Variable has unknown type \u0027abcdefg\u0027")
-        {
-            Code = "INVALID_VALUE"
-        };
-        error3.AddLocation(new Location(1, 7));
-        var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2, error3 }, executed: false);
-        AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, variables: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 3, renderErrors: true);
+        var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 }, executed: false);
+        AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, variables: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 2, renderErrors: true);
     }
 }
 

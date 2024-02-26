@@ -15,7 +15,7 @@ public class FieldMiddlewareBuilderTests
         _context = new ResolveFieldContext
         {
             FieldDefinition = new FieldType { Name = "Name" },
-            FieldAst = new GraphQLField { Name = new GraphQLName("Name") },
+            FieldAst = new GraphQLField(new GraphQLName("Name")),
             Source = new Person { Name = "Quinn" },
             Errors = new ExecutionErrors(),
             Schema = new Schema(),

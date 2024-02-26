@@ -186,6 +186,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 
@@ -234,6 +235,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (serviceLifetime != ServiceLifetime.Singleton)
         {
             GlobalSwitches.EnableReflectionCaching = true;
+            GlobalSwitches.DynamicallyCompileToObject = false;
         }
 #endif
 
@@ -392,81 +394,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
     public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
     {
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers <typeparamref name="TAnalyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-    /// dependency injection framework, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer, TAnalyzer>(ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers <paramref name="analyzer"/> as a singleton of type <see cref="IComplexityAnalyzer"/> within the
-    /// dependency injection framework, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, TAnalyzer, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, TAnalyzer analyzer, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzer ?? throw new ArgumentNullException(nameof(analyzer)));
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers a singleton of type <see cref="IComplexityAnalyzer"/> within the dependency injection framework
-    /// using the specified factory delegate, then enables and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration>? action = null)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
-        builder.AddValidationRule<ComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddComplexityAnalyzer{TAnalyzer}(IGraphQLBuilder, Func{IServiceProvider, TAnalyzer}, Action{ComplexityConfiguration})"/>
-    [Obsolete("Please write a custom complexity analyzer as a validation rule. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddComplexityAnalyzer<TAnalyzer>(this IGraphQLBuilder builder, Func<IServiceProvider, TAnalyzer> analyzerFactory, Action<ComplexityConfiguration, IServiceProvider?>? action)
-        where TAnalyzer : class, IComplexityAnalyzer
-    {
-        builder.Services.Register<IComplexityAnalyzer>(analyzerFactory ?? throw new ArgumentNullException(nameof(analyzerFactory)), ServiceLifetime.Singleton);
         builder.AddValidationRule<ComplexityValidationRule>();
         builder.Services.Configure(action);
         return builder;
@@ -704,30 +631,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     #endregion
 
     #region - UseMiddleware -
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, bool, ServiceLifetime)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware<TMiddleware>(builder, install, serviceLifetime);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, Func{IServiceProvider, ISchema, bool}, ServiceLifetime)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware<TMiddleware>(builder, installPredicate, serviceLifetime);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, bool)"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, bool install = true)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware(builder, middleware, install);
-
-    /// <inheritdoc cref="UseMiddleware{TMiddleware}(IGraphQLBuilder, TMiddleware, Func{IServiceProvider, ISchema, bool})"/>
-    [Obsolete("Please use UseMiddleware. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddMiddleware<TMiddleware>(this IGraphQLBuilder builder, TMiddleware middleware, Func<IServiceProvider, ISchema, bool> installPredicate)
-        where TMiddleware : class, IFieldMiddleware
-        => UseMiddleware(builder, middleware, installPredicate);
-
     /// <summary>
     /// Registers <typeparamref name="TMiddleware"/> with the dependency injection framework as both <typeparamref name="TMiddleware"/> and
     /// <see cref="IFieldMiddleware"/>. If <paramref name="install"/> is <see langword="true"/>, installs the middleware by configuring schema
@@ -906,6 +809,14 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 
+    /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
+    public static IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this IGraphQLBuilder builder)
+        where TConfigureSchema : class, IConfigureSchema
+    {
+        builder.Services.TryRegister<IConfigureSchema, TConfigureSchema>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
+
     /// <summary>
     /// Configures an action to configure execution options, which run prior to calls to
     /// <see cref="ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see>
@@ -941,7 +852,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
         where TConfigureExecution : class, IConfigureExecution
     {
-        builder.Services.Register<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 
@@ -974,10 +885,10 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="useForCachedDocuments"/> is <see langword="true"/>, do not separately install the validation rule within
     /// your execution code or the validation rule may be run twice for each execution.
     /// </remarks>
-    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false)
+    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(ServiceLifetime.Singleton);
+        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(serviceLifetime);
         builder.ConfigureExecutionOptions(options =>
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
@@ -1027,10 +938,10 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="useForCachedDocuments"/> is <see langword="true"/>, do not separately install the validation rule within
     /// your execution code or the validation rule may be run twice for each execution.
     /// </remarks>
-    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false)
+    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, Func<IServiceProvider, TValidationRule> validationRuleFactory, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), ServiceLifetime.Singleton);
+        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(validationRuleFactory ?? throw new ArgumentNullException(nameof(validationRuleFactory)), serviceLifetime);
         builder.ConfigureExecutionOptions(options =>
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
@@ -1045,16 +956,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     #endregion
 
     #region - UseApolloTracing -
-    /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, bool)"/>
-    [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, bool enableMetrics = true)
-        => UseApolloTracing(builder, enableMetrics);
-
-    /// <inheritdoc cref="UseApolloTracing(IGraphQLBuilder, Func{ExecutionOptions, bool})"/>
-    [Obsolete("Please use UseApolloTracing. This method will be removed in v8.")]
-    public static IGraphQLBuilder AddApolloTracing(this IGraphQLBuilder builder, Func<ExecutionOptions, bool> enableMetricsPredicate)
-        => UseApolloTracing(builder, enableMetricsPredicate);
-
     /// <summary>
     /// Registers <see cref="InstrumentFieldsMiddleware"/> within the dependency injection framework and
     /// configures it to be installed within the schema, and configures responses to include Apollo

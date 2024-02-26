@@ -1,5 +1,6 @@
 namespace GraphQL.Tests.Execution;
 
+[Collection("StaticTests")] // due to tests with ValueConverter
 public abstract class InputConversionTestsBase
 {
     #region Input Types
@@ -332,28 +333,28 @@ public abstract class InputConversionTestsBase
     [Fact]
     public void can_convert_json_to_input_object_with_custom_converter()
     {
-        const string json = """{ "name1": "tom", "age1": 10 }""";
+        const string json = """{ "name": "tom", "age": 10 }""";
 
         var inputs = VariablesToInputs(json);
 
         // before custom converter
-        var person1 = inputs.ToObject<Person>();
-        person1.Name.ShouldBeNull();
-        person1.Age.ShouldBe(0);
+        var person1 = inputs.ToObject<Person>()!;
+        person1.Name.ShouldBe("tom");
+        person1.Age.ShouldBe(10);
 
-        ValueConverter.Register(v => new Person { Name = (string)v["name1"], Age = (int)v["age1"] });
+        ValueConverter.Register(v => new Person { Name = (string)v["name"] + "sample", Age = (int)v["age"] + 2 });
 
         // after registering custom converter
-        var person2 = inputs.ToObject<Person>();
-        person2.Name.ShouldBe("tom");
-        person2.Age.ShouldBe(10);
+        var person2 = inputs.ToObject<Person>()!;
+        person2.Name.ShouldBe("tomsample");
+        person2.Age.ShouldBe(12);
 
         // after unregistering custom converter
         ValueConverter.Register<Person>(null);
 
-        var person3 = inputs.ToObject<Person>();
-        person3.Name.ShouldBeNull();
-        person3.Age.ShouldBe(0);
+        var person3 = inputs.ToObject<Person>()!;
+        person3.Name.ShouldBe("tom");
+        person3.Age.ShouldBe(10);
     }
 
     protected abstract Inputs VariablesToInputs(string? variables);

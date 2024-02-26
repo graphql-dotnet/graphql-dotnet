@@ -62,7 +62,6 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
                 return;
         }
 
-        INamedTypeSymbol? notAGraphTypeAttribute = null;
         INamedTypeSymbol? graphTypeInterface = null;
         string? genericNameString = null;
 
@@ -85,10 +84,10 @@ public class NotAGraphTypeAnalyzer : DiagnosticAnalyzer
 
         bool HasNotAGraphTypeAttribute(ISymbol typeParam)
         {
-            notAGraphTypeAttribute ??= context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.NotAGraphTypeAttribute);
             return typeParam.GetAttributes()
-                .Any(data => SymbolEqualityComparer.Default.Equals(data.AttributeClass, notAGraphTypeAttribute));
+                .Any(data => data.AttributeClass?.MetadataName == Constants.MetadataNames.NotAGraphTypeAttribute);
         }
+
         bool IsGraphType(ITypeSymbol typeArg)
         {
             graphTypeInterface ??= context.Compilation.GetTypeByMetadataName(Constants.MetadataNames.IGraphType);

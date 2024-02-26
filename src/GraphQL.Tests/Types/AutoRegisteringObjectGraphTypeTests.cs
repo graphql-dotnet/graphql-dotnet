@@ -254,6 +254,28 @@ public class AutoRegisteringObjectGraphTypeTests
         }
     }
 
+    [Fact]
+    public async Task DefaultValueIsCoerced()
+    {
+        var schema = new Schema
+        {
+            Query = new AutoRegisteringObjectGraphType<ArgumentTests>()
+        };
+        schema.Initialize();
+        var result = await schema.ExecuteAsync(o =>
+        {
+            o.Root = new ArgumentTests();
+            o.Query = """
+                query {
+                    withDefaultString
+                }
+                """;
+        });
+        result.ShouldBeSimilarTo("""
+            {"data":{"withDefaultString":"test"}}
+            """);
+    }
+
     [Theory]
     [InlineData(nameof(ArgumentTests.WithNonNullString), "arg1", "hello", null, "hello")]
     [InlineData(nameof(ArgumentTests.WithNullableString), "arg1", "hello", null, "hello")]
@@ -261,7 +283,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(ArgumentTests.WithNullableString), null, null, null, null)]
     [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", "hello", null, "hello")]
     [InlineData(nameof(ArgumentTests.WithDefaultString), "arg1", null, null, null)]
-    [InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")]
+    //[InlineData(nameof(ArgumentTests.WithDefaultString), null, null, null, "test")] //cannot occur -- TryGetArgumentExact returns true for args with default values
     [InlineData(nameof(ArgumentTests.WithCancellationToken), null, null, null, true)]
     [InlineData(nameof(ArgumentTests.WithFromServices), null, null, null, "testService")]
     [InlineData(nameof(ArgumentTests.NamedArg), "arg1rename", "hello", null, "hello")]
@@ -274,6 +296,17 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         var graphType = new AutoRegisteringObjectGraphType<ArgumentTests>();
         var fieldType = graphType.Fields.Find(fieldName).ShouldNotBeNull();
+
+        // initialize schema
+        var services = new ServiceCollection();
+        services
+            .AddSingleton("testService")
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(b => b.RegisterType(graphType)));
+        using var provider = services.BuildServiceProvider();
+        provider.GetRequiredService<ISchema>().Initialize();
+
         using var cts = new CancellationTokenSource();
         cts.Cancel();
         var context = new ResolveFieldContext
@@ -281,6 +314,8 @@ public class AutoRegisteringObjectGraphTypeTests
             Arguments = new Dictionary<string, ArgumentValue>(),
             CancellationToken = cts.Token,
             Source = new ArgumentTests(),
+            FieldDefinition = fieldType,
+            RequestServices = provider,
         };
         if (arg1Name != null)
         {
@@ -290,10 +325,6 @@ public class AutoRegisteringObjectGraphTypeTests
         {
             context.Arguments.Add("arg2", new ArgumentValue(arg2Value, ArgumentSource.Variable));
         }
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton<string>("testService");
-        using var provider = serviceCollection.BuildServiceProvider();
-        context.RequestServices = provider;
         fieldType.Resolver.ShouldNotBeNull();
         (await fieldType.Resolver!.ResolveAsync(context)).ShouldBe(expected);
     }
@@ -471,6 +502,14 @@ public class AutoRegisteringObjectGraphTypeTests
         var graphType = new TestFieldSupport<TestStructModel>();
         graphType.Name.ShouldBe("Test");
         graphType.Fields.Count.ShouldBe(3);
+
+        // initialize graph type
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<Class1>()
+            .ConfigureSchema(s => s.RegisterType(graphType)));
+        services.BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
+
         var context = new ResolveFieldContext
         {
             Source = new TestStructModel(),
@@ -478,11 +517,19 @@ public class AutoRegisteringObjectGraphTypeTests
             {
                 { "prefix", new ArgumentValue("test", ArgumentSource.Literal) },
             },
+            FieldDefinition = graphType.Fields.Find("id")!,
         };
-        (await graphType.Fields.Find("Id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
-        graphType.Fields.Find("Id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
-        (await graphType.Fields.Find("Name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
-        (await graphType.Fields.Find("IdAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
+        (await graphType.Fields.Find("id").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe(1);
+        graphType.Fields.Find("id")!.Type.ShouldBe(typeof(NonNullGraphType<IdGraphType>));
+        context.FieldDefinition = graphType.Fields.Find("name")!;
+        (await graphType.Fields.Find("name").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("Example");
+        context.FieldDefinition = graphType.Fields.Find("idAndName")!;
+        (await graphType.Fields.Find("idAndName").ShouldNotBeNull().Resolver!.ResolveAsync(context)).ShouldBe("testExample1");
+    }
+
+    public class Class1
+    {
+        public string? Test { get; set; }
     }
 
     [Fact]
@@ -514,6 +561,96 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         Should.Throw<ArgumentNullException>(() => new NoMemberInstanceExpression<TestBasicClass>())
             .ParamName.ShouldBe("instanceExpression");
+    }
+
+    [Fact]
+    public async Task ParserOnArgumentsSetProperly()
+    {
+        var queryType = new AutoRegisteringObjectGraphType<Class3>();
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is converted to an integer
+        var fieldType = queryType.Fields.First();
+        var argument = fieldType.Arguments.ShouldNotBeNull().First();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
+        argument.Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<FormatException>(() => argument.Parser("abc"));
+        // perform end-to-end test for bad argument
+        var result = await new DocumentExecuter().ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = """{ testMe(id: "abc") }""";
+        });
+        result.Executed.ShouldBeFalse();
+        var resultJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+#if NET7_0_OR_GREATER
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. The input string \u0027abc\u0027 was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#else
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027id\u0027 of field \u0027testMe\u0027. Input string was not in a correct format.","locations":[{"line":1,"column":14}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","FORMAT"],"number":"5.6"}}]}""");
+#endif
+    }
+
+    private class Class3
+    {
+        public static int TestMe([Id] int id) => id;
+    }
+
+    [Fact]
+    public async Task ValidatorOnArgumentsSetProperly()
+    {
+        var queryType = new AutoRegisteringObjectGraphType<Class4>();
+        var schema = new Schema { Query = queryType };
+        schema.Initialize();
+        // verify that during input coercion, the value is validated
+        var fieldType = queryType.Fields.First();
+        var argument = fieldType.Arguments.ShouldNotBeNull().First();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<StringGraphType>>();
+        argument.Validator.ShouldNotBeNull().Invoke("abc");
+        // verify that during input coercion, parsing errors throw an exception
+        Should.Throw<ArgumentException>(() => argument.Validator("abcdef"));
+        // perform end-to-end test for bad argument
+        var result = await new DocumentExecuter().ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = """{ testMe(value: "abcdef") }""";
+        });
+        result.Executed.ShouldBeFalse();
+        var resultJson = new SystemTextJson.GraphQLSerializer().Serialize(result);
+        resultJson.ShouldBe("""{"errors":[{"message":"Invalid value for argument \u0027value\u0027 of field \u0027testMe\u0027. Value is too long. Max length is 5.","locations":[{"line":1,"column":17}],"extensions":{"code":"INVALID_VALUE","codes":["INVALID_VALUE","ARGUMENT"],"number":"5.6"}}]}""");
+    }
+
+    private class Class4
+    {
+        public static string TestMe([MyMaxLength(5)] string value) => value;
+    }
+
+    private class MyMaxLength : GraphQLAttribute
+    {
+        private readonly int _maxLength;
+        public MyMaxLength(int maxLength)
+        {
+            _maxLength = maxLength;
+        }
+
+        public override void Modify(ArgumentInformation argumentInformation)
+        {
+            if (argumentInformation.TypeInformation.Type != typeof(string))
+            {
+                throw new InvalidOperationException("MyMaxLength can only be used on string arguments.");
+            }
+        }
+
+        public override void Modify(QueryArgument queryArgument)
+        {
+            queryArgument.Validate(value =>
+            {
+                if (((string)value).Length > _maxLength)
+                {
+                    throw new ArgumentException($"Value is too long. Max length is {_maxLength}.");
+                }
+            });
+        }
     }
 
     public class NoMemberInstanceExpression<T> : AutoRegisteringObjectGraphType<T>
@@ -684,7 +821,7 @@ public class AutoRegisteringObjectGraphTypeTests
     {
         public int Field1 { get; set; } = 1;
         public int Field2 => 2;
-        public int Field3 { set { } }
+        public int Field3 { private get => 123; set { } }
         public int Field4() => 4;
         public int Field5 = 5;
         [Name("Field6AltName")]

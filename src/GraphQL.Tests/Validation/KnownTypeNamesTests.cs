@@ -43,7 +43,6 @@ public class KnownTypeNamesTests : ValidationTestBase<KnownTypeNames, Validation
                 }
                 """;
             _.Error(KnownTypeNamesError.UnknownTypeMessage("Abcd"), 1, 17);
-            _.Error("Variable '$var' is invalid. Variable has unknown type 'Abcd'", 1, 11);
         });
     }
 
@@ -66,7 +65,6 @@ public class KnownTypeNamesTests : ValidationTestBase<KnownTypeNames, Validation
             _.Error(KnownTypeNamesError.UnknownTypeMessage("JumbledUpLetters"), 1, 19);
             _.Error(KnownTypeNamesError.UnknownTypeMessage("Badger"), 4, 21);
             _.Error(KnownTypeNamesError.UnknownTypeMessage("Peettt", new[] { "Pet" }), 7, 25);
-            _.Error("Variable '$var' is invalid. Variable has unknown type 'JumbledUpLetters'", 1, 13);
         });
     }
 }

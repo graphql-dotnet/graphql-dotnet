@@ -5,13 +5,13 @@ using GraphQL.Types;
 using GraphQLParser;
 using GraphQLParser.AST;
 
-namespace GraphQL.Utilities.Federation
-{
-    public class FederatedSchemaBuilder : SchemaBuilder
-    {
-        internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
+namespace GraphQL.Utilities.Federation;
 
-        private const string FEDERATED_SDL = @"
+public class FederatedSchemaBuilder : SchemaBuilder
+{
+    internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
+
+    private const string FEDERATED_SDL = @"
             scalar _Any
             # scalar _FieldSet
 
@@ -36,171 +36,170 @@ namespace GraphQL.Utilities.Federation
             directive @extends on OBJECT | INTERFACE
         ";
 
-        public override Schema Build(string typeDefinitions)
+    public override Schema Build(string typeDefinitions)
+    {
+        var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
+        schema.RegisterType(BuildEntityGraphType());
+        AddRootEntityFields(schema);
+        return schema;
+    }
+
+    protected override void PreConfigure(Schema schema)
+    {
+        schema.RegisterType<AnyScalarGraphType>();
+        schema.RegisterType<ServiceGraphType>();
+    }
+
+    private void AddRootEntityFields(ISchema schema)
+    {
+        var query = schema.Query;
+
+        if (query == null)
         {
-            var schema = base.Build($"{FEDERATED_SDL}{Environment.NewLine}{typeDefinitions}");
-            schema.RegisterType(BuildEntityGraphType());
-            AddRootEntityFields(schema);
-            return schema;
+            schema.Query = query = new ObjectGraphType { Name = "Query" };
         }
 
-        protected override void PreConfigure(Schema schema)
+        var service = new FieldType
         {
-            schema.RegisterType<AnyScalarGraphType>();
-            schema.RegisterType<ServiceGraphType>();
-        }
+            Name = "_service",
+            ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
+            Resolver = new FuncFieldResolver<object>(_ => new { })
+        };
+        query.AddField(service);
 
-        private void AddRootEntityFields(ISchema schema)
+        var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
+
+        var entities = new FieldType
         {
-            var query = schema.Query;
-
-            if (query == null)
+            Name = "_entities",
+            Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+            ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
+            Resolver = new FuncFieldResolver<object>(async context =>
             {
-                schema.Query = query = new ObjectGraphType { Name = "Query" };
-            }
+                AddTypeNameToSelection(context.FieldAst, context.Document);
 
-            var service = new FieldType
-            {
-                Name = "_service",
-                ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
-                Resolver = new FuncFieldResolver<object>(_ => new { })
-            };
-            query.AddField(service);
+                var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
 
-            var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
+                var results = new List<object?>();
 
-            var entities = new FieldType
-            {
-                Name = "_entities",
-                Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
-                ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-                Resolver = new FuncFieldResolver<object>(async context =>
+                foreach (var rep in reps!)
                 {
-                    AddTypeNameToSelection(context.FieldAst, context.Document);
-
-                    var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
-
-                    var results = new List<object?>();
-
-                    foreach (var rep in reps!)
+                    var typeName = rep!["__typename"].ToString();
+                    var type = context.Schema.AllTypes[typeName!];
+                    if (type != null)
                     {
-                        var typeName = rep!["__typename"].ToString();
-                        var type = context.Schema.AllTypes[typeName!];
-                        if (type != null)
+                        // execute resolver
+                        var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
+                        if (resolver != null)
                         {
-                            // execute resolver
-                            var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
-                            if (resolver != null)
+                            var resolveContext = new FederatedResolveContext
                             {
-                                var resolveContext = new FederatedResolveContext
-                                {
-                                    Arguments = rep!,
-                                    ParentFieldContext = context
-                                };
-                                var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
-                                results.Add(result);
-                            }
-                            else
-                            {
-                                results.Add(rep);
-                            }
+                                Arguments = rep!,
+                                ParentFieldContext = context
+                            };
+                            var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
+                            results.Add(result);
                         }
                         else
                         {
-                            // otherwise return the representation
                             results.Add(rep);
                         }
                     }
+                    else
+                    {
+                        // otherwise return the representation
+                        results.Add(rep);
+                    }
+                }
 
-                    return results;
-                })
-            };
-            query.AddField(entities);
-        }
+                return results;
+            })
+        };
+        query.AddField(entities);
+    }
 
-        private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
+    private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
+    {
+        if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
         {
-            if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
+            setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
+        }
+    }
+
+    private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
+    {
+        foreach (var selection in selectionSet.Selections)
+        {
+            if (selection is GraphQLField childField && childField.Name == "__typename")
             {
-                setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
+                setToAlter = null;
+                return false;
+            }
+
+            if (selection is GraphQLInlineFragment frag)
+            {
+                return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
+            }
+
+            if (selection is GraphQLFragmentSpread spread)
+            {
+                var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
+                return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
             }
         }
+        setToAlter = selectionSet;
+        return true;
+    }
 
-        private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
+    private UnionGraphType BuildEntityGraphType()
+    {
+        var union = new UnionGraphType
         {
-            foreach (var selection in selectionSet.Selections)
+            Name = "_Entity",
+            Description = "A union of all types that use the @key directive"
+        };
+
+        var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
+        foreach (var e in entities)
+        {
+            union.AddPossibleType(e!);
+        }
+
+        union.ResolveType = x =>
+        {
+            if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
             {
-                if (selection is GraphQLField childField && childField.Name == "__typename")
-                {
-                    setToAlter = null;
-                    return false;
-                }
-
-                if (selection is GraphQLInlineFragment frag)
-                {
-                    return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
-                }
-
-                if (selection is GraphQLFragmentSpread spread)
-                {
-                    var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
-                    return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
-                }
+                return new GraphQLTypeReference(typeName!.ToString()!);
             }
-            setToAlter = selectionSet;
+
+            // TODO: Provide another way to give graph type name, such as an attribute
+            return new GraphQLTypeReference(x.GetType().Name);
+        };
+
+        return union;
+    }
+
+    private bool IsEntity(IGraphType type)
+    {
+        if (type.IsInputObjectType())
+        {
+            return false;
+        }
+
+        var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
+        if (directive != null)
             return true;
-        }
 
-        private UnionGraphType BuildEntityGraphType()
-        {
-            var union = new UnionGraphType
-            {
-                Name = "_Entity",
-                Description = "A union of all types that use the @key directive"
-            };
+        var ast = type.GetAstType<IHasDirectivesNode>();
+        if (ast == null)
+            return false;
 
-            var entities = _types.Values.Where(IsEntity).Select(x => x as IObjectGraphType).ToList();
-            foreach (var e in entities)
-            {
-                union.AddPossibleType(e!);
-            }
+        var keyDir = Directive(ast.Directives!, "key");
+        return keyDir != null;
+    }
 
-            union.ResolveType = x =>
-            {
-                if (x is Dictionary<string, object> dict && dict.TryGetValue("__typename", out object? typeName))
-                {
-                    return new GraphQLTypeReference(typeName!.ToString()!);
-                }
-
-                // TODO: Provide another way to give graph type name, such as an attribute
-                return new GraphQLTypeReference(x.GetType().Name);
-            };
-
-            return union;
-        }
-
-        private bool IsEntity(IGraphType type)
-        {
-            if (type.IsInputObjectType())
-            {
-                return false;
-            }
-
-            var directive = Directive(type.GetExtensionDirectives<ASTNode>(), "key");
-            if (directive != null)
-                return true;
-
-            var ast = type.GetAstType<IHasDirectivesNode>();
-            if (ast == null)
-                return false;
-
-            var keyDir = Directive(ast.Directives!, "key");
-            return keyDir != null;
-        }
-
-        private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
-        {
-            return directives?.FirstOrDefault(x => x.Name == name);
-        }
+    private static GraphQLDirective? Directive(IEnumerable<GraphQLDirective> directives, string name) //TODO: remove?
+    {
+        return directives?.FirstOrDefault(x => x.Name == name);
     }
 }

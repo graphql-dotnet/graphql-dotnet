@@ -60,7 +60,9 @@ public static class Constants
 
     public static class Types
     {
+        public const string AutoRegisteringInputObjectGraphType = "AutoRegisteringInputObjectGraphType";
         public const string FieldType = "FieldType";
+        public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
     }
 
     public static class Interfaces
@@ -71,9 +73,11 @@ public static class Constants
 
     public static class MetadataNames
     {
+        public const string AllowedOnAttribute = "AllowedOnAttribute";
+        public const string GraphQLConstructorAttribute = "GraphQL.GraphQLConstructorAttribute";
         public const string IGraphType = "GraphQL.Types.IGraphType";
         public const string InputObjectGraphType = "GraphQL.Types.InputObjectGraphType`1";
-        public const string NotAGraphTypeAttribute = "GraphQL.NotAGraphTypeAttribute";
+        public const string NotAGraphTypeAttribute = "NotAGraphTypeAttribute";
     }
 }
 

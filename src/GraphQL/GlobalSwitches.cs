@@ -85,9 +85,18 @@ public static class GlobalSwitches
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
 
     /// <summary>
+    /// Enables the schema validation rule requiring schemas to have a Query type defined.
+    /// This is required by the GraphQL specification.
+    /// See <see href="https://spec.graphql.org/October2021/#sec-Root-Operation-Types">Root Operation Types</see>.
+    /// </summary>
+    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+    public static bool RequireRootQueryType { get; set; } = true;
+
+    /// <summary>
     /// Use the v7 naming strategy for graph type names.
     /// </summary>
-    public static bool UseLegacyTypeNaming { get; set; } = true;
+    [Obsolete("This property will be removed in v9.")]
+    public static bool UseLegacyTypeNaming { get; set; } = false;
 
     /// <summary>
     /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
@@ -100,4 +109,20 @@ public static class GlobalSwitches
     /// that have the same TSourceType, one instance will incorrectly pull cached information stored by the other instance.
     /// </summary>
     public static bool EnableReflectionCaching { get; set; }
+
+    /// <summary>
+    /// Enables or disables the use of dynamic compliation to compile the conversion of dictionaries to objects for
+    /// <see cref="GraphQL.Types.InputObjectGraphType{TSourceType}.ParseDictionary(IDictionary{string, object?})">InputObjectGraphType&lt;T&gt;.ParseDictionary</see>
+    /// at runtime. Compiled code is cached in memory for the lifetime of the input object graph type.
+    /// <br/><br/>
+    /// By default enabled for runtimes that support dynamic compilation (i.e. not AOT).
+    /// <see cref="GraphQLBuilderExtensions.AddSchema{TSchema}(DI.IGraphQLBuilder, DI.ServiceLifetime)">AddSchema</see> sets
+    /// this value to <see langword="false"/> when <see cref="DI.ServiceLifetime.Scoped"/> is specified.
+    /// </summary>
+    public static bool DynamicallyCompileToObject { get; set; } =
+#if NETSTANDARD2_0
+        true;
+#else
+        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
 }

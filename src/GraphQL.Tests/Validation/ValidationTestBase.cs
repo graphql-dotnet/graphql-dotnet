@@ -99,6 +99,6 @@ public class ValidationTestBase<TRule, TSchema>
             Rules = rules,
             Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault()!,
             Variables = variables
-        }).Result.validationResult;
+        }).Result;
     }
 }

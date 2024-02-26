@@ -1,18 +1,17 @@
-namespace GraphQL.Execution
+namespace GraphQL.Execution;
+
+/// <summary>
+/// Represents an error triggered by an operation type being requested that is not configured for the schema.
+/// </summary>
+[Serializable]
+public class InvalidOperationError : DocumentError
 {
     /// <summary>
-    /// Represents an error triggered by an invalid operation being requested that is not configured for the schema.
+    /// Initializes a new instance of the <see cref="InvalidOperationError"/> class with a specified error message.
     /// </summary>
-    [Serializable]
-    public class InvalidOperationError : DocumentError
+    public InvalidOperationError(string message)
+        : base(message)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InvalidOperationError"/> class with a specified error message.
-        /// </summary>
-        public InvalidOperationError(string message)
-            : base(message)
-        {
-            Code = "INVALID_OPERATION";
-        }
+        Code = "INVALID_OPERATION";
     }
 }

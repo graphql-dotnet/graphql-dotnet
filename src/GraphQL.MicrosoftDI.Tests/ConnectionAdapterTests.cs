@@ -29,14 +29,14 @@ public class ConnectionAdapterTests
         rccMock.SetupGet(x => x.Arguments).Returns(new Dictionary<string, ArgumentValue>() { { "6", default } });
         rccMock.SetupGet(x => x.ArrayPool).Returns(Mock.Of<IExecutionArrayPool>());
         rccMock.SetupGet(x => x.CancellationToken).Returns((CancellationToken)default);
-        rccMock.SetupGet(x => x.Document).Returns(new GraphQLDocument());
+        rccMock.SetupGet(x => x.Document).Returns(new GraphQLDocument(new()));
         rccMock.SetupGet(x => x.Errors).Returns(new ExecutionErrors());
         rccMock.SetupGet(x => x.InputExtensions).Returns(new Dictionary<string, object?>() { { "7", new object() } });
         rccMock.SetupGet(x => x.OutputExtensions).Returns(new Dictionary<string, object?>() { { "1", new object() } });
-        rccMock.SetupGet(x => x.FieldAst).Returns(new GraphQLField { Name = new GraphQLName("test") });
+        rccMock.SetupGet(x => x.FieldAst).Returns(new GraphQLField(new GraphQLName("test")));
         rccMock.SetupGet(x => x.FieldDefinition).Returns(new FieldType());
         rccMock.SetupGet(x => x.Metrics).Returns(new Instrumentation.Metrics());
-        rccMock.SetupGet(x => x.Operation).Returns(new GraphQLOperationDefinition());
+        rccMock.SetupGet(x => x.Operation).Returns(new GraphQLOperationDefinition(new GraphQLSelectionSet(new())));
         rccMock.SetupGet(x => x.ParentType).Returns(Mock.Of<IObjectGraphType>());
         rccMock.SetupGet(x => x.Path).Returns(new object[] { "5" });
         rccMock.SetupGet(x => x.RequestServices).Returns(Mock.Of<IServiceProvider>());
