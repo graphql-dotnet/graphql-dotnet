@@ -13,6 +13,56 @@ namespace GraphQL;
 /// </summary>
 public static class TypeExtensions
 {
+    private static readonly Type[] _objectListTypes = [
+        typeof(IEnumerable),
+        typeof(IList),
+        typeof(ICollection),
+        typeof(object),
+    ];
+
+    private static readonly Type[] _genericEnumerableTypes = [
+        typeof(IEnumerable<>),
+        typeof(IList<>),
+        typeof(ICollection<>),
+        typeof(IReadOnlyCollection<>),
+        typeof(IReadOnlyList<>),
+    ];
+
+    /// <summary>
+    /// Returns the list type of the indicated type.
+    /// </summary>
+    internal static (bool IsArray, bool IsList, Type ElementType) GetListType(this Type type)
+    {
+        var isArray = false;
+        var isList = false;
+        Type? elementType = null;
+        if (type.IsArray)
+        {
+            elementType = type.GetElementType()!;
+            isArray = true;
+        }
+        else if (_objectListTypes.Contains(type))
+        {
+            elementType = typeof(object);
+        }
+        else if (type.IsGenericType)
+        {
+            var genericTypeDef = type.GetGenericTypeDefinition();
+            if (genericTypeDef == typeof(List<>))
+            {
+                elementType = type.GetGenericArguments()[0];
+                isList = true;
+            }
+            else if (_genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
+            {
+                elementType = type.GetGenericArguments()[0];
+            }
+        }
+        if (elementType == null)
+            throw new InvalidOperationException($"Could not determine enumerable type for CLR type '{type.GetFriendlyName()}'.");
+        return (isArray, isList, elementType);
+    }
+
     /// <summary>
     /// Determines whether the indicated type implements IGraphType.
     /// </summary>
