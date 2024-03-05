@@ -164,33 +164,7 @@ public static partial class ObjectExtensions
             {
                 var elementGraphType = listGraphType.ResolvedType ?? throw new InvalidOperationException();
                 // determine the type of list to create
-                var isArray = false;
-                var isList = false;
-                Type? elementType = null;
-                if (type.IsArray)
-                {
-                    elementType = type.GetElementType()!;
-                    isArray = true;
-                }
-                else if (_objectListTypes.Contains(type))
-                {
-                    elementType = typeof(object);
-                }
-                else if (type.IsGenericType)
-                {
-                    var genericTypeDef = type.GetGenericTypeDefinition();
-                    if (genericTypeDef == typeof(List<>))
-                    {
-                        elementType = type.GetGenericArguments()[0];
-                        isList = true;
-                    }
-                    else if (_genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
-                    {
-                        elementType = type.GetGenericArguments()[0];
-                    }
-                }
-                if (elementType == null)
-                    throw new InvalidOperationException($"Could not determine enumerable type for CLR type '{type.GetFriendlyName()}' while coercing graph type '{graphType}'.");
+                var (isArray, isList, elementType) = type.GetListType();
                 // create an expression that represents this:
                 // (IEnumerable<object>?)expr?.Select(x => CoerceExpression(x, elementType, listGraphType.ResolvedType))
                 Func<ParameterExpression, Expression> loopContent = (loopVar) => CoerceExpression(loopVar, elementType, elementGraphType);
@@ -200,21 +174,6 @@ public static partial class ObjectExtensions
             return Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType));
         }
     }
-
-    private static readonly Type[] _objectListTypes = [
-        typeof(IEnumerable),
-        typeof(IList),
-        typeof(ICollection),
-        typeof(object),
-    ];
-
-    private static readonly Type[] _genericEnumerableTypes = [
-        typeof(IEnumerable<>),
-        typeof(IList<>),
-        typeof(ICollection<>),
-        typeof(IReadOnlyCollection<>),
-        typeof(IReadOnlyList<>),
-    ];
 
     private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
     private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
