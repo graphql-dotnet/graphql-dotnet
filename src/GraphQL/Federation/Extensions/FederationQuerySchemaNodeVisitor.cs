@@ -1,4 +1,3 @@
-using GraphQL.Federation.Types;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -46,14 +45,67 @@ internal class FederationQuerySchemaNodeVisitor : BaseSchemaNodeVisitor
         foreach (var repMap in repMaps)
         {
             var typeName = repMap["__typename"].ToString();
-            var graphTypeInstance = context.Schema.AllTypes[typeName]!;
+            var graphTypeInstance = context.Schema.AllTypes[typeName]
+                ?? throw new InvalidOperationException($"Type '{typeName}' not found.");
             var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
                 ?? throw new NotImplementedException($"ResolveReference() was not provided for {graphTypeInstance.Name}.");
 
-            var rep = repMap!.ToObject(resolver.SourceType, graphTypeInstance);
+            resolver.SourceGraphType ??= GenerateGraphType(resolver.SourceType, (IComplexGraphType)graphTypeInstance);
+            var rep = repMap!.ToObject(resolver.SourceType, resolver.SourceGraphType);
             var result = resolver.Resolve(context, rep);
             results.Add(result);
         }
         return results;
+    }
+
+    private static IInputObjectGraphType GenerateGraphType(Type clrType, IComplexGraphType graphType)
+    {
+        var fields = graphType.GetAppliedDirectives()
+            ?.Where(x => x.Name == KEY_DIRECTIVE)
+            .Select(x => (string?)x.FindArgument(FIELDS_ARGUMENT)?.Value)
+            .Where(fields => fields != null)
+            .Select(fields => fields!.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            .SelectMany(x => x)
+            .Distinct(StringComparer.Ordinal)
+            .ToList();
+
+        if (fields == null || fields.Count == 0)
+            throw new InvalidOperationException($"No keys specified for type '{graphType.Name}'.");
+
+        var inputType = clrType == typeof(object)
+            ? new InputObjectGraphType()
+            : (IInputObjectGraphType)Activator.CreateInstance(typeof(InputObjectGraphType<>).MakeGenericType(clrType))!;
+
+        foreach (var field in fields)
+        {
+            var originalField = graphType.GetField(field)
+                ?? throw new InvalidOperationException($"Could not find field '{field}' on type '{graphType.Name}'.");
+
+            inputType.AddField(new FieldType
+            {
+                Name = field,
+                ResolvedType = originalField.ResolvedType!.IsInputType()
+                    ? originalField.ResolvedType // scalar
+                    : GenerateInputObjectGraphType((IComplexGraphType)originalField.ResolvedType!)
+            });
+        }
+
+        return inputType;
+
+        static InputObjectGraphType GenerateInputObjectGraphType(IComplexGraphType complexGraphType)
+        {
+            var ret = new InputObjectGraphType();
+            foreach (var field in complexGraphType.Fields)
+            {
+                ret.AddField(new FieldType
+                {
+                    Name = field.Name,
+                    ResolvedType = field.ResolvedType!.IsInputType()
+                        ? field.ResolvedType
+                        : GenerateInputObjectGraphType((IComplexGraphType)field.ResolvedType!),
+                });
+            }
+            return ret;
+        }
     }
 }

@@ -1,4 +1,5 @@
 using GraphQL.DataLoader;
+using GraphQL.Types;
 
 namespace GraphQL.Federation;
 
@@ -7,6 +8,8 @@ internal class DataLoaderFederationResolver<TSourceType> : IFederationResolver
     private readonly Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType>> _resolveFunc;
 
     public Type SourceType => typeof(TSourceType);
+
+    public IInputObjectGraphType? SourceGraphType { get; set; }
 
     public DataLoaderFederationResolver(Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType>> resolveFunc)
     {

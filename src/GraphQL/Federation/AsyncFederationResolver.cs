@@ -1,3 +1,5 @@
+using GraphQL.Types;
+
 namespace GraphQL.Federation;
 
 internal class AsyncFederationResolver<TSourceType> : IFederationResolver
@@ -5,6 +7,8 @@ internal class AsyncFederationResolver<TSourceType> : IFederationResolver
     private readonly Func<IResolveFieldContext, TSourceType, Task<TSourceType>> _resolveFunc;
 
     public Type SourceType => typeof(TSourceType);
+
+    public IInputObjectGraphType? SourceGraphType { get; set; }
 
     public AsyncFederationResolver(Func<IResolveFieldContext, TSourceType, Task<TSourceType>> resolveFunc)
     {
