@@ -1,4 +1,3 @@
-using GraphQL.Federation.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using static GraphQL.Federation.Extensions.FederationHelper;
