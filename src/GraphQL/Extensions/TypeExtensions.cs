@@ -30,6 +30,9 @@ public static class TypeExtensions
 
     /// <summary>
     /// Returns the list type of the indicated type.
+    /// Also indicates if the list type is an array type or a <see cref="List{T}"/>.
+    /// If neither, this indicates that the type is an interface compatible with
+    /// both <see cref="List{T}"/>s and arrays.
     /// </summary>
     internal static (bool IsArray, bool IsList, Type ElementType) GetListType(this Type type)
     {

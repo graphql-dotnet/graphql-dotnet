@@ -560,7 +560,7 @@ public class ObjectExtensionsTests
         if (compiled)
         {
             Should.Throw<InvalidOperationException>(() => schema.Initialize())
-                .Message.ShouldBe("Could not determine enumerable type for CLR type 'String' while coercing graph type '[Int]'.");
+                .Message.ShouldBe("Could not determine enumerable type for CLR type 'String'.");
         }
         else
         {
