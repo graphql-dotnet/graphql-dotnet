@@ -585,10 +585,6 @@ public class SchemaTypes : IEnumerable<IGraphType>
         if (type is UnionGraphType union)
         {
             using var _ = context.Trace("Loop for possible types of union type '{0}'", union.Name);
-            if (!union.Types.Any() && !union.PossibleTypes.Any())
-            {
-                throw new InvalidOperationException($"Must provide types for Union '{union}'.");
-            }
 
             foreach (var unionedType in union.PossibleTypes)
             {
