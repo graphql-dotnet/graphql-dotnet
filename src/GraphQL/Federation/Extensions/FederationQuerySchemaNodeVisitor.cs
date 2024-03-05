@@ -1,4 +1,3 @@
-using GraphQL.Federation.Types;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
@@ -50,10 +49,26 @@ internal class FederationQuerySchemaNodeVisitor : BaseSchemaNodeVisitor
             var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
                 ?? throw new NotImplementedException($"ResolveReference() was not provided for {graphTypeInstance.Name}.");
 
-            var rep = repMap!.ToObject(resolver.SourceType, graphTypeInstance);
+            //var rep = repMap!.ToObject(resolver.SourceType, null!);
+            var rep = ToObject(resolver.SourceType, repMap);
             var result = resolver.Resolve(context, rep);
             results.Add(result);
         }
         return results;
+
+        object ToObject(Type t, Dictionary<string, object> map)
+        {
+            var obj = Activator.CreateInstance(t)!;
+            foreach (var item in map)
+            {
+                if (item.Key != "__typename")
+                {
+                    var prop = t.GetProperty(item.Key, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public)
+                        ?? throw new InvalidOperationException($"Property '{item.Key}' not found in type '{t.GetFriendlyName()}'.");
+                    prop.SetValue(obj, item.Value);
+                }
+            }
+            return obj;
+        }
     }
 }
