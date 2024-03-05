@@ -26,7 +26,7 @@ public static class FederationGraphTypeExtensions
     {
         return graphType.Field<NonNullGraphType<ListGraphType<EntityType>>>("_entities")
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<Utilities.Federation.AnyScalarGraphType>>>>("representations")
-            .Resolve(FederationQuerySchemaNodeVisitor.ResolveEntities);
+            .Resolve(EntityResolver.Instance);
     }
 
     /// <summary>
