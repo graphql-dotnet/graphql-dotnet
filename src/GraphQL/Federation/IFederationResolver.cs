@@ -3,5 +3,5 @@ namespace GraphQL.Federation;
 internal interface IFederationResolver
 {
     Type SourceType { get; }
-    object Resolve(IResolveFieldContext context, object source);
+    ValueTask<object> ResolveAsync(IResolveFieldContext context, object source);
 }

@@ -14,9 +14,7 @@ public class EntityResolver : IFieldResolver
     public static EntityResolver Instance { get; } = new EntityResolver();
 
     /// <inheritdoc/>
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
     public async ValueTask<object?> ResolveAsync(IResolveFieldContext context)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
     {
         // BUG: Authorization only works at a field level. Authorization at GraphType level doesn't work.
         //      i.e. _entities(representations: [{ __typename: "MyType", id: 1 }]) { myField }
@@ -32,7 +30,7 @@ public class EntityResolver : IFieldResolver
 
             //var rep = repMap!.ToObject(resolver.SourceType, null!);
             var rep = ToObject(resolver.SourceType, repMap);
-            var result = resolver.Resolve(context, rep);
+            var result = await resolver.ResolveAsync(context, rep).ConfigureAwait(false);
             results.Add(result);
         }
         return results;

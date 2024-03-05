@@ -39,13 +39,13 @@ public static class FederationGraphTypeExtensions
     /// Specifies reference resolver for the type.
     /// </summary>
     public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, Task<TSourceType>> resolver) =>
-        graphType.Metadata[RESOLVER_METADATA] = new AsyncFederationResolver<TSourceType>(resolver);
+        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
     /// <summary>
     /// Specifies reference resolver for the type.
     /// </summary>
     public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType>> resolver) =>
-        graphType.Metadata[RESOLVER_METADATA] = new DataLoaderFederationResolver<TSourceType>(resolver);
+        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
     /// <summary>
     /// Specifies reference resolver for the type.
@@ -57,11 +57,11 @@ public static class FederationGraphTypeExtensions
     /// Specifies reference resolver for the type.
     /// </summary>
     public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, Task<TSourceType>> resolver) =>
-        typeConfig.Metadata[RESOLVER_METADATA] = new AsyncFederationResolver<TSourceType>(resolver);
+        typeConfig.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
     /// <summary>
     /// Specifies reference resolver for the type.
     /// </summary>
     public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType>> resolver) =>
-        typeConfig.Metadata[RESOLVER_METADATA] = new DataLoaderFederationResolver<TSourceType>(resolver);
+        typeConfig.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 }
