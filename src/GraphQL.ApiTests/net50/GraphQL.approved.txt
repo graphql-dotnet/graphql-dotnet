@@ -1516,7 +1516,20 @@ namespace GraphQL.Federation
     {
         public EntityResolver() { }
         public static GraphQL.Federation.EntityResolver Instance { get; }
+        public System.Collections.Generic.IEnumerable<GraphQL.Federation.Representation> ConvertRepresentations(GraphQL.Types.ISchema schema, System.Collections.IList representations) { }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
+    }
+    public interface IFederationResolver
+    {
+        System.Type SourceType { get; }
+        System.Threading.Tasks.ValueTask<object> ResolveAsync(GraphQL.IResolveFieldContext context, object source);
+    }
+    public class Representation : System.IEquatable<GraphQL.Federation.Representation>
+    {
+        public Representation(GraphQL.Types.IObjectGraphType GraphType, GraphQL.Federation.IFederationResolver Resolver, object Value) { }
+        public GraphQL.Types.IObjectGraphType GraphType { get; init; }
+        public GraphQL.Federation.IFederationResolver Resolver { get; init; }
+        public object Value { get; init; }
     }
 }
 namespace GraphQL.Federation.Enums
@@ -1524,6 +1537,7 @@ namespace GraphQL.Federation.Enums
     [System.Flags]
     public enum FederationDirectiveEnum
     {
+        All = -1,
         Key = 1,
         Shareable = 2,
         Inaccessible = 4,
@@ -1560,7 +1574,7 @@ namespace GraphQL.Federation.Extensions
     }
     public static class FederationGraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.Federation.Enums.FederationDirectiveEnum import, bool addFields = true, GraphQL.Utilities.PrintOptions? printOptions = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.Federation.Enums.FederationDirectiveEnum import = -1, bool addFields = true, GraphQL.Utilities.PrintOptions? printOptions = null) { }
     }
     public static class FederationGraphTypeExtensions
     {
