@@ -1,4 +1,3 @@
-using GraphQL.Federation.Enums;
 using GraphQL.Federation.Extensions;
 using GraphQL.Federation.Tests.Schema;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,14 +21,7 @@ public class CodeFirstFixture
             .AddGraphTypes(typeof(TestSchema).Assembly)
             .AddClrTypeMappings(typeof(TestSchema).Assembly)
             .AddAutoClrMappings()
-            .AddFederation(FederationDirectiveEnum.Key
-                | FederationDirectiveEnum.Shareable
-                | FederationDirectiveEnum.Inaccessible
-                | FederationDirectiveEnum.Override
-                | FederationDirectiveEnum.External
-                | FederationDirectiveEnum.Provides
-                | FederationDirectiveEnum.Requires,
-                addFields: true));
+            .AddFederation());
 
         Services = sc.BuildServiceProvider();
 

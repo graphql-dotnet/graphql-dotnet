@@ -16,10 +16,57 @@ public class EntityResolver : IFieldResolver
     /// </summary>
     public static EntityResolver Instance { get; } = new EntityResolver();
 
+    /// <summary>
+    /// Converts representations to a list of <see cref="Representation"/> objects.
+    /// This should occur during field validation so that the representations can be validated.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="NotImplementedException"></exception>
+    /// <remarks>
+    /// Exceptions thrown within this method are expected to be returned to the caller as a validation error
+    /// (aka Input Error), not logged as a server error (aka Processing Error).
+    /// </remarks>
+    public IEnumerable<Representation> ConvertRepresentations(ISchema schema, IList representations)
+    {
+        var ret = new List<Representation>();
+        foreach (var representation in representations)
+        {
+            if (representation is IDictionary<string, object> rep)
+            {
+                var typeName = rep["__typename"].ToString();
+                var graphTypeInstance = schema.AllTypes[typeName]
+                    ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
+                if (graphTypeInstance is not IObjectGraphType objectGraphType)
+                    throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
+                var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
+                    ?? throw new NotImplementedException($"The type '{typeName}' has not been configured for GraphQL Federation.");
+
+                object value;
+                try
+                {
+                    //can't use ObjectExtensions.ToObject because that requires an input object graph type for
+                    //  deserialization mapping
+                    //value = rep.ToObject(resolver.SourceType, null!);
+                    value = ToObject(resolver.SourceType, objectGraphType, rep);
+                }
+                catch (Exception ex)
+                {
+                    // mask the underlying exception to prevent leaking implementation details
+                    // the InnerException can be read for debugging purposes
+                    throw new InvalidOperationException($"Error converting representation for type '{typeName}'.", ex);
+                }
+
+                ret.Add(new Representation(objectGraphType, resolver, value));
+            }
+        }
+        return ret;
+    }
+
     /// <inheritdoc/>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
     {
-        //context.Copy is implicit due to the returned object being a list; otherwise it would be necessary (see below)
+        //context.Copy is implicit due to the returned object being a list; otherwise it would be necessary,
+        //  as the context is referenced within a delegate passed to the SimpleDataLoader (see below)
         //context = context.Copy();
 
         // BUG: Authorization only works at a field level. Authorization at GraphType level doesn't work.
@@ -27,40 +74,30 @@ public class EntityResolver : IFieldResolver
         //      will only check authorization for "myField" but not for "MyType".
         // NOTE: is this not true for all unions? i.e. the union type itself is checked for authorization but the type
         //       of the object returned by the field resolver is not checked for authorization
-        var repMaps = context.GetArgument<List<Dictionary<string, object>>>("representations");
+
+        // require the representations argument to be converted to the proper type before hitting this code
+        var representations = (IEnumerable<Representation>)context.Arguments!["representations"].Value!;
+
         var results = new List<object>();
-        foreach (var repMap in repMaps)
+        foreach (var representation in representations)
         {
-            var typeName = repMap["__typename"].ToString();
-            var graphTypeInstance = context.Schema.AllTypes[typeName]
-                ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
-            if (graphTypeInstance is not IObjectGraphType objectGraphType)
-                throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
-            var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
-                ?? throw new NotImplementedException($"ResolveReference() was not provided for {graphTypeInstance.Name}.");
-
-            //can't use ObjectExtensions.ToObject because that requires an input object graph type for
-            //  deserialization mapping
-            //var rep = repMap!.ToObject(resolver.SourceType, null!);
-            var rep = ToObject(resolver.SourceType, objectGraphType, repMap);
-
             // using a data loader here causes the resolvers to run in serial or parallel based on the selected execution strategy.
             // unfortunately this requires extra allocations whereas if the strategy was known this code could be optimized by
             // either awaiting each resolver or collecting them and performing WaitAll. note that this code counts on the fact
             // that the context instance will not be reused due to a list being returned from this method.
-            var result = new SimpleDataLoader(_ => resolver.ResolveAsync(context, rep).AsTask()!);
+            var result = new SimpleDataLoader(_ => representation.Resolver.ResolveAsync(context, representation.Value).AsTask()!);
 
             results.Add(result);
         }
-        return new(results);
 
+        return new(results);
     }
 
     /// <summary>
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
-    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, Dictionary<string, object> map)
+    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
     {
         var obj = Activator.CreateInstance(objectType)!;
         foreach (var item in map)
@@ -73,7 +110,7 @@ public class EntityResolver : IFieldResolver
                 var prop = objectType.GetProperty(item.Key, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public)
                     ?? throw new InvalidOperationException($"Property '{item.Key}' not found in type '{objectType.GetFriendlyName()}'.");
                 var value = Deserialize(item.Key, graphType, prop.PropertyType, item.Value);
-                prop.SetValue(obj, item.Value);
+                prop.SetValue(obj, value);
             }
         }
         return obj;

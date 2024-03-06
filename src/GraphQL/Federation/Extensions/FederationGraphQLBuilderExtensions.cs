@@ -19,7 +19,7 @@ public static class FederationGraphQLBuilderExtensions
     /// <param name="printOptions"> <see cref="PrintOptions"/> used to print _services { sdl }. </param>
     public static IGraphQLBuilder AddFederation(
         this IGraphQLBuilder builder,
-        FederationDirectiveEnum import,
+        FederationDirectiveEnum import = FederationDirectiveEnum.All,
         bool addFields = true,
         PrintOptions? printOptions = null)
     {
@@ -34,16 +34,21 @@ public static class FederationGraphQLBuilderExtensions
             .Register<FederationQuerySchemaNodeVisitor>(ServiceLifetime.Transient);
 
         return builder
-            .ConfigureSchema((schema, services) =>
+            .ConfigureSchema((schema, _) =>
             {
                 schema.AddFederationDirectives(import);
+                // add the @link directive to the schema, referencing the directive specified by the import parameter
                 schema.BuildLinkExtension(import);
+                // register Federation types
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<Utilities.Federation.AnyScalarGraphType>();
                 schema.RegisterType<EntityType>();
+                // after schema initialization, configure the _Entity union type with the proper types
                 schema.RegisterVisitor<FederationEntitiesSchemaNodeVisitor>();
                 if (addFields)
                 {
+                    // add the _service and _entities fields to the query type
+                    // this cannot be done here because the schema.Query property will not yet be set
                     schema.RegisterVisitor<FederationQuerySchemaNodeVisitor>();
                 }
             });

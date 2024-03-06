@@ -7,6 +7,10 @@ namespace GraphQL.Federation.Enums;
 public enum FederationDirectiveEnum
 {
     /// <summary>
+    /// All supported federation directives.
+    /// </summary>
+    All = -1,
+    /// <summary>
     /// @key directive.
     /// </summary>
     Key = 1,

@@ -1,5 +1,4 @@
 using GraphQL.DataLoader;
-using GraphQL.Federation.Enums;
 using GraphQL.Federation.Extensions;
 using GraphQL.Federation.Tests.Schema.External;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,14 +17,7 @@ public class SchemaFirstFixture
         sc.AddGraphQL(builder => builder
             .AddSystemTextJson()
             .AddDataLoader()
-            .AddFederation(FederationDirectiveEnum.Key
-                | FederationDirectiveEnum.Shareable
-                | FederationDirectiveEnum.Inaccessible
-                | FederationDirectiveEnum.Override
-                | FederationDirectiveEnum.External
-                | FederationDirectiveEnum.Provides
-                | FederationDirectiveEnum.Requires,
-                addFields: true));
+            .AddFederation());
 
         Services = sc.BuildServiceProvider();
 

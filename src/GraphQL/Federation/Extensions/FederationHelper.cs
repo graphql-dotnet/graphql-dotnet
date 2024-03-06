@@ -1,5 +1,7 @@
+using System.Collections;
 using GraphQL.Federation.Enums;
 using GraphQL.Federation.Types;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -140,7 +142,7 @@ internal static class FederationHelper
             {
                 Value = Enum.GetValues(typeof(FederationDirectiveEnum))
                     .Cast<FederationDirectiveEnum>()
-                    .Where(x => import.HasFlag(x))
+                    .Where(x => import.HasFlag(x) && FederationDirectiveEnumMap.ContainsKey(x))
                     .Select(x => FederationDirectiveEnumMap[x])
                     .ToList()
             });
@@ -173,5 +175,31 @@ internal static class FederationHelper
         {
             (directive.Arguments ??= new([])).Items.Add(new(new(RESOLVABLE_ARGUMENT), new GraphQLFalseBooleanValue()));
         }
+    }
+
+    internal static void AddFederationFields(this ISchema schema)
+    {
+        var type = schema.Query
+            ?? throw new InvalidOperationException("The query type for the schema has not been defined.");
+
+        type.AddField(new FieldType
+        {
+            Name = "_service",
+            ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
+            Resolver = new FuncFieldResolver<object>(_ => BoolBox.True)
+        });
+
+        var representationsArgumentGraphType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
+        var representationsArgument = new QueryArgument(representationsArgumentGraphType) { Name = "representations" };
+        representationsArgument.Validator += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value);
+        type.AddField(new FieldType
+        {
+            Name = "_entities",
+            ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
+            Arguments = new QueryArguments(
+                new QueryArgument(representationsArgumentGraphType) { Name = "representations" }
+            ),
+            Resolver = EntityResolver.Instance,
+        });
     }
 }
