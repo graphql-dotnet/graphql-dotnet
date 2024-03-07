@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using GraphQL.DataLoader;
 using GraphQL.Types;
@@ -441,6 +442,71 @@ public static class TypeExtensions
             .Concat(assembly.GetCustomAttributes<GraphQLAttribute>())
             .Concat(GlobalSwitches.GlobalAttributes)
             .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// Identifies a property or field on the specified type that matches the specified name.
+    /// Search is performed case-insensitively.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMember(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
+        this Type type,
+        string propertyName)
+    {
+        PropertyInfo? propertyInfo = null;
+
+        // note: analzyer raises false IL2070 warning due to BindingFlags.IgnoreCase being present
+
+        try
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+        catch (AmbiguousMatchException)
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+
+        if (propertyInfo?.SetMethod?.IsPublic ?? false)
+        {
+            var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
+                .Any(type => type.FullName == typeof(IsExternalInit).FullName);
+
+            var isRequired = propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+            return (propertyInfo, isExternalInit, isRequired);
+        }
+
+        FieldInfo? fieldInfo;
+
+        try
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+        catch (AmbiguousMatchException)
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+
+        if (fieldInfo != null)
+        {
+            if (fieldInfo.IsInitOnly)
+                throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+
+            var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+            return (fieldInfo, false, isRequired);
+        }
+
+        throw new InvalidOperationException($"Cannot find member named '{propertyName}' on CLR type '{type.GetFriendlyName()}'.");
     }
 }
 
