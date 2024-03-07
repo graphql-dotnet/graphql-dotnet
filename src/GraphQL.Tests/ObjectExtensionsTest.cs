@@ -415,7 +415,7 @@ public class ObjectExtensionsTests
         schema.RegisterType(inputType);
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field.");
     }
 
     private class MyInput8Type : InputObjectGraphType<MyInput8>

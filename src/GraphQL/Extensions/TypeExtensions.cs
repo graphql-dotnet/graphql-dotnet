@@ -446,10 +446,10 @@ public static class TypeExtensions
 
     /// <summary>
     /// Identifies a property or field on the specified type that matches the specified name.
-    /// Search is performed case-insensitively.
+    /// Search is performed case-insensitively. The property or field must be public and writable/settable.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-    internal static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMember(
+    internal static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindWritableMember(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
         this Type type,
         string propertyName)
@@ -499,7 +499,7 @@ public static class TypeExtensions
         if (fieldInfo != null)
         {
             if (fieldInfo.IsInitOnly)
-                throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+                throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field.");
 
             var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
 
