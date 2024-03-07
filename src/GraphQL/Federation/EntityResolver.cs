@@ -47,7 +47,14 @@ public class EntityResolver : IFieldResolver
                     //can't use ObjectExtensions.ToObject because that requires an input object graph type for
                     //  deserialization mapping
                     //value = rep.ToObject(resolver.SourceType, null!);
-                    value = ToObject(resolver.SourceType, objectGraphType, rep);
+                    if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object>))
+                    {
+                        value = rep;
+                    }
+                    else
+                    {
+                        value = ToObject(resolver.SourceType, objectGraphType, rep);
+                    }
                 }
                 catch (Exception ex)
                 {
