@@ -2247,7 +2247,7 @@ namespace GraphQL.Types
     {
         GraphQL.Types.IGraphType? ResolvedType { get; set; }
     }
-    public interface ISchema : GraphQL.Types.IMetadataReader, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public interface ISchema : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
@@ -2480,7 +2480,7 @@ namespace GraphQL.Types
         public virtual GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
     }
     [System.Diagnostics.DebuggerTypeProxy(typeof(GraphQL.Types.Schema.SchemaDebugView))]
-    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IMetadataReader, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
+    public class Schema : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.ISchema, System.IDisposable, System.IServiceProvider
     {
         public Schema() { }
         public Schema(System.IServiceProvider services) { }
