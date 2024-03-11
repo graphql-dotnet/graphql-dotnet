@@ -5,7 +5,7 @@ namespace GraphQL.Conversion;
 /// </summary>
 internal sealed class DefaultListConverterFactory : ListConverterFactoryBase
 {
-    public override Func<object?[], object> GetConversion<T>()
+    public override Func<object?[], object> Create<T>()
     {
         return list =>
         {

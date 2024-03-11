@@ -16,7 +16,7 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     /// </summary>
     protected ListConverterFactoryBase()
     {
-        Expression<Func<object>> expression = () => GetConversion<string>();
+        Expression<Func<object>> expression = () => Create<string>();
         _convertMethodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
     }
 
@@ -56,5 +56,5 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     /// Returns a converter which will convert items from a given <c>object[]</c> list which contains
     /// items of the specified <typeparamref name="T"/> into a list instance.
     /// </summary>
-    public abstract Func<object?[], object> GetConversion<T>();
+    public abstract Func<object?[], object> Create<T>();
 }

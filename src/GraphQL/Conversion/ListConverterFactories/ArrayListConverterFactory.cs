@@ -8,7 +8,7 @@ internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
 
     public static ArrayListConverterFactory Instance { get; } = new ArrayListConverterFactory();
 
-    public override Func<object?[], object> GetConversion<T>()
+    public override Func<object?[], object> Create<T>()
     {
         if (typeof(T) == typeof(object))
         {

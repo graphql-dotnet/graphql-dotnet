@@ -1056,7 +1056,7 @@ namespace GraphQL.Conversion
     {
         protected ListConverterFactoryBase() { }
         public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
-        public abstract System.Func<object?[], object> GetConversion<T>();
+        public abstract System.Func<object?[], object> Create<T>();
     }
     public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
