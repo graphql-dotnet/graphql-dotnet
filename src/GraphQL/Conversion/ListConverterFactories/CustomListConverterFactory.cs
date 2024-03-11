@@ -15,13 +15,7 @@ namespace GraphQL.Conversion;
 /// </summary>
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
-    private static readonly MethodInfo _castMethodInfo;
-
-    static CustomListConverterFactory()
-    {
-        Expression<Func<IEnumerable<int>>> expression = () => CastOrDefault<int>(null!);
-        _castMethodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
-    }
+    private static readonly MethodInfo _castMethodInfo = typeof(CustomListConverterFactory).GetMethod(nameof(CastOrDefault), BindingFlags.NonPublic | BindingFlags.Static)!;
 
     public IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
