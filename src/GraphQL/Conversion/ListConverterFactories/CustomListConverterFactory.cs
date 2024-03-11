@@ -81,9 +81,9 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
-        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (??)
-
         var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
+
+        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (??)
         /*
         return list =>
         {
