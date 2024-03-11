@@ -1015,7 +1015,7 @@ namespace GraphQL.Conversion
     }
     public sealed class ListConverter : GraphQL.Conversion.IListConverter
     {
-        public ListConverter(System.Type elementType, System.Func<object?[], object> conversion) { }
+        public ListConverter(System.Type elementType, System.Func<object?[], object> converter) { }
         public System.Type ElementType { get; }
         public object Convert(object?[] list) { }
     }
