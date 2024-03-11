@@ -300,9 +300,7 @@ public static partial class ObjectExtensions
             var itemGraphType = listGraphType.ResolvedType
                 ?? throw new InvalidOperationException("Graph type is not a list graph type or ResolvedType not set.");
 
-            var listConverterFactory = ValueConverter.GetListConverterFactory(fieldType);
-
-            var listConverter = listConverterFactory.Create(fieldType);
+            var listConverter = ValueConverter.GetListConverter(fieldType);
 
             var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
 

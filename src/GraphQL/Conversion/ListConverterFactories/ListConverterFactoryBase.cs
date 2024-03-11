@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -9,7 +8,6 @@ namespace GraphQL.Conversion;
 public abstract class ListConverterFactoryBase : IListConverterFactory
 {
     private readonly MethodInfo _convertMethodInfo;
-    private readonly ConcurrentDictionary<Type, IListConverter> _dictionary = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ListConverterFactoryBase"/> class.
@@ -32,24 +30,21 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
             ? listType.GetElementType()!
             : typeof(object);
 
-        return _dictionary.GetOrAdd(elementType, (Type elementType2) =>
+        var methodInfo = _convertMethodInfo.MakeGenericMethod(elementType);
+        try
         {
-            var methodInfo = _convertMethodInfo.MakeGenericMethod(elementType2);
-            try
-            {
-                return new ListConverter(elementType2, (Func<object?[], object>)methodInfo.Invoke(this, null)!);
-            }
-            catch (TargetInvocationException ex) when (ex.InnerException != null)
-            {
-                //preserve stack trace and throw inner exception
+            return new ListConverter(elementType, (Func<object?[], object>)methodInfo.Invoke(this, null)!);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            //preserve stack trace and throw inner exception
 #if NETSTANDARD2_0
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 #else
-                ExceptionDispatchInfo.Throw(ex.InnerException);
+            ExceptionDispatchInfo.Throw(ex.InnerException);
 #endif
-                throw; //unreachable
-            }
-        });
+            throw; //unreachable
+        }
     }
 
     /// <summary>

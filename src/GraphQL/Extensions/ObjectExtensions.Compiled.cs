@@ -194,8 +194,7 @@ public static partial class ObjectExtensions
                 // }
                 // ret = listConverter.GetConversion(type, elementType)(expr);
 
-                var listConverterFactory = ValueConverter.GetListConverterFactory(type);
-                var listConverter = listConverterFactory.Create(type);
+                var listConverter = ValueConverter.GetListConverter(type);
                 var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
                 Expression<Func<object?[], object>> converterExpression = (arg) => listConverter.Convert(arg);
                 var arrayVariable = Expression.Variable(typeof(object?[]), "expr2");

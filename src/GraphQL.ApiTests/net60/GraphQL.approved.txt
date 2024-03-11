@@ -791,6 +791,7 @@ namespace GraphQL
         public static object? ConvertTo(object? value, System.Type targetType) { }
         public static T? ConvertTo<T>(object? value) { }
         public static System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
+        public static GraphQL.Conversion.IListConverter GetListConverter([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public static GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
         public static void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget>? conversion)

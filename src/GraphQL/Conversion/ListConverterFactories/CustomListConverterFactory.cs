@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -17,7 +16,6 @@ namespace GraphQL.Conversion;
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
     private static readonly MethodInfo _methodInfo;
-    private static readonly ConcurrentDictionary<(Type ListType, Type ElementType), IListConverter> _constructors = new();
 
     static CustomListConverterFactory()
     {
@@ -33,16 +31,6 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             ? listType.GetGenericArguments()[0]
             : typeof(object);
 
-        return _constructors.GetOrAdd((listType, elementType), ConstructorFactory);
-    }
-
-    /// <summary>
-    /// Constructs a delegate to create a list of the specified list type from
-    /// an <c>object[]</c> array containing items of the specified element type.
-    /// </summary>
-    private static IListConverter ConstructorFactory((Type ListType, Type ElementType) key)
-    {
-        var (listType, elementType) = key;
         if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition)
             throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is an array, interface or generic type definition and cannot be instantiated.");
         var ctors = listType.GetConstructors();

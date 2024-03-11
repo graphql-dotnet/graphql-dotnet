@@ -288,30 +288,34 @@ public static class ValueConverter
         => Register<IDictionary<string, object>, TTarget>(conversion);
 
     /// <summary>
-    /// Registers or removes a list converter for a specified list type.
+    /// Registers or removes a list converter factory for a specified list type.
     /// The list type should be a generic type definition, such as <see cref="List{T}"/>
     /// or a non-generic collection type such as <see cref="IList"/>.
-    /// Array types are not supported.
+    /// Array types cannot be registered.
     /// </summary>
     public static void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
     {
         if (listType.IsArray)
-            throw new ArgumentException("Array types are not supported.", nameof(listType));
+            throw new ArgumentException("Array types cannot be registered.", nameof(listType));
         if (listType.IsConstructedGenericType)
             throw new ArgumentException("Constructed generic type definitions are not supported.", nameof(listType));
         if (converter == null)
             _listConverters.TryRemove(listType, out var _);
         else
             _listConverters[listType] = converter;
+        _listConvertersCache.Clear();
     }
 
     /// <summary>
     /// Specifies the default list converter factory for types that are not explicitly registered.
+    /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
+    /// registerd will lead to an exception being thrown.
     /// </summary>
     public static IListConverterFactory? DefaultListConverterFactory { get; set; } = new CustomListConverterFactory();
 
     /// <summary>
     /// Gets the list converter factory for the specified list type, if any.
+    /// Array types are supported.
     /// </summary>
     public static IListConverterFactory GetListConverterFactory(Type listType)
     {
@@ -322,5 +326,20 @@ public static class ValueConverter
         var ret = _listConverters.TryGetValue(listType, out var converter) ? converter : null;
         return ret ?? DefaultListConverterFactory
             ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
+    }
+
+    private static readonly ConcurrentDictionary<Type, IListConverter> _listConvertersCache = new();
+
+    /// <summary>
+    /// Returns a converter which will convert items from a given <c>object[]</c> list
+    /// into a list instance of the specified type. The list converter is cached for the specified type.
+    /// </summary>
+    public static IListConverter GetListConverter(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType)
+    {
+#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        return _listConvertersCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
+#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
     }
 }
