@@ -1,8 +1,5 @@
 using System.Collections;
 using System.Collections.Concurrent;
-#if NETCOREAPP1_0_OR_GREATER
-using System.Collections.Immutable;
-#endif
 using System.Globalization;
 using System.Numerics;
 using GraphQL.Conversion;
@@ -160,17 +157,6 @@ public static class ValueConverter
         RegisterListConverterFactory(typeof(HashSet<>), hashSetConverter);
 #if NET5_0_OR_GREATER
         RegisterListConverterFactory(typeof(IReadOnlySet<>), hashSetConverter);
-#endif
-        // types that return an immutable collection
-#if NETCOREAPP1_0_OR_GREATER
-        var immutableListConverter = new ImmutableListConverterFactory();
-        RegisterListConverterFactory(typeof(ImmutableList<>), immutableListConverter);
-        RegisterListConverterFactory(typeof(IImmutableList<>), immutableListConverter);
-        var immutableSetConverter = new ImmutableSetListConverterFactory();
-        RegisterListConverterFactory(typeof(ImmutableHashSet<>), immutableSetConverter);
-        RegisterListConverterFactory(typeof(IImmutableSet<>), immutableSetConverter);
-        var immutableArrayConverter = new ImmutableArrayListConverterFactory();
-        RegisterListConverterFactory(typeof(ImmutableArray<>), immutableArrayConverter);
 #endif
     }
 
