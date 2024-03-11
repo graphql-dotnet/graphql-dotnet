@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
-using GraphQL.Conversion;
 using GraphQL.Types;
 
 namespace GraphQL;

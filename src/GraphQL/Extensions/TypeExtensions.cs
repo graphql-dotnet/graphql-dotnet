@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using GraphQL.Conversion;
 using GraphQL.DataLoader;
 using GraphQL.Types;
 using GraphQL.Utilities;
