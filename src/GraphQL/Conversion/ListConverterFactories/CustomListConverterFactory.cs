@@ -16,6 +16,19 @@ namespace GraphQL.Conversion;
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
     private static readonly MethodInfo _castMethodInfo = typeof(CustomListConverterFactory).GetMethod(nameof(CastOrDefault), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private Type? _implementationType { get; }
+
+    public CustomListConverterFactory(Type? implementationType = null)
+    {
+        if (implementationType != null)
+        {
+            if (implementationType.IsArray || implementationType.IsInterface || implementationType.IsAbstract)
+                throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is an array or interface and cannot be instantiated.");
+            if (implementationType.IsGenericTypeDefinition && implementationType.GetGenericArguments().Length != 1)
+                throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is a generic type definition with more than one generic argument.");
+        }
+        _implementationType = implementationType;
+    }
 
     public IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -25,8 +38,16 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             ? listType.GetGenericArguments()[0]
             : typeof(object);
 
+        if (_implementationType != null)
+        {
+            listType = _implementationType.IsGenericTypeDefinition
+                ? _implementationType.MakeGenericType(elementType)
+                : _implementationType;
+        }
+
         if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition)
             throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is an array, interface or generic type definition and cannot be instantiated.");
+
         var ctors = listType.GetConstructors();
         ConstructorInfo? parameterlessCtor = null;
         var enumerableElementType = typeof(IEnumerable<>).MakeGenericType(elementType);

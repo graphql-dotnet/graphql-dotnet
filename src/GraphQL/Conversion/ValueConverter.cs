@@ -294,6 +294,17 @@ public static class ValueConverter
     }
 
     /// <summary>
+    /// Registers a generic list converter factory for a specified list type.
+    /// For example, it can be used to register a custom list converter for <see cref="IList{T}"/>.
+    /// If the implementation type is an open generic type, the generic type argument from the list
+    /// type will be used to create the implementation type. The implementation type must have a
+    /// public constructor and Add method that accepts a single argument of the generic type argument,
+    /// or a public constructor that accepts a single argument of type <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    public static void RegisterListConverterFactory(Type listType, Type implementationType)
+        => RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
+
+    /// <summary>
     /// Specifies the default list converter factory for types that are not explicitly registered.
     /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
     /// registerd will lead to an exception being thrown.

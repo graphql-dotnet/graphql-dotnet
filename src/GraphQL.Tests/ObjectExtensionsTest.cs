@@ -662,26 +662,38 @@ public class ObjectExtensionsTests
     [InlineData(typeof(TypesTest_Custom2))]
     public void toobject_supports_varioustypes(Type classToTest)
     {
-        var inputType = new InputObjectGraphType();
-        inputType.AddField(new FieldType { Name = "Values", ResolvedType = new ListGraphType(new NonNullGraphType(new IntGraphType())) });
-        var inputs = new Dictionary<string, object?> { { "Values", new object?[] { 1, 2, 3 } } };
-
-        // test compiled
-        Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType)(inputs));
-
-        // test via reflection
-        Validate(inputs.ToObject(classToTest, inputType));
-
-        void Validate(object value)
+        var oldSetConverter = ValueConverter.GetListConverterFactory(typeof(ISet<>));
+        oldSetConverter.ShouldBe(ValueConverter.GetListConverterFactory(typeof(HashSet<>)));
+        try
         {
-            value.ShouldBeOfType(classToTest);
-            var actual = classToTest.GetProperty("Values")!.GetValue(value);
-            if (classToTest == typeof(TypesTest_Stack))
-                actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([3, 2, 1]);
-            else if (classToTest == typeof(TypesTest_IEnumerable) || classToTest == typeof(TypesTest_IList) || classToTest == typeof(TypesTest_ICollection))
-                actual.ShouldBeAssignableTo<IEnumerable>().ShouldBe(new object?[] { 1, 2, 3 });
-            else
-                actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([1, 2, 3]);
+            ValueConverter.RegisterListConverterFactory(typeof(ISet<>), typeof(MyHashSet<>));
+            var inputType = new InputObjectGraphType();
+            inputType.AddField(new FieldType { Name = "Values", ResolvedType = new ListGraphType(new NonNullGraphType(new IntGraphType())) });
+            var inputs = new Dictionary<string, object?> { { "Values", new object?[] { 1, 2, 3 } } };
+
+            // test compiled
+            Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType)(inputs));
+
+            // test via reflection
+            Validate(inputs.ToObject(classToTest, inputType));
+
+            void Validate(object value)
+            {
+                value.ShouldBeOfType(classToTest);
+                var actual = classToTest.GetProperty("Values")!.GetValue(value);
+                if (classToTest == typeof(TypesTest_Stack))
+                    actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([3, 2, 1]);
+                else if (classToTest == typeof(TypesTest_IEnumerable) || classToTest == typeof(TypesTest_IList) || classToTest == typeof(TypesTest_ICollection))
+                    actual.ShouldBeAssignableTo<IEnumerable>().ShouldBe(new object?[] { 1, 2, 3 });
+                else if (classToTest == typeof(TypesTest_ISet))
+                    actual.ShouldBeAssignableTo<MyHashSet<int>>().ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([1, 2, 3]);
+                else
+                    actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([1, 2, 3]);
+            }
+        }
+        finally
+        {
+            ValueConverter.RegisterListConverterFactory(typeof(ISet<>), oldSetConverter);
         }
     }
 
@@ -780,5 +792,8 @@ public class ObjectExtensionsTests
         public List<T> Values { get; } = new();
         public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+    public class MyHashSet<T> : HashSet<T>
+    {
     }
 }

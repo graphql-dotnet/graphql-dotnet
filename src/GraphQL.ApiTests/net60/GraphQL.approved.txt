@@ -798,6 +798,7 @@ namespace GraphQL
             where TTarget :  class { }
         public static void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
         public static void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
+        public static void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
     }
     public struct VariableName
     {
@@ -1058,6 +1059,7 @@ namespace GraphQL.Conversion
         protected ListConverterFactoryBase() { }
         public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public abstract System.Func<object?[], object> Create<T>();
+        protected System.Type GetElementType(System.Type listType) { }
     }
     public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {
