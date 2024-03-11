@@ -172,9 +172,6 @@ public static class ValueConverter
         var immutableArrayConverter = new ImmutableArrayListConverterFactory();
         RegisterListConverterFactory(typeof(ImmutableArray<>), immutableArrayConverter);
 #endif
-        // types that return a Stack<T> or Queue<T>
-        RegisterListConverterFactory(typeof(Stack<>), new StackListConverterFactory());
-        RegisterListConverterFactory(typeof(Queue<>), new QueueListConverterFactory());
     }
 
     /// <summary>
