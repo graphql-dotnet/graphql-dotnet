@@ -18,7 +18,8 @@ namespace GraphQL;
 public static class ValueConverter
 {
     private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
-    private static readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverters = new();
+    private static readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverterFactories = new();
+    private static readonly ConcurrentDictionary<Type, IListConverter> _listConverterCache = new();
 
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
@@ -286,10 +287,10 @@ public static class ValueConverter
         if (listType.IsConstructedGenericType)
             throw new ArgumentException("Constructed generic type definitions are not supported.", nameof(listType));
         if (converter == null)
-            _listConverters.TryRemove(listType, out var _);
+            _listConverterFactories.TryRemove(listType, out var _);
         else
-            _listConverters[listType] = converter;
-        _listConvertersCache.Clear();
+            _listConverterFactories[listType] = converter;
+        _listConverterCache.Clear();
     }
 
     /// <summary>
@@ -309,12 +310,10 @@ public static class ValueConverter
             return ArrayListConverterFactory.Instance;
         if (listType.IsConstructedGenericType)
             listType = listType.GetGenericTypeDefinition();
-        var ret = _listConverters.TryGetValue(listType, out var converter) ? converter : null;
+        var ret = _listConverterFactories.TryGetValue(listType, out var converter) ? converter : null;
         return ret ?? DefaultListConverterFactory
             ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
     }
-
-    private static readonly ConcurrentDictionary<Type, IListConverter> _listConvertersCache = new();
 
     /// <summary>
     /// Returns a converter which will convert items from a given <c>object[]</c> list
@@ -325,7 +324,7 @@ public static class ValueConverter
         Type listType)
     {
 #pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-        return _listConvertersCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
+        return _listConverterCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
 #pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
     }
 }

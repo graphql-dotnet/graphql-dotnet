@@ -7,20 +7,20 @@ namespace GraphQL.Conversion;
 /// <summary>
 /// Dynamically constructs a list of the specified type using reflection.
 /// The type must have a public constructor that takes a single parameter compatible
-/// with an array of the element type, such as <see cref="IEnumerable{T}"/>,
+/// with <see cref="IEnumerable{T}"/>,
 /// or a public parameterless constructor and a public method named "Add" that
-/// takes a single parameter of the element type.
-/// Alternatively, the type may implement <see cref="IList"/> and have a public
-/// parameterless constructor.
+/// takes a single parameter of the element type. Alternatively, the type may
+/// implement <see cref="IList"/> and have a public parameterless constructor.
+/// The returned converter is compiled to a delegate for best execution speed.
 /// </summary>
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
-    private static readonly MethodInfo _methodInfo;
+    private static readonly MethodInfo _castMethodInfo;
 
     static CustomListConverterFactory()
     {
-        Expression<Func<IEnumerable<int>>> expression = () => Enumerable.Cast<int>(null!);
-        _methodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
+        Expression<Func<IEnumerable<int>>> expression = () => CastOrDefault<int>(null!);
+        _castMethodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
     }
 
     public IListConverter Create(
@@ -41,7 +41,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         foreach (var ctor in ctors)
         {
             var ctorParams = ctor.GetParameters();
-            if (ctorParams.Length == 1 && ctorParams[0].ParameterType.IsAssignableFrom(enumerableElementType))
+            if (ctorParams.Length == 1 && ctorParams[0].ParameterType == enumerableElementType)
             {
                 // create expression to call the constructor
                 return new ListConverter(elementType, CreateLambdaViaConstructor(elementType, ctor));
@@ -87,13 +87,36 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
-        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (?)
-        var param = Expression.Parameter(typeof(object[]), "param");
-        var methodInfo = _methodInfo.MakeGenericMethod(elementType);
+        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (??)
+
+        var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
+        /*
+        return list =>
+        {
+            try
+            {
+                var enumerable = methodInfo.Invoke(null, [list])!;
+                var list = constructor.Invoke([enumerable]);
+                return list;
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                //preserve stack trace and throw inner exception
+#if NETSTANDARD2_0
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+#else
+                ExceptionDispatchInfo.Throw(ex.InnerException);
+#endif
+            }
+        };
+        */
+
+        var param = Expression.Parameter(typeof(object?[]), "param");
         var castExpr = Expression.Call(methodInfo, param);
-        var ctorCall = Expression.New(constructor, castExpr);
-        var castCtorCall = Expression.Convert(ctorCall, typeof(object));
-        var lambda = Expression.Lambda<Func<object?[], object>>(castCtorCall, param);
+        Expression body = Expression.New(constructor, castExpr);
+        if (body.Type.IsValueType)
+            body = Expression.Convert(body, typeof(object));
+        var lambda = Expression.Lambda<Func<object?[], object>>(body, param);
         return lambda.Compile();
     }
 
@@ -103,7 +126,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     private static Func<object?[], object> CreateLambdaViaAdd(ConstructorInfo parameterlessCtor, MethodInfo addMethod)
     {
-        // todo: directly call the methods when GlobalSwitches.DynamicallyCompileToObject is false (?)
+        // todo: directly call the methods when GlobalSwitches.DynamicallyCompileToObject is false (??)
         var addMethodParameterType = addMethod.GetParameters()[0].ParameterType;
         var newExpression = Expression.New(parameterlessCtor);
         var param = Expression.Parameter(typeof(object?[]), "param");
@@ -111,11 +134,31 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         var continueTarget = Expression.Label("continue");
         var breakTarget = Expression.Label("break");
         var index = Expression.Variable(typeof(int), "index");
-        Expression addMethodExpression = Expression.ArrayIndex(param, Expression.PostIncrementAssign(index));
-        if (addMethodParameterType != typeof(object))
+
+        // create expression to obtain the item from the array
+        var indexExpression = Expression.ArrayIndex(param, Expression.PostIncrementAssign(index));
+        Expression addMethodExpression;
+        if (!addMethodParameterType.IsValueType)
         {
-            addMethodExpression = Expression.Convert(addMethodExpression, addMethodParameterType);
+            // cast the item to the proper type (if not already object type)
+            addMethodExpression = addMethodParameterType != typeof(object)
+                ? Expression.Convert(indexExpression, addMethodParameterType)
+                : indexExpression;
         }
+        else
+        {
+            // cast the item to the proper type, or use default(T) if null
+            var blockParam = Expression.Parameter(typeof(object), "value");
+            addMethodExpression = Expression.Block(
+                [blockParam],
+                Expression.Assign(blockParam, indexExpression),
+                Expression.Condition(
+                    Expression.Equal(blockParam, Expression.Constant(null)),
+                    Expression.Default(addMethodParameterType),
+                    Expression.Convert(blockParam, addMethodParameterType)));
+        }
+
+        // create loop to add each item to the list
         var loop = Expression.Loop(
             Expression.IfThenElse(
                 Expression.LessThan(index, Expression.ArrayLength(param)),
@@ -128,6 +171,8 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             breakTarget,
             continueTarget
         );
+
+        // create block to initialize the list, add each item, and return the list
         var block = Expression.Block(
             [instance, index],
             Expression.Assign(index, Expression.Constant(0)),
@@ -135,7 +180,21 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             loop,
             Expression.Convert(instance, typeof(object))
         );
+
+        // create lambda and compile it
         var lambda = Expression.Lambda<Func<object?[], object>>(block, param);
         return lambda.Compile();
+    }
+
+    /// <summary>
+    /// Casts each item in the array to the specified type, returning the default value for null items.
+    /// </summary>
+    private static IEnumerable<T> CastOrDefault<T>(object?[] source)
+    {
+        for (var i = 0; i < source.Length; i++)
+        {
+            var value = source[i];
+            yield return value == null ? default! : (T)value;
+        }
     }
 }

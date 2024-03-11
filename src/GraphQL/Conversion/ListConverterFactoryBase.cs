@@ -23,12 +23,7 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
-        // note: does not throw exceptions if there are the wrong number of generic arguments, or if an array has multiple dimensions
-        var elementType = listType.IsGenericType
-            ? listType.GetGenericArguments()[0]
-            : listType.IsArray
-            ? listType.GetElementType()!
-            : typeof(object);
+        var elementType = GetElementType(listType);
 
         var methodInfo = _convertMethodInfo.MakeGenericMethod(elementType);
         try
@@ -48,8 +43,29 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     }
 
     /// <summary>
+    /// Returns the element type of the specified list type.
+    /// </summary>
+    protected Type GetElementType(Type listType)
+    {
+        if (listType is null)
+            throw new ArgumentNullException(nameof(listType));
+        if (listType.IsGenericTypeDefinition)
+            throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type definition and the element type cannot be determined.");
+        if (listType.IsGenericType)
+        {
+            var genericArguments = listType.GetGenericArguments();
+            if (genericArguments.Length != 1)
+                throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type with {genericArguments.Length} generic arguments so the element type cannot be determined.");
+            return genericArguments[0];
+        }
+        return listType.IsArray
+            ? listType.GetElementType()!
+            : typeof(object);
+    }
+
+    /// <summary>
     /// Returns a converter which will convert items from a given <c>object[]</c> list which contains
-    /// items of the specified <typeparamref name="T"/> into a list instance.
+    /// items of the specified elment type <typeparamref name="T"/> into a list instance.
     /// </summary>
     public abstract Func<object?[], object> Create<T>();
 }
