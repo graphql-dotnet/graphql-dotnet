@@ -1,6 +1,11 @@
+using System.Collections;
 using System.Collections.Concurrent;
+#if NETCOREAPP1_0_OR_GREATER
+using System.Collections.Immutable;
+#endif
 using System.Globalization;
 using System.Numerics;
+using GraphQL.Conversion;
 
 namespace GraphQL;
 
@@ -16,6 +21,7 @@ namespace GraphQL;
 public static class ValueConverter
 {
     private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
+    private static readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverters = new();
 
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
@@ -136,6 +142,39 @@ public static class ValueConverter
         Register<char, int>(value => value);
 
         Register<decimal, double>(value => checked((double)value));
+
+        // types that return an array
+        RegisterListConverterFactory(typeof(ICollection), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(ICollection<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyList<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyCollection<>), ArrayListConverterFactory.Instance);
+        // types that return a List<T>
+        RegisterListConverterFactory(typeof(List<>), new DefaultListConverterFactory());
+        // types that return a HashSet<T>
+        var hashSetConverter = new HashSetListConverterFactory();
+        RegisterListConverterFactory(typeof(ISet<>), hashSetConverter);
+        RegisterListConverterFactory(typeof(HashSet<>), hashSetConverter);
+#if NET5_0_OR_GREATER
+        RegisterListConverterFactory(typeof(IReadOnlySet<>), hashSetConverter);
+#endif
+        // types that return an immutable collection
+#if NETCOREAPP1_0_OR_GREATER
+        var immutableListConverter = new ImmutableListConverterFactory();
+        RegisterListConverterFactory(typeof(ImmutableList<>), immutableListConverter);
+        RegisterListConverterFactory(typeof(IImmutableList<>), immutableListConverter);
+        var immutableSetConverter = new ImmutableSetListConverterFactory();
+        RegisterListConverterFactory(typeof(ImmutableHashSet<>), immutableSetConverter);
+        RegisterListConverterFactory(typeof(IImmutableSet<>), immutableSetConverter);
+        var immutableArrayConverter = new ImmutableArrayListConverterFactory();
+        RegisterListConverterFactory(typeof(ImmutableArray<>), immutableArrayConverter);
+#endif
+        // types that return a Stack<T> or Queue<T>
+        RegisterListConverterFactory(typeof(Stack<>), new StackListConverterFactory());
+        RegisterListConverterFactory(typeof(Queue<>), new QueueListConverterFactory());
     }
 
     /// <summary>
@@ -250,4 +289,41 @@ public static class ValueConverter
     public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
         where TTarget : class
         => Register<IDictionary<string, object>, TTarget>(conversion);
+
+    /// <summary>
+    /// Registers or removes a list converter for a specified list type.
+    /// The list type should be a generic type definition, such as <see cref="List{T}"/>
+    /// or a non-generic collection type such as <see cref="IList"/>.
+    /// Array types are not supported.
+    /// </summary>
+    public static void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
+    {
+        if (listType.IsArray)
+            throw new ArgumentException("Array types are not supported.", nameof(listType));
+        if (listType.IsConstructedGenericType)
+            throw new ArgumentException("Constructed generic type definitions are not supported.", nameof(listType));
+        if (converter == null)
+            _listConverters.TryRemove(listType, out var _);
+        else
+            _listConverters[listType] = converter;
+    }
+
+    /// <summary>
+    /// Specifies the default list converter factory for types that are not explicitly registered.
+    /// </summary>
+    public static IListConverterFactory? DefaultListConverterFactory { get; set; } = new CustomListConverterFactory();
+
+    /// <summary>
+    /// Gets the list converter factory for the specified list type, if any.
+    /// </summary>
+    public static IListConverterFactory GetListConverterFactory(Type listType)
+    {
+        if (listType.IsArray)
+            return ArrayListConverterFactory.Instance;
+        if (listType.IsConstructedGenericType)
+            listType = listType.GetGenericTypeDefinition();
+        var ret = _listConverters.TryGetValue(listType, out var converter) ? converter : null;
+        return ret ?? DefaultListConverterFactory
+            ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
+    }
 }

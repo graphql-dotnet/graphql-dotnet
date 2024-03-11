@@ -606,6 +606,7 @@ namespace GraphQL
     public static class ObjectExtensions
     {
         public static System.Func<System.Collections.Generic.IDictionary<string, object?>, object> CompileToObject([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type sourceType, GraphQL.Types.IInputObjectGraphType graphType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
         public static object? GetPropertyValue(this object? propertyValue, System.Type fieldType, GraphQL.Types.IGraphType mappedType) { }
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type type, GraphQL.Types.IGraphType mappedType) { }
@@ -786,13 +787,16 @@ namespace GraphQL
     }
     public static class ValueConverter
     {
+        public static GraphQL.Conversion.IListConverterFactory? DefaultListConverterFactory { get; set; }
         public static object? ConvertTo(object? value, System.Type targetType) { }
         public static T? ConvertTo<T>(object? value) { }
         public static System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
+        public static GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
         public static void Register<TTarget>(System.Func<System.Collections.Generic.IDictionary<string, object>, TTarget>? conversion)
             where TTarget :  class { }
         public static void Register<TSource, TTarget>(System.Func<TSource, TTarget>? conversion) { }
+        public static void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
     }
     public struct VariableName
     {
@@ -1028,10 +1032,31 @@ namespace GraphQL.Conversion
         public string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field) { }
         public string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType) { }
     }
+    public interface IListConverter
+    {
+        System.Type ElementType { get; }
+        object Convert(object?[] list);
+    }
+    public interface IListConverterFactory
+    {
+        GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType);
+    }
     public interface INameConverter
     {
         string NameForArgument(string argumentName, GraphQL.Types.IComplexGraphType parentGraphType, GraphQL.Types.FieldType field);
         string NameForField(string fieldName, GraphQL.Types.IComplexGraphType parentGraphType);
+    }
+    public sealed class ListConverter : GraphQL.Conversion.IListConverter
+    {
+        public ListConverter(System.Type elementType, System.Func<object?[], object> conversion) { }
+        public System.Type ElementType { get; }
+        public object Convert(object?[] list) { }
+    }
+    public abstract class ListConverterFactoryBase : GraphQL.Conversion.IListConverterFactory
+    {
+        protected ListConverterFactoryBase() { }
+        public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
+        public abstract System.Func<object?[], object> GetConversion<T>();
     }
     public class PascalCaseNameConverter : GraphQL.Conversion.INameConverter
     {

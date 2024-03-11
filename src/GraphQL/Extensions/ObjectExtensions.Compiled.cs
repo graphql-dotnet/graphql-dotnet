@@ -2,6 +2,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Conversion;
 using GraphQL.Types;
 
 namespace GraphQL;
@@ -118,7 +119,8 @@ public static partial class ObjectExtensions
                         CoerceExpression(
                             Expression.MakeMemberAccess(param, typeof(ValueTuple<object?, bool>).GetField("Item1")!),
                             type,
-                            graphType)),
+                            graphType,
+                            false)),
                     Expression.Assign(ret, Expression.Default(type))),
                 ret);
         }
@@ -137,7 +139,7 @@ public static partial class ObjectExtensions
              */
             var param = Expression.Variable(typeof(ValueTuple<object?, bool>), "value");
             return Expression.Block(
-                new[] { param },
+                [param],
                 Expression.Assign(
                     param,
                     Expression.Call(_getOrDefaultMethod, _dictionaryParam, Expression.Constant(member.Key, typeof(string)))),
@@ -150,43 +152,88 @@ public static partial class ObjectExtensions
                         CoerceExpression(
                             Expression.MakeMemberAccess(param, typeof(ValueTuple<object?, bool>).GetField("Item1")!),
                             type,
-                            member.GraphType))));
+                            member.GraphType,
+                            false))));
         }
 
-        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType)
+        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject)
+        {
+            // if requested type is object, return the expression as is
+            if (type == typeof(object))
+                return expr.Type == typeof(object) ? expr : Expression.Convert(expr, typeof(object));
+
+            // if the expression is already of the requested type, return it as is,
+            // or if the expression is null, return default(T)
+            var returnType = asObject ? typeof(object) : type;
+            var param = Expression.Parameter(expr.Type, "param");
+            return Expression.Block(
+                [param],
+                Expression.Assign(param, expr),
+                Expression.Condition(
+                    Expression.TypeIs(param, type),
+                    param.Type == returnType ? param : Expression.Convert(param, returnType),
+                    Expression.Condition(
+                        Expression.Equal(param, Expression.Constant(null, param.Type)),
+                        Expression.Default(returnType),
+                        CoerceExpressionInternal(param, type, graphType, asObject))));
+        }
+
+        static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject)
         {
             // unwrap non-null graph type
             graphType = graphType is NonNullGraphType nonNullGraphType
-                ? nonNullGraphType.ResolvedType ?? throw new InvalidOperationException($"ResolvedType is null for graph type '{nonNullGraphType}'")
+                ? nonNullGraphType.ResolvedType ?? throw new InvalidOperationException($"ResolvedType is null for graph type '{nonNullGraphType}'.")
                 : graphType;
 
             if (graphType is ListGraphType listGraphType)
             {
-                var elementGraphType = listGraphType.ResolvedType ?? throw new InvalidOperationException();
-                // determine the type of list to create
-                var (isArray, isList, elementType) = type.GetListType();
+                var elementGraphType = listGraphType.ResolvedType ?? throw new InvalidOperationException($"ResolvedType is null for graph type '{listGraphType}'.");
                 // create an expression that represents this:
-                // (IEnumerable<object>?)expr?.Select(x => CoerceExpression(x, elementType, listGraphType.ResolvedType))
-                Func<ParameterExpression, Expression> loopContent = (loopVar) => CoerceExpression(loopVar, elementType, elementGraphType);
-                return SelectOrNull(expr, loopContent, isArray, isList, type, listGraphType);
+                // var expr2 = ((IEnumerable)expr).ToObjectArray();
+                // for (int i = 0; i < expr2.Length; i++)
+                // {
+                //     expr2[i] = CoerceExpression(elementType, expr2[i]);
+                // }
+                // ret = listConverter.GetConversion(type, elementType)(expr);
+
+                var listConverterFactory = ValueConverter.GetListConverterFactory(type);
+                var listConverter = listConverterFactory.Create(type);
+                var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
+                Expression<Func<object?[], object>> converterExpression = (arg) => listConverter.Convert(arg);
+                var arrayVariable = Expression.Variable(typeof(object?[]), "expr2");
+                Expression ret = Expression.Block(
+                    [arrayVariable],
+                    Expression.Assign(arrayVariable, Expression.Call(_convertToObjectArrayMethod, expr)),
+                    UpdateArray(arrayVariable, (loopVar) => CoerceExpression(loopVar, underlyingType, elementGraphType, true)),
+                    Expression.Invoke(converterExpression, arrayVariable));
+
+                if (!asObject)
+                    ret = Expression.Convert(ret, type);
+
+                return ret;
             }
 
-            return Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType));
+            return !asObject
+                ? Expression.Call(_getPropertyValueTypedMethod.MakeGenericMethod(type), expr, Expression.Constant(graphType))
+                : Expression.Call(_getPropertyValueUntypedMethod, Expression.Constant(type), expr, Expression.Constant(graphType));
         }
     }
 
-    private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
-        object? value, IGraphType mappedType)
+    private static readonly MethodInfo _convertToObjectArrayMethod = typeof(ObjectExtensions).GetMethod(nameof(ConvertToObjectArray), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static object?[] ConvertToObjectArray(object list)
     {
-        // if the property is null return the default value
-        if (value == null)
-            return default;
+        if (list is IEnumerable enumerable)
+            return enumerable.ToObjectArray();
 
-        // Short-circuit conversion if the property value already of the right type
-        // (works for converting to/from nullable value types too)
-        if (typeof(T) == typeof(object) || typeof(T).IsInstanceOfType(value))
-            return (T?)value;
+        throw new InvalidOperationException($"Cannot coerce collection of type '{list?.GetType().GetFriendlyName()}' to IEnumerable.");
+    }
+
+    private static readonly MethodInfo _getPropertyValueUntypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueUntyped), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static object? GetPropertyValueUntyped(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)]
+        Type returnType, object? value, IGraphType mappedType)
+    {
+        // CoerceExpression already contains short-circuit logic for null and type compatibility
 
         // in the rare circumstance that the value is not a compatible type,
         //   use the reflection-based converter for object types, and
@@ -198,201 +245,72 @@ public static partial class ObjectExtensions
 
         // matches only when mappedType is an input object graph type AND the value is a
         //   dictionary (not yet parsed from a dictionary into an object)
-        if (value is IDictionary<string, object?> dictionary)
+        if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
         {
-            // unwrap non-null graph type
-            mappedType = mappedType is NonNullGraphType nonNullGraphType
-                ? nonNullGraphType.ResolvedType ?? throw new InvalidOperationException($"ResolvedType is null for graph type '{nonNullGraphType}'.")
-                : mappedType;
+            // note that ToObject checks the ValueConverter before parsing the dictionary
+            return ToObject(dictionary, returnType, inputObjectGraphType);
+        }
 
-            // process input object graph types
-            if (mappedType is IInputObjectGraphType inputObjectGraphType)
-            {
-                // note that ToObject checks the ValueConverter before parsing the dictionary
-                return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
-            }
+        return ValueConverter.ConvertTo(value, returnType);
+    }
+
+    private static readonly MethodInfo _getPropertyValueTypedMethod = typeof(ObjectExtensions).GetMethod(nameof(GetPropertyValueTyped), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static T? GetPropertyValueTyped<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)] T>(
+        object? value, IGraphType mappedType)
+    {
+        // CoerceExpression already contains short-circuit logic for null and type compatibility
+
+        // in the rare circumstance that the value is not a compatible type,
+        //   use the reflection-based converter for object types, and
+        //   the value converter for value types
+
+        // note that during literal/variable parsing, input object graph types
+        //   are typically already converted to the correct type, as ParseDictionary
+        //   is called during parsing, so this code path would not normally be hit.
+
+        // matches only when mappedType is an input object graph type AND the value is a
+        //   dictionary (not yet parsed from a dictionary into an object)
+        if (value is IDictionary<string, object?> dictionary && mappedType is IInputObjectGraphType inputObjectGraphType)
+        {
+            // note that ToObject checks the ValueConverter before parsing the dictionary
+            return (T)ToObject(dictionary, typeof(T), inputObjectGraphType);
         }
 
         return ValueConverter.ConvertTo<T>(value);
     }
 
-    private static Expression SelectOrNull(Expression collection, Func<ParameterExpression, Expression> loopContent, bool asArray, bool asList, Type returnType, IGraphType graphType)
+    private static Expression UpdateArray(ParameterExpression objectArray, Func<ParameterExpression, Expression> loopContent)
     {
         /*
-         * var collectionVar = collection;
-         * TReturnType result = null;
-         * if (collectionVar != null)
+         * if (objectArray != null)
          * {
-         *     if (collectionVar is IList && !asList)
+         *     for (int i = 0; i < objectArray.Length; i++)
          *     {
-         *         result = (TReturnType)SelectList(collectionVar, loopVar, loopContent, asArray, asList);
-         *     }
-         *     else if (collectionVar is IEnumerable)
-         *     {
-         *         result = (TReturnType)SelectEnumerable(collectionVar, loopVar, loopContent, asArray, asList);
-         *     }
-         *     else
-         *     {
-         *         throw new InvalidOperationException($"Cannot coerce collection of type '{typeName}' to IEnumerable for graph type '{graphType}'.");
+         *         var item = objectArray[i];
+         *         objectArray[i] = loopContent(item);
          *     }
          * }
-         * return result;
          */
-        var collectionVar = Expression.Variable(typeof(object), "collectionVar");
-        var resultVar = Expression.Variable(returnType, "result");
-
-        Expression enumerableCheck =
-            Expression.IfThenElse(
-                Expression.TypeIs(collectionVar, typeof(IEnumerable)),
-                Expression.Assign(
-                    resultVar,
-                    Expression.Convert(
-                        SelectEnumerable(Expression.Convert(collectionVar, typeof(IEnumerable)), loopContent, asArray),
-                        returnType)),
-                Expression.Call(_throwMethod, collectionVar, Expression.Constant(graphType, typeof(IGraphType))));
-
-        Expression listCheck = asList ? enumerableCheck :
-            Expression.IfThenElse(
-                Expression.TypeIs(collectionVar, typeof(IList)),
-                Expression.Assign(
-                    resultVar,
-                    Expression.Convert(
-                        SelectList(Expression.Convert(collectionVar, typeof(IList)), loopContent),
-                        returnType)),
-                enumerableCheck);
-
-        return Expression.Block(
-            new[] { collectionVar, resultVar },
-            Expression.Assign(collectionVar, collection),
-            Expression.Assign(resultVar, Expression.Constant(null, resultVar.Type)),
-            Expression.IfThen(
-                Expression.NotEqual(
-                    collectionVar,
-                    Expression.Constant(null, collectionVar.Type)),
-                listCheck),
-            resultVar);
-    }
-
-    private static readonly MethodInfo _throwMethod = typeof(ObjectExtensions).GetMethod(nameof(ThrowInvalidCollectionTypeException), BindingFlags.NonPublic | BindingFlags.Static)!;
-    private static void ThrowInvalidCollectionTypeException(object collection, IGraphType graphType)
-    {
-        string typeName = collection?.GetType().GetFriendlyName() ?? "null";
-        throw new InvalidOperationException($"Cannot coerce collection of CLR type '{typeName}' to IEnumerable for graph type '{graphType}'.");
-    }
-
-    private static Expression SelectList(Expression collection, Func<ParameterExpression, Expression> loopContentFunc)
-    {
-        var loopVar = Expression.Variable(typeof(object), "loopVar");
-        var loopContent = loopContentFunc(loopVar);
-        var countVar = Expression.Variable(typeof(int), "count");
-        var collectionVar = Expression.Variable(typeof(IList), "collection");
         var indexVar = Expression.Variable(typeof(int), "i");
-        var collectionCountProperty = typeof(ICollection).GetProperty(nameof(ICollection.Count))!;
-        Debug.Assert(collectionCountProperty != null);
-
+        var itemVar = Expression.Variable(typeof(object), "item");
         var breakLabel = Expression.Label("breakLabel");
-
-        var listType = loopContent.Type.MakeArrayType();
-        var listVariable = Expression.Variable(listType, "list");
-        var indexerProperty = typeof(IList).GetProperty("Item", [typeof(int)])!;
-        Debug.Assert(indexerProperty != null);
-
-        /*
-         * IList collectionVar = collection;
-         * countVar = collectionVar.Count;
-         * T[] listVariable = new T[countVar];
-         * index i = 0;
-         * while (true)
-         * {
-         *     if (i < countVar)
-         *     {
-         *         T loopVar = collectionVar[i];
-         *         listVariable[i++] = {loopContent};
-         *     }
-         *     else
-         *     {
-         *         break;
-         *     }
-         * }
-         * return listVariable;
-         */
-
-        return Expression.Block(
-            listType,
-            [collectionVar, listVariable, indexVar, countVar],
-            Expression.Assign(collectionVar, collection),
-            Expression.Assign(countVar, Expression.Property(collectionVar, collectionCountProperty)),
-            Expression.Assign(listVariable, Expression.NewArrayBounds(loopContent.Type, countVar)),
-            Expression.Assign(indexVar, Expression.Constant(0, indexVar.Type)),
-            Expression.Loop(
-                Expression.IfThenElse(
-                    Expression.LessThan(indexVar, countVar),
-                    Expression.Block(
-                        [loopVar],
-                        Expression.Assign(loopVar, Expression.Property(collectionVar, indexerProperty, indexVar)),
-                        Expression.Assign(
-                            Expression.ArrayAccess(listVariable, Expression.PostIncrementAssign(indexVar)),
-                            loopContent)),
-                    Expression.Break(breakLabel)),
-                breakLabel),
-            listVariable);
+        return Expression.IfThen(
+            Expression.NotEqual(objectArray, Expression.Constant(null, objectArray.Type)),
+            Expression.Block(
+                [indexVar, itemVar],
+                Expression.Assign(indexVar, Expression.Constant(0, indexVar.Type)),
+                Expression.Loop(
+                    Expression.IfThenElse(
+                        Expression.LessThan(indexVar, Expression.ArrayLength(objectArray)),
+                        Expression.Block(
+                            Expression.Assign(itemVar, Expression.ArrayAccess(objectArray, indexVar)),
+                            Expression.Assign(
+                                Expression.ArrayAccess(objectArray, Expression.PostIncrementAssign(indexVar)),
+                                loopContent(itemVar))),
+                        Expression.Break(breakLabel)),
+                    breakLabel)));
     }
 
-    private static Expression SelectEnumerable(Expression collection, Func<ParameterExpression, Expression> loopContentFunc, bool asArray)
-    {
-        var loopVar = Expression.Variable(typeof(object), "loopVar");
-        var loopContent = loopContentFunc(loopVar);
-        var collectionVar = Expression.Variable(typeof(IEnumerable), "collection");
-        var enumeratorVar = Expression.Variable(typeof(IEnumerator), "enumerator");
-        var getEnumeratorCall = Expression.Call(collectionVar, _getEnumeratorMethod);
-        var moveNextCall = Expression.Call(enumeratorVar, _moveNextMethod);
-        var getCurrent = Expression.MakeMemberAccess(enumeratorVar, _currentProperty);
-
-        var breakLabel = Expression.Label("breakLabel");
-
-        var listType = typeof(List<>).MakeGenericType(loopContent.Type);
-        var listVariable = Expression.Variable(listType, "list");
-        var addMethod = listType.GetMethod(nameof(List<object>.Add))!;
-        Debug.Assert(addMethod != null);
-        var toArrayMethod = listType.GetMethod(nameof(List<object>.ToArray))!;
-        Debug.Assert(toArrayMethod != null);
-
-        /*
-         * IEnumerable collectionVar = collection;
-         * IEnumerator enumeratorVar = collectionVar.GetEnumerator();
-         * List<T> listVariable = new();
-         * while (true)
-         * {
-         *     if (enumerator.MoveNext() == true)
-         *     {
-         *         T loopVar = enumerator.Current;
-         *         listVariable.Add( {loopContent} );
-         *     }
-         *     else
-         *         break;
-         * }
-         * return asArray ? listVariable.ToArray() : listVariable;
-         */
-        return Expression.Block(
-            [collectionVar, enumeratorVar, listVariable],
-            Expression.Assign(collectionVar, collection),
-            Expression.Assign(enumeratorVar, getEnumeratorCall),
-            Expression.Assign(listVariable, Expression.New(listVariable.Type)),
-            Expression.Loop(
-                Expression.IfThenElse(
-                    Expression.Equal(moveNextCall, Expression.Constant(true)),
-                    Expression.Block(
-                        [loopVar],
-                        Expression.Assign(loopVar, getCurrent),
-                        Expression.Call(listVariable, addMethod, loopContent)),
-                    Expression.Break(breakLabel)),
-                breakLabel),
-            asArray ? Expression.Call(listVariable, toArrayMethod) : listVariable);
-    }
-
-    private static readonly MethodInfo _getEnumeratorMethod = typeof(IEnumerable).GetMethod(nameof(IEnumerable.GetEnumerator))!;
-    private static readonly MethodInfo _moveNextMethod = typeof(IEnumerator).GetMethod(nameof(IEnumerator.MoveNext))!;
-    private static readonly PropertyInfo _currentProperty = typeof(IEnumerator).GetProperty(nameof(IEnumerator.Current))!;
     private static readonly ParameterExpression _dictionaryParam = Expression.Parameter(typeof(IDictionary<string, object?>), "dic");
 
     private static readonly MethodInfo _getOrDefaultMethod = typeof(ObjectExtensions).GetMethod(nameof(GetOrDefaultImplementation), BindingFlags.NonPublic | BindingFlags.Static)!;
