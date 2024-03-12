@@ -5,6 +5,13 @@ namespace GraphQL.Conversion;
 /// </summary>
 internal sealed class DefaultListConverterFactory : ListConverterFactoryBase
 {
+    private DefaultListConverterFactory()
+    {
+    }
+
+    /// <inheritdoc cref="DefaultListConverterFactory"/>
+    public static readonly DefaultListConverterFactory Instance = new();
+
     public override Func<object?[], object> Create<T>()
     {
         // simplified for reference types

@@ -1,12 +1,16 @@
 namespace GraphQL.Conversion;
 
+/// <summary>
+/// A converter that can convert a list of objects to a typed array.
+/// </summary>
 internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
 {
     private ArrayListConverterFactory()
     {
     }
 
-    public static ArrayListConverterFactory Instance { get; } = new ArrayListConverterFactory();
+    /// <inheritdoc cref="ArrayListConverterFactory"/>
+    public static ArrayListConverterFactory Instance { get; } = new();
 
     public override IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]

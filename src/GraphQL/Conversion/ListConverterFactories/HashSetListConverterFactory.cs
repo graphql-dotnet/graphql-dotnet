@@ -1,7 +1,17 @@
 namespace GraphQL.Conversion;
 
+/// <summary>
+/// A converter that can convert a list of objects to a <see cref="HashSet{T}"/>.
+/// </summary>
 internal sealed class HashSetListConverterFactory : ListConverterFactoryBase
 {
+    private HashSetListConverterFactory()
+    {
+    }
+
+    /// <inheritdoc cref="HashSetListConverterFactory"/>
+    public static HashSetListConverterFactory Instance { get; } = new();
+
     public override Func<object?[], object> Create<T>() => static list =>
     {
 #if NETSTANDARD2_0

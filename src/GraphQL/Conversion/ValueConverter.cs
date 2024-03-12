@@ -151,13 +151,12 @@ public static class ValueConverter
         RegisterListConverterFactory(typeof(IReadOnlyList<>), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IReadOnlyCollection<>), ArrayListConverterFactory.Instance);
         // types that return a List<T>
-        RegisterListConverterFactory(typeof(List<>), new DefaultListConverterFactory());
+        RegisterListConverterFactory(typeof(List<>), Conversion.DefaultListConverterFactory.Instance);
         // types that return a HashSet<T>
-        var hashSetConverter = new HashSetListConverterFactory();
-        RegisterListConverterFactory(typeof(ISet<>), hashSetConverter);
-        RegisterListConverterFactory(typeof(HashSet<>), hashSetConverter);
+        RegisterListConverterFactory(typeof(ISet<>), HashSetListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(HashSet<>), HashSetListConverterFactory.Instance);
 #if NET5_0_OR_GREATER
-        RegisterListConverterFactory(typeof(IReadOnlySet<>), hashSetConverter);
+        RegisterListConverterFactory(typeof(IReadOnlySet<>), HashSetListConverterFactory.Instance);
 #endif
     }
 
@@ -309,7 +308,7 @@ public static class ValueConverter
     /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
     /// registerd will lead to an exception being thrown.
     /// </summary>
-    public static IListConverterFactory? DefaultListConverterFactory { get; set; } = new CustomListConverterFactory();
+    public static IListConverterFactory? DefaultListConverterFactory { get; set; } = CustomListConverterFactory.DefaultInstance;
 
     /// <summary>
     /// Gets the list converter factory for the specified list type, if any.

@@ -18,17 +18,27 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     private static readonly MethodInfo _castMethodInfo = typeof(CustomListConverterFactory).GetMethod(nameof(CastOrDefault), BindingFlags.NonPublic | BindingFlags.Static)!;
     private Type? _implementationType { get; }
 
-    public CustomListConverterFactory(Type? implementationType = null)
+    private CustomListConverterFactory()
     {
-        if (implementationType != null)
-        {
-            if (implementationType.IsArray || implementationType.IsInterface || implementationType.IsAbstract)
-                throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is an array or interface and cannot be instantiated.");
-            if (implementationType.IsGenericTypeDefinition && implementationType.GetGenericArguments().Length != 1)
-                throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is a generic type definition with more than one generic argument.");
-        }
+        _implementationType = null;
+    }
+
+    public CustomListConverterFactory(Type implementationType)
+    {
+        if (implementationType == null)
+            throw new ArgumentNullException(nameof(implementationType));
+        if (implementationType.IsArray || implementationType.IsInterface || implementationType.IsAbstract)
+            throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is an array or interface and cannot be instantiated.");
+        if (implementationType.IsGenericTypeDefinition && implementationType.GetGenericArguments().Length != 1)
+            throw new InvalidOperationException($"Type '{implementationType.GetFriendlyName()}' is a generic type definition with more than one generic argument.");
         _implementationType = implementationType;
     }
+
+    /// <summary>
+    /// Returns a <see cref="CustomListConverterFactory"/> which will work for any
+    /// compatible list type.
+    /// </summary>
+    public static CustomListConverterFactory DefaultInstance { get; } = new();
 
     public IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -45,7 +55,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
                 : _implementationType;
         }
 
-        if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition)
+        if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition || listType.IsAbstract)
             throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is an array, interface or generic type definition and cannot be instantiated.");
 
         var ctors = listType.GetConstructors();
