@@ -27,8 +27,7 @@ internal sealed class ArrayListConverterFactory : IListConverterFactory
         }
 
         // determine the underlying element type
-        var elementType = listType.GetListElementType()
-            ?? throw new InvalidOperationException("The list type must be an array type.");
+        var elementType = listType.GetListElementType();
 
         // for reference types or nullable value types, just copy the list to a new array
         if (!elementType.IsValueType || Nullable.GetUnderlyingType(elementType) != null)
