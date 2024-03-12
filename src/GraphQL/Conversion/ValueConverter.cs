@@ -172,11 +172,18 @@ public static class ValueConverter
         }
         else // AOT scenarios
         {
-            // supports List<T> and HashSet<T>, and any other class that implements IList
-            // does not support ISet<T> and IReadOnlySet<T>
+            // supports List<T> and any other class that implements IList
             // does not support classes that have constructors accepting IEnumerable<T>
-            // much faster implementation than expression interpretation
+            // much faster implementation than expression interpretation (I assume), but the list size
+            //   is not initialized with the number of elements, so it may be slower for large lists
             DefaultListConverterFactory = ReflectionListConverterFactory.Instance;
+
+            // hash sets do not support IList, so this is better than nothing; should work if HashSet<T> is not trimmed
+            RegisterListConverterFactory(typeof(HashSet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+            RegisterListConverterFactory(typeof(ISet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+#if NET5_0_OR_GREATER
+            RegisterListConverterFactory(typeof(IReadOnlySet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+#endif
         }
     }
 
