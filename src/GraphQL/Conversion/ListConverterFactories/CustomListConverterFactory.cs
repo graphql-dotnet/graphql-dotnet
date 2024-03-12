@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace GraphQL.Conversion;
 
@@ -70,16 +71,21 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition || listType.IsAbstract)
             throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is an array, interface or generic type definition and cannot be instantiated.");
 
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+            true;
+#else
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        if (!dynamicCodeCompiled && typeof(IList).IsAssignableFrom(listType))
+        {
+            return new ListConverter(elementType, CreateReflectionBasedLambda(listType, elementType));
+        }
+
         var ctors = listType.GetConstructors();
         ConstructorInfo? parameterlessCtor = null;
         var enumerableElementType = typeof(IEnumerable<>).MakeGenericType(elementType);
-
-        var dynamicCodeCompiled =
-#if NETSTANDARD2_0
-        true;
-#else
-        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
-#endif
 
         // look for a constructor that takes a single parameter of IEnumerable<elementType>
         foreach (var ctor in ctors)
@@ -126,6 +132,36 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             addMethod = typeof(IList).GetMethod("Add")!;
         }
         return addMethod;
+    }
+
+    // for AOT scenarios
+    private static Func<object?[], object> CreateReflectionBasedLambda(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType, object? elementDefault)
+    {
+        return array =>
+        {
+            IList list;
+            try
+            {
+                list = (IList)Activator.CreateInstance(listType)!;
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException != null)
+            {
+                //preserve stack trace and throw inner exception
+#if NETSTANDARD2_0
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+#else
+                ExceptionDispatchInfo.Throw(ex.InnerException);
+#endif
+                throw; //unreachable
+            }
+            foreach (var item in array)
+            {
+                list.Add(item ?? elementDefault);
+            }
+            return list;
+        };
     }
 
     /// <summary>

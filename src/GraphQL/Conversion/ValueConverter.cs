@@ -148,7 +148,7 @@ public static class ValueConverter
             System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
 
-        // types that return an array (fully supported by AOT)
+        // types that return an array (fully supported by AOT, if the array type is not trimmed)
         RegisterListConverterFactory(typeof(ICollection), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IEnumerable), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IList), ArrayListConverterFactory.Instance);
@@ -172,14 +172,12 @@ public static class ValueConverter
         }
         else // AOT scenarios
         {
-            // supports List<T> and any other class that implements IList
-            // does not support classes that have constructors accepting IEnumerable<T>
-            // much faster implementation than expression interpretation (I assume), but the list size
-            //   is not initialized with the number of elements, so it may be slower for large lists
-            DefaultListConverterFactory = ReflectionListConverterFactory.Instance;
+            // CustomListConverterFactory.DefaultInstance contains custom logic for list types
+            //   that implement IList when running under AOT. This includes List<T> and provides
+            //   the best possible performance for List<T> in that scenario. It may not work as expected
+            //   or may work slowly for other list types, such as HashSet<T>.
 
-            // hash sets do not support IList, so this is better than nothing; should work if HashSet<T> is not trimmed
-            RegisterListConverterFactory(typeof(HashSet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+            // add mapping for hash set interface types
             RegisterListConverterFactory(typeof(ISet<>), new CustomListConverterFactory(typeof(HashSet<>)));
 #if NET5_0_OR_GREATER
             RegisterListConverterFactory(typeof(IReadOnlySet<>), new CustomListConverterFactory(typeof(HashSet<>)));
