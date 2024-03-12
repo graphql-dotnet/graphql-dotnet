@@ -143,9 +143,9 @@ public static class ValueConverter
 
         var dynamicCodeCompiled =
 #if NETSTANDARD2_0
-        true;
+            true;
 #else
-        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
 
         // types that return an array (fully supported by AOT)
