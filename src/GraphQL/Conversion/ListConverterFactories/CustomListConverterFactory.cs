@@ -7,16 +7,28 @@ namespace GraphQL.Conversion;
 /// <summary>
 /// Dynamically constructs a list of the specified type using reflection.
 /// The type must have a public constructor that takes a single parameter compatible
-/// with <see cref="IEnumerable{T}"/>,
-/// or a public parameterless constructor and a public method named "Add" that
-/// takes a single parameter of the element type. Alternatively, the type may
-/// implement <see cref="IList"/> and have a public parameterless constructor.
-/// The returned converter is compiled to a delegate for best execution speed.
+/// with <see cref="IEnumerable{T}"/>, or a public parameterless constructor and a
+/// public method named "Add" that takes a single parameter of the element type.
+/// Alternatively, the type may implement <see cref="IList"/> and have a public
+/// parameterless constructor. The returned converter is compiled to a delegate
+/// for best execution speed.
 /// </summary>
+/// <remarks>
+/// The constructor-based approach with value types is not supported for AOT scenarios.
+/// The method-based approach is supported for all types, but will be interpreted (slow)
+/// for AOT scenarios.
+/// </remarks>
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
-    private static readonly MethodInfo _castMethodInfo = typeof(CustomListConverterFactory).GetMethod(nameof(CastOrDefault), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static readonly MethodInfo _castMethodInfo;
     private Type? _implementationType { get; }
+
+    static CustomListConverterFactory()
+    {
+        // ensure CastOrDefault<T> is compiled for reference types in AOT scenarios
+        Expression<Func<object?[], IEnumerable<object>>> expression = arr => CastOrDefault<object>(arr);
+        _castMethodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
+    }
 
     private CustomListConverterFactory()
     {
@@ -62,6 +74,13 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         ConstructorInfo? parameterlessCtor = null;
         var enumerableElementType = typeof(IEnumerable<>).MakeGenericType(elementType);
 
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+        true;
+#else
+        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
         // look for a constructor that takes a single parameter of IEnumerable<elementType>
         foreach (var ctor in ctors)
         {
@@ -69,7 +88,10 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             if (ctorParams.Length == 1 && ctorParams[0].ParameterType == enumerableElementType)
             {
                 // create expression to call the constructor
-                return new ListConverter(elementType, CreateLambdaViaConstructor(elementType, ctor));
+                // note: not supported for AOT scenarios as we cannot compile a reference to the CastOrDefault<T> method
+                //   if T is a value type
+                if (dynamicCodeCompiled || !elementType.IsValueType)
+                    return new ListConverter(elementType, CreateLambdaViaConstructor(elementType, ctor));
             }
             else if (ctorParams.Length == 0)
             {
@@ -112,32 +134,11 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
-        var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
-
-        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (??)
-        /*
-        return list =>
-        {
-            try
-            {
-                var enumerable = methodInfo.Invoke(null, [list])!;
-                var list = constructor.Invoke([enumerable]);
-                return list;
-            }
-            catch (TargetInvocationException ex) when (ex.InnerException != null)
-            {
-                //preserve stack trace and throw inner exception
-#if NETSTANDARD2_0
-                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-#else
-                ExceptionDispatchInfo.Throw(ex.InnerException);
-#endif
-            }
-        };
-        */
+        // the following method 
+        var castMethodInfo = _castMethodInfo.MakeGenericMethod(elementType);
 
         var param = Expression.Parameter(typeof(object?[]), "param");
-        var castExpr = Expression.Call(methodInfo, param);
+        var castExpr = Expression.Call(castMethodInfo, param);
         Expression body = Expression.New(constructor, castExpr);
         if (body.Type.IsValueType)
             body = Expression.Convert(body, typeof(object));

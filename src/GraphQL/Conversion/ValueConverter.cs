@@ -141,7 +141,14 @@ public static class ValueConverter
 
         Register<decimal, double>(value => checked((double)value));
 
-        // types that return an array
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+        true;
+#else
+        System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        // types that return an array (fully supported by AOT)
         RegisterListConverterFactory(typeof(ICollection), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IEnumerable), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IList), ArrayListConverterFactory.Instance);
@@ -150,14 +157,27 @@ public static class ValueConverter
         RegisterListConverterFactory(typeof(ICollection<>), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IReadOnlyList<>), ArrayListConverterFactory.Instance);
         RegisterListConverterFactory(typeof(IReadOnlyCollection<>), ArrayListConverterFactory.Instance);
-        // types that return a List<T>
-        RegisterListConverterFactory(typeof(List<>), Conversion.DefaultListConverterFactory.Instance);
-        // types that return a HashSet<T>
-        RegisterListConverterFactory(typeof(ISet<>), HashSetListConverterFactory.Instance);
-        RegisterListConverterFactory(typeof(HashSet<>), HashSetListConverterFactory.Instance);
+
+        if (dynamicCodeCompiled)
+        {
+            // types that return a List<T>
+            RegisterListConverterFactory(typeof(List<>), Conversion.DefaultListConverterFactory.Instance);
+
+            // types that return a HashSet<T>
+            RegisterListConverterFactory(typeof(ISet<>), HashSetListConverterFactory.Instance);
+            RegisterListConverterFactory(typeof(HashSet<>), HashSetListConverterFactory.Instance);
 #if NET5_0_OR_GREATER
-        RegisterListConverterFactory(typeof(IReadOnlySet<>), HashSetListConverterFactory.Instance);
+            RegisterListConverterFactory(typeof(IReadOnlySet<>), HashSetListConverterFactory.Instance);
 #endif
+        }
+        else // AOT scenarios
+        {
+            // supports List<T> and HashSet<T>, and any other class that implements IList
+            // does not support ISet<T> and IReadOnlySet<T>
+            // does not support classes that have constructors accepting IEnumerable<T>
+            // much faster implementation than expression interpretation
+            DefaultListConverterFactory = ReflectionListConverterFactory.Instance;
+        }
     }
 
     /// <summary>
@@ -275,16 +295,16 @@ public static class ValueConverter
 
     /// <summary>
     /// Registers or removes a list converter factory for a specified list type.
-    /// The list type should be a generic type definition, such as <see cref="List{T}"/>
-    /// or a non-generic collection type such as <see cref="IList"/>.
-    /// Array types cannot be registered.
+    /// The list type may be a generic type definition, such as <see cref="List{T}"/>
+    /// or a non-generic collection type such as <see cref="IList"/>. Closed
+    /// generic types are also supported, such as <c>List&lt;int&gt;</c>.
+    /// Array types cannot be registered. If the converter is <see langword="null"/>,
+    /// the factory is removed.
     /// </summary>
     public static void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
     {
         if (listType.IsArray)
             throw new ArgumentException("Array types cannot be registered.", nameof(listType));
-        if (listType.IsConstructedGenericType)
-            throw new ArgumentException("Constructed generic type definitions are not supported.", nameof(listType));
         if (converter == null)
             _listConverterFactories.TryRemove(listType, out var _);
         else
@@ -304,6 +324,21 @@ public static class ValueConverter
         => RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
 
     /// <summary>
+    /// Registers a list converter for a specified list type. Especially useful for AOT scenarios where
+    /// dynamic compilation is not available. Each element type must be individually registered.
+    /// To register an open generic list type, use <see cref="RegisterListConverterFactory(Type, Type)"/>.
+    /// <para>
+    /// Sample usage:
+    /// <code>
+    /// RegisterListConverter&lt;List&lt;int&gt;, int&gt;(list => list.Cast&lt;int&gt;().ToList());
+    /// </code>
+    /// </para>
+    /// </summary>
+    public static void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
+        where TListType : IEnumerable<TElementType>
+        => RegisterListConverterFactory(typeof(TListType), conversion != null ? new DelegateListConverter<TListType, TElementType>(conversion) : null);
+
+    /// <summary>
     /// Specifies the default list converter factory for types that are not explicitly registered.
     /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
     /// registerd will lead to an exception being thrown.
@@ -318,10 +353,15 @@ public static class ValueConverter
     {
         if (listType.IsArray)
             return ArrayListConverterFactory.Instance;
-        if (listType.IsConstructedGenericType)
-            listType = listType.GetGenericTypeDefinition();
-        var ret = _listConverterFactories.TryGetValue(listType, out var converter) ? converter : null;
-        return ret ?? DefaultListConverterFactory
+        if (!_listConverterFactories.TryGetValue(listType, out var converter))
+        {
+            if (!listType.IsConstructedGenericType
+                || !_listConverterFactories.TryGetValue(listType.GetGenericTypeDefinition(), out converter))
+            {
+                converter = DefaultListConverterFactory;
+            }
+        }
+        return converter
             ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
     }
 

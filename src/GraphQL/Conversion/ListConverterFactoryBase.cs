@@ -45,23 +45,7 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     /// <summary>
     /// Returns the element type of the specified list type.
     /// </summary>
-    protected Type GetElementType(Type listType)
-    {
-        if (listType is null)
-            throw new ArgumentNullException(nameof(listType));
-        if (listType.IsGenericTypeDefinition)
-            throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type definition and the element type cannot be determined.");
-        if (listType.IsGenericType)
-        {
-            var genericArguments = listType.GetGenericArguments();
-            if (genericArguments.Length != 1)
-                throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type with {genericArguments.Length} generic arguments so the element type cannot be determined.");
-            return genericArguments[0];
-        }
-        return listType.IsArray
-            ? listType.GetElementType()!
-            : typeof(object);
-    }
+    protected virtual Type GetElementType(Type listType) => listType.GetListElementType();
 
     /// <summary>
     /// Returns a converter which will convert items from a given <c>object[]</c> list which contains
