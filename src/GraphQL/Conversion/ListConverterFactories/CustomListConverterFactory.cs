@@ -134,11 +134,9 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
     {
-        // the following method 
-        var castMethodInfo = _castMethodInfo.MakeGenericMethod(elementType);
-
+        var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
         var param = Expression.Parameter(typeof(object?[]), "param");
-        var castExpr = Expression.Call(castMethodInfo, param);
+        var castExpr = Expression.Call(methodInfo, param);
         Expression body = Expression.New(constructor, castExpr);
         if (body.Type.IsValueType)
             body = Expression.Convert(body, typeof(object));

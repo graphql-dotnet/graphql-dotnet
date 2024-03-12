@@ -5,7 +5,8 @@ namespace GraphQL.Conversion;
 /// </summary>
 /// <remarks>
 /// This converter is fully compatible with AOT compilation when the requested type is an array type.
-/// For interface types such as IEnumerable&lt;int&gt;, the array type must not be trimmed.
+/// For interface types such as IEnumerable&lt;int&gt;, this class is compatible with AOT compilation
+/// so long as the necessary array type is not trimmed.
 /// </remarks>
 internal sealed class ArrayListConverterFactory : IListConverterFactory
 {
