@@ -141,6 +141,7 @@ public static class ValueConverter
 
         Register<decimal, double>(value => checked((double)value));
 
+        // check if running under AOT
         var dynamicCodeCompiled =
 #if NETSTANDARD2_0
             true;
