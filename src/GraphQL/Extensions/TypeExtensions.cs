@@ -14,54 +14,37 @@ namespace GraphQL;
 /// </summary>
 public static class TypeExtensions
 {
-    private static readonly Type[] _objectListTypes = [
-        typeof(IEnumerable),
-        typeof(IList),
-        typeof(ICollection),
-        typeof(object),
-    ];
-
-    private static readonly Type[] _genericEnumerableTypes = [
-        typeof(IEnumerable<>),
-        typeof(IList<>),
-        typeof(ICollection<>),
-        typeof(IReadOnlyCollection<>),
-        typeof(IReadOnlyList<>),
-    ];
-
     /// <summary>
-    /// Returns the list type of the indicated type.
+    /// Converts the specified <see cref="IEnumerable"/> to an <see cref="Array"/> of type <see cref="object"/>.
     /// </summary>
-    internal static (bool IsArray, bool IsList, Type ElementType) GetListType(this Type type)
+    /// <remarks>
+    /// Optimized over <paramref name="values"/><see cref="Enumerable.Cast{TResult}(IEnumerable)">.Cast&lt;object&gt;()</see><see cref="Enumerable.ToArray{TSource}(IEnumerable{TSource})">.ToArray()</see>.
+    /// </remarks>
+    internal static object?[] ToObjectArray(this IEnumerable values)
     {
-        var isArray = false;
-        var isList = false;
-        Type? elementType = null;
-        if (type.IsArray)
+        if (values == null)
+            throw new ArgumentNullException(nameof(values));
+        if (values is object?[] objectArray)
+            return objectArray;
+        if (values is List<object?> objectList)
+            return objectList.ToArray();
+        if (values is IEnumerable<object?> enumerable)
+            return enumerable.ToArray();
+        if (values is ICollection collection) // note: TryGetNonEnumeratedCount is not available for IEnumerable; only IEnumerable<T>
         {
-            elementType = type.GetElementType()!;
-            isArray = true;
+            var count = collection.Count;
+            object?[] array = new object?[count];
+            int i = 0;
+            foreach (var value in values)
+                array[i++] = value;
+            if (i != count)
+                throw new InvalidOperationException("The number of items in the collection changed during enumeration.");
+            return array;
         }
-        else if (_objectListTypes.Contains(type))
-        {
-            elementType = typeof(object);
-        }
-        else if (type.IsGenericType)
-        {
-            var genericTypeDef = type.GetGenericTypeDefinition();
-            if (genericTypeDef == typeof(List<>))
-            {
-                elementType = type.GetGenericArguments()[0];
-                isList = true;
-            }
-            else if (_genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
-            {
-                elementType = type.GetGenericArguments()[0];
-            }
-        }
-        if (elementType == null)
-            throw new InvalidOperationException($"Could not determine enumerable type for CLR type '{type.GetFriendlyName()}'.");
-        return (isArray, isList, elementType);
+        var list = new List<object?>();
+        foreach (object? value in values)
+            list.Add(value);
+        return list.ToArray();
     }
 
     /// <summary>
