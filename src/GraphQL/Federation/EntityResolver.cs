@@ -123,7 +123,7 @@ public class EntityResolver : IFieldResolver
         return obj;
     }
 
-    private static object? Deserialize(string fieldName, IGraphType graphType, Type valueType, object value)
+    private static object? Deserialize(string fieldName, IGraphType graphType, Type valueType, object? value)
     {
         if (graphType is NonNullGraphType nonNullGraphType)
         {
@@ -137,17 +137,20 @@ public class EntityResolver : IFieldResolver
 
         if (graphType is ListGraphType listGraphType)
         {
-            if (value is not IList list)
-                throw new InvalidOperationException($"The field '{fieldName}' is a list graph type but the value is not a list");
-            var ret = new List<object?>();
-            var (isArray, isList, elementType) = valueType.GetListType();
-            foreach (var listValue in list)
+            // cast/convert value to an array (it should already be an array)
+            var array = (value as IEnumerable
+                ?? throw new InvalidOperationException($"The field '{fieldName}' is a list graph type but the value is not a list"))
+                .ToObjectArray();
+            // get the list converter and element type for the list type
+            var listConverter = ValueConverter.GetListConverter(valueType);
+            var elementType = listConverter.ElementType;
+            // deserialize each element in the array
+            for (int i = 0; i < array.Length; i++)
             {
-                ret.Add(Deserialize(fieldName, listGraphType.ResolvedType!, elementType, listValue));
+                array[i] = Deserialize(fieldName, listGraphType.ResolvedType!, elementType, array[i]);
             }
-            if (isArray)
-                return ret.ToArray();
-            return ret;
+            // convert the array to the intended list type
+            return listConverter.Convert(array);
         }
 
         if (graphType is ScalarGraphType scalarGraphType)
