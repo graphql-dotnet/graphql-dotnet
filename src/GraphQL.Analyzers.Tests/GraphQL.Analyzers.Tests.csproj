@@ -15,6 +15,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Analyzer.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeFix.Testing" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.CodeRefactoring.Testing" Version="1.*" />
+    <PackageReference Include="NuGet.Frameworks" Version="6.9.1" />
   </ItemGroup>
 
   <ItemGroup>
