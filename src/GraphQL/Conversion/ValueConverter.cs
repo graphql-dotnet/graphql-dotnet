@@ -327,7 +327,20 @@ public static class ValueConverter
     /// or a public constructor that accepts a single argument of type <see cref="IEnumerable{T}"/>.
     /// </summary>
     public static void RegisterListConverterFactory(Type listType, Type implementationType)
-        => RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
+    {
+        // check if running under AOT
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+            true;
+#else
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        if (dynamicCodeCompiled && implementationType == typeof(List<>))
+            RegisterListConverterFactory(listType, Conversion.DefaultListConverterFactory.Instance);
+        else
+            RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
+    }
 
     /// <summary>
     /// Registers a list converter for a specified list type. Especially useful for AOT scenarios where
@@ -359,14 +372,18 @@ public static class ValueConverter
     {
         if (listType.IsArray)
             return ArrayListConverterFactory.Instance;
-        if (!_listConverterFactories.TryGetValue(listType, out var converter))
+
+        // if the list type is not explicitly registered
+        if (!_listConverterFactories.TryGetValue(listType, out var converter)
+            // and if the generic type definition is not explicitly registered
+            && (!listType.IsConstructedGenericType
+            || !_listConverterFactories.TryGetValue(listType.GetGenericTypeDefinition(), out converter)))
         {
-            if (!listType.IsConstructedGenericType
-                || !_listConverterFactories.TryGetValue(listType.GetGenericTypeDefinition(), out converter))
-            {
-                converter = DefaultListConverterFactory;
-            }
+            // then use the default list converter factory
+            converter = DefaultListConverterFactory;
         }
+
+        // but if the default list converter factory is not set, throw an exception
         return converter
             ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
     }

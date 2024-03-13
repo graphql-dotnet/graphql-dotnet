@@ -319,6 +319,50 @@ Documentation has been added to the [Query Validation](https://graphql-dotnet.gi
 section of the documentation to explain how to create custom validation rules using the
 revised `IValidationRule` interface and related classes.
 
+### 9. List coercion can be customized
+
+Previously only specific list types were natively supported, such as `List<T>` and `IEnumerable<T>`,
+and list types that implemented `IList`. Now, any list-like type such as `HashSet<T>` or `Queue<T>`
+which has either a public parameterless constructor along with an `Add(T value)` method, or a constructor
+that takes an `IEnumerable<T>` is supported. This allows for more flexibility in the types of lists
+that can be used as CLR input types.
+
+You can also register a custom list coercion provider to handle custom list types. For instance, if you
+wish to use a case-insensitive comparer for `HashSet<string>` types, you can register a custom list coercion
+provider as follows:
+
+```csharp
+// register for HashSet<string>
+ValueConverter.RegisterListConverter<HashSet<string>, string>(
+    values => new HashSet<string>(values, StringComparer.OrdinalIgnoreCase));
+
+// also register for ISet<string>
+ValueConverter.RegisterListConverter<ISet<string>, string>(
+    values => new HashSet<string>(values, StringComparer.OrdinalIgnoreCase));
+```
+
+The `RegisterListProvider` method is also useful in AOT scenarios to provide ideal performance since dynamic
+code generation is not possible, and to prevent trimming of necessary list types.
+
+You can also register a custom list coercion provider for an open generic type. For instance, if you wish to
+provide a custom list coercion provider for `IImmutableList<T>`, you can register it as follows:
+
+```csharp
+public class ImmutableListConverterFactory : ListConverterFactoryBase
+{
+    public override Func<object?[], object> Create<T>()
+        => list => ImmutableList.CreateRange(list.Cast<T>());
+}
+
+ValueConverter.RegisterListConverterFactory(typeof(IImmutableList<>), new ImmutableListConverterFactory());
+```
+
+Finally, if you simply need to map an interface list type to a concrete list type, you can do so as follows:
+
+```csharp
+ValueConverter.RegisterListConverterFactory(typeof(IList<>), typeof(List<>)); // default mapping is T[]
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
