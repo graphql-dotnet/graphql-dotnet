@@ -1,22 +1,35 @@
 using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace GraphQL.Conversion;
 
 /// <summary>
 /// Dynamically constructs a list of the specified type using reflection.
 /// The type must have a public constructor that takes a single parameter compatible
-/// with <see cref="IEnumerable{T}"/>,
-/// or a public parameterless constructor and a public method named "Add" that
-/// takes a single parameter of the element type. Alternatively, the type may
-/// implement <see cref="IList"/> and have a public parameterless constructor.
-/// The returned converter is compiled to a delegate for best execution speed.
+/// with <see cref="IEnumerable{T}"/>, or a public parameterless constructor and a
+/// public method named "Add" that takes a single parameter of the element type.
+/// Alternatively, the type may implement <see cref="IList"/> and have a public
+/// parameterless constructor. The returned converter is compiled to a delegate
+/// for best execution speed.
 /// </summary>
+/// <remarks>
+/// The constructor-based approach with value types is not supported for AOT scenarios.
+/// The method-based approach is supported for all types, but will be interpreted (slow)
+/// for AOT scenarios.
+/// </remarks>
 internal sealed class CustomListConverterFactory : IListConverterFactory
 {
-    private static readonly MethodInfo _castMethodInfo = typeof(CustomListConverterFactory).GetMethod(nameof(CastOrDefault), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static readonly MethodInfo _castMethodInfo;
     private Type? _implementationType { get; }
+
+    static CustomListConverterFactory()
+    {
+        // ensure CastOrDefault<T> is compiled for reference types in AOT scenarios
+        Expression<Func<object?[], IEnumerable<object>>> expression = arr => CastOrDefault<object>(arr);
+        _castMethodInfo = ((MethodCallExpression)expression.Body).Method.GetGenericMethodDefinition();
+    }
 
     private CustomListConverterFactory()
     {
@@ -58,6 +71,18 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         if (listType.IsArray || listType.IsInterface || listType.IsGenericTypeDefinition || listType.IsAbstract)
             throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is an array, interface or generic type definition and cannot be instantiated.");
 
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+            true;
+#else
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        if (!dynamicCodeCompiled && typeof(IList).IsAssignableFrom(listType))
+        {
+            return new ListConverter(elementType, CreateReflectionBasedLambda(listType, elementType));
+        }
+
         var ctors = listType.GetConstructors();
         ConstructorInfo? parameterlessCtor = null;
         var enumerableElementType = typeof(IEnumerable<>).MakeGenericType(elementType);
@@ -69,7 +94,10 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
             if (ctorParams.Length == 1 && ctorParams[0].ParameterType == enumerableElementType)
             {
                 // create expression to call the constructor
-                return new ListConverter(elementType, CreateLambdaViaConstructor(elementType, ctor));
+                // note: not supported for AOT scenarios as we cannot compile a reference to the CastOrDefault<T> method
+                //   if T is a value type
+                if (dynamicCodeCompiled || !elementType.IsValueType)
+                    return new ListConverter(elementType, CreateLambdaViaConstructor(elementType, ctor));
             }
             else if (ctorParams.Length == 0)
             {
@@ -106,23 +134,17 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
         return addMethod;
     }
 
-    /// <summary>
-    /// Creates a delegate that calls the specified <paramref name="constructor"/> after casting
-    /// the delegate's parameter to <see cref="IEnumerable{T}"/> of the <paramref name="elementType"/>.
-    /// </summary>
-    private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
+    // for AOT scenarios
+    private static Func<object?[], object> CreateReflectionBasedLambda(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType, object? elementDefault)
     {
-        var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
-
-        // todo: directly call the constructor when GlobalSwitches.DynamicallyCompileToObject is false (??)
-        /*
-        return list =>
+        return array =>
         {
+            IList list;
             try
             {
-                var enumerable = methodInfo.Invoke(null, [list])!;
-                var list = constructor.Invoke([enumerable]);
-                return list;
+                list = (IList)Activator.CreateInstance(listType)!;
             }
             catch (TargetInvocationException ex) when (ex.InnerException != null)
             {
@@ -132,10 +154,23 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
 #else
                 ExceptionDispatchInfo.Throw(ex.InnerException);
 #endif
+                throw; //unreachable
             }
+            foreach (var item in array)
+            {
+                list.Add(item ?? elementDefault);
+            }
+            return list;
         };
-        */
+    }
 
+    /// <summary>
+    /// Creates a delegate that calls the specified <paramref name="constructor"/> after casting
+    /// the delegate's parameter to <see cref="IEnumerable{T}"/> of the <paramref name="elementType"/>.
+    /// </summary>
+    private static Func<object?[], object> CreateLambdaViaConstructor(Type elementType, ConstructorInfo constructor)
+    {
+        var methodInfo = _castMethodInfo.MakeGenericMethod(elementType);
         var param = Expression.Parameter(typeof(object?[]), "param");
         var castExpr = Expression.Call(methodInfo, param);
         Expression body = Expression.New(constructor, castExpr);

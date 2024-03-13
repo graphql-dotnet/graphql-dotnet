@@ -15,6 +15,30 @@ namespace GraphQL;
 public static class TypeExtensions
 {
     /// <summary>
+    /// Returns the element type of the specified list type.
+    /// For arrays, this is the element type of the array.
+    /// For generic types, this is the type of generic argument.
+    /// Otherwise, this is <see cref="object"/>.
+    /// </summary>
+    internal static Type GetListElementType(this Type listType)
+    {
+        if (listType is null)
+            throw new ArgumentNullException(nameof(listType));
+        if (listType.IsGenericTypeDefinition)
+            throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type definition and the element type cannot be determined.");
+        if (listType.IsGenericType)
+        {
+            var genericArguments = listType.GetGenericArguments();
+            if (genericArguments.Length != 1)
+                throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type with {genericArguments.Length} generic arguments so the element type cannot be determined.");
+            return genericArguments[0];
+        }
+        return listType.IsArray
+            ? listType.GetElementType()!
+            : typeof(object);
+    }
+
+    /// <summary>
     /// Converts the specified <see cref="IEnumerable"/> to an <see cref="Array"/> of type <see cref="object"/>.
     /// </summary>
     /// <remarks>

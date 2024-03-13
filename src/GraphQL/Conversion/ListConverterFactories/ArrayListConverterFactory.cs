@@ -3,7 +3,12 @@ namespace GraphQL.Conversion;
 /// <summary>
 /// A converter that can convert a list of objects to a typed array.
 /// </summary>
-internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
+/// <remarks>
+/// This converter is fully compatible with AOT compilation when the requested type is an array type.
+/// For interface types such as IEnumerable&lt;int&gt;, this class is compatible with AOT compilation
+/// so long as the necessary array type is not trimmed.
+/// </remarks>
+internal sealed class ArrayListConverterFactory : IListConverterFactory
 {
     private ArrayListConverterFactory()
     {
@@ -12,7 +17,7 @@ internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
     /// <inheritdoc cref="ArrayListConverterFactory"/>
     public static ArrayListConverterFactory Instance { get; } = new();
 
-    public override IListConverter Create(
+    public IListConverter Create(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
@@ -20,9 +25,12 @@ internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
         {
             return new ListConverter(typeof(object), static list => list);
         }
-        // for reference types, just copy the list to a new array
-        var elementType = GetElementType(listType);
-        if (!elementType.IsValueType)
+
+        // determine the underlying element type
+        var elementType = listType.GetListElementType();
+
+        // for reference types or nullable value types, just copy the list to a new array
+        if (!elementType.IsValueType || Nullable.GetUnderlyingType(elementType) != null)
         {
             return new ListConverter(elementType, list =>
             {
@@ -31,22 +39,25 @@ internal sealed class ArrayListConverterFactory : ListConverterFactoryBase
                 return newArray;
             });
         }
-        // call Create<T> to create a converter for value types,
-        // with logic coercing null to default(T)
-        return base.Create(listType);
-    }
 
-    public override Func<object?[], object> Create<T>() => static list =>
-    {
-        var newArray = new T[list.Length];
-        for (var i = 0; i < list.Length; i++)
+        // for non-nullable value types, coerce null to default(T)
+#pragma warning disable IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+        var elementDefault = Activator.CreateInstance(elementType);
+#pragma warning restore IL2072 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The return value of the source method does not have matching annotations.
+
+        // then return a converter that coerces null to default(T)
+        return new ListConverter(elementType, list =>
         {
-            var value = list[i];
-            if (value != null)
+            for (int i = 0; i < list.Length; i++)
             {
-                newArray[i] = (T)value;
+                if (list[i] == null)
+                {
+                    list[i] = elementDefault;
+                }
             }
-        }
-        return newArray;
-    };
+            var newArray = Array.CreateInstance(elementType, list.Length);
+            list.CopyTo(newArray, 0);
+            return newArray;
+        });
+    }
 }
