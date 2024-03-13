@@ -1,6 +1,8 @@
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
+using GraphQL.Conversion;
 
 namespace GraphQL;
 
@@ -16,6 +18,8 @@ namespace GraphQL;
 public static class ValueConverter
 {
     private static readonly ConcurrentDictionary<Type, ConcurrentDictionary<Type, Func<object, object>>> _valueConversions = new();
+    private static readonly ConcurrentDictionary<Type, IListConverterFactory> _listConverterFactories = new();
+    private static readonly ConcurrentDictionary<Type, IListConverter> _listConverterCache = new();
 
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
@@ -136,6 +140,50 @@ public static class ValueConverter
         Register<char, int>(value => value);
 
         Register<decimal, double>(value => checked((double)value));
+
+        // check if running under AOT
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+            true;
+#else
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        // types that return an array (fully supported by AOT, if the array type is not trimmed)
+        RegisterListConverterFactory(typeof(ICollection), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IList<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IEnumerable<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(ICollection<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyList<>), ArrayListConverterFactory.Instance);
+        RegisterListConverterFactory(typeof(IReadOnlyCollection<>), ArrayListConverterFactory.Instance);
+
+        if (dynamicCodeCompiled)
+        {
+            // types that return a List<T>
+            RegisterListConverterFactory(typeof(List<>), Conversion.DefaultListConverterFactory.Instance);
+
+            // types that return a HashSet<T>
+            RegisterListConverterFactory(typeof(ISet<>), HashSetListConverterFactory.Instance);
+            RegisterListConverterFactory(typeof(HashSet<>), HashSetListConverterFactory.Instance);
+#if NET5_0_OR_GREATER
+            RegisterListConverterFactory(typeof(IReadOnlySet<>), HashSetListConverterFactory.Instance);
+#endif
+        }
+        else // AOT scenarios
+        {
+            // CustomListConverterFactory.DefaultInstance contains custom logic for list types
+            //   that implement IList when running under AOT. This includes List<T> and provides
+            //   the best possible performance for List<T> in that scenario. It may not work as expected
+            //   or may work slowly for other list types, such as HashSet<T>.
+
+            // add mapping for hash set interface types
+            RegisterListConverterFactory(typeof(ISet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+#if NET5_0_OR_GREATER
+            RegisterListConverterFactory(typeof(IReadOnlySet<>), new CustomListConverterFactory(typeof(HashSet<>)));
+#endif
+        }
     }
 
     /// <summary>
@@ -250,4 +298,106 @@ public static class ValueConverter
     public static void Register<TTarget>(Func<IDictionary<string, object>, TTarget>? conversion)
         where TTarget : class
         => Register<IDictionary<string, object>, TTarget>(conversion);
+
+    /// <summary>
+    /// Registers or removes a list converter factory for a specified list type.
+    /// The list type may be a generic type definition, such as <see cref="List{T}"/>
+    /// or a non-generic collection type such as <see cref="IList"/>. Closed
+    /// generic types are also supported, such as <c>List&lt;int&gt;</c>.
+    /// Array types cannot be registered. If the converter is <see langword="null"/>,
+    /// the factory is removed.
+    /// </summary>
+    public static void RegisterListConverterFactory(Type listType, IListConverterFactory? converter)
+    {
+        if (listType.IsArray)
+            throw new ArgumentException("Array types cannot be registered.", nameof(listType));
+        if (converter == null)
+            _listConverterFactories.TryRemove(listType, out var _);
+        else
+            _listConverterFactories[listType] = converter;
+        _listConverterCache.Clear();
+    }
+
+    /// <summary>
+    /// Registers a generic list converter factory for a specified list type.
+    /// For example, it can be used to register a custom list converter for <see cref="IList{T}"/>.
+    /// If the implementation type is an open generic type, the generic type argument from the list
+    /// type will be used to create the implementation type. The implementation type must have a
+    /// public constructor and Add method that accepts a single argument of the generic type argument,
+    /// or a public constructor that accepts a single argument of type <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    public static void RegisterListConverterFactory(Type listType, Type implementationType)
+    {
+        // check if running under AOT
+        var dynamicCodeCompiled =
+#if NETSTANDARD2_0
+            true;
+#else
+            System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
+#endif
+
+        if (dynamicCodeCompiled && implementationType == typeof(List<>))
+            RegisterListConverterFactory(listType, Conversion.DefaultListConverterFactory.Instance);
+        else
+            RegisterListConverterFactory(listType, new CustomListConverterFactory(implementationType));
+    }
+
+    /// <summary>
+    /// Registers a list converter for a specified list type. Especially useful for AOT scenarios where
+    /// dynamic compilation is not available. Each element type must be individually registered.
+    /// To register an open generic list type, use <see cref="RegisterListConverterFactory(Type, Type)"/>.
+    /// <para>
+    /// Sample usage:
+    /// <code>
+    /// RegisterListConverter&lt;List&lt;int&gt;, int&gt;(list => list.Cast&lt;int&gt;().ToList());
+    /// </code>
+    /// </para>
+    /// </summary>
+    public static void RegisterListConverter<TListType, TElementType>(Func<IEnumerable<TElementType>, TListType>? conversion)
+        where TListType : IEnumerable<TElementType>
+        => RegisterListConverterFactory(typeof(TListType), conversion != null ? new DelegateListConverter<TListType, TElementType>(conversion) : null);
+
+    /// <summary>
+    /// Specifies the default list converter factory for types that are not explicitly registered.
+    /// When set to <see langword="null"/>, attempting to convert a list type that is not explicitly
+    /// registerd will lead to an exception being thrown.
+    /// </summary>
+    public static IListConverterFactory? DefaultListConverterFactory { get; set; } = CustomListConverterFactory.DefaultInstance;
+
+    /// <summary>
+    /// Gets the list converter factory for the specified list type, if any.
+    /// Array types are supported.
+    /// </summary>
+    public static IListConverterFactory GetListConverterFactory(Type listType)
+    {
+        if (listType.IsArray)
+            return ArrayListConverterFactory.Instance;
+
+        // if the list type is not explicitly registered
+        if (!_listConverterFactories.TryGetValue(listType, out var converter)
+            // and if the generic type definition is not explicitly registered
+            && (!listType.IsConstructedGenericType
+            || !_listConverterFactories.TryGetValue(listType.GetGenericTypeDefinition(), out converter)))
+        {
+            // then use the default list converter factory
+            converter = DefaultListConverterFactory;
+        }
+
+        // but if the default list converter factory is not set, throw an exception
+        return converter
+            ?? throw new InvalidOperationException($"No list converter is registered for type '{listType.GetFriendlyName()}' and no default list converter is specified.");
+    }
+
+    /// <summary>
+    /// Returns a converter which will convert items from a given <c>object[]</c> list
+    /// into a list instance of the specified type. The list converter is cached for the specified type.
+    /// </summary>
+    public static IListConverter GetListConverter(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType)
+    {
+#pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        return _listConverterCache.GetOrAdd(listType, static type => GetListConverterFactory(type).Create(type));
+#pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+    }
 }

@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.Globalization;
 using System.Numerics;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.ExceptionServices;
 using GraphQL.Types;
 
@@ -252,73 +251,13 @@ public static partial class ObjectExtensions
             if (field.MemberName == null)
                 continue;
             // look for match on type
-#pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
-            var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => FindMatchingMember(info.Type, info.PropertyName));
-#pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindMatchingMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+#pragma warning disable IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindWritableMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
+            var (member, initOnly, isRequired) = _members.GetOrAdd((clrType, field.MemberName), static info => info.Type.FindWritableMember(info.PropertyName));
+#pragma warning restore IL2077 // 'type' argument does not satisfy 'DynamicallyAccessedMemberTypes.PublicFields', 'DynamicallyAccessedMemberTypes.PublicProperties' in call to 'FindWritableMember(Type, String)'. The field '(System.Type, System.String).Item1' does not have matching annotations. The source value must declare at least the same requirements as those declared on the target location it is assigned to.
             members[memberIndex++] = new(field.Key, member, initOnly, isRequired, field.ResolvedType);
         }
 
         return new ReflectionInfo(clrType, bestConstructor, ctorFields, members);
-
-        static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindMatchingMember(
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
-            Type type,
-            string propertyName)
-        {
-            PropertyInfo? propertyInfo = null;
-
-            // note: analzyer raises false IL2070 warning due to BindingFlags.IgnoreCase being present
-
-            try
-            {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-            }
-            catch (AmbiguousMatchException)
-            {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-            }
-
-            if (propertyInfo?.SetMethod?.IsPublic ?? false)
-            {
-                var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
-                    .Any(type => type.FullName == typeof(IsExternalInit).FullName);
-
-                var isRequired = propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
-
-                return (propertyInfo, isExternalInit, isRequired);
-            }
-
-            FieldInfo? fieldInfo;
-
-            try
-            {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-            }
-            catch (AmbiguousMatchException)
-            {
-#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-            }
-
-            if (fieldInfo != null)
-            {
-                if (fieldInfo.IsInitOnly)
-                    throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
-
-                var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
-
-                return (fieldInfo, false, isRequired);
-            }
-
-            throw new InvalidOperationException($"Cannot find member named '{propertyName}' on CLR type '{type.GetFriendlyName()}'.");
-        }
     }
 
     /// <summary>
@@ -333,6 +272,7 @@ public static partial class ObjectExtensions
     /// will have 'FirstName' key but its value should be set to 'FName' property of created object.
     /// </param>
     /// <remarks>There is special handling for strings, IEnumerable&lt;T&gt;, Nullable&lt;T&gt;, and Enum.</remarks>
+    [RequiresUnreferencedCode("Recursively converts propertyValue to fieldType.")]
     public static object? GetPropertyValue(this object? propertyValue, Type fieldType, IGraphType mappedType)
     {
         if (mappedType == null)
@@ -355,63 +295,27 @@ public static partial class ObjectExtensions
         if (ValueConverter.TryConvertTo(propertyValue, fieldType, out object? result))
             return result;
 
-        var enumerableInterface = fieldType.Name == "IEnumerable`1"
-          ? fieldType
-          : fieldType.GetInterface("IEnumerable`1");
-
-        if (mappedType is ListGraphType listGraphType && fieldType != typeof(string) && enumerableInterface != null)
+        if (mappedType is ListGraphType listGraphType)
         {
             var itemGraphType = listGraphType.ResolvedType
                 ?? throw new InvalidOperationException("Graph type is not a list graph type or ResolvedType not set.");
-            IList newCollection;
-            var elementType = enumerableInterface.GetGenericArguments()[0];
-            var underlyingType = Nullable.GetUnderlyingType(elementType) ?? elementType;
-            var fieldTypeImplementsIList = fieldType.GetInterface("IList") != null;
 
-            var propertyValueAsIList = propertyValue as IList;
+            var listConverter = ValueConverter.GetListConverter(fieldType);
 
-            // Custom container
-            if (fieldTypeImplementsIList && !fieldType.IsArray)
+            var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
+
+            // typically, propertyValue is an object[], and no allocations occur
+            var objectArray = (propertyValue as IEnumerable
+                ?? throw new InvalidOperationException($"Cannot coerce collection of type '{propertyValue.GetType().GetFriendlyName()}' to IEnumerable."))
+                .ToObjectArray();
+
+            for (int i = 0; i < objectArray.Length; ++i)
             {
-                newCollection = (IList)Activator.CreateInstance(fieldType)!;
-            }
-            // Array of known size is created immediately
-            else if (fieldType.IsArray && propertyValueAsIList != null)
-            {
-                newCollection = Array.CreateInstance(elementType, propertyValueAsIList.Count);
-            }
-            // List<T>
-            else
-            {
-                var genericListType = typeof(List<>).MakeGenericType(elementType);
-                newCollection = (IList)Activator.CreateInstance(genericListType)!;
+                var listItem = objectArray[i];
+                objectArray[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
             }
 
-            if (propertyValue is not IEnumerable valueList)
-                throw new InvalidOperationException($"Cannot coerce collection of CLR type '{propertyValue.GetType().GetFriendlyName()}' to IEnumerable for graph type '{mappedType}'.");
-
-            // Array of known size is populated in-place
-            if (fieldType.IsArray && propertyValueAsIList != null)
-            {
-                for (int i = 0; i < propertyValueAsIList.Count; ++i)
-                {
-                    var listItem = propertyValueAsIList[i];
-                    newCollection[i] = listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType);
-                }
-            }
-            // Array of unknown size is created only after populating list
-            else
-            {
-                foreach (var listItem in valueList)
-                {
-                    newCollection.Add(listItem == null ? null : GetPropertyValue(listItem, underlyingType, itemGraphType));
-                }
-
-                if (fieldType.IsArray)
-                    newCollection = ((dynamic)newCollection!).ToArray();
-            }
-
-            return newCollection;
+            return listConverter.Convert(objectArray);
         }
 
         var value = propertyValue;

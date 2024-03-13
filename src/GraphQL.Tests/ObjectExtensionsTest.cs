@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 
 namespace GraphQL.Tests;
@@ -415,7 +416,7 @@ public class ObjectExtensionsTests
         schema.RegisterType(inputType);
 
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field. Please add a constructor parameter with the same name to initialize this field.");
+            .Message.ShouldBe("Field named 'Age' on CLR type 'MyInput8' is defined as a read-only field.");
     }
 
     private class MyInput8Type : InputObjectGraphType<MyInput8>
@@ -560,7 +561,7 @@ public class ObjectExtensionsTests
         if (compiled)
         {
             Should.Throw<InvalidOperationException>(() => schema.Initialize())
-                .Message.ShouldBe("Could not determine enumerable type for CLR type 'String'.");
+                .Message.ShouldBe("Type 'String' is not a list type or does not have a compatible public constructor.");
         }
         else
         {
@@ -629,11 +630,170 @@ public class ObjectExtensionsTests
     public void toobject_throws_for_invalid_collection_type(bool compiled)
     {
         Should.Throw<InvalidOperationException>(() => """{ "age": 3.5 }""".ToInputs().ToObject<MyInput16>(compiled))
-            .Message.ShouldBe("Cannot coerce collection of CLR type 'Double' to IEnumerable for graph type '[Int!]'.");
+            .Message.ShouldBe("Cannot coerce collection of type 'Double' to IEnumerable.");
     }
 
     public class MyInput16
     {
         public int[] Age { get; set; }
+    }
+
+
+    [Theory]
+    [InlineData(typeof(TypesTest_List))]
+    [InlineData(typeof(TypesTest_Array))]
+    [InlineData(typeof(TypesTest_IEnumerableGeneric))]
+    [InlineData(typeof(TypesTest_IListGeneric))]
+    [InlineData(typeof(TypesTest_ICollectionGeneric))]
+    [InlineData(typeof(TypesTest_IEnumerable))]
+    [InlineData(typeof(TypesTest_IList))]
+    [InlineData(typeof(TypesTest_ICollection))]
+    [InlineData(typeof(TypesTest_IReadOnlyList))]
+    [InlineData(typeof(TypesTest_IReadOnlyCollection))]
+#if NET6_0_OR_GREATER
+    [InlineData(typeof(TypesTest_IReadOnlySet))]
+#endif
+    [InlineData(typeof(TypesTest_ISet))]
+    [InlineData(typeof(TypesTest_HashSet))]
+    [InlineData(typeof(TypesTest_SortedSet))]
+    [InlineData(typeof(TypesTest_Queue))]
+    [InlineData(typeof(TypesTest_Stack))]
+    [InlineData(typeof(TypesTest_Custom1))]
+    [InlineData(typeof(TypesTest_Custom2))]
+    public void toobject_supports_varioustypes(Type classToTest)
+    {
+        var oldSetConverter = ValueConverter.GetListConverterFactory(typeof(ISet<>));
+        oldSetConverter.ShouldBe(ValueConverter.GetListConverterFactory(typeof(HashSet<>)));
+        try
+        {
+            ValueConverter.RegisterListConverterFactory(typeof(ISet<>), typeof(MyHashSet<>));
+            var inputType = new InputObjectGraphType();
+            inputType.AddField(new FieldType { Name = "Values", ResolvedType = new ListGraphType(new NonNullGraphType(new IntGraphType())) });
+            var inputs = new Dictionary<string, object?> { { "Values", new object?[] { 1, 2, 3 } } };
+
+            // test compiled
+            Validate(GraphQL.ObjectExtensions.CompileToObject(classToTest, inputType)(inputs));
+
+            // test via reflection
+            Validate(inputs.ToObject(classToTest, inputType));
+
+            void Validate(object value)
+            {
+                value.ShouldBeOfType(classToTest);
+                var actual = classToTest.GetProperty("Values")!.GetValue(value);
+                if (classToTest == typeof(TypesTest_Stack))
+                    actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([3, 2, 1]);
+                else if (classToTest == typeof(TypesTest_IEnumerable) || classToTest == typeof(TypesTest_IList) || classToTest == typeof(TypesTest_ICollection))
+                    actual.ShouldBeAssignableTo<IEnumerable>().ShouldBe(new object?[] { 1, 2, 3 });
+                else if (classToTest == typeof(TypesTest_ISet))
+                    actual.ShouldBeAssignableTo<MyHashSet<int>>().ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([1, 2, 3]);
+                else
+                    actual.ShouldBeAssignableTo<IEnumerable<int>>().ShouldBe([1, 2, 3]);
+            }
+        }
+        finally
+        {
+            ValueConverter.RegisterListConverterFactory(typeof(ISet<>), oldSetConverter);
+        }
+    }
+
+    public class TypesTest_List
+    {
+        public List<int> Values { get; set; }
+    }
+    public class TypesTest_Array
+    {
+        public int[] Values { get; set; }
+    }
+    public class TypesTest_IEnumerableGeneric
+    {
+        public IEnumerable<int> Values { get; set; }
+    }
+    public class TypesTest_IListGeneric
+    {
+        public IList<int> Values { get; set; }
+    }
+    public class TypesTest_ICollectionGeneric
+    {
+        public ICollection<int> Values { get; set; }
+    }
+    public class TypesTest_IEnumerable
+    {
+        public IEnumerable Values { get; set; }
+    }
+    public class TypesTest_IList
+    {
+        public IList Values { get; set; }
+    }
+    public class TypesTest_ICollection
+    {
+        public ICollection Values { get; set; }
+    }
+    public class TypesTest_IReadOnlyList
+    {
+        public IReadOnlyList<int> Values { get; set; }
+    }
+    public class TypesTest_IReadOnlyCollection
+    {
+        public IReadOnlyCollection<int> Values { get; set; }
+    }
+#if NET6_0_OR_GREATER
+    public class TypesTest_IReadOnlySet
+    {
+        public IReadOnlySet<int> Values { get; set; }
+    }
+#endif
+    public class TypesTest_ISet
+    {
+        public ISet<int> Values { get; set; }
+    }
+    public class TypesTest_HashSet
+    {
+        public HashSet<int> Values { get; set; }
+    }
+    public class TypesTest_SortedSet
+    {
+        public SortedSet<int> Values { get; set; }
+    }
+    public class TypesTest_Queue
+    {
+        public Queue<int> Values { get; set; }
+    }
+    public class TypesTest_Stack
+    {
+        public Stack<int> Values { get; set; }
+    }
+    public class TypesTest_Custom1
+    {
+        public Custom1<int> Values { get; set; }
+    }
+    public class Custom1<T> : IEnumerable<T>
+    {
+        public Custom1(IEnumerable<T> values)
+        {
+            Values = values.ToList();
+        }
+
+        public List<T> Values { get; }
+        public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+    public class TypesTest_Custom2
+    {
+        public Custom2<int> Values { get; set; }
+    }
+    public class Custom2<T> : IEnumerable<T>
+    {
+        public void Add(T value)
+        {
+            Values.Add(value);
+        }
+
+        public List<T> Values { get; } = new();
+        public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+    public class MyHashSet<T> : HashSet<T>
+    {
     }
 }

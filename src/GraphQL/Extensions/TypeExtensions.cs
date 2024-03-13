@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using GraphQL.DataLoader;
 using GraphQL.Types;
@@ -13,57 +14,61 @@ namespace GraphQL;
 /// </summary>
 public static class TypeExtensions
 {
-    private static readonly Type[] _objectListTypes = [
-        typeof(IEnumerable),
-        typeof(IList),
-        typeof(ICollection),
-        typeof(object),
-    ];
-
-    private static readonly Type[] _genericEnumerableTypes = [
-        typeof(IEnumerable<>),
-        typeof(IList<>),
-        typeof(ICollection<>),
-        typeof(IReadOnlyCollection<>),
-        typeof(IReadOnlyList<>),
-    ];
+    /// <summary>
+    /// Returns the element type of the specified list type.
+    /// For arrays, this is the element type of the array.
+    /// For generic types, this is the type of generic argument.
+    /// Otherwise, this is <see cref="object"/>.
+    /// </summary>
+    internal static Type GetListElementType(this Type listType)
+    {
+        if (listType is null)
+            throw new ArgumentNullException(nameof(listType));
+        if (listType.IsGenericTypeDefinition)
+            throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type definition and the element type cannot be determined.");
+        if (listType.IsGenericType)
+        {
+            var genericArguments = listType.GetGenericArguments();
+            if (genericArguments.Length != 1)
+                throw new InvalidOperationException($"Type '{listType.GetFriendlyName()}' is a generic type with {genericArguments.Length} generic arguments so the element type cannot be determined.");
+            return genericArguments[0];
+        }
+        return listType.IsArray
+            ? listType.GetElementType()!
+            : typeof(object);
+    }
 
     /// <summary>
-    /// Returns the list type of the indicated type.
-    /// Also indicates if the list type is an array type or a <see cref="List{T}"/>.
-    /// If neither, this indicates that the type is an interface compatible with
-    /// both <see cref="List{T}"/>s and arrays.
+    /// Converts the specified <see cref="IEnumerable"/> to an <see cref="Array"/> of type <see cref="object"/>.
     /// </summary>
-    internal static (bool IsArray, bool IsList, Type ElementType) GetListType(this Type type)
+    /// <remarks>
+    /// Optimized over <paramref name="values"/><see cref="Enumerable.Cast{TResult}(IEnumerable)">.Cast&lt;object&gt;()</see><see cref="Enumerable.ToArray{TSource}(IEnumerable{TSource})">.ToArray()</see>.
+    /// </remarks>
+    internal static object?[] ToObjectArray(this IEnumerable values)
     {
-        var isArray = false;
-        var isList = false;
-        Type? elementType = null;
-        if (type.IsArray)
+        if (values == null)
+            throw new ArgumentNullException(nameof(values));
+        if (values is object?[] objectArray)
+            return objectArray;
+        if (values is List<object?> objectList)
+            return objectList.ToArray();
+        if (values is IEnumerable<object?> enumerable)
+            return enumerable.ToArray();
+        if (values is ICollection collection) // note: TryGetNonEnumeratedCount is not available for IEnumerable; only IEnumerable<T>
         {
-            elementType = type.GetElementType()!;
-            isArray = true;
+            var count = collection.Count;
+            object?[] array = new object?[count];
+            int i = 0;
+            foreach (var value in values)
+                array[i++] = value;
+            if (i != count)
+                throw new InvalidOperationException("The number of items in the collection changed during enumeration.");
+            return array;
         }
-        else if (_objectListTypes.Contains(type))
-        {
-            elementType = typeof(object);
-        }
-        else if (type.IsGenericType)
-        {
-            var genericTypeDef = type.GetGenericTypeDefinition();
-            if (genericTypeDef == typeof(List<>))
-            {
-                elementType = type.GetGenericArguments()[0];
-                isList = true;
-            }
-            else if (_genericEnumerableTypes.Contains(type.GetGenericTypeDefinition()))
-            {
-                elementType = type.GetGenericArguments()[0];
-            }
-        }
-        if (elementType == null)
-            throw new InvalidOperationException($"Could not determine enumerable type for CLR type '{type.GetFriendlyName()}'.");
-        return (isArray, isList, elementType);
+        var list = new List<object?>();
+        foreach (object? value in values)
+            list.Add(value);
+        return list.ToArray();
     }
 
     /// <summary>
@@ -494,6 +499,71 @@ public static class TypeExtensions
             .Concat(assembly.GetCustomAttributes<GraphQLAttribute>())
             .Concat(GlobalSwitches.GlobalAttributes)
             .OrderBy(x => x.Priority);
+    }
+
+    /// <summary>
+    /// Identifies a property or field on the specified type that matches the specified name.
+    /// Search is performed case-insensitively. The property or field must be public and writable/settable.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal static (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired) FindWritableMember(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicFields)]
+        this Type type,
+        string propertyName)
+    {
+        PropertyInfo? propertyInfo = null;
+
+        // note: analzyer raises false IL2070 warning due to BindingFlags.IgnoreCase being present
+
+        try
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+        catch (AmbiguousMatchException)
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            propertyInfo = type.GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+
+        if (propertyInfo?.SetMethod?.IsPublic ?? false)
+        {
+            var isExternalInit = propertyInfo.SetMethod.ReturnParameter.GetRequiredCustomModifiers()
+                .Any(type => type.FullName == typeof(IsExternalInit).FullName);
+
+            var isRequired = propertyInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+            return (propertyInfo, isExternalInit, isRequired);
+        }
+
+        FieldInfo? fieldInfo;
+
+        try
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+        catch (AmbiguousMatchException)
+        {
+#pragma warning disable IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+            fieldInfo = type.GetField(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+#pragma warning restore IL2070 // 'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
+        }
+
+        if (fieldInfo != null)
+        {
+            if (fieldInfo.IsInitOnly)
+                throw new InvalidOperationException($"Field named '{propertyName}' on CLR type '{type.GetFriendlyName()}' is defined as a read-only field.");
+
+            var isRequired = fieldInfo.CustomAttributes.Any(x => x.AttributeType.FullName == typeof(RequiredMemberAttribute).FullName);
+
+            return (fieldInfo, false, isRequired);
+        }
+
+        throw new InvalidOperationException($"Cannot find member named '{propertyName}' on CLR type '{type.GetFriendlyName()}'.");
     }
 }
 
