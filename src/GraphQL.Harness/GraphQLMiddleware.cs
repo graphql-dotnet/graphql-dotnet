@@ -1,4 +1,5 @@
 using GraphQL;
+using GraphQL.Federation.Instrumentation;
 using GraphQL.Instrumentation;
 using GraphQL.Transport;
 using GraphQL.Types;
@@ -66,6 +67,7 @@ public class GraphQLMiddleware : IMiddleware
         if (_settings.EnableMetrics)
         {
             result.EnrichWithApolloTracing(start);
+            result.EnrichWithApolloFederatedTracing(start);
         }
 
         await WriteResponseAsync(context, result, context.RequestAborted).ConfigureAwait(false);

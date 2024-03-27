@@ -87,6 +87,8 @@
             file: links.md
           - title: Document Caching
             file: document-caching.md
+          - title: Federated Tracing
+            file: federated-tracing.md
       - title: Analyzers
         dir: analyzers
         items:

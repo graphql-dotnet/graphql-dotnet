@@ -1,0 +1,15 @@
+namespace GraphQL.Federation.Instrumentation
+{
+    public static class FederatedTracingExtensions
+    {
+        public static void EnrichWithApolloFederatedTracing(this GraphQL.ExecutionResult executionResult, System.DateTime start) { }
+    }
+}
+namespace GraphQL
+{
+    public static class FederationGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder UseApolloFederatedTracing(this GraphQL.DI.IGraphQLBuilder builder, bool enableMetrics = true) { }
+        public static GraphQL.DI.IGraphQLBuilder UseApolloFederatedTracing(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.ExecutionOptions, bool> enableMetricsPredicate) { }
+    }
+}
