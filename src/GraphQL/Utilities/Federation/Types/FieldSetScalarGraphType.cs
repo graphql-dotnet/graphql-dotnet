@@ -1,19 +1,19 @@
 using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Utilities.Federation
+namespace GraphQL.Utilities.Federation.Types
 {
     /// <summary>
     /// Represents a type unknown within this portion of the federated schema.
     /// </summary>
-    public class AnyScalarGraphType : ScalarGraphType
+    public class FieldSetScalarGraphType : ScalarGraphType
     {
         /// <summary>
         /// Initializes a new instance of this class.
         /// </summary>
-        public AnyScalarGraphType()
+        public FieldSetScalarGraphType()
         {
-            Name = "_Any";
+            Name = "FieldSet";
         }
 
         /// <inheritdoc/>
@@ -31,7 +31,7 @@ namespace GraphQL.Utilities.Federation
         /// <inheritdoc/>
         public override bool IsValidDefault(object value) => true;
 
-        /// <inheritdoc/>
-        public override GraphQLValue ToAST(object? value) => ThrowASTConversionError(value);
+        // /// <inheritdoc/>
+        // public override GraphQLValue ToAST(object? value) => ThrowASTConversionError(value);
     }
 }

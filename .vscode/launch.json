@@ -1,42 +1,54 @@
 {
-   "version": "0.2.0",
-   "configurations": [
-        {
-            "name": ".NET Core Launch (web)",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/GraphQL.Harness/bin/Debug/netcoreapp2.2/GraphQL.Harness.dll",
-            "args": [],
-            "cwd": "${workspaceRoot}/src/GraphQL.Harness",
-            "stopAtEntry": false,
-            "internalConsoleOptions": "openOnSessionStart",
-            "launchBrowser": {
-                "enabled": true,
-                "args": "${auto-detect-url}",
-                "windows": {
-                    "command": "cmd.exe",
-                    "args": "/C start ${auto-detect-url}"
-                },
-                "osx": {
-                    "command": "open"
-                },
-                "linux": {
-                    "command": "xdg-open"
-                }
-            },
-            "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
-            },
-            "sourceFileMap": {
-                "/Views": "${workspaceRoot}/Views"
-            }
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Core Launch (web)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceRoot}/src/GraphQL.Harness/bin/Debug/netcoreapp2.2/GraphQL.Harness.dll",
+      "args": [],
+      "cwd": "${workspaceRoot}/src/GraphQL.Harness",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart",
+      "launchBrowser": {
+        "enabled": true,
+        "args": "${auto-detect-url}",
+        "windows": {
+          "command": "cmd.exe",
+          "args": "/C start ${auto-detect-url}"
         },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach",
-            "processId": "${command:pickProcess}"
+        "osx": {
+          "command": "open"
+        },
+        "linux": {
+          "command": "xdg-open"
         }
-    ]
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceRoot}/Views"
+      }
+    },
+    {
+      "name": ".NET Core Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    },
+    {
+      "name": "Federation: Schema First",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "schema-first-build",
+      "program": "${workspaceFolder}/src/GraphQL.Federation.SchemaFirst/bin/Debug/net7.0/GraphQL.Federation.SchemaFirst.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  ]
 }
