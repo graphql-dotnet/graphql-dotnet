@@ -73,7 +73,10 @@ First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
 Then use the `Context` property on the accessor to get the current `DataLoaderContext`. The `DataLoaderDocumentListener` configured above ensures that each request will have its own context instance.
 
-Use one of the "GetOrAddLoader" methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
+Use one of the `GetOrAdd*Loader` methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys. The main difference you will see is between the `GetOrAddBatchLoader` and `GetOrAddCollectionBatchLoader` methods:
+
+- use `GetOrAddBatchLoader` for one-to-one relationships, i.e. when each key links to a single value; think for example of resolving users by their ids: each user id maps to one (and only one) user;
+- use `GetOrAddCollectionBatchLoader` for one-to-many or many-to-one relationships, i.e. when each key links to multiple values; think for example of resolving orders by user id: each user id may map to (zero or) more orders.
 
 Call `LoadAsync()` on the data loader. This will queue the request and return a `IDataLoaderResult<T>`. If the result has already been cached, the returned value will be pulled from the cache.
 
