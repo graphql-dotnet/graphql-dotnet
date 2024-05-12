@@ -93,10 +93,12 @@ signature looking like `IDataLoaderResult<IDataLoaderResult<T>>`, which is corre
 
 The decision about whether to use the `GetOrAddBatchLoader` or `GetOrAddCollectionBatchLoader` method should be based on whether each key can link to only one or to multiple values:
 
-- use `GetOrAddBatchLoader` for one-to-one relationships, i.e. when each key links to a single value; think for example of resolving the user who made an order: each order maps to one (and only one) user;
+- use `GetOrAddBatchLoader` for one-to-one or many-to-one relationships, i.e. when each key links to a single value; think for example of resolving the user who made an order: each order maps to one (and only one) user;
 - use `GetOrAddCollectionBatchLoader` for one-to-many or many-to-many relationships, i.e. when each key links to multiple values; think for example of resolving orders for a user: each user may map to (zero or) more orders.
 
-Note that, from a resolver's perspective, one-to-many and many-to-many relationships are exactly the same, since a resolver only sees one side of the relation. Think of orders and products. In theory, a product can appear in multiple orders and an order can contain multiple products, so this is a many-to-many relationship. However, a resolver for `Product.Orders` (or alternatively, `Order.Products`) will only need to care for the one-to-many side of the relation.
+Note that what matters here is the cardinality of the relation as seen from the resolver's perspective. Think for example of orders and products. In theory, a product can appear in multiple orders and an order can contain multiple products, so this is a many-to-many relationship. However, a resolver for `Product.Orders` (or alternatively, `Order.Products`) will only need to care for the one-to-many side of the relation, and thus use the `GetOrAddBatchCollectionLoader`.
+
+The same applies to one-to-many (or many-to-one) relationships. A resolver on the "one" side of the relation will need to use `GetOrAddBatchCollectionLoader`, while a resolver on the "many" side will need to use `GetOrAddBatchLoader`.
 
 ## Examples
 
@@ -104,7 +106,7 @@ Below are some example implementations of a DataLoader for different use cases g
 
 ```graphql
 type Order {
-    User: User! # one-to-one
+    User: User! # many-to-one
 }
 
 type User {
@@ -112,7 +114,7 @@ type User {
 }
 ```
 
-### One-to-one relationships (`Order.User`)
+### One-to-one or many-to-one relationships (`Order.User`)
 
 This is an example of using a DataLoader to batch requests for loading a single item by a key. Since each order belongs to exactly one user, from the perspective of an order this is a one-to-one relationship, so we should use `GetOrAddBatchLoader`.
 
@@ -157,7 +159,7 @@ public class UserStore : IUsersStore
 }
 ```
 
-### One-to-many relationships (`User.Orders`)
+### One-to-many or many-to-many relationships (`User.Orders`)
 
 This is an example of using a DataLoader to batch requests for loading a collection of items by a key. This is used when a key may be associated with more than one item. Since each user can have (zero or) more orders, from the perspective of a user this is a one-to-many relationship, so we should use `GetOrAddCollectionBatchLoader`.
 
