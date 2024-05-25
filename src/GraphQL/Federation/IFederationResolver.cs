@@ -22,6 +22,6 @@ public interface IFederationResolver
     /// <param name="context">The context of the field being resolved, providing access to various aspects of the GraphQL execution.</param>
     /// <param name="source">The source representation, converted to the CLR type specified by <see cref="SourceType"/>.</param>
     /// <returns>A task that represents the asynchronous resolve operation. The task result contains the resolved object.</returns>
-    ValueTask<object> ResolveAsync(IResolveFieldContext context, object source);
+    ValueTask<object?> ResolveAsync(IResolveFieldContext context, object source);
 }
 

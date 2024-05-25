@@ -60,11 +60,11 @@ public class SchemaFirstFixture
                     .ResolveReference<SchemaFirstFederatedTestDto>((ctx, rep) =>
                     {
                         var accessor = ctx.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>();
-                        return accessor.Context.GetOrAddBatchLoader<int, SchemaFirstFederatedTestDto>(
+                        return accessor.Context.GetOrAddBatchLoader<int, SchemaFirstFederatedTestDto?>(
                             "SchemaFirstFederatedTestDto.ResolveReference",
                             (items) =>
                             {
-                                return Task.FromResult<IDictionary<int, SchemaFirstFederatedTestDto>>(new Dictionary<int, SchemaFirstFederatedTestDto>
+                                return Task.FromResult<IDictionary<int, SchemaFirstFederatedTestDto?>>(new Dictionary<int, SchemaFirstFederatedTestDto?>
                                 {
                                     [1] = new() { Id = 1, Name = "111", ExternalTestId = 4, ExternalResolvableTestId = 7 },
                                     [2] = new() { Id = 2, Name = "222", ExternalTestId = 5, ExternalResolvableTestId = 8 },

@@ -10,11 +10,11 @@ public sealed class FederatedTestType : AutoRegisteringObjectGraphType<Federated
     public FederatedTestType(IDataLoaderContextAccessor accessor)
     {
         // this.ResolveReference((ctx, rep) => new() { Id = rep.Id, Name = $"{rep.Id}{rep.Id}{rep.Id}", ExternalTestId = 4 - rep.Id });
-        this.ResolveReference((ctx, rep) => accessor.Context.GetOrAddBatchLoader<int, FederatedTestDto>(
+        this.ResolveReference((ctx, rep) => accessor.Context.GetOrAddBatchLoader<int, FederatedTestDto?>(
             $"{nameof(FederatedTestDto)}-ResolveReference",
             (items) =>
             {
-                return Task.FromResult<IDictionary<int, FederatedTestDto>>(new Dictionary<int, FederatedTestDto>
+                return Task.FromResult<IDictionary<int, FederatedTestDto?>>(new Dictionary<int, FederatedTestDto?>
                 {
                     [1] = new() { Id = 1, Name = "111", ExternalTestId = 4, ExternalResolvableTestId = 7 },
                     [2] = new() { Id = 2, Name = "222", ExternalTestId = 5, ExternalResolvableTestId = 8 },
