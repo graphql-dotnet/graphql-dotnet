@@ -47,6 +47,8 @@ public class Program
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
 
+        // note: this demonstrates GraphQL.NET v7 and prior configuration methods
+#pragma warning disable CS0618 // Type or member is obsolete
         // define the known types and their resolvers
         var schemaBuilder = new FederatedSchemaBuilder();
         schemaBuilder.Types.Include<Query>();
@@ -59,6 +61,7 @@ public class Program
         schemaBuilder.Types.Include<Product>();
         schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(
             new MyFederatedResolver<Product>((data, id) => data.GetProductById(id)));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // build the schema
         return schemaBuilder.Build(schemaString);

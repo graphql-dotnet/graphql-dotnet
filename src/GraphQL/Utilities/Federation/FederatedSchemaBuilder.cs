@@ -1,5 +1,6 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using GraphQL.Federation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
@@ -7,6 +8,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation;
 
+[Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class will be removed in v9.")]
 public class FederatedSchemaBuilder : SchemaBuilder
 {
     internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
@@ -68,63 +70,61 @@ public class FederatedSchemaBuilder : SchemaBuilder
         query.AddField(service);
 
         var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
+        var representationArgument = new QueryArgument(representationsType) { Name = "representations" };
+        representationArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
 
         var entities = new FieldType
         {
             Name = "_entities",
-            Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+            Arguments = new QueryArguments(representationArgument),
             ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-            Resolver = new FuncFieldResolver<object>(async context =>
-            {
-                AddTypeNameToSelection(context.FieldAst, context.Document);
+            Resolver = EntityResolver.Instance,
+            //Resolver = new FuncFieldResolver<object>(async context =>
+            //{
+            //    AddTypeNameToSelection(context.FieldAst, context.Document);
 
-                var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
+            //    var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
 
-                var results = new List<object?>();
+            //    var results = new List<object?>();
 
-                foreach (var rep in reps!)
-                {
-                    var typeName = rep!["__typename"].ToString();
-                    var type = context.Schema.AllTypes[typeName!];
-                    if (type != null)
-                    {
-                        // execute resolver
-                        var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
-                        if (resolver != null)
-                        {
-                            var resolveContext = new FederatedResolveContext
-                            {
-                                Arguments = rep!,
-                                ParentFieldContext = context
-                            };
-                            var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
-                            results.Add(result);
-                        }
-                        else
-                        {
-                            results.Add(rep);
-                        }
-                    }
-                    else
-                    {
-                        // otherwise return the representation
-                        results.Add(rep);
-                    }
-                }
+            //    foreach (var rep in reps!)
+            //    {
+            //        var typeName = rep!["__typename"].ToString();
+            //        var type = context.Schema.AllTypes[typeName!];
+            //        if (type != null)
+            //        {
+            //            // execute resolver
+            //            var resolver = type.GetMetadata<GraphQL.Federation.IFederationResolver>(RESOLVER_METADATA_FIELD);
+            //            if (resolver != null)
+            //            {
+            //                var result = await resolver.ResolveAsync(context, rep!).ConfigureAwait(false);
+            //                results.Add(result);
+            //            }
+            //            else
+            //            {
+            //                results.Add(rep);
+            //            }
+            //        }
+            //        else
+            //        {
+            //            // otherwise return the representation
+            //            results.Add(rep);
+            //        }
+            //    }
 
-                return results;
-            })
+            //    return results;
+            //})
         };
         query.AddField(entities);
     }
 
-    private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
-    {
-        if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
-        {
-            setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
-        }
-    }
+    //private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
+    //{
+    //    if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
+    //    {
+    //        setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
+    //    }
+    //}
 
     private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
     {

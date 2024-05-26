@@ -2372,6 +2372,7 @@ namespace GraphQL.Types
         public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public bool SkipTypeCheck { get; set; }
         public string TypeName { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public override bool Equals(object? obj) { }
@@ -2464,6 +2465,7 @@ namespace GraphQL.Types
     public interface IObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         System.Func<object, bool>? IsTypeOf { get; set; }
+        bool SkipTypeCheck { get; set; }
         void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IProvideDeprecationReason
@@ -2631,6 +2633,7 @@ namespace GraphQL.Types
         public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public bool SkipTypeCheck { get; set; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public void Interface(System.Type type) { }
         public void Interface<TInterface>()
@@ -3241,6 +3244,8 @@ namespace GraphQL.Utilities.Federation
         public System.Collections.Generic.Dictionary<string, object?> Arguments { get; set; }
         public GraphQL.IResolveFieldContext ParentFieldContext { get; set; }
     }
+    [System.Obsolete("Please use Schema.For with graphQlBuilder.AddFederation() instead. This class wil" +
+        "l be removed in v9.")]
     public class FederatedSchema
     {
         public FederatedSchema() { }
@@ -3248,6 +3253,8 @@ namespace GraphQL.Utilities.Federation
         public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder>? configure = null)
             where TFederatedSchemaBuilder : GraphQL.Utilities.Federation.FederatedSchemaBuilder, new () { }
     }
+    [System.Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class " +
+        "will be removed in v9.")]
     public class FederatedSchemaBuilder : GraphQL.Utilities.SchemaBuilder
     {
         public FederatedSchemaBuilder() { }
@@ -3269,11 +3276,15 @@ namespace GraphQL.Utilities.Federation
         public override string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
         public override string PrintObject(GraphQL.Types.IObjectGraphType type) { }
     }
-    public class FuncFederatedResolver<T> : GraphQL.Utilities.Federation.IFederatedResolver
+    public class FuncFederatedResolver<T> : GraphQL.Federation.IFederationResolver, GraphQL.Utilities.Federation.IFederatedResolver
     {
         public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> func) { }
+        public System.Type SourceType { get; }
+        [System.Obsolete("Please use ResolveAsync instead. This method will be removed in v9.")]
         public System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context) { }
+        public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, object source) { }
     }
+    [System.Obsolete("Please use IFederationResolver instead. This interface will be removed in v9.")]
     public interface IFederatedResolver
     {
         System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
@@ -3284,6 +3295,8 @@ namespace GraphQL.Utilities.Federation
     }
     public static class TypeConfigExtensions
     {
+        public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.IFederationResolver resolver) { }
+        [System.Obsolete("Please use ResolveReference instead. This method will be removed in v9.")]
         public static void ResolveReferenceAsync(this GraphQL.Utilities.TypeConfig config, GraphQL.Utilities.Federation.IFederatedResolver resolver) { }
         public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
     }

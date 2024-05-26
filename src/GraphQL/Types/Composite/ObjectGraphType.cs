@@ -11,6 +11,11 @@ public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     Func<object, bool>? IsTypeOf { get; set; }
 
     /// <summary>
+    /// Instructs GraphQL.NET to skip type checking when a resolver of a field that returns this graph type returns an object.
+    /// </summary>
+    bool SkipTypeCheck { get; set; }
+
+    /// <summary>
     /// Adds an instance of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
     /// </summary>
     void AddResolvedInterface(IInterfaceGraphType graphType);
@@ -24,6 +29,9 @@ public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSo
 {
     /// <inheritdoc/>
     public Func<object, bool>? IsTypeOf { get; set; }
+
+    /// <inheritdoc/>
+    public bool SkipTypeCheck { get; set; }
 
     /// <inheritdoc/>
     public ObjectGraphType()

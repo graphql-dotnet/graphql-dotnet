@@ -191,7 +191,7 @@ internal static class FederationHelper
 
         var representationsArgumentGraphType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
         var representationsArgument = new QueryArgument(representationsArgumentGraphType) { Name = "representations" };
-        representationsArgument.Validator += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value);
+        representationsArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value);
         type.AddField(new FieldType
         {
             Name = "_entities",

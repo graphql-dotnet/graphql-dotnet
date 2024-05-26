@@ -30,6 +30,8 @@ public class TypeConfig : MetadataProvider
         set
         {
             _type = value;
+            if (value != null)
+                IsTypeOfFunc ??= value.IsInstanceOfType;
             ApplyMetadata(value);
         }
     }

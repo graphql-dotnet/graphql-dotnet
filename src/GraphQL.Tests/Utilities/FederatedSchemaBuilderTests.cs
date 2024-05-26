@@ -67,6 +67,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
         const string query = """
                 query ($_representations: [_Any!]!) {
                     _entities(representations: $_representations) {
+                        __typename
                         ... on User {
                             id
                             username
@@ -88,7 +89,6 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     }
 
     [Theory]
-    [InlineData("...on User { id }", false)]
     [InlineData("__typename ...on User { id }", false)]
     [InlineData("...on User { __typename id }", false)]
     [InlineData("...on User { ...TypeAndId }", true)]
@@ -214,6 +214,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
         const string query = """
             {
                 _entities(representations: [{__typename: "User", id: "1" }, {__typename: "User", id: "2" }]) {
+                    __typename
                     ... on User {
                         id
                         username
