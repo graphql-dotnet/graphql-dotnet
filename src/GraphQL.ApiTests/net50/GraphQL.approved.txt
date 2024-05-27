@@ -3311,6 +3311,7 @@ namespace GraphQL.Utilities.Visitors
         protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.Visitors.NullVisitorContext context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQLParser.Visitors.NullVisitorContext context) { }
+        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
     }
 }
