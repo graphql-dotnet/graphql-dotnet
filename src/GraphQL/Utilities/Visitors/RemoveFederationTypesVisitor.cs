@@ -9,13 +9,15 @@ namespace GraphQL.Utilities.Visitors;
 /// </summary>
 public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext>
 {
+    private const string LINK_DIRECTIVE = "link";
+
     private static readonly HashSet<string> _federatedDirectives = new()
     {
         "external",
         "provides",
         "requires",
         "key",
-        "link",
+        LINK_DIRECTIVE,
         "shareable",
         "inaccessible",
         "tag",
@@ -57,6 +59,13 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext
             _ => false,
         });
         return base.VisitDocumentAsync(document, context);
+    }
+
+    /// <inheritdoc/>
+    protected override ValueTask VisitSchemaDefinitionAsync(GraphQLSchemaDefinition schemaDefinition, NullVisitorContext context)
+    {
+        schemaDefinition.Directives?.Items.RemoveAll(directive => directive.Name.Value == LINK_DIRECTIVE);
+        return base.VisitSchemaDefinitionAsync(schemaDefinition, context);
     }
 
     /// <inheritdoc/>
