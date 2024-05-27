@@ -43,8 +43,28 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
               query: Query
             }
 
+            directive @link(url: String!, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+            directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+
+            directive @shareable on FIELD_DEFINITION | OBJECT
+
+            directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+            directive @override(from: String!) on FIELD_DEFINITION
+
+            directive @external on FIELD_DEFINITION | OBJECT
+
+            directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+
+            directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+
+            scalar _Any
+
             type Query {
               _noop: String
+              _service: _Service!
+              _entities(representations: [_Any!]!): [_Entity]!
             }
 
             type SchemaFirstExternalResolvableTestDto @key(fields: "id") {
@@ -65,6 +85,18 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
               externalTest: SchemaFirstExternalTestDto! @deprecated(reason: "Test deprecation reason 04.")
               externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: "external")
             }
+
+            type _Service {
+              sdl: String
+            }
+
+            union _Entity = SchemaFirstExternalResolvableTestDto | SchemaFirstFederatedTestDto
+
+            scalar link__Purpose
+
+            scalar link__Import
+
+            scalar FieldSet
             """,
             StringCompareShould.IgnoreLineEndings);
     }

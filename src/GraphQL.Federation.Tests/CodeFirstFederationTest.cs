@@ -43,6 +43,24 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
               query: TestQuery
             }
 
+            directive @link(url: String!, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+            directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+
+            directive @shareable on FIELD_DEFINITION | OBJECT
+
+            directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+            directive @override(from: String!) on FIELD_DEFINITION
+
+            directive @external on FIELD_DEFINITION | OBJECT
+
+            directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+
+            directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+
+            scalar _Any
+
             type TestQuery {
               directivesTest: DirectivesTestDto!
               _service: _Service!
@@ -58,6 +76,12 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
               provides: String! @provides(fields: "foo bar")
               requires: String! @requires(fields: "foo bar")
             }
+
+            type _Service {
+              sdl: String
+            }
+
+            union _Entity = DirectivesTestDto | FederatedTestDto | ExternalResolvableTestDto
 
             type FederatedTestDto @key(fields: "id") {
               id: Int!
@@ -77,6 +101,12 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
               external: String! @external
               extended: String! @requires(fields: "External")
             }
+
+            scalar link__Purpose
+
+            scalar link__Import
+
+            scalar FieldSet
             """,
             StringCompareShould.IgnoreLineEndings);
     }
