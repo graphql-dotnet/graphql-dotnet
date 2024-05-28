@@ -147,9 +147,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Federation", "Federation", 
 		Federation\federation-request-1.json = Federation\federation-request-1.json
 		Federation\federation-request-2.json = Federation\federation-request-2.json
 		Federation\federation-request-3.json = Federation\federation-request-3.json
+		Federation\federation-request-4.json = Federation\federation-request-4.json
 		Federation\federation-response-1.json = Federation\federation-response-1.json
 		Federation\federation-response-2.json = Federation\federation-response-2.json
 		Federation\federation-response-3.json = Federation\federation-response-3.json
+		Federation\federation-response-4.json = Federation\federation-response-4.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Federation.Tests", "GraphQL.Federation.Tests\GraphQL.Federation.Tests.csproj", "{75326CF3-9C2A-447E-9D5A-6B0200A23035}"

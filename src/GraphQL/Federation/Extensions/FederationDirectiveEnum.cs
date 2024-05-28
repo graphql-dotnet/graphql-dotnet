@@ -1,4 +1,4 @@
-namespace GraphQL.Federation.Enums;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Enumeration of all Federation directives.

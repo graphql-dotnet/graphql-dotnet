@@ -1,11 +1,12 @@
 using GraphQL.Builders;
 using GraphQL.DataLoader;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Federation.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using static GraphQL.Federation.Extensions.FederationHelper;
+using static GraphQL.Federation.FederationHelper;
 
-namespace GraphQL.Federation.Extensions;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Federation extensions for Graph Types.
@@ -25,7 +26,7 @@ public static class FederationGraphTypeExtensions
     public static FieldBuilder<T, object> AddEntities<T>(this ComplexGraphType<T> graphType)
     {
         return graphType.Field<NonNullGraphType<ListGraphType<EntityType>>>("_entities")
-            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<Utilities.Federation.AnyScalarGraphType>>>>("representations")
+            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<AnyScalarGraphType>>>>("representations")
             .Resolve(EntityResolver.Instance);
     }
 

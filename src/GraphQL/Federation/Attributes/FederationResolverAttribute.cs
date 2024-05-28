@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Security.Claims;
 using GraphQL.Execution;
-using GraphQL.Federation.Extensions;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;

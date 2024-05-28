@@ -1,5 +1,4 @@
 using GraphQL.DataLoader;
-using GraphQL.Federation.Extensions;
 using GraphQL.Federation.Tests.Schema.External;
 using GraphQL.Types;
 

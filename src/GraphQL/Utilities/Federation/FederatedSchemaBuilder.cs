@@ -1,6 +1,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using GraphQL.Federation;
+using GraphQL.Federation.Types;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser;
@@ -49,7 +50,7 @@ public class FederatedSchemaBuilder : SchemaBuilder
     protected override void PreConfigure(Schema schema)
     {
         schema.RegisterType<AnyScalarGraphType>();
-        schema.RegisterType<ServiceGraphType>();
+        schema.RegisterType(new ServiceGraphType(new PrintOptions { IncludeFederationTypes = false })); // skip federation types for federation v1 support
     }
 
     private void AddRootEntityFields(ISchema schema)

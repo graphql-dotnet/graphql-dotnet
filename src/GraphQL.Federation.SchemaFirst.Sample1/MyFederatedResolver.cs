@@ -1,3 +1,5 @@
+using GraphQL.Federation.Resolvers;
+
 namespace GraphQL.Federation.SchemaFirst.Sample1;
 
 /// <summary>

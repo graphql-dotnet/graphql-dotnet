@@ -1,12 +1,12 @@
-using System.Collections;
-using GraphQL.Federation.Enums;
 using GraphQL.Federation.Types;
-using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
-namespace GraphQL.Federation.Extensions;
+namespace GraphQL.Federation;
 
+/// <summary>
+/// Provides helper methods for adding Federation directives to a GraphQL schema.
+/// </summary>
 internal static class FederationHelper
 {
     public const string AST_METAFIELD = "__AST_MetaField__";
@@ -30,7 +30,10 @@ internal static class FederationHelper
     public const string FOR_ARGUMENT = "for";
     public const string IMPORT_ARGUMENT = "import";
 
-    public static readonly Dictionary<FederationDirectiveEnum, string> FederationDirectiveEnumMap = new()
+    /// <summary>
+    /// Maps <see cref="FederationDirectiveEnum"/> values to their corresponding directive strings.
+    /// </summary>
+    private static readonly Dictionary<FederationDirectiveEnum, string> _federationDirectiveEnumMap = new()
     {
         [FederationDirectiveEnum.Key] = $"@{KEY_DIRECTIVE}",
         [FederationDirectiveEnum.Shareable] = $"@{SHAREABLE_DIRECTIVE}",
@@ -41,6 +44,11 @@ internal static class FederationHelper
         [FederationDirectiveEnum.Requires] = $"@{REQUIRES_DIRECTIVE}",
     };
 
+    /// <summary>
+    /// Adds Federation directive definitions to the specified GraphQL schema based on the provided <see cref="FederationDirectiveEnum"/> values.
+    /// </summary>
+    /// <param name="schema">The GraphQL schema to add directives to.</param>
+    /// <param name="import">The <see cref="FederationDirectiveEnum"/> values specifying which directives to add.</param>
     public static void AddFederationDirectives(this ISchema schema, FederationDirectiveEnum import)
     {
         var linkDirective = new Directive(LINK_DIRECTIVE)
@@ -134,7 +142,12 @@ internal static class FederationHelper
         }
     }
 
-    public static void BuildLinkExtension(this ISchema schema, FederationDirectiveEnum import)
+    /// <summary>
+    /// Applies a <c>@link</c> directive to the specified GraphQL schema based on the provided <see cref="FederationDirectiveEnum"/> values.
+    /// </summary>
+    /// <param name="schema">The GraphQL schema to build the link extension for.</param>
+    /// <param name="import">The <see cref="FederationDirectiveEnum"/> values specifying which directives to include in the link extension.</param>
+    public static void ApplyLinkDirective(this ISchema schema, FederationDirectiveEnum import)
     {
         schema.ApplyDirective("link", d =>
         {
@@ -143,64 +156,10 @@ internal static class FederationHelper
             {
                 Value = Enum.GetValues(typeof(FederationDirectiveEnum))
                     .Cast<FederationDirectiveEnum>()
-                    .Where(x => import.HasFlag(x) && FederationDirectiveEnumMap.ContainsKey(x))
-                    .Select(x => FederationDirectiveEnumMap[x])
+                    .Where(x => import.HasFlag(x) && _federationDirectiveEnumMap.ContainsKey(x))
+                    .Select(x => _federationDirectiveEnumMap[x])
                     .ToList()
             });
-        });
-    }
-
-    public static IHasDirectivesNode BuildAstMetadata(this IProvideMetadata type)
-    {
-        var astMetadata = type.GetMetadata<IHasDirectivesNode>(AST_METAFIELD, () => new GraphQLObjectTypeDefinition(new("dummy"))
-        {
-            Directives = new(new())
-        });
-        type.Metadata[AST_METAFIELD] = astMetadata;
-        return astMetadata;
-    }
-
-    public static void AddFieldsArgument(this GraphQLDirective directive, string fields)
-    {
-        (directive.Arguments ??= new([])).Items.Add(new(new(FIELDS_ARGUMENT), new GraphQLStringValue(fields)));
-    }
-
-    public static void AddFromArgument(this GraphQLDirective directive, string from)
-    {
-        (directive.Arguments ??= new([])).Items.Add(new(new(FROM_ARGUMENT), new GraphQLStringValue(from)));
-    }
-
-    public static void AddResolvableArgument(this GraphQLDirective directive, bool resolvable)
-    {
-        if (!resolvable)
-        {
-            (directive.Arguments ??= new([])).Items.Add(new(new(RESOLVABLE_ARGUMENT), new GraphQLFalseBooleanValue()));
-        }
-    }
-
-    internal static void AddFederationFields(this ISchema schema)
-    {
-        var type = schema.Query
-            ?? throw new InvalidOperationException("The query type for the schema has not been defined.");
-
-        type.AddField(new FieldType
-        {
-            Name = "_service",
-            ResolvedType = new NonNullGraphType(new GraphQLTypeReference("_Service")),
-            Resolver = new FuncFieldResolver<object>(_ => BoolBox.True)
-        });
-
-        var representationsArgumentGraphType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
-        var representationsArgument = new QueryArgument(representationsArgumentGraphType) { Name = "representations" };
-        representationsArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (IList)value);
-        type.AddField(new FieldType
-        {
-            Name = "_entities",
-            ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-            Arguments = new QueryArguments(
-                new QueryArgument(representationsArgumentGraphType) { Name = "representations" }
-            ),
-            Resolver = EntityResolver.Instance,
         });
     }
 }

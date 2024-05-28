@@ -1,8 +1,9 @@
 using System.Collections;
 using GraphQL.DataLoader;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using static GraphQL.Federation.Extensions.FederationHelper;
+using static GraphQL.Federation.FederationHelper;
 
 namespace GraphQL.Federation;
 

@@ -1,4 +1,4 @@
-namespace GraphQL.Federation;
+namespace GraphQL.Federation.Resolvers;
 
 /// <summary>
 /// Provides a mechanism for resolving objects from the <c>_entities</c> field in a GraphQL federation setup.

@@ -1,5 +1,5 @@
 using System.Reflection;
-using GraphQL.Federation.Extensions;
+using GraphQL.Federation;
 using GraphQL.Federation.SchemaFirst.Sample1.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;

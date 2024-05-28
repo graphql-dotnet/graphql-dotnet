@@ -1,12 +1,12 @@
 using GraphQL.Types;
-using static GraphQL.Federation.Extensions.FederationHelper;
+using static GraphQL.Federation.FederationHelper;
 
-namespace GraphQL.Federation.Extensions;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Extension methods to configure federation directives within GraphQL schemas.
 /// </summary>
-public static class FederationExtensions
+public static class FederationMetadataExtensions
 {
     /// <summary>
     /// Adds "@key" directive.

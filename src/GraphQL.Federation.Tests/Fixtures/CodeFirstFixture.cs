@@ -1,4 +1,3 @@
-using GraphQL.Federation.Extensions;
 using GraphQL.Federation.Tests.Schema;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,4 +1,3 @@
-using GraphQL.Federation.Extensions;
 using GraphQL.Federation.TypeFirst.Sample4.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;

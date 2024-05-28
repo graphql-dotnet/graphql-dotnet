@@ -1,6 +1,5 @@
 using GraphQL.Types;
 using GraphQL.Federation.CodeFirst.Sample3.Models;
-using GraphQL.Federation.Extensions;
 
 namespace GraphQL.Federation.CodeFirst.Sample3.Schema;
 

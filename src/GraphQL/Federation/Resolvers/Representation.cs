@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.Federation;
+namespace GraphQL.Federation.Resolvers;
 
 /// <summary>
 /// Represents a record class for holding the necessary components to resolve an entity

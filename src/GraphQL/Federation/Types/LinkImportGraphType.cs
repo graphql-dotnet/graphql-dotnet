@@ -1,5 +1,3 @@
-using GraphQL.Utilities.Federation;
-
 namespace GraphQL.Federation.Types;
 
 /// <summary>

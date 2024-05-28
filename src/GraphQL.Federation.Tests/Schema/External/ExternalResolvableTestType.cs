@@ -1,4 +1,3 @@
-using GraphQL.Federation.Extensions;
 using GraphQL.Types;
 
 namespace GraphQL.Federation.Tests.Schema.External;

@@ -1,9 +1,9 @@
 using GraphQL.DI;
-using GraphQL.Federation.Enums;
 using GraphQL.Federation.Types;
+using GraphQL.Federation.Visitors;
 using GraphQL.Utilities;
 
-namespace GraphQL.Federation.Extensions;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Federation extensions for <see cref="IGraphQLBuilder"/>.
@@ -25,7 +25,7 @@ public static class FederationGraphQLBuilderExtensions
     {
         builder.Services
             .Register(new ServiceGraphType(printOptions))
-            .Register<Utilities.Federation.AnyScalarGraphType>(ServiceLifetime.Singleton)
+            .Register<AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityType>(ServiceLifetime.Transient)
             .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
             .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
@@ -38,19 +38,17 @@ public static class FederationGraphQLBuilderExtensions
             {
                 schema.AddFederationDirectives(import);
                 // add the @link directive to the schema, referencing the directive specified by the import parameter
-                schema.BuildLinkExtension(import);
+                schema.ApplyLinkDirective(import);
                 // register Federation types
                 schema.RegisterType<ServiceGraphType>();
-                schema.RegisterType<Utilities.Federation.AnyScalarGraphType>();
+                schema.RegisterType<AnyScalarGraphType>();
                 schema.RegisterType<EntityType>();
                 // after schema initialization, configure the _Entity union type with the proper types
                 schema.RegisterVisitor<FederationEntitiesSchemaNodeVisitor>();
                 if (addFields)
-                {
                     // add the _service and _entities fields to the query type
                     // this cannot be done here because the schema.Query property will not yet be set
                     schema.RegisterVisitor<FederationQuerySchemaNodeVisitor>();
-                }
             });
     }
 }

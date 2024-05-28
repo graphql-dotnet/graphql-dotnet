@@ -24,4 +24,8 @@
     <ProjectReference Include="..\GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj" PrivateAssets="none" Condition="'$(ExcludeRestorePackageImports)' != ''" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Federation\Enums\" />
+  </ItemGroup>
+
 </Project>

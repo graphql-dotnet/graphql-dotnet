@@ -4,7 +4,7 @@ using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Federation.Extensions;
+namespace GraphQL.Federation.Visitors;
 
 /// <summary>
 /// This adds the <c>_service</c> and <c>_entities</c> fields to the query type.
