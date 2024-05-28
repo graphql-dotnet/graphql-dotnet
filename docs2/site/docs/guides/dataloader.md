@@ -73,7 +73,7 @@ First, inject the `IDataLoaderContextAccessor` into your GraphQL type class.
 
 Then use the `Context` property on the accessor to get the current `DataLoaderContext`. The `DataLoaderDocumentListener` configured above ensures that each request will have its own context instance.
 
-Use one of the "GetOrAddLoader" methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
+Use one of the `GetOrAdd*Loader` methods on the `DataLoaderContext`. These methods all require a string key to uniquely identify each loader. They also require a delegate for fetching the data. Each method will get an existing loader or add a new one, identified by the string key. Each method has various overloads to support different ways to load and map data with the keys.
 
 Call `LoadAsync()` on the data loader. This will queue the request and return a `IDataLoaderResult<T>`. If the result has already been cached, the returned value will be pulled from the cache.
 
@@ -89,9 +89,36 @@ method of the returned `IDataLoaderResult<T>`. You can use a synchronous or asyn
 `IDataLoaderResult<T>` if you wish to chain dataloaders together. This may result in the field builder's Resolve delegate
 signature looking like `IDataLoaderResult<IDataLoaderResult<T>>`, which is correct and will be handled properly by the execution strategy.
 
+### GetOrAddBatchLoader vs. GetOrAddCollectionBatchLoader
+
+The decision about whether to use the `GetOrAddBatchLoader` or `GetOrAddCollectionBatchLoader` method should be based on whether each key can link to only one or to multiple values:
+
+- use `GetOrAddBatchLoader` for one-to-one or many-to-one relationships, i.e. when each key links to a single value; think for example of resolving the user who made an order: each order maps to one (and only one) user;
+- use `GetOrAddCollectionBatchLoader` for one-to-many or many-to-many relationships, i.e. when each key links to multiple values; think for example of resolving orders for a user: each user may map to (zero or) more orders.
+
+Note that what matters here is the cardinality of the relation as seen from the resolver's perspective. Think for example of orders and products. In theory, a product can appear in multiple orders and an order can contain multiple products, so this is a many-to-many relationship. However, a resolver for `Product.Orders` (or alternatively, `Order.Products`) will only need to care for the one-to-many side of the relation, and thus use the `GetOrAddBatchCollectionLoader`.
+
+The same applies to one-to-many (or many-to-one) relationships. A resolver on the "one" side of the relation will need to use `GetOrAddBatchCollectionLoader`, while a resolver on the "many" side will need to use `GetOrAddBatchLoader`.
+
 ## Examples
 
-This is an example of using a DataLoader to batch requests for loading items by a key. `LoadAsync()` is called by the field resolver for each Order. `IUsersStore.GetUsersByIdAsync()` will be called with the batch of userIds that were requested.
+Below are some example implementations of a DataLoader for different use cases given the following schema:
+
+```graphql
+type Order {
+    User: User! # many-to-one
+}
+
+type User {
+    Orders: [Order!]! # one-to-many
+}
+```
+
+### One-to-one or many-to-one relationships (`Order.User`)
+
+This is an example of using a DataLoader to batch requests for loading a single item by a key. Since each order belongs to exactly one user, from the perspective of an order this is a one-to-one relationship, so we should use `GetOrAddBatchLoader`.
+
+Below, `LoadAsync()` is called by the field resolver for each Order. `IUsersStore.GetUsersByIdAsync()` will be called with the batch of userIds that were requested.
 
 ``` csharp
 public class OrderType : ObjectGraphType<Order>
@@ -118,15 +145,25 @@ public class OrderType : ObjectGraphType<Order>
     }
 }
 
-public interface IUsersStore
+public class UserStore : IUsersStore
 {
     // This will be called by the loader for all pending keys
     // Note that fetch delegates can accept a CancellationToken parameter or not
-    Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+    Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken)
+    {
+        var users = await ... // load data from database
+
+		return users
+			.ToDictionary(x => x.UserId);
+    }
 }
 ```
 
-This is an example of using a DataLoader to batch requests for loading a collection of items by a key. This is used when a key may be associated with more than one item. `LoadAsync()` is called by the field resolver for each User. A User can have zero to many Orders. `IOrdersStore.GetOrdersByUserIdAsync` will be called with a batch of userIds that have been requested.
+### One-to-many or many-to-many relationships (`User.Orders`)
+
+This is an example of using a DataLoader to batch requests for loading a collection of items by a key. This is used when a key may be associated with more than one item. Since each user can have (zero or) more orders, from the perspective of a user this is a one-to-many relationship, so we should use `GetOrAddCollectionBatchLoader`.
+
+`LoadAsync()` is called by the field resolver for each User. `IOrdersStore.GetOrdersByUserIdAsync` will be called with a batch of userIds that have been requested.
 
 ``` csharp
 public class UserType : ObjectGraphType<User>
@@ -167,6 +204,8 @@ public class OrdersStore : IOrdersStore
 
 ```
 
+### No batching
+
 This is an example of using a DataLoader without batching. This could be useful if the data may be requested multiple times. The result will be cached the first time. Subsequent calls to `LoadAsync()` will return the cached result.
 
 ``` csharp
@@ -196,6 +235,8 @@ public interface IUsersStore
 	Task<IEnumerable<User>> GetAllUsersAsync();
 }
 ```
+
+### Chained data loaders
 
 This is an example of using two chained DataLoaders to batch requests together, with asynchronous code before the data loaders execute, and post-processing afterwards.
 
