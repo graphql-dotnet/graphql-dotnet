@@ -7,11 +7,85 @@
         "products": [
           {
             "id": "1",
-            "name": "Product 1"
+            "name": "Product 1",
+            "category": {
+              "id": "1",
+              "name": "Category 1"
+            },
+            "reviews": [
+              {
+                "id": "1",
+                "content": "Review 1",
+                "product": {
+                  "id": "1",
+                  "name": "Product 1"
+                },
+                "author": {
+                  "id": "1",
+                  "username": "Username 1",
+                  "reviews": [
+                    {
+                      "id": "1",
+                      "content": "Review 1"
+                    },
+                    {
+                      "id": "3",
+                      "content": "Review 3"
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "2",
+                "content": "Review 2",
+                "product": {
+                  "id": "1",
+                  "name": "Product 1"
+                },
+                "author": {
+                  "id": "2",
+                  "username": "Username 2",
+                  "reviews": [
+                    {
+                      "id": "2",
+                      "content": "Review 2"
+                    }
+                  ]
+                }
+              }
+            ]
           },
           {
             "id": "2",
-            "name": "Product 2"
+            "name": "Product 2",
+            "category": {
+              "id": "1",
+              "name": "Category 1"
+            },
+            "reviews": [
+              {
+                "id": "3",
+                "content": "Review 3",
+                "product": {
+                  "id": "2",
+                  "name": "Product 2"
+                },
+                "author": {
+                  "id": "1",
+                  "username": "Username 1",
+                  "reviews": [
+                    {
+                      "id": "1",
+                      "content": "Review 1"
+                    },
+                    {
+                      "id": "3",
+                      "content": "Review 3"
+                    }
+                  ]
+                }
+              }
+            ]
           }
         ]
       },
@@ -21,11 +95,21 @@
         "products": [
           {
             "id": "3",
-            "name": "Product 3"
+            "name": "Product 3",
+            "category": {
+              "id": "2",
+              "name": "Category 2"
+            },
+            "reviews": []
           },
           {
             "id": "4",
-            "name": "Product 4"
+            "name": "Product 4",
+            "category": {
+              "id": "2",
+              "name": "Category 2"
+            },
+            "reviews": []
           }
         ]
       }
