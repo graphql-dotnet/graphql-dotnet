@@ -6,6 +6,6 @@ internal class FieldSetGraphType : StringGraphType
 {
     public FieldSetGraphType()
     {
-        Name = "FieldSet";
+        Name = "federation__FieldSet";
     }
 }

@@ -55,9 +55,9 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
 
             directive @external on FIELD_DEFINITION | OBJECT
 
-            directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+            directive @provides(fields: federation__FieldSet!) on FIELD_DEFINITION
 
-            directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+            directive @requires(fields: federation__FieldSet!) on FIELD_DEFINITION
 
             scalar _Any
 
@@ -101,7 +101,7 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
             
             scalar link__Import
 
-            scalar FieldSet
+            scalar federation__FieldSet
             """,
             StringCompareShould.IgnoreLineEndings);
     }

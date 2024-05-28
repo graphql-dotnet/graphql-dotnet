@@ -31,7 +31,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext
     {
         "_Entity",
         "_Any",
-        "FieldSet",
+        "federation__FieldSet",
         "link__Import",
         "link__Purpose",
         "_Service",
