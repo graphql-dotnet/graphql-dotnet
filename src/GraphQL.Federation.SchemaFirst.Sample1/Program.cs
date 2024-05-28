@@ -1,10 +1,8 @@
 using System.Reflection;
-using GraphQL.Federation;
 using GraphQL.Federation.SchemaFirst.Sample1.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Federation.SchemaFirst.Sample1;
 
