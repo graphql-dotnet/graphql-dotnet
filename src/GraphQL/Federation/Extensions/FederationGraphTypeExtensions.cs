@@ -50,7 +50,7 @@ public static class FederationGraphTypeExtensions
     /// <summary>
     /// Specifies reference resolver for the type.
     /// </summary>
-    public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, TSourceType> resolver) =>
+    public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver) =>
         typeConfig.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
 
     /// <summary>

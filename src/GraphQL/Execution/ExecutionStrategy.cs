@@ -60,13 +60,13 @@ public abstract class ExecutionStrategy : IExecutionStrategy
 
             case OperationType.Mutation:
                 type = context.Schema.Mutation;
-                if (type == null)
+                if (type == null || type.IsPrivate)
                     throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document);
                 break;
 
             case OperationType.Subscription:
                 type = context.Schema.Subscription;
-                if (type == null)
+                if (type == null || type.IsPrivate)
                     throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document);
                 break;
 

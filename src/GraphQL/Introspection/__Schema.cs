@@ -32,7 +32,7 @@ public class __Schema : ObjectGraphType<ISchema>
                 int index = 0;
                 foreach (var item in context.Schema.AllTypes.Dictionary)
                 {
-                    if (await context.Schema.Filter.AllowType(item.Value).ConfigureAwait(false))
+                    if (!item.Value.IsPrivate && await context.Schema.Filter.AllowType(item.Value).ConfigureAwait(false))
                         types[index++] = item.Value;
                 }
 
@@ -51,7 +51,7 @@ public class __Schema : ObjectGraphType<ISchema>
             .Description("If this server supports mutation, the type that mutation operations will be rooted at.")
             .ResolveAsync(async context =>
             {
-                return context.Schema.Mutation != null && await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
+                return context.Schema.Mutation != null && !context.Schema.Mutation.IsPrivate && await context.Schema.Filter.AllowType(context.Schema.Mutation).ConfigureAwait(false)
                     ? context.Schema.Mutation
                     : null;
             });
@@ -60,7 +60,7 @@ public class __Schema : ObjectGraphType<ISchema>
             .Description("If this server supports subscription, the type that subscription operations will be rooted at.")
             .ResolveAsync(async context =>
             {
-                return context.Schema.Subscription != null && await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
+                return context.Schema.Subscription != null && !context.Schema.Subscription.IsPrivate && await context.Schema.Filter.AllowType(context.Schema.Subscription).ConfigureAwait(false)
                     ? context.Schema.Subscription
                     : null;
             });

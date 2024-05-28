@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "GraphQL.Federation.Sample4": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:56847;http://localhost:56848"
+    }
+  }
+}

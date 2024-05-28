@@ -46,4 +46,9 @@ public interface IGraphType : IMetadataReader, IMetadataWriter, IProvideDescript
     /// Initializes the graph type.
     /// </summary>
     void Initialize(ISchema schema);
+
+    /// <summary>
+    /// Indicates that the graph type is not exposed through introspection and cannot be used as type conditions within queries.
+    /// </summary>
+    bool IsPrivate { get; set; }
 }

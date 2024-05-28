@@ -92,7 +92,7 @@ public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(Dyn
     /// May return <see langword="null"/> to skip a property.
     /// </summary>
     protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, null, true);
+        => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, null, true);
 
     /// <summary>
     /// Returns a list of properties or fields that should have fields created for them.

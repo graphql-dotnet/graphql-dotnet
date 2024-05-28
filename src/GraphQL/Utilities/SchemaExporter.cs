@@ -65,7 +65,7 @@ public class SchemaExporter
         // export types
         foreach (var type in Schema.AllTypes)
         {
-            if (!IsIntrospectionType(type.Name) && !IsBuiltInScalar(type.Name))
+            if (!IsIntrospectionType(type.Name) && !IsBuiltInScalar(type.Name) && !type.IsPrivate)
                 definitions.Add(ApplyExtend(ExportTypeDefinition(type), type));
         }
 
@@ -154,7 +154,8 @@ public class SchemaExporter
             var list = new List<GraphQLInputValueDefinition>(graphType.Fields.Count);
             foreach (var field in graphType.Fields)
             {
-                list.Add(ExportInputValueDefinition(field));
+                if (!field.IsPrivate)
+                    list.Add(ExportInputFieldDefinition(field));
             }
             fields = new(list);
         }
@@ -168,7 +169,7 @@ public class SchemaExporter
     /// <summary>
     /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputValueDefinition"/>.
     /// </summary>
-    protected virtual GraphQLInputValueDefinition ExportInputValueDefinition(FieldType fieldType)
+    protected virtual GraphQLInputValueDefinition ExportInputFieldDefinition(FieldType fieldType)
     {
         var ret = new GraphQLInputValueDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
         {
@@ -191,7 +192,8 @@ public class SchemaExporter
             var list = new List<GraphQLFieldDefinition>(graphType.Fields.Count);
             foreach (var field in graphType.Fields)
             {
-                list.Add(ExportFieldDefinition(field));
+                if (!field.IsPrivate)
+                    list.Add(ExportFieldDefinition(field));
             }
             fields = new(list);
         }
@@ -223,7 +225,8 @@ public class SchemaExporter
             var list = new List<GraphQLFieldDefinition>(graphType.Fields.Count);
             foreach (var field in graphType.Fields)
             {
-                list.Add(ExportFieldDefinition(field));
+                if (!field.IsPrivate)
+                    list.Add(ExportFieldDefinition(field));
             }
             fields = new(list);
         }
@@ -378,7 +381,7 @@ public class SchemaExporter
                 Type = new GraphQLNamedType(new(Schema.Query.Name))
             }
         };
-        if (Schema.Mutation != null)
+        if (Schema.Mutation != null && !Schema.Mutation.IsPrivate)
         {
             definitions.Add(new GraphQLRootOperationTypeDefinition()
             {
@@ -386,7 +389,7 @@ public class SchemaExporter
                 Type = new GraphQLNamedType(new(Schema.Mutation.Name))
             });
         }
-        if (Schema.Subscription != null)
+        if (Schema.Subscription != null && !Schema.Subscription.IsPrivate)
         {
             definitions.Add(new GraphQLRootOperationTypeDefinition()
             {

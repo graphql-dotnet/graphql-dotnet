@@ -104,7 +104,7 @@ public class EntityResolver : IFieldResolver
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
-    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
+    internal static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
     {
         var obj = Activator.CreateInstance(objectType)!;
         foreach (var item in map)
@@ -117,13 +117,17 @@ public class EntityResolver : IFieldResolver
                 var prop = objectType.GetProperty(item.Key, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public)
                     ?? throw new InvalidOperationException($"Property '{item.Key}' not found in type '{objectType.GetFriendlyName()}'.");
                 var value = Deserialize(item.Key, graphType, prop.PropertyType, item.Value);
+                if (value != null && !prop.PropertyType.IsInstanceOfType(value))
+                {
+                    value = ValueConverter.ConvertTo(value, prop.PropertyType);
+                }
                 prop.SetValue(obj, value);
             }
         }
         return obj;
     }
 
-    private static object? Deserialize(string fieldName, IGraphType graphType, Type valueType, object? value)
+    internal static object? Deserialize(string fieldName, IGraphType graphType, Type valueType, object? value)
     {
         if (graphType is NonNullGraphType nonNullGraphType)
         {
@@ -164,6 +168,15 @@ public class EntityResolver : IFieldResolver
                 throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not an object");
 
             return ToObject(valueType, objectGraphType, dic);
+        }
+
+        // below condition only used by FederationResolverAttribute.FederationStaticResolver.Context.ctor
+        if (graphType is IInputObjectGraphType inputObjectGraphType)
+        {
+            if (value is not Dictionary<string, object?> dic)
+                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not an object");
+
+            return inputObjectGraphType.ParseDictionary(dic);
         }
 
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");

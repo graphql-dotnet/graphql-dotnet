@@ -11,6 +11,7 @@ internal static class FederationHelper
 {
     public const string AST_METAFIELD = "__AST_MetaField__";
     public const string RESOLVER_METADATA = "__FedResolver__";
+    public const string FEDERATION_RESOLVER_FIELD = "_FederationResolverField_";
     public const string LINK_SCHEMA_EXTENSION_METADATA = "__FedLinkSchemaExtension__";
 
     public const string LINK_DIRECTIVE = "link";

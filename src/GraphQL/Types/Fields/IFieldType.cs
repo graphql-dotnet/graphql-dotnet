@@ -14,4 +14,9 @@ public interface IFieldType : IHaveDefaultValue, IMetadataReader, IMetadataWrite
     /// Gets or sets a list of arguments for the field.
     /// </summary>
     QueryArguments? Arguments { get; set; }
+
+    /// <summary>
+    /// Indicates that the field is not exposed through introspection and cannot be queried.
+    /// </summary>
+    bool IsPrivate { get; set; }
 }
