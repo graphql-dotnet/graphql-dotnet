@@ -5,6 +5,13 @@ namespace GraphQL.Federation.CodeFirst.Sample3.Schema;
 
 public class QueryGraphType : ObjectGraphType
 {
-    public Task<IEnumerable<Review>> Reviews([FromServices] Data data)
-        => data.GetReviewsAsync();
+    public QueryGraphType()
+    {
+        Field<NonNullGraphType<ListGraphType<NonNullGraphType<ReviewGraphType>>>, IEnumerable<Review>>("reviews")
+            .ResolveAsync(ctx =>
+            {
+                var data = ctx.RequestServices!.GetRequiredService<Data>();
+                return data.GetReviewsAsync()!;
+            });
+    }
 }

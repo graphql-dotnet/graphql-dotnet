@@ -169,7 +169,7 @@ jobs:
           for i in {1..60}
           do
             echo "Request $i to the URL..."
-            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5602)
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5603)
             if [ $response -eq 200 ]; then
               echo "Received 200 response, step completed."
               exit 0
@@ -184,7 +184,7 @@ jobs:
           for i in {1..60}
           do
             echo "Request $i to the URL..."
-            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5602)
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5604)
             if [ $response -eq 200 ]; then
               echo "Received 200 response, step completed."
               exit 0

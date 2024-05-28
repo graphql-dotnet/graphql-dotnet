@@ -239,6 +239,7 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+        public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
         public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
@@ -1462,6 +1463,14 @@ namespace GraphQL.Federation.Attributes
         public ExternalAttribute() { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class FederationResolverAttribute : GraphQL.GraphQLAttribute
+    {
+        public FederationResolverAttribute() { }
+        public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
+        public override void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
+        public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
     public class InaccessibleAttribute : GraphQL.GraphQLAttribute
     {
@@ -1581,7 +1590,7 @@ namespace GraphQL.Federation.Extensions
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
-        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
     }
 }
 namespace GraphQL.Instrumentation
@@ -2277,6 +2286,7 @@ namespace GraphQL.Types
         public object? DefaultValue { get; set; }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        public bool IsPrivate { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
@@ -2311,6 +2321,7 @@ namespace GraphQL.Types
         protected GraphType() { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        public bool IsPrivate { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object? obj) { }
@@ -2343,10 +2354,12 @@ namespace GraphQL.Types
     public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments? Arguments { get; set; }
+        bool IsPrivate { get; set; }
         string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        bool IsPrivate { get; set; }
         void Initialize(GraphQL.Types.ISchema schema);
     }
     public interface IGraphTypeFactory<out TGraphType>
@@ -3039,8 +3052,8 @@ namespace GraphQL.Utilities
         protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ExportDirectiveDefinition(GraphQL.Types.Directive directive) { }
         protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ExportEnumTypeDefinition(GraphQL.Types.EnumerationGraphType enumType) { }
         protected virtual GraphQLParser.AST.GraphQLFieldDefinition ExportFieldDefinition(GraphQL.Types.FieldType fieldType) { }
+        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportInputFieldDefinition(GraphQL.Types.FieldType fieldType) { }
         protected virtual GraphQLParser.AST.GraphQLInputObjectTypeDefinition ExportInputObjectTypeDefinition(GraphQL.Types.IInputObjectGraphType graphType) { }
-        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportInputValueDefinition(GraphQL.Types.FieldType fieldType) { }
         protected virtual GraphQLParser.AST.GraphQLInterfaceTypeDefinition ExportInterfaceTypeDefinition(GraphQL.Types.IInterfaceGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLObjectTypeDefinition ExportObjectTypeDefinition(GraphQL.Types.IObjectGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLScalarTypeDefinition ExportScalarTypeDefinition(GraphQL.Types.ScalarGraphType scalarType) { }
