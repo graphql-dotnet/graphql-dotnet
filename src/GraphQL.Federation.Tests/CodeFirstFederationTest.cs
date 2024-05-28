@@ -101,9 +101,14 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
               external: String! @external
               extended: String! @requires(fields: "External")
             }
-
-            scalar link__Purpose
-
+            
+            enum link__Purpose {
+              "`SECURITY` features provide metadata necessary to securely resolve fields."
+              SECURITY
+              "`EXECUTION` features provide metadata necessary for operation execution."
+              EXECUTION
+            }
+            
             scalar link__Import
 
             scalar FieldSet

@@ -1627,6 +1627,17 @@ namespace GraphQL.Federation.Extensions
         public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
     }
 }
+namespace GraphQL.Federation.Types
+{
+    [GraphQL.Types.ConstantCase]
+    public enum LinkPurpose
+    {
+        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
+        Security = 0,
+        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
+        Execution = 1,
+    }
+}
 namespace GraphQL.Instrumentation
 {
     public class ApolloTrace
