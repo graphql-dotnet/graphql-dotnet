@@ -609,6 +609,11 @@ namespace GraphQL
         public bool TryRetrieve(TKey key, out TValue? value) { }
         public void WithValue(TKey key, System.Action<TValue> action) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=false, Inherited=true)]
+    public sealed class MapAutoClrTypeAttribute : System.Attribute
+    {
+        public MapAutoClrTypeAttribute() { }
+    }
     public static class MemoryExtensions
     {
         public static System.Collections.Generic.IList<T> Constrained<T>(this T[] array, int count) { }
