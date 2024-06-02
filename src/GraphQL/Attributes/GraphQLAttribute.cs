@@ -49,6 +49,20 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Updates the properties of the specified <see cref="FieldType"/> as necessary
+        /// when adding a field to a graph type. Typically you should use <see cref="Modify(FieldType, bool)"/>
+        /// instead of this method unless you need the additional properties exposed in this method.
+        /// </summary>
+        /// <param name="graphType">The <see cref="IGraphType"/> the field will be added to.</param>
+        /// <param name="fieldType">The <see cref="FieldType"/> to update.</param>
+        /// <param name="memberInfo">The <see cref="MemberInfo"/> that the field was generated from.</param>
+        /// <param name="isInputType">Indicates if the graph type containing this field is an input type.</param>
+        /// <param name="ignore">Indicates that the field should not be added to the graph type.</param>
+        public virtual void Modify(IGraphType graphType, MemberInfo memberInfo, FieldType fieldType, bool isInputType, ref bool ignore)
+        {
+        }
+
+        /// <summary>
         /// Updates the properties of the specified <see cref="TypeInformation"/> as necessary.
         /// </summary>
         public virtual void Modify(TypeInformation typeInformation)
