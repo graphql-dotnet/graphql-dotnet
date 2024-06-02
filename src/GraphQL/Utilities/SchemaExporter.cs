@@ -155,7 +155,7 @@ public class SchemaExporter
             foreach (var field in graphType.Fields)
             {
                 if (!field.IsPrivate)
-                    list.Add(ExportInputFieldDefinition(field));
+                    list.Add(ExportInputValueDefinition(field));
             }
             fields = new(list);
         }
@@ -169,7 +169,7 @@ public class SchemaExporter
     /// <summary>
     /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputValueDefinition"/>.
     /// </summary>
-    protected virtual GraphQLInputValueDefinition ExportInputFieldDefinition(FieldType fieldType)
+    protected virtual GraphQLInputValueDefinition ExportInputValueDefinition(FieldType fieldType)
     {
         var ret = new GraphQLInputValueDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
         {
