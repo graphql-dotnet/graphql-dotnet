@@ -385,6 +385,10 @@ for schema-first schemas where the CLR type is not defined while the resolver is
 `IsTypeOf` to be set automatically for other use cases. Schema-first schemas will automatically set this
 property to `true` for all object graph types to retain the existing behavior.
 
+### 12. `ISchemaNodeVisitor.PostVisitSchema` method added
+
+Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -559,3 +563,8 @@ and override only the methods you need to implement.
 
 See the new features section for details on the new properties added to these interfaces.
 Unless you directly implement these interfaces, you should not be impacted by these changes.
+
+### 14. `ISchemaNodeVisitor.PostVisitSchema` method added
+
+See the new features section for details on the new method added to this interface.
+Unless you directly implement this interface, you should not be impacted by this change.

@@ -2847,6 +2847,7 @@ namespace GraphQL.Utilities
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.AppliedDirectivesValidationVisitor Instance;
+        public void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2873,6 +2874,7 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
+        public virtual void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public virtual void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -2910,6 +2912,7 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
+        void PostVisitSchema(GraphQL.Types.ISchema schema);
         void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
         void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
         void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
