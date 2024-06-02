@@ -3117,6 +3117,18 @@ namespace GraphQL.Utilities
         public bool IncludeFederationTypes { get; set; }
         public System.StringComparison? StringComparison { get; set; }
     }
+    public sealed class RemovePrivateTypesAndFieldsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static readonly GraphQL.Utilities.RemovePrivateTypesAndFieldsVisitor Instance;
+        public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitSchema(GraphQL.Types.ISchema schema) { }
+        public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
+    }
     public class SchemaBuilder
     {
         protected readonly System.Collections.Generic.Dictionary<string, GraphQL.Types.IGraphType> _types;
