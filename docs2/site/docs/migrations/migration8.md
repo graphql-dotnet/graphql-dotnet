@@ -583,3 +583,8 @@ Unless you directly implement these interfaces, you should not be impacted by th
 
 See the new features section for details on the new method added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
+
+### 15. `IInputObjectGraphType.IsOneOf` property added
+
+See the new features section for details on the new property added to this interface.
+Unless you directly implement this interface, you should not be impacted by this change.
