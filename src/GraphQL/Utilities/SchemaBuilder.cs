@@ -269,7 +269,7 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         var typeFactory = ServiceProvider.GetService(typeof(IGraphTypeFactory<ObjectGraphType>)) as IGraphTypeFactory<ObjectGraphType>;
         var type = _types.TryGetValue(name, out var t)
             ? t as ObjectGraphType ?? throw new InvalidOperationException($"Type '{name} should be ObjectGraphType")
-            : typeFactory?.Create() ?? new ObjectGraphType();
+            : typeFactory?.Create() ?? new ObjectGraphType() { SkipTypeCheck = true };
 
         type.Name = name;
 

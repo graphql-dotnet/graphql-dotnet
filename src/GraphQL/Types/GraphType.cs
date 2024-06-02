@@ -134,4 +134,7 @@ public abstract class GraphType : MetadataProvider, IGraphType
 
     /// <inheritdoc />
     public override int GetHashCode() => Name?.GetHashCode() ?? 0;
+
+    /// <inheritdoc/>
+    public bool IsPrivate { get; set; }
 }
