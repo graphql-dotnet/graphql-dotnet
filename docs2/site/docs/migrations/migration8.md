@@ -363,6 +363,18 @@ Finally, if you simply need to map an interface list type to a concrete list typ
 ValueConverter.RegisterListConverterFactory(typeof(IList<>), typeof(List<>)); // default mapping is T[]
 ```
 
+### 10. `IGraphType.IsPrivate` and `IFieldType.IsPrivate` properties added
+
+Allows to set a graph type or field as private within a schema visitor, effectively removing it from the schema.
+Introspection queries will not be able to query the type/field, and queries will not be able to reference the type/field.
+
+### 11. `IObjectGraphType.SkipTypeCheck` property added
+
+Allows to skip the type check for a specific object graph type during resolver execution. This is useful
+for schema-first schemas where the CLR type is not defined while the resolver is built, while allowing
+`IsTypeOf` to be set automatically for other use cases. Schema-first schemas will automatically set this
+property to `true` for all object graph types to retain the existing behavior.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -532,3 +544,8 @@ public interface IValidationRule
 
 It is recommended to inherit from `ValidationRuleBase` for custom validation rules
 and override only the methods you need to implement.
+
+### 13. New properties added to `IGraphType`, `IFieldType` and `IObjectGraphType`
+
+See the new features section for details on the new properties added to these interfaces.
+Unless you directly implement these interfaces, you should not be impacted by these changes.
