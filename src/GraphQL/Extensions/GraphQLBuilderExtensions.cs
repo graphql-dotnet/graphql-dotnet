@@ -1200,6 +1200,15 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// </summary>
     /// <remarks>
     /// When applicable, place after calls to UseAutomaticPersistedQueries to ensure that the query document is recorded properly.
+    /// <br/>
+    /// To instruct OpenTelemetry SDK to collect the traces produced by GraphQL.NET register the
+    /// '<see cref="GraphQLTelemetryProvider.SourceName"/>' source name with the TracerProviderBuilder.
+    /// <code>
+    /// services
+    ///     .AddOpenTelemetry()
+    ///     .WithTracing(tracing =&gt; tracing
+    ///         .AddSource(GraphQLTelemetryProvider.SourceName));
+    /// </code>
     /// </remarks>
     public static IGraphQLBuilder UseTelemetry(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
         => UseTelemetry<GraphQLTelemetryProvider>(builder, configure);
