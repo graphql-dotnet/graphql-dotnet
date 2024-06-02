@@ -489,6 +489,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         SchemaValidationVisitor.Instance.Run(this);
         AppliedDirectivesValidationVisitor.Instance.Run(this);
         FieldTypeDefaultArgumentsVisitor.Instance.Run(this);
+        RemovePrivateTypesAndFieldsVisitor.Instance.Run(this); // This should be the last validation, so default field values are properly set.
     }
 
     /// <summary>

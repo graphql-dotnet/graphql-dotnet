@@ -21,10 +21,17 @@ public sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     /// <summary>
     /// Returns the GraphQL type name that this reference is a placeholder for.
     /// </summary>
-    public string TypeName { get; private set; }
+    public string TypeName { get; }
 
     /// <inheritdoc/>
     public Func<object, bool>? IsTypeOf
+    {
+        get => throw Invalid();
+        set => throw Invalid();
+    }
+
+    /// <inheritdoc/>
+    public bool SkipTypeCheck
     {
         get => throw Invalid();
         set => throw Invalid();
@@ -64,6 +71,8 @@ public sealed class GraphQLClrOutputTypeReference<[NotAGraphType] T> : Interface
     }
 
     Func<object, bool>? IObjectGraphType.IsTypeOf { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    bool IObjectGraphType.SkipTypeCheck { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     Interfaces IImplementInterfaces.Interfaces => throw new NotImplementedException();
 

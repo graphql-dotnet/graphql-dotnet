@@ -2212,6 +2212,7 @@ namespace GraphQL.Types
         public object? DefaultValue { get; set; }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        public bool IsPrivate { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
@@ -2235,6 +2236,7 @@ namespace GraphQL.Types
         public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public bool SkipTypeCheck { get; set; }
         public string TypeName { get; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public override bool Equals(object? obj) { }
@@ -2245,6 +2247,7 @@ namespace GraphQL.Types
         protected GraphType() { }
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
+        public bool IsPrivate { get; set; }
         public string Name { get; set; }
         protected bool Equals(GraphQL.Types.IGraphType other) { }
         public override bool Equals(object? obj) { }
@@ -2284,10 +2287,12 @@ namespace GraphQL.Types
     public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments? Arguments { get; set; }
+        bool IsPrivate { get; set; }
         string Name { get; set; }
     }
     public interface IGraphType : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        bool IsPrivate { get; set; }
         void Initialize(GraphQL.Types.ISchema schema);
     }
     public interface IGraphTypeFactory<out TGraphType>
@@ -2327,6 +2332,7 @@ namespace GraphQL.Types
     public interface IObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         System.Func<object, bool>? IsTypeOf { get; set; }
+        bool SkipTypeCheck { get; set; }
         void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IProvideDeprecationReason
@@ -2494,6 +2500,7 @@ namespace GraphQL.Types
         public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public bool SkipTypeCheck { get; set; }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public void Interface(System.Type type) { }
         public void Interface<TInterface>()
@@ -2934,6 +2941,18 @@ namespace GraphQL.Utilities
         public bool IncludeDescriptions { get; set; }
         public bool IncludeFederationTypes { get; set; }
         public System.StringComparison? StringComparison { get; set; }
+    }
+    public sealed class RemovePrivateTypesAndFieldsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static readonly GraphQL.Utilities.RemovePrivateTypesAndFieldsVisitor Instance;
+        public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObject(GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitSchema(GraphQL.Types.ISchema schema) { }
+        public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
     public class SchemaBuilder
     {

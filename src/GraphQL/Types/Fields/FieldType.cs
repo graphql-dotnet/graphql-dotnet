@@ -107,4 +107,7 @@ public class FieldType : MetadataProvider, IFieldType
     /// Only applicable to fields of input graph types.
     /// </summary>
     public Action<object>? Validator { get; set; }
+
+    /// <inheritdoc/>
+    public bool IsPrivate { get; set; }
 }

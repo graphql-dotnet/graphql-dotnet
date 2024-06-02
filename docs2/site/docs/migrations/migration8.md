@@ -363,6 +363,28 @@ Finally, if you simply need to map an interface list type to a concrete list typ
 ValueConverter.RegisterListConverterFactory(typeof(IList<>), typeof(List<>)); // default mapping is T[]
 ```
 
+### 10. `IGraphType.IsPrivate` and `IFieldType.IsPrivate` properties added
+
+Allows to set a graph type or field as private within a schema visitor, effectively removing it from the schema.
+Introspection queries will not be able to query the type/field, and queries will not be able to reference the type/field.
+Exporting the schema as a SDL (or printing it) will not include the private types or fields.
+
+Private types are fully 'resolved' and validated; you can obtain references to these types or fields in a schema validation
+visitor before they are removed from the schema. After initialization is complete, these types and fields will not be present
+within SchemaTypes or TypeFields. The only exception for validation is that private types are not required have any fields
+or, for interfaces and unions, possible types.
+
+This makes it possible to create a private type used within the schema but not exposed to the client. For instance,
+it is possible to dynamically create input object types to deserialize GraphQL Federation entity representations, which
+are normally sent via the `_Any` type.
+
+### 11. `IObjectGraphType.SkipTypeCheck` property added
+
+Allows to skip the type check for a specific object graph type during resolver execution. This is useful
+for schema-first schemas where the CLR type is not defined while the resolver is built, while allowing
+`IsTypeOf` to be set automatically for other use cases. Schema-first schemas will automatically set this
+property to `true` for all object graph types to retain the existing behavior.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -532,3 +554,8 @@ public interface IValidationRule
 
 It is recommended to inherit from `ValidationRuleBase` for custom validation rules
 and override only the methods you need to implement.
+
+### 13. New properties added to `IGraphType`, `IFieldType` and `IObjectGraphType`
+
+See the new features section for details on the new properties added to these interfaces.
+Unless you directly implement these interfaces, you should not be impacted by these changes.
