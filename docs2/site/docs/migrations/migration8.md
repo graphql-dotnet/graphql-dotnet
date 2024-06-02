@@ -367,6 +367,12 @@ ValueConverter.RegisterListConverterFactory(typeof(IList<>), typeof(List<>)); //
 
 Allows to set a graph type or field as private within a schema visitor, effectively removing it from the schema.
 Introspection queries will not be able to query the type/field, and queries will not be able to reference the type/field.
+Exporting the schema as a SDL (or printing it) will not include the private types or fields.
+
+Private types are fully 'resolved', and it is possible to reference the private types through the `SchemaTypes` dictionary.
+This makes it possible to create a private type used within the schema but not exposed to the client. For instance,
+it is possible to dynamically create input object types to deserialize GraphQL Federation entity representations, which are
+normally sent via the `_Any` type.
 
 ### 11. `IObjectGraphType.SkipTypeCheck` property added
 
