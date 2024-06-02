@@ -17,6 +17,11 @@ public interface ISchemaNodeVisitor
     void VisitSchema(ISchema schema);
 
     /// <summary>
+    /// Visits <see cref="Schema"/> after all other definitions have been visited.
+    /// </summary>
+    void PostVisitSchema(ISchema schema);
+
+    /// <summary>
     /// Visits registered within the schema <see cref="Directive"/>.
     /// </summary>
     void VisitDirective(Directive directive, ISchema schema);

@@ -1572,7 +1572,7 @@ namespace GraphQL.Federation
     }
     public static class FederationGraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.Federation.FederationDirectiveEnum import = -1, bool addFields = true, GraphQL.Utilities.PrintOptions? printOptions = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.Federation.FederationDirectiveEnum import = -1, GraphQL.Utilities.PrintOptions? printOptions = null) { }
     }
     public static class FederationGraphTypeExtensions
     {
@@ -3019,6 +3019,7 @@ namespace GraphQL.Utilities
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         public static readonly GraphQL.Utilities.AppliedDirectivesValidationVisitor Instance;
+        public void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -3045,6 +3046,7 @@ namespace GraphQL.Utilities
     public abstract class BaseSchemaNodeVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
         protected BaseSchemaNodeVisitor() { }
+        public virtual void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public virtual void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public virtual void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -3082,6 +3084,7 @@ namespace GraphQL.Utilities
     }
     public interface ISchemaNodeVisitor
     {
+        void PostVisitSchema(GraphQL.Types.ISchema schema);
         void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
         void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema);
         void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema);
@@ -3361,13 +3364,18 @@ namespace GraphQL.Utilities.Visitors
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQLParser.Visitors.NullVisitorContext context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
     }
-    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
+    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context>
     {
-        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
+        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+            public GraphQLParser.ROM QueryTypeName { get; set; }
+        }
     }
 }
 namespace GraphQL.Validation

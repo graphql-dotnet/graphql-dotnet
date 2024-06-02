@@ -14,6 +14,11 @@ public abstract class BaseSchemaNodeVisitor : ISchemaNodeVisitor
     }
 
     /// <inheritdoc />
+    public virtual void PostVisitSchema(ISchema schema)
+    {
+    }
+
+    /// <inheritdoc />
     public virtual void VisitDirective(Directive directive, ISchema schema)
     {
     }

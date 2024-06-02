@@ -11,6 +11,8 @@
     <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.Federation.SchemaFirst.Sample1\GraphQL.Federation.SchemaFirst.Sample1.csproj" />
     <ProjectReference Include="..\GraphQL.Federation.SchemaFirst.Sample2\GraphQL.Federation.SchemaFirst.Sample2.csproj" />
+    <ProjectReference Include="..\GraphQL.Federation.CodeFirst.Sample3\GraphQL.Federation.CodeFirst.Sample3.csproj" />
+    <ProjectReference Include="..\GraphQL.Federation.TypeFirst.Sample4\GraphQL.Federation.TypeFirst.Sample4.csproj" />
   </ItemGroup>
 
   <ItemGroup>

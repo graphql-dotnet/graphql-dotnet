@@ -15,12 +15,10 @@ public static class FederationGraphQLBuilderExtensions
     /// </summary>
     /// <param name="builder"> <see cref="IGraphQLBuilder"/> instance. </param>
     /// <param name="import"> Flags enum used to specify which Federation directives are used by subgraph. </param>
-    /// <param name="addFields"> Pass false to skip adding Federation fields to Query (true by default). </param>
     /// <param name="printOptions"> <see cref="PrintOptions"/> used to print _services { sdl }. </param>
     public static IGraphQLBuilder AddFederation(
         this IGraphQLBuilder builder,
         FederationDirectiveEnum import = FederationDirectiveEnum.All,
-        bool addFields = true,
         PrintOptions? printOptions = null)
     {
         builder.Services
@@ -31,7 +29,7 @@ public static class FederationGraphQLBuilderExtensions
             .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
             .Register<FieldSetGraphType>(ServiceLifetime.Singleton)
             .Register<FederationEntitiesSchemaNodeVisitor>(ServiceLifetime.Transient)
-            .Register<FederationQuerySchemaNodeVisitor>(ServiceLifetime.Transient);
+            .Register<FederationServiceSchemaNodeVisitor>(ServiceLifetime.Transient);
 
         return builder
             .ConfigureSchema((schema, _) =>
@@ -43,12 +41,13 @@ public static class FederationGraphQLBuilderExtensions
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<AnyScalarGraphType>();
                 schema.RegisterType<EntityType>();
-                // after schema initialization, configure the _Entity union type with the proper types
+                // add the _service field to the query type
+                // this cannot be done here because the schema.Query property will not yet be set
+                schema.RegisterVisitor<FederationServiceSchemaNodeVisitor>();
+                // after schema initialization, configure the _Entity union type with the proper types,
+                // and add the _entities field to the query type
+                // this cannot be done here because the schema.Query property will not yet be set, and the types are not yet known
                 schema.RegisterVisitor<FederationEntitiesSchemaNodeVisitor>();
-                if (addFields)
-                    // add the _service and _entities fields to the query type
-                    // this cannot be done here because the schema.Query property will not yet be set
-                    schema.RegisterVisitor<FederationQuerySchemaNodeVisitor>();
             });
     }
 }

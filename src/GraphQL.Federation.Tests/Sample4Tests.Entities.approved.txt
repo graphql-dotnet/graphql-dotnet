@@ -1,0 +1,16 @@
+{
+  "data": {
+    "_entities": [
+      {
+        "__typename": "User",
+        "id": "1",
+        "username": "Username 1"
+      },
+      {
+        "__typename": "User",
+        "id": "2",
+        "username": "Username 2"
+      }
+    ]
+  }
+}

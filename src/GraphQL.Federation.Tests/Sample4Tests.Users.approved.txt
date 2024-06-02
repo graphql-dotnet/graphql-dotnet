@@ -1,0 +1,18 @@
+{
+  "data": {
+    "users": [
+      {
+        "id": "1",
+        "username": "Username 1"
+      },
+      {
+        "id": "2",
+        "username": "Username 2"
+      },
+      {
+        "id": "3",
+        "username": "Username 3"
+      }
+    ]
+  }
+}

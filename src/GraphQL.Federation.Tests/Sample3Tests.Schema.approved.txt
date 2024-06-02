@@ -1,0 +1,60 @@
+schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"]) {
+  query: Query
+}
+
+directive @link(url: String!, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+
+directive @shareable on FIELD_DEFINITION | OBJECT
+
+directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
+
+directive @override(from: String!) on FIELD_DEFINITION
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @provides(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+directive @requires(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+scalar _Any
+
+type Query {
+  _service: _Service!
+  _entities(representations: [_Any!]!): [_Entity]!
+}
+
+type _Service {
+  sdl: String
+}
+
+union _Entity = Review | Product | User
+
+type Review @key(fields: "id") {
+  id: ID!
+  content: String!
+  product: Product!
+  author: User!
+}
+
+type Product @key(fields: "id") {
+  id: ID!
+  reviews: [Review!]!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  reviews: [Review!]!
+}
+
+enum link__Purpose {
+  "`SECURITY` features provide metadata necessary to securely resolve fields."
+  SECURITY
+  "`EXECUTION` features provide metadata necessary for operation execution."
+  EXECUTION
+}
+
+scalar link__Import
+
+scalar federation__FieldSet

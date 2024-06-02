@@ -91,14 +91,14 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
             }
 
             union _Entity = SchemaFirstExternalResolvableTestDto | SchemaFirstFederatedTestDto
-            
+
             enum link__Purpose {
               "`SECURITY` features provide metadata necessary to securely resolve fields."
               SECURITY
               "`EXECUTION` features provide metadata necessary for operation execution."
               EXECUTION
             }
-            
+
             scalar link__Import
 
             scalar federation__FieldSet

@@ -60,6 +60,9 @@ public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
     public void VisitSchema(ISchema schema) => ValidateAppliedDirectives(schema, null, null, schema, DirectiveLocation.Schema);
 
     /// <inheritdoc/>
+    public void PostVisitSchema(ISchema schema) { }
+
+    /// <inheritdoc/>
     public void VisitUnion(UnionGraphType type, ISchema schema) => ValidateAppliedDirectives(type, null, null, schema, DirectiveLocation.Union);
 
     /// <inheritdoc/>
