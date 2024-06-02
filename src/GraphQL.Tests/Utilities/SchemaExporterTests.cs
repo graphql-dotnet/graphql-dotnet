@@ -53,7 +53,7 @@ public class SchemaExporterTests
         serviceCollection.AddSingleton<GraphQL.StarWars.StarWarsData>();
         var services = serviceCollection.BuildServiceProvider();
         var schema = services.GetRequiredService<ISchema>();
-        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+        schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase }).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class SchemaExporterTests
     {
         var schema = new FederatedSchemaBuilder()
             .Build("Federated".ReadSDL());
-        schema.Print(new GraphQL.Utilities.PrintOptions { IncludeFederationTypes = false })
+        schema.Print(new() { IncludeFederationTypes = false, StringComparison = StringComparison.OrdinalIgnoreCase })
             .ShouldMatchApproved(o => o.NoDiff());
     }
 
@@ -70,7 +70,7 @@ public class SchemaExporterTests
     {
         var schema = new FederatedSchemaBuilder()
             .Build("Federated".ReadSDL());
-        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+        schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase }).ShouldMatchApproved(o => o.NoDiff());
     }
 
     [Fact]

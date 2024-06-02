@@ -1,35 +1,35 @@
+directive @extends on INTERFACE | OBJECT
+
 directive @external on FIELD_DEFINITION
 
-directive @requires(fields: String!) on FIELD_DEFINITION
+directive @key(fields: String!) on INTERFACE | OBJECT
 
 directive @provides(fields: String!) on FIELD_DEFINITION
 
-directive @key(fields: String!) on OBJECT | INTERFACE
-
-directive @extends on OBJECT | INTERFACE
-
-scalar _Any
-
-extend type Category @key(fields: "id") {
-  id: ID! @external
-  products: [Product!]!
-}
+directive @requires(fields: String!) on FIELD_DEFINITION
 
 type Product @key(fields: "id") {
+  category: Category!
   id: ID!
   name: String!
-  category: Category!
 }
 
-extend type Query {
-  products: [Product!]!
-  _service: _Service!
-  _entities(representations: [_Any!]!): [_Entity]!
-}
+scalar _Any
 
 "A union of all types that use the @key directive"
 union _Entity = Category | Product
 
 type _Service {
   sdl: String
+}
+
+extend type Category @key(fields: "id") {
+  id: ID! @external
+  products: [Product!]!
+}
+
+extend type Query {
+  products: [Product!]!
+  _entities(representations: [_Any!]!): [_Entity]!
+  _service: _Service!
 }
