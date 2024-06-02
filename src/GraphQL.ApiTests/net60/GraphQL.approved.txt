@@ -611,6 +611,12 @@ namespace GraphQL
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)] System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class OneOfAttribute : GraphQL.GraphQLAttribute
+    {
+        public OneOfAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {
