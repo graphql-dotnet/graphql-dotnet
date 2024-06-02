@@ -341,6 +341,8 @@ public static class SchemaExtensions
                     break;
             }
         }
+
+        visitor.PostVisitSchema(schema);
     }
 
     /// <summary>
