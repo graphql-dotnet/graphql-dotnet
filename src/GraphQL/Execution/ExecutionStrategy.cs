@@ -60,13 +60,13 @@ public abstract class ExecutionStrategy : IExecutionStrategy
 
             case OperationType.Mutation:
                 type = context.Schema.Mutation;
-                if (type == null)
+                if (type == null || type.IsPrivate)
                     throw new InvalidOperationError("Schema is not configured for mutations").AddLocation(context.Operation, context.Document);
                 break;
 
             case OperationType.Subscription:
                 type = context.Schema.Subscription;
-                if (type == null)
+                if (type == null || type.IsPrivate)
                     throw new InvalidOperationError("Schema is not configured for subscriptions").AddLocation(context.Operation, context.Document);
                 break;
 
@@ -655,7 +655,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
             }
         }
 
-        if (objectType?.IsTypeOf != null && !objectType.IsTypeOf(result))
+        if (objectType?.IsTypeOf != null && !objectType.SkipTypeCheck && !objectType.IsTypeOf(result))
         {
             throw new InvalidOperationException($"'{result}' value of type '{result.GetType()}' is not allowed for '{objectType.Name}'. Either change IsTypeOf method of '{objectType.Name}' to accept this value or return another value from your resolver.");
         }

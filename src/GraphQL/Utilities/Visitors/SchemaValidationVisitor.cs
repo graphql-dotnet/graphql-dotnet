@@ -28,7 +28,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitObject(IObjectGraphType type, ISchema schema)
     {
         // 1
-        if (type.Fields.Count == 0)
+        if (!type.IsPrivate && type.Fields.Count == 0)
             throw new InvalidOperationException($"An Object type '{type.Name}' must define one or more fields.");
 
         // 2.1
@@ -109,7 +109,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitInterface(IInterfaceGraphType type, ISchema schema)
     {
         // 1
-        if (type.Fields.Count == 0)
+        if (!type.IsPrivate && type.Fields.Count == 0)
             throw new InvalidOperationException($"An Interface type '{type.Name}' must define one or more fields.");
 
         // 2.1
@@ -187,7 +187,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitInputObject(IInputObjectGraphType type, ISchema schema)
     {
         // 1
-        if (type.Fields.Count == 0)
+        if (!type.IsPrivate && type.Fields.Count == 0)
             throw new InvalidOperationException($"An Input Object type '{type.Name}' must define one or more input fields.");
 
         // 2.1
@@ -266,7 +266,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitUnion(UnionGraphType type, ISchema schema)
     {
         // 1
-        if (type.PossibleTypes.Count == 0)
+        if (!type.IsPrivate && type.PossibleTypes.Count == 0)
             throw new InvalidOperationException($"A Union type '{type.Name}' must include one or more unique member types.");
 
         // 2 [requirement met by design]
@@ -281,7 +281,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitEnum(EnumerationGraphType type, ISchema schema)
     {
         // 1
-        if (type.Values.Count == 0)
+        if (!type.IsPrivate && type.Values.Count == 0)
             throw new InvalidOperationException($"An Enum type '{type.Name}' must define one or more unique enum values.");
     }
 
