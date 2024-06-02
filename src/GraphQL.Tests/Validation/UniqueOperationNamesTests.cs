@@ -1,5 +1,3 @@
-using GraphQL.Tests.Subscription;
-using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQL.Validation.Rules;
 
@@ -67,26 +65,6 @@ public class UniqueOperationNamesTests : ValidationTestBase<UniqueOperationNames
                   field
                 }
                 """);
-    }
-
-    [Fact]
-    public async Task TestMe()
-    {
-        var s = new Schema();
-        var queryType = new ObjectGraphType();
-        queryType.Field<IntGraphType>("abc");
-        s.Query = queryType;
-        var t = """
-            mutation {
-              abc
-            }
-            """;
-        var result = await new DocumentExecuter().ExecuteAsync(o =>
-        {
-            o.Schema = s;
-            o.Query = t;
-        });
-        result.ShouldNotBeSuccessful();
     }
 
     [Fact]
