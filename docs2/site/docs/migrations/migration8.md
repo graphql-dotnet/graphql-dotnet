@@ -389,6 +389,21 @@ property to `true` for all object graph types to retain the existing behavior.
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
+### 13. OneOf Input Object support added
+
+OneOf Input Objects are a special variant of Input Objects where the type system
+asserts that exactly one of the fields must be set and non-null, all others
+being omitted. This is useful for representing situations where an input may be
+one of many different options.
+
+See: https://github.com/graphql/graphql-spec/pull/825
+
+To use this feature, set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
+
+Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
+It is expected to do once it has been implemented in multiple libraries and proven to be useful.
+It is not expected to change from the current draft.
+
 ## Breaking Changes
 
 ### 1. Query type is required

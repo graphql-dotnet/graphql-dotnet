@@ -186,6 +186,19 @@ public class ComplexInput2 : InputObjectGraphType
     }
 }
 
+public class ComplexInput3 : InputObjectGraphType
+{
+    public ComplexInput3()
+    {
+        Name = "ComplexInput3";
+        IsOneOf = true;
+        Field<IntGraphType>("intField");
+        Field<StringGraphType>("stringField");
+        Field<BooleanGraphType>("booleanField");
+        Field<ListGraphType<StringGraphType>>("stringListField");
+    }
+}
+
 public class ComplicatedArgs : ObjectGraphType
 {
     public ComplicatedArgs()
@@ -212,6 +225,8 @@ public class ComplicatedArgs : ObjectGraphType
             .Argument<ComplexInput>("complexArg");
         Field<StringGraphType>("complexArgField2")
             .Argument<NonNullGraphType<ComplexInput2>>("complexArg");
+        Field<StringGraphType>("complexArgField3")
+            .Argument<ComplexInput3>("complexArg");
         Field<StringGraphType>("multipleReqs")
             .Argument<NonNullGraphType<IntGraphType>>("req1")
             .Argument<NonNullGraphType<IntGraphType>>("req2");

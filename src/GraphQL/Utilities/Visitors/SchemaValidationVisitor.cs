@@ -237,6 +237,10 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 
         if (field.Resolver != null)
             throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types.");
+
+        //OneOf Input Objects
+        if (type.IsOneOf && field.ResolvedType is NonNullGraphType)
+            throw new InvalidOperationException($"The field '{field.Name}' of an OneOf Input Object type '{type.Name}' must be a nullable type.");
     }
 
     #endregion

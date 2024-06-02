@@ -6,6 +6,59 @@ namespace GraphQL.Tests.Validation;
 public class UniqueInputFieldNamesTests : ValidationTestBase<UniqueInputFieldNames, ValidationSchema>
 {
     [Fact]
+    public void oneOf_input_types_contain_one_field()
+    {
+        ShouldPassRule("""
+            {
+              complicatedArgs {
+                complexArgField3(complexArg: { intField: 2 })
+              }
+            }
+            """);
+    }
+
+    [Fact]
+    public void oneOf_input_types_containing_multiple_fields()
+    {
+        ShouldFailRule(_ =>
+        {
+            _.Query = """
+                {
+                  complicatedArgs {
+                    complexArgField3(complexArg: { intField: 2, booleanField: true })
+                  }
+                }
+                """;
+            _.Error(x =>
+            {
+                x.Message = OneOfInputValuesError.MULTIPLE_VALUES;
+                x.Loc(3, 34);
+            });
+        });
+    }
+
+    [Fact]
+    public void oneOf_input_types_containing_null_values()
+    {
+        ShouldFailRule(_ =>
+        {
+            _.Query = """
+                {
+                  complicatedArgs {
+                    complexArgField3(complexArg: { intField: null })
+                  }
+                }
+                """;
+            _.Error(x =>
+            {
+                x.Message = OneOfInputValuesError.MULTIPLE_VALUES;
+                x.Loc(3, 36);
+                x.Loc(3, 46);
+            });
+        });
+    }
+
+    [Fact]
     public void input_object_with_fields()
     {
         ShouldPassRule("""

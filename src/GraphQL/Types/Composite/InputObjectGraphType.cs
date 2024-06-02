@@ -28,6 +28,13 @@ public interface IInputObjectGraphType : IComplexGraphType
     /// or return <see langword="null"/> for a failed conversion.
     /// </summary>
     GraphQLValue ToAST(object value);
+
+    /// <summary>
+    /// Indicates that this type is a OneOf Input Object. This means that during parsing, the input object
+    /// must have exactly one of the fields set, which must be non-null. All fields defined on the type must
+    /// be nullable.
+    /// </summary>
+    bool IsOneOf { get; set; }
 }
 
 /// <inheritdoc/>
@@ -59,6 +66,9 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
             _parseDictionary = static x => x;
         }
     }
+
+    /// <inheritdoc/>
+    public bool IsOneOf { get; set; }
 
     /// <inheritdoc/>
     public override void Initialize(ISchema schema)
