@@ -1206,7 +1206,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <code>
     /// services
     ///     .AddOpenTelemetry()
-    ///     .WithTracing(tracing => tracing
+    ///     .WithTracing(tracing =&gt; tracing
     ///         .AddSource(GraphQLTelemetryProvider.SourceName));
     /// </code>
     /// </remarks>
