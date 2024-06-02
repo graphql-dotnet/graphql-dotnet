@@ -26,10 +26,10 @@ public class FieldsOnCorrectType : ValidationRuleBase
     {
         var type = context.TypeInfo.GetParentType()?.GetNamedType();
 
-        if (type != null && !type.IsPrivate)
+        if (type != null)
         {
             var fieldDef = context.TypeInfo.GetFieldDef();
-            if (fieldDef == null || fieldDef.IsPrivate)
+            if (fieldDef == null)
             {
                 // This field doesn't exist, lets look for suggestions.
                 var fieldName = node.Name;
@@ -63,16 +63,14 @@ public class FieldsOnCorrectType : ValidationRuleBase
 
             foreach (var possibleType in absType.PossibleTypes.List)
             {
-                var matchingField = possibleType.Fields.Find(fieldName);
-                if (matchingField != null && !matchingField.IsPrivate)
+                if (possibleType.HasField(fieldName))
                 {
                     // This object defines this field.
                     suggestedObjectTypes.Add(possibleType.Name);
 
                     foreach (var possibleInterface in possibleType.ResolvedInterfaces.List)
                     {
-                        matchingField = possibleInterface.Fields.Find(fieldName);
-                        if (matchingField != null && !matchingField.IsPrivate)
+                        if (possibleInterface.HasField(fieldName))
                         {
                             // This interface type defines this field.
                             interfaceUsageCount[possibleInterface.Name] = interfaceUsageCount.TryGetValue(possibleInterface.Name, out int value) ? value + 1 : 1;
@@ -96,7 +94,7 @@ public class FieldsOnCorrectType : ValidationRuleBase
     {
         if (type is IComplexGraphType complexType)
         {
-            return StringUtils.SuggestionList(fieldName, complexType.Fields.Where(x => !x.IsPrivate).Select(x => x.Name));
+            return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
         }
 
         return Enumerable.Empty<string>();

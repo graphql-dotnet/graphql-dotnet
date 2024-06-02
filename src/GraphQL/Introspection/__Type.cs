@@ -67,7 +67,7 @@ public class __Type : ObjectGraphType<IGraphType>
                     int index = 0;
                     foreach (var field in type.Fields.List)
                     {
-                        if (!field.IsPrivate && (includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                        if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
                             fields[index++] = field;
                     }
 
@@ -164,7 +164,7 @@ public class __Type : ObjectGraphType<IGraphType>
                 int index = 0;
                 foreach (var field in type.Fields.List)
                 {
-                    if (!field.IsPrivate && (includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
+                    if ((includeDeprecated || string.IsNullOrWhiteSpace(field.DeprecationReason)) && await context.Schema.Filter.AllowField(type, field).ConfigureAwait(false))
                         inputFields[index++] = field;
                 }
 
