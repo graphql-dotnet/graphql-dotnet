@@ -401,7 +401,7 @@ See: https://github.com/graphql/graphql-spec/pull/825
 To use this feature, set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
 
 Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
-It is expected to do once it has been implemented in multiple libraries and proven to be useful.
+It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
 It is not expected to change from the current draft.
 
 ## Breaking Changes
