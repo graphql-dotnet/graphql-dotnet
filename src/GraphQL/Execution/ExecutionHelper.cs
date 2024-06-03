@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using GraphQL.Types;
 using GraphQL.Validation;
+using GraphQL.Validation.Errors;
 using GraphQLParser;
 using GraphQLParser.AST;
 
@@ -264,12 +265,16 @@ public static class ExecutionHelper
 
             var obj = new Dictionary<string, object?>();
 
+            var fieldCount = 0;
+            var isAnyNull = false;
             foreach (var field in inputObjectGraphType.Fields.List)
             {
                 // https://spec.graphql.org/October2021/#sec-Input-Objects
                 var objectField = objectValue.Field(field.Name);
                 if (objectField != null)
                 {
+                    fieldCount++;
+                    isAnyNull |= objectField.Value is GraphQLNullValue;
                     // Rules covered:
 
                     // If a literal value is provided for an input object field, an entry in the coerced unordered map is
@@ -312,10 +317,16 @@ public static class ExecutionHelper
                                 throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, objectField.Value, ex);
                             }
                         }
+                        else
+                        {
+                            isAnyNull = true;
+                        }
                         obj[field.Name] = parsedValue;
                     }
                     else if (value.Value != null)
                         obj[field.Name] = value.Value;
+                    else
+                        isAnyNull = true;
                 }
                 else if (field.DefaultValue != null)
                 {
@@ -328,6 +339,20 @@ public static class ExecutionHelper
                 // Covered by validation rules:
                 // If no default value is provided and the input object field’s type is non‐null, an error should be
                 // thrown.
+            }
+
+            // RULE: Further, if the input object is a OneOf Input Object, the following additional rules apply:
+            //
+            // - If the input object literal or unordered map does not contain exactly one entry an error must be thrown.
+            // - Within the input object literal or unordered map, if the single entry is { null } an error must be thrown.
+            // - If the coerced unordered map does not contain exactly one entry an error must be thrown.
+            // - If the value of the single entry in the coerced unordered map is { null } an error must be thrown.
+            if (inputObjectGraphType.IsOneOf && (fieldCount != 1 || isAnyNull))
+            {
+                if (context.Document != null && context.ParentNode != null)
+                    throw new InvalidValueError(context.Document, context.ParentNode, context.Directive, context.Argument, objectValue, OneOfInputValuesError.MULTIPLE_VALUES);
+                else
+                    throw new ArgumentOutOfRangeException(nameof(input), OneOfInputValuesError.MULTIPLE_VALUES);
             }
 
             try
