@@ -141,16 +141,16 @@ public static class AutoRegisteringHelper
     /// <summary>
     /// Creates a <see cref="FieldType"/> for the specified <see cref="MemberInfo"/>.
     /// </summary>
-    internal static FieldType CreateField(MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
+    internal static FieldType? CreateField(IGraphType graphType, MemberInfo memberInfo, Func<MemberInfo, TypeInformation> getTypeInformation, Action<FieldType, MemberInfo>? buildFieldType, bool isInputType)
     {
         var typeInformation = getTypeInformation(memberInfo);
-        var graphType = typeInformation.ConstructGraphType();
-        var fieldType = CreateField(memberInfo, graphType, isInputType);
+        var fieldGraphType = typeInformation.ConstructGraphType();
+        var fieldType = CreateField(memberInfo, fieldGraphType, isInputType);
         // set resolver, if applicable
         buildFieldType?.Invoke(fieldType, memberInfo);
         // apply field attributes after resolver has been set
-        ApplyFieldAttributes(memberInfo, fieldType, isInputType);
-        return fieldType;
+        ApplyFieldAttributes(graphType, memberInfo, fieldType, isInputType, out var ignore);
+        return ignore ? null : fieldType;
     }
 
     /// <summary>
@@ -188,13 +188,15 @@ public static class AutoRegisteringHelper
     /// Applies <see cref="GraphQLAttribute"/>s defined on <paramref name="memberInfo"/> to <paramref name="fieldType"/>.
     /// Also scans the member's owning module and assembly for globally-applied attributes.
     /// </summary>
-    internal static void ApplyFieldAttributes(MemberInfo memberInfo, FieldType fieldType, bool isInputType)
+    internal static void ApplyFieldAttributes(IGraphType graphType, MemberInfo memberInfo, FieldType fieldType, bool isInputType, out bool ignore)
     {
         // Apply derivatives of GraphQLAttribute
         var attributes = memberInfo.GetGraphQLAttributes();
+        ignore = false;
         foreach (var attr in attributes)
         {
             attr.Modify(fieldType, isInputType);
+            attr.Modify(graphType, memberInfo, fieldType, isInputType, ref ignore);
         }
     }
 
