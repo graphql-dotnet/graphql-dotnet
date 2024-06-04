@@ -49,8 +49,9 @@ public abstract class GraphQLAttribute : Attribute
     }
 
     /// <summary>
-    /// Updates the properties of the specified <see cref="IGraphType"/> and <see cref="FieldType"/> as necessary
-    /// when adding a field to a graph type.
+    /// Updates the properties of the specified <see cref="FieldType"/> as necessary
+    /// when adding a field to a graph type. Typically you should use <see cref="Modify(FieldType, bool)"/>
+    /// instead of this method unless you need the additional properties exposed in this method.
     /// </summary>
     /// <param name="graphType">The <see cref="IGraphType"/> the field will be added to.</param>
     /// <param name="fieldType">The <see cref="FieldType"/> to update.</param>

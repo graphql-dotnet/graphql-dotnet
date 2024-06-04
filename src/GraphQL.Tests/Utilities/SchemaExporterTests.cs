@@ -61,7 +61,7 @@ public class SchemaExporterTests
     {
         var schema = new FederatedSchemaBuilder()
             .Build("Federated".ReadSDL());
-        schema.Print(new GraphQL.Utilities.PrintOptions { IncludeFederationTypes = false, StringComparison = StringComparison.OrdinalIgnoreCase })
+        schema.Print(new() { IncludeFederationTypes = false, StringComparison = StringComparison.OrdinalIgnoreCase })
             .ShouldMatchApproved(o => o.NoDiff());
     }
 

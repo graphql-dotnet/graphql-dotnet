@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace GraphQL.Types;
 
 /// <summary>
@@ -40,8 +42,8 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
         if (preferredType != null)
             return preferredType;
 
-        if (isInputType && !_mapInputTypes ||
-            !isInputType && !_mapOutputTypes ||
+        if (isInputType && !_mapInputTypes && !IsForcedType(clrType) ||
+            !isInputType && !_mapOutputTypes && !IsForcedType(clrType) ||
             clrType.IsEnum ||
             SchemaTypes.BuiltInScalarMappings.ContainsKey(clrType))
             return null;
@@ -58,5 +60,7 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
         {
             return typeof(AutoRegisteringObjectGraphType<>).MakeGenericType(clrType);
         }
+
+        static bool IsForcedType(Type type) => type.GetCustomAttribute<MapAutoClrTypeAttribute>() != null;
     }
 }
