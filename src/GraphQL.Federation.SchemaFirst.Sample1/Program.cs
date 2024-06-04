@@ -17,8 +17,7 @@ public class Program
         builder.Services.AddGraphQL(b => b
             .AddSchema(BuildSchema)
             .AddSystemTextJson()
-            .AddFederation(
-                printOptions: new PrintOptions { IncludeFederationTypes = false })); // for Federation v1 compatibility
+            .AddFederation(o => o.Version = "1.0")); // for Federation v1 compatibility
 
         // Build the web application
         var app = builder.Build();

@@ -1,9 +1,9 @@
 using GraphQL.DI;
+using GraphQL.Federation;
 using GraphQL.Federation.Types;
 using GraphQL.Federation.Visitors;
-using GraphQL.Utilities;
 
-namespace GraphQL.Federation;
+namespace GraphQL;
 
 /// <summary>
 /// Federation extensions for <see cref="IGraphQLBuilder"/>.
@@ -13,16 +13,21 @@ public static class FederationGraphQLBuilderExtensions
     /// <summary>
     /// Registers Federation types, directives and, optionally, Query fields.
     /// </summary>
-    /// <param name="builder"> <see cref="IGraphQLBuilder"/> instance. </param>
-    /// <param name="import"> Flags enum used to specify which Federation directives are used by subgraph. </param>
-    /// <param name="printOptions"> <see cref="PrintOptions"/> used to print _services { sdl }. </param>
     public static IGraphQLBuilder AddFederation(
         this IGraphQLBuilder builder,
-        FederationDirectiveEnum import = FederationDirectiveEnum.All,
-        PrintOptions? printOptions = null)
+        Action<FederationSettings>? configure = null)
     {
+        var settings = new FederationSettings();
+        configure?.Invoke(settings);
+
+        if (settings.Version.StartsWith("1.") && settings.SdlPrintOptions == null)
+            settings.SdlPrintOptions = new() { IncludeFederationTypes = false };
+
+        // todo: ensure all directives are supported by all supported versions
+        var directives = settings.ImportDirectives ?? FederationDirectiveEnum.All;
+
         builder.Services
-            .Register(new ServiceGraphType(printOptions))
+            .Register(new ServiceGraphType(settings.SdlPrintOptions))
             .Register<AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityType>(ServiceLifetime.Transient)
             .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
@@ -34,9 +39,9 @@ public static class FederationGraphQLBuilderExtensions
         return builder
             .ConfigureSchema((schema, _) =>
             {
-                schema.AddFederationDirectives(import);
+                schema.AddFederationDirectives(directives);
                 // add the @link directive to the schema, referencing the directive specified by the import parameter
-                schema.ApplyLinkDirective(import);
+                schema.ApplyLinkDirective(settings.Version, directives);
                 // register Federation types
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<AnyScalarGraphType>();

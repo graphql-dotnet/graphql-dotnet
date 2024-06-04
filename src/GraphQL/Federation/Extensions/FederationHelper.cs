@@ -146,12 +146,13 @@ internal static class FederationHelper
     /// Applies a <c>@link</c> directive to the specified GraphQL schema based on the provided <see cref="FederationDirectiveEnum"/> values.
     /// </summary>
     /// <param name="schema">The GraphQL schema to build the link extension for.</param>
+    /// <param name="version">The version of the federation specification to use, such as 2.0.</param>
     /// <param name="import">The <see cref="FederationDirectiveEnum"/> values specifying which directives to include in the link extension.</param>
-    public static void ApplyLinkDirective(this ISchema schema, FederationDirectiveEnum import)
+    public static void ApplyLinkDirective(this ISchema schema, string version, FederationDirectiveEnum import)
     {
         schema.ApplyDirective("link", d =>
         {
-            d.AddArgument(new DirectiveArgument(URL_ARGUMENT) { Value = "https://specs.apollo.dev/federation/v2.0" });
+            d.AddArgument(new DirectiveArgument(URL_ARGUMENT) { Value = "https://specs.apollo.dev/federation/v" + version });
             d.AddArgument(new DirectiveArgument(IMPORT_ARGUMENT)
             {
                 Value = Enum.GetValues(typeof(FederationDirectiveEnum))
