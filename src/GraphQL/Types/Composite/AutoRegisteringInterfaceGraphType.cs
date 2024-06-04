@@ -98,7 +98,7 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.CreateField(MemberInfo)"/>
     protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false);
+        => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)

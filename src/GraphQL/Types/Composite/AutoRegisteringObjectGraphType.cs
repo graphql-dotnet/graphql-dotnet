@@ -103,7 +103,7 @@ public class AutoRegisteringObjectGraphType<[DynamicallyAccessedMembers(Dynamica
     /// May return <see langword="null"/> to skip a member.
     /// </summary>
     protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        => AutoRegisteringHelper.CreateField(memberInfo, GetTypeInformation, BuildFieldType, false);
+        => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
 
     /// <inheritdoc cref="AutoRegisteringOutputHelper.BuildFieldType(MemberInfo, FieldType, Func{MemberInfo, LambdaExpression}, Func{Type, Func{FieldType, ParameterInfo, ArgumentInformation}}, Action{ParameterInfo, QueryArgument})"/>
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
