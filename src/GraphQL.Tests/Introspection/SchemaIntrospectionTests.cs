@@ -28,6 +28,7 @@ public class SchemaIntrospectionTests
             _.Query = "IntrospectionQuery".ReadGraphQLRequest();
         });
         var json = serializer.Serialize(executionResult);
+        json = json.Replace("\\r\\n", "\\n");
         json.ShouldMatchApproved(o => o.NoDiff().WithStringCompareOptions(StringCompareShould.IgnoreLineEndings));
     }
 
