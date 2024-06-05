@@ -1,11 +1,9 @@
-using GraphQL.Conversion;
 using GraphQL.Types;
 
 namespace GraphQL;
 
 /// <summary>
-/// Specifies a GraphQL type name for a CLR class when used as an input type.
-/// Note that the specified name will be translated by the schema's <see cref="INameConverter"/>.
+/// Marks a class as a OneOf Input Object.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class OneOfAttribute : GraphQLAttribute
