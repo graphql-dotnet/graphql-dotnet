@@ -398,7 +398,10 @@ one of many different options.
 
 See: https://github.com/graphql/graphql-spec/pull/825
 
-To use this feature, set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
+To use this feature:
+- **Code-First**: Set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
+- **Schema-First**: Use the `@oneOf` directive on the input type in your schema definition.
+- **Type-First**: Use the `[OneOf]` directive on the CLR class.
 
 Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
 It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
