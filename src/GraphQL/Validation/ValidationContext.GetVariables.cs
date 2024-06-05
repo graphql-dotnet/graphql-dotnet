@@ -1,3 +1,4 @@
+using GraphQL.Types;
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
 
@@ -97,6 +98,7 @@ public partial class ValidationContext
             if (ancestor is not GraphQLVariableDefinition)
             {
                 bool lastHasDefault = false;
+                bool isRequired = false;
                 if (ancestor is GraphQLArgument)
                 {
                     var arg = context.Info.GetArgument();
@@ -105,11 +107,13 @@ public partial class ValidationContext
                 }
                 if (ancestor is GraphQLObjectField)
                 {
+                    isRequired = (context.Info.GetInputType(1)?.GetNamedType() as IInputObjectGraphType)?.IsOneOf ?? false;
                     var field = context.Info.GetFieldDef();
                     if (field != null && field.DefaultValue != null)
                         lastHasDefault = true;
+
                 }
-                context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!, lastHasDefault));
+                context.AddVariableUsage(new VariableUsage(variable, context.Info.GetInputType()!, lastHasDefault, isRequired));
             }
             return default;
         }

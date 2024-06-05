@@ -591,3 +591,9 @@ Unless you directly implement this interface, you should not be impacted by this
 
 See the new features section for details on the new property added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
+
+### 16. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
+
+This is required for OneOf Input Object support and is used to determine if a variable is required.
+Unless you have a custom validation rule that uses `VariableUsage`, you should not be impacted
+by this change.
