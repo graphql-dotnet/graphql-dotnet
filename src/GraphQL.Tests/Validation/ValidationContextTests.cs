@@ -369,4 +369,123 @@ public class ValidationContextTests
         ret.Errors.Count.ShouldBe(1);
         ret.Errors[0].Message.ShouldBe(errorMessage);
     }
+
+    [Theory]
+    [InlineData("query q01 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":"test"}}""")]
+    [InlineData("query q02 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item2":"test"}}""")]
+    [InlineData("query q03 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":"test","item2":"test"}}""", "Variable '$arg' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("query q04 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":"test","item2":null}}""", "Variable '$arg' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("query q05 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":null,"item2":"test"}}""", "Variable '$arg' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("query q06 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":null,"item2":null}}""", "Variable '$arg' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("query q07 ($arg: OneOfInput!) { test(arg: $arg) }", """{"arg":{"item1":null}}""", "Variable '$arg' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("query q08 ($arg: String!) { test(arg: { item1: $arg } ) }", """{"arg":"test"}""")]
+    [InlineData("query q09 ($arg: String) { test(arg: { item1: $arg } ) }", """{"arg":"test"}""")]
+    [InlineData("query q10 ($arg: String!) { test(arg: { item1: $arg } ) }", """{"arg":null}""", "Variable '$arg' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("query q11 ($arg: String) { test(arg: { item1: $arg } ) }", """{"arg":null}""", "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    public async Task OneOfVariableCoercion(string query, string variables, string? expectedFailure = null)
+    {
+        var sdl = """
+            input OneOfInput @oneOf {
+              item1: String
+              item2: String
+            }
+
+            type Query {
+              test(arg: OneOfInput!): String
+            }
+            """;
+        var schema = Schema.For(sdl);
+        schema.Initialize();
+
+        var validator = new DocumentValidator();
+        var document = GraphQLParser.Parser.Parse(query);
+        var ret = await validator.ValidateAsync(new ValidationOptions
+        {
+            Document = document,
+            Schema = schema,
+            Operation = document.Operation(),
+            Variables = variables.ToInputs(),
+        });
+
+        if (expectedFailure == null)
+        {
+            ret.IsValid.ShouldBeTrue("Failure: " + ret.Errors.FirstOrDefault()?.Message);
+        }
+        else
+        {
+            ret.IsValid.ShouldBeFalse();
+            (ret.Errors.FirstOrDefault()?.Message).ShouldBe(expectedFailure);
+        }
+    }
+
+    [Theory]
+    [InlineData("""query q01 { test(arg: { a: "abc", b: 123 }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q02 { test(arg: { a: null, b: 123 }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q03 { test(arg: { a: null, b: null }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q04 { test(arg: { a: null }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q05 { test(arg: { b: 123 }) }""", null)]
+    [InlineData("""query q06 { test(arg: {}) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q07 ($a: String) { test(arg: { a: $a, b: 123 }) }""", """{"a":null}""", "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q07b ($a: String!) { test(arg: { a: $a, b: 123 }) }""", """{"a":null}""", "Variable '$a' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("""query q08 ($a: String) { test(arg: { a: $a, b: 123 }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q08b ($a: String!) { test(arg: { a: $a, b: 123 }) }""", null, "Variable '$a' is invalid. No value provided for a non-null variable.")]
+    [InlineData("""query q09 ($a: String, $b: Int) { test(arg: { a: $a, b: $b }) }""", """{"a":"abc"}""", "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q09b ($a: String!, $b: Int) { test(arg: { a: $a, b: $b }) }""", """{"a":"abc"}""", "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q09c ($a: String!, $b: Int!) { test(arg: { a: $a, b: $b }) }""", """{"a":"abc"}""", "Variable '$b' is invalid. No value provided for a non-null variable.")]
+    [InlineData("""query q10 ($b: Int) { test(arg: { b: $b }) }""", """{"b":123}""")]
+    [InlineData("""query q10b ($b: Int!) { test(arg: { b: $b }) }""", """{"b":123}""")]
+    [InlineData("""query q11 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"b":123}}""")]
+    [InlineData("""query q12 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"a":"abc","b":123}}""", "Variable '$var' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q13 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"a":"abc","b":null}}""", "Variable '$var' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q14 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"a":null}}""", "Variable '$var' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q15 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{}}""", "Variable '$var' is invalid. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q16 { test(arg: "abc123") }""", null, "Argument 'arg' has invalid value. Expected 'ExampleInputTagged', found not an object.")]
+    [InlineData("""query q17 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":"abc123"}""", "Variable '$var' is invalid. Unable to parse input as a 'ExampleInputTagged' type. Did you provide a List or Scalar value accidentally?")]
+    [InlineData("""query q18 { test(arg: { a: "abc", b: "123" }) }""", null, """Argument 'arg' has invalid value. In field 'b': [Expected type 'Int', found "123".]""")]
+    [InlineData("""query q19 { test(arg: { b: "123" }) }""", null, "Argument 'arg' has invalid value. In field 'b': [Expected type 'Int', found \"123\".]")]
+    [InlineData("""query q20 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"b":"abc"}}""", "Variable '$var.b' is invalid. Unable to convert 'abc' to 'Int'")]
+    [InlineData("""query q21 { test(arg: { a: "abc" }) }""", null)]
+    [InlineData("""query q22 ($b: Int) { test(arg: { b: $b }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q22b ($b: Int!) { test(arg: { b: $b }) }""", null, "Variable '$b' is invalid. No value provided for a non-null variable.")]
+    [InlineData("""query q23 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"a":"abc"}}""")]
+    [InlineData("""query q24 { test(arg: { a: "abc", b: null }) }""", null, "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q25 ($b: Int) { test(arg: { b: $b }) }""", """{"b":null}""", "Invalid value for argument 'arg' of field 'test'. Input object literals mapping to a OneOf Input Object must contain exactly one non-null value.")]
+    [InlineData("""query q25b ($b: Int!) { test(arg: { b: $b }) }""", """{"b":null}""", "Variable '$b' is invalid. Received a null input for a non-null variable.")]
+    [InlineData("""query q26 { test(arg: { b: 123, c: "xyz" }) }""", null, "Argument 'arg' has invalid value. In field 'c': Unknown field.")]
+    [InlineData("""query q27 ($var: ExampleInputTagged!) { test(arg: $var) }""", """{"var":{"b":123,"c":"xyz"}}""", "Variable '$var' is invalid. Unrecognized input fields 'c' for type 'ExampleInputTagged'.")]
+    public async Task OneOfSamples(string query, string? variables, string? expectedFailure = null)
+    {
+        var sdl = """
+            input ExampleInputTagged @oneOf {
+              a: String
+              b: Int
+            }
+
+            type Query {
+              test(arg: ExampleInputTagged!): String
+            }
+            """;
+        var schema = Schema.For(sdl); // also verifies schema-first @oneOf support
+        schema.Initialize();
+
+        var validator = new DocumentValidator();
+        var document = GraphQLParser.Parser.Parse(query);
+        var ret = await validator.ValidateAsync(new ValidationOptions
+        {
+            Document = document,
+            Schema = schema,
+            Operation = document.Operation(),
+            Variables = variables.ToInputs(),
+        });
+
+        if (expectedFailure == null)
+        {
+            ret.IsValid.ShouldBeTrue("Failure: " + ret.Errors.FirstOrDefault()?.Message);
+        }
+        else
+        {
+            ret.IsValid.ShouldBeFalse();
+            (ret.Errors.FirstOrDefault()?.Message).ShouldBe(expectedFailure);
+        }
+    }
 }

@@ -7,6 +7,29 @@ namespace GraphQL.Tests.Introspection;
 
 public class SchemaIntrospectionTests
 {
+    [Fact]
+    public async Task validate_oneOf_introspection()
+    {
+        var schema = Schema.For("""
+            input ExampleInputTagged @oneOf {
+              a: String
+              b: Int
+            }
+            
+            type Query {
+              test(arg: ExampleInputTagged!): String
+            }
+            """);
+        var documentExecuter = new DocumentExecuter();
+        var executionResult = await documentExecuter.ExecuteAsync(_ =>
+        {
+            _.Schema = schema;
+            _.Query = "IntrospectionQuery".ReadGraphQLRequest();
+        });
+        var json = new SystemTextJson.GraphQLSerializer(true).Serialize(executionResult);
+        json.ShouldMatchApproved(o => o.NoDiff());
+    }
+
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
     public async Task validate_core_schema(IGraphQLTextSerializer serializer)
