@@ -9,6 +9,10 @@ namespace GraphQL.Validation.Rules;
 ///
 /// A GraphQL input object value is only valid if all supplied fields are
 /// uniquely named.
+/// 
+/// <para>
+/// Also validates that literals for OneOf Input Objects contain only one field.
+/// </para>
 /// </summary>
 public class UniqueInputFieldNames : ValidationRuleBase
 {
