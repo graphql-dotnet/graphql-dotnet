@@ -3,10 +3,7 @@ using static GraphQL.Federation.FederationHelper;
 
 namespace GraphQL.Federation;
 
-/// <summary>
-/// Extension methods to configure federation directives within GraphQL schemas.
-/// These methods allow the application of various federation directives such as @key, @shareable, @inaccessible, @override, @external, @provides, and @requires to GraphQL types and fields.
-/// </summary>
+/// <inheritdoc cref="FederationMetadataExtensions"/>
 public static class FederationFieldMetadataExtensions
 {
     /// <summary>
@@ -15,6 +12,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="graphType">The GraphQL field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#shareable"/>.
+    /// </remarks>
     public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IFieldMetadataWriter
         => graphType.ApplyDirective(SHAREABLE_DIRECTIVE);
@@ -26,6 +26,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="from">The name of the service from which the field is overridden.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#override"/>.
+    /// </remarks>
     public static TMetadataWriter Override<TMetadataWriter>(this TMetadataWriter fieldType, string from)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.ApplyDirective(OVERRIDE_DIRECTIVE, d => d.AddArgument(new(FROM_ARGUMENT) { Value = from }));
@@ -36,6 +39,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#external"/>.
+    /// </remarks>
     public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE);
@@ -47,6 +53,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="fields">An array of field names that are provided by this field.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#provides"/>.
+    /// </remarks>
     public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.Provides(string.Join(" ", fields));
@@ -58,6 +67,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="fields">A space-separated string of field names that are provided by this field.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#provides"/>.
+    /// </remarks>
     public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
@@ -69,6 +81,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="fields">An array of field names that are required by this field.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#requires"/>.
+    /// </remarks>
     public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.Requires(string.Join(" ", fields));
@@ -80,6 +95,9 @@ public static class FederationFieldMetadataExtensions
     /// <param name="fields">A space-separated string of field names that are required by this field.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#requires"/>.
+    /// </remarks>
     public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
         where TMetadataWriter : IFieldMetadataWriter
         => fieldType.ApplyDirective(REQUIRES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));

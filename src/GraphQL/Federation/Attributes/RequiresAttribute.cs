@@ -6,6 +6,9 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@requires" directive attribute.
 /// This attribute is used to indicate that a field requires certain fields from the parent type, enabling complex field resolution across services.
 /// </summary>
+/// <remarks>
+/// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#requires"/>.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class RequiresAttribute : GraphQLAttribute
 {

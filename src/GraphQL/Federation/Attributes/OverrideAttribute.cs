@@ -6,6 +6,9 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@override" directive attribute.
 /// This attribute is used to indicate that a field overrides a field from another service.
 /// </summary>
+/// <remarks>
+/// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#override"/>.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class OverrideAttribute : GraphQLAttribute
 {

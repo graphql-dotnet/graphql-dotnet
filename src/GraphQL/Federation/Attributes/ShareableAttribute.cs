@@ -6,6 +6,9 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@shareable" directive attribute.
 /// This attribute is used to mark types or fields as shareable, indicating that they can be resolved by multiple services.
 /// </summary>
+/// <remarks>
+/// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#shareable"/>.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field, AllowMultiple = true)]
 public class ShareableAttribute : GraphQLAttribute
 {

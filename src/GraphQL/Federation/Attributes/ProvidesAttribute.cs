@@ -6,6 +6,9 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@provides" directive attribute.
 /// This attribute is used to indicate that a field provides fields from another type, enabling nested field resolution across services.
 /// </summary>
+/// <remarks>
+/// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#provides"/>.
+/// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class ProvidesAttribute : GraphQLAttribute
 {
