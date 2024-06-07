@@ -4,7 +4,10 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@override" directive attribute.
-/// This attribute is used to indicate that a field overrides a field from another service.
+/// <para>
+/// Indicates that an object field is now resolved by this subgraph instead of another subgraph where
+/// it's also defined. This enables you to migrate a field from one subgraph to another.
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#override"/>.

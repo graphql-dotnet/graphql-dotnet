@@ -4,7 +4,10 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@external" directive attribute.
-/// This attribute is used to mark a field as external, indicating that the field is owned by another service.
+/// <para>
+/// Indicates that this subgraph usually can't resolve a particular object field, but it still needs
+/// to define that field for other purposes.
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#external"/>.
