@@ -1,5 +1,6 @@
 using GraphQLParser.AST;
 using GraphQLParser.Visitors;
+using static GraphQL.Federation.FederationHelper;
 
 namespace GraphQL.Utilities.Visitors;
 
@@ -12,14 +13,14 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext
     private static readonly HashSet<string> _federatedDirectives = new()
     {
         "external",
-        "provides",
-        "requires",
-        "key",
-        "link",
-        "shareable",
-        "inaccessible",
+        PROVIDES_DIRECTIVE,
+        REQUIRES_DIRECTIVE,
+        KEY_DIRECTIVE,
+        LINK_DIRECTIVE,
+        SHAREABLE_DIRECTIVE,
+        INACCESSIBLE_DIRECTIVE,
         "tag",
-        "override",
+        OVERRIDE_DIRECTIVE,
         "composeDirective",
         "interfaceObject",
         "extends",
