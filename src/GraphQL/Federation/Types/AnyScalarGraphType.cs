@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.Utilities.Federation;
+namespace GraphQL.Federation.Types;
 
 /// <summary>
 /// Represents a type unknown within this portion of the federated schema.

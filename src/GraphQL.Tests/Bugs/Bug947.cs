@@ -1,7 +1,7 @@
 using System.Numerics;
 using GraphQL.Execution;
+using GraphQL.Federation.Types;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
 
 namespace GraphQL.Tests.Bugs;
 
