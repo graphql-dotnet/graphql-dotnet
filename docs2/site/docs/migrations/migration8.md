@@ -26,7 +26,8 @@ Both interfaces extend `IProvideMetadata` with read/write access to the metadata
 Be sure not to write metadata during the execution of a query, as the same graph/field type instance may be used for
 multiple queries and you would run into concurrency issues.
 
-In addition, the `IFieldMetadataWriter` interface has been added to scoping extension methods to fields only.  For example:
+In addition, the `IFieldMetadataWriter` interface has been added to allow scoping extension methods to fields only.
+For example:
 
 ```csharp
 // adds the GraphQL Federation '@requires' directive to the field
