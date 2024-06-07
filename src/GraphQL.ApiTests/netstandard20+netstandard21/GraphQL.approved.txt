@@ -3151,12 +3151,18 @@ namespace GraphQL.Utilities.Visitors
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQLParser.Visitors.NullVisitorContext context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
     }
-    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
+    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context>
     {
-        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQLParser.Visitors.NullVisitorContext context) { }
+        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+            public GraphQLParser.ROM QueryTypeName { get; set; }
+        }
     }
 }
 namespace GraphQL.Validation
