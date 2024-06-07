@@ -10,7 +10,7 @@ namespace GraphQL.Builders;
 /// </summary>
 /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
 /// <typeparam name="TReturnType">The type of the return value of the resolver.</typeparam>
-public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IMetadataWriter
+public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IFieldMetadataWriter
 {
     /// <summary>
     /// Returns the generated field.
