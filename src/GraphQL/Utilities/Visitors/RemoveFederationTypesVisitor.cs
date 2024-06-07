@@ -12,7 +12,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<NullVisitorContext
 {
     private static readonly HashSet<string> _federatedDirectives = new()
     {
-        "external",
+        EXTERNAL_DIRECTIVE,
         PROVIDES_DIRECTIVE,
         REQUIRES_DIRECTIVE,
         KEY_DIRECTIVE,
