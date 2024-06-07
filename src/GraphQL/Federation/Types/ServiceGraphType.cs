@@ -3,7 +3,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Federation.Types;
 
-internal class ServiceGraphType : ObjectGraphType
+public class ServiceGraphType : ObjectGraphType
 {
     public ServiceGraphType(PrintOptions? printOptions)
     {
