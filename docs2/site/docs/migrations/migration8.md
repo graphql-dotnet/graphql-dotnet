@@ -31,9 +31,9 @@ For example:
 
 ```csharp
 // adds the GraphQL Federation '@requires' directive to the field
-public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
+public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
     where TMetadataWriter : IFieldMetadataWriter
-    => fieldType.Requires(string.Join(" ", fields));
+    => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
 ```
 
 ### 2. Built-in scalars may be overridden via DI registrations
