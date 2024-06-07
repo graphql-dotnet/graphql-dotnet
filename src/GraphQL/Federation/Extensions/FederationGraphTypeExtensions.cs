@@ -1,7 +1,5 @@
-using GraphQL.Builders;
 using GraphQL.DataLoader;
 using GraphQL.Federation.Resolvers;
-using GraphQL.Federation.Types;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using static GraphQL.Federation.FederationHelper;
@@ -13,23 +11,6 @@ namespace GraphQL.Federation;
 /// </summary>
 public static class FederationGraphTypeExtensions
 {
-    /// <summary>
-    /// Adds "_service" field. Intended to use on Query in conjunction with .AddFederation(..., addFields = false).
-    /// </summary>
-    public static FieldBuilder<T, object> AddServices<T>(this ComplexGraphType<T> graphType) =>
-        graphType.Field<NonNullGraphType<ServiceGraphType>>("_service")
-            .Resolve(context => new { });
-
-    /// <summary>
-    /// Adds "_entities" field. Intended to use on Query in conjunction with .AddFederation(..., addFields = false).
-    /// </summary>
-    public static FieldBuilder<T, object> AddEntities<T>(this ComplexGraphType<T> graphType)
-    {
-        return graphType.Field<NonNullGraphType<ListGraphType<EntityType>>>("_entities")
-            .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<AnyScalarGraphType>>>>("representations")
-            .Resolve(EntityResolver.Instance);
-    }
-
     /// <summary>
     /// Specifies reference resolver for the type.
     /// </summary>

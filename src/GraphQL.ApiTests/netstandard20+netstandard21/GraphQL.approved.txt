@@ -1547,8 +1547,6 @@ namespace GraphQL.Federation
     }
     public static class FederationGraphTypeExtensions
     {
-        public static GraphQL.Builders.FieldBuilder<T, object> AddEntities<T>(this GraphQL.Types.ComplexGraphType<T> graphType) { }
-        public static GraphQL.Builders.FieldBuilder<T, object> AddServices<T>(this GraphQL.Types.ComplexGraphType<T> graphType) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
