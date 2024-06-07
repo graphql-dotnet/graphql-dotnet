@@ -1581,12 +1581,13 @@ namespace GraphQL.Federation
     }
     public static class FederationGraphTypeExtensions
     {
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
-        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
-        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
-        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
     public static class FederationMetadataExtensions
     {
@@ -1621,9 +1622,12 @@ namespace GraphQL.Federation
     public static class TypeConfigExtensions
     {
         public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
-        public static void ResolveReferenceAsync<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
-        public static void ResolveReferenceAsync<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
     }
 }
 namespace GraphQL.Federation.Resolvers

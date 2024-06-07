@@ -10,13 +10,40 @@ namespace GraphQL.Federation;
 public static class TypeConfigExtensions
 {
     /// <summary>
+    /// Configures synchronous resolution of a reference using a resolver function.
+    /// </summary>
+    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
+    /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
+    /// <param name="resolver">The function used to resolve the source representation.</param>
+    public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver) =>
+        typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
+
+    /// <summary>
+    /// Configures asynchronous resolution of a reference using a task-based resolver function.
+    /// </summary>
+    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
+    /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
+    /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
+    public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, Task<TSourceType?>> resolver) =>
+        typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
+
+    /// <summary>
+    /// Configures resolution of a reference using a data loader-based resolver function.
+    /// </summary>
+    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
+    /// <param name="typeConfig">The type configuration to apply the resolver to.</param>
+    /// <param name="resolver">The data loader function used to resolve the source representation.</param>
+    public static void ResolveReference<TSourceType>(this TypeConfig typeConfig, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType?>> resolver) =>
+        typeConfig.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
+
+    /// <summary>
     /// Configures asynchronous resolution of a reference using a task-based resolver function.
     /// </summary>
     /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="config">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
-    public static void ResolveReferenceAsync<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolver)
+    public static void ResolveReference<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, Task<TReturnType?>> resolver)
     {
         config.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
     }
@@ -28,7 +55,7 @@ public static class TypeConfigExtensions
     /// <typeparam name="TReturnType">The CLR type of the resolved object returned by the resolver.</typeparam>
     /// <param name="config">The type configuration to apply the resolver to.</param>
     /// <param name="resolver">The data loader function used to resolve the source representation.</param>
-    public static void ResolveReferenceAsync<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolver)
+    public static void ResolveReference<TSourceType, TReturnType>(this TypeConfig config, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TReturnType?>> resolver)
     {
         config.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationResolver<TSourceType, TReturnType>(resolver);
     }

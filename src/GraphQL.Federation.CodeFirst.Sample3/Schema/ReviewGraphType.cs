@@ -8,7 +8,7 @@ public class ReviewGraphType : ObjectGraphType<Review>
     public ReviewGraphType()
     {
         this.Key("id");
-        this.ResolveReference((ctx, source) =>
+        this.ResolveReference<Review>((ctx, source) =>
         {
             var data = ctx.RequestServices!.GetRequiredService<Data>();
             return data.GetReviewByIdAsync(source.Id);
