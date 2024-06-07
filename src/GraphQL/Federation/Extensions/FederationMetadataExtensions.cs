@@ -11,6 +11,10 @@ public static class FederationMetadataExtensions
 {
     /// <summary>
     /// Adds the "@key" directive to a GraphQL type.
+    /// <para>
+    /// Designates an object type as an entity and specifies its key fields. Key fields are a set of fields
+    /// that a subgraph can use to uniquely identify any instance of the entity.
+    /// </para>
     /// </summary>
     /// <param name="graphType">The GraphQL type to which the directive is added.</param>
     /// <param name="fields">An array of field names that form the key.</param>
@@ -26,6 +30,10 @@ public static class FederationMetadataExtensions
 
     /// <summary>
     /// Adds the "@key" directive to a GraphQL type.
+    /// <para>
+    /// Designates an object type as an entity and specifies its key fields. Key fields are a set of fields
+    /// that a subgraph can use to uniquely identify any instance of the entity.
+    /// </para>
     /// </summary>
     /// <param name="graphType">The GraphQL type to which the directive is added.</param>
     /// <param name="fields">A space-separated string of field names that form the key.</param>
@@ -46,6 +54,10 @@ public static class FederationMetadataExtensions
 
     /// <summary>
     /// Adds the "@shareable" directive to a GraphQL type.
+    /// <para>
+    /// Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in
+    /// Federation 2, object fields can be resolved by only one subgraph).
+    /// </para>
     /// </summary>
     /// <param name="graphType">The GraphQL type to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
@@ -59,6 +71,10 @@ public static class FederationMetadataExtensions
 
     /// <summary>
     /// Adds the "@inaccessible" directive to a GraphQL type or field.
+    /// <para>
+    /// Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that
+    /// definition is also present in other subgraphs. This means that the field is not exposed to clients at all.
+    /// </para>
     /// </summary>
     /// <param name="graphType">The GraphQL type or field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
@@ -72,6 +88,10 @@ public static class FederationMetadataExtensions
 
     /// <summary>
     /// Adds the "@external" directive to a GraphQL type.
+    /// <para>
+    /// Indicates that this subgraph usually can't resolve a particular object field, but it still needs
+    /// to define that field for other purposes.
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL type to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>

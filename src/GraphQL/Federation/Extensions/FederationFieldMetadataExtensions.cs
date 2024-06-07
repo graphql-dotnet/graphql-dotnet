@@ -8,6 +8,10 @@ public static class FederationFieldMetadataExtensions
 {
     /// <summary>
     /// Adds the "@shareable" directive to a GraphQL field.
+    /// <para>
+    /// Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in
+    /// Federation 2, object fields can be resolved by only one subgraph).
+    /// </para>
     /// </summary>
     /// <param name="graphType">The GraphQL field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
@@ -21,6 +25,10 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@override" directive to a GraphQL field.
+    /// <para>
+    /// Indicates that an object field is now resolved by this subgraph instead of another subgraph where it's also
+    /// defined. This enables you to migrate a field from one subgraph to another.
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <param name="from">The name of the service from which the field is overridden.</param>
@@ -35,6 +43,10 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@external" directive to a GraphQL field.
+    /// <para>
+    /// Indicates that this subgraph usually can't resolve a particular object field, but it still needs to
+    /// define that field for other purposes.
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
@@ -48,6 +60,10 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@provides" directive to a GraphQL field.
+    /// <para>
+    /// Specifies a set of entity fields that a subgraph can resolve, but only at a particular schema path (at other
+    /// paths, the subgraph can't resolve those fields).
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <param name="fields">An array of field names that are provided by this field.</param>
@@ -62,6 +78,10 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@provides" directive to a GraphQL field.
+    /// <para>
+    /// Specifies a set of entity fields that a subgraph can resolve, but only at a particular schema path (at other
+    /// paths, the subgraph can't resolve those fields).
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <param name="fields">A space-separated string of field names that are provided by this field.</param>
@@ -76,6 +96,11 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@requires" directive to a GraphQL field.
+    /// <para>
+    /// Indicates that the resolver for a particular entity field depends on the values of other entity fields that
+    /// are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally
+    /// defined fields first, even if the original client query didn't request them.
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <param name="fields">An array of field names that are required by this field.</param>
@@ -90,6 +115,11 @@ public static class FederationFieldMetadataExtensions
 
     /// <summary>
     /// Adds the "@requires" directive to a GraphQL field.
+    /// <para>
+    /// Indicates that the resolver for a particular entity field depends on the values of other entity fields that
+    /// are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally
+    /// defined fields first, even if the original client query didn't request them.
+    /// </para>
     /// </summary>
     /// <param name="fieldType">The GraphQL field to which the directive is added.</param>
     /// <param name="fields">A space-separated string of field names that are required by this field.</param>
