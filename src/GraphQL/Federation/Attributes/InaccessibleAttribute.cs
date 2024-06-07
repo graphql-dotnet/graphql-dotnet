@@ -6,7 +6,7 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@inaccessible" directive attribute.
 /// This attribute is used to mark elements as inaccessible, indicating they should not be exposed to consumers.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Enum | AttributeTargets.Parameter)]
 public class InaccessibleAttribute : GraphQLAttribute
 {
     /// <inheritdoc/>

@@ -6,7 +6,7 @@ namespace GraphQL.Federation;
 /// Represents a GraphQL Federation "@external" directive attribute.
 /// This attribute is used to mark a field as external, indicating that the field is owned by another service.
 /// </summary>
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class ExternalAttribute : GraphQLAttribute
 {
     /// <inheritdoc/>
