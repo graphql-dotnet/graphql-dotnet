@@ -389,6 +389,18 @@ property to `true` for all object graph types to retain the existing behavior.
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
+### 13. GraphQL Federation v2 graph types added
+
+These graph types have been added to the `GraphQL.Federation.Types` namespace:
+
+- `AnyScalarType` (moved from `GraphQL.Utilities.Federation`)
+- `EntityGraphType`
+- `FieldSetGraphType`
+- `LinkImportGraphType`
+- `LinkPurpose` enumeration
+- `LinkPurposeGraphType`
+- `ServiceGraphType`
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -568,3 +580,8 @@ Unless you directly implement these interfaces, you should not be impacted by th
 
 See the new features section for details on the new method added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
+
+### 15. `AnyScalarType` moved to `GraphQL.Federation.Types`
+
+`GraphQL.Utilities.Federation.AnyScalarType` has been moved to `GraphQL.Federation.Types.AnyScalarType`.
+All federation types are now located within the `GraphQL.Federation.Types` namespace.

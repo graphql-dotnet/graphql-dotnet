@@ -1494,6 +1494,41 @@ namespace GraphQL.Execution
         public override object? ToValue() { }
     }
 }
+namespace GraphQL.Federation.Types
+{
+    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
+    {
+        public AnyScalarGraphType() { }
+    }
+    public class EntityGraphType : GraphQL.Types.UnionGraphType
+    {
+        public EntityGraphType() { }
+    }
+    public class FieldSetGraphType : GraphQL.Types.StringGraphType
+    {
+        public FieldSetGraphType() { }
+    }
+    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
+    {
+        public LinkImportGraphType() { }
+    }
+    [GraphQL.Types.ConstantCase]
+    public enum LinkPurpose
+    {
+        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
+        Security = 0,
+        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
+        Execution = 1,
+    }
+    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Federation.Types.LinkPurpose>
+    {
+        public LinkPurposeGraphType() { }
+    }
+    public class ServiceGraphType : GraphQL.Types.ObjectGraphType
+    {
+        public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
+    }
+}
 namespace GraphQL.Instrumentation
 {
     public class ApolloTrace
@@ -3115,10 +3150,6 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
-    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
-    {
-        public AnyScalarGraphType() { }
-    }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }

@@ -2,7 +2,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
+using GraphQL.Federation.Types;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types;
