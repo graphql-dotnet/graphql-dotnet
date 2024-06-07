@@ -2,11 +2,15 @@ using GraphQL.Federation.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 
-namespace GraphQL.Federation.ValidationRules;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Injects the <c>__typename</c> field into the selection set of a GraphQL Federation entity resolver.
 /// </summary>
+/// <remarks>
+/// This validation rule is not compatible with document caching, as the document is modified during validation.
+/// This modification is not thread-safe and would cause problems if used alongside document caching.
+/// </remarks>
 [Obsolete("This class will be removed in GraphQL.NET v9.")]
 public class InjectTypenameValidationRule : IValidationRule, INodeVisitor
 {

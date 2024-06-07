@@ -1503,6 +1503,16 @@ namespace GraphQL.Federation
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
     }
+    [System.Obsolete("This class will be removed in GraphQL.NET v9.")]
+    public class InjectTypenameValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
+    {
+        public InjectTypenameValidationRule() { }
+        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+    }
     public static class TypeConfigExtensions
     {
         public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
@@ -1583,19 +1593,6 @@ namespace GraphQL.Federation.Types
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
         public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
-    }
-}
-namespace GraphQL.Federation.ValidationRules
-{
-    [System.Obsolete("This class will be removed in GraphQL.NET v9.")]
-    public class InjectTypenameValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
-    {
-        public InjectTypenameValidationRule() { }
-        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
     }
 }
 namespace GraphQL.Instrumentation

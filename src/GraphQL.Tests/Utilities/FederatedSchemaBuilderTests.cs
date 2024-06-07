@@ -137,7 +137,7 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
             _.Query = query;
             _.Variables = variables.ToInputs();
             if (addTypenameRule)
-                _.ValidationRules = DocumentValidator.CoreRules.Append(new GraphQL.Federation.ValidationRules.InjectTypenameValidationRule());
+                _.ValidationRules = DocumentValidator.CoreRules.Append(new GraphQL.Federation.InjectTypenameValidationRule());
         }, CreateQueryResult(expected));
     }
 
