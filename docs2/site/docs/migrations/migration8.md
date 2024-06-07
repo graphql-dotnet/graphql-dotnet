@@ -591,7 +591,51 @@ Unless you directly implement these interfaces, you should not be impacted by th
 See the new features section for details on the new method added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
 
-### 15. `AnyScalarType` moved to `GraphQL.Federation.Types`
+### 15. `AnyScalarType` and `ServiceGraphType` moved to `GraphQL.Federation.Types`
 
-`GraphQL.Utilities.Federation.AnyScalarType` has been moved to `GraphQL.Federation.Types.AnyScalarType`.
-All federation types are now located within the `GraphQL.Federation.Types` namespace.
+These graph types, previously located within the `GraphQL.Utilities.Federation` namespace,
+have been moved to the `GraphQL.Federation.Types` namespace alongside all other federation types.
+
+### 16. `IFederatedResolver`, `FuncFederatedResolver` and `ResolveReferenceAsync` replaced
+
+- `IFederatedResolver` has been replaced with `IFederationResolver`.
+- `FuncFederatedResolver` has been replaced with `FederationResolver`.
+- `ResolveReferenceAsync` has been replaced with `ResolveReference`.
+
+Please note that the new members are now located in the `GraphQL.Federation` namespace and may
+require slight changes to your code to accommodate the new signatures. The old members have been
+marked as obsolete and will continue to work in v8, but will be removed in v9.
+
+### 17. GraphQL Federation entity resolvers do not automatically inject `__typename` into requests.
+
+Previously, the `__typename` field was automatically injected into the request for entity resolvers.
+This behavior has been removed as it is not required to meet the GraphQL Federation specification.
+
+For instance, the following sample request:
+
+```graphql
+{
+  _entities(representations: [{ __typename: "User", id: "1" }]) {
+    ... on User {
+      id
+    }
+  }
+}
+```
+
+Should now be written as:
+
+```graphql
+{
+  _entities(representations: [{ __typename: "User", id: "1" }]) {
+    __typename
+    ... on User {
+      id
+    }
+  }
+}
+```
+
+Please ensure that your client requests are updated to include the `__typename` field in the response.
+Alternatively, you can install the provided `InjectTypenameValidationRule` validation rule to automatically
+inject the `__typename` field into the request.

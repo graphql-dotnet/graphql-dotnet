@@ -1,9 +1,9 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using GraphQL.Federation.Resolvers;
 using GraphQL.Federation.Types;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation;
@@ -48,7 +48,7 @@ public class FederatedSchemaBuilder : SchemaBuilder
     protected override void PreConfigure(Schema schema)
     {
         schema.RegisterType<AnyScalarGraphType>();
-        schema.RegisterType<ServiceGraphType>();
+        schema.RegisterType(new ServiceGraphType(new PrintOptions { IncludeFederationTypes = false })); // skip federation types for federation v1 support
     }
 
     private void AddRootEntityFields(ISchema schema)
@@ -69,87 +69,17 @@ public class FederatedSchemaBuilder : SchemaBuilder
         query.AddField(service);
 
         var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
+        var representationArgument = new QueryArgument(representationsType) { Name = "representations" };
+        representationArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
 
         var entities = new FieldType
         {
             Name = "_entities",
-            Arguments = new QueryArguments(new QueryArgument(representationsType) { Name = "representations" }),
+            Arguments = new QueryArguments(representationArgument),
             ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
-            Resolver = new FuncFieldResolver<object>(async context =>
-            {
-                AddTypeNameToSelection(context.FieldAst, context.Document);
-
-                var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
-
-                var results = new List<object?>();
-
-                foreach (var rep in reps!)
-                {
-                    var typeName = rep!["__typename"].ToString();
-                    var type = context.Schema.AllTypes[typeName!];
-                    if (type != null)
-                    {
-                        // execute resolver
-                        var resolver = type.GetMetadata<IFederatedResolver>(RESOLVER_METADATA_FIELD);
-                        if (resolver != null)
-                        {
-                            var resolveContext = new FederatedResolveContext
-                            {
-                                Arguments = rep!,
-                                ParentFieldContext = context
-                            };
-                            var result = await resolver.Resolve(resolveContext).ConfigureAwait(false);
-                            results.Add(result);
-                        }
-                        else
-                        {
-                            results.Add(rep);
-                        }
-                    }
-                    else
-                    {
-                        // otherwise return the representation
-                        results.Add(rep);
-                    }
-                }
-
-                return results;
-            })
+            Resolver = EntityResolver.Instance,
         };
         query.AddField(entities);
-    }
-
-    private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
-    {
-        if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
-        {
-            setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
-        }
-    }
-
-    private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
-    {
-        foreach (var selection in selectionSet.Selections)
-        {
-            if (selection is GraphQLField childField && childField.Name == "__typename")
-            {
-                setToAlter = null;
-                return false;
-            }
-
-            if (selection is GraphQLInlineFragment frag)
-            {
-                return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
-            }
-
-            if (selection is GraphQLFragmentSpread spread)
-            {
-                var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
-                return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
-            }
-        }
-        setToAlter = selectionSet;
-        return true;
     }
 
     private UnionGraphType BuildEntityGraphType()

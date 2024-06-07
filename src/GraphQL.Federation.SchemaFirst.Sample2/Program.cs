@@ -54,11 +54,13 @@ public class Program
         // categories do not actually exist in the data, so we use a pseudo-resolver
         // which always returns a Category instance for the given ID, so that the product
         // list can be resolved from it
+#pragma warning disable CS0618 // Type or member is obsolete
         schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
             new MyPseudoFederatedResolver<Category>());
         schemaBuilder.Types.Include<Product>();
         schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(
             new MyFederatedResolver<Product>((data, id) => data.GetProductById(id)));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // build the schema
         return schemaBuilder.Build(schemaString);
