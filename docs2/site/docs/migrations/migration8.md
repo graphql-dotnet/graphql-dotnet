@@ -399,6 +399,20 @@ property to `true` for all object graph types to retain the existing behavior.
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
+### 13. Extension methods and attributes added to simplify defining GraphQL Federation directives in code-first and schema-first schemas
+
+These extension methods and attributes simplify the process of applying GraphQL Federation directives:
+
+| Directive | Extension Method | Attribute | Description |
+|-----------|------------------|-----------|-------------|
+| `@external` | `External()` | `[External]` | Indicates that this subgraph usually can't resolve a particular object field, but it still needs to define that field for other purposes. |
+| `@requires` | `Requires(string fields)` | `[Requires("fields")]` | Indicates that the resolver for a particular entity field depends on the values of other entity fields that are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally defined fields first, even if the original client query didn't request them. |
+| `@provides` | `Provides(string fields)` | `[Provides("fields")]` | Specifies a set of entity fields that a subgraph can resolve, but only at a particular schema path (at other paths, the subgraph can't resolve those fields). |
+| `@key` | `Key(string fields)` | `[Key("fields")]` | Designates an object type as an entity and specifies its key fields. Key fields are a set of fields that a subgraph can use to uniquely identify any instance of the entity. |
+| `@override` | `Override()` | `[Override]` | Indicates that an object field is now resolved by this subgraph instead of another subgraph where it's also defined. This enables you to migrate a field from one subgraph to another. |
+| `@shareable` | `Shareable()` | `[Shareable]` | Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in Federation 2, object fields can be resolved by only one subgraph). |
+| `@inaccessible` | `Inaccessible()` | `[Inaccessible]` | Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs. This means that the field is not exposed to clients at all. |
+
 ## Breaking Changes
 
 ### 1. Query type is required
