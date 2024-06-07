@@ -3,7 +3,8 @@ using GraphQL.Types;
 namespace GraphQL.Federation;
 
 /// <summary>
-/// Adds "@inaccessible" directive.
+/// Represents a GraphQL Federation "@inaccessible" directive attribute.
+/// This attribute is used to mark elements as inaccessible, indicating they should not be exposed to consumers.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class InaccessibleAttribute : GraphQLAttribute

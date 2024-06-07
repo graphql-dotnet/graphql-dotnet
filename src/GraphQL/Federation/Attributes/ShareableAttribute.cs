@@ -3,7 +3,8 @@ using GraphQL.Types;
 namespace GraphQL.Federation;
 
 /// <summary>
-/// Adds "@shareable" directive.
+/// Represents a GraphQL Federation "@shareable" directive attribute.
+/// This attribute is used to mark types or fields as shareable, indicating that they can be resolved by multiple services.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class ShareableAttribute : GraphQLAttribute

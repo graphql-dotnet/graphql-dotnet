@@ -3,15 +3,21 @@ using GraphQL.Types;
 namespace GraphQL.Federation;
 
 /// <summary>
-/// Adds "@override" directive.
+/// Represents a GraphQL Federation "@override" directive attribute.
+/// This attribute is used to indicate that a field overrides a field from another service.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class OverrideAttribute : GraphQLAttribute
 {
-    /// <summary> .ctor </summary>
+    /// <summary>
+    /// Gets the name of the service from which the field is overridden.
+    /// </summary>
     public string From { get; }
 
-    /// <summary> .ctor </summary>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="OverrideAttribute"/> class with the specified service name.
+    /// </summary>
+    /// <param name="from">The name of the service from which the field is overridden.</param>
     public OverrideAttribute(string from)
     {
         From = from;

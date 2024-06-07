@@ -1532,9 +1532,9 @@ namespace GraphQL.Federation
         public static TMetadataWriter Inaccessible<TMetadataWriter>(this TMetadataWriter graphType)
             where TMetadataWriter : GraphQL.Types.IMetadataWriter { }
         public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string[] fields, bool resolvable = true)
-            where TMetadataWriter : GraphQL.Types.IMetadataWriter { }
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IComplexGraphType { }
         public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string fields, bool resolvable = true)
-            where TMetadataWriter : GraphQL.Types.IMetadataWriter { }
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IComplexGraphType { }
         public static TMetadataWriter Override<TMetadataWriter>(this TMetadataWriter fieldType, string from)
             where TMetadataWriter : GraphQL.Types.IMetadataWriter { }
         public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
