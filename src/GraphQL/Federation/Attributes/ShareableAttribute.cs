@@ -4,7 +4,10 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@shareable" directive attribute.
-/// This attribute is used to mark types or fields as shareable, indicating that they can be resolved by multiple services.
+/// <para>
+/// Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in
+/// Federation 2, object fields can be resolved by only one subgraph).
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#shareable"/>.

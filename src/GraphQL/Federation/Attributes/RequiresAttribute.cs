@@ -4,7 +4,11 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@requires" directive attribute.
-/// This attribute is used to indicate that a field requires certain fields from the parent type, enabling complex field resolution across services.
+/// <para>
+/// Indicates that the resolver for a particular entity field depends on the values of other entity fields that
+/// are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally
+/// defined fields first, even if the original client query didn't request them.
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#requires"/>.

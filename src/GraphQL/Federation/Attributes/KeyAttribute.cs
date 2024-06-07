@@ -4,7 +4,10 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@key" directive attribute.
-/// This attribute is used to annotate a class with fields that form a unique key, enabling entity resolution across federated services.
+/// <para>
+/// Designates an object type as an entity and specifies its key fields. Key fields are a set of fields
+/// that a subgraph can use to uniquely identify any instance of the entity.
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#key"/>.

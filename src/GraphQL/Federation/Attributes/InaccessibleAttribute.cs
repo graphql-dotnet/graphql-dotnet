@@ -4,7 +4,11 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Represents a GraphQL Federation "@inaccessible" directive attribute.
-/// This attribute is used to mark elements as inaccessible, indicating they should not be exposed to consumers.
+/// <para>
+/// Indicates that a definition in the subgraph schema should be omitted from the router's API schema,
+/// even if that definition is also present in other subgraphs. This means that the field is not exposed
+/// to clients at all.
+/// </para>
 /// </summary>
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#inaccessible"/>.
