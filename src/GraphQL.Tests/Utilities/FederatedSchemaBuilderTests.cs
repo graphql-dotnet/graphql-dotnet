@@ -1,6 +1,7 @@
 using System.Text.Json;
 using GraphQL.DataLoader;
 using GraphQL.Utilities.Federation;
+using GraphQL.Validation;
 
 namespace GraphQL.Tests.Utilities;
 
@@ -89,10 +90,11 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
     }
 
     [Theory]
-    [InlineData("__typename ...on User { id }", false)]
-    [InlineData("...on User { __typename id }", false)]
-    [InlineData("...on User { ...TypeAndId }", true)]
-    public void result_includes_typename(string selectionSet, bool includeFragment)
+    [InlineData("...on User { id }", false, true)]
+    [InlineData("__typename ...on User { id }", false, false)]
+    [InlineData("...on User { __typename id }", false, false)]
+    [InlineData("...on User { ...TypeAndId }", true, false)]
+    public void result_includes_typename(string selectionSet, bool includeFragment, bool addTypenameRule)
     {
         const string definitions = """
             extend type Query {
@@ -131,11 +133,12 @@ public class FederatedSchemaBuilderTests : FederatedSchemaBuilderTestBase
 
         AssertQuery(_ =>
         {
-            _.Definitions = definitions;
+            _.Schema = Builder.Build(definitions);
             _.Query = query;
-            _.Variables = variables;
-            _.ExpectedResult = expected;
-        });
+            _.Variables = variables.ToInputs();
+            if (addTypenameRule)
+                _.ValidationRules = DocumentValidator.CoreRules.Append(new GraphQL.Federation.InjectTypenameValidationRule());
+        }, CreateQueryResult(expected));
     }
 
     [Fact]

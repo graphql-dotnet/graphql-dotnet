@@ -7,7 +7,7 @@ using static GraphQL.Federation.FederationHelper;
 namespace GraphQL.Federation.Resolvers;
 
 /// <summary>
-/// Resolves the _entity field for GraphQL Federation.
+/// Resolves the <c>_entities</c> field for GraphQL Federation.
 /// </summary>
 public class EntityResolver : IFieldResolver
 {
@@ -72,12 +72,6 @@ public class EntityResolver : IFieldResolver
         //  as the context is referenced within a delegate passed to the SimpleDataLoader (see below)
         //context = context.Copy();
 
-        // BUG: Authorization only works at a field level. Authorization at GraphType level doesn't work.
-        //      i.e. _entities(representations: [{ __typename: "MyType", id: 1 }]) { myField }
-        //      will only check authorization for "myField" but not for "MyType".
-        // NOTE: is this not true for all unions? i.e. the union type itself is checked for authorization but the type
-        //       of the object returned by the field resolver is not checked for authorization
-
         // require the representations argument to be converted to the proper type before hitting this code
         var representations = (IEnumerable<Representation>)context.Arguments!["representations"].Value!;
 
@@ -86,7 +80,7 @@ public class EntityResolver : IFieldResolver
         {
             // using a data loader here causes the resolvers to run in serial or parallel based on the selected execution strategy.
             // unfortunately this requires extra allocations whereas if the strategy was known this code could be optimized by
-            // either awaiting each resolver or collecting them and performing WaitAll. note that this code counts on the fact
+            // either awaiting each resolver or collecting them and performing WaitAll. Note that this code counts on the fact
             // that the context instance will not be reused due to a list being returned from this method.
             var result = new SimpleDataLoader(_ => representation.Resolver.ResolveAsync(context, representation.Value).AsTask()!);
 
@@ -174,7 +168,7 @@ public class EntityResolver : IFieldResolver
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");
     }
 
-    private record SimpleDataLoader(Func<CancellationToken, Task<object?>> Resolver) : IDataLoaderResult
+    private class SimpleDataLoader(Func<CancellationToken, Task<object?>> Resolver) : IDataLoaderResult
     {
         public Task<object?> GetResultAsync(CancellationToken cancellationToken = default) => Resolver(cancellationToken);
     }

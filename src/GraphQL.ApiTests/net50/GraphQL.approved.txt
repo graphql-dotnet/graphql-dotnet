@@ -1587,6 +1587,16 @@ namespace GraphQL.Federation
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.Obsolete("This class will be removed in GraphQL.NET v9.")]
+    public class InjectTypenameValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
+    {
+        public InjectTypenameValidationRule() { }
+        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
     public class KeyAttribute : GraphQL.GraphQLAttribute
     {
