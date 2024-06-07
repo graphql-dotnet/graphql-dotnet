@@ -5,7 +5,7 @@ namespace GraphQL.Federation;
 
 /// <summary>
 /// Extension methods to configure federation directives within GraphQL schemas.
-/// These methods allow the application of various federation directives such as @key, @shareable, @inaccessible, @override, @external, @provides, and @requires to GraphQL types and fields.
+/// These methods allow the application of various federation directives such as @key, @shareable, @inaccessible, @override, @provides, and @requires to GraphQL types and fields.
 /// </summary>
 public static class FederationMetadataExtensions
 {

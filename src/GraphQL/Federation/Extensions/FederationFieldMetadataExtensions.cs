@@ -3,10 +3,7 @@ using static GraphQL.Federation.FederationHelper;
 
 namespace GraphQL.Federation;
 
-/// <summary>
-/// Extension methods to configure federation directives within GraphQL schemas.
-/// These methods allow the application of various federation directives such as @key, @shareable, @inaccessible, @override, @external, @provides, and @requires to GraphQL types and fields.
-/// </summary>
+/// <inheritdoc cref="FederationMetadataExtensions"/>
 public static class FederationFieldMetadataExtensions
 {
     /// <summary>
