@@ -1,5 +1,3 @@
-using GraphQL.Federation.Attributes;
-
 namespace GraphQL.Federation.TypeFirst.Sample4.Schema;
 
 [Key("id")]

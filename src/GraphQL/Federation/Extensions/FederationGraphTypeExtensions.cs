@@ -11,33 +11,6 @@ namespace GraphQL.Federation;
 public static class FederationGraphTypeExtensions
 {
     /// <summary>
-    /// Configures synchronous resolution of a reference using a resolver function.
-    /// </summary>
-    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
-    /// <param name="graphType">The graph type to apply the resolver to.</param>
-    /// <param name="resolver">The function used to resolve the source representation.</param>
-    public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver) =>
-        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
-
-    /// <summary>
-    /// Configures asynchronous resolution of a reference using a task-based resolver function.
-    /// </summary>
-    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
-    /// <param name="graphType">The graph type to apply the resolver to.</param>
-    /// <param name="resolver">The asynchronous function used to resolve the source representation.</param>
-    public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, Task<TSourceType?>> resolver) =>
-        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
-
-    /// <summary>
-    /// Configures resolution of a reference using a data loader-based resolver function.
-    /// </summary>
-    /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>
-    /// <param name="graphType">The graph type to apply the resolver to.</param>
-    /// <param name="resolver">The data loader function used to resolve the source representation.</param>
-    public static void ResolveReference<TSourceType>(this ObjectGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, IDataLoaderResult<TSourceType?>> resolver) =>
-        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
-
-    /// <summary>
     /// Configures synchronous resolution of a reference using a resolver function with a return type.
     /// </summary>
     /// <typeparam name="TSourceType">The CLR type of the source representation that the resolver handles.</typeparam>

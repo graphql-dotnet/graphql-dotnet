@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.Federation.Attributes;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Adds "@requires" directive.

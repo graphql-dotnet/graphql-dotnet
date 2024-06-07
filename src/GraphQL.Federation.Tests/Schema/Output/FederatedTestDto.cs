@@ -1,5 +1,3 @@
-using GraphQL.Federation.Attributes;
-
 namespace GraphQL.Federation.Tests.Schema.Output;
 
 [Key("id")]

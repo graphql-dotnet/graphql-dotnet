@@ -1,10 +1,9 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
-using GraphQL.Federation;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Federation.Types;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation;
@@ -80,76 +79,8 @@ public class FederatedSchemaBuilder : SchemaBuilder
             Arguments = new QueryArguments(representationArgument),
             ResolvedType = new NonNullGraphType(new ListGraphType(new GraphQLTypeReference("_Entity"))),
             Resolver = EntityResolver.Instance,
-            //Resolver = new FuncFieldResolver<object>(async context =>
-            //{
-            //    AddTypeNameToSelection(context.FieldAst, context.Document);
-
-            //    var reps = context.GetArgument<List<Dictionary<string, object>>>("representations");
-
-            //    var results = new List<object?>();
-
-            //    foreach (var rep in reps!)
-            //    {
-            //        var typeName = rep!["__typename"].ToString();
-            //        var type = context.Schema.AllTypes[typeName!];
-            //        if (type != null)
-            //        {
-            //            // execute resolver
-            //            var resolver = type.GetMetadata<GraphQL.Federation.IFederationResolver>(RESOLVER_METADATA_FIELD);
-            //            if (resolver != null)
-            //            {
-            //                var result = await resolver.ResolveAsync(context, rep!).ConfigureAwait(false);
-            //                results.Add(result);
-            //            }
-            //            else
-            //            {
-            //                results.Add(rep);
-            //            }
-            //        }
-            //        else
-            //        {
-            //            // otherwise return the representation
-            //            results.Add(rep);
-            //        }
-            //    }
-
-            //    return results;
-            //})
         };
         query.AddField(entities);
-    }
-
-    //private void AddTypeNameToSelection(GraphQLField field, GraphQLDocument document)
-    //{
-    //    if (FindSelectionToAmend(field.SelectionSet!, document, out var setToAlter))
-    //    {
-    //        setToAlter!.Selections.Insert(0, new GraphQLField(new GraphQLName("__typename")));
-    //    }
-    //}
-
-    private bool FindSelectionToAmend(GraphQLSelectionSet selectionSet, GraphQLDocument document, out GraphQLSelectionSet? setToAlter)
-    {
-        foreach (var selection in selectionSet.Selections)
-        {
-            if (selection is GraphQLField childField && childField.Name == "__typename")
-            {
-                setToAlter = null;
-                return false;
-            }
-
-            if (selection is GraphQLInlineFragment frag)
-            {
-                return FindSelectionToAmend(frag.SelectionSet, document, out setToAlter);
-            }
-
-            if (selection is GraphQLFragmentSpread spread)
-            {
-                var def = document.FindFragmentDefinition(spread.FragmentName.Name)!;
-                return FindSelectionToAmend(def.SelectionSet, document, out setToAlter);
-            }
-        }
-        setToAlter = selectionSet;
-        return true;
     }
 
     private UnionGraphType BuildEntityGraphType()

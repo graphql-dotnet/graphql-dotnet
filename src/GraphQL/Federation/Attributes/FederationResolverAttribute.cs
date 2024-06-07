@@ -9,7 +9,7 @@ using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 
-namespace GraphQL.Federation.Attributes;
+namespace GraphQL.Federation;
 
 /// <summary>
 /// Indicates that the method is a GraphQL Federation resolver.
@@ -175,9 +175,7 @@ public class FederationResolverAttribute : GraphQLAttribute
                     {
                         var matched = arguments.TryGetValue(arg.Name, out var value);
                         if (matched)
-                        {
                             value = EntityResolver.Deserialize(arg.Name, arg.ResolvedType!, typeof(object), value);
-                        }
                         Arguments[arg.Name] = matched
                             ? new ArgumentValue(value, ArgumentSource.Literal)
                             : new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault);

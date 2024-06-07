@@ -1,5 +1,6 @@
 using System.Collections;
 using GraphQL.DI;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using static GraphQL.Federation.FederationHelper;

@@ -1,11 +1,10 @@
 using System.Collections;
 using GraphQL.DataLoader;
-using GraphQL.Federation.Resolvers;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using static GraphQL.Federation.FederationHelper;
 
-namespace GraphQL.Federation;
+namespace GraphQL.Federation.Resolvers;
 
 /// <summary>
 /// Resolves the _entity field for GraphQL Federation.
@@ -49,13 +48,9 @@ public class EntityResolver : IFieldResolver
                     //  deserialization mapping
                     //value = rep.ToObject(resolver.SourceType, null!);
                     if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object>))
-                    {
                         value = rep;
-                    }
                     else
-                    {
                         value = ToObject(resolver.SourceType, objectGraphType, rep);
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -119,9 +114,7 @@ public class EntityResolver : IFieldResolver
                     ?? throw new InvalidOperationException($"Property '{item.Key}' not found in type '{objectType.GetFriendlyName()}'.");
                 var value = Deserialize(item.Key, graphType, prop.PropertyType, item.Value);
                 if (value != null && !prop.PropertyType.IsInstanceOfType(value))
-                {
                     value = ValueConverter.ConvertTo(value, prop.PropertyType);
-                }
                 prop.SetValue(obj, value);
             }
         }
@@ -159,9 +152,7 @@ public class EntityResolver : IFieldResolver
         }
 
         if (graphType is ScalarGraphType scalarGraphType)
-        {
             return scalarGraphType.ParseValue(value);
-        }
 
         if (graphType is IObjectGraphType objectGraphType)
         {
