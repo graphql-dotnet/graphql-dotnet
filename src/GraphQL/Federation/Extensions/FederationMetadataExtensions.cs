@@ -17,6 +17,9 @@ public static class FederationMetadataExtensions
     /// <param name="resolvable">Indicates whether the key is resolvable. Default is true.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#key"/>.
+    /// </remarks>
     public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string[] fields, bool resolvable = true)
         where TMetadataWriter : IMetadataWriter, IComplexGraphType
         => graphType.Key(string.Join(" ", fields), resolvable);
@@ -29,6 +32,9 @@ public static class FederationMetadataExtensions
     /// <param name="resolvable">Indicates whether the key is resolvable. Default is true.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#key"/>.
+    /// </remarks>
     public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string fields, bool resolvable = true)
         where TMetadataWriter : IMetadataWriter, IComplexGraphType
         => graphType.ApplyDirective(KEY_DIRECTIVE, d =>
@@ -44,6 +50,9 @@ public static class FederationMetadataExtensions
     /// <param name="graphType">The GraphQL type to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#shareable"/>.
+    /// </remarks>
     public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IMetadataWriter, IObjectGraphType
         => graphType.ApplyDirective(SHAREABLE_DIRECTIVE);
@@ -54,6 +63,9 @@ public static class FederationMetadataExtensions
     /// <param name="graphType">The GraphQL type or field to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#inaccessible"/>.
+    /// </remarks>
     public static TMetadataWriter Inaccessible<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IMetadataWriter
         => graphType.ApplyDirective(INACCESSIBLE_DIRECTIVE);
@@ -64,6 +76,9 @@ public static class FederationMetadataExtensions
     /// <param name="fieldType">The GraphQL type to which the directive is added.</param>
     /// <typeparam name="TMetadataWriter">The type of the metadata writer.</typeparam>
     /// <returns>The modified metadata writer.</returns>
+    /// <remarks>
+    /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#external"/>.
+    /// </remarks>
     public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
         where TMetadataWriter : IMetadataWriter, IObjectGraphType
         => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE);
