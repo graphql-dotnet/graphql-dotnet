@@ -833,7 +833,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -884,7 +884,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -918,7 +918,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
