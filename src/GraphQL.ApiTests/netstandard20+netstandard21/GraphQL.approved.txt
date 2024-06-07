@@ -1625,6 +1625,18 @@ namespace GraphQL.Federation.Types
     {
         public AnyScalarGraphType() { }
     }
+    public class EntityGraphType : GraphQL.Types.UnionGraphType
+    {
+        public EntityGraphType() { }
+    }
+    public class FieldSetGraphType : GraphQL.Types.StringGraphType
+    {
+        public FieldSetGraphType() { }
+    }
+    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
+    {
+        public LinkImportGraphType() { }
+    }
     [GraphQL.Types.ConstantCase]
     public enum LinkPurpose
     {
@@ -1632,6 +1644,14 @@ namespace GraphQL.Federation.Types
         Security = 0,
         [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
         Execution = 1,
+    }
+    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Federation.Types.LinkPurpose>
+    {
+        public LinkPurposeGraphType() { }
+    }
+    public class ServiceGraphType : GraphQL.Types.ObjectGraphType
+    {
+        public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
     }
 }
 namespace GraphQL.Instrumentation
