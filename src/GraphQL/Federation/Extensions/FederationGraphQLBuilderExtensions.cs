@@ -29,7 +29,7 @@ public static class FederationGraphQLBuilderExtensions
         builder.Services
             .Register(new ServiceGraphType(settings.SdlPrintOptions))
             .Register<AnyScalarGraphType>(ServiceLifetime.Singleton)
-            .Register<EntityType>(ServiceLifetime.Transient)
+            .Register<EntityGraphType>(ServiceLifetime.Transient)
             .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
             .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
             .Register<FieldSetGraphType>(ServiceLifetime.Singleton)
@@ -45,7 +45,7 @@ public static class FederationGraphQLBuilderExtensions
                 // register Federation types
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<AnyScalarGraphType>();
-                schema.RegisterType<EntityType>();
+                schema.RegisterType<EntityGraphType>();
                 // add the _service field to the query type
                 // this cannot be done here because the schema.Query property will not yet be set
                 schema.RegisterVisitor<FederationServiceSchemaNodeVisitor>();

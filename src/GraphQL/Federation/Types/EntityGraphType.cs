@@ -2,9 +2,9 @@ using GraphQL.Types;
 
 namespace GraphQL.Federation.Types;
 
-internal class EntityType : UnionGraphType
+internal class EntityGraphType : UnionGraphType
 {
-    public EntityType()
+    public EntityGraphType()
     {
         Name = "_Entity";
     }
