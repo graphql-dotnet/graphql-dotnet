@@ -833,7 +833,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -884,7 +884,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -918,7 +918,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
@@ -2146,7 +2146,7 @@ namespace GraphQL.Types
         protected override GraphQL.Types.EnumValuesBase CreateValues() { }
         public override object? ParseValue(object? value) { }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments? Arguments { get; set; }
@@ -2218,7 +2218,8 @@ namespace GraphQL.Types
         GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name);
         bool HasField(string name);
     }
-    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public interface IFieldMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata { }
+    public interface IFieldType : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments? Arguments { get; set; }
         bool IsPrivate { get; set; }
