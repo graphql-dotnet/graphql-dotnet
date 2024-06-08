@@ -11,8 +11,6 @@ namespace GraphQL.Utilities.Visitors;
 /// </summary>
 public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTypesVisitor.Context>
 {
-    private const string LINK_DIRECTIVE = "link";
-
     private static readonly HashSet<string> _federatedDirectives = new()
     {
         EXTERNAL_DIRECTIVE,

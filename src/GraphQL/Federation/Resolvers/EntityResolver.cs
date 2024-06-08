@@ -9,8 +9,13 @@ namespace GraphQL.Federation.Resolvers;
 /// <summary>
 /// Resolves the <c>_entities</c> field for GraphQL Federation.
 /// </summary>
-public class EntityResolver : IFieldResolver
+public sealed class EntityResolver : IFieldResolver
 {
+    /// <inheritdoc/>
+    private EntityResolver()
+    {
+    }
+
     /// <summary>
     /// Returns the static instance of <see cref="EntityResolver"/>.
     /// </summary>
@@ -20,14 +25,21 @@ public class EntityResolver : IFieldResolver
     /// Converts representations to a list of <see cref="Representation"/> objects.
     /// This should occur during field validation so that the representations can be validated.
     /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    /// <exception cref="NotImplementedException"></exception>
+    /// <exception cref="InvalidOperationException">
+    /// Occurs when the requested type cannot be found, is not an object graph type, has not been
+    /// configured for GraphQL Federation, or cannot be converted to the source type.
+    /// </exception>
     /// <remarks>
     /// Exceptions thrown within this method are expected to be returned to the caller as a validation error
     /// (aka Input Error), not logged as a server error (aka Processing Error).
     /// </remarks>
     public IEnumerable<Representation> ConvertRepresentations(ISchema schema, IList representations)
     {
+        if (schema == null)
+            throw new ArgumentNullException(nameof(schema));
+        if (representations == null)
+            throw new ArgumentNullException(nameof(representations));
+
         var ret = new List<Representation>();
         foreach (var representation in representations)
         {
@@ -39,7 +51,7 @@ public class EntityResolver : IFieldResolver
                 if (graphTypeInstance is not IObjectGraphType objectGraphType)
                     throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
                 var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
-                    ?? throw new NotImplementedException($"The type '{typeName}' has not been configured for GraphQL Federation.");
+                    ?? throw new InvalidOperationException($"The type '{typeName}' has not been configured for GraphQL Federation.");
 
                 object value;
                 try
@@ -60,6 +72,10 @@ public class EntityResolver : IFieldResolver
                 }
 
                 ret.Add(new Representation(objectGraphType, resolver, value));
+            }
+            else
+            {
+                throw new InvalidOperationException("Representation must be a dictionary.");
             }
         }
         return ret;
@@ -94,7 +110,7 @@ public class EntityResolver : IFieldResolver
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
-    internal static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
+    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
     {
         var obj = Activator.CreateInstance(objectType)!;
         foreach (var item in map)

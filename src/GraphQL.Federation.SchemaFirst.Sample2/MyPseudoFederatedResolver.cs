@@ -9,7 +9,6 @@ namespace GraphQL.Federation.SchemaFirst.Sample2;
 /// </summary>
 #pragma warning disable CS0618 // Type or member is obsolete
 public class MyPseudoFederatedResolver<T> : IFederatedResolver
-#pragma warning restore CS0618 // Type or member is obsolete
     where T : IHasId, new()
 {
     public Task<object?> Resolve(FederatedResolveContext context)
