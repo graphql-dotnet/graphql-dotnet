@@ -43,40 +43,36 @@ public sealed class EntityResolver : IFieldResolver
         var ret = new List<Representation>();
         foreach (var representation in representations)
         {
-            if (representation is IDictionary<string, object> rep)
-            {
-                var typeName = rep["__typename"].ToString();
-                var graphTypeInstance = schema.AllTypes[typeName]
-                    ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
-                if (graphTypeInstance is not IObjectGraphType objectGraphType)
-                    throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
-                var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
-                    ?? throw new InvalidOperationException($"The type '{typeName}' has not been configured for GraphQL Federation.");
-
-                object value;
-                try
-                {
-                    //can't use ObjectExtensions.ToObject because that requires an input object graph type for
-                    //  deserialization mapping
-                    //value = rep.ToObject(resolver.SourceType, null!);
-                    if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object>))
-                        value = rep;
-                    else
-                        value = ToObject(resolver.SourceType, objectGraphType, rep);
-                }
-                catch (Exception ex)
-                {
-                    // mask the underlying exception to prevent leaking implementation details
-                    // the InnerException can be read for debugging purposes
-                    throw new InvalidOperationException($"Error converting representation for type '{typeName}'.", ex);
-                }
-
-                ret.Add(new Representation(objectGraphType, resolver, value));
-            }
-            else
-            {
+            if (representation is not IDictionary<string, object> rep)
                 throw new InvalidOperationException("Representation must be a dictionary.");
+
+            var typeName = rep["__typename"].ToString();
+            var graphTypeInstance = schema.AllTypes[typeName]
+                ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
+            if (graphTypeInstance is not IObjectGraphType objectGraphType)
+                throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
+            var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
+                ?? throw new InvalidOperationException($"The type '{typeName}' has not been configured for GraphQL Federation.");
+
+            object value;
+            try
+            {
+                //can't use ObjectExtensions.ToObject because that requires an input object graph type for
+                //  deserialization mapping
+                //value = rep.ToObject(resolver.SourceType, null!);
+                if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object>))
+                    value = rep;
+                else
+                    value = ToObject(resolver.SourceType, objectGraphType, rep);
             }
+            catch (Exception ex)
+            {
+                // mask the underlying exception to prevent leaking implementation details
+                // the InnerException can be read for debugging purposes
+                throw new InvalidOperationException($"Error converting representation for type '{typeName}'.", ex);
+            }
+
+            ret.Add(new Representation(objectGraphType, resolver, value));
         }
         return ret;
     }
