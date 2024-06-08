@@ -89,7 +89,7 @@ public sealed class EntityResolver : IFieldResolver
         //context = context.Copy();
 
         // require the representations argument to be converted to the proper type before hitting this code
-        var representations = (IEnumerable<Representation>)context.Arguments!["representations"].Value!;
+        var representations = (IEnumerable<Representation>)context.Arguments![REPRESENTATIONS_ARGUMENT].Value!;
 
         var results = new List<object>();
         foreach (var representation in representations)
