@@ -117,6 +117,16 @@ public class EntityResolverTests
             .Message.ShouldBe("The type 'TestInput' is not an object graph type.");
     }
 
+    [Fact]
+    public void ConvertRepresentations_WrongValueType()
+    {
+        var schema = CreateSchema<TestObject>("name");
+        var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "name", 1 } } };
+        var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Unable to convert '1' value of type 'Int32' to the scalar type 'String'");
+    }
+
     private class TestSimpleObject
     {
         public string Id { get; set; }
