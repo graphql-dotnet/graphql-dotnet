@@ -652,8 +652,7 @@ Should now be written as:
 
 Please ensure that your client requests are updated to include the `__typename` field in the response.
 Alternatively, you can install the provided `InjectTypenameValidationRule` validation rule to automatically
-inject the `__typename` field into the request. Note that `InjectTypenameValidationRule` is not compatible
-with document caching.
+inject the `__typename` field into the request.
 
 ```cs
 services.AddGraphQL(b => b
