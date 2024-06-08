@@ -36,6 +36,17 @@ public class EntityResolverTests
     }
 
     [Fact]
+    public void ConvertRepresentations_ValueConverterWorks()
+    {
+        var schema = CreateSchema<TestSimpleObject2>("id");
+        var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", "1" } } };
+        var result = _resolver.ConvertRepresentations(schema, representations);
+        var ret = result.ShouldHaveSingleItem();
+        var obj = ret.Value.ShouldBeOfType<TestSimpleObject2>();
+        obj.Id.ShouldBe(1);
+    }
+
+    [Fact]
     public void ConvertRepresentations_MultipleDictionary()
     {
         var schema = CreateSchema<TestObject>("id name age");
@@ -127,9 +138,38 @@ public class EntityResolverTests
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Unable to convert '1' value of type 'Int32' to the scalar type 'String'");
     }
 
+    [Fact]
+    public void ConvertRepresentations_ValueConverterFailure()
+    {
+        var schema = CreateSchema<TestSimpleObject3>("id");
+        var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", 1 } } };
+        var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Could not find conversion from 'System.Int32' to 'System.Guid'");
+    }
+
+    [Fact]
+    public void ConvertRepresentations_MissingTypename()
+    {
+        var schema = CreateSchema<TestObject>("id");
+        var representations = new List<object> { new Dictionary<string, object>() { { "id", "1" } } };
+        Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations))
+            .Message.ShouldBe("Representation must contain a __typename field.");
+    }
+
     private class TestSimpleObject
     {
         public string Id { get; set; }
+    }
+
+    private class TestSimpleObject2
+    {
+        public int Id { get; set; }
+    }
+
+    private class TestSimpleObject3
+    {
+        public Guid Id { get; set; }
     }
 
     private class TestObject
