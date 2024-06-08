@@ -1615,9 +1615,8 @@ namespace GraphQL.Federation
 }
 namespace GraphQL.Federation.Resolvers
 {
-    public class EntityResolver : GraphQL.Resolvers.IFieldResolver
+    public sealed class EntityResolver : GraphQL.Resolvers.IFieldResolver
     {
-        public EntityResolver() { }
         public static GraphQL.Federation.Resolvers.EntityResolver Instance { get; }
         public System.Collections.Generic.IEnumerable<GraphQL.Federation.Resolvers.Representation> ConvertRepresentations(GraphQL.Types.ISchema schema, System.Collections.IList representations) { }
         public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
