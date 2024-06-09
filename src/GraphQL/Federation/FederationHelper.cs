@@ -29,6 +29,7 @@ internal static class FederationHelper
     public const string AS_ARGUMENT = "as";
     public const string FOR_ARGUMENT = "for";
     public const string IMPORT_ARGUMENT = "import";
+    public const string REPRESENTATIONS_ARGUMENT = "representations";
 
     /// <summary>
     /// Maps <see cref="FederationDirectiveEnum"/> values to their corresponding directive strings.
