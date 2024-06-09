@@ -5,7 +5,7 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
-### 1. `IMetadataReader` and `IMetadataWriter` interfaces added
+### 1. `IMetadataReader`, `IMetadataWriter` and `IFieldMetadataWriter` interfaces added
 
 This makes it convenient to add extension methods to graph types or fields that can be used to read or write metadata
 such as authentication information. Methods for `IMetadataWriter` types will appear on both field builders and graph/field
@@ -25,6 +25,16 @@ public static TMetadataBuilder RequireAdmin<TMetadataBuilder>(this TMetadataBuil
 Both interfaces extend `IProvideMetadata` with read/write access to the metadata contained within the graph or field type.
 Be sure not to write metadata during the execution of a query, as the same graph/field type instance may be used for
 multiple queries and you would run into concurrency issues.
+
+In addition, the `IFieldMetadataWriter` interface has been added to allow scoping extension methods to fields only.
+For example:
+
+```csharp
+// adds the GraphQL Federation '@requires' directive to the field
+public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
+    where TMetadataWriter : IFieldMetadataWriter
+    => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
+```
 
 ### 2. Built-in scalars may be overridden via DI registrations
 
@@ -389,7 +399,33 @@ property to `true` for all object graph types to retain the existing behavior.
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
-### 13. OneOf Input Object support added
+### 13. GraphQL Federation v2 graph types added
+
+These graph types have been added to the `GraphQL.Federation.Types` namespace:
+
+- `AnyScalarType` (moved from `GraphQL.Utilities.Federation`)
+- `EntityGraphType`
+- `FieldSetGraphType`
+- `LinkImportGraphType`
+- `LinkPurpose` enumeration
+- `LinkPurposeGraphType`
+- `ServiceGraphType`
+
+### 14. Extension methods and attributes added to simplify applying GraphQL Federation directives in code-first and type-first schemas
+
+These extension methods and attributes simplify the process of applying GraphQL Federation directives:
+
+| Directive | Extension Method | Attribute | Description |
+|-----------|------------------|-----------|-------------|
+| `@external` | `External()` | `[External]` | Indicates that this subgraph usually can't resolve a particular object field, but it still needs to define that field for other purposes. |
+| `@requires` | `Requires(fields)` | `[Requires(fields)]` | Indicates that the resolver for a particular entity field depends on the values of other entity fields that are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally defined fields first, even if the original client query didn't request them. |
+| `@provides` | `Provides(fields)` | `[Provides(fields)]` | Specifies a set of entity fields that a subgraph can resolve, but only at a particular schema path (at other paths, the subgraph can't resolve those fields). |
+| `@key` | `Key(fields)` | `[Key(fields)]` | Designates an object type as an entity and specifies its key fields. Key fields are a set of fields that a subgraph can use to uniquely identify any instance of the entity. |
+| `@override` | `Override(from)` | `[Override(from)]` | Indicates that an object field is now resolved by this subgraph instead of another subgraph where it's also defined. This enables you to migrate a field from one subgraph to another. |
+| `@shareable` | `Shareable()` | `[Shareable]` | Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in Federation 2, object fields can be resolved by only one subgraph). |
+| `@inaccessible` | `Inaccessible()` | `[Inaccessible]` | Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs. This means that the field is not exposed to clients at all. |
+
+### 15. OneOf Input Object support added
 
 OneOf Input Objects are a special variant of Input Objects where the type system
 asserts that exactly one of the fields must be set and non-null, all others
@@ -587,12 +623,17 @@ Unless you directly implement these interfaces, you should not be impacted by th
 See the new features section for details on the new method added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
 
-### 15. `IInputObjectGraphType.IsOneOf` property added
+### 15. `AnyScalarType` moved to `GraphQL.Federation.Types`
+
+`GraphQL.Utilities.Federation.AnyScalarType` has been moved to `GraphQL.Federation.Types.AnyScalarType`.
+All federation types are now located within the `GraphQL.Federation.Types` namespace.
+
+### 16. `IInputObjectGraphType.IsOneOf` property added
 
 See the new features section for details on the new property added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
 
-### 16. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
+### 17. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
 
 This is required for OneOf Input Object support and is used to determine if a variable is required.
 Unless you have a custom validation rule that uses `VariableUsage`, you should not be impacted

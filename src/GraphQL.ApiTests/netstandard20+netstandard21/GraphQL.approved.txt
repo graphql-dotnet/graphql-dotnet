@@ -839,7 +839,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -890,7 +890,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class ConnectionBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected ConnectionBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; set; }
@@ -924,7 +924,7 @@ namespace GraphQL.Builders
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
     }
-    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
+    public class FieldBuilder<TSourceType, TReturnType> : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
@@ -1464,6 +1464,133 @@ namespace GraphQL.Execution
         public ValueExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.ScalarGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public GraphQL.Types.ScalarGraphType GraphType { get; }
         public override object? ToValue() { }
+    }
+}
+namespace GraphQL.Federation
+{
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ExternalAttribute : GraphQL.GraphQLAttribute
+    {
+        public ExternalAttribute() { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public static class FederationFieldMetadataExtensions
+    {
+        public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Override<TMetadataWriter>(this TMetadataWriter fieldType, string from)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string[] fields)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+    }
+    public static class FederationInterfaceMetadataExtensions
+    {
+        public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string[] fields, bool resolvable = true)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IInterfaceGraphType { }
+        public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string fields, bool resolvable = true)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IInterfaceGraphType { }
+    }
+    public static class FederationMetadataExtensions
+    {
+        public static TMetadataWriter Inaccessible<TMetadataWriter>(this TMetadataWriter graphType)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter { }
+    }
+    public static class FederationObjectMetadataExtensions
+    {
+        public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IObjectGraphType { }
+        public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string[] fields, bool resolvable = true)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IObjectGraphType { }
+        public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string fields, bool resolvable = true)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IObjectGraphType { }
+        public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
+            where TMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IObjectGraphType { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
+    public class InaccessibleAttribute : GraphQL.GraphQLAttribute
+    {
+        public InaccessibleAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
+    public class KeyAttribute : GraphQL.GraphQLAttribute
+    {
+        public KeyAttribute(string fields) { }
+        public KeyAttribute(params string[] fields) { }
+        public bool Resolvable { get; set; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class OverrideAttribute : GraphQL.GraphQLAttribute
+    {
+        public OverrideAttribute(string from) { }
+        public string From { get; }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class ProvidesAttribute : GraphQL.GraphQLAttribute
+    {
+        public ProvidesAttribute(string fields) { }
+        public ProvidesAttribute(params string[] fields) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field)]
+    public class RequiresAttribute : GraphQL.GraphQLAttribute
+    {
+        public RequiresAttribute(string fields) { }
+        public RequiresAttribute(params string[] fields) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=true)]
+    public class ShareableAttribute : GraphQL.GraphQLAttribute
+    {
+        public ShareableAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+}
+namespace GraphQL.Federation.Types
+{
+    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
+    {
+        public AnyScalarGraphType() { }
+    }
+    public class EntityGraphType : GraphQL.Types.UnionGraphType
+    {
+        public EntityGraphType() { }
+    }
+    public class FieldSetGraphType : GraphQL.Types.StringGraphType
+    {
+        public FieldSetGraphType() { }
+    }
+    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
+    {
+        public LinkImportGraphType() { }
+    }
+    [GraphQL.Types.ConstantCase]
+    public enum LinkPurpose
+    {
+        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
+        Security = 0,
+        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
+        Execution = 1,
+    }
+    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Federation.Types.LinkPurpose>
+    {
+        public LinkPurposeGraphType() { }
+    }
+    public class ServiceGraphType : GraphQL.Types.ObjectGraphType
+    {
+        public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
     }
 }
 namespace GraphQL.Instrumentation
@@ -2152,7 +2279,7 @@ namespace GraphQL.Types
         protected override GraphQL.Types.EnumValuesBase CreateValues() { }
         public override object? ParseValue(object? value) { }
     }
-    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public class FieldType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IFieldType, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         public FieldType() { }
         public GraphQL.Types.QueryArguments? Arguments { get; set; }
@@ -2224,7 +2351,8 @@ namespace GraphQL.Types
         GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name);
         bool HasField(string name);
     }
-    public interface IFieldType : GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
+    public interface IFieldMetadataWriter : GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata { }
+    public interface IFieldType : GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IHaveDefaultValue, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata, GraphQL.Types.IProvideResolvedType
     {
         GraphQL.Types.QueryArguments? Arguments { get; set; }
         bool IsPrivate { get; set; }
@@ -3051,10 +3179,6 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
-    public class AnyScalarGraphType : GraphQL.Types.ComplexScalarGraphType
-    {
-        public AnyScalarGraphType() { }
-    }
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
@@ -3127,12 +3251,18 @@ namespace GraphQL.Utilities.Visitors
         public override System.Threading.Tasks.ValueTask VisitAsync(GraphQLParser.AST.ASTNode? node, GraphQLParser.Visitors.NullVisitorContext context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
     }
-    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
+    public sealed class RemoveFederationTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context>
     {
-        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQLParser.Visitors.NullVisitorContext context) { }
-        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQLParser.Visitors.NullVisitorContext context) { }
+        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
+        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+            public GraphQLParser.ROM QueryTypeName { get; set; }
+        }
     }
 }
 namespace GraphQL.Validation
