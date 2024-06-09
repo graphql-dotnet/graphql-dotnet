@@ -24,15 +24,22 @@ public class VariableUsage
     public bool HasDefault { get; }
 
     /// <summary>
+    /// Indicates if the variable usage is a non-null field.
+    /// </summary>
+    public bool IsRequired { get; }
+
+    /// <summary>
     /// Initializes a new instance with the specified parameters.
     /// </summary>
     /// <param name="node">A variable reference node.</param>
     /// <param name="type">A graph type.</param>
     /// <param name="hasDefault">Indicates if the field has a default value.</param>
-    public VariableUsage(GraphQLVariable node, IGraphType type, bool hasDefault)
+    /// <param name="isRequired">Indicates if the field is a non-null field.</param>
+    public VariableUsage(GraphQLVariable node, IGraphType type, bool hasDefault, bool isRequired)
     {
         Node = node;
         Type = type;
         HasDefault = hasDefault;
+        IsRequired = isRequired;
     }
 }

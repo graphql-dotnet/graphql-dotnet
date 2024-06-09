@@ -425,6 +425,24 @@ These extension methods and attributes simplify the process of applying GraphQL 
 | `@shareable` | `Shareable()` | `[Shareable]` | Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in Federation 2, object fields can be resolved by only one subgraph). |
 | `@inaccessible` | `Inaccessible()` | `[Inaccessible]` | Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs. This means that the field is not exposed to clients at all. |
 
+### 15. OneOf Input Object support added
+
+OneOf Input Objects are a special variant of Input Objects where the type system
+asserts that exactly one of the fields must be set and non-null, all others
+being omitted. This is useful for representing situations where an input may be
+one of many different options.
+
+See: https://github.com/graphql/graphql-spec/pull/825
+
+To use this feature:
+- **Code-First**: Set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
+- **Schema-First**: Use the `@oneOf` directive on the input type in your schema definition.
+- **Type-First**: Use the `[OneOf]` directive on the CLR class.
+
+Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
+It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
+It is not expected to change from the current draft.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -654,9 +672,13 @@ Please ensure that your client requests are updated to include the `__typename` 
 Alternatively, you can install the provided `InjectTypenameValidationRule` validation rule to automatically
 inject the `__typename` field into the request.
 
-```cs
-services.AddGraphQL(b => b
-    .AddSchema<MySchema>()
-    // etc
-    .AddValidationRule<InjectTypenameValidationRule>());
-```
+### 18. `IInputObjectGraphType.IsOneOf` property added
+
+See the new features section for details on the new property added to this interface.
+Unless you directly implement this interface, you should not be impacted by this change.
+
+### 19. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
+
+This is required for OneOf Input Object support and is used to determine if a variable is required.
+Unless you have a custom validation rule that uses `VariableUsage`, you should not be impacted
+by this change.

@@ -49,6 +49,7 @@ fragment FullType on __Type {
   possibleTypes {
     ...TypeRef
   }
+  isOneOf
 }
 
 fragment InputValue on __InputValue {
