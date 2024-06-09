@@ -83,7 +83,7 @@ public sealed class EntityResolver : IFieldResolver
             {
                 // mask the underlying exception to prevent leaking implementation details
                 // the InnerException can be read for debugging purposes
-                throw new InvalidOperationException($"Error converting representation for type '{typeName}'.", ex);
+                throw new InvalidOperationException($"Error converting representation for type '{typeName}'. Please verify your supergraph is up to date.", ex);
             }
 
             ret.Add(new Representation(objectGraphType, resolver, value));
