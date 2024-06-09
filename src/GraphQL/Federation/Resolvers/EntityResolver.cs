@@ -83,7 +83,7 @@ public sealed class EntityResolver : IFieldResolver
             {
                 // mask the underlying exception to prevent leaking implementation details
                 // the InnerException can be read for debugging purposes
-                throw new InvalidOperationException($"Error converting representation for type '{typeName}'.", ex);
+                throw new InvalidOperationException($"Error converting representation for type '{typeName}'. Please verify your supergraph is up to date.", ex);
             }
 
             ret.Add(new Representation(objectGraphType, resolver, value));
@@ -188,7 +188,7 @@ public sealed class EntityResolver : IFieldResolver
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");
     }
 
-    private record RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult
+    private class RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult
     {
         public Task<object?> GetResultAsync(CancellationToken cancellationToken = default) => Representation.Resolver.ResolveAsync(Context, Representation.Value).AsTask();
     }

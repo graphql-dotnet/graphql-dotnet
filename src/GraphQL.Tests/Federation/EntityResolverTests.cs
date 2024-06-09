@@ -78,7 +78,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("id child { id }");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", "1" }, { "child", "abc" } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'child' is an object graph type but the value is not a dictionary");
     }
 
@@ -100,7 +100,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("id numbers");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", "1" }, { "numbers", 1 } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'numbers' is a list graph type but the value is not a list");
     }
 
@@ -110,7 +110,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("id");
         var representations = new List<object> { new Dictionary<string, object?>() { { "__typename", "TestObject" }, { "id", null } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The non-null field 'id' has a null value.");
     }
 
@@ -138,7 +138,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("id name");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", "1" }, { "dummy", "abc" } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Field 'dummy' not found in graph type 'TestObject'.");
     }
 
@@ -148,7 +148,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestSimpleObject>("id name");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", "1" }, { "name", "abc" } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Property 'name' not found in type 'TestSimpleObject'.");
     }
 
@@ -176,7 +176,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("name");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "name", 1 } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Unable to convert '1' value of type 'Int32' to the scalar type 'String'");
     }
 
@@ -186,7 +186,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestSimpleObject3>("id");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestObject" }, { "id", 1 } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("Could not find conversion from 'System.Int32' to 'System.Guid'");
     }
 
@@ -205,7 +205,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObjectWithUnion>("id union");
         var representations = new List<object> { new Dictionary<string, object?>() { { "__typename", "TestObject" }, { "id", "1" }, { "union", new Dictionary<string, object?> { { "id", "2" } } } } };
         var err = Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations));
-        err.Message.ShouldBe("Error converting representation for type 'TestObject'.");
+        err.Message.ShouldBe("Error converting representation for type 'TestObject'. Please verify your supergraph is up to date.");
         err.InnerException.ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'union' is not a scalar or object graph type.");
     }
 
