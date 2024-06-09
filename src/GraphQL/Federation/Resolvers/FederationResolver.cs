@@ -50,9 +50,7 @@ public class FederationResolver<TSourceType, TReturnType> : IFederationResolver
 {
     internal readonly Func<IResolveFieldContext, TSourceType, ValueTask<object?>> _resolveFunc;
 
-    /// <summary>
-    /// Gets the CLR type of the representation that this resolver is responsible for.
-    /// </summary>
+    /// <inheritdoc/>
     public Type SourceType => typeof(TSourceType);
 
     /// <summary>
@@ -85,11 +83,6 @@ public class FederationResolver<TSourceType, TReturnType> : IFederationResolver
         _resolveFunc = (ctx, source) => new(resolveFunc(ctx, source));
     }
 
-    /// <summary>
-    /// Asynchronously resolves an object based on the given context and source representation.
-    /// </summary>
-    /// <param name="context">The context of the field being resolved, providing access to various aspects of the GraphQL execution.</param>
-    /// <param name="source">The source representation, converted to the CLR type specified by <see cref="SourceType"/>.</param>
-    /// <returns>A task that represents the asynchronous resolve operation. The task result contains the resolved object.</returns>
+    /// <inheritdoc/>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context, object source) => _resolveFunc(context, (TSourceType)source)!;
 }
