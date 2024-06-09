@@ -253,6 +253,7 @@ type __Type {
   Directives applied to the type
   """
   appliedDirectives: [__AppliedDirective!]!
+  isOneOf: Boolean
 }
 
 """

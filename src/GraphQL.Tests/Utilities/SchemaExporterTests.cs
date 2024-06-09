@@ -171,4 +171,22 @@ public class SchemaExporterTests
         var exported = new SchemaExporter(schema).Export();
         exported.Definitions.Count(x => x is GraphQLSchemaDefinition).ShouldBe(1);
     }
+
+    [Fact]
+    public void PrintsOneOfTypesCorrectly()
+    {
+        var sdl = """
+            input ExampleInputTagged @oneOf {
+              a: String
+              b: Int
+            }
+            
+            type Query {
+              test(arg: ExampleInputTagged!): String
+            }
+            """;
+        var schema = Schema.For(sdl);
+        var exported = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
+        exported.ShouldBe(sdl);
+    }
 }

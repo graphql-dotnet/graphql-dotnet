@@ -3,6 +3,7 @@ using System.Security.Claims;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Types;
+using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation;
@@ -374,6 +375,8 @@ public partial class ValidationContext : IProvideUserContext
                 throw new InvalidVariableError(this, variableDef, variableName, $"Unable to parse input as a '{graphType.Name}' type. Did you provide a List or Scalar value accidentally?");
             }
 
+            var fieldCount = 0;
+            var anyNull = false;
             var newDictionary = new Dictionary<string, object?>(dic.Count);
             foreach (var field in graphType.Fields.List)
             {
@@ -381,6 +384,8 @@ public partial class ValidationContext : IProvideUserContext
 
                 if (dic.TryGetValue(field.Name, out object? fieldValue))
                 {
+                    fieldCount += 1;
+
                     // RULE: If the value null was provided for an input object field, and
                     // the field’s type is not a non‐null type, an entry in the coerced
                     // unordered map is given the value null. In other words, there is a
@@ -414,6 +419,7 @@ public partial class ValidationContext : IProvideUserContext
                     if (visitor != null)
                         await visitor.VisitFieldAsync(this, variableDef, childFieldVariableName, graphType, field, fieldValue, parsedFieldValue).ConfigureAwait(false);
                     newDictionary[field.Name] = parsedFieldValue;
+                    anyNull |= parsedFieldValue == null;
                 }
                 else if (field.DefaultValue != null)
                 {
@@ -432,6 +438,17 @@ public partial class ValidationContext : IProvideUserContext
                 // entry is added to the coerced unordered map.
 
                 // so do not do this:    else { newDictionary[field.Name] = null; }
+            }
+
+            // RULE: Further, if the input object is a OneOf Input Object, the following additional rules apply:
+            //
+            // - If the input object literal or unordered map does not contain exactly one entry an error must be thrown.
+            // - Within the input object literal or unordered map, if the single entry is { null } an error must be thrown.
+            // - If the coerced unordered map does not contain exactly one entry an error must be thrown.
+            // - If the value of the single entry in the coerced unordered map is { null } an error must be thrown.
+            if (graphType.IsOneOf && (fieldCount != 1 || anyNull))
+            {
+                throw new InvalidVariableError(this, variableDef, variableName, OneOfInputValuesError.MULTIPLE_VALUES);
             }
 
             // RULE: The value for an input object should be an input object literal

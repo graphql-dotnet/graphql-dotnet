@@ -48,14 +48,21 @@ internal static class SchemaBuilderExtensions
         {
             foreach (var directive in node.Directives)
             {
-                provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
+                if (directive.Name == "oneOf" && (directive.Arguments?.Count ?? 0) == 0 && provider is IInputObjectGraphType inputType)
                 {
-                    if (directive.Arguments?.Count > 0)
+                    inputType.IsOneOf = true;
+                }
+                else
+                {
+                    provider.ApplyDirective(directive!.Name.StringValue, d => //ISSUE:allocation
                     {
-                        foreach (var arg in directive.Arguments)
-                            d.AddArgument(new DirectiveArgument(arg.Name.StringValue) { Value = arg.Value.ParseAnyLiteral() }); //ISSUE:allocation
-                    }
-                });
+                        if (directive.Arguments?.Count > 0)
+                        {
+                            foreach (var arg in directive.Arguments)
+                                d.AddArgument(new DirectiveArgument(arg.Name.StringValue) { Value = arg.Value.ParseAnyLiteral() }); //ISSUE:allocation
+                        }
+                    });
+                }
             }
         }
         return provider;

@@ -9,6 +9,31 @@ public class SchemaIntrospectionTests
 {
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
+    public async Task validate_oneOf_introspection(IGraphQLTextSerializer serializer)
+    {
+        var schema = Schema.For("""
+            input ExampleInputTagged @oneOf {
+              a: String
+              b: Int
+            }
+            
+            type Query {
+              test(arg: ExampleInputTagged!): String
+            }
+            """);
+        var documentExecuter = new DocumentExecuter();
+        var executionResult = await documentExecuter.ExecuteAsync(_ =>
+        {
+            _.Schema = schema;
+            _.Query = "IntrospectionQuery".ReadGraphQLRequest();
+        });
+        var json = serializer.Serialize(executionResult);
+        json = json.Replace("\\r\\n", "\\n");
+        json.ShouldMatchApproved(o => o.NoDiff().WithStringCompareOptions(StringCompareShould.IgnoreLineEndings));
+    }
+
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersTestData))]
     public async Task validate_core_schema(IGraphQLTextSerializer serializer)
     {
         var documentExecuter = new DocumentExecuter();

@@ -592,6 +592,12 @@ namespace GraphQL
         public static bool IsDefinedEnumValue(System.Type type, object? value) { }
         public static object ToObject(this System.Collections.Generic.IDictionary<string, object?> source, System.Type type, GraphQL.Types.IGraphType mappedType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class OneOfAttribute : GraphQL.GraphQLAttribute
+    {
+        public OneOfAttribute() { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface)]
     public class OutputNameAttribute : GraphQL.GraphQLAttribute
     {
@@ -2439,6 +2445,7 @@ namespace GraphQL.Types
     }
     public interface IInputObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
+        bool IsOneOf { get; set; }
         bool IsValidDefault(object value);
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
         GraphQLParser.AST.GraphQLValue ToAST(object value);
@@ -2530,6 +2537,7 @@ namespace GraphQL.Types
     public class InputObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InputObjectGraphType() { }
+        public bool IsOneOf { get; set; }
         public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         public virtual object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value) { }
@@ -3512,8 +3520,9 @@ namespace GraphQL.Validation
     }
     public class VariableUsage
     {
-        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault) { }
+        public VariableUsage(GraphQLParser.AST.GraphQLVariable node, GraphQL.Types.IGraphType type, bool hasDefault, bool isRequired) { }
         public bool HasDefault { get; }
+        public bool IsRequired { get; }
         public GraphQLParser.AST.GraphQLVariable Node { get; }
         public GraphQL.Types.IGraphType Type { get; }
     }
@@ -3625,6 +3634,12 @@ namespace GraphQL.Validation.Errors
     public class NoUnusedVariablesError : GraphQL.Validation.ValidationError
     {
         public NoUnusedVariablesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLVariableDefinition node, GraphQLParser.AST.GraphQLOperationDefinition op) { }
+    }
+    [System.Serializable]
+    public class OneOfInputValuesError : GraphQL.Validation.ValidationError
+    {
+        public OneOfInputValuesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLObjectField node) { }
+        public OneOfInputValuesError(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLValue node) { }
     }
     [System.Serializable]
     public class OverlappingFieldsCanBeMergedError : GraphQL.Validation.ValidationError

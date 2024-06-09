@@ -192,6 +192,8 @@ public class __Type : ObjectGraphType<IGraphType>
 
         if (allowAppliedDirectives)
             this.AddAppliedDirectivesField("type");
+
+        Field<BooleanGraphType>("isOneOf").Resolve(context => context.Source is IInputObjectGraphType inputType ? BoolBox.Boxed(inputType.IsOneOf) : null);
     }
 
     private static object KindForInstance(IGraphType type) => type switch
