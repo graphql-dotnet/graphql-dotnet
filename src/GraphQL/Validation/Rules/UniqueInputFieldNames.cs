@@ -1,3 +1,4 @@
+using GraphQL.Types;
 using GraphQL.Validation.Errors;
 using GraphQLParser.AST;
 
@@ -8,6 +9,10 @@ namespace GraphQL.Validation.Rules;
 ///
 /// A GraphQL input object value is only valid if all supplied fields are
 /// uniquely named.
+/// 
+/// <para>
+/// Also validates that literals for OneOf Input Objects contain only one field.
+/// </para>
 /// </summary>
 public class UniqueInputFieldNames : ValidationRuleBase
 {
@@ -29,7 +34,18 @@ public class UniqueInputFieldNames : ValidationRuleBase
                     knownNameStack.Push(context.TypeInfo.UniqueInputFieldNames_KnownNames!);
                     context.TypeInfo.UniqueInputFieldNames_KnownNames = null;
                 },
-                leave: (objVal, context) => context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop()),
+                leave: (objVal, context) =>
+                {
+                    if (context.TypeInfo.GetInputType() is IInputObjectGraphType { IsOneOf: true })
+                    {
+                        var fieldCount = context.TypeInfo.UniqueInputFieldNames_KnownNames?.Count ?? 0;
+                        if (fieldCount != 1)
+                        {
+                            context.ReportError(new OneOfInputValuesError(context, objVal));
+                        }
+                    }
+                    context.TypeInfo.UniqueInputFieldNames_KnownNames = context.TypeInfo.UniqueInputFieldNames_KnownNameStack!.Pop();
+                }),
 
             new MatchingNodeVisitor<GraphQLObjectField>(
                 leave: (objField, context) =>
@@ -43,6 +59,11 @@ public class UniqueInputFieldNames : ValidationRuleBase
                     else
                     {
                         knownNames[objField.Name] = objField.Value;
+                    }
+
+                    if (objField.Value is GraphQLNullValue && context.TypeInfo.GetInputType(1) is IInputObjectGraphType { IsOneOf: true })
+                    {
+                        context.ReportError(new OneOfInputValuesError(context, objField));
                     }
                 })
         );

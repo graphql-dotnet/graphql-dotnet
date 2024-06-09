@@ -489,29 +489,36 @@ public class SchemaExporter
     {
         var deprecationReason = (obj as IProvideDeprecationReason)?.DeprecationReason;
         var appliedDirectives = obj.GetAppliedDirectives();
-        List<GraphQLDirective>? directives = null;
-        if (appliedDirectives != null && appliedDirectives.Count > 0)
+        var isOneOf = obj is IInputObjectGraphType inputType && inputType.IsOneOf;
+        int directiveCount = (appliedDirectives?.Count ?? 0) + (deprecationReason != null ? 1 : 0) + (isOneOf ? 1 : 0);
+        if (directiveCount > 0)
         {
-            directives = new(appliedDirectives.Count + (deprecationReason != null ? 1 : 0));
-            foreach (var appliedDirective in appliedDirectives)
+            var directives = new List<GraphQLDirective>(directiveCount);
+            if (isOneOf)
             {
-                directives.Add(ExportAppliedDirective(appliedDirective));
-                // do not add the @deprecated directive twice; give preference to the directive
-                // set within the metadata rather than the DeprecationReason property
-                if (appliedDirective.Name == "deprecated")
-                    deprecationReason = null;
+                directives.Add(new(new("oneOf")));
             }
-        }
-        if (deprecationReason != null)
-        {
-            directives ??= new(1);
-            directives.Add(new(new("deprecated"))
+            if (appliedDirectives?.List != null)
             {
-                Arguments = deprecationReason == "" ? null :
-                    new(new(1) { new(new("reason"), new GraphQLStringValue(deprecationReason)) })
-            });
+                foreach (var appliedDirective in appliedDirectives.List)
+                {
+                    directives.Add(ExportAppliedDirective(appliedDirective));
+                    // do not add the @deprecated directive twice; give preference to the directive
+                    // set within the metadata rather than the DeprecationReason property
+                    if (appliedDirective.Name == "deprecated")
+                        deprecationReason = null;
+                }
+            }
+            if (deprecationReason != null)
+            {
+                directives.Add(new(new("deprecated"))
+                {
+                    Arguments = deprecationReason == "" ? null :
+                        new(new(1) { new(new("reason"), new GraphQLStringValue(deprecationReason)) })
+                });
+            }
+            node.Directives = new GraphQLDirectives(directives);
         }
-        node.Directives = directives != null ? new GraphQLDirectives(directives) : null;
         return node;
     }
 

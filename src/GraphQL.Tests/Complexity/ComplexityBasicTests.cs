@@ -28,7 +28,7 @@ public class ComplexityBasicTests : ComplexityTestBase
     {
         var res = AnalyzeComplexity("IntrospectionQuery".ReadGraphQLRequest());
         res.TotalQueryDepth.ShouldBe(59);
-        res.Complexity.ShouldBe(73708);
+        res.Complexity.ShouldBe(73712);
     }
 
     [Fact]

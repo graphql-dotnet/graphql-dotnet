@@ -61,7 +61,7 @@ public class VariablesInAllowedPosition : ValidationRuleBase
     private static bool IsVariableUsageAllowed(GraphQLVariableDefinition variableDefinition, IGraphType variableType, VariableUsage variableUsage, bool allowScalarsForLists)
     {
         // >> If locationType is a non-null type AND variableType is NOT a non-null type:
-        if (variableUsage.Type is NonNullGraphType nonNullUsageType && variableType is not NonNullGraphType)
+        if ((variableUsage.Type is NonNullGraphType || variableUsage.IsRequired) && variableType is not NonNullGraphType)
         {
             // >> Let hasNonNullVariableDefaultValue be true if a default value exists for variableDefinition and is not the value null
             var hasNonNullVariableDefaultValue = variableDefinition.DefaultValue != null;
@@ -73,7 +73,8 @@ public class VariablesInAllowedPosition : ValidationRuleBase
                 return false;
             }
             // >> Let nullableLocationType be the unwrapped nullable type of locationType.
-            var nullableLocationType = nonNullUsageType.ResolvedType!;
+            // NOTE: for OneOf Input Objects, the locationType will not have a nullability wrapper.
+            var nullableLocationType = (variableUsage.Type as NonNullGraphType)?.ResolvedType! ?? variableUsage.Type;
             // >> Return AreTypesCompatible(variableType, nullableLocationType).
             return variableType.IsSubtypeOf(nullableLocationType, allowScalarsForLists);
         }
