@@ -175,15 +175,6 @@ public sealed class EntityResolver : IFieldResolver
             return ToObject(valueType, objectGraphType, dic);
         }
 
-        // below condition only used by FederationResolverAttribute.FederationStaticResolver.Context.ctor
-        if (graphType is IInputObjectGraphType inputObjectGraphType)
-        {
-            if (value is not Dictionary<string, object?> dic)
-                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not a dictionary");
-
-            return inputObjectGraphType.ParseDictionary(dic);
-        }
-
         // union and interface types are not supported
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");
     }
