@@ -47,7 +47,7 @@ public sealed class EntityResolver : IFieldResolver
         {
             // the representation should always be a dictionary, although the _Any scalar type
             // does not enforce that it is not a scalar or list
-            if (representation is not IDictionary<string, object> rep)
+            if (representation is not IDictionary<string, object?> rep)
                 throw new InvalidOperationException("Representation must be a dictionary.");
 
             // pull the __typename field from the representation, which will indicate the type
@@ -74,7 +74,7 @@ public sealed class EntityResolver : IFieldResolver
                 //can't use ObjectExtensions.ToObject because that requires an input object graph type for
                 //  deserialization mapping
                 //value = rep.ToObject(resolver.SourceType, null!);
-                if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object>))
+                if (resolver.SourceType == typeof(object) || resolver.SourceType == typeof(Dictionary<string, object>) || resolver.SourceType == typeof(IDictionary<string, object?>))
                     value = rep;
                 else
                     value = ToObject(resolver.SourceType, objectGraphType, rep);
@@ -95,7 +95,7 @@ public sealed class EntityResolver : IFieldResolver
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
-    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object> map)
+    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object?> map)
     {
         // create an instance of the target CLR type
         var obj = Activator.CreateInstance(objectType)!;
@@ -146,6 +146,7 @@ public sealed class EntityResolver : IFieldResolver
         if (graphType is ListGraphType listGraphType)
         {
             // cast/convert value to an array (it should already be an array)
+            // note: coercing scalars to an array of a single element is not applicable here
             var array = (value as IEnumerable
                 ?? throw new InvalidOperationException($"The field '{fieldName}' is a list graph type but the value is not a list"))
                 .ToObjectArray();
@@ -168,8 +169,8 @@ public sealed class EntityResolver : IFieldResolver
         // handle object graph types
         if (graphType is IObjectGraphType objectGraphType)
         {
-            if (value is not Dictionary<string, object> dic)
-                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not an object");
+            if (value is not Dictionary<string, object?> dic)
+                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not a dictionary");
 
             return ToObject(valueType, objectGraphType, dic);
         }
@@ -178,17 +179,18 @@ public sealed class EntityResolver : IFieldResolver
         if (graphType is IInputObjectGraphType inputObjectGraphType)
         {
             if (value is not Dictionary<string, object?> dic)
-                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not an object");
+                throw new InvalidOperationException($"The field '{fieldName}' is an object graph type but the value is not a dictionary");
 
             return inputObjectGraphType.ParseDictionary(dic);
         }
 
+        // union and interface types are not supported
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");
     }
 
-    private class SimpleDataLoader(Func<CancellationToken, Task<object?>> Resolver) : IDataLoaderResult
+    private record RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult
     {
-        public Task<object?> GetResultAsync(CancellationToken cancellationToken = default) => Resolver(cancellationToken);
+        public Task<object?> GetResultAsync(CancellationToken cancellationToken = default) => Representation.Resolver.ResolveAsync(Context, Representation.Value).AsTask();
     }
 
     /// <inheritdoc/>
@@ -205,16 +207,14 @@ public sealed class EntityResolver : IFieldResolver
         //   as the context is referenced within a delegate passed to the SimpleDataLoader (see below)
         //context = context.Copy();
 
-        var results = new List<object>();
+        var results = new List<RepresentationDataLoader>();
         foreach (var representation in representations)
         {
             // using a data loader here causes the resolvers to run in serial or parallel based on the selected execution strategy.
             // unfortunately this requires extra allocations whereas if the strategy was known this code could be optimized by
             // either awaiting each resolver or collecting them and performing WaitAll. Note that this code counts on the fact
             // that the context instance will not be reused due to a list being returned from this method.
-            var result = new SimpleDataLoader(_ => representation.Resolver.ResolveAsync(context, representation.Value).AsTask()!);
-
-            results.Add(result);
+            results.Add(new RepresentationDataLoader(context, representation));
         }
 
         return new(results);
