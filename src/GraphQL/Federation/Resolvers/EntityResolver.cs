@@ -179,7 +179,7 @@ public sealed class EntityResolver : IFieldResolver
         throw new InvalidOperationException($"The field '{fieldName}' is not a scalar or object graph type.");
     }
 
-    private record RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult
+    private class RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult
     {
         public Task<object?> GetResultAsync(CancellationToken cancellationToken = default) => Representation.Resolver.ResolveAsync(Context, Representation.Value).AsTask();
     }
