@@ -51,8 +51,10 @@ public class Program
         var schemaBuilder = new FederatedSchemaBuilder();
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
+#pragma warning disable CS0618 // Type or member is obsolete
         schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
             new MyFederatedResolver<Category>((data, id) => data.GetCategoryById(id)));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // build the schema
         return schemaBuilder.Build(schemaString);

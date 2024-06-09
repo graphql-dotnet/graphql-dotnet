@@ -1525,6 +1525,13 @@ namespace GraphQL.Federation
         public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
             where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
     }
+    public static class FederationGraphTypeExtensions
+    {
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
+    }
     public static class FederationInterfaceMetadataExtensions
     {
         public static TMetadataWriter Key<TMetadataWriter>(this TMetadataWriter graphType, string[] fields, bool resolvable = true)
@@ -1554,6 +1561,16 @@ namespace GraphQL.Federation
         public InaccessibleAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.Obsolete("This class will be removed in GraphQL.NET v9.")]
+    public class InjectTypenameValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
+    {
+        public InjectTypenameValidationRule() { }
+        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
     public class KeyAttribute : GraphQL.GraphQLAttribute
@@ -1590,6 +1607,51 @@ namespace GraphQL.Federation
         public ShareableAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    public static class TypeConfigExtensions
+    {
+        public static void ResolveReference(this GraphQL.Utilities.TypeConfig config, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Utilities.TypeConfig typeConfig, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
+    }
+}
+namespace GraphQL.Federation.Resolvers
+{
+    public sealed class EntityResolver : GraphQL.Resolvers.IFieldResolver
+    {
+        public static GraphQL.Federation.Resolvers.EntityResolver Instance { get; }
+        public System.Collections.Generic.IEnumerable<GraphQL.Federation.Resolvers.Representation> ConvertRepresentations(GraphQL.Types.ISchema schema, System.Collections.IList representations) { }
+        public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
+    }
+    public class FederationResolver<TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
+    {
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, GraphQL.DataLoader.IDataLoaderResult<TClrType?>> resolveFunc) { }
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, System.Threading.Tasks.Task<TClrType?>> resolveFunc) { }
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TClrType, TClrType?> resolveFunc) { }
+    }
+    public class FederationResolver<TSourceType, TReturnType> : GraphQL.Federation.Resolvers.IFederationResolver
+    {
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolveFunc) { }
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolveFunc) { }
+        public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolveFunc) { }
+        public System.Type SourceType { get; }
+        public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, object source) { }
+    }
+    public interface IFederationResolver
+    {
+        System.Type SourceType { get; }
+        System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, object source);
+    }
+    public class Representation : System.IEquatable<GraphQL.Federation.Resolvers.Representation>
+    {
+        public Representation(GraphQL.Types.IObjectGraphType GraphType, GraphQL.Federation.Resolvers.IFederationResolver Resolver, object Value) { }
+        public GraphQL.Types.IObjectGraphType GraphType { get; init; }
+        public GraphQL.Federation.Resolvers.IFederationResolver Resolver { get; init; }
+        public object Value { get; init; }
     }
 }
 namespace GraphQL.Federation.Types
@@ -3299,22 +3361,25 @@ namespace GraphQL.Utilities.Federation
         public override string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
         public override string PrintObject(GraphQL.Types.IObjectGraphType type) { }
     }
-    public class FuncFederatedResolver<T> : GraphQL.Utilities.Federation.IFederatedResolver
+    [System.Obsolete("Please use the GraphQL.Federation.FederationResolver class instead. This class wi" +
+        "ll be removed in v9.")]
+    public class FuncFederatedResolver<TReturn> : GraphQL.Federation.Resolvers.FederationResolver<System.Collections.Generic.Dictionary<string, object?>, TReturn>, GraphQL.Utilities.Federation.IFederatedResolver
     {
-        public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> func) { }
+        public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<TReturn?>> func) { }
         public System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context) { }
     }
+    [System.Obsolete("Please use IFederationResolver instead. This interface will be removed in v9.")]
     public interface IFederatedResolver
     {
         System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
     }
-    public class ServiceGraphType : GraphQL.Types.ObjectGraphType
-    {
-        public ServiceGraphType() { }
-    }
     public static class TypeConfigExtensions
     {
+        [System.Obsolete("Please use ResolveReference instead, found in the GraphQL.Federation namespace. T" +
+            "his method will be removed in v9.")]
         public static void ResolveReferenceAsync(this GraphQL.Utilities.TypeConfig config, GraphQL.Utilities.Federation.IFederatedResolver resolver) { }
+        [System.Obsolete("Please use another overload instead, found in the GraphQL.Federation namespace. T" +
+            "his method will be removed in v9.")]
         public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
     }
 }

@@ -7,7 +7,9 @@ namespace GraphQL.Federation.SchemaFirst.Sample2;
 /// Creates a new instance of <typeparamref name="T"/> for any object requested to be resolved.
 /// Used for <see cref="Category"/> since there is no data stored in this repository for categories.
 /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
 public class MyPseudoFederatedResolver<T> : IFederatedResolver
+#pragma warning restore CS0618 // Type or member is obsolete
     where T : IHasId, new()
 {
     public Task<object?> Resolve(FederatedResolveContext context)
