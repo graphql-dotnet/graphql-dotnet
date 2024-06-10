@@ -62,6 +62,9 @@ public partial class FederationResolverAttribute : GraphQLAttribute
                 // for static members, generate an IResolveFieldContext where the arguments are the various
                 //   properties provided from Apollo Router, and a null source
                 var newResolver = new FederationStaticResolver(fieldType);
+
+                // add the resolver to a list of resolvers for the graph type
+                // note: this is the only scenario where a list of resolvers is currently supported
                 var resolver = graphType.GetMetadata<object>(FederationHelper.RESOLVER_METADATA);
                 if (resolver is List<IFederationResolver> resolverList)
                 {
