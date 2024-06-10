@@ -1,3 +1,4 @@
+using System.Globalization;
 using GraphQL.Federation.Resolvers;
 using GraphQL.Types;
 
@@ -20,7 +21,7 @@ public class MyFederatedResolver<T> : IFederationResolver
     public bool MatchKeys(IDictionary<string, object?> representation) => true;
 
     public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
-        => (int)Convert.ChangeType(representation["id"], typeof(int))!;
+        => (int)Convert.ChangeType(representation["id"], typeof(int), CultureInfo.InvariantCulture)!;
 
     public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
     {
