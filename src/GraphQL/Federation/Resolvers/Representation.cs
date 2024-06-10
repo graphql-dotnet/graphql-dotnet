@@ -12,7 +12,7 @@ namespace GraphQL.Federation.Resolvers;
 /// <param name="Resolver">The federation resolver responsible for resolving the entity.
 /// Each entity type has its specific implementation of <see cref="IFederationResolver"/>
 /// to handle its resolution logic.</param>
-/// <param name="Value">The representation of the entity, converted to the CLR type as specified by
-/// <see cref="IFederationResolver.SourceType"/>. This is the actual data passed to the resolver
-/// for processing and fetching the corresponding entity.</param>
+/// <param name="Value">The representation of the entity, parsed to an object by
+/// <see cref="IFederationResolver.ParseRepresentation(IObjectGraphType, IDictionary{string, object?})"/>.
+/// This is the actual data passed to the resolver for processing and fetching the corresponding entity.</param>
 public record class Representation(IObjectGraphType GraphType, IFederationResolver Resolver, object Value);

@@ -1,3 +1,5 @@
+using GraphQL.Types;
+
 namespace GraphQL.Federation.Resolvers;
 
 /// <summary>
@@ -8,20 +10,25 @@ namespace GraphQL.Federation.Resolvers;
 public interface IFederationResolver
 {
     /// <summary>
-    /// Gets the CLR type of the representation that this resolver is responsible for.
-    /// This property indicates the type to which the 'source' parameter's representation
-    /// will be converted before being passed to the <see cref="ResolveAsync(IResolveFieldContext, object)"/> method.
+    /// Determines whether the source representation matches the required keys for this resolver.
     /// </summary>
-    Type SourceType { get; }
+    bool MatchKeys(IDictionary<string, object?> representation);
+
+    /// <summary>
+    /// Parses the source representation into a CLR type that can be used by the resolver.
+    /// </summary>
+    /// <param name="graphType">The object graph type associated with the entity being resolved.</param>
+    /// <param name="representation">The source representation provided by the Apollo Router.</param>
+    object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation);
 
     /// <summary>
     /// Asynchronously resolves an object based on the given context and source representation.
-    /// The source representation is converted to the CLR type specified by <see cref="SourceType"/>
-    /// before being passed to this method's <paramref name="source"/> argument.
+    /// The source representation is parsed by <see cref="ParseRepresentation(IObjectGraphType, IDictionary{string, object?})"/>
+    /// during the validation phase before being passed to this method's <paramref name="parsedRepresentation"/> argument.
     /// </summary>
     /// <param name="context">The context of the field being resolved, providing access to various aspects of the GraphQL execution.</param>
-    /// <param name="source">The source representation, converted to the CLR type specified by <see cref="SourceType"/>.</param>
+    /// <param name="graphType">The object graph type associated with the entity being resolved.</param>
+    /// <param name="parsedRepresentation">The source representation, parsed by <see cref="ParseRepresentation(IObjectGraphType, IDictionary{string, object?})"/>.</param>
     /// <returns>A task that represents the asynchronous resolve operation. The task result contains the resolved object.</returns>
-    ValueTask<object?> ResolveAsync(IResolveFieldContext context, object source);
+    ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation);
 }
-

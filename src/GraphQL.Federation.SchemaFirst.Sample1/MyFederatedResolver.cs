@@ -1,4 +1,5 @@
 using GraphQL.Federation.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.Federation.SchemaFirst.Sample1;
 
@@ -6,7 +7,7 @@ namespace GraphQL.Federation.SchemaFirst.Sample1;
 /// Retrieves the local instance of <typeparamref name="T"/> from the <see cref="Data"/>
 /// class using the specified delegate.
 /// </summary>
-public class MyFederatedResolver<T> : IFederationResolver
+public class MyFederatedResolver<T> : FederationResolverBase
     where T : IHasId
 {
     private readonly Func<Data, int, Task<T?>> _resolver;
@@ -15,11 +16,11 @@ public class MyFederatedResolver<T> : IFederationResolver
         _resolver = resolver;
     }
 
-    public Type SourceType => typeof(IDictionary<string, object?>);
+    public override Type SourceType => typeof(IDictionary<string, object?>);
 
-    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, object source)
+    public override async ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object representation)
     {
-        var arguments = (IDictionary<string, object?>)source;
+        var arguments = (IDictionary<string, object?>)representation;
         if (arguments.TryGetValue("id", out object? idValue))
         {
             int id = (int)Convert.ChangeType(idValue, typeof(int))!;

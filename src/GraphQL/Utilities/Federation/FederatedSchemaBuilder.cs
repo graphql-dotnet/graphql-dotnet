@@ -71,8 +71,11 @@ public class FederatedSchemaBuilder : SchemaBuilder
         query.AddField(service);
 
         var representationsType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new GraphQLTypeReference("_Any"))));
-        var representationArgument = new QueryArgument(representationsType) { Name = FederationHelper.REPRESENTATIONS_ARGUMENT };
-        representationArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
+        var representationArgument = new QueryArgument(representationsType)
+        {
+            Name = FederationHelper.REPRESENTATIONS_ARGUMENT,
+            Parser = (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value)
+        };
 
         var entities = new FieldType
         {
