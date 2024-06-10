@@ -568,9 +568,10 @@ public class Widget
 }
 ```
 
-Note that although you may apply the `[Key]` attribute multiple times to define multiple sets of key fields,
-you may only define a single federation resolver on an entity type. Your method will need to collect the key fields
-from all sets of key fields if you wish to support multiple sets of key fields. Below is a code-first sample:
+Note that you may apply the `[Key]` attribute multiple times to define multiple sets of key fields, pursuant to the
+GraphQL Federation specification. You may define multiple resolvers when using static methods in a type-first schema.
+Otherwise your method will need to decide which set of key fields to use for resolution, as demonstrated in the
+code-first sample below:
 
 ```cs
 public class WidgetType : ObjectGraphType<Widget>
