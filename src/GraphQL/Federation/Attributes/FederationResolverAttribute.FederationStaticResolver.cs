@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Diagnostics;
 using System.Security.Claims;
 using GraphQL.Execution;
@@ -28,7 +27,7 @@ public partial class FederationResolverAttribute
     /// will be registered as input object graph types within the schema; mark them with
     /// <see cref="IGraphType.IsPrivate"/> to prevent them from being exposed.
     /// </remarks>
-    private class FederationStaticResolver : IFederationResolver
+    private partial class FederationStaticResolver : IFederationResolver
     {
         private readonly FieldType _fieldType;
 
@@ -37,14 +36,43 @@ public partial class FederationResolverAttribute
             _fieldType = fieldType;
         }
 
-        public Type SourceType => typeof(Dictionary<string, object?>);
-
         public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
-            => CreateArguments(_fieldType, representation)!;
-
-        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object source)
         {
-            var context2 = new Context(context, _fieldType, (Dictionary<string, ArgumentValue>?)source);
+            // Creates a dictionary of arguments for the field type based on the entity representation properties.
+            // The argument dictionary is returned as the parsed representation, to be used by the synthesized IResolveFieldContext.
+
+            if (_fieldType.Arguments == null || _fieldType.Arguments.Count <= 0)
+            {
+                // IResolveFieldContext.Arguments may return null if the field has no arguments, so just return null here
+                return null!;
+            }
+
+            var arguments = new Dictionary<string, ArgumentValue>();
+            foreach (var arg in _fieldType.Arguments)
+            {
+                // check if the representation contains a value for the argument
+                var matched = representation.TryGetValue(arg.Name, out var value);
+                if (matched)
+                {
+                    // deserialize the value based on the argument's graph type
+                    value = Deserialize(arg.ResolvedType!, arg.Name, value);
+                    // coerce the value based on the argument's parser, useful for coercing ID strings to integers, etc
+                    if (arg.Parser != null && value != null)
+                        value = arg.Parser(value);
+                }
+                // set the argument value based on the matched value or the default value otherwise
+                arguments[arg.Name] = matched
+                    ? new ArgumentValue(value, ArgumentSource.Literal) // ArgumentSource not used by GetArgument or the AutoRegisteringObjectGraphType field resolver
+                    : new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault);
+            }
+            return arguments;
+        }
+
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
+        {
+            // create a synthesized IResolveFieldContext with the arguments and a null source
+            var context2 = new Context(context, _fieldType, (Dictionary<string, ArgumentValue>?)parsedRepresentation);
+            // call the field resolver with the synthesized context
             var resolver = _fieldType.Resolver ?? ThrowForNoResolver();
             return resolver.ResolveAsync(context2);
 
@@ -52,166 +80,6 @@ public partial class FederationResolverAttribute
             [StackTraceHidden]
             IFieldResolver ThrowForNoResolver()
                 => throw new InvalidOperationException($"The field resolver for {_fieldType.Name} must be set on the field type.");
-        }
-
-        private Dictionary<string, ArgumentValue>? CreateArguments(FieldType fieldType, IDictionary<string, object?> representation)
-        {
-            if (fieldType.Arguments == null || fieldType.Arguments.Count <= 0)
-            {
-                return null;
-            }
-
-            var arguments = new Dictionary<string, ArgumentValue>();
-            foreach (var arg in fieldType.Arguments)
-            {
-                var matched = representation.TryGetValue(arg.Name, out var value);
-                if (matched)
-                    value = Deserialize(arg.ResolvedType!, arg.Name, value);
-                arguments[arg.Name] = matched
-                    ? new ArgumentValue(value, ArgumentSource.Literal)
-                    : new ArgumentValue(arg.DefaultValue, ArgumentSource.FieldDefault);
-            }
-            return arguments;
-        }
-
-        /// <summary>
-        /// Deserializes an argument supplied within an entity representation from Apollo Router.
-        /// Also see <see cref="ValidationContext.GetVariableValueAsync"/>.
-        /// </summary>
-        private static object? Deserialize(IGraphType type, string name, object? value)
-        {
-            // parse recursively based on the type of the graph type
-            return ParseValue(type, name, value);
-
-            static object? ParseValue(IGraphType type, VariableName name, object? value)
-            {
-                // validate non-null types and values first
-                if (type is NonNullGraphType nonNullGraphType)
-                {
-                    return value == null
-                        ? ThrowValueIsNullException(name)
-                        : ParseValue(nonNullGraphType.ResolvedType!, name, value);
-                }
-                else if (value == null)
-                    return null;
-
-                // return a value based on the type of the graph type (scalar, input object, list)
-                return type switch
-                {
-                    // scalar types simply parse the value
-                    ScalarGraphType scalarGraphType => scalarGraphType.ParseValue(value),
-
-                    // input object types need to parse each field first, then call ParseDictionary
-                    IInputObjectGraphType inputObjectGraphType => value is IDictionary<string, object?> dic
-                        ? ParseValueObject(inputObjectGraphType, name, dic)
-                        : ThrowNotDictionaryException(name),
-
-                    // list types need to parse each item in the list
-                    ListGraphType listGraphType => value is IList list && value is not string
-                        ? ParseValueList(listGraphType, name, list)
-                        : new object?[] { ParseValue(listGraphType.ResolvedType!, name, value) },
-
-                    // there should not be any other types remaining
-                    _ => ThrowNotInputTypeException(name),
-                };
-            }
-
-            // parse a list of values, returning an array of parsed objects
-            static object? ParseValueList(ListGraphType listGraphType, VariableName name, IList list)
-            {
-                var itemType = listGraphType.ResolvedType!;
-                var ret = new object?[list.Count];
-                for (var i = 0; i < list.Count; i++)
-                {
-                    ret[i] = ParseValue(itemType, new(name, i), list[i]);
-                }
-                return ret;
-            }
-
-            // parse a dictionary of values, returning a parsed object
-            static object? ParseValueObject(IInputObjectGraphType inputObjectGraphType, VariableName name, IDictionary<string, object?> dic)
-            {
-                bool anyNull = false;
-                int fieldCount = 0;
-                var ret = new Dictionary<string, object?>();
-                foreach (var field in inputObjectGraphType.Fields)
-                {
-                    // if the field is present in the dictionary, parse the value
-                    // if the field is not present, use the default value if it exists
-                    // if the field is required and not present, throw an exception
-                    var key = field.Name;
-                    if (dic.TryGetValue(key, out var value))
-                    {
-                        ret[key] = ParseValue(field.ResolvedType!, new(name, key), value);
-                        fieldCount += 1;
-                        anyNull |= value == null;
-                    }
-                    else if (field.DefaultValue != null)
-                    {
-                        ret[key] = field.DefaultValue;
-                    }
-                    else if (field.ResolvedType is NonNullGraphType)
-                    {
-                        ThrowMissingFieldException(new(name, key));
-                    }
-                }
-
-                // if the input object type is a one-of type, there must be exactly one field present
-                if (inputObjectGraphType.IsOneOf && (fieldCount != 1 || anyNull))
-                    ThrowOneOfException(name);
-
-                // check for unmatched fields in the dictionary
-                foreach (var key in dic.Keys)
-                {
-                    bool match = false;
-                    foreach (var field in inputObjectGraphType.Fields)
-                    {
-                        if (key == field.Name)
-                        {
-                            match = true;
-                            break;
-                        }
-                    }
-
-                    if (!match)
-                    {
-                        ThrowExcessFieldException(name, key);
-                    }
-                }
-
-                // parse the dictionary into a CLR object and return it
-                return inputObjectGraphType.ParseDictionary(ret);
-            }
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static object? ThrowValueIsNullException(VariableName name)
-                => throw new InvalidOperationException($"The argument '{name}' must not be null.");
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static object? ThrowNotDictionaryException(VariableName name)
-                => throw new InvalidOperationException($"The argument '{name}' must be a dictionary.");
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static object? ThrowNotInputTypeException(VariableName name)
-                => throw new InvalidOperationException($"The argument '{name}' must be an input type.");
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static void ThrowMissingFieldException(VariableName name)
-                => throw new InvalidOperationException($"The argument '{name}' is required but was not provided.");
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static void ThrowOneOfException(VariableName name)
-                => throw new InvalidOperationException($"The argument '{name}' must have exactly one field present.");
-
-            [StackTraceHidden]
-            [DoesNotReturn]
-            static void ThrowExcessFieldException(VariableName name, string field)
-                => throw new InvalidOperationException($"The argument '{name}' has an excess field named {field}.");
         }
 
         private class Context : IResolveFieldContext
