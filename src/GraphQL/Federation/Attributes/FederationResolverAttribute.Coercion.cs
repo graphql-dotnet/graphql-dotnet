@@ -12,8 +12,10 @@ public partial class FederationResolverAttribute
     {
         /// <summary>
         /// Deserializes an argument supplied within an entity representation from Apollo Router.
-        /// Also see <see cref="ValidationContext.GetVariableValueAsync"/>.
         /// </summary>
+        /// <remarks>
+        /// Also see <see cref="ValidationContext.GetVariableValueAsync"/>.
+        /// </remarks>
         private static object? Deserialize(IGraphType type, string name, object? value)
         {
             // parse recursively based on the type of the graph type
