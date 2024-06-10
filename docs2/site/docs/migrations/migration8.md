@@ -568,6 +568,49 @@ public class Widget
 }
 ```
 
+Note that although you may apply the `[Key]` attribute multiple times to define multiple sets of key fields,
+you may only define a single federation resolver on an entity type. Your method will need to collect the key fields
+from all sets of key fields if you wish to support multiple sets of key fields. Below is a code-first sample:
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+        this.Key("sku");
+
+        // configure federation resolver
+        this.ResolveReference(async (context, widget) =>
+        {
+            // pull the key values from the representation
+            var id = widget.Id;
+            var sku = widget.Sku;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            if (id != null)
+                return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+            else
+                return await widgetData.GetWidgetBySkuAsync(sku, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Sku);
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Sku { get; set; }
+    public string Name { get; set; }
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
