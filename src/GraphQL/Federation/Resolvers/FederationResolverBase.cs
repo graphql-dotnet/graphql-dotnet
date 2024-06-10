@@ -3,6 +3,20 @@ using GraphQL.Types;
 
 namespace GraphQL.Federation.Resolvers;
 
+/// <inheritdoc cref="FederationResolverBase"/>
+public abstract class FederationResolverBase<TParsedType> : FederationResolverBase
+{
+    /// <inheritdoc/>
+    public override Type SourceType => typeof(TParsedType);
+
+    /// <inheritdoc/>
+    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
+        => ResolveAsync(context, graphType, (TParsedType)parsedRepresentation);
+
+    /// <inheritdoc cref="IFederationResolver.ResolveAsync(IResolveFieldContext, IObjectGraphType, object)"/>
+    public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, TParsedType parsedRepresentation);
+}
+
 /// <summary>
 /// Provides an abstract implementation of <see cref="IFederationResolver"/> which includes parsing of the representation
 /// into a specific CLR type.

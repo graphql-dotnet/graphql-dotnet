@@ -47,7 +47,7 @@ public class FederationResolver<TClrType> : FederationResolver<TClrType, TClrTyp
 /// </summary>
 /// <typeparam name="TSourceType">The CLR type of the source representation that this resolver handles.</typeparam>
 /// <typeparam name="TReturnType">The CLR type of the resolved object returned by this resolver.</typeparam>
-public class FederationResolver<TSourceType, TReturnType> : FederationResolverBase
+public class FederationResolver<TSourceType, TReturnType> : FederationResolverBase<TSourceType>
 {
     internal readonly Func<IResolveFieldContext, TSourceType, ValueTask<object?>> _resolveFunc;
 
@@ -85,6 +85,6 @@ public class FederationResolver<TSourceType, TReturnType> : FederationResolverBa
     }
 
     /// <inheritdoc/>
-    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object source)
-        => _resolveFunc(context, (TSourceType)source)!;
+    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, TSourceType source)
+        => _resolveFunc(context, source)!;
 }
