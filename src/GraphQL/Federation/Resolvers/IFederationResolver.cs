@@ -10,6 +10,11 @@ namespace GraphQL.Federation.Resolvers;
 public interface IFederationResolver
 {
     /// <summary>
+    /// Determines whether the source representation matches the required keys for this resolver.
+    /// </summary>
+    bool MatchKeys(IDictionary<string, object?> representation);
+
+    /// <summary>
     /// Parses the source representation into a CLR type that can be used by the resolver.
     /// </summary>
     /// <param name="graphType">The object graph type associated with the entity being resolved.</param>

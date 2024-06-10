@@ -1642,6 +1642,7 @@ namespace GraphQL.Federation.Resolvers
     {
         protected FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
+        public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
         public object ParseRepresentation(GraphQL.Types.IObjectGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation) { }
         public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, object parsedRepresentation);
     }
@@ -1661,6 +1662,7 @@ namespace GraphQL.Federation.Resolvers
     }
     public interface IFederationResolver
     {
+        bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation);
         object ParseRepresentation(GraphQL.Types.IObjectGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation);
         System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, object parsedRepresentation);
     }

@@ -1,4 +1,5 @@
 using System.Reflection;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Types;
 
 namespace GraphQL.Federation;
@@ -56,13 +57,27 @@ public partial class FederationResolverAttribute : GraphQLAttribute
                 (memberInfo is FieldInfo fi && fi.IsStatic);
 
             // generate a federation resolver for this graph type
-            graphType.Metadata[FederationHelper.RESOLVER_METADATA] = isStatic
+            if (isStatic)
+            {
                 // for static members, generate an IResolveFieldContext where the arguments are the various
                 //   properties provided from Apollo Router, and a null source
-                ? new FederationStaticResolver(fieldType)
+                var newResolver = new FederationStaticResolver(fieldType);
+                var resolver = graphType.GetMetadata<object>(FederationHelper.RESOLVER_METADATA);
+                if (resolver is List<IFederationResolver> resolverList)
+                {
+                    resolverList.Add(newResolver);
+                }
+                else
+                {
+                    graphType.Metadata[FederationHelper.RESOLVER_METADATA] = new List<IFederationResolver> { newResolver };
+                }
+            }
+            else
+            {
                 // for instance members, generate an IResolveFieldContext where the source is coerced from
                 //   the properties provided from Apollo Router, and null arguments
-                : new FederationNonStaticResolver(fieldType, memberInfo.DeclaringType!);
+                graphType.Metadata[FederationHelper.RESOLVER_METADATA] = new FederationNonStaticResolver(fieldType, memberInfo.DeclaringType!);
+            }
         }
     }
 }

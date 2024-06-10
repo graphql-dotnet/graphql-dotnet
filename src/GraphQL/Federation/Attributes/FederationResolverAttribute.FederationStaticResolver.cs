@@ -36,6 +36,22 @@ public partial class FederationResolverAttribute
             _fieldType = fieldType;
         }
 
+        public bool MatchKeys(IDictionary<string, object?> representation)
+        {
+            var args = _fieldType.Arguments;
+
+            if (args == null || args.Count == 0)
+                return true;
+
+            foreach (var arg in args)
+            {
+                if (!representation.ContainsKey(arg.Name))
+                    return false;
+            }
+
+            return true;
+        }
+
         public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
         {
             // Creates a dictionary of arguments for the field type based on the entity representation properties.

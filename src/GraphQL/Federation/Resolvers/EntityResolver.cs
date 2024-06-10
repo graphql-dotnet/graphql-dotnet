@@ -60,13 +60,14 @@ public sealed class EntityResolver : IFieldResolver
             if (!rep.TryGetValue("__typename", out var typeNameObj) || typeNameObj is not string typeName)
                 throw new InvalidOperationException("Representation must contain a __typename field.");
 
-            // now find the graph type instance for the type name, ensuring it is an object type and has an entity resolver
+            // now find the graph type instance for the type name, ensuring it is an object type
             var graphTypeInstance = schema.AllTypes[typeName]
                 ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
             if (graphTypeInstance is not IObjectGraphType objectGraphType)
                 throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
-            var resolver = graphTypeInstance.GetMetadata<IFederationResolver>(RESOLVER_METADATA)
-                ?? throw new InvalidOperationException($"The type '{typeName}' has not been configured for GraphQL Federation.");
+
+            // find the federation resolver to use based on the representation
+            var resolver = SelectFederationResolver(graphTypeInstance.GetMetadata<object>(RESOLVER_METADATA), typeName, rep);
 
             // each entity resolver defines (1) a method to parse the representation into an object, which occurs during
             //   the validation phase of the GraphQL execution, and (2) a resolver method to convert this object into the
@@ -86,6 +87,37 @@ public sealed class EntityResolver : IFieldResolver
             ret.Add(new Representation(objectGraphType, resolver, value));
         }
         return ret;
+    }
+
+    /// <summary>
+    /// Selects the federation resolver to use based on the representation provided.
+    /// </summary>
+    /// <param name="resolvers">The resolvers to select from; either a <see cref="List{T}">List&lt;IFederationResolver&gt;</see> or an <see cref="IFederationResolver"/>.</param>
+    /// <param name="typeName">The type name of the representation, used for exception messages.</param>
+    /// <param name="representation">The representation to match against the resolvers.</param>
+    /// <returns>The selected federation resolver.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the type has not been configured for GraphQL Federation or the representation does not match any of the resolvers.</exception>
+    private static IFederationResolver SelectFederationResolver(object resolvers, string typeName, IDictionary<string, object?> representation)
+    {
+        if (resolvers == null)
+            throw new InvalidOperationException($"The type '{typeName}' has not been configured for GraphQL Federation.");
+
+        // if resolvers is not a list, return the single resolver
+        if (resolvers is not List<IFederationResolver> resolverList)
+            return (IFederationResolver)resolvers;
+
+        // short-circuit if there is only one resolver
+        if (resolverList.Count == 1)
+            return resolverList[0];
+
+        // find the resolver that matches the representation
+        foreach (var resolver in resolverList)
+        {
+            if (resolver.MatchKeys(representation))
+                return resolver;
+        }
+
+        throw new InvalidOperationException($"Representation does not match any of the resolvers configured for {typeName}.");
     }
 
     private class RepresentationDataLoader(IResolveFieldContext Context, Representation Representation) : IDataLoaderResult

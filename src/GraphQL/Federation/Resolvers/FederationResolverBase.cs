@@ -17,6 +17,9 @@ public abstract class FederationResolverBase : IFederationResolver
     public abstract Type SourceType { get; }
 
     /// <inheritdoc/>
+    public virtual bool MatchKeys(IDictionary<string, object?> representation) => true;
+
+    /// <inheritdoc/>
     public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation);
 
     /// <inheritdoc/>
