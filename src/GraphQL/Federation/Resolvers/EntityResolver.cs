@@ -12,7 +12,7 @@ namespace GraphQL.Federation.Resolvers;
 /// <remarks>
 /// Be sure to parse the representations before calling this resolver, such as shown here:
 /// <code>
-/// representationArgument.Parser += (value) =&gt; EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
+/// representationArgument.Parser = (value) =&gt; EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
 /// </code>
 /// </remarks>
 public sealed class EntityResolver : IFieldResolver
@@ -130,7 +130,7 @@ public sealed class EntityResolver : IFieldResolver
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context)
     {
         // require the representations argument to be converted to the proper type before hitting this code
-        // e.g.: representationArgument.Parser += (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
+        // e.g.: representationArgument.Parser = (value) => EntityResolver.Instance.ConvertRepresentations(schema, (System.Collections.IList)value);
         var representations = (IEnumerable<Representation>)context.Arguments![REPRESENTATIONS_ARGUMENT].Value!;
 
         // now that the representations have been validated, we can use them to resolve the entities using
