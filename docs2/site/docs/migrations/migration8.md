@@ -535,10 +535,10 @@ public class Widget
 
     // configure federation resolver
     [FederationResolver]
-    public static async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, [Id] string id)
+    public static async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, [Id] string id, CancellationToken token)
     {
         // resolve the entity reference
-        return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        return await widgetData.GetWidgetByIdAsync(id, token);
     }
 }
 ```
@@ -557,13 +557,13 @@ public class Widget
 
     // configure federation resolver
     [FederationResolver]
-    public async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData)
+    public async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, CancellationToken token)
     {
         // pull the id from the representation
         var id = Id;
 
         // resolve the entity reference
-        return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        return await widgetData.GetWidgetByIdAsync(id, token);
     }
 }
 ```
