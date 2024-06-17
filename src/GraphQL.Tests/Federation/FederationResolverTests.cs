@@ -1,3 +1,4 @@
+using System.Globalization;
 using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Federation;
@@ -5,6 +6,7 @@ using GraphQL.Federation.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQLParser;
+using GraphQLParser.AST;
 using Moq;
 
 namespace GraphQL.Tests.Federation;
@@ -95,6 +97,41 @@ public class FederationResolverTests
     }
 
     [Fact]
+    public void CodeFirst_ResolveReference8()
+    {
+        var objectGraphType = new ObjectGraphType<Class1>() { Name = "Class1" };
+        objectGraphType.Field<IntGraphType>("Id").FieldType.ResolvedType = new IntGraphType();
+        objectGraphType.Field<IntGraphType>("Id2").FieldType.ResolvedType = new IntGraphType();
+        objectGraphType.ResolveReference((ctx, obj) => new Class1() { Id = obj.Id + obj.Id2 });
+
+        var ret = TestResolver(objectGraphType, """{ "__typename": "Class1", "Id": 1, "Id2": 10 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    [Fact]
+    public void CodeFirst_ResolveReference9()
+    {
+        var objectGraphType = new ObjectGraphType<Class1>() { Name = "Class1" };
+        objectGraphType.Field<IntGraphType>("Id").FieldType.ResolvedType = new IntGraphType();
+        objectGraphType.Field<IntGraphType>("Id2").FieldType.ResolvedType = new IntGraphType();
+        objectGraphType.ResolveReference<Class3, Class1>((ctx, obj) => new Class1() { Id = obj.Id + obj.Id2 });
+
+        var ret = TestResolver(objectGraphType, """{ "__typename": "Class1", "Id": 1, "Id2": 10 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    [Fact]
+    public void CodeFirst_ResolveReference10_CustomScalar()
+    {
+        var objectGraphType = new ObjectGraphType<Class1>() { Name = "Class1" };
+        objectGraphType.Field<MyCustomScalar>("Id").FieldType.ResolvedType = new MyCustomScalar();
+        objectGraphType.ResolveReference((ctx, obj) => new Class1() { Id = obj.Id + 100 });
+
+        var ret = TestResolver(objectGraphType, """{ "__typename": "Class1", "Id": 1 }""");
+        ret.Id.ShouldBe(110);
+    }
+
+    [Fact]
     public void SchemaFirst_ResolveReference1()
     {
         var mockResolver = new Mock<IFederationResolver>(MockBehavior.Strict);
@@ -161,6 +198,24 @@ public class FederationResolverTests
         var objectGraphType = SchemaFirstSetup(t => t.ResolveReference<Class2, Class1>((ctx, obj) => Task.FromResult<Class1?>(new Class1() { Id = obj.ShouldBeOfType<Class2>().Id + 10 })));
 
         var ret = TestResolver<Class1>(objectGraphType, """{ "__typename": "Class1", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    [Fact]
+    public void SchemaFirst_ResolveReference8()
+    {
+        var objectGraphType = SchemaFirstSetup(t => t.ResolveReference<Class1>((ctx, obj) => new Class1() { Id = obj.Id + obj.Id2 }));
+
+        var ret = TestResolver<Class1>(objectGraphType, """{ "__typename": "Class1", "id": 1, "id2": 10 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    [Fact]
+    public void SchemaFirst_ResolveReference9()
+    {
+        var objectGraphType = SchemaFirstSetup(t => t.ResolveReference<Class3, Class1>((ctx, obj) => new Class1() { Id = obj.Id + obj.Id2 }));
+
+        var ret = TestResolver<Class1>(objectGraphType, """{ "__typename": "Class1", "id": 1, "id2": 10 }""");
         ret.Id.ShouldBe(11);
     }
 
@@ -273,6 +328,82 @@ public class FederationResolverTests
         public TypeFirstTest6 Resolve() => new() { Id = Id + 10 };
     }
 
+    [Fact]
+    public void TypeFirst_ResolveReference7()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest7>();
+
+        var ret = TestResolver<TypeFirstTest7>(objectGraphType, """{ "__typename": "TypeFirstTest7", "id": 1, "id2": 10 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest7
+    {
+        public int Id { get; set; }
+        public int Id2 { get; set; }
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static TypeFirstTest7 Resolve(int id, int id2) => new() { Id = id + id2 };
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference8()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest8>();
+
+        var ret = TestResolver<TypeFirstTest8>(objectGraphType, """{ "__typename": "TypeFirstTest8", "id": 1, "id2": 10 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest8
+    {
+        public int Id { get; set; }
+        public int Id2 { get; set; }
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public TypeFirstTest8 Resolve() => new() { Id = Id + Id2 };
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference9_CustomScalar()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest9>();
+
+        var ret = TestResolver<TypeFirstTest9>(objectGraphType, """{ "__typename": "TypeFirstTest9", "id": 1 }""");
+        ret.Id.ShouldBe(110);
+    }
+
+    private class TypeFirstTest9
+    {
+        [OutputType(typeof(MyCustomScalar))]
+        public int Id { get; set; }
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public TypeFirstTest9 Resolve() => new() { Id = Id + 100 };
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference10_CustomScalar2()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest10>();
+
+        var ret = TestResolver<TypeFirstTest10>(objectGraphType, """{ "__typename": "TypeFirstTest10", "id": 1 }""");
+        ret.Id.ShouldBe(110);
+    }
+
+    private class TypeFirstTest10
+    {
+        [OutputType(typeof(MyCustomScalar))]
+        public int Id { get; set; }
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static TypeFirstTest10 Resolve([InputType(typeof(MyCustomScalar))] int id) => new() { Id = id + 100 };
+    }
+
     private static IObjectGraphType TypeFirstSetup<T>()
     {
         var objectGraphType = new AutoRegisteringObjectGraphType<T>();
@@ -292,6 +423,7 @@ public class FederationResolverTests
 
             type Class1 {
                 id: Int!
+                id2: Int!
                 name: String
             }
             """,
@@ -369,6 +501,24 @@ public class FederationResolverTests
     private class Class1
     {
         public int Id { get; set; }
+        public int Id2 { get; set; }
         public string? Name { get; set; }
+    }
+
+    public class Class3
+    {
+        public int Id { get; set; }
+        public int Id2 { get; set; }
+    }
+
+    public class MyCustomScalar : ScalarGraphType
+    {
+        public MyCustomScalar()
+        {
+            Name = "MyCustom";
+        }
+        public override object? ParseLiteral(GraphQLValue value) => throw new NotImplementedException();
+        public override object? ParseValue(object? value) => value == null ? null : int.Parse(value.ToString()!, CultureInfo.InvariantCulture) * 10;
+        public override object? Serialize(object? value) => throw new NotImplementedException();
     }
 }
