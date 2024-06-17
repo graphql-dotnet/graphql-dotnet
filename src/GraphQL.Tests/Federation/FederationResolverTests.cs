@@ -164,6 +164,124 @@ public class FederationResolverTests
         ret.Id.ShouldBe(11);
     }
 
+    [Fact]
+    public void TypeFirst_ResolveReference1()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest1>();
+
+        var ret = TestResolver<TypeFirstTest1>(objectGraphType, """{ "__typename": "TypeFirstTest1", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest1
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static TypeFirstTest1 Resolve(int id) => new() { Id = id + 10 };
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference2()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest2>();
+
+        var ret = TestResolver<TypeFirstTest2>(objectGraphType, """{ "__typename": "TypeFirstTest2", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest2
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static Task<TypeFirstTest2> Resolve(int id) => Task.FromResult(new TypeFirstTest2() { Id = id + 10 });
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference3()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest3>();
+
+        var ret = TestResolver<TypeFirstTest3>(objectGraphType, """{ "__typename": "TypeFirstTest3", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest3
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static IDataLoaderResult<TypeFirstTest3> Resolve(int id) => new SimpleDataLoader<TypeFirstTest3>(_ => Task.FromResult(new TypeFirstTest3() { Id = id + 10 }));
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference4()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest4>();
+
+        var ret = TestResolver<TypeFirstTest4>(objectGraphType, """{ "__typename": "TypeFirstTest4", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference5()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest4>();
+
+        var ret = TestResolver<TypeFirstTest4>(objectGraphType, """{ "__typename": "TypeFirstTest4", "id2": 1 }""");
+        ret.Id.ShouldBe(21);
+    }
+
+    private class TypeFirstTest4
+    {
+        public int Id { get; set; }
+
+        public int Id2 { get; set; }
+
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public static TypeFirstTest4 Resolve1(int id) => new() { Id = id + 10 };
+
+        [FederationResolver]
+        public static TypeFirstTest4 Resolve2(int id2) => new() { Id = id2 + 20 };
+    }
+
+    [Fact]
+    public void TypeFirst_ResolveReference6()
+    {
+        var objectGraphType = TypeFirstSetup<TypeFirstTest6>();
+
+        var ret = TestResolver<TypeFirstTest6>(objectGraphType, """{ "__typename": "TypeFirstTest6", "id": 1 }""");
+        ret.Id.ShouldBe(11);
+    }
+
+    private class TypeFirstTest6
+    {
+        public int Id { get; set; }
+
+        public string? Name { get; set; }
+
+        [FederationResolver]
+        public TypeFirstTest6 Resolve() => new() { Id = Id + 10 };
+    }
+
+    private static IObjectGraphType TypeFirstSetup<T>()
+    {
+        var objectGraphType = new AutoRegisteringObjectGraphType<T>();
+        var schema = new Schema { Query = objectGraphType };
+        schema.RegisterTypeMapping<T, AutoRegisteringObjectGraphType<T>>();
+        schema.Initialize();
+        return objectGraphType;
+    }
+
     private static IObjectGraphType SchemaFirstSetup(Action<TypeConfig> class1Config)
     {
         var schema = Schema.For(
