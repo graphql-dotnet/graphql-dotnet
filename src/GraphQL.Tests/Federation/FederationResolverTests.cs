@@ -303,7 +303,7 @@ public class FederationResolverTests
         public string? Name { get; set; }
 
         [FederationResolver]
-        public static TypeFirstTest4 Resolve1(int id) => new() { Id = id + 10 };
+        public static TypeFirstTest4 Resolve(int id) => new() { Id = id + 10 };
 
         [FederationResolver]
         public static TypeFirstTest4 Resolve2(int id2) => new() { Id = id2 + 20 };
@@ -407,9 +407,12 @@ public class FederationResolverTests
     private static IObjectGraphType TypeFirstSetup<T>()
     {
         var objectGraphType = new AutoRegisteringObjectGraphType<T>();
+        objectGraphType.Fields.Find("Resolve").ShouldNotBeNull().IsPrivate.ShouldBeTrue();
         var schema = new Schema { Query = objectGraphType };
         schema.RegisterTypeMapping<T, AutoRegisteringObjectGraphType<T>>();
         schema.Initialize();
+        objectGraphType.Fields.Find("Resolve").ShouldBeNull();
+        objectGraphType.Fields.Find("resolve").ShouldBeNull();
         return objectGraphType;
     }
 
