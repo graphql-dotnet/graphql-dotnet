@@ -9,6 +9,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation;
 
+[Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class will be removed in v9.")]
 public class FederatedSchemaBuilder : SchemaBuilder
 {
     internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";

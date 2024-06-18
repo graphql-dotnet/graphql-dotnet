@@ -185,6 +185,10 @@ namespace GraphQL
         ExecutionOnly = 0,
         IntrospectionAndExecution = 1,
     }
+    public static class FederationGraphQLBuilderExtensions
+    {
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Federation.FederationSettings>? configure = null) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
@@ -1474,6 +1478,18 @@ namespace GraphQL.Federation
         public ExternalAttribute() { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.Flags]
+    public enum FederationDirectiveEnum
+    {
+        All = -1,
+        Key = 1,
+        Shareable = 2,
+        Inaccessible = 4,
+        Override = 8,
+        External = 16,
+        Provides = 32,
+        Requires = 64,
+    }
     public static class FederationFieldMetadataExtensions
     {
         public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
@@ -1531,6 +1547,13 @@ namespace GraphQL.Federation
         public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
         public override void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
         public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
+    }
+    public class FederationSettings
+    {
+        public GraphQL.Utilities.PrintOptions? SdlPrintOptions;
+        public FederationSettings() { }
+        public GraphQL.Federation.FederationDirectiveEnum? ImportDirectives { get; set; }
+        public string Version { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InaccessibleAttribute : GraphQL.GraphQLAttribute
@@ -3268,12 +3291,16 @@ namespace GraphQL.Utilities
 }
 namespace GraphQL.Utilities.Federation
 {
+    [System.Obsolete("This class will be removed in v9 as it is not needed with GraphQL.Federation.Reso" +
+        "lvers.IFederationResolver.")]
     public class FederatedResolveContext
     {
         public FederatedResolveContext() { }
         public System.Collections.Generic.Dictionary<string, object?> Arguments { get; set; }
         public GraphQL.IResolveFieldContext ParentFieldContext { get; set; }
     }
+    [System.Obsolete("Please use Schema.For with graphQlBuilder.AddFederation() instead. This class wil" +
+        "l be removed in v9.")]
     public class FederatedSchema
     {
         public FederatedSchema() { }
@@ -3281,6 +3308,8 @@ namespace GraphQL.Utilities.Federation
         public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder>? configure = null)
             where TFederatedSchemaBuilder : GraphQL.Utilities.Federation.FederatedSchemaBuilder, new () { }
     }
+    [System.Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class " +
+        "will be removed in v9.")]
     public class FederatedSchemaBuilder : GraphQL.Utilities.SchemaBuilder
     {
         public FederatedSchemaBuilder() { }

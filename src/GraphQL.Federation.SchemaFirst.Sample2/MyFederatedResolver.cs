@@ -8,7 +8,6 @@ namespace GraphQL.Federation.SchemaFirst.Sample2;
 /// </summary>
 #pragma warning disable CS0618 // Type or member is obsolete
 public class MyFederatedResolver<T> : IFederatedResolver
-#pragma warning restore CS0618 // Type or member is obsolete
     where T : IHasId
 {
     private readonly Func<Data, int, Task<T?>> _resolver;
@@ -28,3 +27,4 @@ public class MyFederatedResolver<T> : IFederatedResolver
         return Task.FromResult<object?>(null);
     }
 }
+#pragma warning restore CS0618 // Type or member is obsolete

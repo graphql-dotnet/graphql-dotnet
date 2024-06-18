@@ -2,7 +2,7 @@ using System.Reflection;
 using GraphQL.Federation.SchemaFirst.Sample1.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
+using GraphQL.Utilities;
 
 namespace GraphQL.Federation.SchemaFirst.Sample1;
 
@@ -16,7 +16,8 @@ public class Program
         builder.Services.AddSingleton<Query>();
         builder.Services.AddGraphQL(b => b
             .AddSchema(BuildSchema)
-            .AddSystemTextJson());
+            .AddSystemTextJson()
+            .AddFederation(o => o.Version = "1.0")); // for Federation v1 compatibility
 
         // Build the web application
         var app = builder.Build();
@@ -47,14 +48,16 @@ public class Program
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
 
+        // note: this demonstrates GraphQL.NET v8 and nconfiguration methods
         // define the known types and their resolvers
-        var schemaBuilder = new FederatedSchemaBuilder();
+        var schemaBuilder = new SchemaBuilder
+        {
+            ServiceProvider = serviceProvider,
+        };
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
-#pragma warning disable CS0618 // Type or member is obsolete
-        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
+        schemaBuilder.Types.For(nameof(Category)).ResolveReference(
             new MyFederatedResolver<Category>((data, id) => data.GetCategoryById(id)));
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // build the schema
         return schemaBuilder.Build(schemaString);
