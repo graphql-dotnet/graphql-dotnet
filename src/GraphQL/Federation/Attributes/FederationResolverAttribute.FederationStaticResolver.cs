@@ -13,7 +13,7 @@ namespace GraphQL.Federation;
 public partial class FederationResolverAttribute
 {
     /// <summary>
-    /// This federation resolver creates a <see cref="IResolveFieldContext"/> which has arguments matching
+    /// This federation resolver creates an <see cref="IResolveFieldContext"/> which has arguments matching
     /// the entity representation properties provided from Apollo Router, and a null source. It then calls
     /// the configured field resolver with the context. It is intended to be used for static federation
     /// resolvers in a type-first schema.
