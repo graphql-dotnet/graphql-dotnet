@@ -57,7 +57,7 @@ public partial class FederationResolverAttribute
             // Creates a dictionary of arguments for the field type based on the entity representation properties.
             // The argument dictionary is returned as the parsed representation, to be used by the synthesized IResolveFieldContext.
 
-            if (_fieldType.Arguments == null || _fieldType.Arguments.Count <= 0)
+            if (_fieldType.Arguments == null || _fieldType.Arguments.Count == 0)
             {
                 // IResolveFieldContext.Arguments may return null if the field has no arguments, so just return null here
                 return null!;
