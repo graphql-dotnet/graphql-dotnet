@@ -612,6 +612,11 @@ public class Widget
 }
 ```
 
+### 17. Applied directives may contain metadata
+
+`AppliedDirective` now implements `IProvideMetadata`, `IMetadataReader` and `IMetadataWriter`
+to allow for reading and writing metadata to applied directives.
+
 ## Breaking Changes
 
 ### 1. Query type is required
