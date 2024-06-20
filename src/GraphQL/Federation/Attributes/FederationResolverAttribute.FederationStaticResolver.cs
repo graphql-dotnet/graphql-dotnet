@@ -13,7 +13,7 @@ namespace GraphQL.Federation;
 public partial class FederationResolverAttribute
 {
     /// <summary>
-    /// This federation resolver creates a <see cref="IResolveFieldContext"/> which has arguments matching
+    /// This federation resolver creates an <see cref="IResolveFieldContext"/> which has arguments matching
     /// the entity representation properties provided from Apollo Router, and a null source. It then calls
     /// the configured field resolver with the context. It is intended to be used for static federation
     /// resolvers in a type-first schema.
@@ -57,7 +57,7 @@ public partial class FederationResolverAttribute
             // Creates a dictionary of arguments for the field type based on the entity representation properties.
             // The argument dictionary is returned as the parsed representation, to be used by the synthesized IResolveFieldContext.
 
-            if (_fieldType.Arguments == null || _fieldType.Arguments.Count <= 0)
+            if (_fieldType.Arguments == null || _fieldType.Arguments.Count == 0)
             {
                 // IResolveFieldContext.Arguments may return null if the field has no arguments, so just return null here
                 return null!;

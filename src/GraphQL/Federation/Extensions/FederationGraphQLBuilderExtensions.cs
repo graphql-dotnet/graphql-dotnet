@@ -39,16 +39,21 @@ public static class FederationGraphQLBuilderExtensions
         return builder
             .ConfigureSchema((schema, _) =>
             {
-                schema.AddFederationDirectives(directives);
+                // add the federation directives to the schema
+                schema.AddFederationDirectives(settings);
+
                 // add the @link directive to the schema, referencing the directive specified by the import parameter
-                schema.ApplyLinkDirective(settings.Version, directives);
+                schema.ApplyLinkDirective(settings);
+
                 // register Federation types
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<AnyScalarGraphType>();
                 schema.RegisterType<EntityGraphType>();
+
                 // add the _service field to the query type
                 // this cannot be done here because the schema.Query property will not yet be set
                 schema.RegisterVisitor<FederationServiceSchemaNodeVisitor>();
+
                 // after schema initialization, configure the _Entity union type with the proper types,
                 // and add the _entities field to the query type
                 // this cannot be done here because the schema.Query property will not yet be set, and the types are not yet known

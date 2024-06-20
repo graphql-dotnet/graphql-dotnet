@@ -49,9 +49,11 @@ internal static class FederationHelper
     /// Adds Federation directive definitions to the specified GraphQL schema based on the provided <see cref="FederationDirectiveEnum"/> values.
     /// </summary>
     /// <param name="schema">The GraphQL schema to add directives to.</param>
-    /// <param name="import">The <see cref="FederationDirectiveEnum"/> values specifying which directives to add.</param>
-    public static void AddFederationDirectives(this ISchema schema, FederationDirectiveEnum import)
+    /// <param name="federationSettings">The settings to use for adding Federation directives.</param>
+    public static void AddFederationDirectives(this ISchema schema, FederationSettings federationSettings)
     {
+        var import = federationSettings.ImportDirectives ?? FederationDirectiveEnum.All;
+
         var linkDirective = new Directive(LINK_DIRECTIVE)
         {
             Arguments = new(
@@ -85,6 +87,10 @@ internal static class FederationHelper
             var shareableDirective = new Directive(SHAREABLE_DIRECTIVE);
             shareableDirective.Locations.Add(DirectiveLocation.FieldDefinition);
             shareableDirective.Locations.Add(DirectiveLocation.Object);
+            if (!federationSettings.Version.StartsWith("1.") && federationSettings.Version != "2.0" && federationSettings.Version != "2.1")
+            {
+                shareableDirective.Repeatable = true;
+            }
             schema.Directives.Register(shareableDirective);
         }
 
@@ -147,10 +153,11 @@ internal static class FederationHelper
     /// Applies a <c>@link</c> directive to the specified GraphQL schema based on the provided <see cref="FederationDirectiveEnum"/> values.
     /// </summary>
     /// <param name="schema">The GraphQL schema to build the link extension for.</param>
-    /// <param name="version">The version of the federation specification to use, such as 2.0.</param>
-    /// <param name="import">The <see cref="FederationDirectiveEnum"/> values specifying which directives to include in the link extension.</param>
-    public static void ApplyLinkDirective(this ISchema schema, string version, FederationDirectiveEnum import)
+    /// <param name="settings">The settings to use for building the link extension, including version number and list of imported directives.</param>
+    public static void ApplyLinkDirective(this ISchema schema, FederationSettings settings)
     {
+        var version = settings.Version;
+        var import = settings.ImportDirectives ?? FederationDirectiveEnum.All;
         schema.ApplyDirective("link", d =>
         {
             d.AddArgument(new DirectiveArgument(URL_ARGUMENT) { Value = "https://specs.apollo.dev/federation/v" + version });
