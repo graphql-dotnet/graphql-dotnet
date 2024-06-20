@@ -443,6 +443,175 @@ Note: the feature is still a draft and has not made it into the official GraphQL
 It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
 It is not expected to change from the current draft.
 
+### 16. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
+
+Extension methods have been added for defining entity resolvers in code-first and type-first schemas
+for GraphQL Federation.
+
+Code-first sample 1: (uses entity type for representation)
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+
+        // configure federation resolver
+        this.ResolveReference(async (context, widget) =>
+        {
+            // pull the id from the representation
+            var id = widget.Id;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+```
+
+Code-first sample 2: (uses custom type for representation)
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+
+        // configure federation resolver
+        this.ResolveReference<WidgetRepresentation, Widget>(async (context, widget) =>
+        {
+            // pull the id from the representation
+            var id = widget.Id;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class WidgetRepresentation
+{
+    public string Id { get; set; }
+}
+```
+
+Type-first sample 1: (static method; uses method arguments for representation)
+
+```cs
+// configure federation key fields
+[Key("id")]
+public class Widget
+{
+    // configure fields
+    [Id]
+    public string Id { get; set; }
+    public string Name { get; set; }
+
+    // configure federation resolver
+    [FederationResolver]
+    public static async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, [Id] string id, CancellationToken token)
+    {
+        // resolve the entity reference
+        return await widgetData.GetWidgetByIdAsync(id, token);
+    }
+}
+```
+
+Type-first sample 2: (instance method; uses instance for representation)
+
+```cs
+// configure federation key fields
+[Key("id")]
+public class Widget
+{
+    // configure fields
+    [Id]
+    public string Id { get; set; }
+    public string Name { get; set; }
+
+    // configure federation resolver
+    [FederationResolver]
+    public async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, CancellationToken token)
+    {
+        // pull the id from the representation
+        var id = Id;
+
+        // resolve the entity reference
+        return await widgetData.GetWidgetByIdAsync(id, token);
+    }
+}
+```
+
+Note that you may apply the `[Key]` attribute multiple times to define multiple sets of key fields, pursuant to the
+GraphQL Federation specification. You may define multiple resolvers when using static methods in a type-first schema.
+Otherwise your method will need to decide which set of key fields to use for resolution, as demonstrated in the
+code-first sample below:
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+        this.Key("sku");
+
+        // configure federation resolver
+        this.ResolveReference(async (context, widget) =>
+        {
+            // pull the key values from the representation
+            var id = widget.Id;
+            var sku = widget.Sku;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            if (id != null)
+                return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+            else
+                return await widgetData.GetWidgetBySkuAsync(sku, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Sku);
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Sku { get; set; }
+    public string Name { get; set; }
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
