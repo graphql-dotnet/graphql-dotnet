@@ -37,10 +37,11 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(AnalyzeIdentifierName, SyntaxKind.IdentifierName);
+        context.RegisterSyntaxNodeAction(AnalyzeCodeFirstProperty, SyntaxKind.IdentifierName);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeFirstAttribute, SyntaxKind.Attribute);
     }
 
-    private void AnalyzeIdentifierName(SyntaxNodeAnalysisContext context)
+    private void AnalyzeCodeFirstProperty(SyntaxNodeAnalysisContext context)
     {
         var name = (IdentifierNameSyntax)context.Node;
 
@@ -56,11 +57,6 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeStatements(context, statements.Value);
-    }
-
-    private static void AnalyzeStatements(SyntaxNodeAnalysisContext context, SyntaxList<StatementSyntax> statements)
-    {
         foreach (var statement in statements)
         {
             var fieldExpression = statement
@@ -78,12 +74,12 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
                 continue;
             }
 
-            AnalyzeNullability(context, fieldExpression);
-            AnalyzeDefaultValue(context, fieldExpression);
+            AnalyzeCodeFirstNullability(context, fieldExpression);
+            AnalyzeCodeFirstDefaultValue(context, fieldExpression);
         }
     }
 
-    private static void AnalyzeNullability(SyntaxNodeAnalysisContext context, SimpleNameSyntax fieldExpression)
+    private static void AnalyzeCodeFirstNullability(SyntaxNodeAnalysisContext context, SimpleNameSyntax fieldExpression)
     {
         // Field<NonNullGraphType<StringGraphType>>("name");
         if (fieldExpression is GenericNameSyntax genericField)
@@ -135,7 +131,7 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static void AnalyzeDefaultValue(SyntaxNodeAnalysisContext context, SimpleNameSyntax fieldExpression)
+    private static void AnalyzeCodeFirstDefaultValue(SyntaxNodeAnalysisContext context, SimpleNameSyntax fieldExpression)
     {
         var defaultValueExp = fieldExpression
             .Ancestors()
@@ -146,6 +142,74 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         if (defaultValueExp != null)
         {
             ReportMustNotHaveDefaultValue(context, defaultValueExp.Name.GetLocation());
+        }
+    }
+
+    private void AnalyzeTypeFirstAttribute(SyntaxNodeAnalysisContext context)
+    {
+        var attribute = (AttributeSyntax)context.Node;
+        if (attribute.Name.ToString()
+            is not Constants.AttributeNames.OneOf
+            and not Constants.AttributeNames.OneOf + Constants.AttributeNames.Attribute)
+        {
+            return;
+        }
+
+        if (!attribute.IsGraphQLSymbol(context.SemanticModel))
+        {
+            return;
+        }
+
+        var props = attribute
+            .Ancestors()
+            .OfType<ClassDeclarationSyntax>()
+            .FirstOrDefault()
+            ?.DescendantNodes()
+            .OfType<PropertyDeclarationSyntax>();
+
+        if (props == null)
+        {
+            return;
+        }
+
+        foreach (var prop in props)
+        {
+            if (HasIgnoreAttribute(prop, context.SemanticModel))
+            {
+                continue;
+            }
+
+            AnalyzeTypeFirstNullability(context, prop);
+            AnalyzeTypeFirstDefaultValue(context, prop);
+        }
+    }
+
+    private static void AnalyzeTypeFirstNullability(SyntaxNodeAnalysisContext context, PropertyDeclarationSyntax prop)
+    {
+        if (prop.Type is NullableTypeSyntax)
+        {
+            return;
+        }
+
+        var typeInfo = context.SemanticModel.GetTypeInfo(prop.Type);
+        if (typeInfo.Type?.IsValueType == true)
+        {
+            ReportMustBeNullable(context, prop.Type.GetLocation());
+            return;
+        }
+
+        var nullableContext = context.SemanticModel.GetNullableContext(prop.Type.GetLocation().SourceSpan.Start);
+        if (nullableContext == NullableContext.Enabled)
+        {
+            ReportMustBeNullable(context, prop.Type.GetLocation());
+        }
+    }
+
+    private static void AnalyzeTypeFirstDefaultValue(SyntaxNodeAnalysisContext context, PropertyDeclarationSyntax prop)
+    {
+        if (prop.Initializer != null)
+        {
+            ReportMustNotHaveDefaultValue(context, prop.Initializer.Value.GetLocation());
         }
     }
 
@@ -175,6 +239,14 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         var assignment = name.Ancestors().OfType<AssignmentExpressionSyntax>().FirstOrDefault();
         return assignment?.Right is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.TrueLiteralExpression);
     }
+
+    private static bool HasIgnoreAttribute(PropertyDeclarationSyntax prop, SemanticModel semanticModel) =>
+        prop.AttributeLists.Any(attributes =>
+            attributes.Attributes.Any(attribute =>
+                attribute.Name.ToString()
+                    is Constants.AttributeNames.Ignore
+                    or Constants.AttributeNames.Ignore + Constants.AttributeNames.Attribute
+                && attribute.IsGraphQLSymbol(semanticModel)));
 
     private static void ReportMustBeNullable(SyntaxNodeAnalysisContext context, Location location) =>
         context.ReportDiagnostic(Diagnostic.Create(OneOfFieldsMustBeNullable, location));

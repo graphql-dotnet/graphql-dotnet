@@ -7,6 +7,13 @@ public static class Constants
 {
     public const string GraphQL = "GraphQL";
 
+    public static class AttributeNames
+    {
+        public const string Attribute = "Attribute";
+        public const string Ignore = "Ignore";
+        public const string OneOf = "OneOf";
+    }
+
     public static class ArgumentNames
     {
         public const string Arguments = "arguments";

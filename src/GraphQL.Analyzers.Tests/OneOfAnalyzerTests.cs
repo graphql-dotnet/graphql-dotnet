@@ -16,7 +16,7 @@ public class OneOfAnalyzerTests
     [Theory]
     [InlineData(null)]
     [InlineData("this.")]
-    public async Task OneOfIsTrue_AllFieldsAreNullable_NoDiagnostics(string? prefix)
+    public async Task CodeFirst_OneOfIsTrue_AllFieldsAreNullable_NoDiagnostics(string? prefix)
     {
         string source =
             $$"""
@@ -49,7 +49,7 @@ public class OneOfAnalyzerTests
     [InlineData("this.", true)]
     [InlineData(null, false)]
     [InlineData("this.", false)]
-    public async Task AllFieldsAreNotNullable_DiagnosticsReportedWhenIsOneOfTrue(string? prefix, bool isOneOf)
+    public async Task CodeFirst_AllFieldsAreNotNullable_DiagnosticsReportedWhenIsOneOfTrue(string? prefix, bool isOneOf)
     {
         string source =
             $$"""
@@ -91,7 +91,7 @@ public class OneOfAnalyzerTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async Task FieldHasDefaultValue_ReportDiagnosticsWhenIsOneOfTrue(bool isOneOf)
+    public async Task CodeFirst_FieldHasDefaultValue_ReportDiagnosticsWhenIsOneOfTrue(bool isOneOf)
     {
         string source =
             $$"""
@@ -111,6 +111,119 @@ public class OneOfAnalyzerTests
 
         var expected = isOneOf
             ? [VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(0)]
+            : DiagnosticResult.EmptyDiagnosticResults;
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("[OneOf]")]
+    [InlineData("[OneOfAttribute]")]
+    public async Task TypeFirst_NonNullableDiagnosticsReportedWhenOneOfAttribute(string? attribute)
+    {
+        string source =
+            $$"""
+              using GraphQL;
+
+              namespace Sample.Server;
+
+              {{attribute}}
+              public class MyInput
+              {
+                  // Good
+                  public int? NullableValue { get; set; }
+
+                  // Bad
+                  public {|#0:int|} NonNullableValue { get; set; }
+
+              #nullable disable
+                  // Good
+                  public string NullableRefValue1 { get; set; }
+
+              #nullable enable
+                  // Good
+                  public string? NullableRefValue2 { get; set; }
+
+                  // Bad
+                  public {|#1:string|} NonNullableRefValue { get; set; } = {|#2:null!|};
+              }
+              """;
+
+        var expected = attribute != null
+            ?
+            [
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(1),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2)
+            ]
+            : DiagnosticResult.EmptyDiagnosticResults;
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("[OneOf]")]
+    [InlineData("[OneOfAttribute]")]
+    public async Task TypeFirst_DefaultValueDiagnosticsReportedWhenOneOfAttribute(string? attribute)
+    {
+        string source =
+            $$"""
+              using GraphQL;
+
+              namespace Sample.Server;
+
+              {{attribute}}
+              public class MyInput
+              {
+                  public int? NullableValue { get; set; } = {|#0:1|};
+
+              #nullable disable
+                  public string NullableRefValue1 { get; set; } = {|#1:"xxx"|};
+
+              #nullable enable
+                  public string? NullableRefValue2 { get; set; } = {|#2:"yyy"|};
+              }
+              """;
+
+        var expected = attribute != null
+            ?
+            [
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(0),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2)
+            ]
+            : DiagnosticResult.EmptyDiagnosticResults;
+
+        await VerifyCS.VerifyAnalyzerAsync(source, expected);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("[Ignore]")]
+    public async Task TypeFirst_DiagnosticsReported_WhenNotIgnored(string? attribute)
+    {
+        string source =
+            $$"""
+              using GraphQL;
+
+              namespace Sample.Server;
+
+              [OneOf]
+              public class MyInput
+              {
+                  {{attribute}}
+                  public {|#0:int|} NonNullableValue { get; set; } = {|#1:42|};
+              }
+              """;
+
+        var expected = attribute == null
+            ?
+            [
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1)
+            ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
