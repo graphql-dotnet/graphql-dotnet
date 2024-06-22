@@ -39,7 +39,7 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
             .GetString();
 
         sdl.ShouldBe("""
-            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires"]) {
+            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires", {name: "FieldSet", as: "fedFieldSet"}]) {
               query: TestQuery
             }
 
