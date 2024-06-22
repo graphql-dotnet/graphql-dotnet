@@ -2,9 +2,6 @@ name: Test code
 
 on:
   pull_request:
-    branches:
-      - master
-      - develop
     paths:
       - src/**
       - .github/workflows/**
