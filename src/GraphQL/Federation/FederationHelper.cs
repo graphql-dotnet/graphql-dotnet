@@ -167,6 +167,8 @@ internal static class FederationHelper
                     .Cast<FederationDirectiveEnum>()
                     .Where(x => import.HasFlag(x) && _federationDirectiveEnumMap.ContainsKey(x))
                     .Select(x => _federationDirectiveEnumMap[x])
+                    .Cast<object>()
+                    .Append(new Dictionary<string, string> { { "name", "FieldSet" }, { "as", "fedFieldSet" } })
                     .ToList()
             });
         });
