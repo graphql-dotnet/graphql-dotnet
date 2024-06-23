@@ -145,8 +145,8 @@ public class OneOfAnalyzerTests
                   public string? NullableRefProp2 { get; set; }
                   public string? NullableRefField2;
 
-                  public {|#2:string|} NonNullableRefProp { get; set; } = {|#3:null!|};
-                  public {|#4:string|} NonNullableRefField = {|#5:null!|};
+                  public {|#2:string|} NonNullableRefProp { get; set; } = null!;
+                  public {|#3:string|} NonNullableRefField = null!;
               }
               """;
 
@@ -156,9 +156,7 @@ public class OneOfAnalyzerTests
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(1),
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(2),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(3),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(4),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(5)
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(3),
             ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
@@ -174,22 +172,29 @@ public class OneOfAnalyzerTests
         string source =
             $$"""
               using GraphQL;
+              using System.ComponentModel;
 
               namespace Sample.Server;
 
               {{attribute}}
               public class MyInput
               {
-                  public int? NullableProp { get; set; } = {|#0:1|};
-                  public int? NullableField = {|#1:1|};
+                  {|#0:[DefaultValue(1)]|}
+                  public int? NullableProp { get; set; }
+                  {|#1:[DefaultValue(1)]|}
+                  public int? NullableField;
 
               #nullable disable
-                  public string NullableRefProp1 { get; set; } = {|#2:"xxx"|};
-                  public string NullableRefField1 = {|#3:"xxx"|};
+                  {|#2:[DefaultValue("xxx")]|}
+                  public string NullableRefProp1 { get; set; }
+                  {|#3:[DefaultValue("xxx")]|}
+                  public string NullableRefField1;
 
               #nullable enable
-                  public string? NullableRefProp2 { get; set; } = {|#4:"yyy"|};
-                  public string? NullableRefField2 = {|#5:"yyy"|};
+                  {|#4:[DefaultValue("yyy")]|}
+                  public string? NullableRefProp2 { get; set; }
+                  {|#5:[DefaultValue("yyy")]|}
+                  public string? NullableRefField2;
               }
               """;
 
@@ -216,6 +221,7 @@ public class OneOfAnalyzerTests
         string source =
             $$"""
               using GraphQL;
+              using System.ComponentModel;
 
               namespace Sample.Server;
 
@@ -223,20 +229,22 @@ public class OneOfAnalyzerTests
               public class MyInput
               {
                   {{attribute}}
-                  public {|#0:int|} NonNullableProp { get; set; } = {|#1:42|};
+                  {|#0:[DefaultValue(42)]|}
+                  public {|#1:int|} NonNullableProp { get; set; }
 
                   {{attribute}}
-                  public {|#2:int|} NonNullableField = {|#3:42|};
+                  {|#2:[DefaultValue(42)]|}
+                  public {|#3:int|} NonNullableField;
               }
               """;
 
         var expected = attribute == null
             ?
             [
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(2),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(3)
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(0),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(1),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(3)
             ]
             : DiagnosticResult.EmptyDiagnosticResults;
 

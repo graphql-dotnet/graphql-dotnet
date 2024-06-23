@@ -210,14 +210,6 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private static bool HasIgnoreAttribute(MemberDeclarationSyntax prop, SemanticModel semanticModel) =>
-        prop.AttributeLists.Any(attributes =>
-            attributes.Attributes.Any(attribute =>
-                attribute.Name.ToString()
-                    is Constants.AttributeNames.Ignore
-                    or Constants.AttributeNames.Ignore + Constants.AttributeNames.Attribute
-                && attribute.IsGraphQLSymbol(semanticModel)));
-
     private static void AnalyzeTypeFirstNullability(SyntaxNodeAnalysisContext context, MemberDeclarationSyntax member)
     {
         var type = member switch
@@ -248,25 +240,29 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeTypeFirstDefaultValue(SyntaxNodeAnalysisContext context, MemberDeclarationSyntax member)
     {
-        switch (member)
+        var defaultValueAttribute = GetDefaultValueAttribute(member);
+        if (defaultValueAttribute != null)
         {
-            case PropertyDeclarationSyntax prop:
-                if (prop.Initializer != null)
-                {
-                    ReportMustNotHaveDefaultValue(context, prop.Initializer.Value.GetLocation());
-                }
-                break;
-            case FieldDeclarationSyntax field:
-                foreach (var variable in field.Declaration.Variables)
-                {
-                    if (variable.Initializer != null)
-                    {
-                        ReportMustNotHaveDefaultValue(context, variable.Initializer.Value.GetLocation());
-                    }
-                }
-                break;
+            ReportMustNotHaveDefaultValue(context, defaultValueAttribute.Parent!.GetLocation());
         }
     }
+
+    private static bool HasIgnoreAttribute(MemberDeclarationSyntax member, SemanticModel semanticModel) =>
+        GetAttributes(member, Constants.AttributeNames.Ignore)
+            .Any(attribute => attribute.IsGraphQLSymbol(semanticModel));
+
+    private static AttributeSyntax? GetDefaultValueAttribute(MemberDeclarationSyntax member) =>
+        GetAttributes(member, Constants.AttributeNames.DefaultValue)
+            .FirstOrDefault();
+
+    private static IEnumerable<AttributeSyntax> GetAttributes(MemberDeclarationSyntax member, string attributeName) =>
+        member.AttributeLists
+            .Select(attributes => attributes.Attributes.FirstOrDefault(attribute =>
+            {
+                string name = attribute.Name.ToString();
+                return name == attributeName || name == attributeName + Constants.AttributeNames.Attribute;
+            }))
+            .Where(attribute => attribute != null);
 
     private static void ReportMustBeNullable(SyntaxNodeAnalysisContext context, Location location) =>
         context.ReportDiagnostic(Diagnostic.Create(OneOfFieldsMustBeNullable, location));

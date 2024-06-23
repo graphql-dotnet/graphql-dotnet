@@ -10,6 +10,7 @@ public static class Constants
     public static class AttributeNames
     {
         public const string Attribute = "Attribute";
+        public const string DefaultValue = "DefaultValue";
         public const string Ignore = "Ignore";
         public const string OneOf = "OneOf";
     }
