@@ -37,11 +37,11 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
     {
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.RegisterSyntaxNodeAction(AnalyzeCodeFirstProperty, SyntaxKind.IdentifierName);
-        context.RegisterSyntaxNodeAction(AnalyzeTypeFirstAttribute, SyntaxKind.Attribute);
+        context.RegisterSyntaxNodeAction(AnalyzeCodeFirst, SyntaxKind.IdentifierName);
+        context.RegisterSyntaxNodeAction(AnalyzeTypeFirst, SyntaxKind.Attribute);
     }
 
-    private void AnalyzeCodeFirstProperty(SyntaxNodeAnalysisContext context)
+    private void AnalyzeCodeFirst(SyntaxNodeAnalysisContext context)
     {
         var name = (IdentifierNameSyntax)context.Node;
 
@@ -113,8 +113,7 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
             }
             else
             {
-                var nullableArg = fieldInvocation
-                    .GetMethodArgument(Constants.ArgumentNames.Nullable, context.SemanticModel);
+                var nullableArg = fieldInvocation.GetMethodArgument(Constants.ArgumentNames.Nullable, context.SemanticModel);
 
                 // Field(x => x.Name);
                 if (nullableArg == null)
@@ -145,7 +144,7 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         }
     }
 
-    private void AnalyzeTypeFirstAttribute(SyntaxNodeAnalysisContext context)
+    private void AnalyzeTypeFirst(SyntaxNodeAnalysisContext context)
     {
         var attribute = (AttributeSyntax)context.Node;
         if (attribute.Name.ToString()

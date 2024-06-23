@@ -131,21 +131,16 @@ public class OneOfAnalyzerTests
               {{attribute}}
               public class MyInput
               {
-                  // Good
                   public int? NullableValue { get; set; }
 
-                  // Bad
                   public {|#0:int|} NonNullableValue { get; set; }
 
               #nullable disable
-                  // Good
                   public string NullableRefValue1 { get; set; }
 
               #nullable enable
-                  // Good
                   public string? NullableRefValue2 { get; set; }
 
-                  // Bad
                   public {|#1:string|} NonNullableRefValue { get; set; } = {|#2:null!|};
               }
               """;
@@ -202,7 +197,7 @@ public class OneOfAnalyzerTests
     [Theory]
     [InlineData(null)]
     [InlineData("[Ignore]")]
-    public async Task TypeFirst_DiagnosticsReported_WhenNotIgnored(string? attribute)
+    public async Task TypeFirst_DiagnosticsReportedWhenNotIgnored(string? attribute)
     {
         string source =
             $$"""
