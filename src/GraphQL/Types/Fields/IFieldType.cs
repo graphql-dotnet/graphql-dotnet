@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Represents a field of a graph type.
 /// </summary>
-public interface IFieldType : IHaveDefaultValue, IMetadataReader, IMetadataWriter, IProvideDescription, IProvideDeprecationReason
+public interface IFieldType : IHaveDefaultValue, IMetadataReader, IFieldMetadataWriter, IProvideDescription, IProvideDeprecationReason
 {
     /// <summary>
     /// Gets or sets the name of the field.

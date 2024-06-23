@@ -6,7 +6,9 @@ namespace GraphQL.Federation.SchemaFirst.Sample1;
 /// Retrieves the local instance of <typeparamref name="T"/> from the <see cref="Data"/>
 /// class using the specified delegate.
 /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
 public class MyFederatedResolver<T> : IFederatedResolver
+#pragma warning restore CS0618 // Type or member is obsolete
     where T : IHasId
 {
     private readonly Func<Data, int, Task<T?>> _resolver;

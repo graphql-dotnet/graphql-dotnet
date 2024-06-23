@@ -265,6 +265,9 @@ public partial class ValidationContext : IProvideUserContext
     /// <br/><br/>
     /// Since v3.3, returns null for variables set to null rather than the variable's default value.
     /// </summary>
+    /// <remarks>
+    /// Also see <see cref="Federation.FederationResolverAttribute.FederationStaticResolver.Deserialize(IGraphType, string, object?)"/>.
+    /// </remarks>
     private ValueTask<object?> GetVariableValueAsync(IGraphType graphType, GraphQLVariableDefinition variableDef, object? input, IVariableVisitor? visitor)
     {
         return ParseValueAsync(graphType, variableDef, variableDef.Variable.Name.StringValue, input, visitor); //ISSUE:allocation

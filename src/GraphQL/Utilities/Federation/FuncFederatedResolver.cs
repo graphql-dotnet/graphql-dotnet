@@ -1,18 +1,23 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
+using GraphQL.Federation.Resolvers;
+
 namespace GraphQL.Utilities.Federation;
 
-public class FuncFederatedResolver<T> : IFederatedResolver
+[Obsolete("Please use the GraphQL.Federation.FederationResolver class instead. This class will be removed in v9.")]
+public class FuncFederatedResolver<TReturn> : FederationResolver<Dictionary<string, object?>, TReturn>, IFederatedResolver
 {
-    private readonly Func<FederatedResolveContext, Task<T?>> _resolver;
-
-    public FuncFederatedResolver(Func<FederatedResolveContext, Task<T?>> func)
+    public FuncFederatedResolver(Func<FederatedResolveContext, Task<TReturn?>> func)
+        : base((context, source) => func(new FederatedResolveContext
+        {
+            ParentFieldContext = context,
+            Arguments = source,
+        }))
     {
-        _resolver = func;
     }
 
     public async Task<object?> Resolve(FederatedResolveContext context)
     {
-        return await _resolver(context).ConfigureAwait(false);
+        return await _resolveFunc(context.ParentFieldContext, context.Arguments).ConfigureAwait(false);
     }
 }

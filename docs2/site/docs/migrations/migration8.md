@@ -5,7 +5,7 @@ See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone
 
 ## New Features
 
-### 1. `IMetadataReader` and `IMetadataWriter` interfaces added
+### 1. `IMetadataReader`, `IMetadataWriter` and `IFieldMetadataWriter` interfaces added
 
 This makes it convenient to add extension methods to graph types or fields that can be used to read or write metadata
 such as authentication information. Methods for `IMetadataWriter` types will appear on both field builders and graph/field
@@ -25,6 +25,16 @@ public static TMetadataBuilder RequireAdmin<TMetadataBuilder>(this TMetadataBuil
 Both interfaces extend `IProvideMetadata` with read/write access to the metadata contained within the graph or field type.
 Be sure not to write metadata during the execution of a query, as the same graph/field type instance may be used for
 multiple queries and you would run into concurrency issues.
+
+In addition, the `IFieldMetadataWriter` interface has been added to allow scoping extension methods to fields only.
+For example:
+
+```csharp
+// adds the GraphQL Federation '@requires' directive to the field
+public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
+    where TMetadataWriter : IFieldMetadataWriter
+    => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
+```
 
 ### 2. Built-in scalars may be overridden via DI registrations
 
@@ -389,7 +399,33 @@ property to `true` for all object graph types to retain the existing behavior.
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
-### 13. OneOf Input Object support added
+### 13. GraphQL Federation v2 graph types added
+
+These graph types have been added to the `GraphQL.Federation.Types` namespace:
+
+- `AnyScalarType` (moved from `GraphQL.Utilities.Federation`)
+- `EntityGraphType`
+- `FieldSetGraphType`
+- `LinkImportGraphType`
+- `LinkPurpose` enumeration
+- `LinkPurposeGraphType`
+- `ServiceGraphType`
+
+### 14. Extension methods and attributes added to simplify applying GraphQL Federation directives in code-first and type-first schemas
+
+These extension methods and attributes simplify the process of applying GraphQL Federation directives:
+
+| Directive | Extension Method | Attribute | Description |
+|-----------|------------------|-----------|-------------|
+| `@external` | `External()` | `[External]` | Indicates that this subgraph usually can't resolve a particular object field, but it still needs to define that field for other purposes. |
+| `@requires` | `Requires(fields)` | `[Requires(fields)]` | Indicates that the resolver for a particular entity field depends on the values of other entity fields that are resolved by other subgraphs. This tells the router that it needs to fetch the values of those externally defined fields first, even if the original client query didn't request them. |
+| `@provides` | `Provides(fields)` | `[Provides(fields)]` | Specifies a set of entity fields that a subgraph can resolve, but only at a particular schema path (at other paths, the subgraph can't resolve those fields). |
+| `@key` | `Key(fields)` | `[Key(fields)]` | Designates an object type as an entity and specifies its key fields. Key fields are a set of fields that a subgraph can use to uniquely identify any instance of the entity. |
+| `@override` | `Override(from)` | `[Override(from)]` | Indicates that an object field is now resolved by this subgraph instead of another subgraph where it's also defined. This enables you to migrate a field from one subgraph to another. |
+| `@shareable` | `Shareable()` | `[Shareable]` | Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in Federation 2, object fields can be resolved by only one subgraph). |
+| `@inaccessible` | `Inaccessible()` | `[Inaccessible]` | Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs. This means that the field is not exposed to clients at all. |
+
+### 15. OneOf Input Object support added
 
 OneOf Input Objects are a special variant of Input Objects where the type system
 asserts that exactly one of the fields must be set and non-null, all others
@@ -406,6 +442,180 @@ To use this feature:
 Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
 It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
 It is not expected to change from the current draft.
+
+### 16. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
+
+Extension methods have been added for defining entity resolvers in code-first and type-first schemas
+for GraphQL Federation.
+
+Code-first sample 1: (uses entity type for representation)
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+
+        // configure federation resolver
+        this.ResolveReference(async (context, widget) =>
+        {
+            // pull the id from the representation
+            var id = widget.Id;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+```
+
+Code-first sample 2: (uses custom type for representation)
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+
+        // configure federation resolver
+        this.ResolveReference<WidgetRepresentation, Widget>(async (context, widget) =>
+        {
+            // pull the id from the representation
+            var id = widget.Id;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class WidgetRepresentation
+{
+    public string Id { get; set; }
+}
+```
+
+Type-first sample 1: (static method; uses method arguments for representation)
+
+```cs
+// configure federation key fields
+[Key("id")]
+public class Widget
+{
+    // configure fields
+    [Id]
+    public string Id { get; set; }
+    public string Name { get; set; }
+
+    // configure federation resolver
+    [FederationResolver]
+    public static async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, [Id] string id, CancellationToken token)
+    {
+        // resolve the entity reference
+        return await widgetData.GetWidgetByIdAsync(id, token);
+    }
+}
+```
+
+Type-first sample 2: (instance method; uses instance for representation)
+
+```cs
+// configure federation key fields
+[Key("id")]
+public class Widget
+{
+    // configure fields
+    [Id]
+    public string Id { get; set; }
+    public string Name { get; set; }
+
+    // configure federation resolver
+    [FederationResolver]
+    public async Task<Widget> ResolveReference([FromServices] WidgetRepository widgetData, CancellationToken token)
+    {
+        // pull the id from the representation
+        var id = Id;
+
+        // resolve the entity reference
+        return await widgetData.GetWidgetByIdAsync(id, token);
+    }
+}
+```
+
+Note that you may apply the `[Key]` attribute multiple times to define multiple sets of key fields, pursuant to the
+GraphQL Federation specification. You may define multiple resolvers when using static methods in a type-first schema.
+Otherwise your method will need to decide which set of key fields to use for resolution, as demonstrated in the
+code-first sample below:
+
+```cs
+public class WidgetType : ObjectGraphType<Widget>
+{
+    public WidgetType()
+    {
+        // configure federation key fields
+        this.Key("id");
+        this.Key("sku");
+
+        // configure federation resolver
+        this.ResolveReference(async (context, widget) =>
+        {
+            // pull the key values from the representation
+            var id = widget.Id;
+            var sku = widget.Sku;
+
+            // resolve the entity reference
+            var widgetData = context.RequestServices!.GetRequiredService<WidgetRepository>();
+            if (id != null)
+                return await widgetData.GetWidgetByIdAsync(id, context.CancellationToken);
+            else
+                return await widgetData.GetWidgetBySkuAsync(sku, context.CancellationToken);
+        });
+
+        // configure fields
+        Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+        Field(x => x.Sku);
+        Field(x => x.Name);
+    }
+}
+
+public class Widget
+{
+    public string Id { get; set; }
+    public string Sku { get; set; }
+    public string Name { get; set; }
+}
+```
+
+### 17. Applied directives may contain metadata
+
+`AppliedDirective` now implements `IProvideMetadata`, `IMetadataReader` and `IMetadataWriter`
+to allow for reading and writing metadata to applied directives.
 
 ## Breaking Changes
 
@@ -587,12 +797,61 @@ Unless you directly implement these interfaces, you should not be impacted by th
 See the new features section for details on the new method added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
 
-### 15. `IInputObjectGraphType.IsOneOf` property added
+### 15. `AnyScalarType` and `ServiceGraphType` moved to `GraphQL.Federation.Types`
+
+These graph types, previously located within the `GraphQL.Utilities.Federation` namespace,
+have been moved to the `GraphQL.Federation.Types` namespace alongside all other federation types.
+
+### 16. `IFederatedResolver`, `FuncFederatedResolver` and `ResolveReferenceAsync` replaced
+
+- `IFederatedResolver` has been replaced with `IFederationResolver`.
+- `FuncFederatedResolver` has been replaced with `FederationResolver`.
+- `ResolveReferenceAsync` has been replaced with `ResolveReference`.
+
+Please note that the new members are now located in the `GraphQL.Federation` namespace and may
+require slight changes to your code to accommodate the new signatures. The old members have been
+marked as obsolete and will continue to work in v8, but will be removed in v9.
+
+### 17. GraphQL Federation entity resolvers do not automatically inject `__typename` into requests.
+
+Previously, the `__typename` field was automatically injected into the request for entity resolvers.
+This behavior has been removed as it is not required to meet the GraphQL Federation specification.
+
+For instance, the following sample request:
+
+```graphql
+{
+  _entities(representations: [{ __typename: "User", id: "1" }]) {
+    ... on User {
+      id
+    }
+  }
+}
+```
+
+Should now be written as:
+
+```graphql
+{
+  _entities(representations: [{ __typename: "User", id: "1" }]) {
+    __typename
+    ... on User {
+      id
+    }
+  }
+}
+```
+
+Please ensure that your client requests are updated to include the `__typename` field in the response.
+Alternatively, you can install the provided `InjectTypenameValidationRule` validation rule to automatically
+inject the `__typename` field into the request.
+
+### 18. `IInputObjectGraphType.IsOneOf` property added
 
 See the new features section for details on the new property added to this interface.
 Unless you directly implement this interface, you should not be impacted by this change.
 
-### 16. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
+### 19. `VariableUsage.IsRequired` property added and `VariableUsage` constructor changed
 
 This is required for OneOf Input Object support and is used to determine if a variable is required.
 Unless you have a custom validation rule that uses `VariableUsage`, you should not be impacted

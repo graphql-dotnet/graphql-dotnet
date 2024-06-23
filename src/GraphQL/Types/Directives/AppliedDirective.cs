@@ -6,7 +6,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Represents a directive applied to a schema element - type, field, argument, etc.
 /// </summary>
-public class AppliedDirective : IEnumerable<DirectiveArgument>
+public class AppliedDirective : MetadataProvider, IEnumerable<DirectiveArgument>
 {
     private string _name = null!;
 

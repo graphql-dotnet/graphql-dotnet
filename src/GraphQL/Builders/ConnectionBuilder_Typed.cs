@@ -6,7 +6,7 @@ namespace GraphQL.Builders;
 /// <summary>
 /// Builds a connection field for graphs that have the specified source and return type.
 /// </summary>
-public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IMetadataWriter
+public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnType> : IFieldMetadataWriter
 {
     private bool IsBidirectional => FieldType.Arguments?.Find("before")?.Type == typeof(StringGraphType) && FieldType.Arguments.Find("last")?.Type == typeof(IntGraphType);
 
