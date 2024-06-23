@@ -60,11 +60,11 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         foreach (var statement in statements)
         {
             var fieldExpression = statement
-                .DescendantNodesAndSelf()
+                .DescendantNodes()
                 .OfType<SimpleNameSyntax>()
                 .FirstOrDefault(nameSyntax =>
                     nameSyntax.Identifier.Text == Constants.MethodNames.Field &&
-                    nameSyntax.AncestorsAndSelf()
+                    nameSyntax.Ancestors()
                         .OfType<ExpressionSyntax>()
                         .FirstOrDefault()
                         ?.IsGraphQLSymbol(context.SemanticModel) == true);
@@ -77,6 +77,33 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
             AnalyzeCodeFirstNullability(context, fieldExpression);
             AnalyzeCodeFirstDefaultValue(context, fieldExpression);
         }
+    }
+
+    private static bool IsOneOfTrue(SyntaxNodeAnalysisContext context, IdentifierNameSyntax name)
+    {
+        if (name.ToString() != IS_ONE_OF_PROPERTY_NAME)
+        {
+            return false;
+        }
+
+        if (!name.IsGraphQLSymbol(context.SemanticModel))
+        {
+            return false;
+        }
+
+        var enclosingSymbol = context.SemanticModel.GetSymbolInfo(name);
+        if (enclosingSymbol.Symbol is not IPropertySymbol prop)
+        {
+            return false;
+        }
+
+        if (prop.ContainingType.AllInterfaces.All(i => i.Name != Constants.Interfaces.IInputObjectGraphType))
+        {
+            return false;
+        }
+
+        var assignment = name.Ancestors().OfType<AssignmentExpressionSyntax>().FirstOrDefault();
+        return assignment?.Right is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.TrueLiteralExpression);
     }
 
     private static void AnalyzeCodeFirstNullability(SyntaxNodeAnalysisContext context, SimpleNameSyntax fieldExpression)
@@ -183,6 +210,14 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         }
     }
 
+    private static bool HasIgnoreAttribute(MemberDeclarationSyntax prop, SemanticModel semanticModel) =>
+        prop.AttributeLists.Any(attributes =>
+            attributes.Attributes.Any(attribute =>
+                attribute.Name.ToString()
+                    is Constants.AttributeNames.Ignore
+                    or Constants.AttributeNames.Ignore + Constants.AttributeNames.Attribute
+                && attribute.IsGraphQLSymbol(semanticModel)));
+
     private static void AnalyzeTypeFirstNullability(SyntaxNodeAnalysisContext context, MemberDeclarationSyntax member)
     {
         var type = member switch
@@ -232,41 +267,6 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
                 break;
         }
     }
-
-    private static bool IsOneOfTrue(SyntaxNodeAnalysisContext context, IdentifierNameSyntax name)
-    {
-        if (name.ToString() != IS_ONE_OF_PROPERTY_NAME)
-        {
-            return false;
-        }
-
-        if (!name.IsGraphQLSymbol(context.SemanticModel))
-        {
-            return false;
-        }
-
-        var enclosingSymbol = context.SemanticModel.GetSymbolInfo(name);
-        if (enclosingSymbol.Symbol is not IPropertySymbol prop)
-        {
-            return false;
-        }
-
-        if (prop.ContainingType.AllInterfaces.All(i => i.Name != Constants.Interfaces.IInputObjectGraphType))
-        {
-            return false;
-        }
-
-        var assignment = name.Ancestors().OfType<AssignmentExpressionSyntax>().FirstOrDefault();
-        return assignment?.Right is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.TrueLiteralExpression);
-    }
-
-    private static bool HasIgnoreAttribute(MemberDeclarationSyntax prop, SemanticModel semanticModel) =>
-        prop.AttributeLists.Any(attributes =>
-            attributes.Attributes.Any(attribute =>
-                attribute.Name.ToString()
-                    is Constants.AttributeNames.Ignore
-                    or Constants.AttributeNames.Ignore + Constants.AttributeNames.Attribute
-                && attribute.IsGraphQLSymbol(semanticModel)));
 
     private static void ReportMustBeNullable(SyntaxNodeAnalysisContext context, Location location) =>
         context.ReportDiagnostic(Diagnostic.Create(OneOfFieldsMustBeNullable, location));
