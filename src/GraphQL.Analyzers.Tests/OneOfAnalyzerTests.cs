@@ -131,17 +131,22 @@ public class OneOfAnalyzerTests
               {{attribute}}
               public class MyInput
               {
-                  public int? NullableValue { get; set; }
+                  public int? NullableProp { get; set; }
+                  public int? NullableField;
 
-                  public {|#0:int|} NonNullableValue { get; set; }
+                  public {|#0:int|} NonNullableProp { get; set; }
+                  public {|#1:int|} NonNullableField;
 
               #nullable disable
-                  public string NullableRefValue1 { get; set; }
+                  public string NullableRefProp1 { get; set; }
+                  public string NullableRefField1;
 
               #nullable enable
-                  public string? NullableRefValue2 { get; set; }
+                  public string? NullableRefProp2 { get; set; }
+                  public string? NullableRefField2;
 
-                  public {|#1:string|} NonNullableRefValue { get; set; } = {|#2:null!|};
+                  public {|#2:string|} NonNullableRefProp { get; set; } = {|#3:null!|};
+                  public {|#4:string|} NonNullableRefField = {|#5:null!|};
               }
               """;
 
@@ -150,7 +155,10 @@ public class OneOfAnalyzerTests
             [
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(1),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2)
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(2),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(3),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(4),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(5)
             ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
@@ -172,13 +180,16 @@ public class OneOfAnalyzerTests
               {{attribute}}
               public class MyInput
               {
-                  public int? NullableValue { get; set; } = {|#0:1|};
+                  public int? NullableProp { get; set; } = {|#0:1|};
+                  public int? NullableField = {|#1:1|};
 
               #nullable disable
-                  public string NullableRefValue1 { get; set; } = {|#1:"xxx"|};
+                  public string NullableRefProp1 { get; set; } = {|#2:"xxx"|};
+                  public string NullableRefField1 = {|#3:"xxx"|};
 
               #nullable enable
-                  public string? NullableRefValue2 { get; set; } = {|#2:"yyy"|};
+                  public string? NullableRefProp2 { get; set; } = {|#4:"yyy"|};
+                  public string? NullableRefField2 = {|#5:"yyy"|};
               }
               """;
 
@@ -187,7 +198,10 @@ public class OneOfAnalyzerTests
             [
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(0),
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2)
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(2),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(3),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(4),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(5)
             ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
@@ -209,7 +223,10 @@ public class OneOfAnalyzerTests
               public class MyInput
               {
                   {{attribute}}
-                  public {|#0:int|} NonNullableValue { get; set; } = {|#1:42|};
+                  public {|#0:int|} NonNullableProp { get; set; } = {|#1:42|};
+
+                  {{attribute}}
+                  public {|#2:int|} NonNullableField = {|#3:42|};
               }
               """;
 
@@ -217,7 +234,9 @@ public class OneOfAnalyzerTests
             ?
             [
                 VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(0),
-                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1)
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(1),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustBeNullable).WithLocation(2),
+                VerifyCS.Diagnostic(OneOfAnalyzer.OneOfFieldsMustNotHaveDefaultValue).WithLocation(3)
             ]
             : DiagnosticResult.EmptyDiagnosticResults;
 

@@ -159,56 +159,77 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var props = attribute
+        var members = attribute
             .Ancestors()
             .OfType<ClassDeclarationSyntax>()
             .FirstOrDefault()
             ?.DescendantNodes()
-            .OfType<PropertyDeclarationSyntax>();
+            .OfType<MemberDeclarationSyntax>();
 
-        if (props == null)
+        if (members == null)
         {
             return;
         }
 
-        foreach (var prop in props)
+        foreach (var member in members)
         {
-            if (HasIgnoreAttribute(prop, context.SemanticModel))
+            if (HasIgnoreAttribute(member, context.SemanticModel))
             {
                 continue;
             }
 
-            AnalyzeTypeFirstNullability(context, prop);
-            AnalyzeTypeFirstDefaultValue(context, prop);
+            AnalyzeTypeFirstNullability(context, member);
+            AnalyzeTypeFirstDefaultValue(context, member);
         }
     }
 
-    private static void AnalyzeTypeFirstNullability(SyntaxNodeAnalysisContext context, PropertyDeclarationSyntax prop)
+    private static void AnalyzeTypeFirstNullability(SyntaxNodeAnalysisContext context, MemberDeclarationSyntax member)
     {
-        if (prop.Type is NullableTypeSyntax)
+        var type = member switch
+        {
+            PropertyDeclarationSyntax prop => prop.Type,
+            FieldDeclarationSyntax field => field.Declaration.Type,
+            _ => null
+        };
+
+        if (type is null or NullableTypeSyntax)
         {
             return;
         }
 
-        var typeInfo = context.SemanticModel.GetTypeInfo(prop.Type);
+        var typeInfo = context.SemanticModel.GetTypeInfo(type);
         if (typeInfo.Type?.IsValueType == true)
         {
-            ReportMustBeNullable(context, prop.Type.GetLocation());
+            ReportMustBeNullable(context, type.GetLocation());
             return;
         }
 
-        var nullableContext = context.SemanticModel.GetNullableContext(prop.Type.GetLocation().SourceSpan.Start);
+        var nullableContext = context.SemanticModel.GetNullableContext(type.GetLocation().SourceSpan.Start);
         if (nullableContext == NullableContext.Enabled)
         {
-            ReportMustBeNullable(context, prop.Type.GetLocation());
+            ReportMustBeNullable(context, type.GetLocation());
         }
     }
 
-    private static void AnalyzeTypeFirstDefaultValue(SyntaxNodeAnalysisContext context, PropertyDeclarationSyntax prop)
+    private static void AnalyzeTypeFirstDefaultValue(SyntaxNodeAnalysisContext context, MemberDeclarationSyntax member)
     {
-        if (prop.Initializer != null)
+        switch (member)
         {
-            ReportMustNotHaveDefaultValue(context, prop.Initializer.Value.GetLocation());
+            case PropertyDeclarationSyntax prop:
+                if (prop.Initializer != null)
+                {
+                    ReportMustNotHaveDefaultValue(context, prop.Initializer.Value.GetLocation());
+                }
+                break;
+            case FieldDeclarationSyntax field:
+                foreach (var variable in field.Declaration.Variables)
+                {
+                    if (variable.Initializer != null)
+                    {
+                        ReportMustNotHaveDefaultValue(context, variable.Initializer.Value.GetLocation());
+                    }
+                }
+                break;
         }
     }
 
@@ -239,7 +260,7 @@ public class OneOfAnalyzer : DiagnosticAnalyzer
         return assignment?.Right is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.TrueLiteralExpression);
     }
 
-    private static bool HasIgnoreAttribute(PropertyDeclarationSyntax prop, SemanticModel semanticModel) =>
+    private static bool HasIgnoreAttribute(MemberDeclarationSyntax prop, SemanticModel semanticModel) =>
         prop.AttributeLists.Any(attributes =>
             attributes.Attributes.Any(attribute =>
                 attribute.Name.ToString()
