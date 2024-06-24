@@ -184,7 +184,7 @@ public class ComplexGraphTypeTests
     }
 
     [Fact]
-    public void accepts_property_expressions2()
+    public void infer_nullability_from_nrt()
     {
         var schema = new Schema();
         var type = new ComplexType<NrtTest>();
