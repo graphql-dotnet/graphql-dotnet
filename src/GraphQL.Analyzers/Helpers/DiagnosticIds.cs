@@ -14,4 +14,6 @@ public static class DiagnosticIds
     public const string CAN_NOT_RESOLVE_INPUT_SOURCE_TYPE_CONSTRUCTOR = "GQL010";
     public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = "GQL011";
     public const string ILLEGAL_METHOD_USAGE = "GQL012";
+    public const string ONE_OF_FIELDS_MUST_BE_NULLABLE = "GQL013";
+    public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = "GQL014";
 }
