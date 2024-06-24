@@ -104,7 +104,7 @@ public class MessageType : ObjectGraphType<Message>
     {
         Field(o => o.Content);
         Field(o => o.SentAt);
-        Field(o => o.From, false, typeof(MessageFromType)).Resolve(ResolveFrom);
+        Field(o => o.From, typeof(MessageFromType)).Resolve(ResolveFrom);
     }
 
     private MessageFrom ResolveFrom(IResolveFieldContext<Message> context)

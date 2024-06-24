@@ -557,18 +557,16 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="name">The name of this field.</param>
     /// <param name="expression">The property of the source object represented within an expression.</param>
-    /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+    /// <param name="nullable">Indicates if this field should be nullable or not.</param>
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
         string name,
         Expression<Func<TSourceType, TProperty>> expression,
-        bool nullable = false,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
+        bool nullable)
     {
+        Type type;
         try
         {
-            if (type == null)
-                type = typeof(TProperty).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+            type = typeof(TProperty).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
         }
         catch (ArgumentOutOfRangeException exp)
         {
@@ -599,6 +597,81 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
     /// <summary>
     /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+    /// <br/><br/>
+    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+    /// </summary>
+    /// <typeparam name="TProperty">The return type of the field.</typeparam>
+    /// <param name="name">The name of this field.</param>
+    /// <param name="expression">The property of the source object represented within an expression.</param>
+    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+        string name,
+        Expression<Func<TSourceType, TProperty>> expression,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    {
+        var builder = CreateBuilder<TProperty>(name, type)
+            .Description(expression.DescriptionOf())
+            .DeprecationReason(expression.DeprecationReasonOf())
+            .DefaultValue(expression.DefaultValueOf());
+
+        if (this is IInputObjectGraphType)
+        {
+            builder.ParseValue(value => value is TProperty ? value : value.GetPropertyValue(typeof(TProperty), builder.FieldType.ResolvedType!)!);
+        }
+
+        if (this is IObjectGraphType)
+            builder.Resolve(new ExpressionFieldResolver<TSourceType, TProperty>(expression));
+
+        if (expression.Body is MemberExpression expr)
+        {
+            builder.FieldType.Metadata[ORIGINAL_EXPRESSION_PROPERTY_NAME] = expr.Member.Name;
+        }
+
+        AddField(builder.FieldType);
+        return builder;
+    }
+
+    /// <summary>
+    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+    /// The default name of this field is inferred by the property represented within the expression.
+    /// <br/><br/>
+    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+    /// </summary>
+    /// <typeparam name="TProperty">The return type of the field.</typeparam>
+    /// <param name="name"></param>
+    /// <param name="expression">The property of the source object represented within an expression.</param>
+    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+        string name,
+        Expression<Func<TSourceType, TProperty>> expression)
+    {
+        Type type;
+        try
+        {
+            if (GlobalSwitches.InferFieldNullabilityFromNRTAnnotations)
+            {
+                var typeInfo = AutoRegisteringHelper.GetTypeInformation(
+                    ((MemberExpression)expression.Body).Member,
+                    this is IInputObjectGraphType);
+
+                type = typeInfo.ConstructGraphType();
+            }
+            else
+            {
+                type = typeof(TProperty).GetGraphTypeFromType(isNullable: false, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+            }
+        }
+        catch
+        {
+            throw new ArgumentException("Cannot infer a field type from the expression");
+        }
+
+        return Field(name, expression, type);
+    }
+
+    /// <summary>
+    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
     /// The default name of this field is inferred by the property represented within the expression.
     /// <br/><br/>
     /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
@@ -606,12 +679,8 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <typeparam name="TProperty">The return type of the field.</typeparam>
     /// <param name="expression">The property of the source object represented within an expression.</param>
-    /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
     public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
-        Expression<Func<TSourceType, TProperty>> expression,
-        bool nullable = false,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
+        Expression<Func<TSourceType, TProperty>> expression)
     {
         string name;
         try
@@ -624,7 +693,65 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
                 $"Cannot infer a Field name from the expression: '{expression.Body}' " +
                 $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
         }
-        return Field(name, expression, nullable, type);
+
+        return Field(name, expression);
+    }
+
+    /// <summary>
+    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+    /// The default name of this field is inferred by the property represented within the expression.
+    /// <br/><br/>
+    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+    /// </summary>
+    /// <typeparam name="TProperty">The return type of the field.</typeparam>
+    /// <param name="expression">The property of the source object represented within an expression.</param>
+    /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+        Expression<Func<TSourceType, TProperty>> expression,
+        bool nullable)
+    {
+        string name;
+        try
+        {
+            name = expression.NameOf();
+        }
+        catch
+        {
+            throw new ArgumentException(
+                $"Cannot infer a Field name from the expression: '{expression.Body}' " +
+                $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
+        }
+
+        return Field(name, expression, nullable);
+    }
+    /// <summary>
+    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+    /// The default name of this field is inferred by the property represented within the expression.
+    /// <br/><br/>
+    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+    /// </summary>
+    /// <typeparam name="TProperty">The return type of the field.</typeparam>
+    /// <param name="expression">The property of the source object represented within an expression.</param>
+    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+        Expression<Func<TSourceType, TProperty>> expression,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
+    {
+        string name;
+        try
+        {
+            name = expression.NameOf();
+        }
+        catch
+        {
+            throw new ArgumentException(
+                $"Cannot infer a Field name from the expression: '{expression.Body}' " +
+                $"on parent GraphQL type: '{Name ?? GetType().Name}'.");
+        }
+
+        return Field(name, expression, type);
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>

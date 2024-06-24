@@ -125,4 +125,9 @@ public static class GlobalSwitches
 #else
         System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = true;
 }
