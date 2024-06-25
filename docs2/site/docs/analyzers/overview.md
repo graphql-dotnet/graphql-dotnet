@@ -77,6 +77,11 @@ appropriate async version.
 The analyzer identifies instances of incorrectly using `GraphType` as generic
 type argument, where the type argument should not be of type `IGraphType`.
 
+### 8. OneOfAnalyzer
+
+The analyzer validates the correct definition of the `OneOf` input object
+fields.
+
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when
