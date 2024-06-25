@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using GraphQL.Types;
 
 namespace GraphQL.Types.Scalars;
 
