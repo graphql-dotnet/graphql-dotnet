@@ -563,8 +563,8 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
-            bool nullable = false,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
+            bool nullable,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
         {
             try
             {
@@ -661,8 +661,8 @@ namespace GraphQL.Types
         [Obsolete("Please use another overload that receives only one of the 'nullable' or 'type' arguments. This method will be removed in v9.")]
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
-            bool nullable = false,
-            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null)
+            bool nullable,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
         {
             string name;
             try
