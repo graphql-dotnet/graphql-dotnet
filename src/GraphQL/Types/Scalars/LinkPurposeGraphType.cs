@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.Federation.Types;
+namespace GraphQL.Types.Scalars;
 
 /// <summary>
 /// Represents an enumeration type for link purposes in GraphQL Federation.

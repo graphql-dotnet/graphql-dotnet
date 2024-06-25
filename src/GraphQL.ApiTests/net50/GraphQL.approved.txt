@@ -739,6 +739,7 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
+        public static void AddLinkDirectiveSupport(this GraphQL.Types.ISchema schema, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are n" +
             "ot trimmed by the compiler.")]
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
@@ -1694,22 +1695,6 @@ namespace GraphQL.Federation.Types
     public class FieldSetGraphType : GraphQL.Types.StringGraphType
     {
         public FieldSetGraphType() { }
-    }
-    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
-    {
-        public LinkImportGraphType() { }
-    }
-    [GraphQL.Types.ConstantCase]
-    public enum LinkPurpose
-    {
-        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
-        Security = 0,
-        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
-        Execution = 1,
-    }
-    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Federation.Types.LinkPurpose>
-    {
-        public LinkPurposeGraphType() { }
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
@@ -3059,6 +3044,25 @@ namespace GraphQL.Types.Relay.DataObjects
         public string? StartCursor { get; set; }
     }
 }
+namespace GraphQL.Types.Scalars
+{
+    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
+    {
+        public LinkImportGraphType() { }
+    }
+    [GraphQL.Types.ConstantCase]
+    public enum LinkPurpose
+    {
+        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
+        Security = 0,
+        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
+        Execution = 1,
+    }
+    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Types.Scalars.LinkPurpose>
+    {
+        public LinkPurposeGraphType() { }
+    }
+}
 namespace GraphQL.Utilities
 {
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
@@ -3146,6 +3150,22 @@ namespace GraphQL.Utilities
         void VisitSchema(GraphQL.Types.ISchema schema);
         void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema);
     }
+    public sealed class LinkConfiguration
+    {
+        public LinkConfiguration(string url) { }
+        public string? DefaultNamespacePrefix { get; set; }
+        public System.Collections.Generic.List<GraphQL.Utilities.LinkImport> Imports { get; set; }
+        public GraphQL.Types.Scalars.LinkPurpose? Purpose { get; set; }
+        public string Url { get; set; }
+        public string NameForDirective(string directiveName) { }
+        public string NameForType(string typeName) { }
+    }
+    public sealed class LinkImport
+    {
+        public LinkImport() { }
+        public string? Alias { get; set; }
+        public string Name { get; set; }
+    }
     public class MetadataProvider : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
@@ -3174,6 +3194,7 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool IncludeFederationTypes { get; set; }
+        public bool IncludeImportedTypes { get; set; }
         public System.StringComparison? StringComparison { get; set; }
     }
     public sealed class RemovePrivateTypesAndFieldsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
@@ -3398,6 +3419,12 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Utilities.Visitors
 {
+    public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static GraphQL.Utilities.Visitors.ParseLinkVisitor Instance { get; }
+        public void Run(GraphQL.Types.ISchema schema) { }
+        public override void VisitSchema(GraphQL.Types.ISchema schema) { }
+    }
     public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public PatternMatchingVisitor() { }
@@ -3426,6 +3453,17 @@ namespace GraphQL.Utilities.Visitors
         {
             public System.Threading.CancellationToken CancellationToken { get; }
             public GraphQLParser.ROM QueryTypeName { get; set; }
+        }
+    }
+    public sealed class RemoveImportedTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context>
+    {
+        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context context) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+            public System.Collections.Generic.List<string>? ImportedNamespaces { get; set; }
+            public System.Collections.Generic.List<string>? ImportedTypes { get; set; }
         }
     }
 }

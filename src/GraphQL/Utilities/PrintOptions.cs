@@ -28,4 +28,9 @@ public class PrintOptions : SDLPrinterOptions
     /// Only set to <see langword="false"/> for Apollo Federation v1 support.
     /// </summary>
     public bool IncludeFederationTypes { get; set; } = true;
+
+    /// <summary>
+    /// Indicates whether to print type/directive definitions imported from another schema via the @link directive.
+    /// </summary>
+    public bool IncludeImportedTypes { get; set; } = true;
 }

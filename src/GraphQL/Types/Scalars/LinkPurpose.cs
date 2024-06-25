@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using GraphQL.Types;
 
-namespace GraphQL.Federation.Types;
+namespace GraphQL.Types.Scalars;
 
 /// <summary>
 /// The purpose of the link.
