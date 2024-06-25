@@ -89,7 +89,7 @@ public sealed class LinkConfiguration
     internal void ConfigureAppliedDirective(AppliedDirective o)
     {
         if (o.Name != "link")
-            throw new ArgumentException("The supplied directive is not an @link directive.", nameof(o));
+            throw new ArgumentException("The supplied directive is not a @link directive.", nameof(o));
 
         o.WithMetadata(METADATA_KEY, this);
 
