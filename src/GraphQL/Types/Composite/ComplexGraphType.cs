@@ -559,6 +559,7 @@ namespace GraphQL.Types
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
         /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        [Obsolete("Please use another overload that receives only one of the 'nullable' or 'type' arguments. This method will be removed in v9.")]
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
@@ -594,6 +595,60 @@ namespace GraphQL.Types
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The filed graph type will be inferred from the specified expression via registered schema mappings.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            string name,
+            Expression<Func<TSourceType, TProperty>> expression) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(name, expression, nullable: false, type: null);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The filed graph type will be inferred from the specified expression via registered schema mappings.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            string name,
+            Expression<Func<TSourceType, TProperty>> expression,
+            bool nullable) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(name, expression, nullable, type: null);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="type">The graph type of the field.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            string name,
+            Expression<Func<TSourceType, TProperty>> expression,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(name, expression, nullable: false, type);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
         /// The default name of this field is inferred by the property represented within the expression.
         /// <br/><br/>
         /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
@@ -603,6 +658,7 @@ namespace GraphQL.Types
         /// <param name="expression">The property of the source object represented within an expression.</param>
         /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
         /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        [Obsolete("Please use another overload that receives only one of the 'nullable' or 'type' arguments. This method will be removed in v9.")]
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable = false,
@@ -621,6 +677,57 @@ namespace GraphQL.Types
             }
             return Field(name, expression, nullable, type);
         }
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// The filed graph type will be inferred from the specified expression via registered schema mappings.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            Expression<Func<TSourceType, TProperty>> expression) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(expression, nullable: false, type: null);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// The filed graph type will be inferred from the specified expression via registered schema mappings.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            Expression<Func<TSourceType, TProperty>> expression,
+            bool nullable) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(expression, nullable, type: null);
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="type">The graph type of the field.</param>
+        public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            Expression<Func<TSourceType, TProperty>> expression,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
+#pragma warning disable CS0618 // Type or member is obsolete
+            Field(expression, nullable: false, type);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
         [Obsolete("Please use the overload that accepts the mandatory name argument.")]
