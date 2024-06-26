@@ -2240,11 +2240,21 @@ namespace GraphQL.Types
         [System.Obsolete("Please call Field<TGraphType>(string name) instead.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
+        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
+            "guments. This method will be removed in v9.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
+            "guments. This method will be removed in v9.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
         [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
             "ned on it or just use AddField() method directly. This method may be removed in " +
             "a future release. For now you can continue to use this API but we do not encoura" +
