@@ -42,5 +42,4 @@ public static class DocumentEditorExtensions
         // Replace the original invocation expression with the updated one.
         docEditor.ReplaceNode(invocationExpression, updatedInvocationExpression);
     }
-
 }

@@ -16,6 +16,7 @@ public static class Constants
         public const string Description = "description";
         public const string Expression = "expression";
         public const string Name = "name";
+        public const string Nullable = "nullable";
         public const string Resolve = "resolve";
         public const string Subscribe = "subscribe";
         public const string Type = "type";
@@ -56,10 +57,12 @@ public static class Constants
         public const string BuilderMethodName = "BuilderMethodName";
         public const string IsAsync = "IsAsync";
         public const string IsDelegate = "IsDelegate";
+        public const string IsExpression = "IsExpression";
     }
 
     public static class Types
     {
+        public const string FieldBuilder = "FieldBuilder";
         public const string FieldType = "FieldType";
     }
 
