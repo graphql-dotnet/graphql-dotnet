@@ -21,14 +21,14 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DO_NOT_USE_OBSOLETE_FIELD_METHODS);
 
-    private static readonly HashSet<string> _supportedNames = new()
-    {
+    private static readonly HashSet<string> _supportedNames =
+    [
         Constants.MethodNames.Field,
         Constants.MethodNames.FieldAsync,
         Constants.MethodNames.FieldDelegate,
         Constants.MethodNames.FieldSubscribe,
-        Constants.MethodNames.FieldSubscribeAsync,
-    };
+        Constants.MethodNames.FieldSubscribeAsync
+    ];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(DoNotUseObsoleteFieldMethods);
@@ -82,6 +82,16 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        AnalyzeFieldBuilderReturningFiledType(context, genericNameSyntax, methodSymbol, name);
+        AnalyzeExpressionBasedFieldBuilder(context, genericNameSyntax, methodSymbol, name);
+    }
+
+    private static void AnalyzeFieldBuilderReturningFiledType(
+        SyntaxNodeAnalysisContext context,
+        SimpleNameSyntax genericNameSyntax,
+        IMethodSymbol methodSymbol,
+        string name)
+    {
         if (methodSymbol.ReturnType.Name != Constants.Types.FieldType)
         {
             return;
@@ -97,12 +107,66 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             isDelegate: name == Constants.MethodNames.FieldDelegate);
     }
 
-    private void ReportFieldTypeDiagnostic(
+    private static void AnalyzeExpressionBasedFieldBuilder(
+        SyntaxNodeAnalysisContext context,
+        SimpleNameSyntax genericNameSyntax,
+        IMethodSymbol methodSymbol,
+        string name)
+    {
+        if (name != Constants.MethodNames.Field || methodSymbol.ReturnType.Name != Constants.Types.FieldBuilder)
+        {
+            return;
+        }
+
+        var fieldInvocation = genericNameSyntax.FindMethodInvocationExpression()!;
+
+        var expressionArg = GetArgument(Constants.ArgumentNames.Expression);
+        if (expressionArg == null)
+        {
+            return;
+        }
+
+        var typeArgument = GetArgument(Constants.ArgumentNames.Type);
+        if (typeArgument == null)
+        {
+            return;
+        }
+
+        if (typeArgument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+        {
+            // We need to remove the 'type: null' argument regardless of the presence
+            // of the 'nullable' because 'type' is not nullable in the new API
+            ReportFieldTypeDiagnostic(
+                context,
+                fieldInvocation,
+                DoNotUseObsoleteFieldMethods,
+                isExpression: true);
+
+            return;
+        }
+
+        var nullableArg = GetArgument(Constants.ArgumentNames.Nullable);
+        if (nullableArg != null)
+        {
+            // both 'type' and 'nullable' are defined
+            ReportFieldTypeDiagnostic(
+                context,
+                fieldInvocation,
+                DoNotUseObsoleteFieldMethods,
+                isExpression: true);
+        }
+
+        ArgumentSyntax? GetArgument(string argName) =>
+            fieldInvocation.GetMethodArgument(argName, context.SemanticModel);
+    }
+
+    private static void ReportFieldTypeDiagnostic(
         SyntaxNodeAnalysisContext context,
         InvocationExpressionSyntax invocationExpressionSyntax,
         DiagnosticDescriptor diagnosticDescriptor,
-        bool isAsyncField,
-        bool isDelegate)
+        bool isAsyncField = false,
+        bool isDelegate = false,
+        bool isExpression = false)
     {
         var props = ImmutableDictionary<string, string?>.Empty;
 
@@ -114,6 +178,11 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         if (isDelegate)
         {
             props = props.Add(Constants.AnalyzerProperties.IsDelegate, "true");
+        }
+
+        if (isExpression)
+        {
+            props = props.Add(Constants.AnalyzerProperties.IsExpression, "true");
         }
 
         var location = invocationExpressionSyntax.GetLocation();
