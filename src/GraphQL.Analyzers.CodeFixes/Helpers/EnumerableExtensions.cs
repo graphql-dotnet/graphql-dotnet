@@ -7,7 +7,7 @@ public static class EnumerableExtensions
 {
     /// <summary>
     /// Converts the provided <see cref="SyntaxNode"/> collection
-    /// to <see cref="SeparatedSyntaxList{TNode}"/> with comma separator
+    /// to <see cref="SeparatedSyntaxList{TNode}"/> with specified separator.
     /// </summary>
     /// <typeparam name="T">The element type</typeparam>
     /// <param name="nodes">Source collection to convert into <see cref="SeparatedSyntaxList{TNode}"/>.</param>
