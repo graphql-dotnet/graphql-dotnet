@@ -1,4 +1,6 @@
-namespace GraphQL.Federation.Types;
+using GraphQL.Federation.Types;
+
+namespace GraphQL.Types.Scalars;
 
 /// <summary>
 /// Represents a scalar type for link imports in GraphQL Federation.
