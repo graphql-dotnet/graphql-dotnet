@@ -14,7 +14,6 @@ internal static class FederationHelper
     public const string FEDERATION_RESOLVER_FIELD = "_FederationResolverField_";
     public const string LINK_SCHEMA_EXTENSION_METADATA = "__FedLinkSchemaExtension__";
 
-    public const string LINK_DIRECTIVE = "link";
     public const string KEY_DIRECTIVE = "key";
     public const string SHAREABLE_DIRECTIVE = "shareable";
     public const string INACCESSIBLE_DIRECTIVE = "inaccessible";
@@ -25,11 +24,8 @@ internal static class FederationHelper
     public const string FIELDS_ARGUMENT = "fields";
     public const string FROM_ARGUMENT = "from";
     public const string RESOLVABLE_ARGUMENT = "resolvable";
-    public const string URL_ARGUMENT = "url";
-    public const string AS_ARGUMENT = "as";
-    public const string FOR_ARGUMENT = "for";
-    public const string IMPORT_ARGUMENT = "import";
     public const string REPRESENTATIONS_ARGUMENT = "representations";
+    public const string LINK_DIRECTIVE = "link";
 
     /// <summary>
     /// Maps <see cref="FederationDirectiveEnum"/> values to their corresponding directive strings.
@@ -53,19 +49,6 @@ internal static class FederationHelper
     public static void AddFederationDirectives(this ISchema schema, FederationSettings federationSettings)
     {
         var import = federationSettings.ImportDirectives ?? FederationDirectiveEnum.All;
-
-        var linkDirective = new Directive(LINK_DIRECTIVE)
-        {
-            Arguments = new(
-                new QueryArgument<NonNullGraphType<StringGraphType>>() { Name = URL_ARGUMENT },
-                new QueryArgument<StringGraphType>() { Name = AS_ARGUMENT },
-                new QueryArgument<LinkPurposeGraphType>() { Name = FOR_ARGUMENT },
-                new QueryArgument<ListGraphType<LinkImportGraphType>>() { Name = IMPORT_ARGUMENT }
-            ),
-            Repeatable = true,
-        };
-        linkDirective.Locations.Add(DirectiveLocation.Schema);
-        schema.Directives.Register(linkDirective);
 
         if (import.HasFlag(FederationDirectiveEnum.Key))
         {
@@ -158,17 +141,15 @@ internal static class FederationHelper
     {
         var version = settings.Version;
         var import = settings.ImportDirectives ?? FederationDirectiveEnum.All;
-        schema.ApplyDirective("link", d =>
+        schema.LinkSchema("https://specs.apollo.dev/federation/v" + version, c =>
         {
-            d.AddArgument(new DirectiveArgument(URL_ARGUMENT) { Value = "https://specs.apollo.dev/federation/v" + version });
-            d.AddArgument(new DirectiveArgument(IMPORT_ARGUMENT)
+            foreach (var directive in (FederationDirectiveEnum[])Enum.GetValues(typeof(FederationDirectiveEnum)))
             {
-                Value = Enum.GetValues(typeof(FederationDirectiveEnum))
-                    .Cast<FederationDirectiveEnum>()
-                    .Where(x => import.HasFlag(x) && _federationDirectiveEnumMap.ContainsKey(x))
-                    .Select(x => _federationDirectiveEnumMap[x])
-                    .ToList()
-            });
+                if (import.HasFlag(directive) && _federationDirectiveEnumMap.TryGetValue(directive, out var d))
+                {
+                    c.Imports[d] = d;
+                }
+            }
         });
     }
 }

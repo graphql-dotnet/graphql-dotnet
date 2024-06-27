@@ -20,8 +20,13 @@ public static class FederationGraphQLBuilderExtensions
         var settings = new FederationSettings();
         configure?.Invoke(settings);
 
-        if (settings.Version.StartsWith("1.") && settings.SdlPrintOptions == null)
-            settings.SdlPrintOptions = new() { IncludeFederationTypes = false };
+        settings.SdlPrintOptions ??= settings.Version.StartsWith("1.")
+            ? new()
+            {
+                IncludeFederationTypes = false,
+                IncludeImportedDefinitions = false,
+            }
+            : new() { IncludeImportedDefinitions = false };
 
         // todo: ensure all directives are supported by all supported versions
         var directives = settings.ImportDirectives ?? FederationDirectiveEnum.All;
@@ -30,8 +35,6 @@ public static class FederationGraphQLBuilderExtensions
             .Register(new ServiceGraphType(settings.SdlPrintOptions))
             .Register<AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityGraphType>(ServiceLifetime.Transient)
-            .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
-            .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
             .Register<FieldSetGraphType>(ServiceLifetime.Singleton)
             .Register<FederationEntitiesSchemaNodeVisitor>(ServiceLifetime.Transient)
             .Register<FederationServiceSchemaNodeVisitor>(ServiceLifetime.Transient);
