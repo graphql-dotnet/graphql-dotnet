@@ -673,6 +673,16 @@ schema without imported definitions, set the `IncludeImportedDefinitions` option
 var sdl = schema.Print(new() { IncludeImportedDefinitions = false });
 ```
 
+The schema shown above would now print like this:
+
+```graphql
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"])
+  @link(url: "https://specs.apollo.dev/federation/v2.3", as: "fed", import: ["@key", {name:"@shareable", as:"@share"}]) {
+    # etc
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
