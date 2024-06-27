@@ -3190,7 +3190,7 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool IncludeFederationTypes { get; set; }
-        public bool IncludeImportedTypes { get; set; }
+        public bool IncludeImportedDefinitions { get; set; }
         public System.StringComparison? StringComparison { get; set; }
     }
     public sealed class RemovePrivateTypesAndFieldsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor

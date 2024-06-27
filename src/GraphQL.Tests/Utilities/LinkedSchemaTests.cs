@@ -22,7 +22,8 @@ public class LinkedSchemaTests
         var schema = new Schema { Query = queryType };
         schema.AddLinkDirectiveSupport(c =>
         {
-            c.Namespace = defaultNamespacePrefix;
+            if (defaultNamespacePrefix != null)
+                c.Namespace = defaultNamespacePrefix;
             if (purposeAlias != null)
                 c.Imports["Purpose"] = purposeAlias;
             if (importAlias != null)
@@ -42,7 +43,7 @@ public class LinkedSchemaTests
         sb.AppendLine();
         sb.AppendLine("==== Without Imported Types ====");
         sb.AppendLine();
-        sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase, IncludeImportedTypes = false });
+        sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase, IncludeImportedDefinitions = false });
         sb.AppendLine(sdl);
         return sb.ToString();
     }

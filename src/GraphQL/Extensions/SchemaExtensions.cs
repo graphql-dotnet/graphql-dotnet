@@ -130,7 +130,7 @@ public static class SchemaExtensions
         {
             RemoveFederationTypesVisitor.Visit(sdl);
         }
-        if (!options.IncludeImportedTypes)
+        if (!options.IncludeImportedDefinitions)
         {
             RemoveImportedTypesVisitor.Visit(sdl, schema);
         }

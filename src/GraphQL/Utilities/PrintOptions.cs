@@ -32,5 +32,5 @@ public class PrintOptions : SDLPrinterOptions
     /// <summary>
     /// Indicates whether to print type/directive definitions imported from another schema via the @link directive.
     /// </summary>
-    public bool IncludeImportedTypes { get; set; } = true;
+    public bool IncludeImportedDefinitions { get; set; } = true;
 }

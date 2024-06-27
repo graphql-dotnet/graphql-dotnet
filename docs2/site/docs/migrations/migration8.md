@@ -450,7 +450,7 @@ for GraphQL Federation.
 
 Code-first sample 1: (uses entity type for representation)
 
-```cs
+```csharp
 public class WidgetType : ObjectGraphType<Widget>
 {
     public WidgetType()
@@ -484,7 +484,7 @@ public class Widget
 
 Code-first sample 2: (uses custom type for representation)
 
-```cs
+```csharp
 public class WidgetType : ObjectGraphType<Widget>
 {
     public WidgetType()
@@ -523,7 +523,7 @@ public class WidgetRepresentation
 
 Type-first sample 1: (static method; uses method arguments for representation)
 
-```cs
+```csharp
 // configure federation key fields
 [Key("id")]
 public class Widget
@@ -545,7 +545,7 @@ public class Widget
 
 Type-first sample 2: (instance method; uses instance for representation)
 
-```cs
+```csharp
 // configure federation key fields
 [Key("id")]
 public class Widget
@@ -573,7 +573,7 @@ GraphQL Federation specification. You may define multiple resolvers when using s
 Otherwise your method will need to decide which set of key fields to use for resolution, as demonstrated in the
 code-first sample below:
 
-```cs
+```csharp
 public class WidgetType : ObjectGraphType<Widget>
 {
     public WidgetType()
@@ -616,6 +616,62 @@ public class Widget
 
 `AppliedDirective` now implements `IProvideMetadata`, `IMetadataReader` and `IMetadataWriter`
 to allow for reading and writing metadata to applied directives.
+
+### 18. Support added for the Apollo `@link` directive
+
+This directive indicates that some types and/or directives are to be imported from another schema.
+Types and directives can be explicitly imported, either with their original name or with an alias.
+Any types or directives that are not explicitly imported will be assumed to be named with a specified
+namespace, which is derived from the URL of the linked schema if not set explicitly.
+Visit https://specs.apollo.dev/link/v1.0/ for more information.
+
+To link another schema, use this code like this in your schema constructor or `ConfigureSchema` call:
+
+```csharp
+schema.LinkSchema("https://specs.apollo.dev/federation/v2.3", o =>
+{
+    // override the default namespace of 'federation' with the alias 'fed'
+    o.Namespace = "fed";
+
+    // import the '@key' directive without an alias
+    o.Imports.Add("@key", "@key");
+
+    // import the '@shareable' directive with an alias of '@share'
+    o.Imports.Add("@shareable", "@share");
+
+    // other directives such as '@requires' would be implicitly imported
+    // into the 'fed' namespace, so '@requires' becomes '@fed__requires'
+});
+```
+
+In addition to applying a `@link` directive to the schema, it will also import the `@link` directive
+and configure the necessary types and directives to support the `@link` specification.
+Your schema will then look like this:
+
+```graphql
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"])
+  @link(url: "https://specs.apollo.dev/federation/v2.3", as: "fed", import: ["@key", {name:"@shareable", as:"@share"}]) {
+    # etc
+}
+
+directive @link(url: String!, as: String, import: [link__Import], purpose: link__Purpose) repeatable on SCHEMA
+
+scalar link__Import
+
+enum link__Purpose {
+  EXECUTION
+  SECURITY
+}
+```
+
+You will still be required to add the imported schema definitions to your schema, such as `@key`, `@share`, and
+`@fed__requires` in the above example. You may also print the schema without imported definitions. To print the
+schema without imported definitions, set the `IncludeImportedDefinitions` option to `false` when printing:
+
+```csharp
+var sdl = schema.Print(new() { IncludeImportedDefinitions = false });
+```
 
 ## Breaking Changes
 

@@ -17,7 +17,13 @@ public sealed class LinkConfiguration
     /// </summary>
     public LinkConfiguration(string url)
     {
-        Url = url;
+        Url = url ?? throw new ArgumentNullException(nameof(url));
+        if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
+        {
+            var uri = new Uri(url);
+            var (name, _) = TryParseUrl(url);
+            _namespace = OriginalNamespace = name;
+        }
     }
 
     /// <summary>
@@ -25,6 +31,9 @@ public sealed class LinkConfiguration
     /// </summary>
     public string Url { get; }
 
+    private string? OriginalNamespace { get; set; }
+
+    private string? _namespace;
     /// <summary>
     /// The namespace that imported elements are placed in when they are not specifically imported.
     /// Defaults to the name of the imported schema, as derived from the URL.
@@ -34,7 +43,20 @@ public sealed class LinkConfiguration
     /// when "Bar" is not specifically imported.
     /// However, importing the type "Bar" would allow it to be used as "Bar" without a namespace prefix.
     /// </remarks>
-    public string? Namespace { get; set; }
+    public string? Namespace
+    {
+        get => _namespace;
+        set
+        {
+            if (value == null && OriginalNamespace != null)
+                throw new InvalidOperationException("Cannot set the namespace to null when it can be derived from the URL.");
+            if (value == "")
+                throw new InvalidOperationException("The default namespace prefix cannot be an empty string.");
+            if (value != null)
+                NameValidator.ValidateName(value, NamedElement.Type);
+            _namespace = value;
+        }
+    }
 
     /// <summary>
     /// The purpose of the link, which can influence how the link is treated in the schema.
@@ -100,24 +122,11 @@ public sealed class LinkConfiguration
 
         o.WithMetadata(METADATA_KEY, this);
 
-        o.AddArgument(new DirectiveArgument("url") { Value = Url ?? throw new InvalidOperationException("No url specified.") });
+        o.AddArgument(new DirectiveArgument("url") { Value = Url });
 
-        // parse the url now so that future calls to NameForType and NameForDirective don't need to re-parse it
-        var parsedUrl = TryParseUrl(Url);
-
-        if (Namespace != null)
+        if (Namespace != null && Namespace != OriginalNamespace)
         {
-            if (Namespace != parsedUrl.Name)
-            {
-                if (Namespace == "")
-                    throw new InvalidOperationException("The default namespace prefix cannot be an empty string.");
-                NameValidator.ValidateName(Namespace, NamedElement.Type);
-                o.AddArgument(new DirectiveArgument("as") { Value = Namespace });
-            }
-        }
-        else
-        {
-            Namespace = parsedUrl.Name;
+            o.AddArgument(new DirectiveArgument("as") { Value = Namespace });
         }
 
         if (Purpose != null)
@@ -128,23 +137,24 @@ public sealed class LinkConfiguration
             var importList = new List<object>();
             foreach (var import in Imports)
             {
-                if (import.Key == "")
+                if (import.Key == null)
                     throw new InvalidOperationException("No name specified for an import.");
+                var alias = import.Value ?? import.Key;
                 if (import.Key.StartsWith("@", StringComparison.Ordinal))
                 {
                     NameValidator.ValidateName(import.Key.Substring(1), NamedElement.Directive);
-                    if (!import.Value.StartsWith("@", StringComparison.Ordinal))
+                    if (!alias.StartsWith("@", StringComparison.Ordinal))
                         throw new InvalidOperationException("An alias for a directive must start with '@'.");
-                    NameValidator.ValidateName(import.Value.Substring(1), NamedElement.Directive);
+                    NameValidator.ValidateName(alias.Substring(1), NamedElement.Directive);
                 }
                 else
                 {
                     NameValidator.ValidateName(import.Key, NamedElement.Type);
-                    NameValidator.ValidateName(import.Value, NamedElement.Type);
+                    NameValidator.ValidateName(alias, NamedElement.Type);
                 }
-                if (import.Key != import.Value)
+                if (import.Key != alias)
                 {
-                    importList.Add(new Dictionary<string, string> { { "name", import.Key }, { "as", import.Value } });
+                    importList.Add(new Dictionary<string, string> { { "name", import.Key }, { "as", alias } });
                 }
                 else
                 {
@@ -272,8 +282,6 @@ public sealed class LinkConfiguration
         configuration = new LinkConfiguration(url);
         if (appliedDirective.FindArgument("as") is { Value: string defaultNamespacePrefix } && defaultNamespacePrefix != null)
             configuration.Namespace = defaultNamespacePrefix;
-        else
-            configuration.Namespace = TryParseUrl(url).Name;
         if (appliedDirective.FindArgument("purpose") is { Value: LinkPurpose purpose })
             configuration.Purpose = purpose;
         if (appliedDirective.FindArgument("import") is { Value: IEnumerable importList })
