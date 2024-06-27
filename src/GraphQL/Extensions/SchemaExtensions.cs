@@ -417,24 +417,22 @@ public static class SchemaExtensions
     public static void AddLinkDirectiveSupport(this ISchema schema, Action<LinkConfiguration>? configuration = null)
     {
         var config = new LinkConfiguration(LinkConfiguration.LINK_URL);
-        config.Imports.Add(new() { Name = "@link" });
+        config.Imports.Add("@link", "@link");
         configuration?.Invoke(config);
-        if (config.Url != LinkConfiguration.LINK_URL)
-            throw new InvalidOperationException($"The @link directive must be imported from {LinkConfiguration.LINK_URL}. No other versions are currently supported by this method.");
-        var link = config.Imports.FirstOrDefault(x => x.Name == "@link")
-            ?? throw new InvalidOperationException("The @link directive must be imported.");
-        if (link.Alias != null && link.Alias != "@link")
+        if (!config.Imports.TryGetValue("@link", out var linkAlias))
+            throw new InvalidOperationException("The @link directive must be imported.");
+        if (linkAlias != "@link")
             throw new InvalidOperationException("The @link directive must be imported without an alias.");
         foreach (var import in config.Imports)
         {
-            switch (import.Name)
+            switch (import.Key)
             {
                 case "Import":
                 case "Purpose":
                 case "@link":
                     break;
                 default:
-                    throw new InvalidOperationException($"The '{import.Name}' import name is not valid; please specify only '@link', 'Purpose', and 'Import'.");
+                    throw new InvalidOperationException($"The '{import.Key}' import name is not valid; please specify only '@link', 'Purpose', and/or 'Import'.");
             }
         }
         schema.LinkSchema(config);
@@ -459,7 +457,7 @@ public static class SchemaExtensions
     /// <param name="schema">The schema to which the directive will be added.</param>
     /// <param name="url">The URL of the linked schema.</param>
     /// <param name="configuration">An optional action to configure the link further.</param>
-    private static void LinkSchema(this ISchema schema, string url, Action<LinkConfiguration>? configuration = null)
+    public static void LinkSchema(this ISchema schema, string url, Action<LinkConfiguration>? configuration = null)
     {
         var config = new LinkConfiguration(url);
         configuration?.Invoke(config);
@@ -494,6 +492,18 @@ public static class SchemaExtensions
         }
 
         schema.ApplyDirective("link", config.ConfigureAppliedDirective);
+    }
+
+    /// <summary>
+    /// Gets the applied @link directives from the schema.
+    /// Results are only valid after the schema has been initialized.
+    /// </summary>
+    public static IEnumerable<LinkConfiguration> GetLinkedSchemas(this ISchema schema)
+    {
+        var appliedDirectives = schema.GetAppliedDirectives();
+        if (appliedDirectives == null)
+            return Array.Empty<LinkConfiguration>();
+        return appliedDirectives.Select(LinkConfiguration.GetConfiguration).Where(x => x != null)!;
     }
 }
 

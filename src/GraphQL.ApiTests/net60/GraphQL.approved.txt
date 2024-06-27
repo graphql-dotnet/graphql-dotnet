@@ -747,6 +747,8 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static System.Collections.Generic.IEnumerable<GraphQL.Utilities.LinkConfiguration> GetLinkedSchemas(this GraphQL.Types.ISchema schema) { }
+        public static void LinkSchema(this GraphQL.Types.ISchema schema, string url, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
         public static string Print(this GraphQL.Types.ISchema schema, GraphQL.Utilities.PrintOptions? options = null) { }
         public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQL.Utilities.PrintOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T>(this GraphQL.Types.ISchema schema)
@@ -3167,18 +3169,12 @@ namespace GraphQL.Utilities
     public sealed class LinkConfiguration
     {
         public LinkConfiguration(string url) { }
-        public string? DefaultNamespacePrefix { get; set; }
-        public System.Collections.Generic.List<GraphQL.Utilities.LinkImport> Imports { get; set; }
+        public System.Collections.Generic.Dictionary<string, string> Imports { get; }
+        public string? Namespace { get; set; }
         public GraphQL.Types.Scalars.LinkPurpose? Purpose { get; set; }
-        public string Url { get; set; }
+        public string Url { get; }
         public string NameForDirective(string directiveName) { }
         public string NameForType(string typeName) { }
-    }
-    public sealed class LinkImport
-    {
-        public LinkImport() { }
-        public string? Alias { get; set; }
-        public string Name { get; set; }
     }
     public class MetadataProvider : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
@@ -3477,7 +3473,7 @@ namespace GraphQL.Utilities.Visitors
         {
             public System.Threading.CancellationToken CancellationToken { get; }
             public System.Collections.Generic.List<string>? ImportedNamespaces { get; set; }
-            public System.Collections.Generic.List<string>? ImportedTypes { get; set; }
+            public System.Collections.Generic.HashSet<string>? ImportedTypes { get; set; }
         }
     }
 }

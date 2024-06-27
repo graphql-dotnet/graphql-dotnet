@@ -23,23 +23,23 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
             return;
 
         List<string>? importedNamespaces = null;
-        List<string>? importedTypes = null;
+        HashSet<string>? importedTypes = null;
         foreach (var appliedDirective in appliedDirectives)
         {
             var link = LinkConfiguration.GetConfiguration(appliedDirective);
             if (link == null)
                 continue;
-            if (link.DefaultNamespacePrefix != null)
+            if (link.Namespace != null)
             {
                 importedNamespaces ??= new();
-                importedNamespaces.Add(link.DefaultNamespacePrefix);
+                importedNamespaces.Add(link.Namespace + "__");
             }
-            if (link.Imports != null && link.Imports.Count > 0)
+            if (link.Imports?.Count > 0)
             {
                 importedTypes ??= new();
                 foreach (var import in link.Imports)
                 {
-                    importedTypes.Add(import.Alias ?? import.Name);
+                    importedTypes.Add(import.Value);
                 }
             }
         }
@@ -69,22 +69,13 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
         {
             if (context.ImportedNamespaces != null)
             {
-                var directiveNameNoAt = directiveName.Substring(1); // remove '@'
                 foreach (var importedNamespace in context.ImportedNamespaces)
                 {
-                    if (directiveNameNoAt.StartsWith(importedNamespace + "__"))
+                    if (directiveName.StartsWith(importedNamespace))
                         return true;
                 }
             }
-            if (context.ImportedTypes != null)
-            {
-                foreach (var importedType in context.ImportedTypes)
-                {
-                    if (directiveName == importedType)
-                        return true;
-                }
-            }
-            return false;
+            return context.ImportedTypes?.Contains("@" + directiveName) ?? false;
         }
 
         bool MatchTypeName(string typeName)
@@ -93,19 +84,11 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
             {
                 foreach (var importedNamespace in context.ImportedNamespaces)
                 {
-                    if (typeName.StartsWith(importedNamespace + "__"))
+                    if (typeName.StartsWith(importedNamespace))
                         return true;
                 }
             }
-            if (context.ImportedTypes != null)
-            {
-                foreach (var importedType in context.ImportedTypes)
-                {
-                    if (typeName == importedType)
-                        return true;
-                }
-            }
-            return false;
+            return context.ImportedTypes?.Contains(typeName) ?? false;
         }
     }
 
@@ -122,7 +105,7 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
         /// <summary>
         ///  Contains a list of imported types and directives.
         /// </summary>
-        public List<string>? ImportedTypes { get; set; }
+        public HashSet<string>? ImportedTypes { get; set; }
 
         /// <inheritdoc/>
         public CancellationToken CancellationToken => default;
