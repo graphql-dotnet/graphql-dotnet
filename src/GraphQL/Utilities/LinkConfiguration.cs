@@ -18,12 +18,8 @@ public sealed class LinkConfiguration
     public LinkConfiguration(string url)
     {
         Url = url ?? throw new ArgumentNullException(nameof(url));
-        if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
-        {
-            var uri = new Uri(url);
-            var (name, _) = TryParseUrl(url);
-            _namespace = OriginalNamespace = name;
-        }
+        var (name, _) = TryParseUrl(url);
+        _namespace = _originalNamespace = name;
     }
 
     /// <summary>
@@ -31,7 +27,7 @@ public sealed class LinkConfiguration
     /// </summary>
     public string Url { get; }
 
-    private string? OriginalNamespace { get; set; }
+    private readonly string? _originalNamespace;
 
     private string? _namespace;
     /// <summary>
@@ -48,7 +44,7 @@ public sealed class LinkConfiguration
         get => _namespace;
         set
         {
-            if (value == null && OriginalNamespace != null)
+            if (value == null && _originalNamespace != null)
                 throw new InvalidOperationException("Cannot set the namespace to null when it can be derived from the URL.");
             if (value == "")
                 throw new InvalidOperationException("The default namespace prefix cannot be an empty string.");
@@ -128,7 +124,7 @@ public sealed class LinkConfiguration
 
         o.AddArgument(new DirectiveArgument("url") { Value = Url });
 
-        if (Namespace != null && Namespace != OriginalNamespace)
+        if (Namespace != null && Namespace != _originalNamespace)
         {
             o.AddArgument(new DirectiveArgument("as") { Value = Namespace });
         }
