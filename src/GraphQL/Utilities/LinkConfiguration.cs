@@ -113,7 +113,9 @@ public sealed class LinkConfiguration
     /// Configures the specified applied directive with the settings from this configuration.
     /// </summary>
     /// <remarks>
-    /// This is called by <see cref="SchemaExtensions.LinkSchema(ISchema, LinkConfiguration)"/> to apply the configuration to the schema.
+    /// This is called by <see cref="SchemaExtensions.LinkSchema(ISchema, string, Action{LinkConfiguration}?)"/>
+    /// and <see cref="SchemaExtensions.AddLinkDirectiveSupport(ISchema, Action{LinkConfiguration}?)"/>
+    /// to apply the configuration to the schema.
     /// </remarks>
     internal void ConfigureAppliedDirective(AppliedDirective o)
     {
@@ -121,6 +123,8 @@ public sealed class LinkConfiguration
             throw new ArgumentException("The supplied directive is not a @link directive.", nameof(o));
 
         o.WithMetadata(METADATA_KEY, this);
+
+        o.List?.Clear();
 
         o.AddArgument(new DirectiveArgument("url") { Value = Url });
 

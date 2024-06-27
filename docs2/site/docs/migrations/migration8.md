@@ -683,6 +683,9 @@ schema
 }
 ```
 
+Note that you may call `LinkSchema` multiple times with the same URL to apply additional configuration
+options to the same url, or with a separate URL to link multiple schemas.
+
 ## Breaking Changes
 
 ### 1. Query type is required

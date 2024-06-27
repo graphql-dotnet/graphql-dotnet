@@ -119,4 +119,16 @@ public class LinkedSchemaTests
             PrintSchema(schema).ShouldMatchApproved(o => o.NoDiff().WithDiscriminator(i.Value.ToString()));
         }
     }
+
+    [Fact]
+    public void AllowsDoubleConfiguration()
+    {
+        var queryType = new ObjectGraphType { Name = "Query" };
+        queryType.Field<StringGraphType>("dummy");
+        var schema = new Schema { Query = queryType };
+        schema.LinkSchema("https://spec.example.com/example", c => c.Imports.Add("@key", "@key"));
+        schema.LinkSchema("https://spec.example.com/example", c => c.Imports.Add("@shareable", "@share"));
+        schema.Initialize();
+        PrintSchema(schema).ShouldMatchApproved(o => o.NoDiff());
+    }
 }

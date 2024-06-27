@@ -435,7 +435,7 @@ public static class SchemaExtensions
                     throw new InvalidOperationException($"The '{import.Key}' import name is not valid; please specify only '@link', 'Purpose', and/or 'Import'.");
             }
         }
-        schema.LinkSchema(config);
+        schema.ApplyDirective("link", config.ConfigureAppliedDirective);
         var linkPurposeGraphType = new LinkPurposeGraphType() { Name = config.NameForType("Purpose") };
         var linkImportGraphType = new LinkImportGraphType() { Name = config.NameForType("Import") };
         var linkDirective = new Directive("link")
@@ -453,23 +453,13 @@ public static class SchemaExtensions
 
     /// <summary>
     /// Adds a @link directive to the schema, specifying a URL and optional configuration for the link.
+    /// If the url specified has already been linked, you may apply additional changes to the link.
     /// </summary>
     /// <param name="schema">The schema to which the directive will be added.</param>
     /// <param name="url">The URL of the linked schema.</param>
     /// <param name="configuration">An optional action to configure the link further.</param>
     public static void LinkSchema(this ISchema schema, string url, Action<LinkConfiguration>? configuration = null)
     {
-        var config = new LinkConfiguration(url);
-        configuration?.Invoke(config);
-        schema.LinkSchema(config);
-    }
-
-    /// <inheritdoc cref="LinkSchema(ISchema, string, Action{LinkConfiguration}?)"/>
-    private static void LinkSchema(this ISchema schema, LinkConfiguration config)
-    {
-        if (config.Url == null)
-            throw new InvalidOperationException("No URL specified for the linked schema.");
-
         var linkInstalled = false;
         var appliedDirectives = schema.GetAppliedDirectives();
         if (appliedDirectives != null)
@@ -478,19 +468,30 @@ public static class SchemaExtensions
             {
                 if (appliedDirective.Name == "link")
                 {
-                    var url = appliedDirective.FindArgument("url")?.Value as string;
-                    if (url == config.Url)
-                        throw new InvalidOperationException($"The schema is already linked to the schema at '{config.Url}'.");
+                    var urlMatch = appliedDirective.FindArgument("url")?.Value as string;
+                    if (urlMatch == url)
+                    {
+                        // parse existing configuration
+                        if (!LinkConfiguration.TryParseDirective(appliedDirective, true, out var link))
+                            throw new InvalidOperationException("Unable to parse existing @link directive for this url.");
+                        // add additional configuration
+                        configuration?.Invoke(link);
+                        // re-apply directive
+                        link.ConfigureAppliedDirective(appliedDirective);
+                        return;
+                    }
                     if (url == LinkConfiguration.LINK_URL)
                         linkInstalled = true;
                 }
             }
         }
-        if (!linkInstalled && config.Url != LinkConfiguration.LINK_URL)
+        if (!linkInstalled && url != LinkConfiguration.LINK_URL)
         {
             schema.AddLinkDirectiveSupport();
         }
 
+        var config = new LinkConfiguration(url);
+        configuration?.Invoke(config);
         schema.ApplyDirective("link", config.ConfigureAppliedDirective);
     }
 
