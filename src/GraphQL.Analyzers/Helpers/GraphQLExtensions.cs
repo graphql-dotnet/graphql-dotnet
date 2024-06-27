@@ -8,16 +8,15 @@ public static class GraphQLExtensions
     /// <summary>
     /// Checks if the given <see cref="ExpressionSyntax"/> represents a symbol defined by the GraphQL library.
     /// </summary>
-    /// <param name="expression">The <see cref="ExpressionSyntax"/> to check.</param>
+    /// <param name="syntaxNode">The <see cref="SyntaxNode"/> to check.</param>
     /// <param name="semanticModel">The <see cref="SemanticModel"/> for semantic analysis.</param>
     /// <returns>
-    /// <see langword="true"/> if the symbol represented by the <paramref name="expression"/>
+    /// <see langword="true"/> if the symbol represented by the <paramref name="syntaxNode"/>
     /// is defined by the GraphQL library; otherwise, returns <see langword="false"/>.
-    /// If the given expression doesn't represent a symbol, the method returns <see langword="false"/>.
     /// </returns>
-    public static bool IsGraphQLSymbol(this ExpressionSyntax expression, SemanticModel semanticModel)
+    public static bool IsGraphQLSymbol(this SyntaxNode syntaxNode, SemanticModel semanticModel)
     {
-        var symbolInfo = semanticModel.GetSymbolInfo(expression);
+        var symbolInfo = semanticModel.GetSymbolInfo(syntaxNode);
 
         return symbolInfo.Symbol?.IsGraphQLSymbol()
                ?? symbolInfo.CandidateSymbols
