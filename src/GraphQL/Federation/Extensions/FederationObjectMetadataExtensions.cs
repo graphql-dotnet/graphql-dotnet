@@ -16,6 +16,7 @@ public static class FederationObjectMetadataExtensions
         where TMetadataWriter : IMetadataWriter, IObjectGraphType
         => graphType.ApplyDirective(KEY_DIRECTIVE, d =>
         {
+            d.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL;
             d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields });
             if (!resolvable)
                 d.AddArgument(new(RESOLVABLE_ARGUMENT) { Value = false });
@@ -36,7 +37,7 @@ public static class FederationObjectMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IMetadataWriter, IObjectGraphType
-        => graphType.ApplyDirective(SHAREABLE_DIRECTIVE);
+        => graphType.ApplyDirective(SHAREABLE_DIRECTIVE, c => c.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL);
 
     /// <summary>
     /// Adds the "@external" directive to a GraphQL type.
@@ -53,5 +54,5 @@ public static class FederationObjectMetadataExtensions
     /// </remarks>
     public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
         where TMetadataWriter : IMetadataWriter, IObjectGraphType
-        => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE);
+        => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE, c => c.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL);
 }

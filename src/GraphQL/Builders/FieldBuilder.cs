@@ -322,6 +322,25 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     }
 
     /// <summary>
+    /// Adds an argument to the field.
+    /// </summary>
+    /// <param name="type">The graph type of the argument.</param>
+    /// <param name="name">The name of the argument.</param>
+    /// <param name="configure">A delegate to further configure the argument.</param>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument(IGraphType type, string name, Action<QueryArgument>? configure = null)
+    {
+        var arg = new QueryArgument(type)
+        {
+            Name = name,
+        };
+        configure?.Invoke(arg);
+        FieldType.Arguments ??= new();
+        FieldType.Arguments.Add(arg);
+        return this;
+    }
+
+    /// <summary>
     /// Adds the specified collection of arguments to the field.
     /// </summary>
     /// <param name="arguments">Arguments to add.</param>

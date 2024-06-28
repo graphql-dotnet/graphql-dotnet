@@ -1,0 +1,98 @@
+schema @link(import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") @link(import: [{as: "@testAlias", name: "@test"}], url: "https://spec.example.com/example") @testAlias {
+  query: Query
+  mutation: Mutation
+}
+
+directive @link(as: String, import: [link__Import], purpose: link__Purpose, url: String!) repeatable on SCHEMA
+
+directive @testAlias on ARGUMENT_DEFINITION | ENUM | ENUM_VALUE | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | SCHEMA | UNION
+
+"The `Date` scalar type represents a year, month and day in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."
+scalar Date @testAlias
+
+scalar link__Import
+
+enum link__Purpose {
+  "`EXECUTION` features provide metadata necessary for operation execution."
+  EXECUTION
+  "`SECURITY` features provide metadata necessary to securely resolve fields."
+  SECURITY
+}
+
+type Mutation {
+  createUser(input: UserInput @testAlias): User
+}
+
+interface Node @testAlias {
+  id: ID!
+}
+
+type Post {
+  title: String
+}
+
+type Query {
+  getUser(id: ID @testAlias): User
+}
+
+enum Role @testAlias {
+  ADMIN @testAlias
+  USER
+}
+
+union SearchResult @testAlias = Post | User
+
+type User @testAlias {
+  age: Int
+  id: ID! @testAlias
+  name: String @testAlias
+}
+
+input UserInput @testAlias {
+  age: Int
+  name: String! @testAlias
+}
+
+==== Without Imported Types ====
+
+schema @link(import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") @link(import: [{as: "@testAlias", name: "@test"}], url: "https://spec.example.com/example") @testAlias {
+  query: Query
+  mutation: Mutation
+}
+
+"The `Date` scalar type represents a year, month and day in accordance with the [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601) standard."
+scalar Date @testAlias
+
+type Mutation {
+  createUser(input: UserInput @testAlias): User
+}
+
+interface Node @testAlias {
+  id: ID!
+}
+
+type Post {
+  title: String
+}
+
+type Query {
+  getUser(id: ID @testAlias): User
+}
+
+enum Role @testAlias {
+  ADMIN @testAlias
+  USER
+}
+
+union SearchResult @testAlias = Post | User
+
+type User @testAlias {
+  age: Int
+  id: ID! @testAlias
+  name: String @testAlias
+}
+
+input UserInput @testAlias {
+  age: Int
+  name: String! @testAlias
+}
