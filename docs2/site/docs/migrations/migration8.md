@@ -625,7 +625,7 @@ Any types or directives that are not explicitly imported will be assumed to be n
 namespace, which is derived from the URL of the linked schema if not set explicitly.
 Visit https://specs.apollo.dev/link/v1.0/ for more information.
 
-To link another schema, use this code like this in your schema constructor or `ConfigureSchema` call:
+To link another schema, use code like this in your schema constructor or `ConfigureSchema` call:
 
 ```csharp
 schema.LinkSchema("https://specs.apollo.dev/federation/v2.3", o =>
