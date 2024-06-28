@@ -931,6 +931,7 @@ namespace GraphQL.Builders
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
