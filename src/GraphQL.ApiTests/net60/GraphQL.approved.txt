@@ -1712,7 +1712,6 @@ namespace GraphQL.Federation.Types
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
-        public ServiceGraphType() { }
         public ServiceGraphType(GraphQL.Federation.Types.FederationPrintOptions printOptions) { }
     }
 }
