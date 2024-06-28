@@ -7,6 +7,14 @@ public static class Constants
 {
     public const string GraphQL = "GraphQL";
 
+    public static class AttributeNames
+    {
+        public const string Attribute = "Attribute";
+        public const string DefaultValue = "DefaultValue";
+        public const string Ignore = "Ignore";
+        public const string OneOf = "OneOf";
+    }
+
     public static class ArgumentNames
     {
         public const string Arguments = "arguments";
@@ -16,6 +24,7 @@ public static class Constants
         public const string Description = "description";
         public const string Expression = "expression";
         public const string Name = "name";
+        public const string Nullable = "nullable";
         public const string Resolve = "resolve";
         public const string Subscribe = "subscribe";
         public const string Type = "type";
@@ -27,6 +36,7 @@ public static class Constants
         public const string Arguments = "Arguments";
         public const string Connection = "Connection";
         public const string Create = "Create";
+        public const string DefaultValue = "DefaultValue";
         public const string DeprecationReason = "DeprecationReason";
         public const string Description = "Description";
         public const string Field = "Field";
@@ -63,6 +73,7 @@ public static class Constants
         public const string AutoRegisteringInputObjectGraphType = "AutoRegisteringInputObjectGraphType";
         public const string FieldType = "FieldType";
         public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
+        public const string NonNullGraphType = "NonNullGraphType";
     }
 
     public static class Interfaces

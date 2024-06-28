@@ -187,7 +187,7 @@ namespace GraphQL
     }
     public static class FederationGraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Federation.FederationSettings>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, string version, System.Action<GraphQL.Utilities.LinkConfiguration>? configureLinkDirective = null) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
@@ -743,6 +743,7 @@ namespace GraphQL
     }
     public static class SchemaExtensions
     {
+        public static void AddLinkDirectiveSupport(this GraphQL.Types.ISchema schema, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR type and the related auto-registering graph type are n" +
             "ot trimmed by the compiler.")]
         public static void AutoRegister(this GraphQL.Types.ISchema schema, System.Type clrType, GraphQL.AutoRegisteringMode mode = 3) { }
@@ -750,6 +751,8 @@ namespace GraphQL
         public static TSchema EnableExperimentalIntrospectionFeatures<TSchema>(this TSchema schema, GraphQL.ExperimentalIntrospectionFeaturesMode mode = 0)
             where TSchema : GraphQL.Types.ISchema { }
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, GraphQL.IGraphQLTextSerializer serializer, System.Action<GraphQL.ExecutionOptions> configure) { }
+        public static System.Collections.Generic.IEnumerable<GraphQL.Utilities.LinkConfiguration> GetLinkedSchemas(this GraphQL.Types.ISchema schema) { }
+        public static void LinkSchema(this GraphQL.Types.ISchema schema, string url, System.Action<GraphQL.Utilities.LinkConfiguration>? configuration = null) { }
         public static string Print(this GraphQL.Types.ISchema schema, GraphQL.Utilities.PrintOptions? options = null) { }
         public static System.Threading.Tasks.ValueTask PrintAsync(this GraphQL.Types.ISchema schema, System.IO.TextWriter writer, GraphQL.Utilities.PrintOptions? options = null, System.Threading.CancellationToken cancellationToken = default) { }
         public static void RegisterType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T>(this GraphQL.Types.ISchema schema)
@@ -1710,33 +1713,26 @@ namespace GraphQL.Federation.Types
     {
         public AnyScalarGraphType() { }
     }
+    public class ContextFieldValueGraphType : GraphQL.Types.StringGraphType
+    {
+        public ContextFieldValueGraphType() { }
+    }
     public class EntityGraphType : GraphQL.Types.UnionGraphType
     {
         public EntityGraphType() { }
+    }
+    public class FederationPrintOptions : GraphQL.Utilities.PrintOptions
+    {
+        public FederationPrintOptions() { }
     }
     public class FieldSetGraphType : GraphQL.Types.StringGraphType
     {
         public FieldSetGraphType() { }
     }
-    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
-    {
-        public LinkImportGraphType() { }
-    }
-    [GraphQL.Types.ConstantCase]
-    public enum LinkPurpose
-    {
-        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
-        Security = 0,
-        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
-        Execution = 1,
-    }
-    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Federation.Types.LinkPurpose>
-    {
-        public LinkPurposeGraphType() { }
-    }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
-        public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
+        public ServiceGraphType() { }
+        public ServiceGraphType(GraphQL.Federation.Types.FederationPrintOptions printOptions) { }
     }
 }
 namespace GraphQL.Instrumentation
@@ -2263,11 +2259,21 @@ namespace GraphQL.Types
         [System.Obsolete("Please call Field<TGraphType>(string name) instead.")]
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>()
             where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable = false, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
+        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
+            "guments. This method will be removed in v9.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
+        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
+            "guments. This method will be removed in v9.")]
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
         [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
             "ned on it or just use AddField() method directly. This method may be removed in " +
             "a future release. For now you can continue to use this API but we do not encoura" +
@@ -3096,6 +3102,25 @@ namespace GraphQL.Types.Relay.DataObjects
         public string? StartCursor { get; set; }
     }
 }
+namespace GraphQL.Types.Scalars
+{
+    public class LinkImportGraphType : GraphQL.Federation.Types.AnyScalarGraphType
+    {
+        public LinkImportGraphType() { }
+    }
+    [GraphQL.Types.ConstantCase]
+    public enum LinkPurpose
+    {
+        [System.ComponentModel.Description("`SECURITY` features provide metadata necessary to securely resolve fields.")]
+        Security = 0,
+        [System.ComponentModel.Description("`EXECUTION` features provide metadata necessary for operation execution.")]
+        Execution = 1,
+    }
+    public class LinkPurposeGraphType : GraphQL.Types.EnumerationGraphType<GraphQL.Types.Scalars.LinkPurpose>
+    {
+        public LinkPurposeGraphType() { }
+    }
+}
 namespace GraphQL.Utilities
 {
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
@@ -3183,6 +3208,16 @@ namespace GraphQL.Utilities
         void VisitSchema(GraphQL.Types.ISchema schema);
         void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema);
     }
+    public sealed class LinkConfiguration
+    {
+        public LinkConfiguration(string url) { }
+        public System.Collections.Generic.Dictionary<string, string> Imports { get; }
+        public string? Namespace { get; set; }
+        public GraphQL.Types.Scalars.LinkPurpose? Purpose { get; set; }
+        public string Url { get; }
+        public string NameForDirective(string directiveName) { }
+        public string NameForType(string typeName) { }
+    }
     public class MetadataProvider : GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         public MetadataProvider() { }
@@ -3211,6 +3246,7 @@ namespace GraphQL.Utilities
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
         public bool IncludeFederationTypes { get; set; }
+        public bool IncludeImportedDefinitions { get; set; }
         public System.StringComparison? StringComparison { get; set; }
     }
     public sealed class RemovePrivateTypesAndFieldsVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
@@ -3441,6 +3477,12 @@ namespace GraphQL.Utilities.Federation
 }
 namespace GraphQL.Utilities.Visitors
 {
+    public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static GraphQL.Utilities.Visitors.ParseLinkVisitor Instance { get; }
+        public void Run(GraphQL.Types.ISchema schema) { }
+        public override void VisitSchema(GraphQL.Types.ISchema schema) { }
+    }
     public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public PatternMatchingVisitor() { }
@@ -3463,12 +3505,22 @@ namespace GraphQL.Utilities.Visitors
         protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
-        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {
             public System.Threading.CancellationToken CancellationToken { get; }
             public GraphQLParser.ROM QueryTypeName { get; set; }
+        }
+    }
+    public sealed class RemoveImportedTypesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context>
+    {
+        protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context context) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema) { }
+        public struct Context : GraphQLParser.Visitors.IASTVisitorContext
+        {
+            public System.Threading.CancellationToken CancellationToken { get; }
+            public System.Collections.Generic.List<string>? ImportedNamespaces { get; set; }
+            public System.Collections.Generic.HashSet<string>? ImportedTypes { get; set; }
         }
     }
 }

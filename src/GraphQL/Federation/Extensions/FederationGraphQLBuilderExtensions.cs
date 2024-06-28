@@ -2,6 +2,7 @@ using GraphQL.DI;
 using GraphQL.Federation;
 using GraphQL.Federation.Types;
 using GraphQL.Federation.Visitors;
+using GraphQL.Utilities;
 
 namespace GraphQL;
 
@@ -11,41 +12,44 @@ namespace GraphQL;
 public static class FederationGraphQLBuilderExtensions
 {
     /// <summary>
-    /// Registers Federation types, directives and, optionally, Query fields.
+    /// Registers Federation types and directives for a specified federation version, and modifies
+    /// the Query operation type definition to include the required `_entities` and `_service` fields.
     /// </summary>
+    /// <param name="builder">The GraphQL builder.</param>
+    /// <param name="version">The version of the federation specification to use. Specify in major.minor format, such as "1.0" or "2.3".</param>
+    /// <param name="configureLinkDirective">Optional configuration for the @link directive.</param>
     public static IGraphQLBuilder AddFederation(
         this IGraphQLBuilder builder,
-        Action<FederationSettings>? configure = null)
+        string version,
+        Action<LinkConfiguration>? configureLinkDirective = null)
     {
-        var settings = new FederationSettings();
-        configure?.Invoke(settings);
-
-        if (settings.Version.StartsWith("1.") && settings.SdlPrintOptions == null)
-            settings.SdlPrintOptions = new() { IncludeFederationTypes = false };
-
-        // todo: ensure all directives are supported by all supported versions
-        var directives = settings.ImportDirectives ?? FederationDirectiveEnum.All;
+        if (!FederationHelper.TryParseVersion(version, out _))
+            throw new ArgumentOutOfRangeException(nameof(version), version, "Invalid federation version.");
+        if (version.StartsWith("1.") && configureLinkDirective != null)
+            throw new ArgumentException("The @link directive is not supported in federation version 1.x.", nameof(configureLinkDirective));
 
         builder.Services
-            .Register(new ServiceGraphType(settings.SdlPrintOptions))
+            .Configure<FederationPrintOptions>(o => o.IncludeFederationTypes = !version.StartsWith("1."))
+            .Register<ServiceGraphType>(ServiceLifetime.Transient)
             .Register<AnyScalarGraphType>(ServiceLifetime.Singleton)
             .Register<EntityGraphType>(ServiceLifetime.Transient)
-            .Register<LinkPurposeGraphType>(ServiceLifetime.Singleton)
-            .Register<LinkImportGraphType>(ServiceLifetime.Singleton)
-            .Register<FieldSetGraphType>(ServiceLifetime.Singleton)
             .Register<FederationEntitiesSchemaNodeVisitor>(ServiceLifetime.Transient)
             .Register<FederationServiceSchemaNodeVisitor>(ServiceLifetime.Transient);
 
         return builder
             .ConfigureSchema((schema, _) =>
             {
+                if (!version.StartsWith("1."))
+                {
+                    // add the @link directive to the schema, referencing the directive specified by the import parameter
+                    schema.AddFederationLink(version, configureLinkDirective);
+                }
+
                 // add the federation directives to the schema
-                schema.AddFederationDirectives(settings);
+                // (examines the @link directive to ensure the directives are added with the correct aliases)
+                schema.AddFederationTypesAndDirectives(version);
 
-                // add the @link directive to the schema, referencing the directive specified by the import parameter
-                schema.ApplyLinkDirective(settings);
-
-                // register Federation types
+                // register Federation types so they are available for use by the schema node visitors later on
                 schema.RegisterType<ServiceGraphType>();
                 schema.RegisterType<AnyScalarGraphType>();
                 schema.RegisterType<EntityGraphType>();
