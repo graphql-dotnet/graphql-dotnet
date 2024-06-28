@@ -48,7 +48,7 @@ public class Program
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
 
-        // note: this demonstrates GraphQL.NET v8 and nconfiguration methods
+        // note: this demonstrates GraphQL.NET v8 and newer configuration methods
         // define the known types and their resolvers
         var schemaBuilder = new SchemaBuilder
         {
