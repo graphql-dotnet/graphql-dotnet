@@ -1,3 +1,4 @@
+using GraphQL.Federation;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -67,6 +68,26 @@ public class SchemaTests
         schema.Initialize();
         var sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
         sdl.ShouldMatchApproved(c => c.NoDiff().WithDiscriminator(version));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ResolvableEntitiesIdentifiesAliasedKey(bool includeImportedTypes)
+    {
+        var queryType = new ObjectGraphType { Name = "Query" };
+        var postType = new ObjectGraphType { Name = "Post" };
+        postType.Field<StringGraphType>("id");
+        postType.Key("id");
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddGraphQL(x => x
+            .AddSchema(provider => new Schema(provider) { Query = queryType })
+            .AddFederation("2.0", c => c.Imports.Remove("@key"))
+            .ConfigureSchema(s => s.RegisterType(postType)));
+        var schema = serviceCollection.BuildServiceProvider().GetRequiredService<ISchema>();
+        schema.Initialize();
+        var sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase, IncludeImportedDefinitions = includeImportedTypes });
+        sdl.ShouldMatchApproved(c => c.NoDiff().WithDiscriminator(includeImportedTypes ? "WithImported" : "NoImported"));
     }
 
     private class Query

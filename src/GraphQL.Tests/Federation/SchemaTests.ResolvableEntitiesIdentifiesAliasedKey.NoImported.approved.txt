@@ -1,0 +1,20 @@
+schema @link(import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") @link(import: ["@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag"], url: "https://specs.apollo.dev/federation/v2.0") {
+  query: Query
+}
+
+type Post @federation__key(fields: "id") {
+  id: String
+}
+
+type Query {
+  _entities(representations: [_Any!]!): [_Entity]!
+  _service: _Service!
+}
+
+scalar _Any
+
+union _Entity = Post
+
+type _Service {
+  sdl: String
+}
