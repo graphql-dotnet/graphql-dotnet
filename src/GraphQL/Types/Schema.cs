@@ -5,6 +5,7 @@ using GraphQL.DI;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
+using GraphQL.Utilities.Visitors;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types;
@@ -486,6 +487,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
         // Do not change the order of these validations.
         CoerceInputTypeDefaultValues();
+        ParseLinkVisitor.Instance.Run(this);
         SchemaValidationVisitor.Instance.Run(this);
         AppliedDirectivesValidationVisitor.Instance.Run(this);
         FieldTypeDefaultArgumentsVisitor.Instance.Run(this);

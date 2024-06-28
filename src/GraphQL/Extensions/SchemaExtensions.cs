@@ -1,6 +1,7 @@
 using System.Reflection;
 using GraphQL.Introspection;
 using GraphQL.Types;
+using GraphQL.Types.Scalars;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
 using GraphQLParser.AST;
@@ -128,6 +129,10 @@ public static class SchemaExtensions
         if (!options.IncludeFederationTypes)
         {
             RemoveFederationTypesVisitor.Visit(sdl);
+        }
+        if (!options.IncludeImportedDefinitions)
+        {
+            RemoveImportedTypesVisitor.Visit(sdl, schema);
         }
         if (options.StringComparison != null)
         {
@@ -405,6 +410,106 @@ public static class SchemaExtensions
     /// </summary>
     public static GraphQLDocument ToAST(this ISchema schema)
         => new SchemaExporter(schema).Export();
+
+    /// <summary>
+    /// Adds support for the @link directive to the schema.
+    /// </summary>
+    public static void AddLinkDirectiveSupport(this ISchema schema, Action<LinkConfiguration>? configuration = null)
+    {
+        if (schema.Initialized)
+            throw new InvalidOperationException("Schema is already initialized");
+        var config = new LinkConfiguration(LinkConfiguration.LINK_URL);
+        config.Imports.Add("@link", "@link");
+        configuration?.Invoke(config);
+        if (!config.Imports.TryGetValue("@link", out var linkAlias))
+            throw new InvalidOperationException("The @link directive must be imported.");
+        if (linkAlias != "@link")
+            throw new InvalidOperationException("The @link directive must be imported without an alias.");
+        foreach (var import in config.Imports)
+        {
+            switch (import.Key)
+            {
+                case "Import":
+                case "Purpose":
+                case "@link":
+                    break;
+                default:
+                    throw new InvalidOperationException($"The '{import.Key}' import name is not valid; please specify only '@link', 'Purpose', and/or 'Import'.");
+            }
+        }
+        schema.ApplyDirective("link", config.ConfigureAppliedDirective);
+        var linkPurposeGraphType = new LinkPurposeGraphType() { Name = config.NameForType("Purpose") };
+        var linkImportGraphType = new LinkImportGraphType() { Name = config.NameForType("Import") };
+        var linkDirective = new Directive("link")
+        {
+            Arguments = new QueryArguments(
+                new QueryArgument(typeof(NonNullGraphType<StringGraphType>)) { Name = "url" },
+                new QueryArgument(typeof(StringGraphType)) { Name = "as" },
+                new QueryArgument(linkPurposeGraphType) { Name = "purpose" },
+                new QueryArgument(new ListGraphType(linkImportGraphType)) { Name = "import" }),
+            Repeatable = true,
+        };
+        linkDirective.Locations.Add(DirectiveLocation.Schema);
+        schema.Directives.Register(linkDirective);
+    }
+
+    /// <summary>
+    /// Adds a @link directive to the schema, specifying a URL and optional configuration for the link.
+    /// If the url specified has already been linked, you may apply additional changes to the link.
+    /// </summary>
+    /// <param name="schema">The schema to which the directive will be added.</param>
+    /// <param name="url">The URL of the linked schema.</param>
+    /// <param name="configuration">An optional action to configure the link further.</param>
+    public static void LinkSchema(this ISchema schema, string url, Action<LinkConfiguration>? configuration = null)
+    {
+        if (schema.Initialized)
+            throw new InvalidOperationException("Schema is already initialized");
+        var linkInstalled = false;
+        var appliedDirectives = schema.GetAppliedDirectives();
+        if (appliedDirectives != null)
+        {
+            foreach (var appliedDirective in appliedDirectives)
+            {
+                if (appliedDirective.Name == "link")
+                {
+                    var urlMatch = appliedDirective.FindArgument("url")?.Value as string;
+                    if (urlMatch == url)
+                    {
+                        // parse existing configuration
+                        if (!LinkConfiguration.TryParseDirective(appliedDirective, true, out var link))
+                            throw new InvalidOperationException("Unable to parse existing @link directive for this url.");
+                        // add additional configuration
+                        configuration?.Invoke(link);
+                        // re-apply directive
+                        link.ConfigureAppliedDirective(appliedDirective);
+                        return;
+                    }
+                    if (url == LinkConfiguration.LINK_URL)
+                        linkInstalled = true;
+                }
+            }
+        }
+        if (!linkInstalled && url != LinkConfiguration.LINK_URL)
+        {
+            schema.AddLinkDirectiveSupport();
+        }
+
+        var config = new LinkConfiguration(url);
+        configuration?.Invoke(config);
+        schema.ApplyDirective("link", config.ConfigureAppliedDirective);
+    }
+
+    /// <summary>
+    /// Gets the applied @link directives from the schema.
+    /// Results are only valid after the schema has been initialized.
+    /// </summary>
+    public static IEnumerable<LinkConfiguration> GetLinkedSchemas(this ISchema schema)
+    {
+        var appliedDirectives = schema.GetAppliedDirectives();
+        if (appliedDirectives == null)
+            return Array.Empty<LinkConfiguration>();
+        return appliedDirectives.Select(LinkConfiguration.GetConfiguration).Where(x => x != null)!;
+    }
 }
 
 /// <summary>

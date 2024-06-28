@@ -1,0 +1,28 @@
+schema @link(as: "ns", import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") {
+  query: Query
+}
+
+directive @link(as: String, import: [ns__Import], purpose: ns__Purpose, url: String!) repeatable on SCHEMA
+
+scalar ns__Import
+
+enum ns__Purpose {
+  "`EXECUTION` features provide metadata necessary for operation execution."
+  EXECUTION
+  "`SECURITY` features provide metadata necessary to securely resolve fields."
+  SECURITY
+}
+
+type Query {
+  dummy: String
+}
+
+==== Without Imported Types ====
+
+schema @link(as: "ns", import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") {
+  query: Query
+}
+
+type Query {
+  dummy: String
+}
