@@ -35,6 +35,17 @@ public class AppliedDirective : MetadataProvider, IEnumerable<DirectiveArgument>
     }
 
     /// <summary>
+    /// Indicates the schema url that this directive was imported from via the @link directive.
+    /// Use a trailing slash to match any version of the specified schema. Upon schema initialization,
+    /// the directive name will be updated to match the alias defined in the @link directive.
+    /// <code>
+    /// FromSchemaUrl = "https://example.com/schema/"; // matches any version of the schema such as https://example.com/schema/v2.3
+    /// FromSchemaUrl = "https://example.com/schema/v1.0"; // matches only the specified version of the schema
+    /// </code>
+    /// </summary>
+    public string? FromSchemaUrl { get; set; }
+
+    /// <summary>
     /// Returns the number of directive arguments.
     /// </summary>
     public int ArgumentsCount => List?.Count ?? 0;
