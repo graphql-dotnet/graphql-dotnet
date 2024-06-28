@@ -21,7 +21,7 @@ public static class FederationFieldMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Shareable<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IFieldMetadataWriter
-        => graphType.ApplyDirective(SHAREABLE_DIRECTIVE);
+        => graphType.ApplyDirective(SHAREABLE_DIRECTIVE, s => s.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL);
 
     /// <summary>
     /// Adds the "@override" directive to a GraphQL field.
@@ -39,7 +39,11 @@ public static class FederationFieldMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Override<TMetadataWriter>(this TMetadataWriter fieldType, string from)
         where TMetadataWriter : IFieldMetadataWriter
-        => fieldType.ApplyDirective(OVERRIDE_DIRECTIVE, d => d.AddArgument(new(FROM_ARGUMENT) { Value = from }));
+        => fieldType.ApplyDirective(OVERRIDE_DIRECTIVE, d =>
+        {
+            d.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL;
+            d.AddArgument(new(FROM_ARGUMENT) { Value = from });
+        });
 
     /// <summary>
     /// Adds the "@external" directive to a GraphQL field.
@@ -56,7 +60,7 @@ public static class FederationFieldMetadataExtensions
     /// </remarks>
     public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
         where TMetadataWriter : IFieldMetadataWriter
-        => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE);
+        => fieldType.ApplyDirective(EXTERNAL_DIRECTIVE, c => c.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL);
 
     /// <summary>
     /// Adds the "@provides" directive to a GraphQL field.
@@ -92,7 +96,11 @@ public static class FederationFieldMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Provides<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
         where TMetadataWriter : IFieldMetadataWriter
-        => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
+        => fieldType.ApplyDirective(PROVIDES_DIRECTIVE, d =>
+        {
+            d.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL;
+            d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields });
+        });
 
     /// <summary>
     /// Adds the "@requires" directive to a GraphQL field.
@@ -130,5 +138,9 @@ public static class FederationFieldMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Requires<TMetadataWriter>(this TMetadataWriter fieldType, string fields)
         where TMetadataWriter : IFieldMetadataWriter
-        => fieldType.ApplyDirective(REQUIRES_DIRECTIVE, d => d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields }));
+        => fieldType.ApplyDirective(REQUIRES_DIRECTIVE, d =>
+        {
+            d.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL;
+            d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields });
+        });
 }

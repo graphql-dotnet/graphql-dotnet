@@ -686,6 +686,21 @@ schema
 Note that you may call `LinkSchema` multiple times with the same URL to apply additional configuration
 options to the same url, or with a separate URL to link multiple schemas.
 
+### 19. `FromSchemaUrl` added to `AppliedDirective`
+
+This property supports using a directive that was separately imported via `@link`. After importing the schema as described
+above, apply imported directives to your schema similar to the example below:
+
+```csharp
+graphType.ApplyDirective("shareable", s => s.FromSchemaUrl = "https://specs.apollo.dev/federation/"); // applies to any version
+// or
+graphType.ApplyDirective("shareable", s => s.FromSchemaUrl = "https://specs.apollo.dev/federation/v2.3"); // only version 2.3
+```
+
+During schema initialization, the name of the applied directive will be resolved to the fully-qualified name.
+In the above example, if `@shareable` was imported, the directive will be applied as `@shareable`, but if not, it will
+be applied as `@federation__shareable`. Aliases are also supported.
+
 ## Breaking Changes
 
 ### 1. Query type is required

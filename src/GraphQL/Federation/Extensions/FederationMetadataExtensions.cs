@@ -24,5 +24,5 @@ public static class FederationMetadataExtensions
     /// </remarks>
     public static TMetadataWriter Inaccessible<TMetadataWriter>(this TMetadataWriter graphType)
         where TMetadataWriter : IMetadataWriter
-        => graphType.ApplyDirective(INACCESSIBLE_DIRECTIVE);
+        => graphType.ApplyDirective(INACCESSIBLE_DIRECTIVE, c => c.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL);
 }

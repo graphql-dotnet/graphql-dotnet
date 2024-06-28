@@ -9,6 +9,7 @@ internal static class FederationHelper
     public const string RESOLVER_METADATA = "__FedResolver__";
     public const string FEDERATION_RESOLVER_FIELD = "_FederationResolverField_";
     public const string LINK_SCHEMA_EXTENSION_METADATA = "__FedLinkSchemaExtension__";
+    public const string FEDERATION_LINK_SCHEMA_URL = "https://specs.apollo.dev/federation/";
 
     public const string LINK_DIRECTIVE = "link";
     public const string KEY_DIRECTIVE = "key";
