@@ -72,7 +72,7 @@ public sealed class RenameImportedDirectivesVisitor : BaseSchemaNodeVisitor
     private void VisitNode(IMetadataReader metadataReader)
     {
         var appliedDirectives = metadataReader.GetAppliedDirectives();
-        if (appliedDirectives == null || appliedDirectives.List == null)
+        if (appliedDirectives?.List == null)
             return;
 
         foreach (var appliedDirective in appliedDirectives.List)
