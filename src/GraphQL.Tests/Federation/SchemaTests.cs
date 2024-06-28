@@ -90,6 +90,32 @@ public class SchemaTests
         sdl.ShouldMatchApproved(c => c.NoDiff().WithDiscriminator(includeImportedTypes ? "WithImported" : "NoImported"));
     }
 
+    [Theory]
+    [InlineData("2.0", false)]
+    [InlineData("2.3", true)]
+    public void SchemaFailsValidationWithUnsupportedDirectives(string version, bool shouldSucceed)
+    {
+        var queryType = new ObjectGraphType { Name = "Query" };
+        var postType = new ObjectGraphType { Name = "Post" };
+        postType.Field<StringGraphType>("id");
+        postType.ApplyDirective("federation__interfaceObject");
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddGraphQL(x => x
+            .AddSchema(provider => new Schema(provider) { Query = queryType })
+            .AddFederation(version)
+            .ConfigureSchema(s => s.RegisterType(postType)));
+        var schema = serviceCollection.BuildServiceProvider().GetRequiredService<ISchema>();
+        if (shouldSucceed)
+        {
+            schema.Initialize();
+        }
+        else
+        {
+            Should.Throw<InvalidOperationException>(schema.Initialize)
+                .Message.ShouldBe("Unknown directive 'federation__interfaceObject' applied to object 'Post'.");
+        }
+    }
+
     private class Query
     {
         public static Post GetPost() => new Post();
