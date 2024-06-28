@@ -1,0 +1,56 @@
+schema @link(import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") @link(import: ["@key", "@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag"], url: "https://specs.apollo.dev/federation/v2.5") {
+  query: Query
+}
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @federation__authenticated on ENUM | FIELD_DEFINITION | INTERFACE | OBJECT | SCALAR
+
+directive @federation__composeDirective(name: String!) repeatable on SCHEMA
+
+directive @federation__extends on INTERFACE | OBJECT
+
+directive @federation__interfaceObject on OBJECT
+
+directive @federation__requiresScopes(scopes: [String!]!) on ENUM | FIELD_DEFINITION | INTERFACE | OBJECT | SCALAR
+
+directive @inaccessible on ARGUMENT_DEFINITION | ENUM | ENUM_VALUE | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
+
+directive @key(fields: federation__FieldSet!, resolvable: Boolean = true) repeatable on INTERFACE | OBJECT
+
+directive @link(as: String, import: [link__Import], purpose: link__Purpose, url: String!) repeatable on SCHEMA
+
+directive @override(from: String!) on FIELD_DEFINITION
+
+directive @provides(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+directive @requires(fields: federation__FieldSet!) on FIELD_DEFINITION
+
+directive @shareable repeatable on FIELD_DEFINITION | OBJECT
+
+directive @tag(name: String!) repeatable on ARGUMENT_DEFINITION | ENUM | ENUM_VALUE | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | SCHEMA | UNION
+
+scalar federation__FieldSet
+
+scalar link__Import
+
+enum link__Purpose {
+  "`EXECUTION` features provide metadata necessary for operation execution."
+  EXECUTION
+  "`SECURITY` features provide metadata necessary to securely resolve fields."
+  SECURITY
+}
+
+type Post {
+  title: String
+}
+
+type Query {
+  _service: _Service!
+}
+
+scalar _Any
+
+type _Service {
+  sdl: String
+}
