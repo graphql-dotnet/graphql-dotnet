@@ -688,7 +688,7 @@ options to the same url, or with a separate URL to link multiple schemas.
 
 ### 19. `FromSchemaUrl` added to `AppliedDirective`
 
-This supports using a directive that was separately imported via `@link`. After importing the schema as described
+This property supports using a directive that was separately imported via `@link`. After importing the schema as described
 above, apply imported directives to your schema similar to the example below:
 
 ```csharp
