@@ -100,4 +100,9 @@ public static class GlobalSwitches
     /// that have the same TSourceType, one instance will incorrectly pull cached information stored by the other instance.
     /// </summary>
     public static bool EnableReflectionCaching { get; set; }
+
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = true;
 }

@@ -163,14 +163,61 @@ public class ComplexGraphTypeTests
     [Fact]
     public void accepts_property_expressions()
     {
+        bool old = GlobalSwitches.InferFieldNullabilityFromNRTAnnotations;
+        GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = false;
+        try
+        {
+            var schema = new Schema();
+            var type = new ComplexType<Droid>();
+            _ = type.Field(d => d.Name);
+            schema.Query = type;
+            schema.Initialize();
+
+            type.Fields.Last().Name.ShouldBe("name");
+            type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+        }
+        finally
+        {
+            GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = old;
+        }
+    }
+
+    [Fact]
+    public void infer_nullability_from_nrt()
+    {
         var schema = new Schema();
-        var type = new ComplexType<Droid>();
-        _ = type.Field(d => d.Name);
+        var type = new ComplexType<NrtTest>();
+        _ = type.Field(d => d.Str1);
+        _ = type.Field(d => d.Str2);
+        _ = type.Field(d => d.List1);
+        _ = type.Field(d => d.List2);
+        _ = type.Field(d => d.List3);
         schema.Query = type;
         schema.Initialize();
 
-        type.Fields.Last().Name.ShouldBe("name");
-        type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+        var field = type.Fields.FirstOrDefault(f => f.Name == "str1").ShouldNotBeNull();
+        field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+
+        field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
+        field.Type.ShouldBe(typeof(StringGraphType));
+
+        field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
+        field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>));
+
+        field = type.Fields.FirstOrDefault(f => f.Name == "list2").ShouldNotBeNull();
+        field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+
+        field = type.Fields.FirstOrDefault(f => f.Name == "list3").ShouldNotBeNull();
+        field.Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
+    }
+
+    private class NrtTest
+    {
+        public string Str1 { get; set; }
+        public string? Str2 { get; set; }
+        public IList<string> List1 { get; set; }
+        public IList<string?> List2 { get; set; }
+        public IList<string?>? List3 { get; set; }
     }
 
     [Fact]
@@ -273,7 +320,7 @@ public class ComplexGraphTypeTests
     {
         var type = new ComplexType<TestObject>();
 
-        var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.someInt));
+        var exp = Should.Throw<ArgumentException>(() => type.Field(d => d.someInt, nullable: false));
 
         exp.InnerException.ShouldNotBeNull().Message.ShouldStartWith("Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
     }

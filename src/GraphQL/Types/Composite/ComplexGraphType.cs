@@ -564,12 +564,27 @@ namespace GraphQL.Types
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
+            Field(name, expression, (bool?)nullable, type);
+
+        private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            string name,
+            Expression<Func<TSourceType, TProperty>> expression,
+            bool? nullable,
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
         {
             try
             {
-                if (type == null)
-                    type = typeof(TProperty).GetGraphTypeFromType(nullable, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                if (type == null && nullable == null && GlobalSwitches.InferFieldNullabilityFromNRTAnnotations)
+                {
+                    var typeInfo = AutoRegisteringHelper.GetTypeInformation(((MemberExpression)expression.Body).Member, this is IInputObjectGraphType);
+                    type = typeInfo.ConstructGraphType();
+                }
+                else if (type == null)
+                {
+                    nullable ??= false;
+                    type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                }
             }
             catch (ArgumentOutOfRangeException exp)
             {
@@ -606,9 +621,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             string name,
             Expression<Func<TSourceType, TProperty>> expression) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(name, expression, nullable: false, type: null);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(name, expression, nullable: null, type: null);
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -625,9 +638,7 @@ namespace GraphQL.Types
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(name, expression, nullable, type: null);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(name, expression, (bool?)nullable, type: null);
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -643,9 +654,7 @@ namespace GraphQL.Types
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(name, expression, nullable: false, type);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(name, expression, nullable: null, type);
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -662,6 +671,12 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable,
+            [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
+            Field(expression, (bool?)nullable, type);
+
+        private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
+            Expression<Func<TSourceType, TProperty>> expression,
+            bool? nullable,
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type)
         {
             string name;
@@ -690,9 +705,7 @@ namespace GraphQL.Types
         /// <param name="expression">The property of the source object represented within an expression.</param>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(expression, nullable: false, type: null);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(expression, nullable: null, type: null);
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -708,9 +721,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool nullable) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(expression, nullable, type: null);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(expression, (bool?)nullable, type: null);
 
         /// <summary>
         /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -725,9 +736,7 @@ namespace GraphQL.Types
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type) =>
-#pragma warning disable CS0618 // Type or member is obsolete
-            Field(expression, nullable: false, type);
-#pragma warning restore CS0618 // Type or member is obsolete
+            Field(expression, nullable: null, type);
 
         /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
         [Obsolete("Please use the overload that accepts the mandatory name argument.")]

@@ -226,6 +226,7 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool EnableReflectionCaching { get; set; }
+        public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
         public static bool UseLegacyTypeNaming { get; set; }
