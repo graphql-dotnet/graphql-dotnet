@@ -82,6 +82,7 @@ A list of the available extension methods is below:
 | `AddErrorInfoProvider`  | Registers a custom error info provider or configures the default error info provider | |
 | `AddExecutionStrategy`  | Registers an `ExecutionStrategyRegistration` for the selected execution strategy and operation type | |
 | `AddExecutionStrategySelector` | Registers the specified execution strategy selector | |
+| `AddFederation`         | Registers the federation types and configures the schema to support Apollo Federation | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |

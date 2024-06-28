@@ -1,4 +1,6 @@
-using GraphQL.Utilities.Federation;
+using System.Globalization;
+using GraphQL.Federation.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.Federation.SchemaFirst.Sample1;
 
@@ -6,25 +8,25 @@ namespace GraphQL.Federation.SchemaFirst.Sample1;
 /// Retrieves the local instance of <typeparamref name="T"/> from the <see cref="Data"/>
 /// class using the specified delegate.
 /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
-public class MyFederatedResolver<T> : IFederatedResolver
-#pragma warning restore CS0618 // Type or member is obsolete
+public class MyFederatedResolver<T> : IFederationResolver
     where T : IHasId
 {
     private readonly Func<Data, int, Task<T?>> _resolver;
+
     public MyFederatedResolver(Func<Data, int, Task<T?>> resolver)
     {
         _resolver = resolver;
     }
 
-    public async Task<object?> Resolve(FederatedResolveContext context)
+    public bool MatchKeys(IDictionary<string, object?> representation) => true;
+
+    public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
+        => (int)Convert.ChangeType(representation["id"], typeof(int), CultureInfo.InvariantCulture)!;
+
+    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
     {
-        if (context.Arguments.TryGetValue("id", out object? idValue))
-        {
-            int id = (int)Convert.ChangeType(idValue, typeof(int))!;
-            var data = context.ParentFieldContext.RequestServices!.GetRequiredService<Data>();
-            return await _resolver(data, id).ConfigureAwait(false);
-        }
-        return Task.FromResult<object?>(null);
+        int id = (int)parsedRepresentation;
+        var data = context.RequestServices!.GetRequiredService<Data>();
+        return await _resolver(data, id).ConfigureAwait(false);
     }
 }

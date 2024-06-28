@@ -6,7 +6,7 @@ using static GraphQL.Federation.FederationHelper;
 namespace GraphQL.Utilities.Visitors;
 
 /// <summary>
-/// Remove all Apollo Federation types and fields from an AST.
+/// Remove all Apollo Federation v1 types and fields from an AST.
 /// Not necessary for Apollo Federation v2.
 /// </summary>
 public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTypesVisitor.Context>
@@ -17,13 +17,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
         PROVIDES_DIRECTIVE,
         REQUIRES_DIRECTIVE,
         KEY_DIRECTIVE,
-        LINK_DIRECTIVE,
-        SHAREABLE_DIRECTIVE,
-        INACCESSIBLE_DIRECTIVE,
         "tag",
-        OVERRIDE_DIRECTIVE,
-        "composeDirective",
-        "interfaceObject",
         "extends",
     };
 
@@ -31,9 +25,7 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
     {
         "_Entity",
         "_Any",
-        "federation__FieldSet",
-        "link__Import",
-        "link__Purpose",
+        "FieldSet",
         "_Service",
     };
 
@@ -81,13 +73,6 @@ public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTy
         });
 
         return base.VisitDocumentAsync(document, context);
-    }
-
-    /// <inheritdoc/>
-    protected override ValueTask VisitSchemaDefinitionAsync(GraphQLSchemaDefinition schemaDefinition, Context context)
-    {
-        schemaDefinition.Directives?.Items.RemoveAll(directive => directive.Name.Value == LINK_DIRECTIVE);
-        return base.VisitSchemaDefinitionAsync(schemaDefinition, context);
     }
 
     /// <inheritdoc/>

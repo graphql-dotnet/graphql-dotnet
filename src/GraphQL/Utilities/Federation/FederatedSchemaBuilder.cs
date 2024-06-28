@@ -9,6 +9,7 @@ using GraphQLParser.AST;
 
 namespace GraphQL.Utilities.Federation;
 
+[Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class will be removed in v9.")]
 public class FederatedSchemaBuilder : SchemaBuilder
 {
     internal const string RESOLVER_METADATA_FIELD = "__FedResolver__";
@@ -49,7 +50,7 @@ public class FederatedSchemaBuilder : SchemaBuilder
     protected override void PreConfigure(Schema schema)
     {
         schema.RegisterType<AnyScalarGraphType>();
-        schema.RegisterType(new ServiceGraphType(new PrintOptions { IncludeFederationTypes = false })); // skip federation types for federation v1 support
+        schema.RegisterType(new ServiceGraphType(new FederationPrintOptions { IncludeFederationTypes = false })); // skip federation types for federation v1 support
     }
 
     private void AddRootEntityFields(ISchema schema)

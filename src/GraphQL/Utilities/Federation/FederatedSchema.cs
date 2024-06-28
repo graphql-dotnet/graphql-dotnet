@@ -5,7 +5,8 @@ namespace GraphQL.Utilities.Federation;
 /// <summary>
 /// A schema builder for GraphQL federation
 /// </summary>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1102:Make class static.", Justification = "TODO: rewrite")]
+[SuppressMessage("Roslynator", "RCS1102:Make class static.", Justification = "TODO: rewrite")]
+[Obsolete("Please use Schema.For with graphQlBuilder.AddFederation() instead. This class will be removed in v9.")]
 public class FederatedSchema
 {
     /// <summary>
