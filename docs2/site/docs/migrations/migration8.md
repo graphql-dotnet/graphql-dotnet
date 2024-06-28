@@ -686,6 +686,35 @@ schema
 Note that you may call `LinkSchema` multiple times with the same URL to apply additional configuration
 options to the same url, or with a separate URL to link multiple schemas.
 
+### 20. `AddFederation` GraphQL builder call added to initialize any schema for federation support
+
+This method will automatically add the necessary types and directives to support GraphQL Federation.
+Simply call `AddFederation` with the version number of the Federation specification that you wish to import
+within your DI configuration. See example below:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddFederation("2.3")
+);
+```
+
+This will do the following:
+
+- Configure the Query type to include the `_service` field.
+- Configure the `_Entity` type based on which of the schema's type definitions are marked with `@key`.
+- Configure the Query type to include the `_entities` field if there are any resolvable entities.
+- Link the schema to the Federation specification at `https://specs.apollo.dev/federation/v2.3`.
+- Import the `@key`, `@requires`, `@provides`, `@external`, `@extends`, `@shareable`, `@inaccessible`, `@override` and `@tag` directives.
+- Configure the remaining supported directives within the `federation` namespace - `@federation__interfaceObject` and `@federation__composeDirective`
+  for version 2.3.
+
+Currently supported are versions 1.0 through 2.8. Note that for version 1.0, you will be required to mark
+parts of your schema with `@extends`. This is not required for version 2.0 and later.
+
+You may add additional configuration to the `AddFederation` call to import additional directives or types, remove imports,
+change import aliases, or change the namespace used for directives that are not explicitly imported.
+
 ## Breaking Changes
 
 ### 1. Query type is required

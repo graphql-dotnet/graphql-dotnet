@@ -1,0 +1,26 @@
+directive @extends on INTERFACE | OBJECT
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @key(fields: FieldSet!, resolvable: Boolean = true) repeatable on OBJECT
+
+directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+
+directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+
+scalar FieldSet
+
+type Post {
+  title: String
+}
+
+type Query {
+  getPost: Post!
+  _service: _Service!
+}
+
+scalar _Any
+
+type _Service {
+  sdl: String
+}

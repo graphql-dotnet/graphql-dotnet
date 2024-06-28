@@ -42,7 +42,7 @@ internal static class FederationHelper
 
         // configure all directives available in Federation v2.0, which
         // are the most commonly-used directives; other directives and types
-        // will be imported into the federation namespace
+        // will be imported into the 'federation' namespace (e.g. 'federation__FieldSet')
         Action<LinkConfiguration> configure = c =>
         {
             c.Imports.Add("@key", "@key");

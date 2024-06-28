@@ -24,13 +24,14 @@ public class PrintOptions : SDLPrinterOptions
     public StringComparison? StringComparison { get; set; }
 
     /// <summary>
-    /// Indicates whether to print federation types.
-    /// Only set to <see langword="false"/> for Apollo Federation v1 support.
+    /// Indicates whether to print Apollo Federation v1 types.
+    /// Do not use this flag with Federation v2 or newer; see <see cref="IncludeImportedDefinitions"/>.
     /// </summary>
     public bool IncludeFederationTypes { get; set; } = true;
 
     /// <summary>
     /// Indicates whether to print type/directive definitions imported from another schema via the @link directive.
+    /// Typically disabled with Federation v2 to exclude imported definitions from the printed schema.
     /// </summary>
     public bool IncludeImportedDefinitions { get; set; } = true;
 }

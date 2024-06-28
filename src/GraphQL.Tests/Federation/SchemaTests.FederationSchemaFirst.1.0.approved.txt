@@ -1,0 +1,28 @@
+directive @extends on INTERFACE | OBJECT
+
+directive @external on FIELD_DEFINITION | OBJECT
+
+directive @key(fields: FieldSet!, resolvable: Boolean = true) repeatable on OBJECT
+
+directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+
+directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+
+scalar FieldSet
+
+type Post @key(fields: "id") {
+  title: String
+}
+
+type Query {
+  _entities(representations: [_Any!]!): [_Entity]!
+  _service: _Service!
+}
+
+scalar _Any
+
+union _Entity = Post
+
+type _Service {
+  sdl: String
+}
