@@ -50,7 +50,11 @@ public class FederatedSchemaBuilder : SchemaBuilder
     protected override void PreConfigure(Schema schema)
     {
         schema.RegisterType<AnyScalarGraphType>();
-        schema.RegisterType(new ServiceGraphType(new PrintOptions { IncludeFederationTypes = false })); // skip federation types for federation v1 support
+        schema.RegisterType(new ServiceGraphType(new FederationPrintOptions
+        {
+            IncludeFederationTypes = false,
+            IncludeImportedDefinitions = false
+        })); // skip federation types for federation v1 support
     }
 
     private void AddRootEntityFields(ISchema schema)

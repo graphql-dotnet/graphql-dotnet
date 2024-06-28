@@ -111,13 +111,15 @@ public static class SchemaExtensions
         return writer.ToString();
     }
 
+    private static readonly PrintOptions _defaultPrintOptions = new();
+
     /// <summary>
     /// Prints the schema to a specified <see cref="TextWriter"/>.
     /// </summary>
     public static ValueTask PrintAsync(this ISchema schema, TextWriter writer, PrintOptions? options = null, CancellationToken cancellationToken = default)
     {
         var sdl = schema.ToAST();
-        options ??= new();
+        options ??= _defaultPrintOptions;
         if (!options.IncludeDeprecationReasons)
         {
             RemoveDeprecationReasonsVisitor.Visit(sdl);
@@ -501,14 +503,13 @@ public static class SchemaExtensions
 
     /// <summary>
     /// Gets the applied @link directives from the schema.
-    /// Results are only valid after the schema has been initialized.
     /// </summary>
     public static IEnumerable<LinkConfiguration> GetLinkedSchemas(this ISchema schema)
     {
         var appliedDirectives = schema.GetAppliedDirectives();
         if (appliedDirectives == null)
             return Array.Empty<LinkConfiguration>();
-        return appliedDirectives.Select(LinkConfiguration.GetConfiguration).Where(x => x != null)!;
+        return appliedDirectives.Select(d => LinkConfiguration.TryParseDirective(d, false, out var c) ? c : null).Where(x => x != null)!;
     }
 }
 

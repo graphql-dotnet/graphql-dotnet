@@ -187,7 +187,7 @@ namespace GraphQL
     }
     public static class FederationGraphQLBuilderExtensions
     {
-        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Federation.FederationSettings>? configure = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, string version, System.Action<GraphQL.Utilities.LinkConfiguration>? configureLinkDirective = null) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
@@ -1713,9 +1713,17 @@ namespace GraphQL.Federation.Types
     {
         public AnyScalarGraphType() { }
     }
+    public class ContextFieldValueGraphType : GraphQL.Types.StringGraphType
+    {
+        public ContextFieldValueGraphType() { }
+    }
     public class EntityGraphType : GraphQL.Types.UnionGraphType
     {
         public EntityGraphType() { }
+    }
+    public class FederationPrintOptions : GraphQL.Utilities.PrintOptions
+    {
+        public FederationPrintOptions() { }
     }
     public class FieldSetGraphType : GraphQL.Types.StringGraphType
     {
@@ -1723,7 +1731,8 @@ namespace GraphQL.Federation.Types
     }
     public class ServiceGraphType : GraphQL.Types.ObjectGraphType
     {
-        public ServiceGraphType(GraphQL.Utilities.PrintOptions? printOptions) { }
+        public ServiceGraphType() { }
+        public ServiceGraphType(GraphQL.Federation.Types.FederationPrintOptions printOptions) { }
     }
 }
 namespace GraphQL.Instrumentation
@@ -3482,7 +3491,6 @@ namespace GraphQL.Utilities.Visitors
         protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeDefinitionAsync(GraphQLParser.AST.GraphQLObjectTypeDefinition objectTypeDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         protected override System.Threading.Tasks.ValueTask VisitObjectTypeExtensionAsync(GraphQLParser.AST.GraphQLObjectTypeExtension objectTypeExtension, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
-        protected override System.Threading.Tasks.ValueTask VisitSchemaDefinitionAsync(GraphQLParser.AST.GraphQLSchemaDefinition schemaDefinition, GraphQL.Utilities.Visitors.RemoveFederationTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {
