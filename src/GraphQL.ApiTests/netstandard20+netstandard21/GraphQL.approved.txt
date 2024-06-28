@@ -1481,18 +1481,6 @@ namespace GraphQL.Federation
         public ExternalAttribute() { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
-    [System.Flags]
-    public enum FederationDirectiveEnum
-    {
-        All = -1,
-        Key = 1,
-        Shareable = 2,
-        Inaccessible = 4,
-        Override = 8,
-        External = 16,
-        Provides = 32,
-        Requires = 64,
-    }
     public static class FederationFieldMetadataExtensions
     {
         public static TMetadataWriter External<TMetadataWriter>(this TMetadataWriter fieldType)
@@ -1550,13 +1538,6 @@ namespace GraphQL.Federation
         public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
         public override void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
         public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
-    }
-    public class FederationSettings
-    {
-        public GraphQL.Utilities.PrintOptions? SdlPrintOptions;
-        public FederationSettings() { }
-        public GraphQL.Federation.FederationDirectiveEnum? ImportDirectives { get; set; }
-        public string Version { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]
     public class InaccessibleAttribute : GraphQL.GraphQLAttribute

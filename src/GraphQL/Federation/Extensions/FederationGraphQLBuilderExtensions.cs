@@ -23,9 +23,9 @@ public static class FederationGraphQLBuilderExtensions
         string version,
         Action<LinkConfiguration>? configureLinkDirective = null)
     {
-        if (!FederationHelper.TryParseVersion(version, out _))
+        if (!FederationHelper.TryParseVersion(version, out var parsedVersion))
             throw new ArgumentOutOfRangeException(nameof(version), version, "Invalid federation version.");
-        if (version.StartsWith("1.") && configureLinkDirective != null)
+        if (parsedVersion.Major == 1 && configureLinkDirective != null)
             throw new ArgumentException("The @link directive is not supported in federation version 1.x.", nameof(configureLinkDirective));
 
         builder.Services
