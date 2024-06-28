@@ -1,22 +1,18 @@
 schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag"]) {
-  query: Query
+  query: MyQuery
 }
 
 scalar _Any
 
-type Query {
-  users: [User!]!
+type MyQuery {
+  favoriteProduct: Product!
   _service: _Service!
-  _entities(representations: [_Any!]!): [_Entity]!
 }
 
-type User @key(fields: "id") {
+type Product @key(fields: "id", resolvable: false) {
   id: ID!
-  username: String!
 }
 
 type _Service {
   sdl: String
 }
-
-union _Entity = User

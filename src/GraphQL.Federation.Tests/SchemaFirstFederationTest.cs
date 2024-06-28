@@ -36,74 +36,9 @@ public class SchemaFirstFederationTest : BaseSchemaFirstGraphQLTest
             .GetProperty("data")
             .GetProperty("_service")
             .GetProperty("sdl")
-            .GetString();
+            .GetString()!;
 
-        sdl.ShouldBe("""
-            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires", {name: "FieldSet", as: "fedFieldSet"}]) {
-              query: Query
-            }
-
-            directive @link(url: String!, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
-
-            directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
-
-            directive @shareable on FIELD_DEFINITION | OBJECT
-
-            directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
-
-            directive @override(from: String!) on FIELD_DEFINITION
-
-            directive @external on FIELD_DEFINITION | OBJECT
-
-            directive @provides(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-            directive @requires(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-            scalar _Any
-
-            type Query {
-              _noop: String
-              _service: _Service!
-              _entities(representations: [_Any!]!): [_Entity]!
-            }
-
-            type SchemaFirstExternalResolvableTestDto @key(fields: "id") {
-              id: Int!
-              external: String @external
-              extended: String! @requires(fields: "external")
-            }
-
-            type SchemaFirstExternalTestDto @key(fields: "id", resolvable: false) {
-              id: Int!
-            }
-
-            type SchemaFirstFederatedTestDto @key(fields: "id") {
-              id: Int!
-              name: String @deprecated(reason: "Test deprecation reason 03.")
-              externalTestId: Int!
-              externalResolvableTestId: Int!
-              externalTest: SchemaFirstExternalTestDto! @deprecated(reason: "Test deprecation reason 04.")
-              externalResolvableTest: SchemaFirstExternalResolvableTestDto! @provides(fields: "external")
-            }
-
-            type _Service {
-              sdl: String
-            }
-
-            union _Entity = SchemaFirstExternalResolvableTestDto | SchemaFirstFederatedTestDto
-
-            enum link__Purpose {
-              "`SECURITY` features provide metadata necessary to securely resolve fields."
-              SECURITY
-              "`EXECUTION` features provide metadata necessary for operation execution."
-              EXECUTION
-            }
-
-            scalar link__Import
-
-            scalar federation__FieldSet
-            """,
-            StringCompareShould.IgnoreLineEndings);
+        sdl.ShouldMatchApproved(c => c.NoDiff());
     }
 
     [Fact]

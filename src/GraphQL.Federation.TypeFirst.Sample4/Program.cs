@@ -15,7 +15,7 @@ public class Program
         builder.Services.AddGraphQL(b => b
             .AddAutoSchema<Query>()
             .AddSystemTextJson()
-            .AddFederation());
+            .AddFederation("2.3"));
 
         // Build the web application
         var app = builder.Build();

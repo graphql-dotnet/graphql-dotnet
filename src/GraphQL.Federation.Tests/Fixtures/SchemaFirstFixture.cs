@@ -16,7 +16,7 @@ public class SchemaFirstFixture
         sc.AddGraphQL(builder => builder
             .AddSystemTextJson()
             .AddDataLoader()
-            .AddFederation());
+            .AddFederation("2.3"));
 
         Services = sc.BuildServiceProvider();
 

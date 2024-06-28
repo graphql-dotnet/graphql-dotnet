@@ -16,7 +16,7 @@ public class Program
             .AddSchema<Schema3>()
             .AddSystemTextJson()
             .AddGraphTypes()
-            .AddFederation());
+            .AddFederation("2.3"));
 
         // Build the web application
         var app = builder.Build();

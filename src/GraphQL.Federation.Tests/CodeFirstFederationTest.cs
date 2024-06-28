@@ -36,84 +36,9 @@ public class CodeFirstFederationTest : BaseCodeFirstGraphQLTest
             .GetProperty("data")
             .GetProperty("_service")
             .GetProperty("sdl")
-            .GetString();
+            .GetString()!;
 
-        sdl.ShouldBe("""
-            schema @link(url: "https://specs.apollo.dev/federation/v2.0", import: ["@key", "@shareable", "@inaccessible", "@override", "@external", "@provides", "@requires", {name: "FieldSet", as: "fedFieldSet"}]) {
-              query: TestQuery
-            }
-
-            directive @link(url: String!, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
-
-            directive @key(fields: String!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
-
-            directive @shareable on FIELD_DEFINITION | OBJECT
-
-            directive @inaccessible on FIELD_DEFINITION | INTERFACE | OBJECT | UNION | ARGUMENT_DEFINITION | SCALAR | ENUM | ENUM_VALUE | INPUT_OBJECT | INPUT_FIELD_DEFINITION
-
-            directive @override(from: String!) on FIELD_DEFINITION
-
-            directive @external on FIELD_DEFINITION | OBJECT
-
-            directive @provides(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-            directive @requires(fields: federation__FieldSet!) on FIELD_DEFINITION
-
-            scalar _Any
-
-            type TestQuery {
-              directivesTest: DirectivesTestDto!
-              _service: _Service!
-              _entities(representations: [_Any!]!): [_Entity]!
-            }
-
-            type DirectivesTestDto @key(fields: "id") @shareable @inaccessible {
-              id: Int!
-              shareable: String! @shareable
-              inaccessible: String! @inaccessible
-              override: String! @override(from: "OtherSubgraph")
-              external: String! @external
-              provides: String! @provides(fields: "foo bar")
-              requires: String! @requires(fields: "foo bar")
-            }
-
-            type _Service {
-              sdl: String
-            }
-
-            union _Entity = DirectivesTestDto | FederatedTestDto | ExternalResolvableTestDto
-
-            type FederatedTestDto @key(fields: "id") {
-              id: Int!
-              name: String! @deprecated(reason: "Test deprecation reason 01.")
-              externalTestId: Int!
-              externalResolvableTestId: Int!
-              externalTest: ExternalTestDto! @deprecated(reason: "Test deprecation reason 02.")
-              externalResolvableTest: ExternalResolvableTestDto! @provides(fields: "external")
-            }
-
-            type ExternalTestDto @key(fields: "id", resolvable: false) {
-              id: Int!
-            }
-
-            type ExternalResolvableTestDto @key(fields: "id") {
-              id: Int!
-              external: String! @external
-              extended: String! @requires(fields: "External")
-            }
-            
-            enum link__Purpose {
-              "`SECURITY` features provide metadata necessary to securely resolve fields."
-              SECURITY
-              "`EXECUTION` features provide metadata necessary for operation execution."
-              EXECUTION
-            }
-            
-            scalar link__Import
-
-            scalar federation__FieldSet
-            """,
-            StringCompareShould.IgnoreLineEndings);
+        sdl.ShouldMatchApproved(c => c.NoDiff());
     }
 
     [Fact]

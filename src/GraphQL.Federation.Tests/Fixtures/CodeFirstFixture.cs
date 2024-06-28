@@ -20,7 +20,7 @@ public class CodeFirstFixture
             .AddGraphTypes(typeof(TestSchema).Assembly)
             .AddClrTypeMappings(typeof(TestSchema).Assembly)
             .AddAutoClrMappings()
-            .AddFederation());
+            .AddFederation("2.3"));
 
         Services = sc.BuildServiceProvider();
 

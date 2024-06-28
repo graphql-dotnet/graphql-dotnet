@@ -11,23 +11,12 @@ public class NoEntityTests
         var services = new ServiceCollection();
         services.AddGraphQL(b => b
             .AddAutoSchema<MyQuery>()
-            .AddFederation());
+            .AddFederation("2.3"));
         using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.Initialize();
-        schema.Print(new() { IncludeFederationTypes = false }).ShouldBe("""
-            schema {
-              query: MyQuery
-            }
-
-            type MyQuery {
-              favoriteProduct: Product!
-            }
-
-            type Product @key(fields: "id", resolvable: false) {
-              id: ID!
-            }
-            """, StringCompareShould.IgnoreLineEndings);
+        var sdl = schema.Print(new() { IncludeImportedDefinitions = false });
+        sdl.ShouldMatchApproved(c => c.NoDiff());
     }
 
     private class MyQuery
