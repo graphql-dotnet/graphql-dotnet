@@ -21,4 +21,3 @@ public class MyPseudoFederatedResolver<T> : IFederatedResolver
         return Task.FromResult<object?>(null);
     }
 }
-#pragma warning restore CS0618 // Type or member is obsolete
