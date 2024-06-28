@@ -27,12 +27,26 @@ namespace GraphQL.Federation.Visitors;
 /// </remarks>
 internal class FederationEntitiesSchemaNodeVisitor : BaseSchemaNodeVisitor
 {
+    private Func<AppliedDirective, bool> _keyDirectivePredicate = d => d.Name == KEY_DIRECTIVE;
+    public override void VisitSchema(ISchema schema)
+    {
+        var linkedSchemas = schema.GetLinkedSchemas();
+        var link = linkedSchemas?.Where(x => x.Url.StartsWith(FEDERATION_LINK_PREFIX)).FirstOrDefault();
+        if (link != null)
+        {
+            var keyDirectiveName = link.NameForDirective(KEY_DIRECTIVE);
+            if (keyDirectiveName == KEY_DIRECTIVE)
+                return;
+            _keyDirectivePredicate = d => d.Name == keyDirectiveName || (d.Name == KEY_DIRECTIVE && (d.FromSchemaUrl == FEDERATION_LINK_SCHEMA_URL || d.FromSchemaUrl == link.Url));
+        }
+    }
+
     public override void VisitObject(IObjectGraphType type, ISchema schema)
     {
         var directives = type.GetAppliedDirectives();
         if (directives == null)
             return;
-        if (type.GetAppliedDirectives()?.Any(d => d.Name == KEY_DIRECTIVE && d.FromSchemaUrl == FEDERATION_LINK_SCHEMA_URL && !d.Any(arg => arg.Name == RESOLVABLE_ARGUMENT && arg.Value is bool b && !b)) == true)
+        if (type.GetAppliedDirectives()?.Any(d => _keyDirectivePredicate(d) && !d.Any(arg => arg.Name == RESOLVABLE_ARGUMENT && arg.Value is bool b && !b)) == true)
         {
             var entityType = schema.AllTypes["_Entity"] as UnionGraphType
                 ?? throw new InvalidOperationException("The _Entity type is not defined in the schema.");
