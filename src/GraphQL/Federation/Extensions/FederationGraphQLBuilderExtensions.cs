@@ -39,7 +39,7 @@ public static class FederationGraphQLBuilderExtensions
         return builder
             .ConfigureSchema((schema, _) =>
             {
-                if (!version.StartsWith("1."))
+                if (parsedVersion.Major != 1)
                 {
                     // add the @link directive to the schema, referencing the directive specified by the import parameter
                     schema.AddFederationLink(version, configureLinkDirective);
