@@ -137,14 +137,12 @@ public sealed class LinkConfiguration
             var importList = new List<object>();
             foreach (var import in Imports)
             {
-                if (import.Key == null)
-                    throw new InvalidOperationException("No name specified for an import.");
                 var alias = import.Value ?? import.Key;
                 if (import.Key.StartsWith("@", StringComparison.Ordinal))
                 {
                     NameValidator.ValidateName(import.Key.Substring(1), NamedElement.Directive);
                     if (!alias.StartsWith("@", StringComparison.Ordinal))
-                        throw new InvalidOperationException("An alias for a directive must start with '@'.");
+                        throw new InvalidOperationException($"The alias for the directive '{import.Key}' must start with '@'.");
                     NameValidator.ValidateName(alias.Substring(1), NamedElement.Directive);
                 }
                 else
