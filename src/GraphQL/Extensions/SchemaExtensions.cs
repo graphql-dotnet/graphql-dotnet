@@ -416,6 +416,8 @@ public static class SchemaExtensions
     /// </summary>
     public static void AddLinkDirectiveSupport(this ISchema schema, Action<LinkConfiguration>? configuration = null)
     {
+        if (schema.Initialized)
+            throw new InvalidOperationException("Schema is already initialized");
         var config = new LinkConfiguration(LinkConfiguration.LINK_URL);
         config.Imports.Add("@link", "@link");
         configuration?.Invoke(config);
@@ -460,6 +462,8 @@ public static class SchemaExtensions
     /// <param name="configuration">An optional action to configure the link further.</param>
     public static void LinkSchema(this ISchema schema, string url, Action<LinkConfiguration>? configuration = null)
     {
+        if (schema.Initialized)
+            throw new InvalidOperationException("Schema is already initialized");
         var linkInstalled = false;
         var appliedDirectives = schema.GetAppliedDirectives();
         if (appliedDirectives != null)
