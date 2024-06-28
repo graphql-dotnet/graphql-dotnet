@@ -486,7 +486,7 @@ public static class SchemaExtensions
                         link.ConfigureAppliedDirective(appliedDirective);
                         return;
                     }
-                    if (url == LinkConfiguration.LINK_URL)
+                    if (urlMatch == LinkConfiguration.LINK_URL)
                         linkInstalled = true;
                 }
             }

@@ -486,11 +486,20 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         //TODO: add different validations, also see SchemaBuilder.Validate
         //TODO: checks for parsed SDL may be expanded in the future, see https://github.com/graphql/graphql-spec/issues/653
         // Do not change the order of these validations.
+
+        // coerce input field or argument default values properly
         CoerceInputTypeDefaultValues();
+        // parse @link directives defined via schema-first
         ParseLinkVisitor.Instance.Run(this);
+        // rename any applied directives that were imported from another schema to use the alias defined in the @link directive or the proper namespace
+        RenameImportedDirectivesVisitor.Run(this);
+        // run general schema validation code
         SchemaValidationVisitor.Instance.Run(this);
+        // validate that all applied directives are valid
         AppliedDirectivesValidationVisitor.Instance.Run(this);
+        // initialize default field arguments for optimized execution
         FieldTypeDefaultArgumentsVisitor.Instance.Run(this);
+        // removes types and fields that have IsPrivate set
         RemovePrivateTypesAndFieldsVisitor.Instance.Run(this); // This should be the last validation, so default field values are properly set.
     }
 

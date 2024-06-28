@@ -44,6 +44,7 @@ public static class FederationInterfaceMetadataExtensions
         where TMetadataWriter : IMetadataWriter, IInterfaceGraphType
         => graphType.ApplyDirective(KEY_DIRECTIVE, d =>
         {
+            d.FromSchemaUrl = FEDERATION_LINK_SCHEMA_URL;
             d.AddArgument(new(FIELDS_ARGUMENT) { Value = fields });
             if (!resolvable)
                 d.AddArgument(new(RESOLVABLE_ARGUMENT) { Value = false });

@@ -131,4 +131,146 @@ public class LinkedSchemaTests
         schema.Initialize();
         PrintSchema(schema).ShouldMatchApproved(o => o.NoDiff());
     }
+
+    [Fact]
+    public void AppliedDirectivesAreProperlyRenamed()
+    {
+        var queryType = new ObjectGraphType { Name = "Query" };
+        var schema = new Schema { Query = queryType };
+
+        schema.LinkSchema("https://spec.example.com/exampleA", c => c.Imports.Add("@importedA", "@importedA"));
+        schema.Directives.Register(NewDirective("importedA"));
+        schema.Directives.Register(NewDirective("exampleA__testA"));
+        schema.LinkSchema("https://spec.example.com/exampleB/v1.0", c => c.Imports.Add("@importedB", "@importedB"));
+        schema.Directives.Register(NewDirective("importedB"));
+        schema.Directives.Register(NewDirective("failB"));
+        schema.Directives.Register(NewDirective("exampleB__testB"));
+        schema.LinkSchema("https://spec.example.com/exampleC", c =>
+        {
+            c.Imports.Add("@importedC", "@aliasC");
+            c.Namespace = "customC";
+        });
+        schema.Directives.Register(NewDirective("aliasC"));
+        schema.Directives.Register(NewDirective("customC__testC"));
+
+        queryType.Field<StringGraphType>("field1")
+            .ApplyDirective("importedA", c => c.FromSchemaUrl = "https://spec.example.com/exampleA");
+        queryType.Field<StringGraphType>("field2")
+            .ApplyDirective("testA", c => c.FromSchemaUrl = "https://spec.example.com/exampleA");
+        queryType.Field<StringGraphType>("field3")
+            .ApplyDirective("failB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB");
+        queryType.Field<StringGraphType>("field4")
+            .ApplyDirective("importedB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/");
+        queryType.Field<StringGraphType>("field5")
+            .ApplyDirective("testB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/");
+        queryType.Field<StringGraphType>("field6")
+            .ApplyDirective("failB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/v1");
+        queryType.Field<StringGraphType>("field7")
+            .ApplyDirective("importedB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/v1.0");
+        queryType.Field<StringGraphType>("field8")
+            .ApplyDirective("testB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/v1.0");
+        queryType.Field<StringGraphType>("field9")
+            .ApplyDirective("failB", c => c.FromSchemaUrl = "https://spec.example.com/exampleB/v2.0");
+        queryType.Field<StringGraphType>("field10")
+            .ApplyDirective("importedC", c => c.FromSchemaUrl = "https://spec.example.com/exampleC");
+        queryType.Field<StringGraphType>("field11")
+            .ApplyDirective("testC", c => c.FromSchemaUrl = "https://spec.example.com/exampleC");
+
+        schema.Initialize();
+        PrintSchema(schema).ShouldMatchApproved(o => o.NoDiff());
+
+        Directive NewDirective(string name)
+        {
+            var d = new Directive(name);
+            d.Locations.Add(GraphQLParser.AST.DirectiveLocation.FieldDefinition);
+            return d;
+        }
+    }
+
+    [Fact]
+    public void AppliedDirectivesAreProperlyRenamedForAllLocations()
+    {
+        var schema = new Schema();
+        var url = "https://spec.example.com/example";
+        schema.LinkSchema(url, c => c.Imports.Add("@test", "@testAlias"));
+
+        // Define the custom directive @test
+        var testDirective = new Directive("testAlias");
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Schema);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Scalar);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Object);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.FieldDefinition);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.ArgumentDefinition);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Interface);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Union);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.Enum);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.EnumValue);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.InputObject);
+        testDirective.Locations.Add(GraphQLParser.AST.DirectiveLocation.InputFieldDefinition);
+        schema.Directives.Register(testDirective);
+
+        // Apply the @test directive to the schema
+        schema.ApplyDirective("test", d => d.FromSchemaUrl = url);
+
+        // Define scalar
+        var dateScalar = new DateGraphType();
+        dateScalar.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        schema.RegisterType(dateScalar);
+
+        // Define User object
+        var userType = new ObjectGraphType() { Name = "User" };
+        userType.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        userType.Field<NonNullGraphType<IdGraphType>>("id").ApplyDirective("test", d => d.FromSchemaUrl = url);
+        userType.Field<StringGraphType>("name").ApplyDirective("test", d => d.FromSchemaUrl = url);
+        userType.Field<IntGraphType>("age");
+        schema.RegisterType(userType);
+
+        // Define Query type
+        var queryType = new ObjectGraphType() { Name = "Query" };
+        queryType.Field("getUser", userType)
+            .Argument<IdGraphType>("id", c => c.ApplyDirective("test", d => d.FromSchemaUrl = url));
+        schema.Query = queryType;
+
+        // Define Node interface
+        var nodeInterface = new InterfaceGraphType() { Name = "Node" };
+        nodeInterface.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        nodeInterface.Field<NonNullGraphType<IdGraphType>>("id");
+        schema.RegisterType(nodeInterface);
+
+        // Define Post object (part of union)
+        var postType = new ObjectGraphType() { Name = "Post" };
+        postType.Field<StringGraphType>("title");
+        schema.RegisterType(postType);
+
+        // Define SearchResult union
+        var searchResultUnion = new UnionGraphType() { Name = "SearchResult" };
+        searchResultUnion.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        searchResultUnion.PossibleTypes.Add(userType);
+        searchResultUnion.PossibleTypes.Add(postType);
+        searchResultUnion.ResolveType = _ => userType;
+        schema.RegisterType(searchResultUnion);
+
+        // Define Role enum
+        var roleEnum = new EnumerationGraphType() { Name = "Role" };
+        roleEnum.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        roleEnum.Add(new EnumValueDefinition("ADMIN", 1).ApplyDirective("test", d => d.FromSchemaUrl = url));
+        roleEnum.Add(new EnumValueDefinition("USER", 2));
+        schema.RegisterType(roleEnum);
+
+        // Define UserInput input object
+        var userInput = new InputObjectGraphType() { Name = "UserInput" };
+        userInput.ApplyDirective("test", d => d.FromSchemaUrl = url);
+        userInput.Field<NonNullGraphType<StringGraphType>>("name").ApplyDirective("test", d => d.FromSchemaUrl = url);
+        userInput.Field<IntGraphType>("age");
+        schema.RegisterType(userInput);
+
+        // Define Mutation type
+        var mutationType = new ObjectGraphType() { Name = "Mutation" };
+        mutationType.Field("createUser", userType)
+            .Argument(userInput, "input", c => c.ApplyDirective("test", d => d.FromSchemaUrl = url));
+        schema.Mutation = mutationType;
+
+        schema.Initialize();
+        PrintSchema(schema).ShouldMatchApproved(o => o.NoDiff());
+    }
 }
