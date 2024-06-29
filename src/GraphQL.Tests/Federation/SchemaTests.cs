@@ -116,6 +116,20 @@ public class SchemaTests
         }
     }
 
+    [Fact]
+    public void DoesNotCreateRepresentationsWhenNoResolvableTypes()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<Query2>()
+            .AddFederation("2.3"));
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var sdl = schema.Print(new() { IncludeImportedDefinitions = false });
+        sdl.ShouldMatchApproved(c => c.NoDiff());
+    }
+
     private class Query
     {
         public static Post GetPost() => new Post();
@@ -125,4 +139,18 @@ public class SchemaTests
     {
         public string? Title { get; set; }
     }
+
+    [Name("MyQuery")]
+    private class Query2
+    {
+        public static Product FavoriteProduct => new Product { Id = 1 };
+    }
+
+    [Key("id", Resolvable = false)]
+    private class Product
+    {
+        [Id]
+        public int Id { get; set; }
+    }
 }
+

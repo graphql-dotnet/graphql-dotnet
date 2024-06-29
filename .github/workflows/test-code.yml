@@ -2,9 +2,6 @@ name: Test code
 
 on:
   pull_request:
-    branches:
-      - master
-      - develop
     paths:
       - src/**
       - .github/workflows/**
@@ -109,12 +106,24 @@ jobs:
       - name: Build Sample2
         working-directory: src
         run: dotnet build GraphQL.Federation.SchemaFirst.Sample2
+      - name: Build Sample3
+        working-directory: src
+        run: dotnet build GraphQL.Federation.CodeFirst.Sample3
+      - name: Build Sample4
+        working-directory: src
+        run: dotnet build GraphQL.Federation.TypeFirst.Sample4
       - name: Start Sample1 on port 5601
         working-directory: src
         run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample1 &
       - name: Start Sample2 on port 5602
         working-directory: src
         run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample2 &
+      - name: Start Sample3 on port 5603
+        working-directory: src
+        run: dotnet run --no-build --project GraphQL.Federation.CodeFirst.Sample3 &
+      - name: Start Sample4 on port 5604
+        working-directory: src
+        run: dotnet run --no-build --project GraphQL.Federation.TypeFirst.Sample4 &
       - name: Install Apollo Rover CLI
         run: |
           curl -sSL https://rover.apollo.dev/nix/latest | sh
@@ -143,6 +152,36 @@ jobs:
           do
             echo "Request $i to the URL..."
             response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5602)
+            if [ $response -eq 200 ]; then
+              echo "Received 200 response, step completed."
+              exit 0
+            fi
+            echo "Did not receive a 200 response, sleeping for 0.5 second..."
+            sleep 0.5
+          done
+          echo "Timed out after 30 seconds, step failed."
+          exit 1
+      - name: Wait for Sample3 to spin up
+        run: |
+          for i in {1..60}
+          do
+            echo "Request $i to the URL..."
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5603)
+            if [ $response -eq 200 ]; then
+              echo "Received 200 response, step completed."
+              exit 0
+            fi
+            echo "Did not receive a 200 response, sleeping for 0.5 second..."
+            sleep 0.5
+          done
+          echo "Timed out after 30 seconds, step failed."
+          exit 1
+      - name: Wait for Sample4 to spin up
+        run: |
+          for i in {1..60}
+          do
+            echo "Request $i to the URL..."
+            response=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5604)
             if [ $response -eq 200 ]; then
               echo "Received 200 response, step completed."
               exit 0
@@ -185,6 +224,11 @@ jobs:
           curl -X POST -H "Content-Type: application/json" -d @federation-request-1.json http://127.0.0.1:4000 > response-1.json
           curl -X POST -H "Content-Type: application/json" -d @federation-request-2.json http://127.0.0.1:4000 > response-2.json
           curl -X POST -H "Content-Type: application/json" -d @federation-request-3.json http://127.0.0.1:4000 > response-3.json
+      - name: Run additional GraphQL queries
+        if: matrix.federationversion == 2
+        working-directory: src/Federation
+        run: |
+          curl -X POST -H "Content-Type: application/json" -d @federation-request-4.json http://127.0.0.1:4000 > response-4.json
       - name: Print query result 1
         working-directory: src/Federation
         run: cat response-1.json
@@ -194,6 +238,10 @@ jobs:
       - name: Print query result 3
         working-directory: src/Federation
         run: cat response-3.json
+      - name: Print query result 4
+        if: matrix.federationversion == 2
+        working-directory: src/Federation
+        run: cat response-4.json
       - name: Compare query result 1 to expected response
         working-directory: src/Federation
         run: |
@@ -212,6 +260,13 @@ jobs:
           jq . response-3.json > actual-response-3.json
           jq . federation-response-3.json > expected-response-3.json
           diff -b actual-response-3.json expected-response-3.json
+      - name: Compare query result 4 to expected response
+        if: matrix.federationversion == 2
+        working-directory: src/Federation
+        run: |
+          jq . response-4.json > actual-response-4.json
+          jq . federation-response-4.json > expected-response-4.json
+          diff -b actual-response-4.json expected-response-4.json
 
   buildcheck:
     needs:

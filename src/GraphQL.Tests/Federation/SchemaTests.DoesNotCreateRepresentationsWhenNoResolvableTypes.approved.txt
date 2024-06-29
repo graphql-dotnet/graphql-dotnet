@@ -1,0 +1,18 @@
+schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag"]) {
+  query: MyQuery
+}
+
+scalar _Any
+
+type MyQuery {
+  favoriteProduct: Product!
+  _service: _Service!
+}
+
+type Product @key(fields: "id", resolvable: false) {
+  id: ID!
+}
+
+type _Service {
+  sdl: String
+}

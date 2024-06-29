@@ -2,9 +2,6 @@ name: Test documentation
 
 on:
   pull_request:
-    branches:
-      - master
-      - develop
     paths:
       - docs2/**
       - package.json
