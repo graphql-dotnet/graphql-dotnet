@@ -575,6 +575,7 @@ public class ComplexGraphTypeTests
             var type = new ComplexType<NrtTest>();
             _ = type.Field(d => d.Str1);
             _ = type.Field(d => d.Str2);
+            _ = type.Field(d => d.Str3);
             _ = type.Field(d => d.List1);
             _ = type.Field(d => d.List2);
             _ = type.Field(d => d.List3);
@@ -589,6 +590,9 @@ public class ComplexGraphTypeTests
             field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
+            field.Type.ShouldBeWhen(infer, typeof(StringGraphType), typeof(NonNullGraphType<StringGraphType>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "str3").ShouldNotBeNull();
             field.Type.ShouldBeWhen(infer, typeof(StringGraphType), typeof(NonNullGraphType<StringGraphType>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
@@ -626,6 +630,9 @@ public class ComplexGraphTypeTests
     {
         public string Str1 { get; set; }
         public string? Str2 { get; set; }
+#nullable disable
+        public string Str3 { get; set; }
+#nullable restore
         public int Int1 { get; set; }
         public int? Int2 { get; set; }
         public IList<string> List1 { get; set; }
