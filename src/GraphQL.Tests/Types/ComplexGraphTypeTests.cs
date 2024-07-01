@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using GraphQL.Conversion;
 using GraphQL.StarWars.Types;
+using GraphQL.Tests.Subscription;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
@@ -180,44 +181,6 @@ public class ComplexGraphTypeTests
         {
             GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = old;
         }
-    }
-
-    [Fact]
-    public void infer_nullability_from_nrt()
-    {
-        var schema = new Schema();
-        var type = new ComplexType<NrtTest>();
-        _ = type.Field(d => d.Str1);
-        _ = type.Field(d => d.Str2);
-        _ = type.Field(d => d.List1);
-        _ = type.Field(d => d.List2);
-        _ = type.Field(d => d.List3);
-        schema.Query = type;
-        schema.Initialize();
-
-        var field = type.Fields.FirstOrDefault(f => f.Name == "str1").ShouldNotBeNull();
-        field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
-
-        field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
-        field.Type.ShouldBe(typeof(StringGraphType));
-
-        field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
-        field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>));
-
-        field = type.Fields.FirstOrDefault(f => f.Name == "list2").ShouldNotBeNull();
-        field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
-
-        field = type.Fields.FirstOrDefault(f => f.Name == "list3").ShouldNotBeNull();
-        field.Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
-    }
-
-    private class NrtTest
-    {
-        public string Str1 { get; set; }
-        public string? Str2 { get; set; }
-        public IList<string> List1 { get; set; }
-        public IList<string?> List2 { get; set; }
-        public IList<string?>? List3 { get; set; }
     }
 
     [Fact]
@@ -596,6 +559,78 @@ public class ComplexGraphTypeTests
         // notice here that since the NRT attribute of 'string' cannot be read, it is assumed to be nullable
         type.Field<IEnumerable<string>>("field13").Resolve(_ => Array.Empty<string>());
         type.Fields.Find("field13").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void infer_nullability_from_nrt(bool infer)
+    {
+        bool old = GlobalSwitches.InferFieldNullabilityFromNRTAnnotations;
+
+        try
+        {
+            GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = infer;
+            var schema = new Schema();
+            var type = new ComplexType<NrtTest>();
+            _ = type.Field(d => d.Str1);
+            _ = type.Field(d => d.Str2);
+            _ = type.Field(d => d.List1);
+            _ = type.Field(d => d.List2);
+            _ = type.Field(d => d.List3);
+            _ = type.Field("concatStr", d => d.Str1 + d.List2);
+            _ = type.Field(d => d.Int1);
+            ShouldlyExtensions.ShouldThrowWhen<ArgumentException>(!infer, () => type.Field(d => d.Int2));
+
+            schema.Query = type;
+            schema.Initialize();
+
+            var field = type.Fields.FirstOrDefault(f => f.Name == "str1").ShouldNotBeNull();
+            field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
+            field.Type.ShouldBeWhen(infer, typeof(StringGraphType), typeof(NonNullGraphType<StringGraphType>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
+            field.Type.ShouldBeWhen(infer,
+                typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>),
+                typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "list2").ShouldNotBeNull();
+            field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "list3").ShouldNotBeNull();
+            field.Type.ShouldBeWhen(infer,
+                typeof(ListGraphType<StringGraphType>),
+                typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "concatStr").ShouldNotBeNull();
+            field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+
+            field = type.Fields.FirstOrDefault(f => f.Name == "int1").ShouldNotBeNull();
+            field.Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+
+            if (infer)
+            {
+                field = type.Fields.FirstOrDefault(f => f.Name == "int2").ShouldNotBeNull();
+                field.Type.ShouldBe(typeof(IntGraphType));
+            }
+        }
+        finally
+        {
+            GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = old;
+        }
+    }
+
+    private class NrtTest
+    {
+        public string Str1 { get; set; }
+        public string? Str2 { get; set; }
+        public int Int1 { get; set; }
+        public int? Int2 { get; set; }
+        public IList<string> List1 { get; set; }
+        public IList<string?> List2 { get; set; }
+        public IList<string?>? List3 { get; set; }
     }
 
     [Fact]

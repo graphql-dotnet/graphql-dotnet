@@ -567,6 +567,25 @@ namespace GraphQL.Types
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
             Field(name, expression, (bool?)nullable, type);
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="name">The name of this field.</param>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        /// <remarks>
+        /// When <paramref name="nullable"/> and <paramref name="type"/> are both <see langword="null"/>
+        /// the field's nullability depends on <see cref="GlobalSwitches.InferFieldNullabilityFromNRTAnnotations"/> and <paramref name="expression"/> type.
+        /// When set to <see langword="true"/> and expression is <see cref="MemberExpression"/>,
+        /// the result field nullability will match the Null Reference Type annotations of the member represented by the expression.
+        /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
+        /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
+        /// </remarks>
         private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             string name,
             Expression<Func<TSourceType, TProperty>> expression,
@@ -577,8 +596,16 @@ namespace GraphQL.Types
             {
                 if (type == null && nullable == null && GlobalSwitches.InferFieldNullabilityFromNRTAnnotations)
                 {
-                    var typeInfo = AutoRegisteringHelper.GetTypeInformation(((MemberExpression)expression.Body).Member, this is IInputObjectGraphType);
-                    type = typeInfo.ConstructGraphType();
+                    if (expression.Body is MemberExpression memberExpression)
+                    {
+                        var typeInfo = AutoRegisteringHelper.GetTypeInformation(memberExpression.Member, this is IInputObjectGraphType);
+                        type = typeInfo.ConstructGraphType();
+                    }
+                    else
+                    {
+                        nullable = typeof(TProperty).IsValueType && Nullable.GetUnderlyingType(typeof(TProperty)) != null;
+                        type = typeof(TProperty).GetGraphTypeFromType(nullable.Value, this is IInputObjectGraphType ? TypeMappingMode.InputType : TypeMappingMode.OutputType);
+                    }
                 }
                 else if (type == null)
                 {
@@ -618,6 +645,13 @@ namespace GraphQL.Types
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="name">The name of this field.</param>
         /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <remarks>
+        /// The field's nullability depends on <see cref="GlobalSwitches.InferFieldNullabilityFromNRTAnnotations"/> and <paramref name="expression"/> type.
+        /// When set to <see langword="true"/> and expression is <see cref="MemberExpression"/>,
+        /// the result field nullability will match the Null Reference Type annotations of the member represented by the expression.
+        /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
+        /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
+        /// </remarks>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             string name,
             Expression<Func<TSourceType, TProperty>> expression) =>
@@ -674,6 +708,25 @@ namespace GraphQL.Types
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
             Field(expression, (bool?)nullable, type);
 
+        /// <summary>
+        /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
+        /// The default name of this field is inferred by the property represented within the expression.
+        /// <br/><br/>
+        /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
+        /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
+        /// </summary>
+        /// <typeparam name="TProperty">The return type of the field.</typeparam>
+        /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
+        /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
+        /// <remarks>
+        /// When <paramref name="nullable"/> and <paramref name="type"/> are both <see langword="null"/>
+        /// the field's nullability depends on <see cref="GlobalSwitches.InferFieldNullabilityFromNRTAnnotations"/> and <paramref name="expression"/> type.
+        /// When set to <see langword="true"/> and expression is <see cref="MemberExpression"/>,
+        /// the result field nullability will match the Null Reference Type annotations of the member represented by the expression.
+        /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
+        /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
+        /// </remarks>
         private FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression,
             bool? nullable,
@@ -703,6 +756,13 @@ namespace GraphQL.Types
         /// </summary>
         /// <typeparam name="TProperty">The return type of the field.</typeparam>
         /// <param name="expression">The property of the source object represented within an expression.</param>
+        /// <remarks>
+        /// The field's nullability depends on <see cref="GlobalSwitches.InferFieldNullabilityFromNRTAnnotations"/> and <paramref name="expression"/> type.
+        /// When set to <see langword="true"/> and expression is <see cref="MemberExpression"/>,
+        /// the result field nullability will match the Null Reference Type annotations of the member represented by the expression.
+        /// If expression is not <see cref="MemberExpression"/> and <typeparamref name="TProperty"/> is of value type
+        /// the graph type nullability will match the <typeparamref name="TProperty"/> nullability. Otherwise, the field will be not nullable.
+        /// </remarks>
         public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
             Expression<Func<TSourceType, TProperty>> expression) =>
             Field(expression, nullable: null, type: null);

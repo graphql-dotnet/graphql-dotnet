@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using GraphQL.Conversion;
+using GraphQL.Types;
 using GraphQL.Utilities;
 
 namespace GraphQL;
@@ -102,7 +103,8 @@ public static class GlobalSwitches
     public static bool EnableReflectionCaching { get; set; }
 
     /// <summary>
-    /// TODO
+    /// Infer the field's graph type nullability from the Null Reference Type annotations of
+    /// the field or property represented by the expression argument. <see langword="false"/> by default.
     /// </summary>
-    public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = true;
+    public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = false;
 }
