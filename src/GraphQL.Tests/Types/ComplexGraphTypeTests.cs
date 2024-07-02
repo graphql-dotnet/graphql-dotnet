@@ -583,8 +583,12 @@ public class ComplexGraphTypeTests
             if (infer)
                 type.Field(d => d.Int2);
             else
+            {
                 Should.Throw<ArgumentException>(() => type.Field(d => d.Int2))
-                    .Message.ShouldBe("The GraphQL type for field 'NrtTest.Int2' could not be derived implicitly from expression 'd => d.Int2'. Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type. (Parameter 'isNullable')");
+                    .InnerException.ShouldNotBeNull()
+                    .Message.ShouldStartWith(
+                        "Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type.");
+            }
 
             schema.Query = type;
             schema.Initialize();
