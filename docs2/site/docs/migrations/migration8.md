@@ -1020,46 +1020,9 @@ by this change.
 ### 20. Infer field nullability from NRT annotations is enabled by default
 
 When defining the field with expression, the graph type nullability will be inferred from
-Null Reference Types (NRT) by default. To disable the feature, set the
-`GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `false`.
-
-For example, given the following code
+Null Reference Types (NRT) by default. See the new features section for more details.  
+To revert to old behavior set the global switch before initializing the schema
 
 ```c#
-public class Person
-{
-    public string FullName { get; set; }
-    public string? SpouseName { get; set; }
-    public IList<string>? Children { get; set; }
-}
-
-public class PersonGraphType : ObjectGraphType<Person>
-{
-    public PersonGraphType()
-    {
-        Field(p => p.FullName);
-        Field(p => p.SpouseName);
-        Field(p => p.Children);
-    }
-}
-```
-
-When `InferFieldNullabilityFromNRTAnnotations` is `true` (default), the result is:
-
-```graphql
-type Person {
-  fullName: String!
-  spouseName: String
-  children: [String!]
-}
-```
-
-When `InferFieldNullabilityFromNRTAnnotations` is `false`:
-
-```graphql
-type Person {
-  fullName: String!
-  spouseName: String!
-  children: [String]!
-}
+GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = false;
 ```
