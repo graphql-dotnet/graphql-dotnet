@@ -91,7 +91,7 @@ public static class ExpressionExtensions
             return null;
         }
 
-        var namedArguments = GetNamedArguments(invocation);
+        var namedArguments = invocation.GetNamedArguments();
         return GetArgument(argumentName, namedArguments, invocation, methodSymbol);
     }
 
@@ -100,7 +100,7 @@ public static class ExpressionExtensions
     /// </summary>
     /// <param name="invocation">The <see cref="InvocationExpressionSyntax"/> to extract named arguments from.</param>
     /// <returns>A dictionary of named arguments.</returns>
-    public static Dictionary<string, ArgumentSyntax> GetNamedArguments(InvocationExpressionSyntax invocation) =>
+    public static Dictionary<string, ArgumentSyntax> GetNamedArguments(this InvocationExpressionSyntax invocation) =>
         invocation.ArgumentList.Arguments
             .Where(arg => arg.NameColon != null)
             .ToDictionary(arg => arg.NameColon!.Name.Identifier.Text);
@@ -207,8 +207,8 @@ public static class ExpressionExtensions
         InvocationExpressionSyntax invocation,
         IMethodSymbol methodSymbol)
     {
-        if (namedArguments.TryGetValue(argumentName, out var msgArg))
-            return msgArg;
+        if (namedArguments.TryGetValue(argumentName, out var arg))
+            return arg;
 
         int paramIndex = GetParamIndex(argumentName, methodSymbol);
         var argument = paramIndex != -1 && invocation.ArgumentList.Arguments.Count > paramIndex
@@ -216,7 +216,7 @@ public static class ExpressionExtensions
             : null;
 
         // if requested argument is a named argument we should find it in 'namedArguments' dict
-        // if we got here and found named argument - it's another argument placed an the requested
+        // if we got here and found named argument - it's another argument placed at the requested
         // argument index, and requested argument has a default value (optional)
         return argument is { NameColon: null }
             ? argument

@@ -34,18 +34,86 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
             var diagnosticSpan = diagnostic.Location.SourceSpan;
             bool isAsyncField = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsAsync);
             bool isDelegate = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsDelegate);
+            bool isExpression = diagnostic.Properties.ContainsKey(Constants.AnalyzerProperties.IsExpression);
 
             var fieldInvocationExpression = (InvocationExpressionSyntax)root!.FindNode(diagnosticSpan);
 
             const string codeFixTitle = "Rewrite obsolete 'Field' method";
-            context.RegisterCodeFix(
-                CodeAction.Create(
-                    title: codeFixTitle,
-                    createChangedDocument: ct =>
-                        RewriteFieldBuilderAsync(context.Document, fieldInvocationExpression, isAsyncField, isDelegate, ct),
-                    equivalenceKey: codeFixTitle),
-                diagnostic);
+
+            if (isExpression)
+            {
+                var semanticModel = (await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false))!;
+                var typeArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Type, semanticModel);
+                var nullableArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Nullable, semanticModel);
+
+                bool removeTypeArg = typeArg?.Expression.IsKind(SyntaxKind.NullLiteralExpression) ?? false;
+                bool isTypeOf = typeArg?.Expression.IsKind(SyntaxKind.TypeOfExpression) ?? false;
+                bool removeNullableArg = nullableArg != null && isTypeOf;
+
+                if (!removeTypeArg && !removeNullableArg)
+                {
+                    continue;
+                }
+
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: codeFixTitle,
+                        createChangedDocument: ct =>
+                            RewriteExpressionFieldBuilderAsync(context.Document, fieldInvocationExpression, removeTypeArg, removeNullableArg, ct),
+                        equivalenceKey: codeFixTitle),
+                    diagnostic);
+            }
+            else
+            {
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        title: codeFixTitle,
+                        createChangedDocument: ct =>
+                            RewriteFieldBuilderAsync(context.Document, fieldInvocationExpression, isAsyncField, isDelegate, ct),
+                        equivalenceKey: codeFixTitle),
+                    diagnostic);
+            }
         }
+    }
+
+    private static async Task<Document> RewriteExpressionFieldBuilderAsync(
+        Document document,
+        InvocationExpressionSyntax fieldInvocationExpression,
+        bool removeTypeArg,
+        bool removeNullableArg,
+        CancellationToken cancellationToken)
+    {
+        var semanticModel = (await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false))!;
+        var typeArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Type, semanticModel);
+        var nullableArg = fieldInvocationExpression.GetMethodArgument(Constants.ArgumentNames.Nullable, semanticModel);
+
+        var newArgs = new List<SyntaxNode>();
+        foreach (var argument in fieldInvocationExpression.ArgumentList.Arguments)
+        {
+            if (argument != typeArg && argument != nullableArg)
+            {
+                // preserve name and expression
+                newArgs.Add(argument);
+            }
+            else if (argument == nullableArg && !removeNullableArg)
+            {
+                newArgs.Add(argument);
+            }
+            else if (argument == typeArg && !removeTypeArg)
+            {
+                var newTypeArg = typeArg.NameColon == null
+                    ? argument
+                    : typeArg.WithNameColon(null);
+
+                newArgs.Add(newTypeArg);
+            }
+        }
+
+        var newArgsList = fieldInvocationExpression.ArgumentList.WithArguments(newArgs.ToSeparatedList());
+        var docEditor = await DocumentEditor.CreateAsync(document, cancellationToken).ConfigureAwait(false);
+        docEditor.ReplaceNode(fieldInvocationExpression.ArgumentList, newArgsList);
+
+        return docEditor.GetChangedDocument();
     }
 
     private static async Task<Document> RewriteFieldBuilderAsync(

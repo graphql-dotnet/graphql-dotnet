@@ -222,6 +222,7 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromAttributes { get; set; }
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool EnableReflectionCaching { get; set; }
+        public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
         [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
             "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
         public static bool RequireRootQueryType { get; set; }

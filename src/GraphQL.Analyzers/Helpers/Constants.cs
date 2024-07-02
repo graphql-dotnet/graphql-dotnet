@@ -66,11 +66,13 @@ public static class Constants
         public const string BuilderMethodName = "BuilderMethodName";
         public const string IsAsync = "IsAsync";
         public const string IsDelegate = "IsDelegate";
+        public const string IsExpression = "IsExpression";
     }
 
     public static class Types
     {
         public const string AutoRegisteringInputObjectGraphType = "AutoRegisteringInputObjectGraphType";
+        public const string FieldBuilder = "FieldBuilder";
         public const string FieldType = "FieldType";
         public const string GraphQLConstructorAttribute = "GraphQLConstructorAttribute";
         public const string NonNullGraphType = "NonNullGraphType";

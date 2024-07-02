@@ -125,4 +125,10 @@ public static class GlobalSwitches
 #else
         System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeCompiled;
 #endif
+
+    /// <summary>
+    /// Infer the field's graph type nullability from the Null Reference Type annotations of
+    /// the field or property represented by the expression argument. <see langword="false"/> by default.
+    /// </summary>
+    public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = false;
 }

@@ -290,6 +290,53 @@ Please note that the `SchemaExporter` class will export type defintions as type 
 
 Please see the `SchemaExtensions.PrintAsync` source code implementation specifics.
 
+### 14. Infer field nullability from NRT annotations
+
+Since 7.9 you can enable the inference of the field nullability from the Null Reference Types (NRT)
+annotations when defining the field with expression. To enable the feature set the  
+`GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `true`.  
+
+For example, given the following code
+
+```c#
+public class Person
+{
+    public string FullName { get; set; }
+    public string? SpouseName { get; set; }
+    public IList<string>? Children { get; set; }
+}
+
+public class PersonGraphType : ObjectGraphType<Person>
+{
+    public PersonGraphType()
+    {
+        Field(p => p.FullName);
+        Field(p => p.SpouseName);
+        Field(p => p.Children);
+    }
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `false` (default), the result is:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String!
+  children: [String]!
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `true`:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String
+  children: [String!]
+}
+```
+
 ## Breaking Changes
 
 ### 1. `DataLoaderPair<TKey, T>.Loader` property removed
