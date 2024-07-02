@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using GraphQL.Conversion;
 using GraphQL.StarWars.Types;
-using GraphQL.Tests.Subscription;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
