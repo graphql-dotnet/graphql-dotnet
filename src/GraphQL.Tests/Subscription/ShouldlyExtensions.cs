@@ -1,5 +1,4 @@
 using GraphQL.SystemTextJson;
-using Should = Shouldly.Should;
 
 namespace GraphQL.Tests.Subscription;
 
@@ -57,17 +56,5 @@ public static class ShouldlyExtensions
         result.Errors.ShouldBeNull();
         result.Executed.ShouldBeTrue();
         return result;
-    }
-
-    public static void ShouldBeWhen(this object? obj, bool condition, object onTrue, object onFalse) =>
-        obj.ShouldBe(condition ? onTrue : onFalse);
-
-    public static void ShouldThrowWhen<TException>(bool condition, Action action)
-        where TException : Exception
-    {
-        if (condition)
-            Should.Throw<TException>(action);
-        else
-            Should.NotThrow(action);
     }
 }

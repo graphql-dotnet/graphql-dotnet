@@ -581,7 +581,11 @@ public class ComplexGraphTypeTests
             _ = type.Field(d => d.List3);
             _ = type.Field("concatStr", d => d.Str1 + d.List2);
             _ = type.Field(d => d.Int1);
-            ShouldlyExtensions.ShouldThrowWhen<ArgumentException>(!infer, () => type.Field(d => d.Int2));
+            if (infer)
+                type.Field(d => d.Int2);
+            else
+                Should.Throw<ArgumentException>(() => type.Field(d => d.Int2))
+                    .Message.ShouldBe("The GraphQL type for field 'NrtTest.Int2' could not be derived implicitly from expression 'd => d.Int2'. Explicitly nullable type: Nullable<Int32> cannot be coerced to a non nullable GraphQL type. (Parameter 'isNullable')");
 
             schema.Query = type;
             schema.Initialize();
@@ -590,23 +594,23 @@ public class ComplexGraphTypeTests
             field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
-            field.Type.ShouldBeWhen(infer, typeof(StringGraphType), typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(infer ? typeof(StringGraphType) : typeof(NonNullGraphType<StringGraphType>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "str3").ShouldNotBeNull();
-            field.Type.ShouldBeWhen(infer, typeof(StringGraphType), typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(infer ? typeof(StringGraphType) : typeof(NonNullGraphType<StringGraphType>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
-            field.Type.ShouldBeWhen(infer,
-                typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>),
-                typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+            field.Type.ShouldBe(infer
+                ? typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>)
+                : typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list2").ShouldNotBeNull();
             field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list3").ShouldNotBeNull();
-            field.Type.ShouldBeWhen(infer,
-                typeof(ListGraphType<StringGraphType>),
-                typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+            field.Type.ShouldBe(infer
+                ? typeof(ListGraphType<StringGraphType>)
+                : typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
 
             field = type.Fields.FirstOrDefault(f => f.Name == "concatStr").ShouldNotBeNull();
             field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
