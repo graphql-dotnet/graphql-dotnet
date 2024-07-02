@@ -730,6 +730,53 @@ parts of your schema with `@extends`. This is not required for version 2.0 and l
 You may add additional configuration to the `AddFederation` call to import additional directives or types, remove imports,
 change import aliases, or change the namespace used for directives that are not explicitly imported.
 
+### 21. Infer field nullability from NRT annotations is enabled by default
+
+When defining the field with expression, the graph type nullability will be inferred from
+Null Reference Types (NRT) by default. To disable the feature, set the
+`GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `false`.
+
+For example, given the following code
+
+```c#
+public class Person
+{
+    public string FullName { get; set; }
+    public string? SpouseName { get; set; }
+    public IList<string>? Children { get; set; }
+}
+
+public class PersonGraphType : ObjectGraphType<Person>
+{
+    public PersonGraphType()
+    {
+        Field(p => p.FullName);
+        Field(p => p.SpouseName);
+        Field(p => p.Children);
+    }
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `true` (default), the result is:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String
+  children: [String!]
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `false`:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String!
+  children: [String]!
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -969,3 +1016,50 @@ Unless you directly implement this interface, you should not be impacted by this
 This is required for OneOf Input Object support and is used to determine if a variable is required.
 Unless you have a custom validation rule that uses `VariableUsage`, you should not be impacted
 by this change.
+
+### 20. Infer field nullability from NRT annotations is enabled by default
+
+When defining the field with expression, the graph type nullability will be inferred from
+Null Reference Types (NRT) by default. To disable the feature, set the
+`GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `false`.
+
+For example, given the following code
+
+```c#
+public class Person
+{
+    public string FullName { get; set; }
+    public string? SpouseName { get; set; }
+    public IList<string>? Children { get; set; }
+}
+
+public class PersonGraphType : ObjectGraphType<Person>
+{
+    public PersonGraphType()
+    {
+        Field(p => p.FullName);
+        Field(p => p.SpouseName);
+        Field(p => p.Children);
+    }
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `true` (default), the result is:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String
+  children: [String!]
+}
+```
+
+When `InferFieldNullabilityFromNRTAnnotations` is `false`:
+
+```graphql
+type Person {
+  fullName: String!
+  spouseName: String!
+  children: [String]!
+}
+```
