@@ -777,6 +777,13 @@ type Person {
 }
 ```
 
+### 22. `ValidationContext.GetRecursivelyReferencedFragments` updated with `@skip` and `@include` directive support
+
+When developing a custom validation rule, such as an authorization rule, you may need to determine which fragments are
+recursively referenced by an operation by calling `GetRecursivelyReferencedFragments` with the `onlyUsed` argument
+set to `true`. The method will then ignore fragments that are conditionally skipped by the `@skip` or `@include`
+directives.
+
 ## Breaking Changes
 
 ### 1. Query type is required

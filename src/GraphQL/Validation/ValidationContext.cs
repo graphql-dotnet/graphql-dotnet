@@ -18,7 +18,9 @@ public partial class ValidationContext : IProvideUserContext
     internal void Reset()
     {
         _errors = null;
-        _fragments.Clear();
+        _fragments?.Clear();
+        _usedFragments?.Clear();
+        _noFragments = false;
         _variables.Clear();
         Operation = null!;
         Schema = null!;

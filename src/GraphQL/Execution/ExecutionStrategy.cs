@@ -121,6 +121,17 @@ public abstract class ExecutionStrategy : IExecutionStrategy
     protected virtual bool ShouldIncludeNode<TASTNode>(ExecutionContext context, TASTNode node)
         where TASTNode : ASTNode, IHasDirectivesNode
     {
+        // if the node has no directives, short-circuit processing
+        if (node.Directives == null)
+            return true;
+
+        // according to GraphQL spec, directives with the same name may be defined so long as they cannot be
+        // placed on the same node types as other directives with the same name; so here we verify that the
+        // node is a field, fragment spread, or inline fragment, the only nodes allowed by the built-in @skip
+        // and @include directives
+        if (node is not GraphQLField && node is not GraphQLFragmentSpread && node is not GraphQLInlineFragment)
+            return true;
+
         if (context.DirectiveValues?.TryGetValue(node, out var directives) ?? false)
         {
             // where @skip and @include are used, validation will ensure that the 'if' argument exists and is a non-null boolean
