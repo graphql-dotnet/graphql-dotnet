@@ -20,7 +20,7 @@ public partial class ValidationContext : IProvideUserContext
         _errors = null;
         _fragments?.Clear();
         _usedFragments?.Clear();
-        _noFragments = false;
+        _noFragments = null;
         _variables.Clear();
         Operation = null!;
         Schema = null!;
