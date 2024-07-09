@@ -140,6 +140,9 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         return true;
     }
 
+    [ThreadStatic]
+    private static Dictionary<string, (GraphQLField, FieldType)>? _reusableFields;
+
     /// <summary>
     /// Creates execution nodes for child fields of an object execution node. Only run if
     /// the object execution node result is not <see langword="null"/> or object execution
@@ -150,23 +153,30 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         Debug.Assert(parent.Result != null || parent is RootExecutionNode);
 
         var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
-        var fields = Interlocked.Exchange(ref context.ReusableFields, null);
-        fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
-
-        var subFields = new ExecutionNode[fields.Count];
-
-        int i = 0;
-        foreach (var kvp in fields)
+        var fields = _reusableFields ??= new();
+        try
         {
-            (var field, var fieldDefinition) = kvp.Value;
-            var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
-            subFields[i++] = node;
+            fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
+
+            var subFields = new ExecutionNode[fields.Count];
+
+            int i = 0;
+            foreach (var kvp in fields)
+            {
+                (var field, var fieldDefinition) = kvp.Value;
+                var node = BuildExecutionNode(parent, fieldDefinition.ResolvedType!, field, fieldDefinition);
+                subFields[i++] = node;
+            }
+
+            parent.SubFields = subFields;
+
+            fields.Clear();
         }
-
-        parent.SubFields = subFields;
-
-        fields.Clear();
-        Interlocked.CompareExchange(ref context.ReusableFields, fields, null);
+        catch
+        {
+            _reusableFields = null;
+            throw;
+        }
     }
 
     /// <summary>
@@ -442,6 +452,9 @@ public abstract class ExecutionStrategy : IExecutionStrategy
     protected virtual IFieldResolver SelectResolver(ExecutionNode node, ExecutionContext context)
         => node.FieldDefinition.Resolver ?? (node.Parent is RootExecutionNode && context.Operation.Operation == OperationType.Subscription ? SourceFieldResolver.Instance : NameFieldResolver.Instance);
 
+    [ThreadStatic]
+    private static ReadonlyResolveFieldContext? _readonlyResolveFieldContext;
+
     /// <summary>
     /// Executes a single node. If the node does not return an <see cref="IDataLoaderResult"/>,
     /// it will pass execution to <see cref="CompleteNodeAsync(ExecutionContext, ExecutionNode)"/>.
@@ -456,7 +469,8 @@ public abstract class ExecutionStrategy : IExecutionStrategy
 
         try
         {
-            var resolveContext = Interlocked.Exchange(ref context.ReusableReadonlyResolveFieldContext, null);
+            var resolveContext = _readonlyResolveFieldContext;
+            _readonlyResolveFieldContext = null;
             resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
 
             var resolver = SelectResolver(node, context);
@@ -472,8 +486,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
                 if (result is not IEnumerable || result is string)
                 {
                     // also see FuncFieldResolver.GetResolverFor as it relates to context re-use
-                    resolveContext.Reset(null, null);
-                    Interlocked.CompareExchange(ref context.ReusableReadonlyResolveFieldContext, resolveContext, null);
+                    _readonlyResolveFieldContext ??= resolveContext.Reset(null, null);
                 }
             }
         }
