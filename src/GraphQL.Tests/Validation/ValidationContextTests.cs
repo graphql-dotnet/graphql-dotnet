@@ -498,4 +498,75 @@ public class ValidationContextTests
             (ret.Errors.FirstOrDefault()?.Message).ShouldBe(expectedFailure);
         }
     }
+
+    [Theory]
+    [InlineData("query q01a { dummy }", new string[] { }, false)]
+    [InlineData("query q01b { dummy }", new string[] { }, true)]
+    [InlineData("query q02a { ...fragment1 } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q02b { ...fragment1 } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q03a { ...fragment1 ...fragment2 } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1", "fragment2" }, false)]
+    [InlineData("query q03b { ...fragment1 ...fragment2 } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1", "fragment2" }, true)]
+    [InlineData("query q04a { ...fragment1 } fragment fragment1 on Query { ...fragment2 } fragment fragment2 on Query { field1 }", new string[] { "fragment1", "fragment2" }, false)]
+    [InlineData("query q04b { ...fragment1 } fragment fragment1 on Query { ...fragment2 } fragment fragment2 on Query { field1 }", new string[] { "fragment1", "fragment2" }, true)]
+    [InlineData("query q05a { ...fragment1 } fragment fragment1 on Query { ...fragment2 } fragment fragment2 on Query { ...fragment3 } fragment fragment3 on Query { field1 }", new string[] { "fragment1", "fragment2", "fragment3" }, false)]
+    [InlineData("query q05b { ...fragment1 } fragment fragment1 on Query { ...fragment2 } fragment fragment2 on Query { ...fragment3 } fragment fragment3 on Query { field1 }", new string[] { "fragment1", "fragment2", "fragment3" }, true)]
+    [InlineData("query q06a { ...fragment1 } query q07 { ...fragment2 } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q06b { ...fragment1 } query q07 { ...fragment2 } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q08a { ...fragment1 @skip(if: true) } fragment fragment1 on Query { field1 }", new string[] { }, false)]
+    [InlineData("query q08b { ...fragment1 @skip(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q09a { ...fragment1 @skip(if: false) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q09b { ...fragment1 @skip(if: false) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q10a { ...fragment1 @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q10b { ...fragment1 @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q11a { ...fragment1 @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { }, false)]
+    [InlineData("query q11b { ...fragment1 @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q12a { ...fragment1 ...fragment2 @include(if: false) } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q12b { ...fragment1 ...fragment2 @include(if: false) } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1", "fragment2" }, true)]
+    [InlineData("query q13a { ...fragment1 @include(if: true) ...fragment2 @skip(if: true) } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q13b { ...fragment1 @include(if: true) ...fragment2 @skip(if: true) } fragment fragment1 on Query { field1 } fragment fragment2 on Query { field2 }", new string[] { "fragment1", "fragment2" }, true)]
+    [InlineData("query q14a { fieldA @skip(if: true) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { }, false)]
+    [InlineData("query q14b { fieldA @skip(if: true) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q15a { fieldA @include(if: false) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { }, false)]
+    [InlineData("query q15b { fieldA @include(if: false) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q16a { fieldA @include(if: true) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q16b { fieldA @include(if: true) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q17a { fieldA @skip(if: false) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q17b { fieldA @skip(if: false) { ...fragment1 } } fragment fragment1 on CustomType { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q18a { ...fragment1 @skip(if: true) @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { }, false)]
+    [InlineData("query q18b { ...fragment1 @skip(if: true) @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q19a { ...fragment1 @skip(if: false) @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, false)]
+    [InlineData("query q19b { ...fragment1 @skip(if: false) @include(if: true) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q20a { ...fragment1 @skip(if: true) @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { }, false)]
+    [InlineData("query q20b { ...fragment1 @skip(if: true) @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    [InlineData("query q21a { ...fragment1 @skip(if: false) @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { }, false)]
+    [InlineData("query q21b { ...fragment1 @skip(if: false) @include(if: false) } fragment fragment1 on Query { field1 }", new string[] { "fragment1" }, true)]
+    public void GetRecursivelyReferencedFragments(string query, string[] expectedFragments, bool includeSkipped)
+    {
+        var schema = Schema.For("""
+        type Query {
+            dummy: String
+            field1: String
+            field2: String
+            fieldA: CustomType
+        }
+        type CustomType {
+            field1: String
+        }
+        """);
+        var document = GraphQLParser.Parser.Parse(query);
+        var variables = Inputs.Empty;
+        var context = new ValidationContext
+        {
+            Document = document,
+            Extensions = Inputs.Empty,
+            Operation = document.Operation(), // first operation in document
+            Schema = schema,
+            TypeInfo = new TypeInfo(schema),
+            UserContext = new Dictionary<string, object?>(),
+            Variables = variables,
+        };
+        var actual = context.GetRecursivelyReferencedFragments(context.Operation, !includeSkipped) ?? [];
+        var actualNames = actual.Select(x => x.FragmentName.Name.StringValue).ToArray();
+        actualNames.ShouldBe(expectedFragments);
+    }
 }
