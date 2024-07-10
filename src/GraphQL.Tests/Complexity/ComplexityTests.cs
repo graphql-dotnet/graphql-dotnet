@@ -373,12 +373,14 @@ public class ComplexityTests : ComplexityTestBase
     [InlineData(160, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 20, 1)]
     [InlineData(161, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 66.66666666666667d, 1)]
     [InlineData(162, "type Query { field1(first: Int): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 10, 1)]
-    [InlineData(163, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 13.33333333333334d, 1)]
+    [InlineData(163, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 13.333333333333334d, 1)]
+    [InlineData(170, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: String }", "{ field1(last: 10) { field2 } }", 1.5, 20, 1)]
+    [InlineData(171, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: String }", "query q($last: Int) { field1(last: $last) { field2 } }", 1.5, 3, 1)]
     public void TestComplexityCases(int idx, string sdl, string query, double avgImpact, double complexity, int totalQueryDepth)
     {
         _ = idx;
         var schema = SchemaFor(sdl);
-        var result = ComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema);
+        var result = ComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema); //notice: nowhere are variables requested (or used)
         var actual = (result.Complexity, result.TotalQueryDepth);
         actual.ShouldBe((complexity, totalQueryDepth));
     }
