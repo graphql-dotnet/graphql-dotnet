@@ -1,7 +1,6 @@
 using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Rules.Custom;
-using GraphQLParser.Visitors;
 
 namespace GraphQL.Tests.Complexity;
 
