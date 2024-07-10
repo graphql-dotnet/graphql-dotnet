@@ -361,6 +361,8 @@ public class ComplexityTests : ComplexityTestBase
     [InlineData(131, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 20, 1)]
     [InlineData(132, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 1.5, 1)]
     [InlineData(133, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 4.5, 1)]
+    [InlineData(134, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 2, 1)]
+    [InlineData(135, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 4, 1)]
     [InlineData(140, "type Query { field1: [Field1Type] } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 3, 1)]
     [InlineData(141, "type Query { field1: [Field1Type] } type Field1Type { field2: String @complexity(value: 5) }", "{ field1 { field2 } }", 1.5, 3, 1)]
     [InlineData(142, "type Query { field1: [Field1Type] @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 10, 1)]
@@ -371,6 +373,7 @@ public class ComplexityTests : ComplexityTestBase
     [InlineData(160, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 20, 1)]
     [InlineData(161, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 66.66666666666667d, 1)]
     [InlineData(162, "type Query { field1(first: Int): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 10, 1)]
+    [InlineData(163, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 13.33333333333334d, 1)]
     public void TestComplexityCases(int idx, string sdl, string query, double avgImpact, double complexity, int totalQueryDepth)
     {
         _ = idx;
