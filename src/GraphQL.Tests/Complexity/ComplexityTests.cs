@@ -1,3 +1,8 @@
+using GraphQL.Types;
+using GraphQL.Utilities;
+using GraphQL.Validation.Rules.Custom;
+using GraphQLParser.Visitors;
+
 namespace GraphQL.Tests.Complexity;
 
 public class ComplexityTests : ComplexityTestBase
@@ -341,6 +346,53 @@ public class ComplexityTests : ComplexityTestBase
         catch (InvalidOperationException ex)
         {
             ex.Message.ShouldBe("Query is too complex to validate.");
+        }
+    }
+
+    [Theory]
+    [InlineData(10, "type Query { field1: String }", "{ field1 }", 1.5, 1, 0)]
+    [InlineData(11, "type Query { field1: String @complexity(value: 5) }", "{ field1 }", 1.5, 1, 0)]
+    [InlineData(12, "type Query { field1: String field2: String field3: String }", "{ field1 field2 field3 }", 1.5, 3, 0)]
+    [InlineData(13, "type Query { field1: String @complexity(value: 5) field2: String field3: String }", "{ field1 field2 field3 }", 1.5, 3, 0)]
+    [InlineData(14, "type Query { field1: Field1Type } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 3, 1)]
+    [InlineData(15, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 10, 1)]
+    [InlineData(16, "type Query { field1: [Field1Type] } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 3, 1)]
+    [InlineData(17, "type Query { field1: [Field1Type] } type Field1Type { field2: String @complexity(value: 5) }", "{ field1 { field2 } }", 1.5, 3, 1)]
+    [InlineData(18, "type Query { field1: [Field1Type] @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 10, 1)]
+    [InlineData(19, "type Query { field1(id: ID): Field1Type } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", 1.5, 2, 1)]
+    [InlineData(20, "type Query { field1(id: ID): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", 1.5, 6.666666666666666d, 1)]
+    [InlineData(21, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 20, 1)]
+    [InlineData(22, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 66.66666666666667d, 1)]
+    public void TestComplexityCases(int idx, string sdl, string query, double avgImpact, double complexity, int totalQueryDepth)
+    {
+        _ = idx;
+        var schema = SchemaFor(sdl);
+        var result = ComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema);
+        var actual = (result.Complexity, result.TotalQueryDepth);
+        actual.ShouldBe((complexity, totalQueryDepth));
+    }
+
+    private ISchema SchemaFor(string sdl)
+    {
+        sdl += """
+
+            directive @complexity(
+                value: Float
+            ) on FIELD_DEFINITION
+            """;
+        var schema = Schema.For(sdl);
+        schema.RegisterVisitor(new DirectiveToComplexityVisitor());
+        schema.Initialize();
+        return schema;
+    }
+
+    private class DirectiveToComplexityVisitor : BaseSchemaNodeVisitor
+    {
+        public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
+        {
+            var complexity = field.GetAppliedDirectives()?.Find("complexity")?.FindArgument("value")?.Value;
+            if (complexity != null)
+                field.WithComplexityImpact((double)Convert.ChangeType(complexity, typeof(double)));
         }
     }
 }
