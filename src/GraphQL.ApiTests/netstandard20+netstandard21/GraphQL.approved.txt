@@ -57,9 +57,18 @@ namespace GraphQL
     }
     public static class ComplexityAnalayzerMetadataExtensions
     {
+        [System.Obsolete("Please use GetComplexityImpactFunc instead.")]
         public static double? GetComplexityImpact(this GraphQL.Types.IMetadataReader provider) { }
+        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "FieldImpact",
+                "ChildImpactMultiplier"})]
+        public static System.Func<GraphQL.Validation.Rules.Custom.NewComplexityValidationRule.FieldImpactContext, System.ValueTuple<double, double>>? GetComplexityImpactFunc(this GraphQL.Types.FieldType provider) { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
-            where TMetadataProvider : GraphQL.Types.IMetadataWriter { }
+            where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, System.Func<GraphQL.Validation.Rules.Custom.NewComplexityValidationRule.FieldImpactContext, System.ValueTuple<double, double>> func)
+            where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double fieldImpact, double childImpactMultiplier)
+            where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
     }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
@@ -254,8 +263,6 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider?>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
@@ -296,6 +303,10 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
+        [System.Obsolete("Please use the new complexity analyzer.")]
+        public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration>? action = null) { }
+        [System.Obsolete("Please use the new complexity analyzer.")]
+        public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration, System.IServiceProvider?>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
@@ -3572,7 +3583,7 @@ namespace GraphQL.Validation
         public System.Threading.Tasks.ValueTask<System.ValueTuple<GraphQL.Validation.Variables, System.Collections.Generic.List<GraphQL.Validation.ValidationError>?>> GetVariablesValuesAsync(GraphQL.Validation.IVariableVisitor? visitor = null) { }
         public string? IsValidLiteralValue(GraphQL.Types.IGraphType type, GraphQLParser.AST.GraphQLValue valueAst) { }
         public void ReportError(GraphQL.Validation.ValidationError error) { }
-        protected virtual bool ShouldIncludeNode(GraphQLParser.AST.ASTNode node) { }
+        public virtual bool ShouldIncludeNode(GraphQLParser.AST.ASTNode node) { }
     }
     [System.Serializable]
     public class ValidationError : GraphQL.Execution.DocumentError
@@ -3649,20 +3660,35 @@ namespace GraphQL.Validation
 }
 namespace GraphQL.Validation.Complexity
 {
-    public class ComplexityConfiguration
+    [System.Obsolete("Please use the new complexity analyzer.")]
+    public class LegacyComplexityConfiguration
     {
-        public ComplexityConfiguration() { }
+        public LegacyComplexityConfiguration() { }
         public double? FieldImpact { get; set; }
         public int? MaxComplexity { get; set; }
         public int? MaxDepth { get; set; }
         public int MaxRecursionCount { get; set; }
     }
-    public class ComplexityResult
+    [System.Obsolete("Please use the new complexity analyzer.")]
+    public class LegacyComplexityResult
     {
-        public ComplexityResult() { }
+        public LegacyComplexityResult() { }
         public double Complexity { get; set; }
         public System.Collections.Generic.Dictionary<GraphQLParser.AST.ASTNode, double> ComplexityMap { get; }
         public int TotalQueryDepth { get; set; }
+    }
+    public class NewComplexityConfiguration
+    {
+        public NewComplexityConfiguration() { }
+        public double DefaultChildImpactMultiplier { get; set; }
+        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
+                "FieldImpact",
+                "ChildImpactMultiplier"})]
+        public System.Func<GraphQL.Validation.Rules.Custom.NewComplexityValidationRule.FieldImpactContext, System.ValueTuple<double, double>> DefaultComplexityImpactFunc { get; set; }
+        public double DefaultObjectImpact { get; set; }
+        public double DefaultScalarImpact { get; set; }
+        public int? MaxComplexity { get; set; }
+        public int? MaxDepth { get; set; }
     }
 }
 namespace GraphQL.Validation.Errors
@@ -4018,12 +4044,31 @@ namespace GraphQL.Validation.Rules
 }
 namespace GraphQL.Validation.Rules.Custom
 {
-    public class ComplexityValidationRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
+    [System.Obsolete("Please use the new complexity analyzer.")]
+    public class LegacyComplexityValidationRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
     {
-        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
-        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.ComplexityResult complexityResult) { }
+        public LegacyComplexityValidationRule(GraphQL.Validation.Complexity.LegacyComplexityConfiguration complexityConfiguration) { }
+        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.LegacyComplexityResult complexityResult) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Types.ISchema schema) { }
+    }
+    public class NewComplexityValidationRule : GraphQL.Validation.ValidationRuleBase
+    {
+        public NewComplexityValidationRule(GraphQL.Validation.Complexity.NewComplexityConfiguration complexityConfiguration) { }
+        protected GraphQL.Validation.Complexity.NewComplexityConfiguration ComplexityConfiguration { get; }
+        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        protected virtual System.Threading.Tasks.Task ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, double maxDepth) { }
+        public struct FieldImpactContext
+        {
+            public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
+            public GraphQL.Validation.Complexity.NewComplexityConfiguration Configuration { get; }
+            public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
+            public GraphQL.Types.FieldType FieldDefinition { get; set; }
+            public GraphQL.Validation.Rules.Custom.NewComplexityValidationRule.FieldImpactContext? Parent { get; }
+            public GraphQL.Types.IGraphType ParentType { get; set; }
+            public GraphQL.Validation.ValidationContext ValidationContext { get; }
+            public TType GetArgument<TType>(string name, TType defaultValue = default) { }
+        }
     }
     public class NoIntrospectionValidationRule : GraphQL.Validation.ValidationRuleBase
     {

@@ -3,7 +3,8 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Class to track complexity of fragment defined in GraphQL document.
 /// </summary>
-internal sealed class FragmentComplexity
+[Obsolete("Please use the new complexity analyzer.")]
+internal sealed class LegacyFragmentComplexity
 {
     /// <summary>
     /// Depth of fragment.

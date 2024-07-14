@@ -27,10 +27,10 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
 
         _currentMethod.Value = methodUnderTest;
 
-        _diAdapters.GetOrAdd(methodUnderTest, _ =>
+        _diAdapters.GetOrAdd(methodUnderTest, static methodUnderTest2 =>
         {
-            var configureMethod = methodUnderTest.DeclaringType!.GetMethod(nameof(QueryTestBase<Schema>.RegisterServices), BindingFlags.Public | BindingFlags.Instance);
-            object temp = Activator.CreateInstance(methodUnderTest.DeclaringType)!;
+            var configureMethod = methodUnderTest2.DeclaringType!.GetMethod(nameof(QueryTestBase<Schema>.RegisterServices), BindingFlags.Public | BindingFlags.Instance);
+            object temp = Activator.CreateInstance(methodUnderTest2.DeclaringType)!;
             Action<IServiceRegister> configure = register => configureMethod?.Invoke(temp, new object[] { register });
 
             var stack = new Stack<IDependencyInjectionAdapter>();
@@ -52,7 +52,8 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
 
         if (_diAdapters.TryGetValue(methodUnderTest, out var stack))
         {
-            _ = stack.Pop();
+            lock (stack)
+                _ = stack.Pop();
             if (stack.Count == 0)
                 Debug.Assert(_diAdapters.TryRemove(methodUnderTest, out _));
         }
@@ -63,9 +64,14 @@ internal sealed class PrepareDependencyInjectionAttribute : BeforeAfterTestAttri
         get
         {
             var method = _currentMethod.Value;
-            return method == null || !_diAdapters.TryGetValue(method, out var stack) || stack == null || stack.Count == 0
-                ? throw new InvalidOperationException("Attempt to access IServiceProvider out of prepared DependencyInjection context.")
-                : stack.Peek().ServiceProvider;
+            if (method == null || !_diAdapters.TryGetValue(method, out var stack) || stack == null)
+                throw new InvalidOperationException("Attempt to access IServiceProvider out of prepared DependencyInjection context.");
+            lock (stack)
+            {
+                return (stack.Count == 0)
+                    ? throw new InvalidOperationException("Attempt to access IServiceProvider out of prepared DependencyInjection context.")
+                    : stack.Peek().ServiceProvider;
+            }
         }
     }
 }

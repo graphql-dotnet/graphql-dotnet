@@ -380,7 +380,7 @@ public class ComplexityTests : ComplexityTestBase
     {
         _ = idx;
         var schema = SchemaFor(sdl);
-        var result = ComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema); //notice: nowhere are variables requested (or used)
+        var result = LegacyComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema); //notice: nowhere are variables requested (or used)
         var actual = (result.Complexity, result.TotalQueryDepth);
         actual.ShouldBe((complexity, totalQueryDepth));
     }

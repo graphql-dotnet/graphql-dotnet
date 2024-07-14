@@ -14,16 +14,16 @@ public class ComplexityTestBase
 
     public StarWarsTestBase StarWarsTestBase { get; } = new StarWarsBasicQueryTests();
 
-    protected ComplexityResult AnalyzeComplexity(string query) => ComplexityValidationRule.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
+    protected LegacyComplexityResult AnalyzeComplexity(string query) => LegacyComplexityValidationRule.Analyze(DocumentBuilder.Build(query), 2.0d, 250);
 
-    public async Task<ExecutionResult> Execute(ComplexityConfiguration complexityConfig, string query, bool onlyComplexityRule = false) =>
+    public async Task<ExecutionResult> Execute(LegacyComplexityConfiguration complexityConfig, string query, bool onlyComplexityRule = false) =>
         await StarWarsTestBase.Executer.ExecuteAsync(options =>
         {
             options.Schema = CreateSchema();
             options.Query = query;
             options.ValidationRules = onlyComplexityRule
-                ? new[] { new ComplexityValidationRule(complexityConfig) }
-                : GraphQL.Validation.DocumentValidator.CoreRules.Append(new ComplexityValidationRule(complexityConfig));
+                ? new[] { new LegacyComplexityValidationRule(complexityConfig) }
+                : GraphQL.Validation.DocumentValidator.CoreRules.Append(new LegacyComplexityValidationRule(complexityConfig));
         }).ConfigureAwait(false);
 
     //ISSUE: manually created test instance with ServiceProvider
