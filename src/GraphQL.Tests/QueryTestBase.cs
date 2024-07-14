@@ -1,7 +1,6 @@
 using GraphQL.Conversion;
 using GraphQL.DI;
 using GraphQL.Execution;
-using GraphQL.Tests.DI;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.Exceptions;
@@ -15,7 +14,6 @@ public class QueryTestBase<TSchema> : QueryTestBase<TSchema, GraphQLDocumentBuil
 {
 }
 
-[PrepareDependencyInjection]
 public class QueryTestBase<TSchema, TDocumentBuilder>
     where TSchema : Schema
     where TDocumentBuilder : IDocumentBuilder, new()
@@ -41,8 +39,15 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     // 2. set is needed for some tests like MultithreadedTests/ComplexityTestBase that create an instance of test class manually
     public IServiceProvider ServiceProvider
     {
-        private get => _serviceProvider ??= PrepareDependencyInjectionAttribute.CurrentServiceProvider;
+        private get => _serviceProvider ??= CreateServiceProvider();
         set => _serviceProvider = value;
+    }
+
+    private IServiceProvider CreateServiceProvider()
+    {
+        var collection = new ServiceCollection();
+        collection.AddGraphQL(b => RegisterServices(b.Services));
+        return collection.BuildServiceProvider();
     }
 
     public TSchema Schema => ServiceProvider.GetService<TSchema>() ?? throw new InvalidOperationException("Schema was not specified in DI container");
