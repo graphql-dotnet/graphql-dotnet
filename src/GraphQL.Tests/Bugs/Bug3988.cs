@@ -55,6 +55,10 @@ public class Bug3988InlineFragmentSpreadWithoutTypeCondition
             }
             """);
     }
+    // the above code demonstrates the bug where an inline fragment spread without a type condition
+    // fails to be validated by the PossibleFragmentSpreads rule
+
+    // github issue subject: Inline fragment spread without type condition is not validated by PossibleFragmentSpreads rule
 
     public class Query
     {
