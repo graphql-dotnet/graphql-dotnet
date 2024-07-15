@@ -384,7 +384,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Enables the legacy complexity analyzer and configures it with the specified configuration delegate.
     /// </summary>
-    [Obsolete("Please use the new complexity analyzer.")]
+    [Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
     public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration>? action = null)
     {
         builder.AddValidationRule<LegacyComplexityValidationRule>();
@@ -393,7 +393,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddLegacyComplexityAnalyzer(IGraphQLBuilder, Action{LegacyComplexityConfiguration})"/>
-    [Obsolete("Please use the new complexity analyzer.")]
+    [Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
     public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration, IServiceProvider>? action)
     {
         builder.AddValidationRule<LegacyComplexityValidationRule>();

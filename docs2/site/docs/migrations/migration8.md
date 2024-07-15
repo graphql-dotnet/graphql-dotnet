@@ -784,6 +784,11 @@ recursively referenced by an operation by calling `GetRecursivelyReferencedFragm
 set to `true`. The method will then ignore fragments that are conditionally skipped by the `@skip` or `@include`
 directives.
 
+### 23. The complexity analyzer has been rewritten to support more complex scenarios
+
+Please review the documentation for the new complexity analyzer to understand how to use it and how to configure it.
+See the 'Complexity Analzyer' document with the 'Guides' section of the documentation for more information.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -1030,6 +1035,22 @@ When defining the field with expression, the graph type nullability will be infe
 Null Reference Types (NRT) by default. See the new features section for more details.  
 To revert to old behavior set the global switch before initializing the schema
 
-```c#
+```csharp
 GlobalSwitches.InferFieldNullabilityFromNRTAnnotations = false;
 ```
+
+### 21. The complexity analyzer has been rewritten and functions differently
+
+The complexity analyzer has been rewritten to be more efficient and to support more complex
+scenarios. Please read the documentation on the new complexity analyzer to understand how it
+works and how to configure it. To revert to the old behavior, use the `LegacyComplexityValidationRule`
+or GraphQL builder method as follows:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddLegacyComplexityAnalyzer(c => c.MaxComplexity = 100)  // use the v7 complexity analyzer
+);
+```
+
+The legacy complexity analyzer will be removed in v9.

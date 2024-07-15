@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Rules.Custom;
 /// <summary>
 /// Analyzes a document to determine if its complexity exceeds a threshold.
 /// </summary>
-[Obsolete("Please use the new complexity analyzer.")]
+[Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
 public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
 {
     private LegacyComplexityConfiguration ComplexityConfiguration { get; }

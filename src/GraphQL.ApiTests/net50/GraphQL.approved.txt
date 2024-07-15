@@ -315,9 +315,11 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        [System.Obsolete("Please use the new complexity analyzer.")]
+        [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
+            "d in v9.")]
         public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration>? action = null) { }
-        [System.Obsolete("Please use the new complexity analyzer.")]
+        [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
+            "d in v9.")]
         public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
@@ -4143,7 +4145,8 @@ namespace GraphQL.Validation.Rules.Custom
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         protected virtual System.Threading.Tasks.Task ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
     }
-    [System.Obsolete("Please use the new complexity analyzer.")]
+    [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
+        "d in v9.")]
     public class LegacyComplexityValidationRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
     {
         public LegacyComplexityValidationRule(GraphQL.Validation.Complexity.LegacyComplexityConfiguration complexityConfiguration) { }
