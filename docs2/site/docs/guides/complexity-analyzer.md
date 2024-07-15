@@ -143,6 +143,12 @@ The above query will have the following complexity calculation:
 - Maximum Depth: 4 (users -> posts -> comments -> id)
 - Total Complexity: 6501
 
+Since the number of rows returned from list fields can vary, it is recommended to use connection fields
+and to require the `first` or `last` argument to allow the complexity analzyer to properly estimate the
+child multiplier for list fields (or have the default page size set very small). You can also choose to
+set the scalar and object impact to zero if you prefer to only consider the number of nodes and maximum
+depth, similar to the [GitHub GraphQL API rate limits](https://docs.github.com/en/graphql/overview/rate-limits-and-node-limits-for-the-graphql-api).
+
 ### 2. Ignoring or Reducing Impact of Introspection Requests
 
 To prevent introspection requests from affecting the complexity calculation, you can configure the introspection
