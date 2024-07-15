@@ -26,7 +26,7 @@ namespace GraphQL.Validation.Rules
         private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
             new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
             {
-                var fragType = context.TypeInfo.GetLastType();
+                var fragType = context.TypeInfo.GetLastType()?.GetNamedType();
                 var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
 
                 if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
