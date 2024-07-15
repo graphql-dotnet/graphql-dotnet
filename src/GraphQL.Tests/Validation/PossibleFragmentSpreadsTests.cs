@@ -249,6 +249,42 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
         });
     }
 
+    [Fact]
+    public void inline_fragment_spread_with_no_type_condition()
+    {
+        ShouldPassRule(c =>
+        {
+            c.Schema = GraphQL.Types.Schema.For("""
+                type Query {
+                  hero: User!
+                }
+                type User {
+                  id: ID!
+                  name: String!
+                }
+                """);
+
+            c.Query = """
+                {
+                  hero {       # hero returns a non-null type (User!)
+                    __typename
+                    id
+                    ... {      # inline fragment spread without type condition on child of non-null type
+                      name
+                    }
+                    ... on User {
+                      name2: name
+                    }
+                    ...userFragment
+                  }
+                }
+                fragment userFragment on User {
+                  name3: name
+                }
+                """;
+        });
+    }
+
     private void error(ValidationTestConfig _, string fragName, string parentType, string fragType, int line, int column)
     {
         _.Error(PossibleFragmentSpreadsError.TypeIncompatibleSpreadMessage(fragName, parentType, fragType), line, column);
