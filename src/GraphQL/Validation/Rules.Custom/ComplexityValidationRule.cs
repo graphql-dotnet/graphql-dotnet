@@ -62,7 +62,7 @@ public class ComplexityValidationRule : ValidationRuleBase
     /// <see cref="ComplexityConfiguration.DefaultObjectImpact"/> for object fields. The default implementation computes the child impact multiplier as follows:
     /// if the field is a list field, and has an integer 'first' or 'last' argument, the multiplier is the value of the argument. If the field is a list field
     /// and has a 'id' argument supplied, the multiplier is 1. If the field is a list field, and if the parent is not a list field and has a 'first' or 'last'
-    /// argument, the multiplier is the value of the argument. Otherwise, the multiplier is <see cref="ComplexityConfiguration.DefaultChildImpactMultiplier"/>.
+    /// argument, the multiplier is the value of the argument. Otherwise, the multiplier is <see cref="ComplexityConfiguration.DefaultListImpactMultiplier"/>.
     /// </para>
     /// </summary>
     protected virtual ValueTask<(double TotalComplexity, int MaximumDepth)> CalculateComplexityAsync(ValidationContext context)

@@ -33,7 +33,7 @@ public class ComplexityConfiguration
     /// Default child multiplier to use for list fields. Should represent the average number of rows/objects returned by each field.
     /// Defaults to 5.
     /// </summary>
-    public double DefaultChildImpactMultiplier { get; set; } = 5;
+    public double DefaultListImpactMultiplier { get; set; } = 5;
 
     /// <summary>
     /// Validates the Total Complexity (double) and Maximum Depth (int) of the query against user-defined limits, such as per-user, per-IP or throttling limits.
@@ -62,7 +62,7 @@ public class ComplexityConfiguration
         {
             graphType = listGraphType.ResolvedType;
             graphType = graphType is NonNullGraphType nonNullGraphType2 ? nonNullGraphType2.ResolvedType : graphType;
-            multiplier *= context.Configuration.DefaultChildImpactMultiplier;
+            multiplier *= context.Configuration.DefaultListImpactMultiplier;
         }
         var impact = graphType is ScalarGraphType ? context.Configuration.DefaultScalarImpact : context.Configuration.DefaultObjectImpact;
 

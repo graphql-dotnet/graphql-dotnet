@@ -69,6 +69,8 @@ namespace GraphQL
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double fieldImpact, double childImpactMultiplier)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
+        public static TSchema WithIntrospectionComplexityImpact<TSchema>(this TSchema schema, double impact)
+            where TSchema : GraphQL.Types.ISchema { }
     }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
@@ -3737,11 +3739,11 @@ namespace GraphQL.Validation.Complexity
     public class ComplexityConfiguration
     {
         public ComplexityConfiguration() { }
-        public double DefaultChildImpactMultiplier { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "FieldImpact",
                 "ChildImpactMultiplier"})]
         public System.Func<GraphQL.Validation.Complexity.FieldImpactContext, System.ValueTuple<double, double>> DefaultComplexityImpactDelegate { get; set; }
+        public double DefaultListImpactMultiplier { get; set; }
         public double DefaultObjectImpact { get; set; }
         public double DefaultScalarImpact { get; set; }
         public int? MaxComplexity { get; set; }

@@ -61,7 +61,7 @@ public class ComplexityTests
         {
             c.DefaultScalarImpact = scalarImpact;
             c.DefaultObjectImpact = objectImpact;
-            c.DefaultChildImpactMultiplier = listMultiplier;
+            c.DefaultListImpactMultiplier = listMultiplier;
         });
         var actual = (result.TotalComplexity, result.MaxDepth);
         actual.ShouldBe((complexity, totalQueryDepth));

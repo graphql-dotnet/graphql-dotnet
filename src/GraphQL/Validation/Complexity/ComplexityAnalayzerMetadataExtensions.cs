@@ -64,4 +64,20 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// </summary>
     public static Func<FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)>? GetComplexityImpactDelegate(this FieldType provider)
         => provider.GetMetadata<Func<FieldImpactContext, (double, double)>?>(COMPLEXITY_IMPACT_FUNC);
+
+    /// <summary>
+    /// Configures the schema to use the specified complexity impact for introspection fields.
+    /// Specifically, the __typename, __schema, and __type fields' impact is set to <paramref name="impact"/>, and
+    /// all their child nodes impact are multiplied by <paramref name="impact"/>. So if the impact is 0, introspection fields
+    /// will not be counted towards the complexity, and if the impact is 0.1, introspection fields will be counted at 10%
+    /// of their default complexity.
+    /// </summary>
+    public static TSchema WithIntrospectionComplexityImpact<TSchema>(this TSchema schema, double impact)
+        where TSchema : ISchema
+    {
+        schema.SchemaMetaFieldType.WithComplexityImpact(impact, impact);
+        schema.TypeNameMetaFieldType.WithComplexityImpact(impact, impact);
+        schema.TypeMetaFieldType.WithComplexityImpact(impact, impact);
+        return schema;
+    }
 }
