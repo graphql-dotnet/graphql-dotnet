@@ -411,7 +411,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder;
     }
 
-    /// <inheritdoc cref="AddLegacyComplexityAnalyzer(IGraphQLBuilder, Action{LegacyComplexityConfiguration})"/>
+    /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityConfiguration})"/>
     public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider>? action)
     {
         builder.AddValidationRule<ComplexityValidationRule>();
