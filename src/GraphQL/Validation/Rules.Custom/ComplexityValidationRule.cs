@@ -268,10 +268,10 @@ public class ComplexityValidationRule : ValidationRuleBase
             // visit the children of the field, if there are any
             // note that even if ChildImpactMultiplier is 0, we still need to visit children to determine the max depth
             return field.SelectionSet != null
-                ? VisitChildrenAsync(complexityImpact.ChildImpactMultiplier)
+                ? VisitChildrenAsync(this, context, field, fieldType, complexityImpact.ChildImpactMultiplier)
                 : default;
 
-            async ValueTask VisitChildrenAsync(double multiplier)
+            static async ValueTask VisitChildrenAsync(ComplexityVisitor visitor, VisitorContext context, GraphQLField field, FieldType fieldType, double multiplier)
             {
                 // push the field onto the stack so that complexity calculation delegates can access the parent field if need be
                 context.FieldAsts.Push(field);
@@ -287,7 +287,7 @@ public class ComplexityValidationRule : ValidationRuleBase
                 var oldMultiplier = context.StandingComplexity;
                 context.StandingComplexity *= multiplier;
                 // visit the selection set (ignoring comments, directives, etc)
-                await VisitAsync(field.SelectionSet.Selections, context).ConfigureAwait(false);
+                await visitor.VisitAsync(field.SelectionSet!.Selections, context).ConfigureAwait(false);
                 // restore the context
                 context.StandingComplexity = oldMultiplier;
                 context.TotalDepth--;
@@ -350,7 +350,7 @@ public class ComplexityValidationRule : ValidationRuleBase
         /// <inheritdoc cref="ValidationContext.Operation"/>
         public GraphQLOperationDefinition Operation => ValidationContext.Operation;
         /// <inheritdoc cref="ValidationContext.ShouldIncludeNode(ASTNode)"/>
-        public Func<ASTNode, bool> ShouldIncludeNode => ValidationContext.ShouldIncludeNode;
+        public bool ShouldIncludeNode(ASTNode node) => ValidationContext.ShouldIncludeNode(node);
         /// <inheritdoc cref="ValidationContext.CancellationToken"/>
         /// <remarks>n/a since this visitor does not call any asynchronous methods</remarks>
         public CancellationToken CancellationToken => ValidationContext.CancellationToken;
