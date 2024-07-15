@@ -382,7 +382,7 @@ public static class GraphQLBuilderExtensions // TODO: split
 
     #region - AddComplexityAnalyzer -
     /// <summary>
-    /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
+    /// Enables the legacy complexity analyzer and configures it with the specified configuration delegate.
     /// </summary>
     [Obsolete("Please use the new complexity analyzer.")]
     public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration>? action = null)
@@ -394,9 +394,27 @@ public static class GraphQLBuilderExtensions // TODO: split
 
     /// <inheritdoc cref="AddLegacyComplexityAnalyzer(IGraphQLBuilder, Action{LegacyComplexityConfiguration})"/>
     [Obsolete("Please use the new complexity analyzer.")]
-    public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration, IServiceProvider?>? action)
+    public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration, IServiceProvider>? action)
     {
         builder.AddValidationRule<LegacyComplexityValidationRule>();
+        builder.Services.Configure(action);
+        return builder;
+    }
+
+    /// <summary>
+    /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
+    /// </summary>
+    public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration>? action = null)
+    {
+        builder.AddValidationRule<ComplexityValidationRule>();
+        builder.Services.Configure(action);
+        return builder;
+    }
+
+    /// <inheritdoc cref="AddLegacyComplexityAnalyzer(IGraphQLBuilder, Action{LegacyComplexityConfiguration})"/>
+    public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityConfiguration, IServiceProvider>? action)
+    {
+        builder.AddValidationRule<ComplexityValidationRule>();
         builder.Services.Configure(action);
         return builder;
     }

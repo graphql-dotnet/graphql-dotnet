@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL;
@@ -12,7 +13,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     private const string COMPLEXITY_IMPACT_FUNC = "__COMPLEXITY_IMPACT_FUNC__";
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
+    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/> and <see cref="LegacyComplexityValidationRule"/>.
     /// Changing this value does not affect the complexity impact of child fields.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
@@ -23,11 +24,11 @@ public static class ComplexityAnalayzerMetadataExtensions
         where TMetadataProvider : IFieldMetadataWriter
     {
         provider.WithMetadata(COMPLEXITY_IMPACT, impact);
-        return provider.WithComplexityImpact(context => (impact, context.Configuration.DefaultComplexityImpactFunc(context).ChildImpactMultiplier));
+        return provider.WithComplexityImpact(context => (impact, context.Configuration.DefaultComplexityImpactDelegate(context).ChildImpactMultiplier));
     }
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
+    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
     /// <param name="provider">Metadata provider which must implement <see cref="IMetadataWriter"/> interface.</param>
@@ -39,13 +40,13 @@ public static class ComplexityAnalayzerMetadataExtensions
         => provider.WithComplexityImpact(_ => (fieldImpact, childImpactMultiplier));
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
+    /// Specify field's complexity impact delegate which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
     /// <param name="provider">Metadata provider which must implement <see cref="IMetadataWriter"/> interface.</param>
     /// <param name="func">A function which calculates the complexity impact of the field.</param>
     /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
-    public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, Func<NewComplexityValidationRule.FieldImpactContext, (double, double)> func)
+    public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, Func<FieldImpactContext, (double, double)> func)
         where TMetadataProvider : IFieldMetadataWriter
         => provider.WithMetadata(COMPLEXITY_IMPACT_FUNC, func);
 
@@ -59,8 +60,8 @@ public static class ComplexityAnalayzerMetadataExtensions
         => provider.GetMetadata<double?>(COMPLEXITY_IMPACT);
 
     /// <summary>
-    /// Get field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
+    /// Get field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
-    public static Func<NewComplexityValidationRule.FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)>? GetComplexityImpactFunc(this FieldType provider)
-        => provider.GetMetadata<Func<NewComplexityValidationRule.FieldImpactContext, (double, double)>?>(COMPLEXITY_IMPACT_FUNC);
+    public static Func<FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)>? GetComplexityImpactDelegate(this FieldType provider)
+        => provider.GetMetadata<Func<FieldImpactContext, (double, double)>?>(COMPLEXITY_IMPACT_FUNC);
 }

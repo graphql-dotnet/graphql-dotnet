@@ -1,388 +1,95 @@
+using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Utilities;
+using GraphQL.Validation;
+using GraphQL.Validation.Complexity;
 using GraphQL.Validation.Rules.Custom;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityTests : ComplexityTestBase
+public class ComplexityTests
 {
-    [Fact]
-    public void inline_fragments_test()
-    {
-        var withFrag = AnalyzeComplexity("""
-            query withInlineFragment {
-              profiles(handles: ["dnetguru"]) {
-                handle
-                ... on User {
-                  friends {
-                    count
-                  }
-                }
-              }
-            }
-            """);
-        var woFrag = AnalyzeComplexity("""
-            query withoutFragments {
-              profiles(handles: ["dnetguru"]) {
-                handle
-                friends {
-                  count
-                }
-              }
-            }
-            """);
-
-        withFrag.Complexity.ShouldBe(woFrag.Complexity);
-        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-    }
-
-    [Fact]
-    public void fragments_test()
-    {
-        var withFrag = AnalyzeComplexity("""
-            {
-              leftComparison: hero(episode: EMPIRE) {
-                ...comparisonFields
-              }
-              rightComparison: hero(episode: JEDI) {
-                ...comparisonFields
-              }
-            }
-
-            fragment comparisonFields on Character {
-              name
-              appearsIn
-              friends {
-                name
-              }
-            }
-            """);
-        var woFrag = AnalyzeComplexity("""
-            {
-              leftComparison: hero(episode: EMPIRE) {
-                name
-                appearsIn
-                friends {
-                  name
-                }
-              }
-              rightComparison: hero(episode: JEDI) {
-                name
-                appearsIn
-                friends {
-                  name
-                }
-              }
-            }
-            """);
-
-        withFrag.Complexity.ShouldBe(woFrag.Complexity);
-        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-    }
-
-    [Fact]
-    public void fragment_test_nested()
-    {
-        var withFrag = AnalyzeComplexity("""
-            {
-              A {
-                W {
-                  ...X
-                }
-              }
-            }
-
-            fragment X on Y {
-              B
-              C
-              D {
-                E
-              }
-            }
-            """);
-
-        var woFrag = AnalyzeComplexity("""
-            {
-              A {
-                W {
-                  B
-                  C
-                  D {
-                    E
-                  }
-                }
-              }
-            }
-            """);
-
-        withFrag.Complexity.ShouldBe(woFrag.Complexity);
-        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-    }
-
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
-    [Fact]
-    public void nested_fragments()
-    {
-        var withFrag = AnalyzeComplexity("""
-            query SomeDroids {
-              droid(id: "3") {
-                ...DroidFragment
-              }
-            }
-
-            fragment DroidFragment on Droid {
-              name
-              ... nestedNameFragment1
-            }
-
-            fragment nestedNameFragment1 on Droid {
-              ... nestedNameFragment2
-              name
-            }
-
-            fragment nestedNameFragment2 on Droid {
-              name
-            }
-            """);
-
-        var woFrag = AnalyzeComplexity("""
-            query SomeDroids {
-              droid(id: "3") {
-                name
-              }
-            }
-            """);
-
-        withFrag.Complexity.ShouldBe(4/*woFrag.Complexity*/); // TODO: 4 != 2 but may be OK
-        withFrag.TotalQueryDepth.ShouldBe(woFrag.TotalQueryDepth);
-    }
-
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3191
-    [Fact]
-    public void nested_fragments_2()
-    {
-        var result = AnalyzeComplexity("""
-            {
-              car(id: 1)
-              {
-                ...lastUpdated
-                ...optionsOnCar
-              }
-            }
-
-            fragment optionsOnCar on Car
-            {
-              options
-              {
-                edges
-                {
-                  node
-                  {
-                    ...optionDetail
-                  }
-                }
-              }
-            }
-
-            fragment optionPrice on Option
-            {
-              price
-            }
-
-            fragment lastUpdated on Car
-            {
-              updatedAt
-            }
-
-            fragment optionDetail on Option
-            {
-              name
-              ...optionPrice
-              optionContents(first: 9999999)
-              {
-                edges
-                {
-                  node
-                  {
-                    optionContent
-                    {
-                      name
-                    }
-                  }
-                }
-              }
-            }
-            """);
-
-        result.Complexity.ShouldBe(1839999848); // WOW! :)
-    }
-
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3207
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void nested_fragments_3(bool reverse)
-    {
-        const string frag1 = """
-            fragment frag1 on QueryType
-            {
-              ...frag4
-            }
-            """;
-        const string frag2 = """
-            fragment frag2 on QueryType
-            {
-              ...frag3
-            }
-            """;
-        const string otherFrags = """
-            fragment frag3 on QueryType
-            {
-              ...frag5
-            }
-
-            fragment frag5 on QueryType
-            {
-              __typename
-            }
-
-            fragment frag4 on QueryType
-            {
-              __typename
-            }
-
-            query fragmentTest
-            {
-              ...frag1
-              ...frag2
-            }
-            """;
-        var result = AnalyzeComplexity(reverse
-            ? frag1 + frag2 + otherFrags
-            : frag2 + frag1 + otherFrags);
-
-        result.Complexity.ShouldBe(2);
-    }
-
-    [Fact]
-    public void duplicate_fragment_ok()
-    {
-        const string query = """
-            query carFragmentTest
-            {
-              car(id: 1)
-              {
-                name
-                ... carInfo
-                ... carInfo
-              }
-            }
-
-            fragment carInfo on Car
-            {
-                ...pricing
-                ...pricing
-            }
-
-            fragment pricing on Car
-            {
-              msrp
-            }
-            """;
-        var result = AnalyzeComplexity(query);
-
-        result.Complexity.ShouldBe(6);
-    }
-
-    // https://github.com/graphql-dotnet/graphql-dotnet/issues/3221
-    [Fact]
-    public void no_fragment_cycle()
-    {
-        const string query = """
-            query carFragmentTest
-            {
-              car(id: 1)
-              {
-                name
-                ... carInfo
-              }
-            }
-
-            fragment carInfo on Car
-            {
-                ...pricing
-                ... detail
-            }
-
-            fragment pricing on Car
-            {
-              msrp
-            }
-
-            fragment detail on Car
-            {
-              ... furtherDetail
-            }
-
-            fragment furtherDetail on Car
-            {
-              ... pricing
-            }
-            """;
-        var result = AnalyzeComplexity(query);
-
-        result.Complexity.ShouldBe(4);
-    }
-
-    [Fact]
-    public void absurdly_huge_query()
-    {
-        try
-        {
-            AnalyzeComplexity(
-                @"{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A{A}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}");
-        }
-        catch (InvalidOperationException ex)
-        {
-            ex.Message.ShouldBe("Query is too complex to validate.");
-        }
-    }
-
-    [Theory]
-    [InlineData(100, "type Query { field1: String }", "{ field1 }", 1.5, 1, 0)]
-    [InlineData(101, "type Query { field1: String field2: String field3: String }", "{ field1 field2 field3 }", 1.5, 3, 0)]
-    [InlineData(110, "type Query { field1: String @complexity(value: 5) }", "{ field1 }", 1.5, 1, 0)]
-    [InlineData(111, "type Query { field1: String @complexity(value: 5) field2: String field3: String }", "{ field1 field2 field3 }", 1.5, 3, 0)]
-    [InlineData(112, "type Query { field1: String @complexity(value: 0) }", "{ field1 }", 1.5, 0, 0)]
-    [InlineData(113, "type Query { field1: String @complexity(value: 0) field2: String field3: String }", "{ field1 field2 field3 }", 1.5, 2, 0)]
-    [InlineData(120, "type Query { field1: Field1Type } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 3, 1)]
-    [InlineData(121, "type Query { field1: Field1Type } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 6, 1)]
-    [InlineData(130, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 10, 1)]
-    [InlineData(131, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 20, 1)]
-    [InlineData(132, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 1.5, 1)]
-    [InlineData(133, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 4.5, 1)]
-    [InlineData(134, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 2, 1)]
-    [InlineData(135, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", 1.5, 4, 1)]
-    [InlineData(140, "type Query { field1: [Field1Type] } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 3, 1)]
-    [InlineData(141, "type Query { field1: [Field1Type] } type Field1Type { field2: String @complexity(value: 5) }", "{ field1 { field2 } }", 1.5, 3, 1)]
-    [InlineData(142, "type Query { field1: [Field1Type] @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 10, 1)]
-    [InlineData(143, "type Query { field1: [Field1Type] @complexity(value: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", 1.5, 1.5, 1)]
-    [InlineData(150, "type Query { field1(id: ID): Field1Type } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", 1.5, 2, 1)]
-    [InlineData(151, "type Query { field1(id: ID): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", 1.5, 6.666666666666666d, 1)]
-    [InlineData(152, "type Query { field1(id: ID): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", 1.5, 1, 1)]
-    [InlineData(160, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 20, 1)]
-    [InlineData(161, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 66.66666666666667d, 1)]
-    [InlineData(162, "type Query { field1(first: Int): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 10, 1)]
-    [InlineData(163, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", 1.5, 13.333333333333334d, 1)]
-    [InlineData(170, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: String }", "{ field1(last: 10) { field2 } }", 1.5, 20, 1)]
-    [InlineData(171, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: String }", "query q($last: Int) { field1(last: $last) { field2 } }", 1.5, 3, 1)]
-    public void TestComplexityCases(int idx, string sdl, string query, double avgImpact, double complexity, int totalQueryDepth)
+    [InlineData(100, "type Query { field1: String }", "{ field1 }", null, 1.5, 1.5, 4, 1.5, 1)]
+    [InlineData(101, "type Query { field1: String field2: String field3: String }", "{ field1 field2 field3 }", null, 1.5, 1.5, 4, 4.5, 1)]
+    [InlineData(110, "type Query { field1: String @complexity(value: 5) }", "{ field1 }", null, 1.5, 1.5, 4, 5, 1)]
+    [InlineData(111, "type Query { field1: String @complexity(value: 5) field2: String field3: String }", "{ field1 field2 field3 }", null, 1.5, 1.5, 4, 8, 1)]
+    [InlineData(112, "type Query { field1: String @complexity(value: 0) }", "{ field1 }", null, 1.5, 1.5, 4, 0, 1)]
+    [InlineData(113, "type Query { field1: String @complexity(value: 0) field2: String field3: String }", "{ field1 field2 field3 }", null, 1.5, 1.5, 4, 3, 1)]
+    [InlineData(120, "type Query { field1: Field1Type } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 3, 2)]
+    [InlineData(121, "type Query { field1: Field1Type } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", null, 1.5, 1.5, 4, 6, 2)]
+    [InlineData(130, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 6.5, 2)]
+    [InlineData(131, "type Query { field1: Field1Type @complexity(value: 5) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", null, 1.5, 1.5, 4, 9.5, 2)]
+    [InlineData(132, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 1.5, 2)]
+    [InlineData(133, "type Query { field1: Field1Type @complexity(value: 0) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", null, 1.5, 1.5, 4, 4.5, 2)]
+    [InlineData(134, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 2.5, 2)]
+    [InlineData(135, "type Query { field1: Field1Type @complexity(value: 1) } type Field1Type { field2: String field3: String field4: String }", "{ field1 { field2 field3 field4 } }", null, 1.5, 1.5, 4, 5.5, 2)]
+    [InlineData(140, "type Query { field1: [Field1Type] } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 7.5, 2)]
+    [InlineData(141, "type Query { field1: [Field1Type] } type Field1Type { field2: String @complexity(value: 5) }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 21.5, 2)]
+    [InlineData(142, "type Query { field1: [Field1Type] @complexity(value: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 11, 2)]
+    [InlineData(143, "type Query { field1: [Field1Type] @complexity(value: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 6, 2)]
+    [InlineData(144, "type Query { field1: [Field1Type] @complexity(children: 5) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 9, 2)]
+    [InlineData(145, "type Query { field1: [Field1Type] @complexity(children: 1) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 3, 2)]
+    [InlineData(146, "type Query { field1: [Field1Type] @complexity(children: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 1.5, 2)]
+    [InlineData(147, "type Query { field1: [Field1Type] @complexity(value: 0, children: 0) } type Field1Type { field2: String }", "{ field1 { field2 } }", null, 1.5, 1.5, 4, 0, 2)]
+    [InlineData(150, "type Query { field1(id: ID): Field1Type } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", null, 1.5, 1.5, 4, 3, 2)]
+    [InlineData(151, "type Query { field1(id: ID): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", null, 1.5, 1.5, 4, 6.5, 2)]
+    [InlineData(152, "type Query { field1(id: ID): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(id: 500) { field2 } }", null, 1.5, 1.5, 4, 1.5, 2)]
+    [InlineData(160, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 3, 2)]
+    [InlineData(161, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 6.5, 2)]
+    [InlineData(162, "type Query { field1(first: Int): Field1Type @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 1.5, 2)]
+    [InlineData(163, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 2.5, 2)]
+    [InlineData(170, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "{ field1(last: 10) { field2 { field3 } } }", null, 1.5, 1.5, 4, 18, 3)]
+    [InlineData(171, "type Query { field1(last: Int): Field1Type } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "query q($last: Int) { field1(last: $last) { field2 { field3 } } }", """{"last":10}""", 1.5, 1.5, 4, 18, 3)]
+    [InlineData(180, "type Query { field1(first: Int): Field1Type } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "{ field1(first: 10) { field2 { field3 } } }", null, 1.5, 1.5, 4, 18, 3)]
+    [InlineData(181, "type Query { field1(first: Int): Field1Type @complexity(value: 5) } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "{ field1(first: 10) { field2 { field3 } } }", null, 1.5, 1.5, 4, 21.5, 3)]
+    [InlineData(182, "type Query { field1(first: Int): Field1Type @complexity(value: 0) } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "{ field1(first: 10) { field2 { field3 } } }", null, 1.5, 1.5, 4, 16.5, 3)]
+    [InlineData(183, "type Query { field1(first: Int): Field1Type @complexity(value: 1) } type Field1Type { field2: [Field3Type] } type Field3Type { field3: String }", "{ field1(first: 10) { field2 { field3 } } }", null, 1.5, 1.5, 4, 17.5, 3)]
+    [InlineData(190, "type Query { field1(first: Int): [Field1Type] } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 16.5, 2)]
+    [InlineData(191, "type Query { field1(first: Int): [Field1Type] @complexity(value: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 20, 2)]
+    [InlineData(192, "type Query { field1(first: Int): [Field1Type] @complexity(value: 0) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 15, 2)]
+    [InlineData(193, "type Query { field1(first: Int): [Field1Type] @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 16, 2)]
+    [InlineData(194, "type Query { field1(first: Int): [Field1Type] @complexity(children: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 9, 2)]
+    [InlineData(195, "type Query { field1(first: Int): [Field1Type] @complexity(children: 5) } type Field1Type { field2: String }", "{ field1(first: 20) { field2 } }", null, 1.5, 1.5, 4, 9, 2)]
+    public void TestComplexityCases(int idx, string sdl, string query, string? variables, double scalarImpact, double objectImpact, double listMultiplier, double complexity, int totalQueryDepth)
     {
         _ = idx;
         var schema = SchemaFor(sdl);
-        var result = LegacyComplexityValidationRule.Analyze(GraphQLParser.Parser.Parse(query), avgImpact, 250, schema); //notice: nowhere are variables requested (or used)
-        var actual = (result.Complexity, result.TotalQueryDepth);
+        var inputs = new SystemTextJson.GraphQLSerializer().Deserialize<Inputs>(variables) ?? Inputs.Empty;
+        var result = Analyze(GraphQLParser.Parser.Parse(query), schema, inputs, c =>
+        {
+            c.DefaultScalarImpact = scalarImpact;
+            c.DefaultObjectImpact = objectImpact;
+            c.DefaultChildImpactMultiplier = listMultiplier;
+        });
+        var actual = (result.TotalComplexity, result.MaxDepth);
         actual.ShouldBe((complexity, totalQueryDepth));
+    }
+
+    private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs variables, Action<ComplexityConfiguration>? configure = null)
+    {
+        var validationOptions = new ValidationOptions
+        {
+            Document = document,
+            Operation = document.Operation(),
+            Schema = schema,
+            Variables = variables
+        };
+        var validationResult = new DocumentValidator().ValidateAsync(validationOptions).GetAwaiter().GetResult();
+        validationResult.Errors.Count.ShouldBe(0);
+        var validationContext = new ValidationContext
+        {
+            ArgumentValues = validationResult.ArgumentValues as Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>,
+            DirectiveValues = validationResult.DirectiveValues as Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>,
+            Document = document,
+            Operation = document.Operation(),
+            Schema = schema,
+            Variables = variables,
+        };
+        var complexityConfiguration = new ComplexityConfiguration();
+        configure?.Invoke(complexityConfiguration);
+        return ComplexityValidationRule.ComplexityVisitor.RunAsync(validationContext, complexityConfiguration).GetAwaiter().GetResult();
     }
 
     private ISchema SchemaFor(string sdl)
@@ -390,7 +97,8 @@ public class ComplexityTests : ComplexityTestBase
         sdl += """
 
             directive @complexity(
-                value: Float
+                value: Float,
+                children: Float,
             ) on FIELD_DEFINITION
             """;
         var schema = Schema.For(sdl);
@@ -403,9 +111,27 @@ public class ComplexityTests : ComplexityTestBase
     {
         public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
         {
-            var complexity = field.GetAppliedDirectives()?.Find("complexity")?.FindArgument("value")?.Value;
-            if (complexity != null)
-                field.WithComplexityImpact((double)Convert.ChangeType(complexity, typeof(double)));
+            var impact = field.GetAppliedDirectives()?.Find("complexity")?.FindArgument("value")?.Value;
+            var listImpact = field.GetAppliedDirectives()?.Find("complexity")?.FindArgument("children")?.Value;
+            if (impact != null && listImpact == null)
+            {
+                field.WithComplexityImpact((double)Convert.ChangeType(impact, typeof(double)));
+            }
+            else if (impact == null && listImpact != null)
+            {
+                var listImpact2 = (double)Convert.ChangeType(listImpact, typeof(double));
+                field.WithComplexityImpact(context =>
+                {
+                    var impact = context.Configuration.DefaultObjectImpact;
+                    return (impact, listImpact2);
+                });
+            }
+            else if (impact != null && listImpact != null)
+            {
+                field.WithComplexityImpact(
+                    (double)Convert.ChangeType(impact, typeof(double)),
+                    (double)Convert.ChangeType(listImpact, typeof(double)));
+            }
         }
     }
 }

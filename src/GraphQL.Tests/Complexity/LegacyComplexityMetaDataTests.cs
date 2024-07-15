@@ -6,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
+public class LegacyComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
 {
     private readonly ComplexityMetaDataFixture _fixture;
 
-    public ComplexityMetaDataTests(ComplexityMetaDataFixture fixture)
+    public LegacyComplexityMetaDataTests(ComplexityMetaDataFixture fixture)
     {
         _fixture = fixture;
     }

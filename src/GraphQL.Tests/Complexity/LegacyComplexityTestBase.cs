@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityTestBase
+public class LegacyComplexityTestBase
 {
     // For our heuristics in these tests it is assumed that each Field returns on average of two results.
     public IDocumentBuilder DocumentBuilder { get; } = new GraphQLDocumentBuilder { MaxDepth = 1000 };

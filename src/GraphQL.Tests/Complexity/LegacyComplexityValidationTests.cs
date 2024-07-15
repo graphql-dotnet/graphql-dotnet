@@ -4,7 +4,7 @@ using GraphQL.Validation.Errors.Custom;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityValidationTest : ComplexityTestBase
+public class LegacyComplexityValidationTest : LegacyComplexityTestBase
 {
     [Fact]
     public async Task should_work_when_complexity_within_params()

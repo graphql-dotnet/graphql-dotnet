@@ -1,6 +1,6 @@
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityTestsWithLimits : ComplexityTestBase
+public class LegacyComplexityTestsWithLimits : LegacyComplexityTestBase
 {
     [Fact]
     public void simple_query_avec_limit()

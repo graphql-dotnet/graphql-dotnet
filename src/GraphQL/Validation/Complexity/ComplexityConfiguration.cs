@@ -1,12 +1,11 @@
 using GraphQL.Types;
-using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL.Validation.Complexity;
 
 /// <summary>
 /// Configuration parameters for a complexity analyzer.
 /// </summary>
-public class NewComplexityConfiguration
+public class ComplexityConfiguration
 {
     /// <summary>
     /// Gets or sets the allowed maximum depth of the query.
@@ -37,17 +36,24 @@ public class NewComplexityConfiguration
     public double DefaultChildImpactMultiplier { get; set; } = 5;
 
     /// <summary>
+    /// Validates the Total Complexity (double) and Maximum Depth (int) of the query against user-defined limits, such as per-user, per-IP or throttling limits.
+    /// These delegate executes only after <see cref="MaxComplexity"/> and <see cref="MaxDepth"/> have been checked and are within limits.
+    /// This delegate can also be used to log the complexity and depth of queries that pass limit checks.
+    /// </summary>
+    public Func<ValidationContext, double, int, Task>? ValidateComplexityDelegate { get; set; }
+
+    /// <summary>
     /// The default complexity function to use when one is not defined on the field.
-    /// The default implementation will check for first/last arguments on list fields, or their parents for non-list fields,
+    /// The default implementation will check for first/last arguments on list fields, or their parents if their parents are non-list fields,
     /// and use the default scalar/object impact values.
     /// </summary>
-    public Func<NewComplexityValidationRule.FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)> DefaultComplexityImpactFunc { get; set; }
-        = DefaultComplexityImpactFuncImpl;
+    public Func<FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)> DefaultComplexityImpactDelegate { get; set; }
+        = DefaultComplexityImpactDelegateImpl;
 
     /// <summary>
     /// The default complexity function.
     /// </summary>
-    private static (double, double) DefaultComplexityImpactFuncImpl(NewComplexityValidationRule.FieldImpactContext context)
+    private static (double, double) DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
     {
         double multiplier = 1;
         var graphType = context.FieldDefinition.ResolvedType;
