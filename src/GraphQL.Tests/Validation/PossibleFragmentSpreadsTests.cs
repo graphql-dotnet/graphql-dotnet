@@ -266,10 +266,10 @@ public class PossibleFragmentSpreadsTests : ValidationTestBase<PossibleFragmentS
 
             c.Query = """
                 {
-                  hero {
+                  hero {       # hero returns a non-null type (User!)
                     __typename
                     id
-                    ... {
+                    ... {      # inline fragment spread without type condition on child of non-null type
                       name
                     }
                     ... on User {
