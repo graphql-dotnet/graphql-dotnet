@@ -74,7 +74,6 @@ A list of the available extension methods is below:
 | `AddAutoClrMappings`    | Configures unmapped CLR types to use auto-registering graph types | |
 | `AddAutoSchema`         | Registers a schema based on CLR types | |
 | `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
-| `AddComplexityAnalyzer` | Enables the complexity analyzer and configures its options | |
 | `AddDataLoader`         | Registers classes necessary for data loader support | GraphQL.DataLoader |
 | `AddDocumentCache<>`    | Registers the specified document caching service | |
 | `AddDocumentExecuter<>` | Registers the specified document executer; useful when needed to change the execution strategy utilized | |
