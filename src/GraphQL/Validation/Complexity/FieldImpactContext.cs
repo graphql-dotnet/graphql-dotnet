@@ -35,6 +35,7 @@ public struct FieldImpactContext
     public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= (VisitorContext.Arguments?.TryGetValue(FieldAst, out var args) == true ? args : null);
 
     /// <inheritdoc cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>
+    /// <remarks>Does not coerce the argument name via <see cref="ISchema.NameConverter"/>.</remarks>
     public TType GetArgument<TType>(string name, TType defaultValue = default!) => Arguments?.TryGetValue(name, out var value) == true ? (TType)value.Value! : defaultValue;
 
     /// <inheritdoc cref="Validation.ValidationContext"/>
