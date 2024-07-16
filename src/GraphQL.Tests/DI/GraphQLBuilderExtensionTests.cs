@@ -346,23 +346,23 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, true)]
     public void AddComplexityAnalyzer(bool withAction, bool withAction2)
     {
-        var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
-        MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
+        var ruleInstance = new LegacyComplexityValidationRule(new LegacyComplexityConfiguration());
+        MockSetupRegister<LegacyComplexityValidationRule, LegacyComplexityValidationRule>();
+        MockSetupRegister<IValidationRule, LegacyComplexityValidationRule>();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
-        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
+        mockServiceProvider.Setup(s => s.GetService(typeof(LegacyComplexityValidationRule))).Returns(ruleInstance).Verifiable();
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
         if (withAction)
         {
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
-            _builder.AddComplexityAnalyzer(action);
+            var action = MockSetupConfigure1<LegacyComplexityConfiguration>();
+            _builder.AddLegacyComplexityAnalyzer(action);
         }
         else
         {
-            var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
+            var action = withAction2 ? MockSetupConfigure2<LegacyComplexityConfiguration>() : null;
             if (!withAction2)
-                MockSetupConfigureNull<ComplexityConfiguration>();
-            _builder.AddComplexityAnalyzer(action!);
+                MockSetupConfigureNull<LegacyComplexityConfiguration>();
+            _builder.AddLegacyComplexityAnalyzer(action!);
         }
         var opts = getOpts();
         opts.ValidationRules.ShouldNotBeNull();

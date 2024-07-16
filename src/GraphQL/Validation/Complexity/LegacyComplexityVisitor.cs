@@ -6,24 +6,25 @@ using GraphQLParser.Visitors;
 namespace GraphQL.Validation.Complexity;
 
 /// <summary>
-/// Two-phase complexity visitor. See <see cref="ComplexityValidationRule.Analyze(GraphQLDocument, double, int, ISchema?)"/>.
-/// Phase 1. Calculate complexity of all fragments defined in GraphQL document; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is false.
-/// Phase 2. Calculate complexity of executed operation; <see cref="AnalysisContext.FragmentMapAlreadyBuilt"/> is true.
+/// Two-phase complexity visitor. See <see cref="LegacyComplexityValidationRule.Analyze(GraphQLDocument, double, int, ISchema?)"/>.
+/// Phase 1. Calculate complexity of all fragments defined in GraphQL document; <see cref="LegacyAnalysisContext.FragmentMapAlreadyBuilt"/> is false.
+/// Phase 2. Calculate complexity of executed operation; <see cref="LegacyAnalysisContext.FragmentMapAlreadyBuilt"/> is true.
 /// </summary>
-internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
+[Obsolete("Please use the new complexity analyzer.")]
+internal class LegacyComplexityVisitor : ASTVisitor<LegacyAnalysisContext>
 {
     private readonly TypeInfo? _visitor;
 
-    public ComplexityVisitor()
+    public LegacyComplexityVisitor()
     {
     }
 
-    public ComplexityVisitor(ISchema schema)
+    public LegacyComplexityVisitor(ISchema schema)
     {
         _visitor = new TypeInfo(schema);
     }
 
-    public override async ValueTask VisitAsync(ASTNode? node, AnalysisContext context)
+    public override async ValueTask VisitAsync(ASTNode? node, LegacyAnalysisContext context)
     {
         if (node != null)
         {
@@ -37,11 +38,11 @@ internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
         }
     }
 
-    protected override async ValueTask VisitFragmentDefinitionAsync(GraphQLFragmentDefinition fragmentDefinition, AnalysisContext context)
+    protected override async ValueTask VisitFragmentDefinitionAsync(GraphQLFragmentDefinition fragmentDefinition, LegacyAnalysisContext context)
     {
         if (!context.FragmentMapAlreadyBuilt)
         {
-            context.FragmentMap[fragmentDefinition.FragmentName.Name.StringValue] = context.CurrentFragmentComplexity = new FragmentComplexity();
+            context.FragmentMap[fragmentDefinition.FragmentName.Name.StringValue] = context.CurrentFragmentComplexity = new LegacyFragmentComplexity();
 
             await base.VisitFragmentDefinitionAsync(fragmentDefinition, context).ConfigureAwait(false);
 
@@ -49,7 +50,7 @@ internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
         }
     }
 
-    protected override async ValueTask VisitFieldAsync(GraphQLField field, AnalysisContext context)
+    protected override async ValueTask VisitFieldAsync(GraphQLField field, LegacyAnalysisContext context)
     {
         context.AssertRecursion();
 
@@ -70,7 +71,7 @@ internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
             {
                 context.Result.TotalQueryDepth++;
 
-                double? impactFromArgs = AnalysisContext.GetImpactFromArgs(field);
+                double? impactFromArgs = LegacyAnalysisContext.GetImpactFromArgs(field);
                 context.CurrentEndNodeImpact = impactFromArgs == null
                     ? context.CurrentSubSelectionImpact.Value
                     : impactFromArgs.Value / context.AvgImpact * context.CurrentSubSelectionImpact.Value;
@@ -89,7 +90,7 @@ internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
             {
                 context.CurrentFragmentComplexity.Depth++;
 
-                double? impactFromArgs = AnalysisContext.GetImpactFromArgs(field);
+                double? impactFromArgs = LegacyAnalysisContext.GetImpactFromArgs(field);
                 context.CurrentEndNodeImpact = impactFromArgs == null
                     ? context.CurrentSubSelectionImpact.Value
                     : impactFromArgs.Value / context.AvgImpact * context.CurrentSubSelectionImpact.Value;
@@ -105,7 +106,7 @@ internal class ComplexityVisitor : ASTVisitor<AnalysisContext>
         context.CurrentEndNodeImpact = prevCurrentEndNodeImpact;
     }
 
-    protected override async ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, AnalysisContext context)
+    protected override async ValueTask VisitFragmentSpreadAsync(GraphQLFragmentSpread fragmentSpread, LegacyAnalysisContext context)
     {
         var fragmentComplexity = context.FragmentMap[fragmentSpread.FragmentName.Name.StringValue];
 

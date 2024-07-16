@@ -5,7 +5,8 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Contains the result of a complexity analysis.
 /// </summary>
-public class ComplexityResult
+[Obsolete("Please use the new complexity analyzer.")]
+public class LegacyComplexityResult
 {
     /// <summary>
     /// Returns a dictionary of nodes and their complexity factors.

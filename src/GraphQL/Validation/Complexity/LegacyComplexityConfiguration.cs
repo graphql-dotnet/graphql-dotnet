@@ -3,7 +3,8 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Configuration parameters for a complexity analyzer.
 /// </summary>
-public class ComplexityConfiguration
+[Obsolete("Please use the new complexity analyzer.")]
+public class LegacyComplexityConfiguration
 {
     /// <summary>
     /// Gets or sets the allowed maximum depth of the query.

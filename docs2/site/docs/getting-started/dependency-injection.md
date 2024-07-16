@@ -85,6 +85,7 @@ A list of the available extension methods is below:
 | `AddFederation`         | Registers the federation types and configures the schema to support Apollo Federation | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
+| `AddLegacyComplexityAnalyzer` | Enables the v7 complexity analyzer and configures its options | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSchemaVisitor<>`    | Registers the specified schema visitor and configures it to be used at schema initialization | |
