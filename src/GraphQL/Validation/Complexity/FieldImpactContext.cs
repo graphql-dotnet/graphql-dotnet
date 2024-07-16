@@ -1,6 +1,5 @@
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Complexity;
@@ -27,7 +26,7 @@ public struct FieldImpactContext
     /// </summary>
     public IGraphType ParentType { get; set; }
 
-    internal ComplexityValidationRule.VisitorContext VisitorContext;
+    internal ComplexityVisitorContext VisitorContext;
     private int _parentDepth;
 
     private IDictionary<string, ArgumentValue>? _arguments;

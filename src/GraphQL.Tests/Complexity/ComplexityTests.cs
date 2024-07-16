@@ -269,7 +269,7 @@ public class ComplexityTests
         };
         var complexityConfiguration = new ComplexityConfiguration();
         configure?.Invoke(complexityConfiguration);
-        return ComplexityValidationRule.ComplexityVisitor.RunAsync(validationContext, complexityConfiguration).GetAwaiter().GetResult();
+        return ComplexityVisitor.RunAsync(validationContext, complexityConfiguration).GetAwaiter().GetResult();
     }
 
     private ISchema SchemaFor(string sdl)
