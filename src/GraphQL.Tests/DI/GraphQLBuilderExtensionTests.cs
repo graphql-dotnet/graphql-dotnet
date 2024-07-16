@@ -344,7 +344,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(false, true)]
-    public void AddComplexityAnalyzer(bool withAction, bool withAction2)
+    public void AddLegacyComplexityAnalyzer(bool withAction, bool withAction2)
     {
         var ruleInstance = new LegacyComplexityValidationRule(new LegacyComplexityConfiguration());
         MockSetupRegister<LegacyComplexityValidationRule, LegacyComplexityValidationRule>();
@@ -363,6 +363,38 @@ public class GraphQLBuilderExtensionTests
             if (!withAction2)
                 MockSetupConfigureNull<LegacyComplexityConfiguration>();
             _builder.AddLegacyComplexityAnalyzer(action!);
+        }
+        var opts = getOpts();
+        opts.ValidationRules.ShouldNotBeNull();
+        opts.ValidationRules.ShouldContain(ruleInstance);
+        opts.CachedDocumentValidationRules?.ShouldBeEmpty();
+        mockServiceProvider.Verify();
+        Verify();
+    }
+
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(false, true)]
+    public void AddComplexityAnalyzer(bool withAction, bool withAction2)
+    {
+        var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
+        MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
+        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
+        var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
+        mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
+        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        if (withAction)
+        {
+            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(action);
+        }
+        else
+        {
+            var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
+            if (!withAction2)
+                MockSetupConfigureNull<ComplexityConfiguration>();
+            _builder.AddComplexityAnalyzer(action!);
         }
         var opts = getOpts();
         opts.ValidationRules.ShouldNotBeNull();
