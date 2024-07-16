@@ -3,7 +3,6 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
-using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Complexity;
