@@ -59,6 +59,105 @@ public class ComplexityTests
             .Message.ShouldBe("Fragment 'frag1' has a circular reference.");
     }
 
+    [Fact]
+    public void TestInvalidFragmentName()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: Field2Type } type Field2Type { field3: Field3Type } type Field3Type { field1: Field1Type }");
+        var query = """
+            {
+              field1 {
+                ...frag1
+              }
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Fragment 'frag1' not found in document.");
+    }
+
+    [Fact]
+    public void TestInvalidTypeConditionFragment()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: String }");
+        var query = """
+            {
+              field1 {
+                ...frag1
+              }
+            }
+            fragment frag1 on InvalidType {
+              field2
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Type 'InvalidType' not found in schema.");
+    }
+
+    [Fact]
+    public void TestInvalidTypeConditionFragmentSpread()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: String }");
+        var query = """
+            {
+              field1 {
+                ... on InvalidType {
+                  field2
+                }
+              }
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Type 'InvalidType' not found in schema.");
+    }
+
+    [Fact]
+    public void TestInvalidField()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: String }");
+        var query = """
+            {
+              invalidField
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Field 'invalidField' not found in type 'Query'.");
+    }
+
+    [Fact]
+    public void TestInvalidParentType()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: String }");
+        var query = """
+            {
+              field1 {
+                field2 {
+                  invalidField
+                }
+              }
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Type 'String' is not an object or interface type.");
+    }
+
+    [Fact]
+    public void TestInvalidOperation()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: String }");
+        var query = """
+            mutation {
+              invalidField
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Schema is not configured for operation type: Mutation");
+    }
+
     [Theory]
     [InlineData(100, "type Query { field1: String }", "{ field1 }", null, 1.5, 1.5, 4, 1.5, 1)]
     [InlineData(101, "type Query { field1: String field2: String field3: String }", "{ field1 field2 field3 }", null, 1.5, 1.5, 4, 4.5, 1)]

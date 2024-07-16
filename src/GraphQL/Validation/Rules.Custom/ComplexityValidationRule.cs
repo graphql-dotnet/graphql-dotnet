@@ -298,7 +298,7 @@ public class ComplexityValidationRule : ValidationRuleBase
 
             [StackTraceHidden, DoesNotReturn]
             static void ThrowNotObjectType(IGraphType? type)
-                => throw new InvalidOperationException($"Type '{type?.Name}' is not an object type.");
+                => throw new InvalidOperationException($"Type '{type?.Name}' is not an object or interface type.");
 
             [StackTraceHidden, DoesNotReturn]
             static FieldType ThrowFieldNotFound(GraphQLField field, IComplexGraphType type)
