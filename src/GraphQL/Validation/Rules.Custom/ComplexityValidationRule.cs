@@ -24,7 +24,7 @@ public class ComplexityValidationRule : ValidationRuleBase
     public override async ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context)
     {
         // Fast return here to avoid all possible problems with complexity analysis.
-        // For example, document may contain fragment cycles, see https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
+        // For example, document may contain fragment cycles; see https://github.com/graphql-dotnet/graphql-dotnet/issues/3527
         if (!context.HasErrors)
             using (context.Metrics.Subject("document", "Analyzing complexity"))
             {

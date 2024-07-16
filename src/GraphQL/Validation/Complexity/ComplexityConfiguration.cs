@@ -55,6 +55,8 @@ public class ComplexityConfiguration
     /// </summary>
     private static (double, double) DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
     {
+        // unwrap any list types and calculate the child impact multiplier
+        // multiplier = DefaultListImpactMultiplier ^ (number of list types) -- e.g. 1 for non-list fields, 5 for list fields, 25 for lists of list fields, etc.
         double multiplier = 1;
         var graphType = context.FieldDefinition.ResolvedType;
         graphType = graphType is NonNullGraphType nonNullGraphType1 ? nonNullGraphType1.ResolvedType : graphType;
@@ -64,51 +66,44 @@ public class ComplexityConfiguration
             graphType = graphType is NonNullGraphType nonNullGraphType2 ? nonNullGraphType2.ResolvedType : graphType;
             multiplier *= context.Configuration.DefaultListImpactMultiplier;
         }
-        var impact = graphType is ScalarGraphType ? context.Configuration.DefaultScalarImpact : context.Configuration.DefaultObjectImpact;
+        // calculate the impact
+        var impact = graphType is ScalarGraphType
+            ? context.Configuration.DefaultScalarImpact  // scalar fields
+            : context.Configuration.DefaultObjectImpact; // object fields
 
         var isList = context.FieldDefinition.ResolvedType is ListGraphType || context.FieldDefinition.ResolvedType is NonNullGraphType nonNullGraphType && nonNullGraphType.ResolvedType is ListGraphType;
         if (isList)
         {
-            try
+            // if this is a list, check if the field has a first or last argument (only IntGraphTypes are supported), or if an id is specified (any type)
+            if (context.Arguments?.TryGetValue("first", out var arg) == true && arg.Value is int firstValue)
             {
-                // if this is a list, check if the field has a first or last argument, or if an id is specified
-                var rows = context.GetArgument<int?>("first");
-                if (rows.HasValue)
+                return (impact, firstValue);
+            }
+            if (context.Arguments?.TryGetValue("last", out arg) == true && arg.Value is int lastValue)
+            {
+                return (impact, lastValue);
+            }
+            if (context.Arguments?.TryGetValue("id", out _) == true)
+            {
+                return (impact, 1);
+            }
+            // if not, and if the parent isn't a list, check if the parent has a first or last argument
+            // (this is a common pattern for relay connection types)
+            var parent = context.Parent;
+            if (parent != null)
+            {
+                isList = parent.Value.FieldDefinition.ResolvedType is ListGraphType || parent.Value.FieldDefinition.ResolvedType is NonNullGraphType parentNonNullGraphType && parentNonNullGraphType.ResolvedType is ListGraphType;
+                if (!isList)
                 {
-                    return (impact, rows.Value);
-                }
-                rows = context.GetArgument<int?>("last");
-                if (rows.HasValue)
-                {
-                    return (impact, rows.Value);
-                }
-                if (context.GetArgument<object?>("id") != null)
-                {
-                    return (impact, 1);
-                }
-                // if not, and if the parent isn't a list, check if the parent has a first or last argument
-                // (this is a common pattern for relay connection types)
-                var parent = context.Parent;
-                if (parent != null)
-                {
-                    isList = parent.Value.FieldDefinition.ResolvedType is ListGraphType || parent.Value.FieldDefinition.ResolvedType is NonNullGraphType parentNonNullGraphType && parentNonNullGraphType.ResolvedType is ListGraphType;
-                    if (!isList)
+                    if (parent.Value.Arguments?.TryGetValue("first", out arg) == true && arg.Value is int firstValue2)
                     {
-                        rows = parent.Value.GetArgument<int?>("first");
-                        if (rows.HasValue)
-                        {
-                            return (impact, rows.Value);
-                        }
-                        rows = parent.Value.GetArgument<int?>("last");
-                        if (rows.HasValue)
-                        {
-                            return (impact, rows.Value);
-                        }
+                        return (impact, firstValue2);
+                    }
+                    if (parent.Value.Arguments?.TryGetValue("last", out arg) == true && arg.Value is int lastValue2)
+                    {
+                        return (impact, lastValue2);
                     }
                 }
-            }
-            catch // first and last may represent arguments that are not integers, so we should ignore any exceptions
-            {
             }
         }
 
