@@ -10,6 +10,55 @@ namespace GraphQL.Tests.Complexity;
 
 public class ComplexityTests
 {
+    [Fact]
+    public void EnsureDefaultsHaveNotChanged()
+    {
+        // if the defaults change, the documentation and tests for the examples provided
+        // in the documentation should be updated
+        var configuration = new ComplexityConfiguration();
+        configuration.MaxComplexity.ShouldBeNull();
+        configuration.MaxDepth.ShouldBeNull();
+        configuration.DefaultScalarImpact.ShouldBe(1);
+        configuration.DefaultObjectImpact.ShouldBe(1);
+        configuration.DefaultListImpactMultiplier.ShouldBe(5);
+        configuration.ValidateComplexityDelegate.ShouldBeNull();
+        configuration.DefaultComplexityImpactDelegate.ShouldNotBeNull();
+    }
+
+    [Fact]
+    public void TestCycleDetection()
+    {
+        var schema = SchemaFor("type Query { field1: Field1Type } type Field1Type { field2: Field2Type } type Field2Type { field3: Field3Type } type Field3Type { field1: Field1Type }");
+        var query = """
+            {
+              field1 {
+                ...frag1
+              }
+            }
+
+            fragment frag1 on Field1Type {
+              field2 {
+                ...frag2
+              }
+            }
+
+            fragment frag2 on Field2Type {
+              field3 {
+                ...frag3
+              }
+            }
+
+            fragment frag3 on Field3Type {
+              field1 {
+                ...frag1
+              }
+            }
+            """;
+        Should.Throw<InvalidOperationException>(
+            () => Analyze(GraphQLParser.Parser.Parse(query), schema, noRules: true))
+            .Message.ShouldBe("Fragment 'frag1' has a circular reference.");
+    }
+
     [Theory]
     [InlineData(100, "type Query { field1: String }", "{ field1 }", null, 1.5, 1.5, 4, 1.5, 1)]
     [InlineData(101, "type Query { field1: String field2: String field3: String }", "{ field1 field2 field3 }", null, 1.5, 1.5, 4, 4.5, 1)]
@@ -52,6 +101,34 @@ public class ComplexityTests
     [InlineData(193, "type Query { field1(first: Int): [Field1Type] @complexity(value: 1) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 16, 2)]
     [InlineData(194, "type Query { field1(first: Int): [Field1Type] @complexity(children: 5) } type Field1Type { field2: String }", "{ field1(first: 10) { field2 } }", null, 1.5, 1.5, 4, 9, 2)]
     [InlineData(195, "type Query { field1(first: Int): [Field1Type] @complexity(children: 5) } type Field1Type { field2: String }", "{ field1(first: 20) { field2 } }", null, 1.5, 1.5, 4, 9, 2)]
+    // test examples provided in documentation
+    [InlineData(200, """
+        type Query { users(first: Int): [User], products(id: ID): [Products] }
+        type User { id: ID, posts: [Post] }
+        type Post { id: ID, comments: [Comment] }
+        type Comment { id: ID }
+        type Products { id: ID, name: String, photos: [Photo], category: Category }
+        type Photo { id: ID, name: String }
+        type Category { id: ID, name: String }
+        """,
+        """
+        query {
+          users(first: 10) { id posts { id comments { id } } }
+          products(id: "5") { id name photos { id name } category { id name } }
+        }
+        """, null, 1, 1, 5, 388, 4)]
+    [InlineData(201, """
+        type Query { users: [User] @complexity(value: 1, children: 100) }
+        type User { id: ID posts: [Post] }
+        type Post { id: ID comments: [Comment] }
+        type Comment { id: ID }
+        """, "query { users { id posts { id comments { id } } } }", null, 1, 1, 7, 6501, 4)]
+    [InlineData(202, """
+        type Query { users: [User] @complexity(value: 50) }
+        type User { id: ID posts: [Post] }
+        type Post { id: ID comments: [Comment] }
+        type Comment { id: ID }
+        """, "query { users { id posts { id comments { id } } } }", null, 1, 20, 5, 805, 4)]
     public void TestComplexityCases(int idx, string sdl, string query, string? variables, double scalarImpact, double objectImpact, double listMultiplier, double complexity, int totalQueryDepth)
     {
         _ = idx;
@@ -67,17 +144,21 @@ public class ComplexityTests
         actual.ShouldBe((complexity, totalQueryDepth));
     }
 
-    private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs variables, Action<ComplexityConfiguration>? configure = null)
+    private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs? variables = null, Action<ComplexityConfiguration>? configure = null, bool noRules = false)
     {
         var validationOptions = new ValidationOptions
         {
             Document = document,
             Operation = document.Operation(),
             Schema = schema,
-            Variables = variables
+            Variables = variables ?? Inputs.Empty,
+            Rules = !noRules ? null : Array.Empty<IValidationRule>(),
         };
         var validationResult = new DocumentValidator().ValidateAsync(validationOptions).GetAwaiter().GetResult();
-        validationResult.Errors.Count.ShouldBe(0);
+        if (validationResult.Errors.Count > 0)
+        {
+            validationResult.Errors[0].Message.ShouldBeNull();
+        }
         var validationContext = new ValidationContext
         {
             ArgumentValues = validationResult.ArgumentValues as Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>,
@@ -85,7 +166,7 @@ public class ComplexityTests
             Document = document,
             Operation = document.Operation(),
             Schema = schema,
-            Variables = variables,
+            Variables = variables ?? Inputs.Empty,
         };
         var complexityConfiguration = new ComplexityConfiguration();
         configure?.Invoke(complexityConfiguration);
