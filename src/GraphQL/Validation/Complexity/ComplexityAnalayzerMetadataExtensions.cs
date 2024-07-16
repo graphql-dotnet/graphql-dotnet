@@ -26,7 +26,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// </summary>
     /// <param name="provider">Metadata provider which must implement <see cref="IProvideMetadata"/> interface.</param>
     /// <returns>Field's complexity impact.</returns>
-    [Obsolete("Please use GetComplexityImpactDelegate instead.")]
+    [Obsolete("Please use GetComplexityImpactDelegate instead. This method will be removed in v9.")]
     public static double? GetComplexityImpact(this IMetadataReader provider)
         => provider.GetMetadata<double?>(COMPLEXITY_IMPACT);
 }
