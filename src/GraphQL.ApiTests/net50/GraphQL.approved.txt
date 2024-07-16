@@ -57,7 +57,8 @@ namespace GraphQL
     }
     public static class ComplexityAnalayzerMetadataExtensions
     {
-        [System.Obsolete("Please use GetComplexityImpactDelegate instead.")]
+        [System.Obsolete("Please use GetComplexityImpactDelegate instead. This method will be removed in v9" +
+            ".")]
         public static double? GetComplexityImpact(this GraphQL.Types.IMetadataReader provider) { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
