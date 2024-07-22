@@ -6,11 +6,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
+public class LegacyComplexityMetaDataTests : IClassFixture<ComplexityMetaDataFixture>
 {
     private readonly ComplexityMetaDataFixture _fixture;
 
-    public ComplexityMetaDataTests(ComplexityMetaDataFixture fixture)
+    public LegacyComplexityMetaDataTests(ComplexityMetaDataFixture fixture)
     {
         _fixture = fixture;
     }
@@ -113,7 +113,7 @@ public class ComplexityMetaDataFixture : IDisposable
 
     private readonly ServiceProvider _provider;
     private readonly IDocumentBuilder _documentBuilder;
-    private readonly ComplexityConfiguration _config;
+    private readonly LegacyComplexityConfiguration _config;
     private readonly ISchema _schema;
     private readonly IDocumentExecuter _executer;
 
@@ -122,16 +122,16 @@ public class ComplexityMetaDataFixture : IDisposable
         _provider = new ServiceCollection()
             .AddGraphQL(builder => builder
                 .AddSchema<ComplexitySchema>()
-                .AddComplexityAnalyzer()
+                .AddLegacyComplexityAnalyzer()
             ).BuildServiceProvider();
 
         _documentBuilder = _provider.GetRequiredService<IDocumentBuilder>();
-        _config = _provider.GetRequiredService<ComplexityConfiguration>();
+        _config = _provider.GetRequiredService<LegacyComplexityConfiguration>();
         _schema = _provider.GetRequiredService<ISchema>();
         _executer = _provider.GetRequiredService<IDocumentExecuter<ComplexitySchema>>();
     }
 
-    public async Task<ComplexityResult> AnalyzeAsync(string query)
+    public async Task<LegacyComplexityResult> AnalyzeAsync(string query)
     {
         var result = await _executer.ExecuteAsync(o =>
         {
@@ -140,7 +140,7 @@ public class ComplexityMetaDataFixture : IDisposable
         }).ConfigureAwait(false);
         result.Errors.ShouldBeNull();
 
-        return ComplexityValidationRule.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
+        return LegacyComplexityValidationRule.Analyze(_documentBuilder.Build(query), _config.FieldImpact ?? 2f, _config.MaxRecursionCount, _schema);
     }
 
     public void Dispose() => _provider.Dispose();

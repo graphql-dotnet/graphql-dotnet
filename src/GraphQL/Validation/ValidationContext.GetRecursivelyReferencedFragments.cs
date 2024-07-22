@@ -63,7 +63,7 @@ public partial class ValidationContext
     /// will not reflect the change. Also ignores any overridden behavior within
     /// <see cref="Execution.ExecutionStrategy.ShouldIncludeNode{TASTNode}(Execution.ExecutionContext, TASTNode)">ExecutionStrategy.ShouldIncludeNode</see>.
     /// </remarks>
-    protected virtual bool ShouldIncludeNode(ASTNode node)
+    public virtual bool ShouldIncludeNode(ASTNode node)
     {
         // according to GraphQL spec, directives with the same name may be defined so long as they cannot be
         // placed on the same node types as other directives with the same name; so here we verify that the

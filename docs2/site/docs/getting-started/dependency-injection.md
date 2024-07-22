@@ -74,7 +74,6 @@ A list of the available extension methods is below:
 | `AddAutoClrMappings`    | Configures unmapped CLR types to use auto-registering graph types | |
 | `AddAutoSchema`         | Registers a schema based on CLR types | |
 | `AddClrTypeMappings`    | Scans the specified assembly for graph types intended to represent CLR types and registers them within the schema | |
-| `AddComplexityAnalyzer` | Enables the complexity analyzer and configures its options | |
 | `AddDataLoader`         | Registers classes necessary for data loader support | GraphQL.DataLoader |
 | `AddDocumentCache<>`    | Registers the specified document caching service | |
 | `AddDocumentExecuter<>` | Registers the specified document executer; useful when needed to change the execution strategy utilized | |
@@ -85,6 +84,7 @@ A list of the available extension methods is below:
 | `AddFederation`         | Registers the federation types and configures the schema to support Apollo Federation | |
 | `AddGraphTypes`         | Scans the specified assembly for graph types and registers them within the DI framework | |
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
+| `AddLegacyComplexityAnalyzer` | Enables the v7 complexity analyzer and configures its options | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSchemaVisitor<>`    | Registers the specified schema visitor and configures it to be used at schema initialization | |

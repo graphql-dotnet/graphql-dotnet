@@ -442,7 +442,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         => this.ApplyDirective(name, configure);
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
+    /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
     /// </summary>
     /// <param name="impact">Field's complexity impact.</param>
     [Obsolete("Please use the WithComplexityImpact method")]

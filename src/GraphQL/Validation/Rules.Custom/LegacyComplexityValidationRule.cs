@@ -10,14 +10,15 @@ namespace GraphQL.Validation.Rules.Custom;
 /// <summary>
 /// Analyzes a document to determine if its complexity exceeds a threshold.
 /// </summary>
-public class ComplexityValidationRule : ValidationRuleBase, INodeVisitor
+[Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
+public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
 {
-    private ComplexityConfiguration ComplexityConfiguration { get; }
+    private LegacyComplexityConfiguration ComplexityConfiguration { get; }
 
     /// <summary>
     /// Initializes an instance with the specified complexity configuration.
     /// </summary>
-    public ComplexityValidationRule(ComplexityConfiguration complexityConfiguration)
+    public LegacyComplexityValidationRule(LegacyComplexityConfiguration complexityConfiguration)
     {
         ComplexityConfiguration = complexityConfiguration;
     }
@@ -80,9 +81,9 @@ public class ComplexityValidationRule : ValidationRuleBase, INodeVisitor
 
     /// <summary>
     /// Executes after the complexity analysis has completed, before comparing results to the complexity configuration parameters.
-    /// This method is made to be able to access the calculated <see cref="ComplexityResult"/> and handle it, for example, for logging.
+    /// This method is made to be able to access the calculated <see cref="LegacyComplexityResult"/> and handle it, for example, for logging.
     /// </summary>
-    protected virtual void Analyzed(GraphQLDocument document, ComplexityResult complexityResult)
+    protected virtual void Analyzed(GraphQLDocument document, LegacyComplexityResult complexityResult)
     {
 #if DEBUG
         Debug.WriteLine($"Complexity: {complexityResult.Complexity}");
@@ -95,18 +96,18 @@ public class ComplexityValidationRule : ValidationRuleBase, INodeVisitor
     /// <summary>
     /// Analyzes the complexity of a document.
     /// </summary>
-    internal static ComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
+    internal static LegacyComplexityResult Analyze(GraphQLDocument doc, double avgImpact, int maxRecursionCount, ISchema? schema = null)
     {
         if (avgImpact <= 1)
             throw new ArgumentOutOfRangeException(nameof(avgImpact));
 
-        var context = new AnalysisContext
+        var context = new LegacyAnalysisContext
         {
             MaxRecursionCount = maxRecursionCount,
             AvgImpact = avgImpact,
             CurrentEndNodeImpact = 1d
         };
-        var visitor = schema == null ? new ComplexityVisitor() : new ComplexityVisitor(schema);
+        var visitor = schema == null ? new LegacyComplexityVisitor() : new LegacyComplexityVisitor(schema);
 
         // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
         // Sort fragment definitions so that independent fragments go in front.

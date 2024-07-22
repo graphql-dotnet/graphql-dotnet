@@ -3,7 +3,8 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity;
 
-internal sealed class AnalysisContext : IASTVisitorContext
+[Obsolete("Please use the new complexity analyzer.")]
+internal sealed class LegacyAnalysisContext : IASTVisitorContext
 {
     public double AvgImpact { get; set; }
 
@@ -11,9 +12,9 @@ internal sealed class AnalysisContext : IASTVisitorContext
 
     public double CurrentEndNodeImpact { get; set; }
 
-    public FragmentComplexity CurrentFragmentComplexity { get; set; } = null!;
+    public LegacyFragmentComplexity CurrentFragmentComplexity { get; set; } = null!;
 
-    public ComplexityResult Result { get; } = new ComplexityResult();
+    public LegacyComplexityResult Result { get; } = new LegacyComplexityResult();
 
     public int LoopCounter { get; set; }
 
@@ -21,7 +22,7 @@ internal sealed class AnalysisContext : IASTVisitorContext
 
     public bool FragmentMapAlreadyBuilt { get; set; }
 
-    public Dictionary<string, FragmentComplexity> FragmentMap { get; } = new Dictionary<string, FragmentComplexity>();
+    public Dictionary<string, LegacyFragmentComplexity> FragmentMap { get; } = new Dictionary<string, LegacyFragmentComplexity>();
 
     public CancellationToken CancellationToken => default;
 
