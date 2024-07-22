@@ -101,6 +101,7 @@ A list of the available extension methods is below:
 | `UseAutomaticPersistedQueries` | Enables Automatic Persisted Queries support | GraphQL.MemoryCache |
 | `UseMemoryCache`        | Registers the memory document cache and configures its options | GraphQL.MemoryCache |
 | `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
+| `UsePersistedDocuments` | Registers the persisted document handler and configures its options | |
 | `UseTelemetry`          | Creates telemetry events based on the System.Diagnostics.Activity API, primarily for use with OpenTelemetry | .NET 5+ |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered

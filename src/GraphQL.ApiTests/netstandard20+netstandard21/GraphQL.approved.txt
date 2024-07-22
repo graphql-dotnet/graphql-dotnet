@@ -140,6 +140,7 @@ namespace GraphQL
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? CachedDocumentValidationRules { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument? Document { get; set; }
+        public string? DocumentId { get; set; }
         public bool EnableMetrics { get; set; }
         public GraphQL.Inputs? Extensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -159,6 +160,7 @@ namespace GraphQL
     public class ExecutionResult
     {
         public ExecutionResult() { }
+        public ExecutionResult(GraphQL.ExecutionError error) { }
         public ExecutionResult(GraphQL.ExecutionResult result) { }
         public object? Data { get; set; }
         public GraphQLParser.AST.GraphQLDocument? Document { get; set; }
@@ -370,6 +372,12 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
+            where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
+            where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
     }
@@ -1909,6 +1917,44 @@ namespace GraphQL.Introspection
         public @__TypeKind() { }
     }
 }
+namespace GraphQL.PersistedDocuments
+{
+    public class DocumentIdInvalidError : GraphQL.Execution.RequestError
+    {
+        public DocumentIdInvalidError() { }
+    }
+    public class DocumentIdMissingError : GraphQL.Execution.RequestError
+    {
+        public DocumentIdMissingError() { }
+    }
+    public class DocumentNotFoundError : GraphQL.Execution.RequestError
+    {
+        public DocumentNotFoundError() { }
+    }
+    public interface IPersistedDocumentLoader
+    {
+        System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string? documentIdPrefix, string documentIdPayload, System.Threading.CancellationToken cancellationToken);
+    }
+    public class InvalidRequestError : GraphQL.Execution.RequestError
+    {
+        public InvalidRequestError() { }
+    }
+    public class PersistedDocumentHandler : GraphQL.DI.IConfigureExecution
+    {
+        public PersistedDocumentHandler() { }
+        public PersistedDocumentHandler(GraphQL.PersistedDocuments.PersistedDocumentOptions options) { }
+        public virtual float SortOrder { get; }
+        protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
+        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+    }
+    public class PersistedDocumentOptions
+    {
+        public PersistedDocumentOptions() { }
+        public bool AllowNonpersistedDocuments { get; set; }
+        public System.Collections.Generic.HashSet<string?> AllowedPrefixes { get; }
+        public System.Func<GraphQL.ExecutionOptions, string?, string, System.Threading.Tasks.ValueTask<string?>> GetQueryDelegate { get; set; }
+    }
+}
 namespace GraphQL.Reflection
 {
     public interface IAccessor
@@ -1992,6 +2038,7 @@ namespace GraphQL.Transport
     public class GraphQLRequest
     {
         public GraphQLRequest() { }
+        public string? DocumentId { get; set; }
         public GraphQL.Inputs? Extensions { get; set; }
         public string? OperationName { get; set; }
         public string? Query { get; set; }

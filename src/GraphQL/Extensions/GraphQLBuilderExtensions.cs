@@ -2,6 +2,8 @@ using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.PersistedDocuments;
+
 #if NET5_0_OR_GREATER
 using GraphQL.Telemetry;
 #endif
@@ -1270,6 +1272,42 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.Register(schemaVisitorFactory, ServiceLifetime.Singleton);
         builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
         return builder;
+    }
+    #endregion
+
+    #region - UsePersistedDocuments -
+    /// <summary>
+    /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
+    /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. The specified implementation of
+    /// <see cref="IPersistedDocumentLoader"/> is used to retrieve query strings from supplied document identifiers.
+    /// </summary>
+    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, Action<PersistedDocumentOptions>? action = null)
+        where TLoader : class, IPersistedDocumentLoader
+        => builder.UsePersistedDocuments<TLoader>(serviceLifetime, action == null ? null : (options, _) => action(options));
+
+    /// <inheritdoc cref="UsePersistedDocuments{TLoader}(IGraphQLBuilder, ServiceLifetime, Action{PersistedDocumentOptions}?)"/>
+    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime, Action<PersistedDocumentOptions, IServiceProvider>? action)
+        where TLoader : class, IPersistedDocumentLoader
+    {
+        builder.Services.Register<IPersistedDocumentLoader, TLoader>(serviceLifetime);
+        builder.Services.Configure(action);
+        return builder.ConfigureExecution<PersistedDocumentHandler>();
+    }
+
+    /// <summary>
+    /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
+    /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. Requires the
+    /// <see cref="PersistedDocumentOptions.GetQueryDelegate"/> to be set to a delegate that can retrieve the
+    /// query string from the document identifier.
+    /// </summary>
+    public static IGraphQLBuilder UsePersistedDocuments(this IGraphQLBuilder builder, Action<PersistedDocumentOptions>? action)
+        => builder.UsePersistedDocuments(action == null ? null : (options, _) => action(options));
+
+    /// <inheritdoc cref="UsePersistedDocuments(IGraphQLBuilder, Action{PersistedDocumentOptions})"/>
+    public static IGraphQLBuilder UsePersistedDocuments(this IGraphQLBuilder builder, Action<PersistedDocumentOptions, IServiceProvider>? action)
+    {
+        builder.Services.Configure(action);
+        return builder.ConfigureExecution<PersistedDocumentHandler>();
     }
     #endregion
 }

@@ -15,6 +15,11 @@ public class ExecutionErrors : IEnumerable<ExecutionError>
         List = new List<ExecutionError>(capacity);
     }
 
+    internal ExecutionErrors(ExecutionError error)
+    {
+        List = new(1) { error };
+    }
+
     /// <summary>
     /// Creates an instance of <see cref="ExecutionErrors"/>.
     /// </summary>

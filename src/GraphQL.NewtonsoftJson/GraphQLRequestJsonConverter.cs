@@ -32,6 +32,11 @@ public class GraphQLRequestJsonConverter : JsonConverter
     /// </summary>
     private const string EXTENSIONS_KEY = "extensions";
 
+    /// <summary>
+    /// Name for the documentId parameter.
+    /// </summary>
+    private const string DOCUMENT_ID_KEY = "documentId";
+
     /// <inheritdoc/>
     public override bool CanConvert(Type objectType) => objectType == typeof(GraphQLRequest);
 
@@ -66,6 +71,11 @@ public class GraphQLRequestJsonConverter : JsonConverter
             writer.WritePropertyName(EXTENSIONS_KEY);
             serializer.Serialize(writer, request.Extensions);
         }
+        if (request.DocumentId != null)
+        {
+            writer.WritePropertyName(DOCUMENT_ID_KEY);
+            writer.WriteValue(request.DocumentId);
+        }
         writer.WriteEndObject();
     }
 
@@ -93,7 +103,7 @@ public class GraphQLRequestJsonConverter : JsonConverter
             switch (key)
             {
                 case QUERY_KEY:
-                    request.Query = reader.ReadAsString()!;
+                    request.Query = reader.ReadAsString();
                     break;
                 case OPERATION_NAME_KEY:
                     request.OperationName = reader.ReadAsString();
@@ -107,6 +117,9 @@ public class GraphQLRequestJsonConverter : JsonConverter
                     if (!reader.Read())
                         throw new JsonException();
                     request.Extensions = serializer.Deserialize<Inputs>(reader);
+                    break;
+                case DOCUMENT_ID_KEY:
+                    request.DocumentId = reader.ReadAsString();
                     break;
                 default:
                     reader.Skip();
