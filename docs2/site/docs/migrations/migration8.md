@@ -786,7 +786,7 @@ directives.
 
 ### 23. Persisted Document support
 
-GraphQL.NET now supports persisted documents based on the draft appendix to the draft GraphQL over HTTP specification.
+GraphQL.NET now supports persisted documents based on the draft spec [listed here](https://github.com/graphql/graphql-over-http/pull/264).
 Persisted documents are a way to store a query string on the server and reference it by a unique identifier, typically
 a SHA-256 hash. When enabled, the default configuration disables use of the `query` field in the request body and
 requires the client to use the `documentId` field instead. This acts as a whitelist of allowed queries and mutations
