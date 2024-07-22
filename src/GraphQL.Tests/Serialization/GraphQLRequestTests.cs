@@ -42,9 +42,10 @@ public class GraphQLRequestTests : DeserializationTestBase
                 { "arg1", 2 },
                 { "arg2", "test2" },
             }),
+            DocumentId = "abc",
         };
 
-        const string expected = """{ "query": "hello", "operationName": "opname", "variables": { "arg1": 1, "arg2": "test" }, "extensions": { "arg1": 2, "arg2": "test2" } }""";
+        const string expected = """{ "query": "hello", "operationName": "opname", "variables": { "arg1": 1, "arg2": "test" }, "extensions": { "arg1": 2, "arg2": "test2" }, "documentId": "abc" }""";
 
         string actual = serializer.Serialize(request);
 
@@ -250,12 +251,13 @@ public class GraphQLRequestTests : DeserializationTestBase
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_GraphQLRequest_Nulls(IGraphQLTextSerializer serializer)
     {
-        const string test = "{\"query\":null,\"operationName\":null,\"variables\":null,\"extensions\":null}";
+        const string test = "{\"query\":null,\"operationName\":null,\"variables\":null,\"extensions\":null,\"documentId\":null}";
         var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBeNull();
         actual.OperationName.ShouldBeNull();
         actual.Variables.ShouldBeNull();
         actual.Extensions.ShouldBeNull();
+        actual.DocumentId.ShouldBeNull();
     }
 
     [Theory]
@@ -268,16 +270,18 @@ public class GraphQLRequestTests : DeserializationTestBase
         actual.OperationName.ShouldBeNull();
         actual.Variables.ShouldBeNull();
         actual.Extensions.ShouldBeNull();
+        actual.DocumentId.ShouldBeNull();
     }
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
     public void Reads_GraphQLRequest_Other_Properties(IGraphQLTextSerializer serializer)
     {
-        string test = $"{{\"query\":\"hello\",\"operationName\":\"hello2\",\"extensions\":{ExampleJson}}}";
+        string test = $"{{\"query\":\"hello\",\"operationName\":\"hello2\",\"extensions\":{ExampleJson},\"documentId\":\"abc\"}}";
         var actual = serializer.Deserialize<GraphQLRequest>(test)!;
         actual.Query.ShouldBe("hello");
         actual.OperationName.ShouldBe("hello2");
+        actual.DocumentId.ShouldBe("abc");
         Verify(actual.Extensions!);
     }
 }

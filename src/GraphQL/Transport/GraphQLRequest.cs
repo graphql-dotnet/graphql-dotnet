@@ -30,7 +30,7 @@ public class GraphQLRequest
 
     /// <summary>
     /// A unique identifier for the document (optional). When in use, the <see cref="Query">Query</see> property should
-    /// not be provided. Typically requires the GraphQL.MemoryCache NuGet package to be installed and configured.
+    /// not be provided. Typically requires the persisted document handler configured.
     /// <para>
     /// The identifier may be either a prefixed document identifier or a custom document identifier.
     /// </para>
