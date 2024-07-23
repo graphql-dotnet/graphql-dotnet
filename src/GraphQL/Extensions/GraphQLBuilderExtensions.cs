@@ -1173,7 +1173,7 @@ public static class GraphQLBuilderExtensions // TODO: split
 #endif
     #endregion
 
-    #region - ConfigureUnhandledExceptionHandler -
+    #region - AddUnhandledExceptionHandler -
     /// <summary>
     /// Configures the delegate to be called when an unhandled exception occurs during document execution.
     /// This is typically used to log exceptions to a database for further review.
@@ -1205,7 +1205,8 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (unhandledExceptionDelegate == null)
             throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
 
-        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+        var handler = (UnhandledExceptionContext context) => unhandledExceptionDelegate(context, context.ExecutionOptions);
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
@@ -1230,11 +1231,12 @@ public static class GraphQLBuilderExtensions // TODO: split
         if (unhandledExceptionDelegate == null)
             throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
 
-        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context =>
+        var handler = (UnhandledExceptionContext context) =>
         {
-            unhandledExceptionDelegate(context, settings);
+            unhandledExceptionDelegate(context, context.ExecutionOptions);
             return Task.CompletedTask;
-        });
+        };
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
         return builder;
     }
     #endregion
