@@ -89,6 +89,27 @@ public class PersistedDocumentTests
     }
 
     [Theory]
+    [InlineData(1, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}""", """{"errors":[{"message":"The format of the documentId parameter is invalid.","extensions":{"code":"DOCUMENT_ID_INVALID","codes":["DOCUMENT_ID_INVALID"]}}]}""")]
+    [InlineData(2, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde"}""", """{"errors":[{"message":"The format of the documentId parameter is invalid.","extensions":{"code":"DOCUMENT_ID_INVALID","codes":["DOCUMENT_ID_INVALID"]}}]}""")]
+    [InlineData(3, """{"documentId":"md5:0123456789abcdef"}""", """{"errors":[{"message":"The format of the documentId parameter is invalid.","extensions":{"code":"DOCUMENT_ID_INVALID","codes":["DOCUMENT_ID_INVALID"]}}]}""")]
+    [InlineData(4, """{"documentId":"test"}""", """{"data":{"test":"{null}:test"}}""")]
+    [InlineData(5, """{"query":"{test(arg:\"abc\")}"}""", """{"errors":[{"message":"The request must have a documentId parameter.","extensions":{"code":"DOCUMENT_ID_MISSING","codes":["DOCUMENT_ID_MISSING"]}}]}""")]
+    [InlineData(6, """{}""", """{"errors":[{"message":"The request must have a documentId parameter.","extensions":{"code":"DOCUMENT_ID_MISSING","codes":["DOCUMENT_ID_MISSING"]}}]}""")]
+    [InlineData(7, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef","query":"{test}"}""", """{"errors":[{"message":"The request must not have both query and documentId parameters.","extensions":{"code":"INVALID_REQUEST","codes":["INVALID_REQUEST"]}}]}""")]
+    public async Task Custom_Identifier_Only_Tests(int num, string query, string expectedResponse)
+    {
+        _ = num;
+        var response = await ExecuteRequestAsync(
+            b => b.UsePersistedDocuments<Loader>(GraphQL.DI.ServiceLifetime.Singleton, c =>
+            {
+                c.AllowedPrefixes.Clear();
+                c.AllowedPrefixes.Add(null);
+            }),
+            query);
+        response.ShouldBeCrossPlatJson(expectedResponse);
+    }
+
+    [Theory]
     [InlineData(1, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}""", """{"data":{"test":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"}}""")]
     [InlineData(2, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcde"}""", """{"errors":[{"message":"The format of the documentId parameter is invalid.","extensions":{"code":"DOCUMENT_ID_INVALID","codes":["DOCUMENT_ID_INVALID"]}}]}""")]
     [InlineData(3, """{"documentId":"sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0"}""", """{"errors":[{"message":"The format of the documentId parameter is invalid.","extensions":{"code":"DOCUMENT_ID_INVALID","codes":["DOCUMENT_ID_INVALID"]}}]}""")]
