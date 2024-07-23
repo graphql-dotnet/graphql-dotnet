@@ -4,7 +4,7 @@ using GraphQL.Validation.Errors.Custom;
 
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityValidationTest : ComplexityTestBase
+public class LegacyComplexityValidationTest : LegacyComplexityTestBase
 {
     [Fact]
     public async Task should_work_when_complexity_within_params()
@@ -17,7 +17,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration { FieldImpact = 2, MaxComplexity = 6, MaxDepth = 1 };
+        var complexityConfiguration = new LegacyComplexityConfiguration { FieldImpact = 2, MaxComplexity = 6, MaxDepth = 1 };
         var res = await Execute(complexityConfiguration, query);
 
         res.Errors.ShouldBe(null);
@@ -39,7 +39,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration { MaxDepth = 2 };
+        var complexityConfiguration = new LegacyComplexityConfiguration { MaxDepth = 2 };
         var res = await Execute(complexityConfiguration, query);
 
         res.Errors.ShouldNotBeNull();
@@ -62,7 +62,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration { FieldImpact = 5, MaxComplexity = 10 };
+        var complexityConfiguration = new LegacyComplexityConfiguration { FieldImpact = 5, MaxComplexity = 10 };
         var res = await Execute(complexityConfiguration, query);
 
         res.Errors.ShouldNotBeNull();
@@ -91,7 +91,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration
+        var complexityConfiguration = new LegacyComplexityConfiguration
         {
             FieldImpact = 5,
             MaxComplexity = 25,
@@ -131,7 +131,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration();
+        var complexityConfiguration = new LegacyComplexityConfiguration();
         var res = await Execute(complexityConfiguration, query);
 
         res.Errors.ShouldNotBeNull();
@@ -164,7 +164,7 @@ public class ComplexityValidationTest : ComplexityTestBase
             }
             """;
 
-        var complexityConfiguration = new ComplexityConfiguration();
+        var complexityConfiguration = new LegacyComplexityConfiguration();
         var res = await Execute(complexityConfiguration, query, onlyComplexityRule: true);
 
         res.Errors.ShouldNotBeNull();

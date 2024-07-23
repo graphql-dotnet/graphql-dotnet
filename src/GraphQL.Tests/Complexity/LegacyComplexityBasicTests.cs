@@ -1,6 +1,6 @@
 namespace GraphQL.Tests.Complexity;
 
-public class ComplexityBasicTests : ComplexityTestBase
+public class LegacyComplexityBasicTests : LegacyComplexityTestBase
 {
     [Fact]
     public void empty_query_complexity()
