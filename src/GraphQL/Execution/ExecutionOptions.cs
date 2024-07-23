@@ -19,8 +19,11 @@ public class ExecutionOptions : IProvideUserContext
     /// <summary>Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers</summary>
     public object? Root { get; set; }
 
-    /// <summary>GraphQL query to parse and execute; required</summary>
+    /// <summary>GraphQL query to parse and execute; required unless <see cref="Document"/> is provided.</summary>
     public string? Query { get; set; }
+
+    /// <inheritdoc cref="Transport.GraphQLRequest.DocumentId"/>
+    public string? DocumentId { get; set; }
 
     /// <summary>GraphQL query operation name; optional, defaults to first (if any) operation defined in query</summary>
     public string? OperationName { get; set; }

@@ -7,8 +7,8 @@ namespace GraphQL;
 public static class MemoryCacheGraphQLBuilderExtensions
 {
     /// <summary>
-    /// Registers <see cref="MemoryDocumentCache"/> as a singleton of type <see cref="IConfigureExecution"/> within
-    /// the dependency injection framework, and configures it with the specified configuration delegate.
+    /// Caches parsed and validated documents in memory. This is useful for reducing the overhead of parsing
+    /// and validating the same document multiple times.
     /// </summary>
     public static IGraphQLBuilder UseMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions>? action = null)
      => builder.UseMemoryCache(action == null ? null : (options, _) => action(options));
@@ -21,8 +21,8 @@ public static class MemoryCacheGraphQLBuilderExtensions
     }
 
     /// <summary>
-    /// Adds support of Automatic Persisted Queries in the form of implementation of <see cref="IConfigureExecution"/>.
-    /// https://www.apollographql.com/docs/react/api/link/persisted-queries/
+    /// Adds support of Automatic Persisted Queries; see
+    /// <see href="https://www.apollographql.com/docs/react/api/link/persisted-queries/"/>.
     /// </summary>
     public static IGraphQLBuilder UseAutomaticPersistedQueries(this IGraphQLBuilder builder, Action<AutomaticPersistedQueriesCacheOptions>? action = null)
         => builder.UseAutomaticPersistedQueries(action == null ? null : (options, _) => action(options));
