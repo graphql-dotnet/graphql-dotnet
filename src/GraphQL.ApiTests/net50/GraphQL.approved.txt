@@ -1984,7 +1984,7 @@ namespace GraphQL.PersistedDocuments
     public class PersistedDocumentOptions
     {
         public PersistedDocumentOptions() { }
-        public bool AllowNonpersistedDocuments { get; set; }
+        public bool AllowOnlyPersistedDocuments { get; set; }
         public System.Collections.Generic.HashSet<string?> AllowedPrefixes { get; }
         public System.Func<GraphQL.ExecutionOptions, string?, string, System.Threading.Tasks.ValueTask<string?>> GetQueryDelegate { get; set; }
     }

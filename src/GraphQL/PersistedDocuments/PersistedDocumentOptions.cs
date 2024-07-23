@@ -9,9 +9,10 @@ public class PersistedDocumentOptions
     private const string ERROR_NO_LOADER = $"{nameof(IPersistedDocumentLoader)} must be registered with your DI provider or {nameof(PersistedDocumentOptions)}.{nameof(GetQueryDelegate)} must be set.";
 
     /// <summary>
-    /// Indicates if requests that are not persisted document requests should be allowed to be executed.
+    /// Indicates if only requests that are persisted document requests should be allowed to be executed.
+    /// Defaults to <see langword="true"/>.
     /// </summary>
-    public bool AllowNonpersistedDocuments { get; set; }
+    public bool AllowOnlyPersistedDocuments { get; set; } = true;
 
     /// <summary>
     /// Returns a list of document id prefixes that are allowed to be used.

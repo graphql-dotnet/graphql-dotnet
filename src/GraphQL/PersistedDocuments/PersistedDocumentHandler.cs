@@ -67,7 +67,7 @@ public class PersistedDocumentHandler : IConfigureExecution
         // if query is provided, but documentId is not, then we need to execute or refuse the request
         if (options.Query != null)
         {
-            if (!_options.AllowNonpersistedDocuments)
+            if (_options.AllowOnlyPersistedDocuments)
                 return CreateExecutionResult(new DocumentIdMissingError());
             else
                 return await next(options).ConfigureAwait(false);

@@ -1280,6 +1280,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
     /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. The specified implementation of
     /// <see cref="IPersistedDocumentLoader"/> is used to retrieve query strings from supplied document identifiers.
+    /// By default, arbitrary queries will be disabled; configure <see cref="PersistedDocumentOptions.AllowOnlyPersistedDocuments"/>
+    /// if desired.
     /// </summary>
     public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, Action<PersistedDocumentOptions>? action = null)
         where TLoader : class, IPersistedDocumentLoader
@@ -1298,7 +1300,8 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
     /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. Requires the
     /// <see cref="PersistedDocumentOptions.GetQueryDelegate"/> to be set to a delegate that can retrieve the
-    /// query string from the document identifier.
+    /// query string from the document identifier. By default, arbitrary queries will be disabled; configure
+    /// <see cref="PersistedDocumentOptions.AllowOnlyPersistedDocuments"/> if desired.
     /// </summary>
     public static IGraphQLBuilder UsePersistedDocuments(this IGraphQLBuilder builder, Action<PersistedDocumentOptions>? action)
         => builder.UsePersistedDocuments(action == null ? null : (options, _) => action(options));
