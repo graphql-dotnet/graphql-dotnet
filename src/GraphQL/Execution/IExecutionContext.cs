@@ -108,4 +108,9 @@ public interface IExecutionContext : IProvideUserContext
     /// Gets security information for the executing request.
     /// </summary>
     ClaimsPrincipal? User { get; }
+
+    /// <summary>
+    /// Returns the <see cref="ExecutionOptions"/> used to configure the current execution.
+    /// </summary>
+    ExecutionOptions ExecutionOptions { get; }
 }

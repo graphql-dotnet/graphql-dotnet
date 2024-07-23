@@ -323,8 +323,12 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, TSerializer serializer)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext> unhandledExceptionDelegate) { }
+        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
+            "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
+        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
+            "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
@@ -1218,6 +1222,7 @@ namespace GraphQL.Execution
         public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
+        public GraphQL.ExecutionOptions ExecutionOptions { get; set; }
         public GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; set; }
         public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
@@ -1336,6 +1341,7 @@ namespace GraphQL.Execution
         System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         GraphQLParser.AST.GraphQLDocument Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
+        GraphQL.ExecutionOptions ExecutionOptions { get; }
         GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; }
         System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
         System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -1475,10 +1481,12 @@ namespace GraphQL.Execution
     }
     public class UnhandledExceptionContext
     {
-        public UnhandledExceptionContext(GraphQL.Execution.IExecutionContext? context, GraphQL.IResolveFieldContext? fieldContext, System.Exception originalException) { }
+        public UnhandledExceptionContext(GraphQL.ExecutionOptions options, System.Exception originalException) { }
+        public UnhandledExceptionContext(GraphQL.Execution.IExecutionContext context, GraphQL.IResolveFieldContext? fieldContext, System.Exception originalException) { }
         public GraphQL.Execution.IExecutionContext? Context { get; }
         public string? ErrorMessage { get; set; }
         public System.Exception Exception { get; set; }
+        public GraphQL.ExecutionOptions ExecutionOptions { get; }
         public GraphQL.IResolveFieldContext? FieldContext { get; }
         public System.Exception OriginalException { get; }
     }

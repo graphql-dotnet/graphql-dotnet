@@ -1199,6 +1199,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)
@@ -1223,6 +1224,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)

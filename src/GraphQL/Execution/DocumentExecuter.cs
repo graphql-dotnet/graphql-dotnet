@@ -65,7 +65,39 @@ public class DocumentExecuter : IDocumentExecuter
             var nextExecution = execution;
             execution = async options => await action.ExecuteAsync(options, nextExecution).ConfigureAwait(false);
         }
-        return execution;
+        return async options =>
+        {
+            try
+            {
+                return await execution(options).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (ExecutionError ex)
+            {
+                return new ExecutionResult(ex);
+            }
+            catch (Exception ex)
+            {
+                if (options.ThrowOnUnhandledException)
+                    throw;
+
+                UnhandledExceptionContext? exceptionContext = null;
+                if (options.UnhandledExceptionDelegate != null)
+                {
+                    exceptionContext = new UnhandledExceptionContext(options, ex);
+                    await options.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
+                    ex = exceptionContext.Exception;
+                }
+
+                var executionError = ex as ExecutionError ??
+                    new UnhandledError(exceptionContext?.ErrorMessage ?? "Error executing document.", ex);
+
+                return new ExecutionResult(executionError);
+            }
+        };
     }
 
     /// <inheritdoc/>
@@ -197,7 +229,9 @@ public class DocumentExecuter : IDocumentExecuter
             UnhandledExceptionContext? exceptionContext = null;
             if (options.UnhandledExceptionDelegate != null)
             {
-                exceptionContext = new UnhandledExceptionContext(context, null, ex);
+                exceptionContext = context == null
+                    ? new UnhandledExceptionContext(options, ex)
+                    : new UnhandledExceptionContext(context, null, ex);
                 await options.UnhandledExceptionDelegate(exceptionContext).ConfigureAwait(false);
                 ex = exceptionContext.Exception;
             }
@@ -227,6 +261,7 @@ public class DocumentExecuter : IDocumentExecuter
             Schema = options.Schema!,
             RootValue = options.Root,
             UserContext = options.UserContext,
+            ExecutionOptions = options,
 
             Operation = operation,
             Variables = validationResult.Variables ?? Variables.None,
