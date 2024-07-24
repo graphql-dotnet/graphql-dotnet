@@ -2,6 +2,8 @@ using System.Reflection;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
+using GraphQL.PersistedDocuments;
+
 #if NET5_0_OR_GREATER
 using GraphQL.Telemetry;
 #endif
@@ -1189,7 +1191,7 @@ public static class GraphQLBuilderExtensions // TODO: split
 #endif
     #endregion
 
-    #region - ConfigureUnhandledExceptionHandler -
+    #region - AddUnhandledExceptionHandler -
     /// <summary>
     /// Configures the delegate to be called when an unhandled exception occurs during document execution.
     /// This is typically used to log exceptions to a database for further review.
@@ -1215,12 +1217,14 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)
             throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
 
-        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
+        var handler = (UnhandledExceptionContext context) => unhandledExceptionDelegate(context, context.ExecutionOptions);
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
@@ -1239,16 +1243,18 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
+    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)
             throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
 
-        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context =>
+        var handler = (UnhandledExceptionContext context) =>
         {
-            unhandledExceptionDelegate(context, settings);
+            unhandledExceptionDelegate(context, context.ExecutionOptions);
             return Task.CompletedTask;
-        });
+        };
+        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
         return builder;
     }
     #endregion
@@ -1290,6 +1296,45 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.Register(schemaVisitorFactory, ServiceLifetime.Singleton);
         builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
         return builder;
+    }
+    #endregion
+
+    #region - UsePersistedDocuments -
+    /// <summary>
+    /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
+    /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. The specified implementation of
+    /// <see cref="IPersistedDocumentLoader"/> is used to retrieve query strings from supplied document identifiers.
+    /// By default, arbitrary queries will be disabled; configure <see cref="PersistedDocumentOptions.AllowOnlyPersistedDocuments"/>
+    /// if desired.
+    /// </summary>
+    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, Action<PersistedDocumentOptions>? action = null)
+        where TLoader : class, IPersistedDocumentLoader
+        => builder.UsePersistedDocuments<TLoader>(serviceLifetime, action == null ? null : (options, _) => action(options));
+
+    /// <inheritdoc cref="UsePersistedDocuments{TLoader}(IGraphQLBuilder, ServiceLifetime, Action{PersistedDocumentOptions}?)"/>
+    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime, Action<PersistedDocumentOptions, IServiceProvider>? action)
+        where TLoader : class, IPersistedDocumentLoader
+    {
+        builder.Services.Register<IPersistedDocumentLoader, TLoader>(serviceLifetime);
+        builder.Services.Configure(action);
+        return builder.ConfigureExecution<PersistedDocumentHandler>();
+    }
+
+    /// <summary>
+    /// Adds support of Persisted Documents, a draft appendix to the draft GraphQL over HTTP specification; see
+    /// <see href="https://github.com/graphql/graphql-over-http/pull/264"/>. Requires the
+    /// <see cref="PersistedDocumentOptions.GetQueryDelegate"/> to be set to a delegate that can retrieve the
+    /// query string from the document identifier. By default, arbitrary queries will be disabled; configure
+    /// <see cref="PersistedDocumentOptions.AllowOnlyPersistedDocuments"/> if desired.
+    /// </summary>
+    public static IGraphQLBuilder UsePersistedDocuments(this IGraphQLBuilder builder, Action<PersistedDocumentOptions>? action)
+        => builder.UsePersistedDocuments(action == null ? null : (options, _) => action(options));
+
+    /// <inheritdoc cref="UsePersistedDocuments(IGraphQLBuilder, Action{PersistedDocumentOptions})"/>
+    public static IGraphQLBuilder UsePersistedDocuments(this IGraphQLBuilder builder, Action<PersistedDocumentOptions, IServiceProvider>? action)
+    {
+        builder.Services.Configure(action);
+        return builder.ConfigureExecution<PersistedDocumentHandler>();
     }
     #endregion
 }

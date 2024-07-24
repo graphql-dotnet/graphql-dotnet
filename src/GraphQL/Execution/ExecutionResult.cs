@@ -70,6 +70,14 @@ public class ExecutionResult
     }
 
     /// <summary>
+    /// Initializes a new instance with the specified error.
+    /// </summary>
+    public ExecutionResult(ExecutionError error)
+    {
+        Errors = new ExecutionErrors(error);
+    }
+
+    /// <summary>
     /// Initializes a new instance as a clone of an existing <see cref="ExecutionResult"/>.
     /// </summary>
     public ExecutionResult(ExecutionResult result)

@@ -152,6 +152,7 @@ namespace GraphQL
         public System.Collections.Generic.IEnumerable<GraphQL.Validation.IValidationRule>? CachedDocumentValidationRules { get; set; }
         public System.Threading.CancellationToken CancellationToken { get; set; }
         public GraphQLParser.AST.GraphQLDocument? Document { get; set; }
+        public string? DocumentId { get; set; }
         public bool EnableMetrics { get; set; }
         public GraphQL.Inputs? Extensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -171,6 +172,7 @@ namespace GraphQL
     public class ExecutionResult
     {
         public ExecutionResult() { }
+        public ExecutionResult(GraphQL.ExecutionError error) { }
         public ExecutionResult(GraphQL.ExecutionResult result) { }
         public object? Data { get; set; }
         public GraphQLParser.AST.GraphQLDocument? Document { get; set; }
@@ -341,8 +343,12 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, TSerializer serializer)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext> unhandledExceptionDelegate) { }
+        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
+            "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
+        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
+            "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
@@ -396,6 +402,12 @@ namespace GraphQL
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
         public static GraphQL.DI.IGraphQLBuilder UseMiddleware<TMiddleware>(this GraphQL.DI.IGraphQLBuilder builder, TMiddleware middleware, System.Func<System.IServiceProvider, GraphQL.Types.ISchema, bool> installPredicate)
             where TMiddleware :  class, GraphQL.Instrumentation.IFieldMiddleware { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions, System.IServiceProvider>? action)
+            where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
+        public static GraphQL.DI.IGraphQLBuilder UsePersistedDocuments<TLoader>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0, System.Action<GraphQL.PersistedDocuments.PersistedDocumentOptions>? action = null)
+            where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions, System.IServiceProvider>? configure) { }
         public static GraphQL.DI.IGraphQLBuilder UseTelemetry<TProvider>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Telemetry.GraphQLTelemetryOptions>? configure = null)
@@ -1256,6 +1268,7 @@ namespace GraphQL.Execution
         public System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
+        public GraphQL.ExecutionOptions ExecutionOptions { get; set; }
         public GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; set; }
         public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; set; }
         public System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; set; }
@@ -1374,6 +1387,7 @@ namespace GraphQL.Execution
         System.Collections.Generic.IReadOnlyDictionary<GraphQLParser.AST.ASTNode, System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>>? DirectiveValues { get; }
         GraphQLParser.AST.GraphQLDocument Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
+        GraphQL.ExecutionOptions ExecutionOptions { get; }
         GraphQL.Execution.IExecutionStrategy ExecutionStrategy { get; }
         System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
         System.Collections.Generic.List<GraphQL.Execution.IDocumentExecutionListener> Listeners { get; }
@@ -1513,10 +1527,12 @@ namespace GraphQL.Execution
     }
     public class UnhandledExceptionContext
     {
-        public UnhandledExceptionContext(GraphQL.Execution.IExecutionContext? context, GraphQL.IResolveFieldContext? fieldContext, System.Exception originalException) { }
+        public UnhandledExceptionContext(GraphQL.ExecutionOptions options, System.Exception originalException) { }
+        public UnhandledExceptionContext(GraphQL.Execution.IExecutionContext context, GraphQL.IResolveFieldContext? fieldContext, System.Exception originalException) { }
         public GraphQL.Execution.IExecutionContext? Context { get; }
         public string? ErrorMessage { get; set; }
         public System.Exception Exception { get; set; }
+        public GraphQL.ExecutionOptions ExecutionOptions { get; }
         public GraphQL.IResolveFieldContext? FieldContext { get; }
         public System.Exception OriginalException { get; }
     }
@@ -1961,6 +1977,44 @@ namespace GraphQL.Introspection
         public @__TypeKind() { }
     }
 }
+namespace GraphQL.PersistedDocuments
+{
+    public class DocumentIdInvalidError : GraphQL.Execution.RequestError
+    {
+        public DocumentIdInvalidError() { }
+    }
+    public class DocumentIdMissingError : GraphQL.Execution.RequestError
+    {
+        public DocumentIdMissingError() { }
+    }
+    public class DocumentNotFoundError : GraphQL.Execution.RequestError
+    {
+        public DocumentNotFoundError() { }
+    }
+    public interface IPersistedDocumentLoader
+    {
+        System.Threading.Tasks.ValueTask<string?> GetQueryAsync(string? documentIdPrefix, string documentIdPayload, System.Threading.CancellationToken cancellationToken);
+    }
+    public class InvalidRequestError : GraphQL.Execution.RequestError
+    {
+        public InvalidRequestError() { }
+    }
+    public class PersistedDocumentHandler : GraphQL.DI.IConfigureExecution
+    {
+        public PersistedDocumentHandler() { }
+        public PersistedDocumentHandler(GraphQL.PersistedDocuments.PersistedDocumentOptions options) { }
+        public virtual float SortOrder { get; }
+        protected virtual GraphQL.ExecutionResult CreateExecutionResult(GraphQL.ExecutionError error) { }
+        public System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(GraphQL.ExecutionOptions options, GraphQL.DI.ExecutionDelegate next) { }
+    }
+    public class PersistedDocumentOptions
+    {
+        public PersistedDocumentOptions() { }
+        public bool AllowOnlyPersistedDocuments { get; set; }
+        public System.Collections.Generic.HashSet<string?> AllowedPrefixes { get; }
+        public System.Func<GraphQL.ExecutionOptions, string?, string, System.Threading.Tasks.ValueTask<string?>> GetQueryDelegate { get; set; }
+    }
+}
 namespace GraphQL.Reflection
 {
     public interface IAccessor
@@ -2072,6 +2126,7 @@ namespace GraphQL.Transport
     public class GraphQLRequest
     {
         public GraphQLRequest() { }
+        public string? DocumentId { get; set; }
         public GraphQL.Inputs? Extensions { get; set; }
         public string? OperationName { get; set; }
         public string? Query { get; set; }

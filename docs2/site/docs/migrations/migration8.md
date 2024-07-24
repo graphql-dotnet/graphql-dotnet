@@ -784,7 +784,97 @@ recursively referenced by an operation by calling `GetRecursivelyReferencedFragm
 set to `true`. The method will then ignore fragments that are conditionally skipped by the `@skip` or `@include`
 directives.
 
-### 23. The complexity analyzer has been rewritten to support more complex scenarios
+### 23. Persisted Document support
+
+GraphQL.NET now supports persisted documents based on the draft spec [listed here](https://github.com/graphql/graphql-over-http/pull/264).
+Persisted documents are a way to store a query string on the server and reference it by a unique identifier, typically
+a SHA-256 hash. When enabled, the default configuration disables use of the `query` field in the request body and
+requires the client to use the `documentId` field instead. This acts as a whitelist of allowed queries and mutations
+that the client may execute, while also reducing the size of the request body.
+
+To configure persisted document support, you must implement the `IPersistedDocumentLoader` interface to retrieve the
+query string based on the document identifier, or set the `GetQueryDelegate` property on the `PersistedDocumentOptions`
+class. See typical examples below:
+
+#### Example 1 - Using a service to retrieve persisted documents
+
+In the below example, regular requests (via the query property) are disabled, and only document identifiers
+prefixed with `sha256:` are allowed where the id is a 64-character lowercase hexadecimal string.
+
+```csharp
+// configure the execution to utilize persisted documents
+services.AddGraphQL(b => b
+    // use default configuration, which disables the 'query' field and only allows SHA-256 hashes
+    .UsePeristedDocuments<MyLoader>(GraphQL.DI.ServiceLifetime.Scoped)
+);
+
+// configure a service to retrieve persisted documents based on their hash
+public class MyLoader : IPersistedDocumentLoader
+{
+    // pull in dependencies via DI as needed
+
+    public async ValueTask<string?> GetQueryAsync(string? documentIdPrefix, string documentIdPayload, CancellationToken cancellationToken)
+    {
+        return await _db.QueryDocuments
+            .Where(x => x.Hash == documentIdPayload)
+            .Select(x => x.Query)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
+}
+```
+
+Sample request:
+
+```json
+{
+  "documentId": "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+  "variables": {
+    "id": "1"
+  }
+}
+```
+
+#### Example 2 - Configuring persisted documents with the options class
+
+In the below example, regular requests are allowed, and document identifiers are unprefixed GUIDs.
+
+```csharp
+// configure the execution to utilize persisted documents
+services.AddGraphQL(b => b
+    .UsePeristedDocuments(options =>
+    {
+        // enable regular queries also
+        options.AllowNonpersistedDocuments = true;
+        // use custom document identifiers and disable sha256 prefixed identifiers
+        options.AllowedPrefixes.Clear()
+        options.AllowedPrefixes.Add(null); // unprefixed document identifiers
+        // configure the service to retrieve persisted documents
+        options.GetQueryDelegate = async (executionOptions, documentIdPrefix, documentIdPayload) =>
+        {
+            if (!Guid.TryParse(documentIdPayload, out var id))
+                return null;
+            var db = executionOptions.RequestServices!.GetRequiredService<MyDbContext>();
+            return await db.QueryDocuments
+                .Where(x => x.Id == id)
+                .Select(x => x.Query)
+                .FirstOrDefaultAsync(executionOptions.CancellationToken);
+        };
+    });
+);
+```
+
+Sample persisted document request:
+
+```json
+{
+  "documentId": "01234567-89ab-cdef-0123-456789abcdef",
+  "variables": {
+    "id": "1"
+  }
+}
+```
+
+### 24. The complexity analyzer has been rewritten to support more complex scenarios
 
 Please review the documentation for the new complexity analyzer to understand how to use it and how to configure it.
 See the 'Complexity Analzyer' document with the 'Guides' section of the documentation for more information.
@@ -1054,3 +1144,61 @@ services.AddGraphQL(b => b
 ```
 
 The legacy complexity analyzer will be removed in v9.
+
+### 22. Unhandled exceptions within execution configuration delegates are now handled and wrapped
+
+Previously, unhandled exceptions within execution configuration delegates were not handled and
+would be thrown directly to the caller. For instance, if a database exception occurred within
+the delegate used to pull persisted documents, the exception would be thrown directly to the
+caller. Now, these exceptions are caught and processed through the unhandled exception handler
+delegate, which allows for logging and other processing of the exception.
+
+Example:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler(context =>
+    {
+        // this now runs when the below exception is thrown
+    })
+    .ConfigureExecution(async (options, next) => {
+        // sample exception thrown while logging the query being executed to a database
+        throw new Exception("Database exception occurred");
+
+        return await next(options);
+    })
+);
+```
+
+For this to work properly, be sure that any code liable to throw an exception is located inside
+a `Use...` or `ConfigureExecution` method, not an `Add...` or `ConfigureExecutionOptions` method,
+or else ensure that the call to `AddUnhandledExceptionHandler` is first in the chain.
+
+### 23. `IExecutionContext.ExecutionOptions` property added
+
+Custom `IExecutionContext` implementations must now implement the `ExecutionOptions` property.
+In addition, the `AddUnhandledExceptionHandler` methods that have an `ExecutionOptions` parameter
+within the delegate have been deprecated in favor of using the `IExecutionContext.ExecutionOptions`
+property.
+
+```csharp
+// v7
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler((context, options) =>
+    {
+        // code
+    })
+);
+
+// v8
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler(context =>
+    {
+        var options = context.ExecutionOptions;
+        // code
+    })
+);
+```
