@@ -22,7 +22,7 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
     }
 
     [Fact]
-    public async Task DocumentExecuter_has_valid_options()
+    public async Task DocumentExecuter_has_valid_options_rethrow()
     {
         var de = new DocumentExecuter();
         var valid = await de.ExecuteAsync(new ExecutionOptions
@@ -45,8 +45,38 @@ public class Bug1769 : QueryTestBase<Bug1769Schema>
             {
                 Query = "{test}",
                 Schema = null,
+                ThrowOnUnhandledException = true,
             });
         });
+    }
+
+    [Fact]
+    public async Task DocumentExecuter_has_valid_options()
+    {
+        var de = new DocumentExecuter();
+        var valid = await de.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{test}",
+            Schema = Schema,
+        });
+        valid.Data.ShouldNotBeNull();
+        var result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = null,
+            Schema = Schema,
+        });
+        result.Errors.ShouldHaveSingleItem().ShouldBeOfType(typeof(QueryMissingError));
+        result.Errors.Single().Locations.ShouldBeNull();
+        result.Errors.Single().Path.ShouldBeNull();
+        result = await de.ExecuteAsync(new ExecutionOptions()
+        {
+            Query = "{test}",
+            Schema = null,
+        });
+        var ex = result.Errors.ShouldHaveSingleItem().ShouldBeOfType<UnhandledError>();
+        ex.Message.ShouldBe("Error executing document.");
+        ex.InnerException.ShouldBeOfType<InvalidOperationException>()
+            .Message.ShouldBe("Cannot execute request if no schema is specified");
     }
 
     [Fact]

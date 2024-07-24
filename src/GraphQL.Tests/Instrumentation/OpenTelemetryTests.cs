@@ -346,6 +346,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query withActivityQuery { withActivity }",
             RequestServices = _host.Services,
+            ThrowOnUnhandledException = true,
         };
         bool ranFilter = false;
         _options.Filter = options =>
@@ -396,6 +397,7 @@ public sealed class OpenTelemetryTests : IDisposable
         {
             Query = "query helloQuery { hello }",
             RequestServices = _host.Services,
+            ThrowOnUnhandledException = true,
         };
 
         _options.Filter = _ => filter ?? throw new FilterException();

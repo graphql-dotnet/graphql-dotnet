@@ -8,10 +8,21 @@ public class UnhandledExceptionContext
     /// <summary>
     /// Initializes a new instance with the specified properties.
     /// </summary>
-    public UnhandledExceptionContext(IExecutionContext? context, IResolveFieldContext? fieldContext, Exception originalException)
+    public UnhandledExceptionContext(IExecutionContext context, IResolveFieldContext? fieldContext, Exception originalException)
     {
         Context = context;
+        ExecutionOptions = context.ExecutionOptions;
         FieldContext = fieldContext;
+        OriginalException = originalException;
+        Exception = originalException;
+    }
+
+    /// <summary>
+    /// Initializes a new instance with the specified properties.
+    /// </summary>
+    public UnhandledExceptionContext(ExecutionOptions options, Exception originalException)
+    {
+        ExecutionOptions = options;
         OriginalException = originalException;
         Exception = originalException;
     }
@@ -27,6 +38,9 @@ public class UnhandledExceptionContext
     /// Also will be <see langword="null"/> between resolvers execution if <c>cancellationToken</c> is canceled.
     /// </summary>
     public IResolveFieldContext? FieldContext { get; }
+
+    /// <inheritdoc cref="IExecutionContext.ExecutionOptions"/>
+    public ExecutionOptions ExecutionOptions { get; }
 
     /// <summary>
     /// Original exception from field resolver or <see cref="DocumentExecuter"/>.

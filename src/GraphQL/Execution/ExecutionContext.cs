@@ -44,6 +44,7 @@ public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposa
         InputExtensions = context.InputExtensions;
         RequestServices = context.RequestServices;
         User = context.User;
+        ExecutionOptions = context.ExecutionOptions;
     }
 
     /// <inheritdoc/>
@@ -106,6 +107,9 @@ public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposa
 
     /// <inheritdoc/>
     public ClaimsPrincipal? User { get; set; }
+
+    /// <inheritdoc/>
+    public ExecutionOptions ExecutionOptions { get; set; }
 
     /// <inheritdoc/>
     public TElement[] Rent<TElement>(int minimumLength)

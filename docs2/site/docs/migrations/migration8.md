@@ -1139,3 +1139,61 @@ services.AddGraphQL(b => b
 ```
 
 The legacy complexity analyzer will be removed in v9.
+
+### 22. Unhandled exceptions within execution configuration delegates are now handled and wrapped
+
+Previously, unhandled exceptions within execution configuration delegates were not handled and
+would be thrown directly to the caller. For instance, if a database exception occurred within
+the delegate used to pull persisted documents, the exception would be thrown directly to the
+caller. Now, these exceptions are caught and processed through the unhandled exception handler
+delegate, which allows for logging and other processing of the exception.
+
+Example:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler(context =>
+    {
+        // this now runs when the below exception is thrown
+    })
+    .ConfigureExecution(async (options, next) => {
+        // sample exception thrown while logging the query being executed to a database
+        throw new Exception("Database exception occurred");
+
+        return await next(options);
+    })
+);
+```
+
+For this to work properly, be sure that any code liable to throw an exception is located inside
+a `Use...` or `ConfigureExecution` method, not an `Add...` or `ConfigureExecutionOptions` method,
+or else ensure that the call to `AddUnhandledExceptionHandler` is first in the chain.
+
+### 23. `IExecutionContext.ExecutionOptions` property added
+
+Custom `IExecutionContext` implementations must now implement the `ExecutionOptions` property.
+In addition, the `AddUnhandledExceptionHandler` methods that have an `ExecutionOptions` parameter
+within the delegate have been deprecated in favor of using the `IExecutionContext.ExecutionOptions`
+property.
+
+```csharp
+// v7
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler((context, options) =>
+    {
+        // code
+    })
+);
+
+// v8
+services.AddGraphQL(b => b
+    .AddSchema<MyQuery>()
+    .AddUnhandledExceptionHandler(context =>
+    {
+        var options = context.ExecutionOptions;
+        // code
+    })
+);
+```
