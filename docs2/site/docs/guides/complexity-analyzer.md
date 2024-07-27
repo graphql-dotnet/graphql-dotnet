@@ -91,7 +91,7 @@ query {                #  impact   multiplier   total impact   child multiplier 
 
 The above query will have the following complexity calculation:
 - Maximum Depth: 4 (users -> posts -> comments -> id)
-- Total Complexity: 385
+- Total Complexity: 388
 
 These values are calculated based on these facts demonstrated in the above query:
 - The `users` field requested 10 items, so the child multiplier is set to 10.

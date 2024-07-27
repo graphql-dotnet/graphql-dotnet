@@ -14,7 +14,7 @@ internal sealed class ComplexityVisitorContext : IASTVisitorContext, IDisposable
     private static Stack<FieldType>? _sharedFieldDefinitions;
     private static Stack<IGraphType>? _sharedParentTypes;
     private static Stack<GraphQLFragmentDefinition>? _sharedFragmentsProcessed;
-    public ComplexityVisitorContext(ValidationContext validationContext, ComplexityConfiguration complexityConfiguration)
+    public ComplexityVisitorContext(ValidationContext validationContext, ComplexityOptions complexityConfiguration)
     {
         ValidationContext = validationContext;
         Configuration = complexityConfiguration;
@@ -22,8 +22,8 @@ internal sealed class ComplexityVisitorContext : IASTVisitorContext, IDisposable
 
     /// <inheritdoc cref="Validation.ValidationContext"/>
     public readonly ValidationContext ValidationContext;
-    /// <inheritdoc cref="ComplexityConfiguration"/>
-    public readonly ComplexityConfiguration Configuration;
+    /// <inheritdoc cref="ComplexityOptions"/>
+    public readonly ComplexityOptions Configuration;
 
     // fragment tracking stack for circular reference detection
 

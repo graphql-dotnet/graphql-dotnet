@@ -378,7 +378,7 @@ public class GraphQLBuilderExtensionTests
     [InlineData(false, true)]
     public void AddComplexityAnalyzer(bool withAction, bool withAction2)
     {
-        var ruleInstance = new ComplexityValidationRule(new ComplexityConfiguration());
+        var ruleInstance = new ComplexityValidationRule(new ComplexityOptions());
         MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
         MockSetupRegister<IValidationRule, ComplexityValidationRule>();
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
@@ -386,14 +386,14 @@ public class GraphQLBuilderExtensionTests
         var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
         if (withAction)
         {
-            var action = MockSetupConfigure1<ComplexityConfiguration>();
+            var action = MockSetupConfigure1<ComplexityOptions>();
             _builder.AddComplexityAnalyzer(action);
         }
         else
         {
-            var action = withAction2 ? MockSetupConfigure2<ComplexityConfiguration>() : null;
+            var action = withAction2 ? MockSetupConfigure2<ComplexityOptions>() : null;
             if (!withAction2)
-                MockSetupConfigureNull<ComplexityConfiguration>();
+                MockSetupConfigureNull<ComplexityOptions>();
             _builder.AddComplexityAnalyzer(action!);
         }
         var opts = getOpts();
@@ -927,7 +927,7 @@ public class GraphQLBuilderExtensionTests
             return Task.CompletedTask;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(opts, new Exception());
+        var e = new UnhandledExceptionContext(null!, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
         o2.ShouldBe(opts);
@@ -944,7 +944,7 @@ public class GraphQLBuilderExtensionTests
             return Task.CompletedTask;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(opts, new Exception());
+        var e = new UnhandledExceptionContext(null!, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
     }
@@ -961,7 +961,7 @@ public class GraphQLBuilderExtensionTests
             e2 = e1;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(opts, new Exception());
+        var e = new UnhandledExceptionContext(null!, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
         o2.ShouldBe(opts);
@@ -974,7 +974,7 @@ public class GraphQLBuilderExtensionTests
         var execute = MockSetupConfigureExecution();
         _builder.AddUnhandledExceptionHandler(e1 => e2 = e1);
         var opts = execute();
-        var e = new UnhandledExceptionContext(opts, new Exception());
+        var e = new UnhandledExceptionContext(null!, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
     }

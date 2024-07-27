@@ -276,8 +276,8 @@ namespace GraphQL
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the graph types used by your schema and their constructors are" +
             " not trimmed by the compiler.")]
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration>? action = null) { }
-        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityConfiguration, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityOptions>? action = null) { }
+        public static GraphQL.DI.IGraphQLBuilder AddComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.ComplexityOptions, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder)
             where TDocumentExecuter :  class, GraphQL.IDocumentExecuter { }
         public static GraphQL.DI.IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this GraphQL.DI.IGraphQLBuilder builder, System.Func<System.IServiceProvider, TDocumentExecuter> documentExecuterFactory)
@@ -347,8 +347,6 @@ namespace GraphQL
             "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
-        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
-            "g this overload.")]
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TValidationRule :  class, GraphQL.Validation.IValidationRule { }
@@ -3794,9 +3792,9 @@ namespace GraphQL.Validation
 }
 namespace GraphQL.Validation.Complexity
 {
-    public class ComplexityConfiguration
+    public class ComplexityOptions
     {
-        public ComplexityConfiguration() { }
+        public ComplexityOptions() { }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "FieldImpact",
                 "ChildImpactMultiplier"})]
@@ -3806,12 +3804,21 @@ namespace GraphQL.Validation.Complexity
         public double DefaultScalarImpact { get; set; }
         public int? MaxComplexity { get; set; }
         public int? MaxDepth { get; set; }
-        public System.Func<GraphQL.Validation.ValidationContext, double, int, System.Threading.Tasks.Task>? ValidateComplexityDelegate { get; set; }
+        public System.Func<GraphQL.Validation.Complexity.ComplexityValidationContext, System.Threading.Tasks.Task>? ValidateComplexityDelegate { get; set; }
+    }
+    public class ComplexityValidationContext
+    {
+        public ComplexityValidationContext(GraphQL.Validation.ValidationContext validationContext, GraphQL.Validation.Complexity.ComplexityOptions complexityOptions, double totalImpact, int maxDepth, GraphQL.Validation.ValidationError? error) { }
+        public GraphQL.Validation.Complexity.ComplexityOptions Configuration { get; }
+        public GraphQL.Validation.ValidationError? Error { get; set; }
+        public int MaxDepth { get; }
+        public double TotalImpact { get; }
+        public GraphQL.Validation.ValidationContext ValidationContext { get; }
     }
     public struct FieldImpactContext
     {
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; }
-        public GraphQL.Validation.Complexity.ComplexityConfiguration Configuration { get; }
+        public GraphQL.Validation.Complexity.ComplexityOptions Configuration { get; }
         public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
         public GraphQL.Validation.Complexity.FieldImpactContext? Parent { get; }
@@ -4192,14 +4199,14 @@ namespace GraphQL.Validation.Rules.Custom
 {
     public class ComplexityValidationRule : GraphQL.Validation.ValidationRuleBase
     {
-        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityConfiguration complexityConfiguration) { }
-        protected GraphQL.Validation.Complexity.ComplexityConfiguration ComplexityConfiguration { get; }
+        public ComplexityValidationRule(GraphQL.Validation.Complexity.ComplexityOptions options) { }
+        protected GraphQL.Validation.Complexity.ComplexityOptions Options { get; }
         [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "TotalComplexity",
                 "MaximumDepth"})]
         protected virtual System.Threading.Tasks.ValueTask<System.ValueTuple<double, int>> CalculateComplexityAsync(GraphQL.Validation.ValidationContext context) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        protected virtual System.Threading.Tasks.Task ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
+        protected virtual System.Threading.Tasks.ValueTask ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
     }
     [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
         "d in v9.")]

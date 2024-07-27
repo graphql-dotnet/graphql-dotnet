@@ -7,9 +7,9 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity;
 
-/// <inheritdoc cref="RunAsync(ValidationContext, ComplexityConfiguration)"/>
+/// <inheritdoc cref="RunAsync(ValidationContext, ComplexityOptions)"/>
 /// <remarks>
-/// Call the <see cref="RunAsync(ValidationContext, ComplexityConfiguration)"/> method to run this visitor.
+/// Call the <see cref="RunAsync(ValidationContext, ComplexityOptions)"/> method to run this visitor.
 /// <para>
 /// This class contains a number of query validation checks. All of these checks should be handled
 /// by the default set of validation rules, and if detected, complexity analysis should be skipped.
@@ -31,7 +31,7 @@ internal sealed class ComplexityVisitor : ASTVisitor<ComplexityVisitorContext>
     /// <inheritdoc cref="ComplexityValidationRule.CalculateComplexityAsync(ValidationContext)"/>
     public static async ValueTask<(double TotalComplexity, int MaximumDepth)> RunAsync(
         ValidationContext validationContext,
-        ComplexityConfiguration complexityConfiguration)
+        ComplexityOptions complexityConfiguration)
     {
         // disposing the visitor context will stash the various empty Stack instances for later re-use
         using var context = new ComplexityVisitorContext(validationContext, complexityConfiguration);
@@ -45,7 +45,7 @@ internal sealed class ComplexityVisitor : ASTVisitor<ComplexityVisitorContext>
 
     /// <inheritdoc/>
     /// <remarks>
-    /// Called from <see cref="RunAsync(ValidationContext, ComplexityConfiguration)"/> only for the operation selected by the request.
+    /// Called from <see cref="RunAsync(ValidationContext, ComplexityOptions)"/> only for the operation selected by the request.
     /// </remarks>
     protected override ValueTask VisitOperationDefinitionAsync(GraphQLOperationDefinition operationDefinition, ComplexityVisitorContext context)
     {

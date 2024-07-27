@@ -5,7 +5,7 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Configuration parameters for a complexity analyzer.
 /// </summary>
-public class ComplexityConfiguration
+public class ComplexityOptions
 {
     /// <summary>
     /// Gets or sets the allowed maximum depth of the query.
@@ -38,9 +38,9 @@ public class ComplexityConfiguration
     /// <summary>
     /// Validates the Total Complexity (double) and Maximum Depth (int) of the query against user-defined limits, such as per-user, per-IP or throttling limits.
     /// These delegate executes only after <see cref="MaxComplexity"/> and <see cref="MaxDepth"/> have been checked and are within limits.
-    /// This delegate can also be used to log the complexity and depth of queries that pass limit checks.
+    /// This delegate can also be used to log the complexity and depth of queries that pass or fail limit checks.
     /// </summary>
-    public Func<ValidationContext, double, int, Task>? ValidateComplexityDelegate { get; set; }
+    public Func<ComplexityValidationContext, Task>? ValidateComplexityDelegate { get; set; }
 
     /// <summary>
     /// The default complexity function to use when one is not defined on the field.

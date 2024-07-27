@@ -40,8 +40,8 @@ public struct FieldImpactContext
     /// <inheritdoc cref="Validation.ValidationContext"/>
     public ValidationContext ValidationContext => VisitorContext.ValidationContext;
 
-    /// <inheritdoc cref="Complexity.ComplexityConfiguration"/>
-    public ComplexityConfiguration Configuration => VisitorContext.Configuration;
+    /// <inheritdoc cref="Complexity.ComplexityOptions"/>
+    public ComplexityOptions Configuration => VisitorContext.Configuration;
 
     /// <summary>
     /// Gets the parent field impact context.

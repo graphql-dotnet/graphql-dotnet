@@ -14,7 +14,7 @@ public class ComplexityTests
     {
         // if the defaults change, the documentation and tests for the examples provided
         // in the documentation should be updated
-        var configuration = new ComplexityConfiguration();
+        var configuration = new ComplexityOptions();
         configuration.MaxComplexity.ShouldBeNull();
         configuration.MaxDepth.ShouldBeNull();
         configuration.DefaultScalarImpact.ShouldBe(1);
@@ -242,7 +242,7 @@ public class ComplexityTests
         actual.ShouldBe((complexity, totalQueryDepth));
     }
 
-    private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs? variables = null, Action<ComplexityConfiguration>? configure = null, bool noRules = false)
+    private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs? variables = null, Action<ComplexityOptions>? configure = null, bool noRules = false)
     {
         var validationOptions = new ValidationOptions
         {
@@ -266,7 +266,7 @@ public class ComplexityTests
             Schema = schema,
             Variables = variables ?? Inputs.Empty,
         };
-        var complexityConfiguration = new ComplexityConfiguration();
+        var complexityConfiguration = new ComplexityOptions();
         configure?.Invoke(complexityConfiguration);
         return ComplexityVisitor.RunAsync(validationContext, complexityConfiguration).GetAwaiter().GetResult();
     }
