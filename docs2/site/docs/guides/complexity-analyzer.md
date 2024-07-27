@@ -114,7 +114,9 @@ multiplier used for specific fields. The default configuration assumes that list
 #### Configuring Child Impact Multiplier for Specific Fields
 
 ```csharp
-usersField.WithComplexityImpact(1, 100); // Assume the users field returns 100 items on average
+usersField.WithComplexityImpact(
+    fieldImpact: 1,
+    childImpactMultiplier: 100); // Assume the users field returns 100 items on average
 ```
 
 #### Setting a Global Default Multiplier
@@ -214,7 +216,7 @@ but you may wish to adjust this to zero if scalar fields do not require conseque
 #### Configuring Impact for Object Fields
 ```csharp
 // Set higher impact for field resolvers that require more processing time
-usersField.WithComplexityImpact(50);
+usersField.WithComplexityImpact(fieldImpact: 50);
 ```
 
 #### Setting a Custom Default Object Impact
