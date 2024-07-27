@@ -26,12 +26,16 @@ public class PossibleFragmentSpreads : ValidationRuleBase
     private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
         new MatchingNodeVisitor<GraphQLInlineFragment>((node, context) =>
         {
-            var fragType = context.TypeInfo.GetLastType();
-            var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
-
-            if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
+            // without a type condition, inline fragment spreads are of the same type as the parent, so it's always valid
+            if (node.TypeCondition != null)
             {
-                context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
+                var fragType = context.TypeInfo.GetLastType();
+                var parentType = context.TypeInfo.GetParentType()?.GetNamedType();
+
+                if (fragType != null && parentType != null && !GraphQLExtensions.DoTypesOverlap(fragType, parentType))
+                {
+                    context.ReportError(new PossibleFragmentSpreadsError(context, node, parentType, fragType));
+                }
             }
         }),
 
