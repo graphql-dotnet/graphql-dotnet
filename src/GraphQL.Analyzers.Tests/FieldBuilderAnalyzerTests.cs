@@ -17,7 +17,7 @@ public class FieldBuilderAnalyzerTests
     [Fact]
     public async Task AllArgumentsProvided_NoNamedArguments_FixProvided()
     {
-        const string source = 
+        const string source =
             """
             using GraphQL.Types;
 
