@@ -13,6 +13,7 @@ using GraphQL.Validation.Rules.Custom;
 using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using ExecutionContext = GraphQL.Execution.ExecutionContext;
 using ServiceLifetime = GraphQL.DI.ServiceLifetime;
 
 namespace GraphQL.Tests.DI;
@@ -927,7 +928,7 @@ public class GraphQLBuilderExtensionTests
             return Task.CompletedTask;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(null!, null, new Exception());
+        var e = new UnhandledExceptionContext(new ExecutionContext() { ExecutionOptions = opts }, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
         o2.ShouldBe(opts);
@@ -944,7 +945,7 @@ public class GraphQLBuilderExtensionTests
             return Task.CompletedTask;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(null!, null, new Exception());
+        var e = new UnhandledExceptionContext(new ExecutionContext() { ExecutionOptions = opts }, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
     }
@@ -961,7 +962,7 @@ public class GraphQLBuilderExtensionTests
             e2 = e1;
         });
         var opts = execute();
-        var e = new UnhandledExceptionContext(null!, null, new Exception());
+        var e = new UnhandledExceptionContext(new ExecutionContext() { ExecutionOptions = opts }, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
         o2.ShouldBe(opts);
@@ -974,7 +975,7 @@ public class GraphQLBuilderExtensionTests
         var execute = MockSetupConfigureExecution();
         _builder.AddUnhandledExceptionHandler(e1 => e2 = e1);
         var opts = execute();
-        var e = new UnhandledExceptionContext(null!, null, new Exception());
+        var e = new UnhandledExceptionContext(new ExecutionContext() { ExecutionOptions = opts }, null, new Exception());
         await opts.UnhandledExceptionDelegate(e);
         e2.ShouldBe(e);
     }
