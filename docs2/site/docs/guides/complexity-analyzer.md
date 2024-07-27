@@ -298,6 +298,12 @@ complexityConfig.ValidateComplexityDelegate = async (context) =>
     // Throttle the request based on the complexity, subtracting the complexity from the user's limit
     var (allow, remaining) = await throttlingService.ThrottleAsync(key, context.TotalComplexity);
 
+    // Get the current HttpContext
+    var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext!;
+
+    // Add a header indicating the remaining throttling limit
+    httpContext.Response.Headers["X-RateLimit-Remaining"] = remaining.ToString();
+
     // Report an error if the user has exceeded their limit
     if (!allow)
     {
