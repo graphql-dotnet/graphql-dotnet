@@ -43,7 +43,7 @@ services.AddGraphQL(b => b
 | MaxComplexity                   | Limits the total complexity of a query.                        | null          |
 | DefaultScalarImpact             | Specifies the default complexity impact for scalar fields.     | 1             |
 | DefaultObjectImpact             | Specifies the default complexity impact for object fields.     | 1             |
-| DefaultListImpactMultiplier     | Specifies the average number of items returned by list fields. | 5             |
+| DefaultListImpactMultiplier     | Specifies the average number of items returned by list fields. | 20            |
 | ValidateComplexityDelegate      | Allows for custom validation and logging based on query complexity and depth. | null |
 | DefaultComplexityImpactDelegate | Provides a default mechanism to calculate field impact and child impact multipliers. | see below |
 
@@ -67,23 +67,23 @@ The below sample assumes that the complexity analyzer is configured with the def
 query {                #  impact   multiplier   total impact   child multiplier   depth
   users(first: 10) {   #     1          1             1                 10          1
     id                 #     1         10            11                             2
-    posts {            #     1         10            21                  5          2
-      id               #     1         50            71                             3
-      comments {       #     1         50           121                  5          3
-        id             #     1        250           371                             4
+    posts {            #     1         10            21                 20          2
+      id               #     1        200           221                             3
+      comments {       #     1        200           421                 20          3
+        id             #     1       4000          4421                             4
       }                #
     }                  #
   }                    #
-  products(id: "5") {  #     1          1           372                  1          1
-    id                 #     1          1           373                             2
-    name               #     1          1           374                             2
-    photos {           #     1          1           375                  5          2
-      id               #     1          5           380                             3
-      name             #     1          5           385                             3
+  products(id: "5") {  #     1          1          4422                  1          1
+    id                 #     1          1          4423                             2
+    name               #     1          1          4424                             2
+    photos {           #     1          1          4425                 20          2
+      id               #     1         20          4445                             3
+      name             #     1         20          4465                             3
     }                  #
-    category {         #     1          1           386                  1          2
-      id               #     1          1           387                             3
-      name             #     1          1           388                             3
+    category {         #     1          1          4466                  1          2
+      id               #     1          1          4467                             3
+      name             #     1          1          4468                             3
     }
   }
 }
@@ -91,14 +91,14 @@ query {                #  impact   multiplier   total impact   child multiplier 
 
 The above query will have the following complexity calculation:
 - Maximum Depth: 4 (users -> posts -> comments -> id)
-- Total Complexity: 388
+- Total Complexity: 4468
 
 These values are calculated based on these facts demonstrated in the above query:
 - The `users` field requested 10 items, so the child multiplier is set to 10.
-- The `posts` field is a list field and uses the default child multiplier of 5.
-- The `comments` field is a list field and uses the default child multiplier of 5.
+- The `posts` field is a list field and uses the default child multiplier of 20.
+- The `comments` field is a list field and uses the default child multiplier of 20.
 - The `products` field has an `id` argument, so the child multiplier is set to 1.
-- The `photos` field is a list field and uses the default child multiplier of 5.
+- The `photos` field is a list field and uses the default child multiplier of 20.
 - The `category` field is not a list field and so does not use the default child multiplier.
 - Other fields are scalar fields and use the default scalar impact of 1, multiplied by the
   multiplier calculated for that level of the graph.
@@ -184,17 +184,22 @@ The above query will have the following complexity calculation:
 
 Please note that the maximum depth calculation will still include introspection fields.
 
-To ignore introspection fields from the maximum depth calculation, you can set the `MaxDepth` property to `null`
-and provide your own validation of the calculated depth:
+To ignore introspection fields from the maximum depth calculation, you can write a custom
+complexity validation delegate to ignore depth limits for introspection requests:
 
 ```csharp
-complexityConfig.MaxDepth = null;
-complexityConfig.ValidateComplexityDelegate = async (context, complexity, depth) =>
+complexityConfig.ValidateComplexityDelegate = async (context) =>
 {
-    // for non-introspection queries, validate the depth
-    if (complexity > 0 && depth > 10)
+    if (IsIntrospectionRequest(context.ValidationContext))
     {
-        context.ReportError(new ExecutionError("Query depth is too high."));
+        context.Error = null; // ignore complexity errors
+    }
+
+    static bool IsIntrospectionRequest(ValidationContext validationContext)
+    {
+        return validationContext.Document.Definitions.OfType<GraphQLOperationDefinition>().All(
+            op => op.Operation == OperationType.Query && op.SelectionSet.Selections.All(
+                node => node is GraphQLField field && (field.Name.Value == "__schema" || field.Name.Value == "__type")));
     }
 };
 ```
@@ -222,12 +227,12 @@ complexityConfig.DefaultObjectImpact = 20;
 
 ```graphql
 query {            #  impact   multiplier   total impact   child multiplier   depth
-  users {          #    50          1            50                  5          1
-    id             #     1          5            55                             2
-    posts {        #    20          5           155                  5          2
-      id           #     1         25           180                             3
-      comments {   #    20         25           680                  5          3
-        id         #     1        125           805                             4
+  users {          #    50          1            50                 20          1
+    id             #     1         20            70                             2
+    posts {        #    20         20           470                 20          2
+      id           #     1        400           870                             3
+      comments {   #    20        400          8870                 20          3
+        id         #     1       8000         16870                             4
       }
     }
   }
@@ -236,36 +241,22 @@ query {            #  impact   multiplier   total impact   child multiplier   de
 
 The above query will have the following complexity calculation:
 - Maximum Depth: 4 (users -> posts -> comments -> id)
-- Total Complexity: 805
+- Total Complexity: 16870
 
 ### 4. Logging Complexity Results
 
 In addition to validation, the `ValidateComplexityDelegate` property allows you to log complexity results
-for monitoring or analysis. Please note that this delegate runs after the maximum depth and complexity checks,
-so it cannot be used to log queries that fail these checks.
+for monitoring or analysis.
 
 ```csharp
-complexityConfig.ValidateComplexityDelegate = async (context, complexity, depth) =>
+complexityConfig.ValidateComplexityDelegate = async (context) =>
 {
     // RequestServices may be used to access scoped services within the DI container
-    var logger = context.RequestServices!.GetRequiredService<ILogger<MySchema>>();
-    logger.LogInformation($"Query Complexity: {complexity}, Depth: {depth}");
-};
-```
-
-To log failed complexity checks, set the `MaxDepth` and `MaxComplexity` properties to `null` and provide
-your own validation delegate:
-
-```csharp
-complexityConfig.MaxDepth = null;
-complexityConfig.MaxComplexity = null;
-complexityConfig.ValidateComplexityDelegate = async (context, complexity, depth) =>
-{
-    if (complexity > 1000 || depth > 10)
-    {
-        var logger = context.RequestServices!.GetRequiredService<ILogger<MySchema>>();
-        logger.LogWarning($"Query Complexity: {complexity}, Depth: {depth}");
-    }
+    var logger = context.ValidationContext.RequestServices!.GetRequiredService<ILogger<MySchema>>();
+    if (context.Error != null) // failed complexity limits
+        logger.LogWarning($"Query Complexity: {context.TotalComplexity}, Depth: {context.MaxDepth}");
+    else
+        logger.LogInformation($"Query Complexity: {context.TotalComplexity}, Depth: {context.MaxDepth}");
 };
 ```
 
@@ -276,8 +267,14 @@ complexity analyzer with a custom validation delegate. As noted above, `MaxCompl
 if set, are still enforced before this delegate runs.
 
 ```csharp
-complexityConfig.ValidateComplexityDelegate = async (context, complexity, depth) =>
+complexityConfig.ValidateComplexityDelegate = async (context) =>
 {
+    // Skip throttling if the query has already exceeded complexity limits
+    if (context.Error != null)
+        return;
+
+    var services = context.ValidationContext.RequestServices!;
+
     // Get the authenticated user, or use the IP address if unauthenticated
     var user = context.User;
     string key;
@@ -289,20 +286,20 @@ complexityConfig.ValidateComplexityDelegate = async (context, complexity, depth)
     else
     {
         // For unauthenticated users, use the IP address
-        var httpContext = context.RequestServices!.GetRequiredService<IHttpContextAccessor>().HttpContext!;
+        var httpContext = services.GetRequiredService<IHttpContextAccessor>().HttpContext!;
         key = "ip:" + httpContext.Connection.RemoteIpAddress.ToString();
     }
 
     // Pull your throttling service (e.g. Polly) from the DI container
-    var throttlingService = context.RequestServices!.GetRequiredService<IThrottlingService>();
+    var throttlingService = services.GetRequiredService<IThrottlingService>();
 
     // Throttle the request based on the complexity, subtracting the complexity from the user's limit
-    var (allow, remaining) = await throttlingService.ThrottleAsync(key, complexity);
+    var (allow, remaining) = await throttlingService.ThrottleAsync(key, context.TotalComplexity);
 
     // Report an error if the user has exceeded their limit
     if (!allow)
     {
-        context.ReportError(new ExecutionError($"Query complexity of {complexity} exceeded throttling limit. Remaining: {remaining}"));
+        context.Error = new ValidationError($"Query complexity of {context.TotalComplexity} exceeded throttling limit. Remaining: {remaining}");
     }
 };
 ```

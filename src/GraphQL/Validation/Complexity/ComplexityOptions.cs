@@ -33,7 +33,7 @@ public class ComplexityOptions
     /// Default child multiplier to use for list fields. Should represent the average number of rows/objects returned by each field.
     /// Defaults to 5.
     /// </summary>
-    public double DefaultListImpactMultiplier { get; set; } = 5;
+    public double DefaultListImpactMultiplier { get; set; } = 20;
 
     /// <summary>
     /// Validates the Total Complexity (double) and Maximum Depth (int) of the query against user-defined limits, such as per-user, per-IP or throttling limits.

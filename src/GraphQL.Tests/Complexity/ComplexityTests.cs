@@ -19,7 +19,7 @@ public class ComplexityTests
         configuration.MaxDepth.ShouldBeNull();
         configuration.DefaultScalarImpact.ShouldBe(1);
         configuration.DefaultObjectImpact.ShouldBe(1);
-        configuration.DefaultListImpactMultiplier.ShouldBe(5);
+        configuration.DefaultListImpactMultiplier.ShouldBe(20);
         configuration.ValidateComplexityDelegate.ShouldBeNull();
         configuration.DefaultComplexityImpactDelegate.ShouldNotBeNull();
     }
@@ -214,7 +214,7 @@ public class ComplexityTests
           users(first: 10) { id posts { id comments { id } } }
           products(id: "5") { id name photos { id name } category { id name } }
         }
-        """, null, 1, 1, 5, 388, 4)]
+        """, null, 1, 1, 20, 4468, 4)]
     [InlineData(201, """
         type Query { users: [User] @complexity(value: 1, children: 100) }
         type User { id: ID posts: [Post] }
@@ -226,7 +226,7 @@ public class ComplexityTests
         type User { id: ID posts: [Post] }
         type Post { id: ID comments: [Comment] }
         type Comment { id: ID }
-        """, "query { users { id posts { id comments { id } } } }", null, 1, 20, 5, 805, 4)]
+        """, "query { users { id posts { id comments { id } } } }", null, 1, 20, 20, 16870, 4)]
     public void TestComplexityCases(int idx, string sdl, string query, string? variables, double scalarImpact, double objectImpact, double listMultiplier, double complexity, int totalQueryDepth)
     {
         _ = idx;
