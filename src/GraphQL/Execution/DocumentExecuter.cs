@@ -227,8 +227,8 @@ public class DocumentExecuter : IDocumentExecuter
         }
         catch (OperationCanceledException) when (originalCancellationToken.IsCancellationRequested)
         {
-            // Re-throw the original cancellation exception when the client disconnects or
-            // the CancellationToken is canceled
+            // Re-throw the original cancellation exception when the the original CancellationToken is canceled
+            // (e.g. the client disconnects)
             throw;
         }
         catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
@@ -367,10 +367,10 @@ public class DocumentExecuter : IDocumentExecuter
 
     /// <inheritdoc cref="TimeoutException"/>
     /// <remarks>
-    /// In order that it be known that this exception is only thrown when the operation is canceled due to a timeout
-    /// within <see cref="BuildExecutionDelegate(IEnumerable{IConfigureExecution})"/>, this class is private and only
-    /// instantiated within <see cref="CoreExecuteAsync(ExecutionOptions)"/>. Callers should look for <see cref="TimeoutException"/>
-    /// just like any other .NET timeout exception as this class derives from it.
+    /// This class exists so that <see cref="BuildExecutionDelegate(IEnumerable{IConfigureExecution})"/> can identify and
+    /// rethrow timeout exceptions thrown from <see cref="CoreExecuteAsync(ExecutionOptions)"/>. As such, this class is
+    /// private and not exposed as part of the public API. Callers should catch <see cref="TimeoutException"/>
+    /// just like any other .NET timeout exception, as this class derives from it.
     /// </remarks>
     private class GraphQLTimeoutException : TimeoutException;
 }

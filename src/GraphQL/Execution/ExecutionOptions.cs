@@ -85,9 +85,7 @@ public class ExecutionOptions : IProvideUserContext
     private TimeSpan _timeout = System.Threading.Timeout.InfiniteTimeSpan;
     /// <summary>
     /// Gets or sets the maximum time allowed for the execution of the GraphQL request before timing out.
-    /// Use <see cref="Timeout.InfiniteTimeSpan"/> for no timeout. Note that if a timeout occurs, the
-    /// request will be cancelled and an <see cref="ExecutionResult"/> will be returned with a message
-    /// indicating that the operation timed out, rather than throwing an <see cref="TimeoutException"/>.
+    /// The default value is <see cref="Timeout.InfiniteTimeSpan"/> which indicates no timeout.
     /// </summary>
     public TimeSpan Timeout
     {
