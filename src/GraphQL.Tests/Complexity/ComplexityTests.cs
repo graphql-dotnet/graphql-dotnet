@@ -297,7 +297,11 @@ public class ComplexityTests
         public string Name => "test";
         [Complexity(typeof(MyFieldAnalyzer))]
         public int Age => 10;
+#if !NETFRAMEWORK
         [Complexity<MyFieldAnalyzer>]
+#else
+        [Complexity(typeof(MyFieldAnalyzer))]
+#endif
         public int Weight => 150;
     }
 
