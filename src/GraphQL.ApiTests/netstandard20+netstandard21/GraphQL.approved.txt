@@ -3755,9 +3755,9 @@ namespace GraphQL.Validation.Complexity
     }
     public struct FieldComplexityResult
     {
-        public double ChildImpactMultiplier;
-        public double FieldImpact;
         public FieldComplexityResult(double fieldImpact, double childImpactMultiplier) { }
+        public double ChildImpactMultiplier { get; set; }
+        public double FieldImpact { get; set; }
     }
     public struct FieldImpactContext
     {
