@@ -325,7 +325,7 @@ https://graphql-dotnet.github.io/docs/migrations/migration8/#24-execution-timeou
 ### Defining Custom Complexity Calculations
 
 To set custom complexity calculations for specific fields, you can use the `WithComplexityImpact` overload
-that defines a calculation delegate as demonstrated in the following eample:
+that defines a calculation delegate as demonstrated in the following example:
 
 ```csharp
 Field<ListGraphType<ProductGraphType>>("products")
