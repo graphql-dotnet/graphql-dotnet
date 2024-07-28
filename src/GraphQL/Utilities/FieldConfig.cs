@@ -1,12 +1,13 @@
 using GraphQL.Reflection;
 using GraphQL.Resolvers;
+using GraphQL.Types;
 
 namespace GraphQL.Utilities;
 
 /// <summary>
 /// Provides configuration for specific field of GraphType when building schema via <see cref="SchemaBuilder"/>.
 /// </summary>
-public class FieldConfig : MetadataProvider
+public class FieldConfig : MetadataProvider, IFieldMetadataWriter
 {
     private readonly LightweightCache<string, ArgumentConfig> _arguments =
        new(f => new ArgumentConfig(f));
