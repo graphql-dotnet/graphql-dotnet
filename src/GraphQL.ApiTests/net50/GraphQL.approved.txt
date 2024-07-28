@@ -885,7 +885,6 @@ namespace GraphQL.Attributes
         where T :  class, GraphQL.Validation.Complexity.IFieldComplexityAnalyzer, new ()
     {
         public ComplexityAttribute() { }
-        [GraphQL.Attributes.Complexity(1D, 100D)]
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }

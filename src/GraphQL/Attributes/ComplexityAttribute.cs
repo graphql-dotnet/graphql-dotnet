@@ -108,7 +108,6 @@ public class ComplexityAttribute<T> : GraphQLAttribute
     private readonly Func<FieldImpactContext, FieldComplexityResult> _func = new T().Analyze;
 
     /// <inheritdoc/>
-    [Complexity(fieldImpact: 1, childImpactMultiplier: 100)]
     public override void Modify(FieldConfig field)
         => field.WithComplexityImpact(_func);
 
