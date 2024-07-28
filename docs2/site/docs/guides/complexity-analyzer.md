@@ -314,38 +314,8 @@ complexityConfig.ValidateComplexityDelegate = async (context) =>
 
 ### 6. Throttling Users Based on Execution Time
 
-While the complexity analyzer does not directly measure execution time, you can write the following code
-to control the maximum execution time of a query:
+While the complexity analyzer does not directly measure execution time, you can use
+`ExecutionOptions.Timeout` / `WithTimeout` to control the maximum execution time of a query.
+See the following documentation for more information:
 
-```csharp
-services.AddGraphQL(b => b
-    .ConfigureExecution(async (options, next) =>
-    {
-        using var cts1 = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        using var cts2 = CancellationTokenSource.CreateLinkedTokenSource(options.CancellationToken, cts1.Token);
-        var oldToken = options.CancellationToken;
-        try
-        {
-            options.CancellationToken = cts2.Token;
-            await next(options).ConfigureAwait(false);
-        }
-        catch (OperationCanceledException) when (cts1.Token.IsCancellationRequested) // when timeout is hit
-        {
-            return new ExecutionResult
-            {
-                Errors = new ExecutionErrors
-                {
-                    new ExecutionError("Operation timed out")
-                    {
-                        Code = "OPERATION_TIMED_OUT"
-                    }
-                }
-            };
-        }
-        finally
-        {
-            options.CancellationToken = oldToken;
-        }
-    })
-);
-```
+https://graphql-dotnet.github.io/docs/migrations/migration8/#24-execution-timeout-support
