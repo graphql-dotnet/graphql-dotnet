@@ -12,4 +12,5 @@ public static class DiagnosticIds
     public const string DO_NOT_USE_OBSOLETE_ARGUMENT_METHOD = "GQL008";
     public const string USE_ASYNC_RESOLVER = "GQL009";
     public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = "GQL011";
+    public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = "GQL015";
 }

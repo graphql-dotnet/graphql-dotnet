@@ -21,6 +21,15 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.DO_NOT_USE_OBSOLETE_FIELD_METHODS);
 
+    public static readonly DiagnosticDescriptor CantInferFieldNameFromExpression = new(
+        id: DiagnosticIds.CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION,
+        title: "Can't infer a Field name from expression",
+        messageFormat: "Can't infer a Field name from expression: '{0}'",
+        category: DiagnosticCategories.USAGE,
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        helpLinkUri: HelpLinks.CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION);
+
     private static readonly HashSet<string> _supportedNames =
     [
         Constants.MethodNames.Field,
@@ -31,7 +40,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
     ];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DoNotUseObsoleteFieldMethods);
+        ImmutableArray.Create(DoNotUseObsoleteFieldMethods, CantInferFieldNameFromExpression);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -63,7 +72,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         AnalyzeExpressionSyntax(context, identifierSyntax);
     }
 
-    private void AnalyzeExpressionSyntax(SyntaxNodeAnalysisContext context, SimpleNameSyntax genericNameSyntax)
+    private static void AnalyzeExpressionSyntax(SyntaxNodeAnalysisContext context, SimpleNameSyntax genericNameSyntax)
     {
         string name = genericNameSyntax.Identifier.Text;
         if (!_supportedNames.Contains(name))
@@ -101,7 +110,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 
         ReportFieldTypeDiagnostic(
             context,
-            fieldInvocation,
+            fieldInvocation.GetLocation(),
             DoNotUseObsoleteFieldMethods,
             isAsyncField: name.EndsWith("Async"),
             isDelegate: name == Constants.MethodNames.FieldDelegate);
@@ -126,6 +135,20 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
+        if (expressionArg.Expression is SimpleLambdaExpressionSyntax { Body: not MemberAccessExpressionSyntax })
+        {
+            var nameArg = GetArgument(Constants.ArgumentNames.Name);
+            if (nameArg == null)
+            {
+                ReportFieldTypeDiagnostic(
+                    context,
+                    expressionArg.GetLocation(),
+                    CantInferFieldNameFromExpression,
+                    isExpression: true,
+                    messageArgs: expressionArg.Expression.ToString());
+            }
+        }
+
         var typeArgument = GetArgument(Constants.ArgumentNames.Type);
         if (typeArgument == null)
         {
@@ -138,7 +161,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             // of the 'nullable' because 'type' is not nullable in the new API
             ReportFieldTypeDiagnostic(
                 context,
-                fieldInvocation,
+                fieldInvocation.GetLocation(),
                 DoNotUseObsoleteFieldMethods,
                 isExpression: true);
 
@@ -151,7 +174,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             // both 'type' and 'nullable' are defined
             ReportFieldTypeDiagnostic(
                 context,
-                fieldInvocation,
+                fieldInvocation.GetLocation(),
                 DoNotUseObsoleteFieldMethods,
                 isExpression: true);
         }
@@ -162,11 +185,12 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 
     private static void ReportFieldTypeDiagnostic(
         SyntaxNodeAnalysisContext context,
-        InvocationExpressionSyntax invocationExpressionSyntax,
+        Location location,
         DiagnosticDescriptor diagnosticDescriptor,
         bool isAsyncField = false,
         bool isDelegate = false,
-        bool isExpression = false)
+        bool isExpression = false,
+        params object?[]? messageArgs)
     {
         var props = ImmutableDictionary<string, string?>.Empty;
 
@@ -185,8 +209,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             props = props.Add(Constants.AnalyzerProperties.IsExpression, "true");
         }
 
-        var location = invocationExpressionSyntax.GetLocation();
-        var diagnostic = Diagnostic.Create(diagnosticDescriptor, location, properties: props);
+        var diagnostic = Diagnostic.Create(diagnosticDescriptor, location, props, messageArgs);
         context.ReportDiagnostic(diagnostic);
     }
 }

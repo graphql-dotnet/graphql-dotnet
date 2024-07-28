@@ -13,4 +13,5 @@ public static class HelpLinks
     public const string DO_NOT_USE_OBSOLETE_ARGUMENT_METHOD = $"{DOCS_URL}/gql008";
     public const string USE_ASYNC_RESOLVER = $"{DOCS_URL}/gql009";
     public const string MUST_NOT_BE_CONVERTIBLE_TO_GRAPH_TYPE = $"{DOCS_URL}/gql011";
+    public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = $"{DOCS_URL}/gql015";
 }
