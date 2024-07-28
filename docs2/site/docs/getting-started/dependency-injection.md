@@ -103,6 +103,7 @@ A list of the available extension methods is below:
 | `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 | `UsePersistedDocuments` | Registers the persisted document handler and configures its options | |
 | `UseTelemetry`          | Creates telemetry events based on the System.Diagnostics.Activity API, primarily for use with OpenTelemetry | .NET 5+ |
+| `WithTimeout`           | Configures the execution timeout | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered
 as transients so that they will match the schema lifetime. So with a singleton schema, all services are effectively singletons.

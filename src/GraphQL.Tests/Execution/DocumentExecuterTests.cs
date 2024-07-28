@@ -1,5 +1,6 @@
 using GraphQL.DI;
 using GraphQL.Execution;
+using GraphQL.SystemTextJson;
 using GraphQL.Types;
 using GraphQL.Validation;
 using Microsoft.Extensions.DependencyInjection;
@@ -325,6 +326,122 @@ public class DocumentExecuterTests
             }
             ran.ShouldBeTrue();
         }
+    }
+
+    [Fact]
+    public async Task Timeout_Throws()
+    {
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("test")
+            .ResolveAsync(async context =>
+            {
+                // note that it is possible that the execution strategy or other code
+                // cancels execution before hitting this code
+                context.CancellationToken.CanBeCanceled.ShouldBeTrue();
+                await Task.Delay(10000, context.CancellationToken);
+                return "test";
+            });
+        var schema = new Schema() { Query = query };
+        var de = new DocumentExecuter();
+        await de.ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = "{test}";
+            o.Timeout = TimeSpan.FromMilliseconds(100);
+            o.TimeoutAction = TimeoutAction.ThrowTimeoutException;
+        }).ShouldThrowAsync<TimeoutException>();
+    }
+
+    [Fact]
+    public async Task Timeout_Returns()
+    {
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("test")
+            .ResolveAsync(async context =>
+            {
+                // note that it is possible that the execution strategy or other code
+                // cancels execution before hitting this code
+                context.CancellationToken.CanBeCanceled.ShouldBeTrue();
+                await Task.Delay(10000, context.CancellationToken);
+                return "test";
+            });
+        var schema = new Schema() { Query = query };
+        var de = new DocumentExecuter();
+        var ret = await de.ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = "{test}";
+            o.Timeout = TimeSpan.FromMilliseconds(100);
+            o.TimeoutAction = TimeoutAction.ReturnTimeoutError;
+        });
+        ret.Executed.ShouldBeFalse();
+        ret.Data.ShouldBeNull();
+        ret.Errors.ShouldHaveSingleItem().ShouldBeOfType<TimeoutError>();
+        // additionally verify the message, code, codes, etc
+        var result = new GraphQLSerializer().Serialize(ret);
+        result.ShouldBeCrossPlatJson("""
+            {"errors":[{"message":"The operation has timed out.","extensions":{"code":"TIMEOUT","codes":["TIMEOUT"]}}]}
+            """);
+    }
+
+    [Fact]
+    public async Task Timeout_Infinite_NoUnderlyingToken()
+    {
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("test")
+            .Resolve(context =>
+            {
+                context.CancellationToken.CanBeCanceled.ShouldBeFalse();
+                return "test";
+            });
+        var schema = new Schema() { Query = query };
+        var de = new DocumentExecuter();
+        var ret = await de.ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = "{test}";
+            o.Timeout.ShouldBe(Timeout.InfiniteTimeSpan);
+        });
+        ret.Executed.ShouldBeTrue();
+        ret.Data.ShouldNotBeNull();
+        ret.Errors.ShouldBeNull();
+        var result = new GraphQLSerializer().Serialize(ret);
+        result.ShouldBeCrossPlatJson("""
+            {"data":{"test":"test"}}
+            """);
+    }
+
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(false, false)]
+    public async Task Timeout_Infinite_PassThrough(bool rethrowTimeout, bool withTimeout)
+    {
+        using var cts = new CancellationTokenSource();
+        var query = new ObjectGraphType();
+        query.Field<StringGraphType>("test")
+            .ResolveAsync(async context =>
+            {
+                context.CancellationToken.CanBeCanceled.ShouldBeTrue();
+                cts.CancelAfter(100); // ensure asynchronous cancellation by using CancelAfter
+                await Task.Delay(10000, context.CancellationToken);
+                return "test";
+            });
+        var schema = new Schema() { Query = query };
+        var de = new DocumentExecuter();
+        var task = de.ExecuteAsync(o =>
+        {
+            o.Schema = schema;
+            o.Query = "{test}";
+            o.Timeout.ShouldBe(Timeout.InfiniteTimeSpan);
+            if (withTimeout)
+                o.Timeout = TimeSpan.FromSeconds(10);
+            o.TimeoutAction = rethrowTimeout ? TimeoutAction.ThrowTimeoutException : TimeoutAction.ReturnTimeoutError;
+            o.CancellationToken = cts.Token;
+        });
+        // verify that OCE is rethrown regardless of TimeoutAction
+        await task.ShouldThrowAsync<OperationCanceledException>();
     }
 
     private class MyExecutionError : ExecutionError

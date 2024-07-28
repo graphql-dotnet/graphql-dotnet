@@ -153,6 +153,8 @@ namespace GraphQL
         public object? Root { get; set; }
         public GraphQL.Types.ISchema? Schema { get; set; }
         public bool ThrowOnUnhandledException { get; set; }
+        public System.TimeSpan Timeout { get; set; }
+        public GraphQL.Execution.TimeoutAction TimeoutAction { get; set; }
         public System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> UnhandledExceptionDelegate { get; set; }
         public System.Security.Claims.ClaimsPrincipal? User { get; set; }
         public System.Collections.Generic.IDictionary<string, object?> UserContext { get; set; }
@@ -390,6 +392,10 @@ namespace GraphQL
             where TLoader :  class, GraphQL.PersistedDocuments.IPersistedDocumentLoader { }
         public static GraphQL.IConfigureAutoSchema WithMutation<TMutationClrType>(this GraphQL.IConfigureAutoSchema builder) { }
         public static GraphQL.IConfigureAutoSchema WithSubscription<TSubscriptionClrType>(this GraphQL.IConfigureAutoSchema builder) { }
+        public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout) { }
+        public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout, GraphQL.Execution.TimeoutAction timeoutAction) { }
+        public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout, System.Func<GraphQL.ExecutionOptions, GraphQL.ExecutionResult> timeoutDelegate) { }
+        public static GraphQL.DI.IGraphQLBuilder WithTimeout(this GraphQL.DI.IGraphQLBuilder builder, System.TimeSpan timeout, System.Func<GraphQL.ExecutionOptions, System.Threading.Tasks.Task<GraphQL.ExecutionResult>> timeoutDelegate) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Constructor, AllowMultiple=false)]
     public class GraphQLConstructorAttribute : System.Attribute
@@ -1473,6 +1479,16 @@ namespace GraphQL.Execution
     public class SyntaxError : GraphQL.Execution.DocumentError
     {
         public SyntaxError(GraphQLParser.Exceptions.GraphQLSyntaxErrorException ex) { }
+    }
+    public enum TimeoutAction
+    {
+        ReturnTimeoutError = 0,
+        ThrowTimeoutException = 1,
+    }
+    public class TimeoutError : GraphQL.ExecutionError
+    {
+        public TimeoutError() { }
+        public TimeoutError(string message, System.Exception? innerException = null) { }
     }
     [System.Serializable]
     public class UnhandledError : GraphQL.ExecutionError
