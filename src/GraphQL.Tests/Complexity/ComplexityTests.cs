@@ -242,6 +242,30 @@ public class ComplexityTests
         actual.ShouldBe((complexity, totalQueryDepth));
     }
 
+    [Fact]
+    public void CustomCalculation()
+    {
+        var product = new ObjectGraphType() { Name = "Product" };
+        product.Field<IdGraphType>("id");
+        product.Field<StringGraphType>("name");
+        var query = new ObjectGraphType() { Name = "Query" };
+        query.Field("products", new ListGraphType(product))
+            .Argument<IntGraphType>("offset")
+            .Argument<IntGraphType>("limit")
+            .WithComplexityImpact(context =>
+            {
+                var fieldImpact = 1;
+                var childImpactModifier = context.GetArgument<int>("limit", 20);
+                return (fieldImpact, childImpactModifier);
+            });
+        var schema = new Schema { Query = query };
+        var queryText = "{ products(offset: 10, limit: 5) { id name } }";
+        var document = GraphQLParser.Parser.Parse(queryText);
+        var result = Analyze(document, schema);
+        result.TotalComplexity.ShouldBe(11); // 1 for products + (1*5) for id + (1*5) for name
+        result.MaxDepth.ShouldBe(2);
+    }
+
     private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs? variables = null, Action<ComplexityOptions>? configure = null, bool noRules = false)
     {
         var validationOptions = new ValidationOptions

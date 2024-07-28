@@ -53,7 +53,7 @@ public class ComplexityOptions
     /// <summary>
     /// The default complexity function.
     /// </summary>
-    private static (double, double) DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
+    private static (double FieldImapct, double ChildImpactMultiplier) DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
     {
         // unwrap any list types and calculate the child impact multiplier
         // multiplier = DefaultListImpactMultiplier ^ (number of list types) -- e.g. 1 for non-list fields, 5 for list fields, 25 for lists of list fields, etc.

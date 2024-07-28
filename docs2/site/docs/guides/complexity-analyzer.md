@@ -319,3 +319,22 @@ While the complexity analyzer does not directly measure execution time, you can 
 See the following documentation for more information:
 
 https://graphql-dotnet.github.io/docs/migrations/migration8/#24-execution-timeout-support
+
+## Advanced configurations
+
+### Defining Custom Complexity Calculations
+
+To set custom complexity calculations for specific fields, you can use the `WithComplexityImpact` overload
+that defines a calculation delegate as demonstrated in the following eample:
+
+```csharp
+Field<ListGraphType<ProductGraphType>>("products")
+    .Argument<IntGraphType>("offset")
+    .Argument<IntGraphType>("limit")
+    .WithComplexityImpact(context =>
+    {
+        var fieldImpact = 1;
+        var childImpactModifier = context.GetArgument<int>("limit", 20); // use 20 if unspecified
+        return (fieldImpact, childImpactModifier);
+    });
+```
