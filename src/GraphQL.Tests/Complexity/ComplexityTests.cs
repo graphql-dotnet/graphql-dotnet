@@ -1,9 +1,10 @@
+using GraphQL.Attributes;
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Complexity;
 using GraphQLParser.AST;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Complexity;
 
@@ -266,6 +267,45 @@ public class ComplexityTests
         result.MaxDepth.ShouldBe(2);
     }
 
+    [Fact]
+    public void Attributes()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<MyQuery>());
+        using var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var queryText = "{ users { id name age weight } }";
+        var document = GraphQLParser.Parser.Parse(queryText);
+        var result = Analyze(document, schema);
+        result.TotalComplexity.ShouldBe(98);
+        result.MaxDepth.ShouldBe(2);
+    }
+
+    private class MyQuery
+    {
+        [Complexity(3, 10)]
+        public static IEnumerable<MyUser> Users => null!;
+    }
+
+    public class MyUser
+    {
+        [Complexity(0.5)]
+        public int Id => 0;
+        [Complexity(5)]
+        public string Name => "test";
+        [Complexity(typeof(MyFieldAnalyzer))]
+        public int Age => 10;
+        [Complexity<MyFieldAnalyzer>]
+        public int Weight => 150;
+    }
+
+    private class MyFieldAnalyzer : IFieldComplexityAnalyzer
+    {
+        public FieldComplexityResult Analyze(FieldImpactContext context) => new(2, 2);
+    }
+
     private (double TotalComplexity, double MaxDepth) Analyze(GraphQLDocument document, ISchema schema, Inputs? variables = null, Action<ComplexityOptions>? configure = null, bool noRules = false)
     {
         var validationOptions = new ValidationOptions
@@ -310,7 +350,7 @@ public class ComplexityTests
         return schema;
     }
 
-    private class DirectiveToComplexityVisitor : BaseSchemaNodeVisitor
+    private class DirectiveToComplexityVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
         {

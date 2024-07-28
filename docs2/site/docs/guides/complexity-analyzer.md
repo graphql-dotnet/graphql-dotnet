@@ -114,9 +114,14 @@ multiplier used for specific fields. The default configuration assumes that list
 #### Configuring Child Impact Multiplier for Specific Fields
 
 ```csharp
+// Code-first
 usersField.WithComplexityImpact(
     fieldImpact: 1,
     childImpactMultiplier: 100); // Assume the users field returns 100 items on average
+
+// Schema-first / type-first:
+[Complexity(fieldImpact: 1, childImpactMultiplier: 100)]
+public static IEnumerable<User> Users([FromServices] IUserService userService) => userService.GetUsers();
 ```
 
 #### Setting a Global Default Multiplier
@@ -157,9 +162,15 @@ To prevent introspection requests from affecting the complexity calculation, you
 fields' impact and child multiplier. An extension method is provided to simplify this configuration as shown below:
 
 ```csharp
+// Code-first:
 schema.WithIntrospectionComplexityImpact(0); // Ignore introspection fields
 // or
 schema.WithIntrospectionComplexityImpact(0.1); // Reduce impact to 10%
+
+// During DI setup:
+services.AddGraphQL(b => b
+    .ConfigureSchema(schema => schema.WithIntrospectionComplexityImpact(0))
+);
 ```
 
 The above method sets the complexity impact and child multiplier for the three meta-fields to the provided value,
@@ -216,7 +227,13 @@ but you may wish to adjust this to zero if scalar fields do not require conseque
 #### Configuring Impact for Object Fields
 ```csharp
 // Set higher impact for field resolvers that require more processing time
+
+// Code-first
 usersField.WithComplexityImpact(fieldImpact: 50);
+
+// Schema-first / type-first:
+[Complexity(fieldImpact: 50)]
+public static IEnumerable<User> Users([FromServices] IUserService userService) => userService.GetUsers();
 ```
 
 #### Setting a Custom Default Object Impact

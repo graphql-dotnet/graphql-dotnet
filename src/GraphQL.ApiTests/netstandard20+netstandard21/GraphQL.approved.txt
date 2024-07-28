@@ -834,6 +834,27 @@ namespace GraphQL
 }
 namespace GraphQL.Attributes
 {
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
+    public class ComplexityAttribute : GraphQL.GraphQLAttribute
+    {
+        public ComplexityAttribute(double fieldImpact) { }
+        public ComplexityAttribute(System.Type fieldComplexityAnalyzer) { }
+        public ComplexityAttribute(double fieldImpact, double childImpactMultiplier) { }
+        public double? ChildImpactMultiplier { get; }
+        public System.Type? FieldComplexityAnalyzer { get; }
+        public double? FieldImpact { get; }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
+    public class ComplexityAttribute<T> : GraphQL.GraphQLAttribute
+        where T :  class, GraphQL.Validation.Complexity.IFieldComplexityAnalyzer, new ()
+    {
+        public ComplexityAttribute() { }
+        [GraphQL.Attributes.Complexity(1D, 100D)]
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public class DirectiveAttribute : GraphQL.GraphQLAttribute
     {
@@ -3151,7 +3172,7 @@ namespace GraphQL.Utilities
         public virtual void VisitSchema(GraphQL.Types.ISchema schema) { }
         public virtual void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
     }
-    public class FieldConfig : GraphQL.Utilities.MetadataProvider
+    public class FieldConfig : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IFieldMetadataWriter, GraphQL.Types.IMetadataWriter, GraphQL.Types.IProvideMetadata
     {
         public FieldConfig(string name) { }
         public object? DefaultValue { get; set; }
@@ -3769,6 +3790,10 @@ namespace GraphQL.Validation.Complexity
         public GraphQL.Types.IGraphType ParentType { get; set; }
         public GraphQL.Validation.ValidationContext ValidationContext { get; }
         public TType GetArgument<TType>(string name, TType defaultValue = default) { }
+    }
+    public interface IFieldComplexityAnalyzer
+    {
+        GraphQL.Validation.Complexity.FieldComplexityResult Analyze(GraphQL.Validation.Complexity.FieldImpactContext context);
     }
     [System.Obsolete("Please use the new complexity analyzer.")]
     public class LegacyComplexityConfiguration
