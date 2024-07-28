@@ -16,4 +16,5 @@ public static class DiagnosticIds
     public const string ILLEGAL_METHOD_USAGE = "GQL012";
     public const string ONE_OF_FIELDS_MUST_BE_NULLABLE = "GQL013";
     public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = "GQL014";
+    public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = "GQL015";
 }

@@ -16,4 +16,5 @@ public static class HelpLinks
     public const string ILLEGAL_METHOD_USAGE = $"{DOCS_URL}/gql012";
     public const string ONE_OF_FIELDS_MUST_BE_NULLABLE = $"{DOCS_URL}/gql013";
     public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = $"{DOCS_URL}/gql014";
+    public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = $"{DOCS_URL}/gql015";
 }
