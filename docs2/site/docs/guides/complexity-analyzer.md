@@ -109,7 +109,7 @@ These values are calculated based on these facts demonstrated in the above query
 
 To configure the complexity analyzer to estimate the total number of nodes returned and/or the maximum depth,
 you can use the default configuration, or customize the default impact multiplier, or customize the impact
-multiplier used for specific fields. The default configuration assumes that list fields return an average of 5 items.
+multiplier used for specific fields. The default configuration assumes that list fields return an average of 20 items.
 
 #### Configuring Child Impact Multiplier for Specific Fields
 
