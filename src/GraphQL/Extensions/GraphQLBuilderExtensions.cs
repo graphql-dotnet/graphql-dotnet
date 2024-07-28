@@ -402,6 +402,24 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.Configure(action);
         return builder;
     }
+
+    /// <summary>
+    /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
+    /// </summary>
+    public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityOptions>? action = null)
+    {
+        builder.AddValidationRule<ComplexityValidationRule>();
+        builder.Services.Configure(action);
+        return builder;
+    }
+
+    /// <inheritdoc cref="AddComplexityAnalyzer(IGraphQLBuilder, Action{ComplexityOptions})"/>
+    public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityOptions, IServiceProvider>? action)
+    {
+        builder.AddValidationRule<ComplexityValidationRule>();
+        builder.Services.Configure(action);
+        return builder;
+    }
     #endregion
 
     #region - AddErrorInfoProvider
@@ -1173,7 +1191,7 @@ public static class GraphQLBuilderExtensions // TODO: split
 #endif
     #endregion
 
-    #region - AddUnhandledExceptionHandler -
+    #region - ConfigureUnhandledExceptionHandler -
     /// <summary>
     /// Configures the delegate to be called when an unhandled exception occurs during document execution.
     /// This is typically used to log exceptions to a database for further review.
@@ -1199,14 +1217,12 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
-    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Func<UnhandledExceptionContext, ExecutionOptions, Task> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)
             throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
 
-        var handler = (UnhandledExceptionContext context) => unhandledExceptionDelegate(context, context.ExecutionOptions);
-        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
+        return builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = context => unhandledExceptionDelegate(context, settings));
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>

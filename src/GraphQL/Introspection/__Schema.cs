@@ -25,6 +25,11 @@ public class __Schema : ObjectGraphType<ISchema>
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>("types")
             .Description("A list of all types supported by this server.")
+            .WithComplexityImpact(context =>
+            {
+                var count = context.ValidationContext.Schema.AllTypes.Count;
+                return new(context.Configuration.DefaultScalarImpact, count);
+            })
             .ResolveAsync(async context =>
             {
                 var types = context.ArrayPool.Rent<IGraphType>(context.Schema.AllTypes.Count);
@@ -67,6 +72,11 @@ public class __Schema : ObjectGraphType<ISchema>
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Directive>>>>("directives")
             .Description("A list of all directives supported by this server.")
+            .WithComplexityImpact(context =>
+            {
+                var count = context.ValidationContext.Schema.Directives.Count;
+                return new(context.Configuration.DefaultScalarImpact, count);
+            })
             .ResolveAsync(async context =>
             {
                 var directives = context.ArrayPool.Rent<Directive>(context.Schema.Directives.Count);

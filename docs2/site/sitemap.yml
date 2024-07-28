@@ -79,6 +79,8 @@
             file: serialization.md
           - title: Dataloader
             file: dataloader.md
+          - title: Complexity Analyzer
+            file: complexity-analyzer.md
           - title: Schema Generation
             file: schema-generation.md
           - title: Known Issues & FAQ

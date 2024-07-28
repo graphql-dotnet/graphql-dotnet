@@ -75,6 +75,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks", "Graph
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F263-BCEB-4738-9111-C85139BC63A7}"
 	ProjectSection(SolutionItems) = preProject
+		..\docs2\site\docs\guides\complexity-analyzer.md = ..\docs2\site\docs\guides\complexity-analyzer.md
 		..\docs2\site\docs\guides\dataloader.md = ..\docs2\site\docs\guides\dataloader.md
 		..\docs2\site\docs\guides\document-caching.md = ..\docs2\site\docs\guides\document-caching.md
 		..\docs2\site\docs\guides\federated-tracing.md = ..\docs2\site\docs\guides\federated-tracing.md
