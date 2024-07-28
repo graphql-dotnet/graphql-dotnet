@@ -71,6 +71,10 @@ public class DocumentExecuter : IDocumentExecuter
             {
                 return await execution(options).ConfigureAwait(false);
             }
+            catch (GraphQLTimeoutException)
+            {
+                throw;
+            }
             catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
             {
                 throw;
@@ -122,9 +126,17 @@ public class DocumentExecuter : IDocumentExecuter
         ExecutionResult? result = null;
         ExecutionContext? context = null;
         bool executionOccurred = false;
+        var originalCancellationToken = options.CancellationToken;
+        CancellationTokenSource? cts = null;
 
         try
         {
+            if (options.Timeout != Timeout.InfiniteTimeSpan)
+            {
+                cts = CancellationTokenSource.CreateLinkedTokenSource(originalCancellationToken);
+                cts.CancelAfter(options.Timeout);
+                options.CancellationToken = cts.Token;
+            }
             if (!options.Schema.Initialized)
             {
                 using (metrics.Subject("schema", "Initializing schema"))
@@ -213,9 +225,22 @@ public class DocumentExecuter : IDocumentExecuter
 
             result.AddErrors(context.Errors);
         }
-        catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (originalCancellationToken.IsCancellationRequested)
         {
+            // Re-throw the original cancellation exception when the the original CancellationToken is canceled
+            // (e.g. the client disconnects)
             throw;
+        }
+        catch (OperationCanceledException ex) when (options.CancellationToken.IsCancellationRequested)
+        {
+            // If the operation was canceled due to a timeout, return a result with no data and an error
+            // or throw a TimeoutException based on the configuration
+            if (options.TimeoutAction == TimeoutAction.ThrowTimeoutException)
+                throw new GraphQLTimeoutException(ex);
+
+            // Clear any pending execution result as it will not be left in a consistent state
+            executionOccurred = false;
+            (result = new()).AddError(new TimeoutError());
         }
         catch (ExecutionError ex)
         {
@@ -240,6 +265,8 @@ public class DocumentExecuter : IDocumentExecuter
         }
         finally
         {
+            options.CancellationToken = originalCancellationToken;
+            cts?.Dispose();
             result ??= new();
             result.Perf = metrics.Finish();
             if (executionOccurred)
@@ -337,6 +364,19 @@ public class DocumentExecuter : IDocumentExecuter
     /// </summary>
     protected virtual IExecutionStrategy SelectExecutionStrategy(ExecutionContext context)
         => _executionStrategySelector.Select(context);
+
+    /// <inheritdoc cref="TimeoutException"/>
+    /// <remarks>
+    /// This class exists so that <see cref="BuildExecutionDelegate(IEnumerable{IConfigureExecution})"/> can identify and
+    /// rethrow timeout exceptions thrown from <see cref="CoreExecuteAsync(ExecutionOptions)"/>. As such, this class is
+    /// private and not exposed as part of the public API. Callers should catch <see cref="TimeoutException"/>
+    /// just like any other .NET timeout exception, as this class derives from it.
+    /// </remarks>
+    private class GraphQLTimeoutException : TimeoutException
+    {
+        public GraphQLTimeoutException(Exception innerException)
+            : base("The operation has timed out.", innerException) { }
+    }
 }
 
 internal class DocumentExecuter<TSchema> : IDocumentExecuter<TSchema>

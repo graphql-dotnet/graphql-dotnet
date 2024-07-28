@@ -9,6 +9,7 @@ GQL010 | Usage | Error | InputGraphTypeAnalyzer, [Documentation](https://graphql
 GQL012 | Usage | Error | AllowedOnAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql012)
 GQL013 | Usage | Error | OneOfAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql013)
 GQL014 | Usage | Error | OneOfAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql014)
+GQL015 | Usage | Error | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql015)
 
 ### Removed Rules
 

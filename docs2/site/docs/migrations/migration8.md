@@ -874,6 +874,74 @@ Sample persisted document request:
 }
 ```
 
+### 24. Execution timeout support
+
+`ExecutionOptions.Timeout` has been added to allow a maximum time for the execution of a query. If the execution
+exceeds the timeout, the execution will be cancelled and a timeout error will be returned to the client. The default
+value is `Timeout.InfiniteTimeSpan`, which means no timeout is set. The timeout error is not an 'unhandled' exception
+and so is not passed through the `UnhandledExceptionDelegate`.
+
+Configuration:
+
+```csharp
+// via the GraphQL builder
+services.AddGraphQL(b => b
+    .WithTimeout(TimeSpan.FromSeconds(30))
+);
+
+// or via the options
+options.Timeout = TimeSpan.FromSeconds(30);
+```
+
+Example response:
+
+```json
+{
+    "errors":[
+        {
+            "message": "The operation has timed out.",
+            "extensions": { "code": "TIMEOUT", "codes": [ "TIMEOUT" ] }
+        }
+    ]
+}
+```
+
+Note that the timeout triggers immediate cancellation throughout the execution pipeline, including
+resolvers and middleware. This means that any pending response data will be discarded as the client
+would otherwise receive an incomplete response.
+
+You may alternatively configure the timeout to throw a `TimeoutException` to the caller. Set the
+`TimeoutAction` property as shown here:
+
+```csharp
+// via the GraphQL builder
+services.AddGraphQL(b => b
+    .WithTimeout(TimeSpan.FromSeconds(30), TimeoutAction.ThrowTimeoutException)
+);
+
+// or via the options
+options.Timeout = TimeSpan.FromSeconds(30);
+options.TimeoutAction = TimeoutAction.ThrowTimeoutException;
+```
+
+If you wish to catch and handle timeout errors, use the delegate overload as demonstrated below:
+
+```csharp
+services.AddGraphQL(b => b
+    .WithTimeout(TimeSpan.FromSeconds(30), options =>
+    {
+        // log the timeout error
+        var logger = options.RequestServices!.GetRequiredService<ILogger<MySchema>>();
+        logger.LogError("The operation has timed out.");
+        // return a custom error
+        return new ExecutionResult(new TimeoutError());
+    })
+);
+```
+
+Please note that signaling the cancellation token passed to `ExecutionOptions.CancellationToken` will always
+rethrow the `OperationCanceledException` to the caller, regardless of the `TimeoutAction` setting.
+
 ### 25. The complexity analyzer has been rewritten to support more complex scenarios
 
 Please review the documentation for the new complexity analyzer to understand how to use it and how to configure it.

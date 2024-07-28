@@ -1335,4 +1335,54 @@ public static class GraphQLBuilderExtensions // TODO: split
         return builder.ConfigureExecution<PersistedDocumentHandler>();
     }
     #endregion
+
+    #region - WithTimeout -
+    /// <summary>
+    /// Configures a timeout for the execution of a GraphQL request. If the timeout is exceeded, a timeout error
+    /// formatted as a GraphQL response will be returned.
+    /// </summary>
+    public static IGraphQLBuilder WithTimeout(this IGraphQLBuilder builder, TimeSpan timeout)
+        => WithTimeout(builder, timeout, TimeoutAction.ReturnTimeoutError);
+
+    /// <summary>
+    /// Configures a timeout for the execution of a GraphQL request. If the timeout is exceeded, the specified
+    /// <paramref name="timeoutDelegate"/> will be invoked to generate a response.
+    /// </summary>
+    public static IGraphQLBuilder WithTimeout(this IGraphQLBuilder builder, TimeSpan timeout, Func<ExecutionOptions, ExecutionResult> timeoutDelegate)
+        => WithTimeout(builder, timeout, options => Task.FromResult(timeoutDelegate(options)));
+
+    /// <inheritdoc cref="WithTimeout(IGraphQLBuilder, TimeSpan, Func{ExecutionOptions, ExecutionResult})"/>
+    public static IGraphQLBuilder WithTimeout(this IGraphQLBuilder builder, TimeSpan timeout, Func<ExecutionOptions, Task<ExecutionResult>> timeoutDelegate)
+    {
+        builder.WithTimeout(timeout, TimeoutAction.ThrowTimeoutException);
+        builder.ConfigureExecution(async (options, next) =>
+        {
+            try
+            {
+                return await next(options).ConfigureAwait(false);
+            }
+            catch (TimeoutException)
+            {
+                return await timeoutDelegate(options).ConfigureAwait(false);
+            }
+        });
+        return builder;
+    }
+
+    /// <summary>
+    /// Configures a timeout for the execution of a GraphQL request. If the timeout is exceeded, the specified
+    /// <paramref name="timeoutAction"/> will be taken.
+    /// </summary>
+    public static IGraphQLBuilder WithTimeout(this IGraphQLBuilder builder, TimeSpan timeout, TimeoutAction timeoutAction)
+    {
+        if (timeout <= TimeSpan.Zero && timeout != Timeout.InfiniteTimeSpan)
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        builder.ConfigureExecutionOptions(options =>
+        {
+            options.Timeout = timeout;
+            options.TimeoutAction = timeoutAction;
+        });
+        return builder;
+    }
+    #endregion
 }
