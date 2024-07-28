@@ -47,13 +47,13 @@ public class ComplexityOptions
     /// The default implementation will check for first/last arguments on list fields, or their parents if their parents are non-list fields,
     /// and use the default scalar/object impact values.
     /// </summary>
-    public Func<FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)> DefaultComplexityImpactDelegate { get; set; }
+    public Func<FieldImpactContext, FieldComplexityResult> DefaultComplexityImpactDelegate { get; set; }
         = DefaultComplexityImpactDelegateImpl;
 
     /// <summary>
     /// The default complexity function.
     /// </summary>
-    private static (double FieldImapct, double ChildImpactMultiplier) DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
+    private static FieldComplexityResult DefaultComplexityImpactDelegateImpl(FieldImpactContext context)
     {
         // unwrap any list types and calculate the child impact multiplier
         // multiplier = DefaultListImpactMultiplier ^ (number of list types) -- e.g. 1 for non-list fields, 5 for list fields, 25 for lists of list fields, etc.
@@ -77,15 +77,15 @@ public class ComplexityOptions
             // if this is a list, check if the field has a first or last argument (only IntGraphTypes are supported), or if an id is specified (any type)
             if (context.Arguments?.TryGetValue("first", out var arg) == true && arg.Value is int firstValue)
             {
-                return (impact, firstValue);
+                return new(impact, firstValue);
             }
             if (context.Arguments?.TryGetValue("last", out arg) == true && arg.Value is int lastValue)
             {
-                return (impact, lastValue);
+                return new(impact, lastValue);
             }
             if (context.Arguments?.TryGetValue("id", out _) == true)
             {
-                return (impact, 1);
+                return new(impact, 1);
             }
             // if not, and if the parent isn't a list, check if the parent has a first or last argument
             // (this is a common pattern for relay connection types)
@@ -97,16 +97,16 @@ public class ComplexityOptions
                 {
                     if (parent.Value.Arguments?.TryGetValue("first", out arg) == true && arg.Value is int firstValue2)
                     {
-                        return (impact, firstValue2);
+                        return new(impact, firstValue2);
                     }
                     if (parent.Value.Arguments?.TryGetValue("last", out arg) == true && arg.Value is int lastValue2)
                     {
-                        return (impact, lastValue2);
+                        return new(impact, lastValue2);
                     }
                 }
             }
         }
 
-        return (impact, multiplier);
+        return new(impact, multiplier);
     }
 }

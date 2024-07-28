@@ -24,7 +24,7 @@ public static class ComplexityAnalayzerMetadataExtensions
         where TMetadataProvider : IFieldMetadataWriter
     {
         provider.WithMetadata(COMPLEXITY_IMPACT, impact);
-        return provider.WithComplexityImpact(context => (impact, context.Configuration.DefaultComplexityImpactDelegate(context).ChildImpactMultiplier));
+        return provider.WithComplexityImpact(context => new(impact, context.Configuration.DefaultComplexityImpactDelegate(context).ChildImpactMultiplier));
     }
 
     /// <summary>
@@ -37,7 +37,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
     public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double fieldImpact, double childImpactMultiplier)
         where TMetadataProvider : IFieldMetadataWriter
-        => provider.WithComplexityImpact(_ => (fieldImpact, childImpactMultiplier));
+        => provider.WithComplexityImpact(_ => new FieldComplexityResult(fieldImpact, childImpactMultiplier));
 
     /// <summary>
     /// Specify field's complexity impact delegate which will be taken into account by <see cref="ComplexityValidationRule"/>.
@@ -46,7 +46,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// <param name="provider">Metadata provider which must implement <see cref="IMetadataWriter"/> interface.</param>
     /// <param name="func">A function which calculates the complexity impact of the field.</param>
     /// <returns>The reference to the specified <paramref name="provider"/>.</returns>
-    public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, Func<FieldImpactContext, (double, double)> func)
+    public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, Func<FieldImpactContext, FieldComplexityResult> func)
         where TMetadataProvider : IFieldMetadataWriter
         => provider.WithMetadata(COMPLEXITY_IMPACT_FUNC, func);
 
@@ -62,8 +62,8 @@ public static class ComplexityAnalayzerMetadataExtensions
     /// <summary>
     /// Get field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// </summary>
-    public static Func<FieldImpactContext, (double FieldImpact, double ChildImpactMultiplier)>? GetComplexityImpactDelegate(this FieldType provider)
-        => provider.GetMetadata<Func<FieldImpactContext, (double, double)>?>(COMPLEXITY_IMPACT_FUNC);
+    public static Func<FieldImpactContext, FieldComplexityResult>? GetComplexityImpactDelegate(this FieldType provider)
+        => provider.GetMetadata<Func<FieldImpactContext, FieldComplexityResult>?>(COMPLEXITY_IMPACT_FUNC);
 
     /// <summary>
     /// Configures the schema to use the specified complexity impact for introspection fields.

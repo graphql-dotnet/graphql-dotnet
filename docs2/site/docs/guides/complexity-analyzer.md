@@ -335,6 +335,6 @@ Field<ListGraphType<ProductGraphType>>("products")
     {
         var fieldImpact = 1;
         var childImpactModifier = context.GetArgument<int>("limit", 20); // use 20 if unspecified
-        return (fieldImpact, childImpactModifier);
+        return new(fieldImpact, childImpactModifier);
     });
 ```

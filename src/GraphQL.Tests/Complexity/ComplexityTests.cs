@@ -256,7 +256,7 @@ public class ComplexityTests
             {
                 var fieldImpact = 1;
                 var childImpactModifier = context.GetArgument<int>("limit", 20);
-                return (fieldImpact, childImpactModifier);
+                return new(fieldImpact, childImpactModifier);
             });
         var schema = new Schema { Query = query };
         var queryText = "{ products(offset: 10, limit: 5) { id name } }";
@@ -326,7 +326,7 @@ public class ComplexityTests
                 field.WithComplexityImpact(context =>
                 {
                     var impact = context.Configuration.DefaultObjectImpact;
-                    return (impact, listImpact2);
+                    return new(impact, listImpact2);
                 });
             }
             else if (impact != null && listImpact != null)

@@ -60,13 +60,10 @@ namespace GraphQL
         [System.Obsolete("Please use GetComplexityImpactDelegate instead. This method will be removed in v9" +
             ".")]
         public static double? GetComplexityImpact(this GraphQL.Types.IMetadataReader provider) { }
-        [return: System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "FieldImpact",
-                "ChildImpactMultiplier"})]
-        public static System.Func<GraphQL.Validation.Complexity.FieldImpactContext, System.ValueTuple<double, double>>? GetComplexityImpactDelegate(this GraphQL.Types.FieldType provider) { }
+        public static System.Func<GraphQL.Validation.Complexity.FieldImpactContext, GraphQL.Validation.Complexity.FieldComplexityResult>? GetComplexityImpactDelegate(this GraphQL.Types.FieldType provider) { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
-        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, System.Func<GraphQL.Validation.Complexity.FieldImpactContext, System.ValueTuple<double, double>> func)
+        public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, System.Func<GraphQL.Validation.Complexity.FieldImpactContext, GraphQL.Validation.Complexity.FieldComplexityResult> func)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double fieldImpact, double childImpactMultiplier)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
@@ -3825,10 +3822,7 @@ namespace GraphQL.Validation.Complexity
     public class ComplexityOptions
     {
         public ComplexityOptions() { }
-        [System.Runtime.CompilerServices.TupleElementNames(new string[] {
-                "FieldImpact",
-                "ChildImpactMultiplier"})]
-        public System.Func<GraphQL.Validation.Complexity.FieldImpactContext, System.ValueTuple<double, double>> DefaultComplexityImpactDelegate { get; set; }
+        public System.Func<GraphQL.Validation.Complexity.FieldImpactContext, GraphQL.Validation.Complexity.FieldComplexityResult> DefaultComplexityImpactDelegate { get; set; }
         public double DefaultListImpactMultiplier { get; set; }
         public double DefaultObjectImpact { get; set; }
         public double DefaultScalarImpact { get; set; }
@@ -3844,6 +3838,12 @@ namespace GraphQL.Validation.Complexity
         public int MaxDepth { get; }
         public double TotalImpact { get; }
         public GraphQL.Validation.ValidationContext ValidationContext { get; }
+    }
+    public struct FieldComplexityResult
+    {
+        public double ChildImpactMultiplier;
+        public double FieldImpact;
+        public FieldComplexityResult(double fieldImpact, double childImpactMultiplier) { }
     }
     public struct FieldImpactContext
     {

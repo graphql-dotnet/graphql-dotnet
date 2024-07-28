@@ -28,7 +28,7 @@ public class __Schema : ObjectGraphType<ISchema>
             .WithComplexityImpact(context =>
             {
                 var count = context.ValidationContext.Schema.AllTypes.Count;
-                return (context.Configuration.DefaultScalarImpact, count);
+                return new(context.Configuration.DefaultScalarImpact, count);
             })
             .ResolveAsync(async context =>
             {
@@ -75,7 +75,7 @@ public class __Schema : ObjectGraphType<ISchema>
             .WithComplexityImpact(context =>
             {
                 var count = context.ValidationContext.Schema.Directives.Count;
-                return (context.Configuration.DefaultScalarImpact, count);
+                return new(context.Configuration.DefaultScalarImpact, count);
             })
             .ResolveAsync(async context =>
             {
