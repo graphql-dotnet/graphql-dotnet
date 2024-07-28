@@ -67,7 +67,10 @@ public class ComplexityAttribute : GraphQLAttribute
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
-        => ModifyField(fieldType);
+    {
+        if (!isInputType)
+            ModifyField(fieldType);
+    }
 
     private void ModifyField(IFieldMetadataWriter field)
     {
@@ -111,5 +114,8 @@ public class ComplexityAttribute<T> : GraphQLAttribute
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
-        => fieldType.WithComplexityImpact(_func);
+    {
+        if (!isInputType)
+            fieldType.WithComplexityImpact(_func);
+    }
 }
