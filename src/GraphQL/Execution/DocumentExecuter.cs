@@ -231,12 +231,12 @@ public class DocumentExecuter : IDocumentExecuter
             // (e.g. the client disconnects)
             throw;
         }
-        catch (OperationCanceledException) when (options.CancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException ex) when (options.CancellationToken.IsCancellationRequested)
         {
             // If the operation was canceled due to a timeout, return a result with no data and an error
             // or throw a TimeoutException based on the configuration
             if (options.TimeoutAction == TimeoutAction.ThrowTimeoutException)
-                throw new GraphQLTimeoutException();
+                throw new GraphQLTimeoutException(ex);
 
             // Clear any pending execution result as it will not be left in a consistent state
             executionOccurred = false;
@@ -372,7 +372,11 @@ public class DocumentExecuter : IDocumentExecuter
     /// private and not exposed as part of the public API. Callers should catch <see cref="TimeoutException"/>
     /// just like any other .NET timeout exception, as this class derives from it.
     /// </remarks>
-    private class GraphQLTimeoutException : TimeoutException;
+    private class GraphQLTimeoutException : TimeoutException
+    {
+        public GraphQLTimeoutException(Exception innerException)
+            : base("The operation has timed out.", innerException) { }
+    }
 }
 
 internal class DocumentExecuter<TSchema> : IDocumentExecuter<TSchema>
