@@ -64,7 +64,7 @@ public abstract class ScalarGraphType : GraphType
 
     /// <summary>
     /// Given a list where <see cref="CanSerializeList(IEnumerable, bool)"/> has already returned <see langword="true"/>,
-    /// this method must serialize each member of the list.and return the new list without an exception. Behavior when
+    /// this method must serialize each member of the list and return the new list without an exception. Behavior when
     /// <see cref="CanSerializeList(IEnumerable, bool)"/> does not return <see langword="true"/> is undefined.
     /// </summary>
     public virtual IEnumerable SerializeList(IEnumerable list) => list;
