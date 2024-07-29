@@ -44,6 +44,10 @@ public class ComplexScalarGraphType : ScalarGraphType
     public override object? Serialize(object? value) => value;
 
     /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => allowNulls || list is IEnumerable<object?> objectList && objectList.FastAll(value => value != null);
+
+    /// <inheritdoc/>
     public override GraphQLValue ToAST(object? value)
     {
         return value switch

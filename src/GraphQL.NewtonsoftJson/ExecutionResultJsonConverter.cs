@@ -87,7 +87,26 @@ public class ExecutionResultJsonConverter : JsonConverter
             var items = arrayExecutionNode.Items;
             if (items == null)
             {
-                writer.WriteNull();
+                var result = arrayExecutionNode.SerializedResult;
+                if (result == null)
+                {
+                    writer.WriteNull();
+                }
+                // there is a special case where a list of byte scalars has been fast-serialized as a list;
+                // we need to ensure that byte arrays are returned as byte arrays, and not as base64
+                else if (result.GetType() == typeof(byte[]))
+                {
+                    writer.WriteStartArray();
+                    foreach (var b in (byte[])result)
+                    {
+                        writer.WriteValue(b);
+                    }
+                    writer.WriteEndArray();
+                }
+                else
+                {
+                    serializer.Serialize(writer, arrayExecutionNode.SerializedResult);
+                }
             }
             else
             {

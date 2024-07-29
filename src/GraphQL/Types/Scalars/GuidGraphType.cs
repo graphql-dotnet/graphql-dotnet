@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Globalization;
 using GraphQLParser.AST;
 
@@ -56,5 +57,18 @@ public class GuidGraphType : ScalarGraphType
         Guid g => g.ToString("D", CultureInfo.InvariantCulture),
         null => null,
         _ => ThrowSerializationError(value)
+    };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<Guid>(list, allowNulls);
+
+    /// <inheritdoc/>
+    public override IEnumerable SerializeList(IEnumerable list) => list switch
+    {
+        // while not ideal, this does provide a notable performance benefit over constructing an execution node for each value
+        IEnumerable<Guid> list2 => list2.Select(g => g.ToString("D", CultureInfo.InvariantCulture)),
+        IEnumerable<Guid?> list2 => list2.Select(g => g?.ToString("D", CultureInfo.InvariantCulture)),
+        _ => throw new NotSupportedException()
     };
 }

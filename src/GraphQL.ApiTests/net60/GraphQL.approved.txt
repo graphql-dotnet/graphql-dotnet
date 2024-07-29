@@ -1222,6 +1222,7 @@ namespace GraphQL.Execution
     {
         public ArrayExecutionNode(GraphQL.Execution.ExecutionNode parent, GraphQL.Types.IGraphType graphType, GraphQLParser.AST.GraphQLField field, GraphQL.Types.FieldType fieldDefinition, int? indexInParentNode) { }
         public System.Collections.Generic.List<GraphQL.Execution.ExecutionNode>? Items { get; set; }
+        public System.Collections.IEnumerable? SerializedResult { get; set; }
         public void ApplyToChildren<TState>(System.Action<GraphQL.Execution.ExecutionNode, TState> action, TState state, bool reverse = false) { }
         public override bool PropagateNull() { }
         public override object? ToValue() { }
@@ -2281,6 +2282,7 @@ namespace GraphQL.Types
     {
         public BigIntGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2289,6 +2291,7 @@ namespace GraphQL.Types
         public BooleanGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
@@ -2297,6 +2300,7 @@ namespace GraphQL.Types
     {
         public ByteGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2416,6 +2420,7 @@ namespace GraphQL.Types
         public ComplexScalarGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
@@ -2458,6 +2463,7 @@ namespace GraphQL.Types
     {
         public DecimalGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2577,6 +2583,7 @@ namespace GraphQL.Types
     {
         public FloatGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2612,14 +2619,17 @@ namespace GraphQL.Types
         public GuidGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
+        public override System.Collections.IEnumerable SerializeList(System.Collections.IEnumerable list) { }
     }
     public class HalfGraphType : GraphQL.Types.ScalarGraphType
     {
         public HalfGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2745,9 +2755,11 @@ namespace GraphQL.Types
     {
         public IdGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
         public override object? Serialize(object? value) { }
+        public override System.Collections.IEnumerable SerializeList(System.Collections.IEnumerable list) { }
     }
     public class IncludeDirective : GraphQL.Types.Directive
     {
@@ -2770,6 +2782,7 @@ namespace GraphQL.Types
     {
         public IntGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2817,6 +2830,7 @@ namespace GraphQL.Types
     {
         public LongGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2917,6 +2931,7 @@ namespace GraphQL.Types
     {
         public SByteGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -2925,6 +2940,7 @@ namespace GraphQL.Types
         protected ScalarGraphType() { }
         public virtual bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public virtual bool CanParseValue(object? value) { }
+        public virtual bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override void Initialize(GraphQL.Types.ISchema schema) { }
         public virtual bool IsValidDefault(object value) { }
         protected double ParseDoubleAccordingSpec<TValueNode>(TValueNode node)
@@ -2932,6 +2948,7 @@ namespace GraphQL.Types
         public virtual object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public abstract object? ParseValue(object? value);
         public virtual object? Serialize(object? value) { }
+        public virtual System.Collections.IEnumerable SerializeList(System.Collections.IEnumerable list) { }
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
         protected GraphQLParser.AST.GraphQLValue ThrowASTConversionError(object? value) { }
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
@@ -3025,6 +3042,7 @@ namespace GraphQL.Types
     {
         public ShortGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -3037,6 +3055,7 @@ namespace GraphQL.Types
         public StringGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override bool CanParseValue(object? value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -3101,6 +3120,7 @@ namespace GraphQL.Types
     {
         public UIntGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -3108,6 +3128,7 @@ namespace GraphQL.Types
     {
         public ULongGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
@@ -3115,6 +3136,7 @@ namespace GraphQL.Types
     {
         public UShortGraphType() { }
         public override bool CanParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override bool CanSerializeList(System.Collections.IEnumerable list, bool allowNulls) { }
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }

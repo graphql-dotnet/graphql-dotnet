@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types;
@@ -29,4 +30,8 @@ public class StringGraphType : ScalarGraphType
 
     /// <inheritdoc/>
     public override bool CanParseValue(object? value) => value is string || value == null;
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => list is IEnumerable<string?> strings && (allowNulls || strings.FastAll(s => s != null));
 }

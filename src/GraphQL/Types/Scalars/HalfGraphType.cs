@@ -1,5 +1,6 @@
 #if NET5_0_OR_GREATER
 
+using System.Collections;
 using System.Numerics;
 using GraphQLParser;
 using GraphQLParser.AST;
@@ -64,6 +65,10 @@ public class HalfGraphType : ScalarGraphType
         BigInteger bi => NotInfinity(checked((Half)(double)bi)),
         _ => ThrowValueConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<Half>(list, allowNulls);
 }
 
 #endif

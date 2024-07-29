@@ -413,12 +413,22 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         var listType = (ListGraphType)parent.GraphType!;
         var itemType = listType.ResolvedType!;
 
+        bool allowNulls = true;
         if (itemType is NonNullGraphType nonNullGraphType)
+        {
+            allowNulls = false;
             itemType = nonNullGraphType.ResolvedType!;
+        }
 
         if (parent.Result is not IEnumerable data)
         {
-            throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().Name}");
+            throw new InvalidOperationException($"Expected an IEnumerable list though did not find one. Found: {parent.Result?.GetType().GetFriendlyName()}");
+        }
+
+        if (itemType is ScalarGraphType scalarType && scalarType.CanSerializeList(data, allowNulls))
+        {
+            parent.SerializedResult = scalarType.SerializeList(data);
+            return;
         }
 
         int index = 0;

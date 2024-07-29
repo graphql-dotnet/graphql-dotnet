@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -40,4 +41,8 @@ public class LongGraphType : ScalarGraphType
         BigInteger bi => checked((long)bi),
         _ => ThrowValueConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<long>(list, allowNulls);
 }
