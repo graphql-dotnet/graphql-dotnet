@@ -91,6 +91,7 @@ public class IdGraphType : ScalarGraphType
     /// <inheritdoc/>
     public override IEnumerable SerializeList(IEnumerable list) => list switch
     {
+        // CanSerializeList has already verified that these are not uint[] or ulong[]
         IEnumerable<int> values => values.Select(value => value.ToString(CultureInfo.InvariantCulture)),
         IEnumerable<int?> values => values.Select(value => value?.ToString(CultureInfo.InvariantCulture)),
         IEnumerable<long> values => values.Select(value => value.ToString(CultureInfo.InvariantCulture)),

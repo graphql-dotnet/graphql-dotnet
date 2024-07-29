@@ -187,7 +187,14 @@ public class ExecutionResultTests
         var result = await new DocumentExecuter().ExecuteAsync(new ExecutionOptions
         {
             Schema = schema,
-            Query = "{ bools bools2 sBytes sBytes2 bytes bytes2 bytes3 shorts shorts2 uShorts uShorts2 ints ints2 ints3 uInts uInts2 longs longs2 uLongs uLongs2 singles singles2 doubles doubles2 decimals decimals2 bigIntegers bigIntegers2 strings strings2 }"
+            Query = """
+                {
+                    bools bools2 sBytes sBytes2 bytes bytes2 bytes3 shorts shorts2 uShorts uShorts2
+                    ints ints2 ints3 uInts uInts2 longs longs2 uLongs uLongs2 singles singles2
+                    doubles doubles2 decimals decimals2 bigIntegers bigIntegers2 strings strings2
+                    guids guids2 ids1 ids2 ids3 ids4 ids5 ids6
+                }
+                """
         });
         string actual = serializer.Serialize(result);
         actual.ShouldBeCrossPlatJson("""
@@ -222,7 +229,15 @@ public class ExecutionResultTests
                 "bigIntegers": [-1, 0, 1],
                 "bigIntegers2": [-1, null, 1],
                 "strings": ["abc", "def", "ghi"],
-                "strings2": ["abc", null, "ghi"]
+                "strings2": ["abc", null, "ghi"],
+                "guids": ["00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000"],
+                "guids2": ["00000000-0000-0000-0000-000000000000", null, "00000000-0000-0000-0000-000000000000"],
+                "ids1": ["1", "2", "3"],
+                "ids2": ["1", null, "3"],
+                "ids3": ["1", "2", "3"],
+                "ids4": ["1", null, "3"],
+                "ids5": ["00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000", "00000000-0000-0000-0000-000000000000"],
+                "ids6": ["00000000-0000-0000-0000-000000000000", null, "00000000-0000-0000-0000-000000000000"]
               }
             }
             """);
@@ -262,5 +277,19 @@ public class ExecutionResultTests
         public static BigInteger?[] BigIntegers2 => [-1, null, 1];
         public static string[] Strings => ["abc", "def", "ghi"];
         public static string?[] Strings2 => ["abc", null, "ghi"];
+        public static Guid[] Guids => [Guid.Empty, Guid.Empty, Guid.Empty];
+        public static Guid?[] Guids2 => [Guid.Empty, null, Guid.Empty];
+        [Id]
+        public static int[] Ids1 => [1, 2, 3];
+        [Id]
+        public static int?[] Ids2 => [1, null, 3];
+        [Id]
+        public static long[] Ids3 => [1, 2, 3];
+        [Id]
+        public static long?[] Ids4 => [1, null, 3];
+        [Id]
+        public static Guid[] Ids5 => [Guid.Empty, Guid.Empty, Guid.Empty];
+        [Id]
+        public static Guid?[] Ids6 => [Guid.Empty, null, Guid.Empty];
     }
 }
