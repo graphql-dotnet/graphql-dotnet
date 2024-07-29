@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -49,4 +50,8 @@ public class FloatGraphType : ScalarGraphType
         BigInteger bi => (double)bi,
         _ => ThrowValueConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<double>(list, allowNulls);
 }

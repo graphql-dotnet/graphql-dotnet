@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -32,6 +33,41 @@ public abstract class ScalarGraphType : GraphType
     /// value by the serialization layer. Returning <see langword="null"/> is valid.
     /// </returns>
     public virtual object? Serialize(object? value) => ParseValue(value);
+
+    /// <summary>
+    /// Indicates if the scalar can serialize a list of values without possibility of an exception.
+    /// The <paramref name="allowNulls"/> parameter indicates if the list may contain <see langword="null"/>
+    /// values. Typical implementations may check to see if the list is an <see cref="IEnumerable{T}"/> of
+    /// the correct type. An implementation may also check each member to see if it can be serialized
+    /// to the destination type.
+    /// </summary>
+    public virtual bool CanSerializeList(IEnumerable list, bool allowNulls) => false;
+
+    internal static bool CanSerializeList<T>(IEnumerable list, bool allowNulls)
+        where T : struct
+    {
+        // int[] matches on IEnumerable<int> and also IEnumerable<uint>, so we need to directly check array
+        // types before matching against IEnumerable (List<int> does not match on both interfaces)
+        var listType = list.GetType();
+        if (listType == typeof(T[]))
+            return true;
+        if (listType == typeof(T?[]))
+            return allowNulls || ((T?[])list).FastAll(t => t.HasValue);
+        if (listType.IsArray)
+            return false;
+        if (listType is IEnumerable<T>)
+            return true;
+        if (listType is IEnumerable<T?> nullableList)
+            return allowNulls || nullableList.FastAll(t => t.HasValue);
+        return false;
+    }
+
+    /// <summary>
+    /// Given a list where <see cref="CanSerializeList(IEnumerable, bool)"/> has already returned <see langword="true"/>,
+    /// this method must serialize each member of the list and return the new list without an exception. Behavior when
+    /// <see cref="CanSerializeList(IEnumerable, bool)"/> does not return <see langword="true"/> is undefined.
+    /// </summary>
+    public virtual IEnumerable SerializeList(IEnumerable list) => list;
 
     /// <summary>
     /// Literal input coercion. It takes an abstract syntax tree (AST) element from a schema

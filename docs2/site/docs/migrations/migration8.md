@@ -947,6 +947,15 @@ rethrow the `OperationCanceledException` to the caller, regardless of the `Timeo
 Please review the documentation for the new complexity analyzer to understand how to use it and how to configure it.
 See the 'Complexity Analzyer' document with the 'Guides' section of the documentation for more information.
 
+### 26. Optimization when returning lists of scalars
+
+When returning a list of scalars, specifically of intrinsic types such as `int`, `string`, and `bool`, the matching
+scalar type (e.g. `IntGraphType`, `StringGraphType`, `BooleanGraphType`) will be used to serialize the list as a whole
+rather than each individual item. This can result in a significant performance improvement when returning large lists
+of scalars. Be sure the returned list type (e.g. `IEnumerable<int>`) matches the scalar type (e.g. `IntGraphType`)
+to take advantage of this optimization. Scalar types that require conversion, such as `DateTimeGraphType` are not
+currently optimized in this way.
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -1270,3 +1279,7 @@ services.AddGraphQL(b => b
     })
 );
 ```
+
+### 24. ID graph type serialization is culture-invariant
+
+The `IdGraphType` now serializes values using the invariant culture.

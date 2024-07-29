@@ -70,7 +70,7 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
             var items = arrayExecutionNode.Items;
             if (items == null)
             {
-                writer.WriteNullValue();
+                JsonSerializer.Serialize(writer, arrayExecutionNode.SerializedResult, options);
             }
             else
             {

@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -14,6 +15,11 @@ public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     public List<ExecutionNode>? Items { get; set; }
 
     /// <summary>
+    /// Returns a serialized result of the child execution nodes.
+    /// </summary>
+    public IEnumerable? SerializedResult { get; set; }
+
+    /// <summary>
     /// Initializes an <see cref="ArrayExecutionNode"/> instance with the specified values.
     /// </summary>
     public ArrayExecutionNode(ExecutionNode parent, IGraphType graphType, GraphQLField field, FieldType fieldDefinition, int? indexInParentNode)
@@ -28,7 +34,7 @@ public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     public override object? ToValue()
     {
         if (Items == null)
-            return null;
+            return SerializedResult;
 
         var items = new object?[Items.Count];
         for (int i = 0; i < Items.Count; ++i)
@@ -43,7 +49,7 @@ public class ArrayExecutionNode : ExecutionNode, IParentExecutionNode
     public override bool PropagateNull()
     {
         if (Items == null)
-            return true;
+            return SerializedResult == null;
 
         if (Items.Count == 0)
             return false;

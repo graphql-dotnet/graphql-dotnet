@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -40,4 +41,8 @@ public class ShortGraphType : ScalarGraphType
         BigInteger bi => checked((short)bi),
         _ => ThrowValueConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<short>(list, allowNulls);
 }

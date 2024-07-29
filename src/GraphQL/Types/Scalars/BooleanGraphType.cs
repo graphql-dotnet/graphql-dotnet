@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQLParser.AST;
 
 namespace GraphQL.Types;
@@ -38,4 +39,8 @@ public class BooleanGraphType : ScalarGraphType
         null => GraphQLValuesCache.Null,
         _ => ThrowASTConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<bool>(list, allowNulls);
 }

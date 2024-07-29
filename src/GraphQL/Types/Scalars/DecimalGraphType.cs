@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -45,4 +46,8 @@ public class DecimalGraphType : ScalarGraphType
         BigInteger bi => (decimal)bi,
         _ => ThrowValueConversionError(value)
     };
+
+    /// <inheritdoc/>
+    public override bool CanSerializeList(IEnumerable list, bool allowNulls)
+        => CanSerializeList<decimal>(list, allowNulls);
 }
