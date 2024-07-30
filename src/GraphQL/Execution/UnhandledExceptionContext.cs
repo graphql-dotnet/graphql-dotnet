@@ -34,7 +34,7 @@ public class UnhandledExceptionContext
 
     /// <summary>
     /// Field context whose resolver generated an error. Will be <see langword="null"/> if the error came from
-    /// <see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)"/>, for example, validation stage.
+    /// <see cref="DocumentExecuter.ExecuteAsync(GraphQL.ExecutionOptions)"/>, for example, validation stage.
     /// Also will be <see langword="null"/> between resolvers execution if <c>cancellationToken</c> is canceled.
     /// </summary>
     public IResolveFieldContext? FieldContext { get; }

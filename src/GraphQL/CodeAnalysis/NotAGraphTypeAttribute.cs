@@ -7,4 +7,4 @@ namespace GraphQL;
 /// parameter is not <see cref="IGraphType"/>
 /// </summary>
 [AttributeUsage(AttributeTargets.GenericParameter)]
-internal class NotAGraphTypeAttribute : Attribute { }
+internal class NotAGraphTypeAttribute : Attribute;
