@@ -10,7 +10,7 @@ GQL012 | Usage | Error | AllowedOnAnalyzer, [Documentation](https://graphql-dotn
 GQL013 | Usage | Error | OneOfAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql013)
 GQL014 | Usage | Error | OneOfAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql014)
 GQL015 | Usage | Error | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql015)
-GQL016 | Usage | Error | RequireParameterlessConstructorAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql013)
+GQL016 | Usage | Error | RequireParameterlessConstructorAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql016)
 
 ### Removed Rules
 
