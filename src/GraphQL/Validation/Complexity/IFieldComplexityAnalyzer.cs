@@ -7,6 +7,7 @@ namespace GraphQL.Validation.Complexity;
 /// a custom implementation for calculating the complexity of a field. Classes that implement this
 /// interface must have a public parameterless constructor.
 /// </summary>
+[RequireParameterlessConstructor]
 public interface IFieldComplexityAnalyzer
 {
     /// <summary>

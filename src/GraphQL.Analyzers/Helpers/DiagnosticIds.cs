@@ -17,4 +17,5 @@ public static class DiagnosticIds
     public const string ONE_OF_FIELDS_MUST_BE_NULLABLE = "GQL013";
     public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = "GQL014";
     public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = "GQL015";
+    public const string REQUIRE_PARAMETERLESS_CONSTRUCTOR = "GQL016";
 }
