@@ -27,7 +27,6 @@ public class RequireParameterlessConstructorAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
         context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
-        context.RegisterSyntaxNodeAction(AnalyzeGenericName, SyntaxKind.GenericName);
     }
 
     private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
@@ -62,46 +61,6 @@ public class RequireParameterlessConstructorAnalyzer : DiagnosticAnalyzer
                 context,
                 classDeclaration.Identifier.GetLocation(),
                 classDeclaration.Identifier.Text);
-        }
-    }
-
-    private void AnalyzeGenericName(SyntaxNodeAnalysisContext context)
-    {
-        var genericName = (GenericNameSyntax)context.Node;
-        if (genericName.Parent?.IsGraphQLSymbol(context.SemanticModel) != true)
-        {
-            return;
-        }
-
-        var typeInfo = context.SemanticModel.GetTypeInfo(genericName.Parent);
-        if (typeInfo.Type is not INamedTypeSymbol namedTypeSymbol || namedTypeSymbol.TypeParameters.Length == 0)
-        {
-            return;
-        }
-
-        // Check if any generic parameter has [RequireParameterlessConstructor] attribute
-        // then check if matching generic argument has parameterless constructor
-        for (int i = 0; i < namedTypeSymbol.TypeParameters.Length; i++)
-        {
-            if (!HasRequireParameterlessConstructorAttribute(namedTypeSymbol.TypeParameters[i]))
-            {
-                continue;
-            }
-
-            if (namedTypeSymbol.TypeArguments[i] is not INamedTypeSymbol typeArg)
-            {
-                continue;
-            }
-
-            if (HasRequireParameterlessConstructor(typeArg.Constructors))
-            {
-                continue;
-            }
-
-            ReportDiagnostic(
-                context,
-                genericName.TypeArgumentList.Arguments[i].GetLocation(),
-                typeArg.Name);
         }
     }
 

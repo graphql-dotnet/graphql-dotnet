@@ -78,43 +78,4 @@ public class RequireParameterlessConstructorAnalyzerTests
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
-
-    [Theory]
-    [InlineData(1, null, false)]
-    [InlineData(2, "public TestGraphType() {}", false)]
-    [InlineData(3, "private TestGraphType() {}", true)]
-    [InlineData(4, "protected TestGraphType() {}", true)]
-    [InlineData(5, "internal TestGraphType() {}", true)]
-    [InlineData(6, "public TestGraphType(int i) {}", true)]
-    public async Task GenericParameter_GQL016(int idx, string? constructor, bool report)
-    {
-        _ = idx;
-        string source =
-            $$"""
-              using GraphQL.Types;
-
-              namespace Sample.Server;
-
-              public class Test
-              {
-                  public IGraphTypeFactory<TestGraphType> CreateFactory() =>
-                      new DefaultGraphTypeFactory<{|#0:TestGraphType|}>();
-              }
-
-              public class TestGraphType : ObjectGraphType
-              {
-                  {{constructor}}
-              }
-              """;
-
-        var expected = report
-            ?
-            [
-                VerifyCS.Diagnostic(RequireParameterlessConstructorAnalyzer.RequireParameterlessConstructor)
-                    .WithLocation(0).WithArguments("TestGraphType")
-            ]
-            : DiagnosticResult.EmptyDiagnosticResults;
-
-        await VerifyCS.VerifyAnalyzerAsync(source, expected);
-    }
 }
