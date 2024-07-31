@@ -2122,7 +2122,7 @@ namespace GraphQL.Types
         public override object? ParseValue(object? value) { }
     }
     public class DefaultGraphTypeFactory<TGraphType> : GraphQL.Types.IGraphTypeFactory<TGraphType>
-        where TGraphType : GraphQL.Types.IGraphType
+        where TGraphType : GraphQL.Types.IGraphType, new ()
     {
         public DefaultGraphTypeFactory() { }
         public TGraphType Create() { }
