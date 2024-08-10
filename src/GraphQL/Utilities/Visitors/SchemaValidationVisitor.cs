@@ -43,6 +43,9 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 
         // 4
         // TODO: An object type must be a super‐set of all interfaces it implements
+
+        // Transitively implemented interfaces (interfaces implemented by the interface that is being implemented) must also be defined on an implementing type or interface.
+        CheckTransitiveInterfaces(type);
     }
 
     /// <inheritdoc/>
@@ -117,6 +120,49 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         {
             if (item.Count() > 1)
                 throw new InvalidOperationException($"The field '{item.Key}' must have a unique name within Interface type '{type.Name}'; no two fields may share the same name.");
+        }
+
+        // Interface definitions must not contain cyclic references nor implement themselves.
+        if (type.Interfaces.Count > 0)
+        {
+            var types = new HashSet<IInterfaceGraphType>() { type };
+            CheckCyclicReferences(type);
+
+            void CheckCyclicReferences(IInterfaceGraphType iface)
+            {
+                foreach (var i in iface.ResolvedInterfaces.List)
+                {
+                    if (types.Add(i))
+                        CheckCyclicReferences(i);
+
+                    if (i == type)
+                        throw new InvalidOperationException($"The interface type '{type.Name}' must not contain cyclic references.");
+                }
+            }
+        }
+
+        // Transitively implemented interfaces (interfaces implemented by the interface that is being implemented) must also be defined on an implementing type or interface.
+        CheckTransitiveInterfaces(type);
+    }
+
+    /// <summary>
+    /// Ensures that all transitively implemented interfaces are defined on the implementing type.
+    /// </summary>
+    private static void CheckTransitiveInterfaces(IImplementInterfaces type)
+    {
+        if (type.ResolvedInterfaces.Count == 0)
+            return;
+        CheckChildren(type);
+
+        void CheckChildren(IImplementInterfaces iface)
+        {
+            foreach (var i in iface.ResolvedInterfaces.List)
+            {
+                if (!type.ResolvedInterfaces.Contains(i))
+                    throw new InvalidOperationException($"The interface type '{((IGraphType)type).Name}' must also define all interfaces implemented by its transitive interfaces. The interface '{i.Name}' is implemented by the interface '{((IGraphType)iface).Name}' but is not implemented by '{((IGraphType)type).Name}'.");
+
+                CheckChildren(i);
+            }
         }
     }
 

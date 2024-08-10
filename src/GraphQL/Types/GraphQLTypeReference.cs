@@ -37,14 +37,14 @@ public sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
         set => throw Invalid();
     }
 
-    /// <inheritdoc/>
-    public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
+    ///// <inheritdoc/>
+    //public void AddResolvedInterface(IInterfaceGraphType graphType) => throw Invalid();
 
-    /// <inheritdoc/>
-    public Interfaces Interfaces => throw Invalid();
+    ///// <inheritdoc/>
+    //public Interfaces Interfaces => throw Invalid();
 
-    /// <inheritdoc/>
-    public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
+    ///// <inheritdoc/>
+    //public ResolvedInterfaces ResolvedInterfaces => throw Invalid();
 
     private InvalidOperationException Invalid() => new($"This is just a reference to '{TypeName}'. Resolve the real type first.");
 
@@ -78,7 +78,7 @@ public sealed class GraphQLClrOutputTypeReference<[NotAGraphType] T> : Interface
 
     ResolvedInterfaces IImplementInterfaces.ResolvedInterfaces => throw new NotImplementedException();
 
-    void IObjectGraphType.AddResolvedInterface(IInterfaceGraphType graphType) => throw new NotImplementedException();
+    void IImplementInterfaces.AddResolvedInterface(IInterfaceGraphType graphType) => throw new NotImplementedException();
 }
 
 /// <summary>

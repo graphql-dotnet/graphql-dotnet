@@ -14,4 +14,9 @@ public interface IImplementInterfaces
     /// Gets or sets a list of instances of supported GraphQL interface types.
     /// </summary>
     ResolvedInterfaces ResolvedInterfaces { get; }
+
+    /// <summary>
+    /// Adds an instance of <see cref="IInterfaceGraphType"/> to the list of interface instances supported by this object graph type.
+    /// </summary>
+    void AddResolvedInterface(IInterfaceGraphType graphType);
 }

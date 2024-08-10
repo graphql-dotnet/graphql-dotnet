@@ -582,6 +582,23 @@ public class SchemaTypes : IEnumerable<IGraphType>
             }
         }
 
+        if (type is IInterfaceGraphType iface)
+        {
+            using var _ = context.Trace("Loop for interfaces of interface type '{0}'", iface.Name);
+            foreach (var objectInterface in iface.Interfaces.List)
+            {
+                using var __ = context.Trace("Interface '{0}'", objectInterface.Name);
+                object typeOrError = RebuildType(objectInterface, false, context.ClrToGraphTypeMappings);
+                if (typeOrError is string error)
+                    throw new InvalidOperationException($"The GraphQL implemented type '{objectInterface.GetFriendlyName()}' for object graph type '{type.Name}' could not be derived implicitly. " + error);
+                var objectInterface2 = (Type)typeOrError;
+                if (AddTypeIfNotRegistered(objectInterface2, context) is IInterfaceGraphType interfaceInstance)
+                {
+                    iface.AddResolvedInterface(interfaceInstance);
+                }
+            }
+        }
+
         if (type is UnionGraphType union)
         {
             using var _ = context.Trace("Loop for possible types of union type '{0}'", union.Name);

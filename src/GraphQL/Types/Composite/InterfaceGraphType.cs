@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Represents a GraphQL interface graph type.
 /// </summary>
-public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType
+public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType, IImplementInterfaces
 {
 }
 
@@ -36,6 +36,22 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
 
     /// <inheritdoc/>
     public Func<object, IObjectGraphType?>? ResolveType { get; set; }
+
+    /// <inheritdoc/>
+    public void AddResolvedInterface(IInterfaceGraphType graphType)
+    {
+        if (graphType == null)
+            throw new ArgumentNullException(nameof(graphType));
+
+        _ = graphType.IsValidInterfaceFor(this, throwError: true);
+        ResolvedInterfaces.Add(graphType);
+    }
+
+    /// <inheritdoc/>
+    public Interfaces Interfaces { get; } = new Interfaces();
+
+    /// <inheritdoc/>
+    public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
 
     /// <inheritdoc/>
     public void AddPossibleType(IObjectGraphType type)
