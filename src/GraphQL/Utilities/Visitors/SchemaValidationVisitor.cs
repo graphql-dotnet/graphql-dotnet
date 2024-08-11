@@ -183,7 +183,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             foreach (var i in iface.ResolvedInterfaces.List)
             {
                 if (!type.ResolvedInterfaces.Contains(i))
-                    throw new InvalidOperationException($"The interface type '{((IGraphType)type).Name}' must also define all interfaces implemented by its transitive interfaces. The interface '{i.Name}' is implemented by the interface '{((IGraphType)iface).Name}' but is not implemented by '{((IGraphType)type).Name}'.");
+                    throw new InvalidOperationException($"The interface type '{type.Name}' must also define all interfaces implemented by its transitive interfaces. The interface '{i.Name}' is implemented by the interface '{iface.Name}' but is not implemented by '{type.Name}'.");
 
                 CheckChildren(i);
             }
