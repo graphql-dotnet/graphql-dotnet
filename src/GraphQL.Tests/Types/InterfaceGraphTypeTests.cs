@@ -149,6 +149,58 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         ValidateSchema(schema);
     }
 
+    [Fact]
+    public void ReturnInterfacesRequiresResolver()
+    {
+        var schema = new MySchema2();
+        // the schema can be initialized without this field because no object graph type returns the interface type Image.
+        // here, since a field has been added that returns the interface type Image, the interface type must either
+        //   provide a resolveType function, or each possible type must provide an IsTypeOf function.
+        schema.Query.Field("test", new GraphQLTypeReference("Image"));
+        Should.Throw<InvalidOperationException>(schema.Initialize)
+            .Message.ShouldBe("Interface type 'Image' does not provide a 'resolveType' function and possible Type 'Picture' does not provide a 'isTypeOf' function.  There is no way to resolve this possible type during execution.");
+    }
+
+    [Fact]
+    public async Task SupportsInterfaceInheritance_Introspection()
+    {
+        var schema = new MySchema2();
+        schema.Initialize();
+        var result = await schema.ExecuteAsync(
+            o => o.Query = """
+                {
+                  __type(name: "Image") {
+                    name
+                    kind
+                    interfaces {
+                      name
+                      kind
+                    }
+                  }
+                }
+                """);
+        result.ShouldBe("""
+            {
+              "data": {
+                "__type": {
+                  "name": "Image",
+                  "kind": "INTERFACE",
+                  "interfaces": [
+                    {
+                      "name": "Resource",
+                      "kind": "INTERFACE"
+                    },
+                    {
+                      "name": "Node",
+                      "kind": "INTERFACE"
+                    }
+                  ]
+                }
+              }
+            }
+            """, StringCompareShould.IgnoreLineEndings);
+    }
+
     private void ValidateSchema(ISchema schema)
     {
         schema.Initialize();

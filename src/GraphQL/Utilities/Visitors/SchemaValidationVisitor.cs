@@ -84,7 +84,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
                 {
                     throw new InvalidOperationException(
                         $"Interface type '{interfaceType.Name}' does not provide a 'resolveType' function " +
-                        $"and possible Type '{field.ResolvedType.Name}' does not provide a 'isTypeOf' function.  " +
+                        $"and possible Type '{possibleType.Name}' does not provide a 'isTypeOf' function.  " +
                         "There is no way to resolve this possible type during execution.");
                 }
             }
