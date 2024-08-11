@@ -78,7 +78,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
             }
             """;
         var schema = GraphQL.Types.Schema.For(sdl);
-        ValidateSchema(schema);
+        ValidateInterfaceInheritance(schema);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         schema.RegisterType(imageInterface);
 
         // Validate schema
-        ValidateSchema(schema);
+        ValidateInterfaceInheritance(schema);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
     {
         var schema = new MySchema2();
         schema.Initialize();
-        ValidateSchema(schema);
+        ValidateInterfaceInheritance(schema);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         var provider = services.BuildServiceProvider();
         var schema = provider.GetService<ISchema>()!;
         schema.Initialize();
-        ValidateSchema(schema);
+        ValidateInterfaceInheritance(schema);
     }
 
     [Fact]
@@ -201,7 +201,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
             """, StringCompareShould.IgnoreLineEndings);
     }
 
-    private void ValidateSchema(ISchema schema)
+    private void ValidateInterfaceInheritance(ISchema schema)
     {
         schema.Initialize();
         var printedSdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
