@@ -1283,3 +1283,7 @@ services.AddGraphQL(b => b
 ### 24. ID graph type serialization is culture-invariant
 
 The `IdGraphType` now serializes values using the invariant culture.
+
+### 25. DirectiveAttribute moved to GraphQL namespace
+
+The `DirectiveAttribute` has been moved to the `GraphQL` namespace.
