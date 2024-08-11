@@ -1,4 +1,3 @@
-using GraphQL.Attributes;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;

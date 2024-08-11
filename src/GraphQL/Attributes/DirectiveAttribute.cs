@@ -1,7 +1,7 @@
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Attributes;
+namespace GraphQL;
 
 /// <summary>
 /// Applies a directive to part of a schema.
