@@ -353,10 +353,10 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
             public Picture? Img => null!;
         }
 
-        [Implements(typeof(Node))]
-        [Implements(typeof(Resource))]
-        [Implements(typeof(Image))]
-        public class Picture
+        [Implements(typeof(INode))]
+        [Implements(typeof(IResource))]
+        [Implements(typeof(IImage))]
+        public class Picture : IImage
         {
             [Id]
             public string Id => null!;
@@ -365,25 +365,23 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
             public bool? Favorite => null;
         }
 
-        [Implements(typeof(Node))]
-        [Implements(typeof(Resource))]
-        public interface Image
+        [Implements(typeof(INode))]
+        [Implements(typeof(IResource))]
+        [Name("Image")]
+        public interface IImage : IResource
         {
-            [Id]
-            string Id { get; }
-            string? Url { get; }
             string? Thumbnail { get; }
         }
 
-        [Implements(typeof(Node))]
-        public interface Resource
+        [Implements(typeof(INode))]
+        [Name("Resource")]
+        public interface IResource : INode
         {
-            [Id]
-            string Id { get; }
             string? Url { get; }
         }
 
-        public interface Node
+        [Name("Node")]
+        public interface INode
         {
             [Id]
             string Id { get; }
