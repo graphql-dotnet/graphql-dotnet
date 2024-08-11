@@ -1,5 +1,3 @@
-using GraphQL.Attributes;
-
 namespace GraphQL.Validation.Complexity;
 
 /// <summary>
