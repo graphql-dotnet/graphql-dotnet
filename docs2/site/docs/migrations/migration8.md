@@ -1338,7 +1338,11 @@ services.AddGraphQL(b => b
 
 The `IdGraphType` now serializes values using the invariant culture.
 
-### 25. Changes to support interface inheritance
+### 25. DirectiveAttribute moved to GraphQL namespace
+
+The `DirectiveAttribute` has been moved to the `GraphQL` namespace.
+
+### 26. Changes to support interface inheritance
 
 Small changes were made to `IInterfaceGraphType` and `IImplementInterfaces` to support interface inheritance.
 If you have custom implementations of these interfaces, you may need to update them.

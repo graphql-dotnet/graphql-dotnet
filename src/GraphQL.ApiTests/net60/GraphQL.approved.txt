@@ -70,10 +70,48 @@ namespace GraphQL
         public static TSchema WithIntrospectionComplexityImpact<TSchema>(this TSchema schema, double impact)
             where TSchema : GraphQL.Types.ISchema { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
+    public class ComplexityAttribute : GraphQL.GraphQLAttribute
+    {
+        public ComplexityAttribute(double fieldImpact) { }
+        public ComplexityAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] System.Type fieldComplexityAnalyzer) { }
+        public ComplexityAttribute(double fieldImpact, double childImpactMultiplier) { }
+        public double? ChildImpactMultiplier { get; }
+        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+        public System.Type? FieldComplexityAnalyzer { get; }
+        public double? FieldImpact { get; }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
+    public class ComplexityAttribute<T> : GraphQL.GraphQLAttribute
+        where T :  class, GraphQL.Validation.Complexity.IFieldComplexityAnalyzer, new ()
+    {
+        public ComplexityAttribute() { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
         public object? GetService(System.Type serviceType) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter, AllowMultiple=true)]
+    public class DirectiveAttribute : GraphQL.GraphQLAttribute
+    {
+        public System.Collections.Generic.Dictionary<string, object?> Arguments;
+        public DirectiveAttribute(string name) { }
+        public DirectiveAttribute(string name, params object[] argsAndValues) { }
+        public DirectiveAttribute(string name, string argumentName, object argumentValue) { }
+        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2) { }
+        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2, string argumentName3, object argumentValue3) { }
+        public string Name { get; }
+        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
     public static class DirectivesExtensions
     {
@@ -863,47 +901,6 @@ namespace GraphQL
         public override string ToString() { }
         public static string op_Implicit(GraphQL.VariableName variableName) { }
         public static GraphQL.VariableName op_Implicit(string name) { }
-    }
-}
-namespace GraphQL.Attributes
-{
-    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
-    public class ComplexityAttribute : GraphQL.GraphQLAttribute
-    {
-        public ComplexityAttribute(double fieldImpact) { }
-        public ComplexityAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] System.Type fieldComplexityAnalyzer) { }
-        public ComplexityAttribute(double fieldImpact, double childImpactMultiplier) { }
-        public double? ChildImpactMultiplier { get; }
-        [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
-        public System.Type? FieldComplexityAnalyzer { get; }
-        public double? FieldImpact { get; }
-        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-    }
-    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field, AllowMultiple=false)]
-    public class ComplexityAttribute<T> : GraphQL.GraphQLAttribute
-        where T :  class, GraphQL.Validation.Complexity.IFieldComplexityAnalyzer, new ()
-    {
-        public ComplexityAttribute() { }
-        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-    }
-    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter, AllowMultiple=true)]
-    public class DirectiveAttribute : GraphQL.GraphQLAttribute
-    {
-        public System.Collections.Generic.Dictionary<string, object?> Arguments;
-        public DirectiveAttribute(string name) { }
-        public DirectiveAttribute(string name, params object[] argsAndValues) { }
-        public DirectiveAttribute(string name, string argumentName, object argumentValue) { }
-        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2) { }
-        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2, string argumentName3, object argumentValue3) { }
-        public string Name { get; }
-        public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
-        public override void Modify(GraphQL.Types.IGraphType graphType) { }
-        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
-        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
-        public override void Modify(GraphQL.Utilities.TypeConfig type) { }
-        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
 }
 namespace GraphQL.Builders

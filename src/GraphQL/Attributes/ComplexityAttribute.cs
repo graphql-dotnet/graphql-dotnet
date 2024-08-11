@@ -2,7 +2,7 @@ using GraphQL.Types;
 using GraphQL.Utilities;
 using GraphQL.Validation.Complexity;
 
-namespace GraphQL.Attributes;
+namespace GraphQL;
 
 /// <summary>
 /// Specifies the complexity impact and/or child impact multiplier of a field.

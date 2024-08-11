@@ -1,4 +1,3 @@
-using GraphQL.Attributes;
 using GraphQL.Types;
 using GraphQL.Utilities.Visitors;
 using Microsoft.Extensions.DependencyInjection;
