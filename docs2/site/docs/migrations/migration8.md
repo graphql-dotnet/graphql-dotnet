@@ -1337,3 +1337,8 @@ services.AddGraphQL(b => b
 ### 24. ID graph type serialization is culture-invariant
 
 The `IdGraphType` now serializes values using the invariant culture.
+
+### 25. Changes to support interface inheritance
+
+Small changes were made to `IInterfaceGraphType` and `IImplementInterfaces` to support interface inheritance.
+If you have custom implementations of these interfaces, you may need to update them.
