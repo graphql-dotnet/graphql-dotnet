@@ -2587,7 +2587,7 @@ namespace GraphQL.Types
     {
         object? DefaultValue { get; }
     }
-    public interface IImplementInterfaces
+    public interface IImplementInterfaces : GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.Interfaces Interfaces { get; }
         GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
@@ -2715,6 +2715,9 @@ namespace GraphQL.Types
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public void Interface(System.Type type) { }
+        public void Interface<TInterface>()
+            where TInterface : GraphQL.Types.IInterfaceGraphType { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
     {

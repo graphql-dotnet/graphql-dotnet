@@ -62,6 +62,18 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
         this.IsValidInterfaceFor(type, throwError: true);
         PossibleTypes.Add(type);
     }
+
+    /// <summary>
+    /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.
+    /// </summary>
+    public void Interface<TInterface>()
+        where TInterface : IInterfaceGraphType
+        => Interfaces.Add<TInterface>();
+
+    /// <summary>
+    /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.
+    /// </summary>
+    public void Interface(Type type) => Interfaces.Add(type);
 }
 
 /// <inheritdoc cref="IInterfaceGraphType"/>

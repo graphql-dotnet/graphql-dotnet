@@ -195,9 +195,20 @@ public class SchemaExporter
             }
             fields = new(list);
         }
+        GraphQLImplementsInterfaces? interfaces = null;
+        if (graphType.ResolvedInterfaces.Count > 0)
+        {
+            var list = new List<GraphQLNamedType>(graphType.ResolvedInterfaces.Count);
+            foreach (var interfaceType in graphType.ResolvedInterfaces)
+            {
+                list.Add(new(new(interfaceType.Name)));
+            }
+            interfaces = new(list);
+        }
         var ret = new GraphQLInterfaceTypeDefinition(new(graphType.Name))
         {
             Fields = fields,
+            Interfaces = interfaces,
         };
         return ApplyDescription(ApplyDirectives(ret, graphType), graphType);
     }

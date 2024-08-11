@@ -570,14 +570,6 @@ public class SchemaTypes : IEnumerable<IGraphType>
                 {
                     obj.AddResolvedInterface(interfaceInstance);
                     interfaceInstance.AddPossibleType(obj);
-
-                    if (interfaceInstance.ResolveType == null && obj.IsTypeOf == null)
-                    {
-                        throw new InvalidOperationException(
-                           $"Interface type '{interfaceInstance.Name}' does not provide a 'resolveType' function " +
-                           $"and possible Type '{obj.Name}' does not provide a 'isTypeOf' function. " +
-                            "There is no way to resolve this possible type during execution.");
-                    }
                 }
             }
         }
@@ -950,17 +942,18 @@ Make sure that your ServiceProvider is configured correctly.");
             {
                 var interfaceType = (IInterfaceGraphType)ConvertTypeReference(objectType, list[i]);
 
-                if (objectType.IsTypeOf == null && interfaceType.ResolveType == null)
-                {
-                    throw new InvalidOperationException(
-                           $"Interface type '{interfaceType.Name}' does not provide a 'resolveType' function " +
-                           $"and possible Type '{objectType.Name}' does not provide a 'isTypeOf' function.  " +
-                            "There is no way to resolve this possible type during execution.");
-                }
-
                 interfaceType.AddPossibleType(objectType);
 
                 list[i] = interfaceType;
+            }
+        }
+
+        if (type is IInterfaceGraphType iface)
+        {
+            var list = iface.ResolvedInterfaces.List;
+            for (int i = 0; i < list.Count; ++i)
+            {
+                list[i] = (IInterfaceGraphType)ConvertTypeReference(iface, list[i]);
             }
         }
 

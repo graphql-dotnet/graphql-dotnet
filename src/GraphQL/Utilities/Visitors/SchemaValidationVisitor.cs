@@ -75,6 +75,30 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 
         if (field.Validator != null)
             throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Validator set. You should set Validator only for fields of input object types.");
+
+        if (field.ResolvedType is IAbstractGraphType interfaceType && interfaceType.ResolveType == null)
+        {
+            foreach (var possibleType in interfaceType.PossibleTypes.List)
+            {
+                if (possibleType.IsTypeOf == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Interface type '{interfaceType.Name}' does not provide a 'resolveType' function " +
+                        $"and possible Type '{field.ResolvedType.Name}' does not provide a 'isTypeOf' function.  " +
+                        "There is no way to resolve this possible type during execution.");
+                }
+            }
+            interfaceType.ResolveType = (value) =>
+            {
+                foreach (var possible in interfaceType.PossibleTypes.List)
+                {
+                    if (possible.IsTypeOf != null && possible.IsTypeOf(value))
+                        return possible;
+                }
+
+                return null;
+            };
+        }
     }
 
     /// <inheritdoc/>

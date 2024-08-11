@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Provides properties for enumerating supported GraphQL interface types for an output graph type.
 /// </summary>
-public interface IImplementInterfaces
+public interface IImplementInterfaces : IGraphType
 {
     /// <summary>
     /// Gets or sets a list of .NET types of supported GraphQL interface types.
