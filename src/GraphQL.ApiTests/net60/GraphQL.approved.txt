@@ -295,7 +295,9 @@ namespace GraphQL
         public virtual void Modify(GraphQL.Utilities.FieldConfig field) { }
         public virtual void Modify(GraphQL.Utilities.TypeConfig type) { }
         public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-        public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
+        public virtual void Modify(GraphQL.Types.IGraphType graphType, System.Type sourceType) { }
+        public virtual void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
+        public virtual void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
         public virtual void Modify<TParameterType>(GraphQL.Types.ArgumentInformation argumentInformation) { }
         public virtual bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
@@ -1636,7 +1638,7 @@ namespace GraphQL.Federation
     {
         public FederationResolverAttribute() { }
         public override void Modify(GraphQL.Types.TypeInformation typeInformation) { }
-        public override void Modify(GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, GraphQL.Types.FieldType fieldType, bool isInputType, ref bool ignore) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
         public override bool ShouldInclude(System.Reflection.MemberInfo memberInfo, bool? isInputType) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Enum | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter)]

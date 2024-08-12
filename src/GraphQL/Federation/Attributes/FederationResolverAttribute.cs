@@ -46,7 +46,7 @@ public partial class FederationResolverAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc/>
-    public override void Modify(IGraphType graphType, MemberInfo memberInfo, FieldType fieldType, bool isInputType, ref bool ignore)
+    public override void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
     {
         if (!isInputType)
         {

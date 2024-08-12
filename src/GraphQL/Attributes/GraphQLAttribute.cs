@@ -33,6 +33,13 @@ public abstract class GraphQLAttribute : Attribute
     }
 
     /// <summary>
+    /// Updates the properties of the specified <see cref="IGraphType"/> as necessary.
+    /// </summary>
+    public virtual void Modify(IGraphType graphType, Type sourceType)
+    {
+    }
+
+    /// <summary>
     /// Updates the properties of the specified <see cref="EnumValueDefinition"/> as necessary.
     /// </summary>
     public virtual void Modify(EnumValueDefinition enumValueDefinition)
@@ -58,7 +65,7 @@ public abstract class GraphQLAttribute : Attribute
     /// <param name="memberInfo">The <see cref="MemberInfo"/> that the field was generated from.</param>
     /// <param name="isInputType">Indicates if the graph type containing this field is an input type.</param>
     /// <param name="ignore">Indicates that the field should not be added to the graph type.</param>
-    public virtual void Modify(IGraphType graphType, MemberInfo memberInfo, FieldType fieldType, bool isInputType, ref bool ignore)
+    public virtual void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
     {
     }
 
@@ -99,6 +106,13 @@ public abstract class GraphQLAttribute : Attribute
     /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
     /// </summary>
     public virtual void Modify(QueryArgument queryArgument)
+    {
+    }
+
+    /// <summary>
+    /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
+    /// </summary>
+    public virtual void Modify(QueryArgument queryArgument, ParameterInfo parameterInfo)
     {
     }
 

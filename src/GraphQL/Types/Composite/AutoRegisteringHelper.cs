@@ -71,7 +71,10 @@ public static class AutoRegisteringHelper
                 // as the generated query argument's name is used within the expression for the call to GetArgument
                 var attributes = parameterInfo.GetGraphQLAttributes();
                 foreach (var attr in attributes)
+                {
                     attr.Modify(queryArgument);
+                    attr.Modify(queryArgument, parameterInfo);
+                }
             }
             expression ??= GetParameterExpression(
                 parameterInfo.ParameterType,
@@ -127,6 +130,7 @@ public static class AutoRegisteringHelper
         foreach (var attr in attributes)
         {
             attr.Modify(graphType);
+            attr.Modify(graphType, typeof(TSourceType));
         }
     }
 
@@ -196,7 +200,7 @@ public static class AutoRegisteringHelper
         foreach (var attr in attributes)
         {
             attr.Modify(fieldType, isInputType);
-            attr.Modify(graphType, memberInfo, fieldType, isInputType, ref ignore);
+            attr.Modify(fieldType, isInputType, graphType, memberInfo, ref ignore);
         }
     }
 
