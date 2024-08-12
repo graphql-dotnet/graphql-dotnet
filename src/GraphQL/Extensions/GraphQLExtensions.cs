@@ -307,11 +307,7 @@ public static class GraphQLExtensions
     /// equal or a subset of the second super type (covariant).
     /// </summary>
     public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType)
-    {
-        var ret = IsSubtypeOf(maybeSubType, superType, false);
-        System.Diagnostics.Debug.WriteLine($"superType: {superType}, maybeSubType: {maybeSubType}, return: {ret}");
-        return ret;
-    }
+        => IsSubtypeOf(maybeSubType, superType, false);
 
     /// <summary>
     /// Provided a type and a super type, return <see langword="true"/> if the first type is either
