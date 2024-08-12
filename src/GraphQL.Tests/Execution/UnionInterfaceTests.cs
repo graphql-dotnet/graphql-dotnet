@@ -90,7 +90,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
                 "fields": [
                   { "name": "name" }
                 ],
-                "interfaces": null,
+                "interfaces": [],
                 "possibleTypes": [
                   { "name": "Dog" },
                   { "name": "Cat" },

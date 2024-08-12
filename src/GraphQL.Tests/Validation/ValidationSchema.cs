@@ -47,7 +47,7 @@ public class Dog : ObjectGraphType
     public Dog()
     {
         Field<StringGraphType>("name")
-            .Argument<StringGraphType>("surname");
+            .Argument<BooleanGraphType>("surname");
         Field<StringGraphType>("nickname");
         Field<BooleanGraphType>("barks");
         Field<IntGraphType>("barkVolume");
@@ -77,7 +77,7 @@ public class Cat : ObjectGraphType
     public Cat()
     {
         Field<StringGraphType>("name")
-            .Argument<StringGraphType>("surname");
+            .Argument<BooleanGraphType>("surname");
         Field<StringGraphType>("nickname");
         Field<BooleanGraphType>("meows");
         Field<IntGraphType>("meowVolume");

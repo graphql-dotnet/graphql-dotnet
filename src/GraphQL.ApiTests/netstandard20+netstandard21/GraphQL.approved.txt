@@ -464,7 +464,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, bool allowScalarsForLists) { }
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
-        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IObjectGraphType type, bool throwError = true) { }
+        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType implementedType, GraphQL.Types.IComplexGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object? value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)
@@ -2516,12 +2516,9 @@ namespace GraphQL.Types
     public sealed class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public GraphQLTypeReference(string typeName) { }
-        public GraphQL.Types.Interfaces Interfaces { get; }
         public System.Func<object, bool>? IsTypeOf { get; set; }
-        public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public bool SkipTypeCheck { get; set; }
         public string TypeName { get; }
-        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
     }
@@ -2587,10 +2584,11 @@ namespace GraphQL.Types
     {
         object? DefaultValue { get; }
     }
-    public interface IImplementInterfaces
+    public interface IImplementInterfaces : GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         GraphQL.Types.Interfaces Interfaces { get; }
         GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IInputObjectGraphType : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2599,7 +2597,7 @@ namespace GraphQL.Types
         object ParseDictionary(System.Collections.Generic.IDictionary<string, object?> value);
         GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
-    public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface IMetadataReader : GraphQL.Types.IProvideMetadata { }
     public interface IMetadataWriter : GraphQL.Types.IProvideMetadata
     {
@@ -2613,7 +2611,6 @@ namespace GraphQL.Types
     {
         System.Func<object, bool>? IsTypeOf { get; set; }
         bool SkipTypeCheck { get; set; }
-        void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType);
     }
     public interface IProvideDeprecationReason
     {
@@ -2706,12 +2703,18 @@ namespace GraphQL.Types
     {
         public InterfaceGraphType() { }
     }
-    public class InterfaceGraphType<TSource> : GraphQL.Types.ComplexGraphType<TSource>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public class InterfaceGraphType<TSource> : GraphQL.Types.ComplexGraphType<TSource>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InterfaceGraphType() { }
+        public GraphQL.Types.Interfaces Interfaces { get; }
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
         public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
+        public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
+        public void Interface(System.Type type) { }
+        public void Interface<TInterface>()
+            where TInterface : GraphQL.Types.IInterfaceGraphType { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
     {

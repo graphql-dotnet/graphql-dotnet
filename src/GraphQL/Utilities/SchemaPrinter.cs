@@ -228,6 +228,9 @@ public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
     {
         Schema?.Initialize();
 
+        if (type.ResolvedInterfaces.Count > 0)
+            throw new NotImplementedException("SchemaPrinter does not support interfaces extending other interfaces. Please use the schema.Print() extension method instead.");
+
         return FormatDescription(type.Description) + "interface {1} {{{0}{2}{0}}}".ToFormat(Environment.NewLine, type.Name, PrintFields(type));
     }
 

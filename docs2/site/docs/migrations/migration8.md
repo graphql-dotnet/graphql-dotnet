@@ -956,6 +956,60 @@ of scalars. Be sure the returned list type (e.g. `IEnumerable<int>`) matches the
 to take advantage of this optimization. Scalar types that require conversion, such as `DateTimeGraphType` are not
 currently optimized in this way.
 
+### 27. Interfaces may implement other interfaces
+
+Pursuant to the current GraphQL specification, interfaces may implement other interfaces. Add implemented interfaces
+to your interface type definition as done for object graph types, as shown below:
+
+Schema-first:
+
+```graphql
+interface Node {
+  id: ID!
+}
+
+interface Character implements Node {
+  id: ID!
+  name: String!
+}
+```
+
+Code-first:
+
+```csharp
+public class NodeGraphType : InterfaceGraphType
+{
+    public NodeGraphType()
+    {
+        Field<NonNullGraphType<IdGraphType>>("id");
+    }
+}
+
+public class CharacterGraphType : InterfaceGraphType
+{
+    public CharacterGraphType()
+    {
+        Field<NonNullGraphType<IdGraphType>>("id");
+        Field<NonNullGraphType<StringGraphType>>("name");
+        Interface<NodeGraphType>();
+    }
+}
+```
+
+Type-first:
+
+```csharp
+public interface Node
+{
+    string Id { get; }
+}
+[Implements(typeof(Node))]
+public interface Character : Node
+{
+    string Name { get; }
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
@@ -1287,3 +1341,13 @@ The `IdGraphType` now serializes values using the invariant culture.
 ### 25. DirectiveAttribute moved to GraphQL namespace
 
 The `DirectiveAttribute` has been moved to the `GraphQL` namespace.
+
+### 26. Changes to support interface inheritance
+
+Small changes were made to `IInterfaceGraphType` and `IImplementInterfaces` to support interface inheritance.
+If you have custom implementations of these interfaces, you may need to update them.
+
+### 27. Stricter type checking when implementing interfaces
+
+Verfies that the arguments defined on fields of interfaces are also defined on fields of implementing types,
+pursuant to GraphQL specifications.

@@ -483,6 +483,12 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
             }
         }
 
+        if (interfaceDef.Interfaces != null)
+        {
+            foreach (var i in interfaceDef.Interfaces)
+                type.AddResolvedInterface(new GraphQLTypeReference(i.Name.StringValue));
+        }
+
         return type;
     }
 
