@@ -228,7 +228,7 @@ public static class GraphQLExtensions
                 {
                     if (arg.ResolvedType is NonNullGraphType && implementedField.Arguments?.Find(arg.Name) == null)
                     {
-                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{arg.Name}' is not defined in the interface.") : false;
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{arg.Name}' is not defined in the interface. Please define the argument to be optional (nullable), include it on the interface field, or remove it from the implementing field.") : false;
                     }
                 }
             }
