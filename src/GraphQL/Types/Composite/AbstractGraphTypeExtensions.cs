@@ -10,11 +10,14 @@ public static class AbstractGraphTypeExtensions
     /// </summary>
     public static bool IsPossibleType(this IAbstractGraphType abstractType, IGraphType type)
     {
-        foreach (var possible in abstractType.PossibleTypes.List)
-        {
-            if (possible.Equals(type))
-                return true;
-        }
+        if (abstractType == type)
+            return true;
+
+        if (abstractType is IInterfaceGraphType && type is IImplementInterfaces hasInterfacesType && hasInterfacesType.ResolvedInterfaces.List.Contains(abstractType))
+            return true;
+
+        if (type is IObjectGraphType objectType && abstractType.PossibleTypes.List.Contains(objectType))
+            return true;
 
         return false;
     }

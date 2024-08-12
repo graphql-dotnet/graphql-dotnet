@@ -464,7 +464,7 @@ namespace GraphQL
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType) { }
         public static bool IsSubtypeOf(this GraphQL.Types.IGraphType maybeSubType, GraphQL.Types.IGraphType superType, bool allowScalarsForLists) { }
         public static bool IsValidDefault(this GraphQL.Types.IGraphType type, object? value) { }
-        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType iface, GraphQL.Types.IComplexGraphType type, bool throwError = true) { }
+        public static bool IsValidInterfaceFor(this GraphQL.Types.IInterfaceGraphType implementedType, GraphQL.Types.IComplexGraphType type, bool throwError = true) { }
         public static string NameOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static GraphQLParser.AST.GraphQLValue ToAST(this GraphQL.Types.IGraphType type, object? value) { }
         public static TMetadataProvider WithMetadata<TMetadataProvider>(this TMetadataProvider provider, string key, object? value)

@@ -174,24 +174,62 @@ public static class GraphQLExtensions
     /// An Interface defines a list of fields; Object types that implement that interface are guaranteed to implement those fields.
     /// Whenever the type system claims it will return an interface, it will return a valid implementing type.
     /// </summary>
-    /// <param name="iface">The interface graph type.</param>
+    /// <param name="implementedType">The interface graph type.</param>
     /// <param name="type">The object graph type to verify it against.</param>
     /// <param name="throwError">Set to <see langword="true"/> to generate an error if the type does not match the interface.</param>
-    public static bool IsValidInterfaceFor(this IInterfaceGraphType iface, IComplexGraphType type, bool throwError = true)
+    public static bool IsValidInterfaceFor(this IInterfaceGraphType implementedType, IComplexGraphType type, bool throwError = true)
     {
-        foreach (var field in iface.Fields)
-        {
-            var found = type.GetField(field.Name);
+        // note: interfaces are only valid for object types
 
-            if (found == null)
+        // loop through all fields defined in the interface
+        foreach (var implementedField in implementedType.Fields)
+        {
+            // find the field on the object type that implements the interface field
+            // note: "object type" may refer to an object or interface type that implements the interface
+            var field = type.GetField(implementedField.Name);
+
+            // the field is required to be present on the object type
+            if (field == null)
             {
-                return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. It has no field '{field.Name}'.") : false;
+                return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. It has no field '{implementedField.Name}'.") : false;
             }
 
-            if (found.ResolvedType != null && field.ResolvedType != null && found.ResolvedType is not GraphQLTypeReference && field.ResolvedType is not GraphQLTypeReference)
+            // the type of the field on the object type must be the same or a subtype of the type of the field on the interface
+            if (field.ResolvedType != null && implementedField.ResolvedType != null && field.ResolvedType is not GraphQLTypeReference && implementedField.ResolvedType is not GraphQLTypeReference)
             {
-                if (!IsSubtypeOf(found.ResolvedType, field.ResolvedType))
-                    return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {iface.GetType().GetFriendlyName()} with name '{iface.Name}'. Field '{field.Name}' must be of type '{field.ResolvedType}' or covariant from it, but in fact it is of type '{found.ResolvedType}'.") : false;
+                if (!field.ResolvedType.IsSubtypeOf(implementedField.ResolvedType))
+                    return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' must be of type '{implementedField.ResolvedType}' or covariant from it, but in fact it is of type '{field.ResolvedType}'.") : false;
+            }
+
+            // all arguments defined on the interface field must be defined on the object field, and be of the same type (invariant)
+            if (implementedField.Arguments?.Count > 0)
+            {
+                foreach (var implementedArg in implementedField.Arguments)
+                {
+                    var arg = field.Arguments?.Find(implementedArg.Name);
+
+                    if (arg == null)
+                    {
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' has no argument '{implementedArg.Name}'.") : false;
+                    }
+
+                    if (arg.ResolvedType != null && implementedArg.ResolvedType != null && arg.ResolvedType != implementedArg.ResolvedType)
+                    {
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{implementedArg.Name}' must be of type '{implementedArg.ResolvedType}', but in fact it is of type '{arg.ResolvedType}'.") : false;
+                    }
+                }
+            }
+
+            // any other arguments defined on the object field must be optional
+            if (field.Arguments?.Count > 0)
+            {
+                foreach (var arg in field.Arguments)
+                {
+                    if (arg.ResolvedType is NonNullGraphType && implementedField.Arguments?.Find(arg.Name) == null)
+                    {
+                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{arg.Name}' is not defined in the interface.") : false;
+                    }
+                }
             }
         }
 
@@ -269,7 +307,11 @@ public static class GraphQLExtensions
     /// equal or a subset of the second super type (covariant).
     /// </summary>
     public static bool IsSubtypeOf(this IGraphType maybeSubType, IGraphType superType)
-        => IsSubtypeOf(maybeSubType, superType, false);
+    {
+        var ret = IsSubtypeOf(maybeSubType, superType, false);
+        System.Diagnostics.Debug.WriteLine($"superType: {superType}, maybeSubType: {maybeSubType}, return: {ret}");
+        return ret;
+    }
 
     /// <summary>
     /// Provided a type and a super type, return <see langword="true"/> if the first type is either
@@ -358,7 +400,7 @@ public static class GraphQLExtensions
         // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
         // If superType type is an abstract type, maybeSubType type may be a currently
         // possible object type.
-        if (superType is IAbstractGraphType type && maybeSubType is IObjectGraphType)
+        if (superType is IAbstractGraphType type)
         {
             return type.IsPossibleType(maybeSubType);
         }

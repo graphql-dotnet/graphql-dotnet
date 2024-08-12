@@ -234,6 +234,34 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
             """, StringCompareShould.IgnoreLineEndings);
     }
 
+    [Theory]
+    [InlineData(11, typeof(Interface1), typeof(Interface2), false)]
+    [InlineData(12, typeof(Interface2), typeof(Interface1), false)]
+    [InlineData(13, typeof(Interface2), typeof(Interface3), true)]
+    [InlineData(14, typeof(Interface3), typeof(Interface2), false)]
+    [InlineData(15, typeof(Interface6), typeof(Interface7), true)]
+    [InlineData(16, typeof(Interface7), typeof(Interface6), false)]
+    [InlineData(17, typeof(Interface8), typeof(Interface9), false)]
+    [InlineData(18, typeof(Interface9), typeof(Interface8), false)]
+    [InlineData(19, typeof(Interface10), typeof(Interface8), true)]
+    [InlineData(20, typeof(Interface8), typeof(Interface10), false)]
+    [InlineData(21, typeof(Interface10), typeof(Interface9), false)]
+    [InlineData(22, typeof(Interface9), typeof(Interface10), false)]
+    [InlineData(23, typeof(Interface8), typeof(Interface11), true)]
+    [InlineData(24, typeof(Interface11), typeof(Interface8), false)]
+    private void IsValidInterfaceFor(int i, Type interfaceType, Type superType, bool isValidInterface)
+    {
+        _ = i;
+        var schema = new Schema() { Query = new ObjectGraphType() };
+        schema.Query.AddField(new FieldType { Name = "dummy", Type = typeof(StringGraphType) });
+        schema.RegisterType(superType);
+        schema.RegisterType(interfaceType);
+        schema.Initialize();
+        var superGraphType = schema.AllTypes[((IGraphType)Activator.CreateInstance(superType)!).Name].ShouldBeAssignableTo<IComplexGraphType>().ShouldNotBeNull();
+        var interfaceGraphType = schema.AllTypes[((IGraphType)Activator.CreateInstance(interfaceType)!).Name].ShouldBeAssignableTo<IInterfaceGraphType>().ShouldNotBeNull();
+        interfaceGraphType.IsValidInterfaceFor(superGraphType, false).ShouldBe(isValidInterface);
+    }
+
     public class MySchema : Schema
     {
         public MySchema()
@@ -346,7 +374,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         }
     }
 
-    public class TypeFirstSchema
+    public static class TypeFirstSchema
     {
         public class Query
         {
@@ -385,6 +413,99 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         {
             [Id]
             string Id { get; }
+        }
+    }
+
+    public class Interface1 : InterfaceGraphType
+    {
+        public Interface1()
+        {
+            Field<NonNullGraphType<IdGraphType>>("id");
+        }
+    }
+
+    public class Interface2 : InterfaceGraphType // wider than Interface3
+    {
+        public Interface2()
+        {
+            Field<StringGraphType>("name");
+        }
+    }
+
+    public class Interface3 : InterfaceGraphType // narrower than Interface2
+    {
+        public Interface3()
+        {
+            Field<NonNullGraphType<StringGraphType>>("name");
+        }
+    }
+
+    public class Interface4 : InterfaceGraphType // wider than Interface5
+    {
+        public Interface4()
+        {
+            Field<StringGraphType>("name");
+        }
+    }
+
+    public class Interface5 : InterfaceGraphType // narrower than Interface4
+    {
+        public Interface5()
+        {
+            Field<NonNullGraphType<StringGraphType>>("name");
+            Interface<Interface4>();
+        }
+    }
+
+    public class Interface6 : InterfaceGraphType // wider than Interface7
+    {
+        public Interface6()
+        {
+            Field<Interface4>("test");
+        }
+    }
+
+    public class Interface7 : InterfaceGraphType // narrower than Interfac6
+    {
+        public Interface7()
+        {
+            Field<Interface5>("test");
+        }
+    }
+
+    public class Interface8 : InterfaceGraphType
+    {
+        public Interface8()
+        {
+            Field<StringGraphType>("test")
+                .Argument<StringGraphType>("arg");
+        }
+    }
+
+    public class Interface9 : InterfaceGraphType
+    {
+        public Interface9()
+        {
+            Field<StringGraphType>("test")
+                .Argument<NonNullGraphType<StringGraphType>>("arg");
+        }
+    }
+
+    public class Interface10 : InterfaceGraphType
+    {
+        public Interface10()
+        {
+            Field<StringGraphType>("test");
+        }
+    }
+
+    public class Interface11 : InterfaceGraphType
+    {
+        public Interface11()
+        {
+            Field<StringGraphType>("test")
+                .Argument<StringGraphType>("arg")
+                .Argument<StringGraphType>("arg2");
         }
     }
 }
