@@ -41,8 +41,11 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         // 3
         // TODO: ? An object type may declare that it implements one or more unique interfaces.
 
-        // 4
-        // TODO: An object type must be a super‐set of all interfaces it implements
+        // Implemented interfaces must be valid for the implementing type.
+        foreach (var iface in type.ResolvedInterfaces.List)
+        {
+            iface.IsValidInterfaceFor(type, true);
+        }
 
         // Transitively implemented interfaces (interfaces implemented by the interface that is being implemented) must also be defined on an implementing type or interface.
         CheckTransitiveInterfaces(type);
@@ -144,6 +147,12 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         {
             if (item.Count() > 1)
                 throw new InvalidOperationException($"The field '{item.Key}' must have a unique name within Interface type '{type.Name}'; no two fields may share the same name.");
+        }
+
+        // Implemented interfaces must be valid for the implementing type.
+        foreach (var iface in type.ResolvedInterfaces.List)
+        {
+            iface.IsValidInterfaceFor(type, true);
         }
 
         // Interface definitions must not contain cyclic references nor implement themselves.

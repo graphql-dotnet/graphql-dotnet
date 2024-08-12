@@ -213,9 +213,10 @@ public static class GraphQLExtensions
                         return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' has no argument '{implementedArg.Name}'.") : false;
                     }
 
-                    if (arg.ResolvedType != null && implementedArg.ResolvedType != null && arg.ResolvedType != implementedArg.ResolvedType)
+                    if (arg.ResolvedType != null && implementedArg.ResolvedType != null && arg.ResolvedType is not GraphQLTypeReference && implementedArg.ResolvedType is not GraphQLTypeReference)
                     {
-                        return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{implementedArg.Name}' must be of type '{implementedArg.ResolvedType}', but in fact it is of type '{arg.ResolvedType}'.") : false;
+                        if (!arg.ResolvedType.IsSubtypeOf(implementedArg.ResolvedType, false))
+                            return throwError ? throw new ArgumentException($"Type {type.GetType().GetFriendlyName()} with name '{type.Name}' does not implement interface {implementedType.GetType().GetFriendlyName()} with name '{implementedType.Name}'. Field '{implementedField.Name}' argument '{implementedArg.Name}' must be of type '{implementedArg.ResolvedType}', but in fact it is of type '{arg.ResolvedType}'.") : false;
                     }
                 }
             }

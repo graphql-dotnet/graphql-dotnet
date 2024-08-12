@@ -241,7 +241,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
     [InlineData(14, typeof(Interface3), typeof(Interface2), false)]
     [InlineData(15, typeof(Interface6), typeof(Interface7), true)]
     [InlineData(16, typeof(Interface7), typeof(Interface6), false)]
-    [InlineData(17, typeof(Interface8), typeof(Interface9), false)]
+    [InlineData(17, typeof(Interface8), typeof(Interface9), true)]
     [InlineData(18, typeof(Interface9), typeof(Interface8), false)]
     [InlineData(19, typeof(Interface10), typeof(Interface8), true)]
     [InlineData(20, typeof(Interface8), typeof(Interface10), false)]
