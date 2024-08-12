@@ -203,6 +203,7 @@ internal static class AutoRegisteringOutputHelper
         foreach (var attr in attributes)
         {
             attr.Modify(queryArgument);
+            attr.Modify(queryArgument, parameterInfo);
         }
     }
 }

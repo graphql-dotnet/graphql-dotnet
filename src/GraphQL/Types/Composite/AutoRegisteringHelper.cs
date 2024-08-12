@@ -71,7 +71,10 @@ namespace GraphQL.Types
                     // as the generated query argument's name is used within the expression for the call to GetArgument
                     var attributes = parameterInfo.GetGraphQLAttributes();
                     foreach (var attr in attributes)
+                    {
                         attr.Modify(queryArgument);
+                        attr.Modify(queryArgument, parameterInfo);
+                    }
                 }
                 expression ??= GetParameterExpression(
                     parameterInfo.ParameterType,
@@ -127,6 +130,7 @@ namespace GraphQL.Types
             foreach (var attr in attributes)
             {
                 attr.Modify(graphType);
+                attr.Modify(graphType, typeof(TSourceType));
             }
         }
 

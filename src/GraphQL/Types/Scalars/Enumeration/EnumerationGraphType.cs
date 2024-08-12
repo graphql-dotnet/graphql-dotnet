@@ -172,6 +172,7 @@ public class EnumerationGraphType<TEnum> : EnumerationGraphType
         foreach (var attr in type.GetGraphQLAttributes())
         {
             attr.Modify(this);
+            attr.Modify(this, typeof(TEnum));
         }
     }
 

@@ -33,6 +33,13 @@ namespace GraphQL
         }
 
         /// <summary>
+        /// Updates the properties of the specified <see cref="IGraphType"/> as necessary.
+        /// </summary>
+        public virtual void Modify(IGraphType graphType, Type sourceType)
+        {
+        }
+
+        /// <summary>
         /// Updates the properties of the specified <see cref="EnumValueDefinition"/> as necessary.
         /// </summary>
         public virtual void Modify(EnumValueDefinition enumValueDefinition)
@@ -99,6 +106,13 @@ namespace GraphQL
         /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
         /// </summary>
         public virtual void Modify(QueryArgument queryArgument)
+        {
+        }
+
+        /// <summary>
+        /// Updates the properties of the specified <see cref="QueryArgument"/> as necessary.
+        /// </summary>
+        public virtual void Modify(QueryArgument queryArgument, ParameterInfo parameterInfo)
         {
         }
 
