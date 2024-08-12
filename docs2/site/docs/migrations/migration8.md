@@ -1346,3 +1346,8 @@ The `DirectiveAttribute` has been moved to the `GraphQL` namespace.
 
 Small changes were made to `IInterfaceGraphType` and `IImplementInterfaces` to support interface inheritance.
 If you have custom implementations of these interfaces, you may need to update them.
+
+### 27. Stricter type checking when implementing interfaces
+
+Verfies that the arguments defined on fields of interfaces are also defined on fields of implementing types,
+pursuant to GraphQL specifications.
