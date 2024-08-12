@@ -5,9 +5,11 @@ using NuGet.Frameworks;
 
 namespace GraphQL.Analyzers.Tests.VerifiersExtensions;
 
-public class ReferenceResolver
+public static class ReferenceResolver
 {
-    public static ReferenceAssemblies ResolveReferenceAssemblies()
+    public static ReferenceAssemblies ReferenceAssemblies { get; } = ResolveReferenceAssemblies();
+
+    private static ReferenceAssemblies ResolveReferenceAssemblies()
     {
         string assemblyLocation = Assembly
             .GetCallingAssembly()
@@ -19,7 +21,7 @@ public class ReferenceResolver
         return CreateReferenceAssemblies(targetFramework);
     }
 
-    public static ReferenceAssemblies CreateReferenceAssemblies(NuGetFramework targetFramework)
+    private static ReferenceAssemblies CreateReferenceAssemblies(NuGetFramework targetFramework)
     {
         if (!targetFramework.IsPackageBased)
         {
