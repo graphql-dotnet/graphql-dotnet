@@ -65,7 +65,7 @@ namespace GraphQL
         /// <param name="memberInfo">The <see cref="MemberInfo"/> that the field was generated from.</param>
         /// <param name="isInputType">Indicates if the graph type containing this field is an input type.</param>
         /// <param name="ignore">Indicates that the field should not be added to the graph type.</param>
-        public virtual void Modify(IGraphType graphType, MemberInfo memberInfo, FieldType fieldType, bool isInputType, ref bool ignore)
+        public virtual void Modify(FieldType fieldType, bool isInputType, IGraphType graphType, MemberInfo memberInfo, ref bool ignore)
         {
         }
 

@@ -198,7 +198,7 @@ namespace GraphQL.Types
             foreach (var attr in attributes)
             {
                 attr.Modify(fieldType, isInputType);
-                attr.Modify(graphType, memberInfo, fieldType, isInputType, ref ignore);
+                attr.Modify(fieldType, isInputType, graphType, memberInfo, ref ignore);
             }
         }
 
