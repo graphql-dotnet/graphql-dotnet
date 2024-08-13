@@ -8,13 +8,28 @@ namespace GraphQL.Utilities;
 /// </summary>
 public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
 {
-    /// <summary>
-    /// Returns a static instance of the <see cref="AppliedDirectivesValidationVisitor"/> class.
-    /// </summary>
-    public static readonly AppliedDirectivesValidationVisitor Instance = new();
+    private readonly List<Exception> _exceptions = new();
 
     private AppliedDirectivesValidationVisitor()
     {
+    }
+
+    /// <inheritdoc cref="AppliedDirectivesValidationVisitor"/>
+    public static void Run(ISchema schema)
+    {
+        var visitor = new AppliedDirectivesValidationVisitor();
+        visitor.Run(schema);
+        if (visitor._exceptions.Count > 0)
+            throw visitor._exceptions.Count == 1
+                ? visitor._exceptions[0]
+                : new AggregateException(
+                    "The schema is invalid. See inner exceptions for details.",
+                    visitor._exceptions);
+    }
+
+    private void ReportError(Exception ex)
+    {
+        _exceptions.Add(ex);
     }
 
     /// <inheritdoc/>
@@ -92,20 +107,25 @@ public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
             foreach (var directive in schema.Directives.List)
             {
                 if (!directive.Repeatable && appliedDirectives.Count(applied => applied.Name == directive.Name) > 1)
-                    throw new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to {GetElementDescription()} more than one time.");
+                    ReportError(new InvalidOperationException($"Non-repeatable directive '{directive.Name}' is applied to {GetElementDescription()} more than one time."));
             }
 
             foreach (var appliedDirective in appliedDirectives)
             {
-                var schemaDirective = schema.Directives.Find(appliedDirective.Name)
-                    ?? throw new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
+                var schemaDirective = schema.Directives.Find(appliedDirective.Name);
+
+                if (schemaDirective == null)
+                {
+                    ReportError(new InvalidOperationException($"Unknown directive '{appliedDirective.Name}' applied to {GetElementDescription()}."));
+                    continue;
+                }
 
                 if (location != null && !schemaDirective.Locations.Contains(location.Value))
                 {
                     // TODO: think about strict check; needs to rewrite some tests (5)
                     // This is a temporary solution for @deprecated directive that we actually allow to more schema elements.
                     if (schemaDirective.Name != "deprecated")
-                        throw new InvalidOperationException($"Directive '{schemaDirective.Name}' is applied in the wrong location '{location.Value}' to {GetElementDescription()}. Allowed locations: {string.Join(", ", schemaDirective.Locations)}");
+                        ReportError(new InvalidOperationException($"Directive '{schemaDirective.Name}' is applied in the wrong location '{location.Value}' to {GetElementDescription()}. Allowed locations: {string.Join(", ", schemaDirective.Locations)}"));
                 }
 
                 if (schemaDirective.Arguments?.Count > 0)
@@ -117,12 +137,12 @@ public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
                         {
                             // definedArg.DefaultValue has been already validated in SchemaValidationVisitor.VisitDirectiveArgumentDefinition
                             if (definedArg.ResolvedType is NonNullGraphType && definedArg.DefaultValue == null)
-                                throw new InvalidOperationException($"Directive '{appliedDirective.Name}' applied to {GetElementDescription()} does not specify required argument '{definedArg.Name}' that has no default value.");
+                                ReportError(new InvalidOperationException($"Directive '{appliedDirective.Name}' applied to {GetElementDescription()} does not specify required argument '{definedArg.Name}' that has no default value."));
                         }
                         else
                         {
                             if (definedArg.ResolvedType is NonNullGraphType && appliedArg.Value == null)
-                                throw new InvalidOperationException($"Directive '{appliedDirective.Name}' applied to {GetElementDescription()} explicitly specifies 'null' value for required argument '{definedArg.Name}'. The value must be non-null.");
+                                ReportError(new InvalidOperationException($"Directive '{appliedDirective.Name}' applied to {GetElementDescription()} explicitly specifies 'null' value for required argument '{definedArg.Name}'. The value must be non-null."));
                         }
 
                         //TODO: add check for applied directive argument value type
@@ -135,7 +155,7 @@ public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
                     foreach (var arg in appliedDirective.List!)
                     {
                         if (schemaDirective.Arguments?.Find(arg.Name) == null)
-                            throw new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}' applied to {GetElementDescription()}.");
+                            ReportError(new InvalidOperationException($"Unknown directive argument '{arg.Name}' for directive '{appliedDirective.Name}' applied to {GetElementDescription()}."));
                     }
                 }
 

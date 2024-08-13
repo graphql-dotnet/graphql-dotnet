@@ -10,13 +10,23 @@ namespace GraphQL.Utilities;
 /// </summary>
 public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 {
-    /// <summary>
-    /// Returns a static instance of the <see cref="SchemaValidationVisitor"/> class.
-    /// </summary>
-    public static readonly SchemaValidationVisitor Instance = new();
+    private readonly List<Exception> _exceptions = new();
 
     private SchemaValidationVisitor()
     {
+    }
+
+    /// <inheritdoc cref="SchemaValidationVisitor"/>
+    public static void Run(ISchema schema)
+    {
+        var visitor = new SchemaValidationVisitor();
+        visitor.Run(schema);
+        if (visitor._exceptions.Count > 0)
+            throw visitor._exceptions.Count == 1
+                ? visitor._exceptions[0]
+                : new AggregateException(
+                    "The schema is invalid. See inner exceptions for details.",
+                    visitor._exceptions);
     }
 
     #region Object
@@ -29,13 +39,13 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 1
         if (!type.IsPrivate && type.Fields.Count == 0)
-            throw new InvalidOperationException($"An Object type '{type.Name}' must define one or more fields.");
+            ReportError(new InvalidOperationException($"An Object type '{type.Name}' must define one or more fields."));
 
         // 2.1
         foreach (var item in type.Fields.List.ToLookup(f => f.Name))
         {
             if (item.Count() > 1)
-                throw new InvalidOperationException($"The field '{item.Key}' must have a unique name within Object type '{type.Name}'; no two fields may share the same name.");
+                ReportError(new InvalidOperationException($"The field '{item.Key}' must have a unique name within Object type '{type.Name}'; no two fields may share the same name."));
         }
 
         // 3
@@ -44,7 +54,14 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         // Implemented interfaces must be valid for the implementing type.
         foreach (var iface in type.ResolvedInterfaces.List)
         {
-            iface.IsValidInterfaceFor(type, true);
+            try
+            {
+                iface.IsValidInterfaceFor(type, true);
+            }
+            catch (Exception ex)
+            {
+                ReportError(ex);
+            }
         }
 
         // Transitively implemented interfaces (interfaces implemented by the interface that is being implemented) must also be defined on an implementing type or interface.
@@ -56,28 +73,28 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 2.2
         if (field.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(field))
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (field.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 2.3
         if (!field.ResolvedType!.IsOutputType())
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must be an output type."));
 
         ValidateFieldArgumentsUniqueness(field, type);
 
         if (field.StreamResolver != null && type != schema.Subscription)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions."));
 
         if (field.Parser != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Parser set. You should set Parser only for fields of input object types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Parser set. You should set Parser only for fields of input object types."));
 
         if (field.Validator != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Validator set. You should set Validator only for fields of input object types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Object type '{type.Name}' must not have Validator set. You should set Validator only for fields of input object types."));
 
         if (field.ResolvedType is IAbstractGraphType interfaceType && interfaceType.ResolveType == null)
         {
@@ -85,10 +102,10 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             {
                 if (possibleType.IsTypeOf == null)
                 {
-                    throw new InvalidOperationException(
+                    ReportError(new InvalidOperationException(
                         $"Interface type '{interfaceType.Name}' does not provide a 'resolveType' function " +
                         $"and possible Type '{possibleType.Name}' does not provide a 'isTypeOf' function.  " +
-                        "There is no way to resolve this possible type during execution.");
+                        "There is no way to resolve this possible type during execution."));
                 }
             }
             interfaceType.ResolveType = (value) =>
@@ -109,24 +126,24 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 2.4.1
         if (argument.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(argument))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (argument.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 2.4.2
         if (!argument.ResolvedType!.IsInputType())
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type."));
 
         // validate default value
         ValidateQueryArgumentDefaultValue(argument, field, type);
 
         // 2.4.3
         if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
-            throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+            ReportError(new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value."));
     }
 
     #endregion
@@ -140,19 +157,26 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 1
         if (!type.IsPrivate && type.Fields.Count == 0)
-            throw new InvalidOperationException($"An Interface type '{type.Name}' must define one or more fields.");
+            ReportError(new InvalidOperationException($"An Interface type '{type.Name}' must define one or more fields."));
 
         // 2.1
         foreach (var item in type.Fields.List.ToLookup(f => f.Name))
         {
             if (item.Count() > 1)
-                throw new InvalidOperationException($"The field '{item.Key}' must have a unique name within Interface type '{type.Name}'; no two fields may share the same name.");
+                ReportError(new InvalidOperationException($"The field '{item.Key}' must have a unique name within Interface type '{type.Name}'; no two fields may share the same name."));
         }
 
         // Implemented interfaces must be valid for the implementing type.
         foreach (var iface in type.ResolvedInterfaces.List)
         {
-            iface.IsValidInterfaceFor(type, true);
+            try
+            {
+                iface.IsValidInterfaceFor(type, true);
+            }
+            catch (Exception ex)
+            {
+                ReportError(ex);
+            }
         }
 
         // Interface definitions must not contain cyclic references nor implement themselves.
@@ -169,7 +193,10 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
                         CheckCyclicReferences(i);
 
                     if (i == type)
-                        throw new InvalidOperationException($"The interface type '{type.Name}' must not contain cyclic references.");
+                    {
+                        ReportError(new InvalidOperationException($"The interface type '{type.Name}' must not contain cyclic references."));
+                        return;
+                    }
                 }
             }
         }
@@ -181,20 +208,25 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     /// <summary>
     /// Ensures that all transitively implemented interfaces are defined on the implementing type.
     /// </summary>
-    private static void CheckTransitiveInterfaces(IImplementInterfaces type)
+    private void CheckTransitiveInterfaces(IImplementInterfaces type)
     {
         if (type.ResolvedInterfaces.Count == 0)
             return;
+
+        var checkedInterfaces = new HashSet<IInterfaceGraphType>();
         CheckChildren(type);
 
         void CheckChildren(IImplementInterfaces iface)
         {
             foreach (var i in iface.ResolvedInterfaces.List)
             {
-                if (!type.ResolvedInterfaces.Contains(i))
-                    throw new InvalidOperationException($"The interface type '{type.Name}' must also define all interfaces implemented by its transitive interfaces. The interface '{i.Name}' is implemented by the interface '{iface.Name}' but is not implemented by '{type.Name}'.");
+                if (checkedInterfaces.Add(i))
+                {
+                    if (!type.ResolvedInterfaces.Contains(i))
+                        ReportError(new InvalidOperationException($"The interface type '{type.Name}' must also define all interfaces implemented by its transitive interfaces. The interface '{i.Name}' is implemented by the interface '{iface.Name}' but is not implemented by '{type.Name}'."));
 
-                CheckChildren(i);
+                    CheckChildren(i);
+                }
             }
         }
     }
@@ -204,31 +236,31 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 2.2
         if (field.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(field))
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (field.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 2.3
         if (!field.ResolvedType!.IsOutputType())
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must be an output type."));
 
         ValidateFieldArgumentsUniqueness(field, type);
 
         if (field.StreamResolver != null && type != schema.Subscription)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions."));
 
         if (field.Resolver != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types."));
 
         if (field.Parser != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Parser set. Each interface is translated to a concrete type during request execution. You should set Parser only for fields of input object types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Parser set. Each interface is translated to a concrete type during request execution. You should set Parser only for fields of input object types."));
 
         if (field.Validator != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Validator set. Each interface is translated to a concrete type during request execution. You should set Validator only for fields of input object types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Validator set. Each interface is translated to a concrete type during request execution. You should set Validator only for fields of input object types."));
     }
 
     /// <inheritdoc/>
@@ -236,24 +268,24 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 2.4.1
         if (argument.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(argument))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (argument.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 2.4.2
         if (!argument.ResolvedType!.IsInputType())
-            throw new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of field '{type.Name}.{field.Name}' must be an input type."));
 
         // validate default value
         ValidateQueryArgumentDefaultValue(argument, field, type);
 
         // 2.4.3
         if (argument.ResolvedType is NonNullGraphType && argument.DefaultValue is null && argument.DeprecationReason is not null)
-            throw new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value.");
+            ReportError(new InvalidOperationException($"The required argument '{argument.Name}' of field '{type.Name}.{field.Name}' has no default value so `@deprecated` directive must not be applied to this argument. To deprecate a required argument, it must first be made optional by either changing the type to nullable or adding a default value."));
     }
 
     #endregion
@@ -267,13 +299,13 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 1
         if (!type.IsPrivate && type.Fields.Count == 0)
-            throw new InvalidOperationException($"An Input Object type '{type.Name}' must define one or more input fields.");
+            ReportError(new InvalidOperationException($"An Input Object type '{type.Name}' must define one or more input fields."));
 
         // 2.1
         foreach (var item in type.Fields.List.ToLookup(f => f.Name))
         {
             if (item.Count() > 1)
-                throw new InvalidOperationException($"The input field '{item.Key}' must have a unique name within Input Object type '{type.Name}'; no two fields may share the same name.");
+                ReportError(new InvalidOperationException($"The input field '{item.Key}' must have a unique name within Input Object type '{type.Name}'; no two fields may share the same name."));
         }
     }
 
@@ -282,17 +314,17 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 2.2
         if (field.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(field))
-            throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (field.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 2.3
         if (!field.ResolvedType!.IsInputType())
-            throw new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type.");
+            ReportError(new InvalidOperationException($"The input field '{field.Name}' of an Input Object '{type.Name}' must be an input type."));
 
         // validate default value
         if (field.DefaultValue is GraphQLValue value)
@@ -301,21 +333,21 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         }
         else if (field.DefaultValue != null && !field.ResolvedType!.IsValidDefault(field.DefaultValue))
         {
-            throw new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid.");
+            ReportError(new InvalidOperationException($"The default value of Input Object type field '{type.Name}.{field.Name}' is invalid."));
         }
 
         if (field.Arguments?.Count > 0)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have any arguments specified.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have any arguments specified."));
 
         // 2.4
         if (field.ResolvedType is NonNullGraphType && field.DefaultValue is null && field.DeprecationReason is not null)
-            throw new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value.");
+            ReportError(new InvalidOperationException($"The required input field '{field.Name}' of an Input Object '{type.Name}' has no default value so `@deprecated` directive must not be applied to this input field. To deprecate an input field, it must first be made optional by either changing the type to nullable or adding a default value."));
 
         if (field.StreamResolver != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions."));
 
         if (field.Resolver != null)
-            throw new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types.");
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have Resolver set. You should set Resolver only for fields of object output types."));
 
         //OneOf Input Objects
         // RULE: If the original Input Object is a OneOf Input Object then:
@@ -324,9 +356,9 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         if (type.IsOneOf)
         {
             if (field.ResolvedType is NonNullGraphType)
-                throw new InvalidOperationException($"The field '{field.Name}' of a OneOf Input Object type '{type.Name}' must be a nullable type.");
+                ReportError(new InvalidOperationException($"The field '{field.Name}' of a OneOf Input Object type '{type.Name}' must be a nullable type."));
             if (field.DefaultValue != null)
-                throw new InvalidOperationException($"The field '{field.Name}' of a OneOf Input Object type '{type.Name}' must not have a default value.");
+                ReportError(new InvalidOperationException($"The field '{field.Name}' of a OneOf Input Object type '{type.Name}' must not have a default value."));
         }
     }
 
@@ -340,13 +372,13 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         var n2 = schema.Mutation?.Name;
         var n3 = schema.Subscription?.Name;
         if (n1 == n2 && n1 != null || n1 == n3 && n1 != null || n2 == n3 && n2 != null)
-            throw new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided.");
+            ReportError(new InvalidOperationException("The query, mutation, and subscription root types must all be different types if provided."));
         if (schema.Subscription != null)
         {
             foreach (var field in schema.Subscription.Fields.List)
             {
                 if (field.StreamResolver == null)
-                    throw new InvalidOperationException($"The field '{field.Name}' of the subscription root type '{schema.Subscription.Name}' must have StreamResolver set.");
+                    ReportError(new InvalidOperationException($"The field '{field.Name}' of the subscription root type '{schema.Subscription.Name}' must have StreamResolver set."));
             }
         }
     }
@@ -358,7 +390,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 1
         if (!type.IsPrivate && type.PossibleTypes.Count == 0)
-            throw new InvalidOperationException($"A Union type '{type.Name}' must include one or more unique member types.");
+            ReportError(new InvalidOperationException($"A Union type '{type.Name}' must include one or more unique member types."));
 
         // 2 [requirement met by design]
         // The member types of a Union type must all be Object base types;
@@ -373,7 +405,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 1
         if (!type.IsPrivate && type.Values.Count == 0)
-            throw new InvalidOperationException($"An Enum type '{type.Name}' must define one or more unique enum values.");
+            ReportError(new InvalidOperationException($"An Enum type '{type.Name}' must define one or more unique enum values."));
     }
 
     // See 'Type Validation' section in https://spec.graphql.org/October2021/#sec-Type-System.Directives
@@ -382,7 +414,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     public override void VisitDirective(Directive directive, ISchema schema)
     {
         if (directive.Locations.Count == 0)
-            throw new InvalidOperationException($"Directive '{directive.Name}' must have locations");
+            ReportError(new InvalidOperationException($"Directive '{directive.Name}' must have locations"));
 
         // 1. A directive definition must not contain the use of a directive which references itself directly.
         // TODO:
@@ -393,7 +425,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 
         // 3
         if (directive.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The directive '{directive.Name}' must not have a name which begins with the __ (two underscores)."));
 
         ValidateDirectiveArgumentsUniqueness(directive);
     }
@@ -403,17 +435,17 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         // 4.1
         if (argument.Name.StartsWith("__"))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores).");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must not have a name which begins with the __ (two underscores)."));
 
         if (!HasFullSpecifiedResolvedType(argument))
-            throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must have non-null '{nameof(IFieldType.ResolvedType)}' property for all types in the chain."));
 
         if (argument.ResolvedType is GraphQLTypeReference)
-            throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' has '{nameof(GraphQLTypeReference)}' type. This type must be replaced with a reference to the actual GraphQL type before using the reference."));
 
         // 4.2
         if (!argument.ResolvedType!.IsInputType())
-            throw new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type.");
+            ReportError(new InvalidOperationException($"The argument '{argument.Name}' of directive '{directive.Name}' must be an input type."));
 
         // validate default
         if (argument.DefaultValue is GraphQLValue value)
@@ -422,7 +454,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         }
         else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
         {
-            throw new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{directive.Name}' is invalid.");
+            ReportError(new InvalidOperationException($"The default value of argument '{argument.Name}' of directive '{directive.Name}' is invalid."));
         }
     }
 
@@ -434,7 +466,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
         }
         else if (argument.DefaultValue != null && !argument.ResolvedType!.IsValidDefault(argument.DefaultValue))
         {
-            throw new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid.");
+            ReportError(new InvalidOperationException($"The default value of argument '{argument.Name}' of field '{type.Name}.{field.Name}' is invalid."));
         }
     }
 
@@ -445,7 +477,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             foreach (var item in field.Arguments.List!.ToLookup(f => f.Name))
             {
                 if (item.Count() > 1)
-                    throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name.");
+                    ReportError(new InvalidOperationException($"The argument '{item.Key}' must have a unique name within field '{type.Name}.{field.Name}'; no two field arguments may share the same name."));
             }
         }
     }
@@ -457,7 +489,7 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             foreach (var item in directive.Arguments.List!.ToLookup(f => f.Name))
             {
                 if (item.Count() > 1)
-                    throw new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{directive.Name}'; no two directive arguments may share the same name.");
+                    ReportError(new InvalidOperationException($"The argument '{item.Key}' must have a unique name within directive '{directive.Name}'; no two directive arguments may share the same name."));
             }
         }
     }
@@ -471,5 +503,10 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             NonNullGraphType nonNull => HasFullSpecifiedResolvedType(nonNull),
             _ => true, // not null
         };
+    }
+
+    private void ReportError(Exception ex)
+    {
+        _exceptions.Add(ex);
     }
 }

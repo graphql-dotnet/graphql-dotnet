@@ -3237,7 +3237,6 @@ namespace GraphQL.Utilities
 {
     public sealed class AppliedDirectivesValidationVisitor : GraphQL.Utilities.ISchemaNodeVisitor
     {
-        public static readonly GraphQL.Utilities.AppliedDirectivesValidationVisitor Instance;
         public void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
@@ -3254,6 +3253,7 @@ namespace GraphQL.Utilities
         public void VisitScalar(GraphQL.Types.ScalarGraphType type, GraphQL.Types.ISchema schema) { }
         public void VisitSchema(GraphQL.Types.ISchema schema) { }
         public void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
+        public static void Run(GraphQL.Types.ISchema schema) { }
     }
     public class ArgumentConfig : GraphQL.Utilities.MetadataProvider
     {
@@ -3475,7 +3475,6 @@ namespace GraphQL.Utilities
     }
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
-        public static readonly GraphQL.Utilities.SchemaValidationVisitor Instance;
         public override void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public override void VisitDirectiveArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
         public override void VisitEnum(GraphQL.Types.EnumerationGraphType type, GraphQL.Types.ISchema schema) { }
@@ -3489,6 +3488,7 @@ namespace GraphQL.Utilities
         public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
         public override void VisitSchema(GraphQL.Types.ISchema schema) { }
         public override void VisitUnion(GraphQL.Types.UnionGraphType type, GraphQL.Types.ISchema schema) { }
+        public static void Run(GraphQL.Types.ISchema schema) { }
     }
     public static class StringUtils
     {

@@ -494,9 +494,9 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         // rename any applied directives that were imported from another schema to use the alias defined in the @link directive or the proper namespace
         RenameImportedDirectivesVisitor.Run(this);
         // run general schema validation code
-        SchemaValidationVisitor.Instance.Run(this);
+        SchemaValidationVisitor.Run(this);
         // validate that all applied directives are valid
-        AppliedDirectivesValidationVisitor.Instance.Run(this);
+        AppliedDirectivesValidationVisitor.Run(this);
         // initialize default field arguments for optimized execution
         FieldTypeDefaultArgumentsVisitor.Instance.Run(this);
         // removes types and fields that have IsPrivate set
