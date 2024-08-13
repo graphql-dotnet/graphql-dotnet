@@ -30,7 +30,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <param name="type">The graph type of the field.</param>
     /// <param name="name">The name of the field.</param>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This will be removed in v9.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
     public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
     {
         var fieldType = new FieldType
@@ -57,7 +57,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     }
 
     /// <inheritdoc cref="Create(IGraphType, string)"/>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This will be removed in v9.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
     public static FieldBuilder<TSourceType, TReturnType> Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null, string name = "default")
     {
         var fieldType = new FieldType
@@ -92,7 +92,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <summary>
     /// Sets the name of the field.
     /// </summary>
-    [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method. This will be removed in v9.")]
+    [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
     {
         FieldType.Name = name;
