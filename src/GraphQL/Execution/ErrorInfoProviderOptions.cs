@@ -8,21 +8,6 @@ namespace GraphQL.Execution;
 public class ErrorInfoProviderOptions
 {
     /// <summary>
-    /// Specifies whether stack traces should be serialized.
-    /// </summary>
-    [Obsolete("Use ExposeExceptionDetails property instead. This method will be removed in v9.")]
-    public bool ExposeExceptionStackTrace
-    {
-        get => ExposeExceptionDetails;
-        set
-        {
-            ExposeExceptionDetails = value;
-            if (value)
-                ExposeExceptionDetailsMode = ExposeExceptionDetailsMode.Message;
-        }
-    }
-
-    /// <summary>
     /// Specifies whether detailed exception information (exception types, stack traces, inner exceptions)
     /// should be serialized.
     /// </summary>

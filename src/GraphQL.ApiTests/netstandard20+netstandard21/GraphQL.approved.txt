@@ -1247,8 +1247,6 @@ namespace GraphQL.Execution
         public bool ExposeData { get; set; }
         public bool ExposeExceptionDetails { get; set; }
         public GraphQL.Execution.ExposeExceptionDetailsMode ExposeExceptionDetailsMode { get; set; }
-        [System.Obsolete("Use ExposeExceptionDetails property instead. This method will be removed in v9.")]
-        public bool ExposeExceptionStackTrace { get; set; }
         public bool ExposeExtensions { get; set; }
     }
     public class ExecutionContext : GraphQL.Execution.IExecutionArrayPool, GraphQL.Execution.IExecutionContext, GraphQL.Execution.IProvideUserContext, System.IDisposable
