@@ -3,7 +3,7 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Configuration parameters for a complexity analyzer.
 /// </summary>
-[Obsolete("Please use the new complexity analyzer.")]
+[Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
 public class LegacyComplexityConfiguration
 {
     /// <summary>

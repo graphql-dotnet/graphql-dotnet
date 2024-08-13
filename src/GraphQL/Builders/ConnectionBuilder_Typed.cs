@@ -98,7 +98,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TRet
     }
 
     /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
-    [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
+    [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method. This method will be removed in v9.")]
     public virtual ConnectionBuilder<TSourceType, TReturnType> Name(string name)
     {
         FieldType.Name = name;

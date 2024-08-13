@@ -158,7 +158,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <summary>
     /// Creates a field builder used by Field() methods.
     /// </summary>
-    [Obsolete("Please use the overload that accepts the name as the first argument.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
     protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
     {
         return FieldBuilder<TSourceType, TReturnType>.Create(type);
@@ -175,7 +175,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <summary>
     /// Creates a field builder used by Field() methods.
     /// </summary>
-    [Obsolete("Please use the overload that accepts the name as the first argument.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
     protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(IGraphType type)
     {
         return FieldBuilder<TSourceType, TReturnType>.Create(type);
@@ -199,7 +199,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType Field(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
         string name,
@@ -231,7 +231,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
         string name,
         string? description = null,
@@ -263,7 +263,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldDelegate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
         string name,
         string? description = null,
@@ -306,7 +306,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldAsync(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
         string name,
@@ -338,7 +338,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
         string name,
         string? description = null,
@@ -371,7 +371,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
     /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(
         string name,
         string? description = null,
@@ -404,7 +404,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="subscribe">A source stream resolver delegate.</param>
     /// <param name="deprecationReason">The deprecation reason for the field.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldSubscribe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
         string name,
         string? description = null,
@@ -441,7 +441,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="subscribeAsync">A source stream resolver delegate.</param>
     /// <param name="deprecationReason">The deprecation reason for the field.</param>
     /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method may be removed in a future release. For now you can continue to use this API but we do not encourage this.")]
+    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
     public FieldType FieldSubscribeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
         string name,
         string? description = null,
@@ -482,13 +482,13 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
-    [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead.")]
+    [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, [NotAGraphType] TReturnType>()
         where TGraphType : IGraphType
         => Field<TGraphType, TReturnType>("default");
 
     /// <inheritdoc cref="Field{TGraphType}(string)"/>
-    [Obsolete("Please call Field<TGraphType>(string name) instead.")]
+    [Obsolete("Please call Field<TGraphType>(string name) instead. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
         where TGraphType : IGraphType
         => Field<TGraphType, object>("default");
@@ -803,7 +803,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         Field(expression, nullable: null, type);
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public ConnectionBuilder<TSourceType> Connection<TNodeType>()
         where TNodeType : IGraphType
     {
@@ -822,7 +822,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
@@ -843,7 +843,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>

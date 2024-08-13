@@ -71,7 +71,7 @@ public class Issue2275
         }
     }
 
-    [GraphQLMetadata(InputType = typeof(FilterInputGraphType))]
+    [InputType(typeof(FilterInputGraphType))]
     public class Filter
     {
         public string Key { get; set; }

@@ -1241,7 +1241,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
-    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload.")]
+    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload. This method will be removed in v9.")]
     public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
     {
         if (unhandledExceptionDelegate == null)

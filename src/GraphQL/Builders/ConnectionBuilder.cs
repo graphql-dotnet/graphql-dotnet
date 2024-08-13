@@ -16,7 +16,7 @@ public static class ConnectionBuilder
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType, [NotAGraphType] TSourceType>()
         where TNodeType : IGraphType
         => ConnectionBuilder<TSourceType>.Create<TNodeType>();
@@ -40,7 +40,7 @@ public static class ConnectionBuilder
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, [NotAGraphType] TSourceType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
@@ -66,7 +66,7 @@ public static class ConnectionBuilder
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType, [NotAGraphType] TSourceType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
@@ -123,7 +123,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType>()
         where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>();
 
@@ -143,7 +143,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
@@ -167,7 +167,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
     /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument.")]
+    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
     public static ConnectionBuilder<TSourceType> Create<TNodeType, TEdgeType, TConnectionType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>

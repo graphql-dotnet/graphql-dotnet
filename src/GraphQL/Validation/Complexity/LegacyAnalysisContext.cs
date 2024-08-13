@@ -3,7 +3,7 @@ using GraphQLParser.Visitors;
 
 namespace GraphQL.Validation.Complexity;
 
-[Obsolete("Please use the new complexity analyzer.")]
+[Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
 internal sealed class LegacyAnalysisContext : IASTVisitorContext
 {
     public double AvgImpact { get; set; }
