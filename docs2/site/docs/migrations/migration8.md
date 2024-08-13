@@ -1351,3 +1351,11 @@ If you have custom implementations of these interfaces, you may need to update t
 
 Verfies that the arguments defined on fields of interfaces are also defined on fields of implementing types,
 pursuant to GraphQL specifications.
+
+### 28. APIs marked obsolete since v5 have been removed
+
+- `GraphQLMetadataAttribute.InputType` has been replaced with `InputTypeAttribute`.
+- `GraphQLMetadataAttribute.OutputType` has been replaced with `OutputTypeAttribute`.
+- `ErrorInfoProviderOptions.ExposeExceptionStackTrace` has been replaced with `ExposeExceptionDetails` and `ExposeExceptionDetailsMode`.
+
+See prior migration documents for more details concerning these changes.
