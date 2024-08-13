@@ -64,7 +64,10 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void SchemaWithNotFullSpecifiedResolvedType_Should_Throw()
     {
-        ShouldThrow<SchemaWithNotFullSpecifiedResolvedType, InvalidOperationException>("The field 'in' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
+        var ex = ShouldThrowMultiple<SchemaWithNotFullSpecifiedResolvedType>();
+        ex.InnerExceptions.Count.ShouldBe(2);
+        ex.InnerExceptions[0].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'in' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
+        ex.InnerExceptions[1].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'not' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/pull/2707/files#r757949833
@@ -114,8 +117,14 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     public void StreamResolver_On_Wrong_Fields_Should_Produce_Friendly_Error()
     {
         ShouldThrow<SchemaWithFieldStreamResolverOnNonRootSubscriptionField, InvalidOperationException>("The field 'str' of an Object type 'MyQuery' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInterface, InvalidOperationException>("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
-        ShouldThrow<SchemaWithFieldStreamResolverOnFieldOfInputObject, InvalidOperationException>("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        var ex1 = ShouldThrowMultiple<SchemaWithFieldStreamResolverOnFieldOfInterface>();
+        ex1.InnerExceptions.Count.ShouldBe(2);
+        ex1.InnerExceptions[0].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'id' of an Interface type 'My' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ex1.InnerExceptions[1].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'id' of an Interface type 'My' must not have Resolver set. Each interface is translated to a concrete type during request execution. You should set Resolver only for fields of object output types.");
+        var ex2 = ShouldThrowMultiple<SchemaWithFieldStreamResolverOnFieldOfInputObject>();
+        ex2.InnerExceptions.Count.ShouldBe(2);
+        ex2.InnerExceptions[0].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'name' of an Input Object type 'PersonInput' must not have StreamResolver set. You should set StreamResolver only for the root fields of subscriptions.");
+        ex2.InnerExceptions[1].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'name' of an Input Object type 'PersonInput' must not have Resolver set. You should set Resolver only for fields of object output types.");
     }
 
     // https://github.com/graphql-dotnet/graphql-dotnet/issues/1176

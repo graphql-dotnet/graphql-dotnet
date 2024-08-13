@@ -21,4 +21,10 @@ public abstract class SchemaInitializationTestBase
     {
         new TSchema().Initialize();
     }
+
+    public AggregateException ShouldThrowMultiple<TSchema>()
+        where TSchema : Schema, new()
+    {
+        return Should.Throw<AggregateException>(() => new TSchema().Initialize());
+    }
 }
