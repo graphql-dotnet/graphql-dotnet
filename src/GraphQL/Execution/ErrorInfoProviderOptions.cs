@@ -10,7 +10,7 @@ public class ErrorInfoProviderOptions
     /// <summary>
     /// Specifies whether stack traces should be serialized.
     /// </summary>
-    [Obsolete("Use ExposeExceptionDetails property instead")]
+    [Obsolete("Use ExposeExceptionDetails property instead. This method will be removed in v9.")]
     public bool ExposeExceptionStackTrace
     {
         get => ExposeExceptionDetails;

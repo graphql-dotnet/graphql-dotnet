@@ -252,19 +252,6 @@ public static class TypeExtensions
         }
         else
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-            if (attr != null)
-            {
-                if (mode == TypeMappingMode.InputType)
-                    graphType = attr.InputType;
-                else if (mode == TypeMappingMode.OutputType)
-                    graphType = attr.OutputType;
-                else if (attr.InputType == attr.OutputType) // scalar
-                    graphType = attr.InputType;
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
-
             if (mode == TypeMappingMode.InputType)
             {
                 var inputAttr = type.GetCustomAttribute<InputTypeAttribute>();

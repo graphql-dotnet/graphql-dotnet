@@ -5,7 +5,7 @@ namespace GraphQL.Validation.Complexity;
 /// <summary>
 /// Contains the result of a complexity analysis.
 /// </summary>
-[Obsolete("Please use the new complexity analyzer.")]
+[Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
 public class LegacyComplexityResult
 {
     /// <summary>

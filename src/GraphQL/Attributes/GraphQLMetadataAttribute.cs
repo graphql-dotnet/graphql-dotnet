@@ -9,9 +9,6 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public sealed class GraphQLMetadataAttribute : GraphQLAttribute
 {
-    private Type? _mappedToInput;
-    private Type? _mappedToOutput;
-
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
@@ -52,38 +49,6 @@ public sealed class GraphQLMetadataAttribute : GraphQLAttribute
     /// Indicates the CLR type that this graph type represents.
     /// </summary>
     public Type? IsTypeOf { get; set; }
-
-    /// <summary>
-    /// Indicates which GraphType input type this CLR type is mapped to (if used in input context).
-    /// </summary>
-    [Obsolete("Please use the [InputType] attribute instead of this property.")]
-    public Type? InputType
-    {
-        get => _mappedToInput;
-        set
-        {
-            if (value != null && !value.IsInputType())
-                throw new ArgumentException(nameof(InputType), $"'{value}' should be of input type");
-
-            _mappedToInput = value;
-        }
-    }
-
-    /// <summary>
-    /// Indicates which GraphType output type this CLR type is mapped to (if used in output context).
-    /// </summary>
-    [Obsolete("Please use the [OutputType] attribute instead of this property.")]
-    public Type? OutputType
-    {
-        get => _mappedToOutput;
-        set
-        {
-            if (value != null && !value.IsOutputType())
-                throw new ArgumentException(nameof(OutputType), $"'{value}' should be of output type");
-
-            _mappedToOutput = value;
-        }
-    }
 
     /// <inheritdoc/>
     public override void Modify(TypeConfig type)
@@ -142,12 +107,6 @@ public sealed class GraphQLMetadataAttribute : GraphQLAttribute
 
         if (DeprecationReason != null)
             fieldType.DeprecationReason = DeprecationReason == "" ? null : DeprecationReason;
-
-        if (isInputType && _mappedToInput != null)
-            fieldType.Type = _mappedToInput;
-
-        if (!isInputType && _mappedToOutput != null)
-            fieldType.Type = _mappedToOutput;
     }
 }
 

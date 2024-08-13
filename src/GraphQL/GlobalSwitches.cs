@@ -89,7 +89,7 @@ public static class GlobalSwitches
     /// This is required by the GraphQL specification.
     /// See <see href="https://spec.graphql.org/October2021/#sec-Root-Operation-Types">Root Operation Types</see>.
     /// </summary>
-    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types")]
+    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types. This property will be removed in v9.")]
     public static bool RequireRootQueryType { get; set; } = true;
 
     /// <summary>

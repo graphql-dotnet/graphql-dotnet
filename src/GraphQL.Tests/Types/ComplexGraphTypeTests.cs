@@ -57,7 +57,7 @@ public class ComplexGraphTypeTests
         public Money? someMoney { get; set; }
     }
 
-    [GraphQLMetadata(InputType = typeof(AutoRegisteringInputObjectGraphType<Money>), OutputType = typeof(AutoRegisteringObjectGraphType<Money>))]
+    [InputType(typeof(AutoRegisteringInputObjectGraphType<Money>)), OutputType(typeof(AutoRegisteringObjectGraphType<Money>))]
     internal class Money
     {
         public decimal Amount { get; set; }

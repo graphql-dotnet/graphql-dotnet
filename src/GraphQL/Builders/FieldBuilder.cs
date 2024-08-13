@@ -30,7 +30,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <param name="type">The graph type of the field.</param>
     /// <param name="name">The name of the field.</param>
-    [Obsolete("Please use the overload that accepts the name as the first argument.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This will be removed in v9.")]
     public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
     {
         var fieldType = new FieldType
@@ -57,7 +57,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     }
 
     /// <inheritdoc cref="Create(IGraphType, string)"/>
-    [Obsolete("Please use the overload that accepts the name as the first argument.")]
+    [Obsolete("Please use the overload that accepts the name as the first argument. This will be removed in v9.")]
     public static FieldBuilder<TSourceType, TReturnType> Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null, string name = "default")
     {
         var fieldType = new FieldType
@@ -92,7 +92,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <summary>
     /// Sets the name of the field.
     /// </summary>
-    [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method.")]
+    [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method. This will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
     {
         FieldType.Name = name;
@@ -230,7 +230,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="description">The description of the argument.</param>
     /// <param name="defaultValue">The default value of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
-    [Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads to set default value for parameter or use Arguments() method. This method will be removed in v8.")]
+    [Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads to set default value for parameter or use Arguments() method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
         TArgumentType? defaultValue = default, Action<QueryArgument>? configure = null)
         where TArgumentGraphType : IGraphType
@@ -404,7 +404,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// then their default values (if any) will be used.
     /// </summary>
     /// <param name="name">Directive name.</param>
-    [Obsolete("Please use the ApplyDirective method")]
+    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name)
         => this.ApplyDirective(name);
 
@@ -415,7 +415,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="name">Directive name.</param>
     /// <param name="argumentName">Argument name.</param>
     /// <param name="argumentValue">Argument value.</param>
-    [Obsolete("Please use the ApplyDirective method")]
+    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue)
         => this.ApplyDirective(name, argumentName, argumentValue);
 
@@ -428,7 +428,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="argument1Value">First argument value.</param>
     /// <param name="argument2Name">Second argument name.</param>
     /// <param name="argument2Value">Second argument value.</param>
-    [Obsolete("Please use the ApplyDirective method")]
+    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
         => this.ApplyDirective(name, argument1Name, argument1Value, argument2Name, argument2Value);
 
@@ -437,7 +437,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <param name="name">Directive name.</param>
     /// <param name="configure">Configuration delegate.</param>
-    [Obsolete("Please use the ApplyDirective method")]
+    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
         => this.ApplyDirective(name, configure);
 
@@ -445,7 +445,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
     /// </summary>
     /// <param name="impact">Field's complexity impact.</param>
-    [Obsolete("Please use the WithComplexityImpact method")]
+    [Obsolete("Please use the WithComplexityImpact method. This method will be removed in v9.")]
     public virtual FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact)
         => this.WithComplexityImpact(impact);
 

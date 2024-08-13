@@ -10,7 +10,7 @@ namespace GraphQL.Validation.Complexity;
 /// Phase 1. Calculate complexity of all fragments defined in GraphQL document; <see cref="LegacyAnalysisContext.FragmentMapAlreadyBuilt"/> is false.
 /// Phase 2. Calculate complexity of executed operation; <see cref="LegacyAnalysisContext.FragmentMapAlreadyBuilt"/> is true.
 /// </summary>
-[Obsolete("Please use the new complexity analyzer.")]
+[Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
 internal class LegacyComplexityVisitor : ASTVisitor<LegacyAnalysisContext>
 {
     private readonly TypeInfo? _visitor;

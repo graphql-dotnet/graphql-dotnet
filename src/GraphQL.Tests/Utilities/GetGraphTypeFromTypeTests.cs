@@ -450,13 +450,13 @@ public class GetGraphTypeFromTypeTests
     {
     }
 
-    [GraphQLMetadata(InputType = typeof(CustomInputGraphType), OutputType = typeof(CustomOutputGraphType))]
+    [InputType(typeof(CustomInputGraphType)), OutputType(typeof(CustomOutputGraphType))]
     private class AttributeTest1 { }
 
-    [GraphQLMetadata(InputType = typeof(CustomInputGraphType))]
+    [InputType(typeof(CustomInputGraphType))]
     private class AttributeTest2 { }
 
-    [GraphQLMetadata(OutputType = typeof(CustomOutputGraphType))]
+    [OutputType(typeof(CustomOutputGraphType))]
     private class AttributeTest3 { }
 
 #if NET48
