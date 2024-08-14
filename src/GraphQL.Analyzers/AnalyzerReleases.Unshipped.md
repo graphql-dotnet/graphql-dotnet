@@ -4,4 +4,3 @@
 ### New Rules
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-GQL015 | Usage | Error | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql015)
