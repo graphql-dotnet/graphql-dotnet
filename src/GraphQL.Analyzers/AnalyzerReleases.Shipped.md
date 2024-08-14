@@ -1,6 +1,14 @@
 ; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
 
+## Release 7.9.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|-------
+GQL015 | Usage | Error | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql015)
+
 ## Release 7.7.0
 
 ### New Rules
