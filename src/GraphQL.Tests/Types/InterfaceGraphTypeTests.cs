@@ -231,6 +231,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
               id: ID!
               url: String
             }
+
             """, StringCompareShould.IgnoreLineEndings);
     }
 
