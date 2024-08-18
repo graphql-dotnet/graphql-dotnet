@@ -48,10 +48,15 @@ options to revert behavior to v7.x if necessary.
 Please keep in mind that methods and classes marked as obsolete in v8.x may be removed in v9.0. Each obsolete member
 will include a message indicating the expected removal version.
 
-To streamline the migration, we recommend upgrading to v7.9 first and using the included analyzers to apply automatic
-code fixes to obsolete code patterns. In addition, we recommend having a test that verifies the SDL of your schema
-matches the expected schema, as this will catch any changes the generated schema between versions. A sample of this
-code is provided at the bottom of this document.
+For best results through the migration, we recommend following these steps:
+
+1. Upgrade to GraphQL.NET v7.9
+2. Use the included analyzers to apply automatic code fixes to obsolete code patterns
+3. Implement a test that verifies the SDL of your schema matches the expected schema, as this will catch any changes
+   the generated schema between versions; a sample of this code is provided at the bottom of this document
+4. Set `GlobalSwitches.UseLegacyTypeNaming` to `false` and verify your type names have not changed (or override them),
+   or set `GlobalSwitches.UseLegacyTypeNaming` to `true` to maintain v7.x behavior during the migration.
+5. Upgrade to GraphQL.NET v8.0
 
 ## New Features
 
