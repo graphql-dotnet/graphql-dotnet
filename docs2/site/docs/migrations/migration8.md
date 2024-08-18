@@ -1,7 +1,7 @@
 # Migrating from v7.x to v8.x
 
-|-|
-| :warning: For the best upgrade experience, please upgrade to 7.9 and use the included analyzers to apply automatic code fixes to obsolete code patterns before upgrading to 8.0. :warning: |
+:warning: For the best upgrade experience, please upgrade to 7.9 and use the included analyzers
+to apply automatic code fixes to obsolete code patterns before upgrading to 8.0. :warning:
 
 See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A8.0+is%3Aissue+is%3Aclosed) and
 [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A8.0+is%3Aclosed) done in v8.
