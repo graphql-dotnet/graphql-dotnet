@@ -112,6 +112,8 @@
             file: gql009.md
           - title: GQL011
             file: gql011.md
+          - title: GQL015
+            file: gql015.md
       - title: Migration Guides
         dir: migrations
         items:
