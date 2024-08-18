@@ -39,12 +39,12 @@ public class LinkedSchemaTests
     {
         var sb = new StringBuilder();
         var sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
-        sb.AppendLine(sdl);
+        sb.Append(sdl);
         sb.AppendLine();
         sb.AppendLine("==== Without Imported Types ====");
         sb.AppendLine();
         sdl = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase, IncludeImportedDefinitions = false });
-        sb.AppendLine(sdl);
+        sb.Append(sdl);
         return sb.ToString();
     }
 

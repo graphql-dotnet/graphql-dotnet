@@ -184,9 +184,25 @@ public class SchemaExporterTests
             type Query {
               test(arg: ExampleInputTagged!): String
             }
+
             """;
         var schema = Schema.For(sdl);
         var exported = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
         exported.ShouldBe(sdl);
+    }
+
+    [Fact]
+    public void EndsWithNewline()
+    {
+        var schema = Schema.For(
+            "PetComplex".ReadSDL(),
+            builder =>
+            {
+                builder.Types.ForAll(config => config.ResolveType = _ => null!);
+                builder.IgnoreComments = false;
+            }
+        );
+        var exported = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
+        exported.ShouldEndWith(Environment.NewLine);
     }
 }

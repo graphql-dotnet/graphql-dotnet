@@ -39,6 +39,7 @@ public class IsPrivateTests
             interface IProduct {
               name: String!
             }
+
             """, StringCompareShould.IgnoreLineEndings);
     }
 
