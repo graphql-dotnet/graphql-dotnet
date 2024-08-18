@@ -35,7 +35,7 @@ Most notably, if your server uses any of the following features, you are likely 
 - The complexity analyzer
 - Apollo Federation subgraph support
 - Custom implementations of GraphQL.NET infrastructure (e.g. custom `IGraphType` implementations not based on an included class)
-- Manual registration of GraphQL.NET infrastructure types vs using `AddGraphQL` builder methods
+- Manual registration of GraphQL.NET infrastructure types (vs. using `AddGraphQL` builder methods)
 - Input object graph types having models utilizing private constructors or non-default init-only properties
 - Generic graph types
 - Methods previously marked as obsolete
