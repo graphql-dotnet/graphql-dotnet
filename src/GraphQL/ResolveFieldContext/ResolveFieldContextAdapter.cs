@@ -103,4 +103,7 @@ internal sealed class ResolveFieldContextAdapter<T> : IResolveFieldContext<T>
 
     /// <inheritdoc/>
     public ClaimsPrincipal? User => _baseContext.User;
+
+    /// <inheritdoc/>
+    public IExecutionContext ExecutionContext => _baseContext.ExecutionContext;
 }

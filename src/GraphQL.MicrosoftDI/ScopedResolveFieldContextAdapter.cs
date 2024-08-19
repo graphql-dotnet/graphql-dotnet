@@ -83,4 +83,6 @@ internal sealed class ScopedResolveFieldContextAdapter<TSource> : IResolveFieldC
     public IExecutionArrayPool ArrayPool => _baseContext.ArrayPool;
 
     public ClaimsPrincipal? User => _baseContext.User;
+
+    public IExecutionContext ExecutionContext => _baseContext.ExecutionContext;
 }

@@ -84,6 +84,9 @@ public class ResolveFieldContext : IResolveFieldContext<object?>
     /// <inheritdoc/>
     public ClaimsPrincipal? User { get; set; }
 
+    /// <inheritdoc/>
+    public IExecutionContext ExecutionContext { get; set; }
+
     /// <summary>
     /// Initializes a new instance with all fields set to their default values.
     /// </summary>
@@ -120,6 +123,7 @@ public class ResolveFieldContext : IResolveFieldContext<object?>
         InputExtensions = context.InputExtensions;
         OutputExtensions = context.OutputExtensions;
         ArrayPool = context.ArrayPool;
+        ExecutionContext = context.ExecutionContext;
     }
 }
 
