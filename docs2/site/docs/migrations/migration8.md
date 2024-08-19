@@ -27,7 +27,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
 
-Some of these features require changes to the infrastrucutre, which can cause breaking changes during upgrades.
+Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
 
 - Custom validation rules, schema node visitors, or IResolveFieldContext implementations
