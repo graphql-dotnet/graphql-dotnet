@@ -55,8 +55,10 @@ For best results through the migration, we recommend following these steps:
 3. Implement a test that verifies the SDL of your schema matches the expected schema, as this will catch any changes
    the generated schema between versions; a sample of this code is provided at the bottom of this document
 4. Set `GlobalSwitches.UseLegacyTypeNaming` to `false` and verify your type names have not changed (or override them),
-   or set `GlobalSwitches.UseLegacyTypeNaming` to `true` to maintain v7.x behavior during the migration.
-5. Upgrade to GraphQL.NET v8.0
+   or set `GlobalSwitches.UseLegacyTypeNaming` to `true` to maintain v7.x behavior during the migration
+5. Set `GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `true` and verify your inferred field types
+   have not changed, or set `GlobalSwitches.InferFieldNullabilityFromNRTAnnotations` to `false` to maintain v7.x behavior
+6. Upgrade to GraphQL.NET v8.0
 
 ## New Features
 
