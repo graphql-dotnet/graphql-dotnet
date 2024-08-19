@@ -1,6 +1,3 @@
-#if !NET5_0_OR_GREATER
-using System.Collections.ObjectModel;
-#endif
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
@@ -18,7 +15,7 @@ public static class ExecutionHelper
 #if NET5_0_OR_GREATER
         System.Collections.Immutable.ImmutableDictionary<string, ArgumentValue>.Empty;
 #else
-        new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+        new System.Collections.ObjectModel.ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
 #endif
 
     /// <summary>
