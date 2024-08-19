@@ -79,4 +79,6 @@ internal sealed class ScopedResolveConnectionContextAdapter<TSource> : IResolveC
     public int? PageSize => _baseContext.PageSize;
 
     public ClaimsPrincipal? User => _baseContext.User;
+
+    public IExecutionContext ExecutionContext => _baseContext.ExecutionContext;
 }

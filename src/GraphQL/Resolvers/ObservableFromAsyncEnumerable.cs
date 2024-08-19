@@ -142,5 +142,6 @@ internal sealed class ObservableFromAsyncEnumerable<T> : IObservable<object?>, I
         public IExecutionArrayPool ArrayPool => _context.ArrayPool;
         public ClaimsPrincipal? User => _context.User;
         public IDictionary<string, object?> UserContext => _context.UserContext;
+        public IExecutionContext ExecutionContext => _context.ExecutionContext;
     }
 }

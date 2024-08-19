@@ -7,6 +7,11 @@ public class DirectiveSchema : Schema
     public DirectiveSchema()
     {
         Query = new DirectiveTestType();
+        Directives.Register(new Directive("test1", GraphQLParser.AST.DirectiveLocation.Field));
+        Directives.Register(new Directive("test2", GraphQLParser.AST.DirectiveLocation.Field)
+        {
+            Arguments = new QueryArguments([new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "value" }])
+        });
     }
 }
 
@@ -18,6 +23,10 @@ public class DirectiveTestType : ObjectGraphType
 
         Field<StringGraphType>("a");
         Field<StringGraphType>("b");
+        Field<BooleanGraphType>("c")
+            .Resolve(context => context.GetDirective("test1") != null);
+        Field<StringGraphType>("d")
+            .Resolve(context => context.GetDirective("test2")?.GetArgument<string>("value"));
     }
 }
 
@@ -337,5 +346,40 @@ public class DirectiveFragmentTests : QueryTestBase<DirectiveSchema>
             }
             """,
             null, _data);
+    }
+}
+
+public class DirectiveParsingTests : QueryTestBase<DirectiveSchema>
+{
+    [Fact]
+    public void finds_directive()
+    {
+        AssertQuerySuccess("""
+            query {
+              c @test1
+            }
+            """,
+            """
+            {
+              "c": true
+            }
+            """,
+            null, null);
+    }
+
+    [Fact]
+    public void finds_directive_with_argument()
+    {
+        AssertQuerySuccess("""
+            query {
+              d @test2(value: "hello")
+            }
+            """,
+            """
+            {
+              "d": "hello"
+            }
+            """,
+            null, null);
     }
 }

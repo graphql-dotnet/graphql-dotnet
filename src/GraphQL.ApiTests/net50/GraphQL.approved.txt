@@ -153,6 +153,11 @@ namespace GraphQL
     {
         public static System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(this GraphQL.IDocumentExecuter executer, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
+    public static class ExecutionContextExtensions
+    {
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? GetArguments(this GraphQL.Execution.IExecutionContext executionContext, GraphQL.Types.FieldType fieldDefinition, GraphQLParser.AST.GraphQLField astField) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(this GraphQL.Execution.IExecutionContext executionContext, GraphQLParser.AST.ASTNode astNode) { }
+    }
     [System.Serializable]
     public class ExecutionError : System.Exception
     {
@@ -545,6 +550,7 @@ namespace GraphQL
         System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; }
         GraphQLParser.AST.GraphQLDocument Document { get; }
         GraphQL.ExecutionErrors Errors { get; }
+        GraphQL.Execution.IExecutionContext ExecutionContext { get; }
         GraphQLParser.AST.GraphQLField FieldAst { get; }
         GraphQL.Types.FieldType FieldDefinition { get; }
         System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
@@ -730,6 +736,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; }
         public GraphQLParser.AST.GraphQLDocument Document { get; }
         public GraphQL.ExecutionErrors Errors { get; }
+        public GraphQL.Execution.IExecutionContext ExecutionContext { get; }
         public GraphQLParser.AST.GraphQLField FieldAst { get; }
         public GraphQL.Types.FieldType FieldDefinition { get; }
         public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; }
@@ -762,6 +769,7 @@ namespace GraphQL
         public System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; set; }
         public GraphQLParser.AST.GraphQLDocument Document { get; set; }
         public GraphQL.ExecutionErrors Errors { get; set; }
+        public GraphQL.Execution.IExecutionContext ExecutionContext { get; set; }
         public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
         public System.Collections.Generic.IReadOnlyDictionary<string, object?> InputExtensions { get; set; }

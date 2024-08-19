@@ -118,6 +118,11 @@ public interface IResolveFieldContext : IProvideUserContext
 
     /// <inheritdoc cref="IExecutionContext.User"/>
     ClaimsPrincipal? User { get; }
+
+    /// <summary>
+    /// Returns the execution context for the current request.
+    /// </summary>
+    IExecutionContext ExecutionContext { get; }
 }
 
 /// <inheritdoc cref="IResolveFieldContext"/>

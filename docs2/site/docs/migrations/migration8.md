@@ -27,11 +27,10 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
 
-Some of these features require changes to the infrastrucutre, which can cause breaking changes during upgrades.
+Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
 
-- Custom validation rules
-- Custom schema node visitors
+- Custom validation rules, schema node visitors, or IResolveFieldContext implementations
 - The complexity analyzer
 - Apollo Federation subgraph support
 - Custom implementations of GraphQL.NET infrastructure (e.g. custom `IGraphType` implementations not based on an included class)
@@ -40,6 +39,7 @@ Most notably, if your server uses any of the following features, you are likely 
 - Generic graph types
 - Methods previously marked as obsolete
 - GraphQL types which improperly implement interfaces
+- Calls to `ExecutionHelper.GetArguments`
 
 Below we have documented each new feature and breaking change, outlining the steps you need to take to upgrade your
 application to v8.0. When possible, we have provided code examples to help you understand the changes required, and
@@ -1013,7 +1013,7 @@ of scalars. Be sure the returned list type (e.g. `IEnumerable<int>`) matches the
 to take advantage of this optimization. Scalar types that require conversion, such as `DateTimeGraphType` are not
 currently optimized in this way.
 
-### 27. Interfaces may implement other interfaces
+### 27. GraphQL interfaces may implement other interfaces
 
 Pursuant to the current GraphQL specification, interfaces may implement other interfaces. Add implemented interfaces
 to your interface type definition as done for object graph types, as shown below:
@@ -1066,6 +1066,12 @@ public interface Character : Node
     string Name { get; }
 }
 ```
+
+### 28. `IResolveFieldContext.ExecutionContext` property added
+
+The `ExecutionContext` property has been added to the `IResolveFieldContext` interface to allow access to the
+underlying execution context. This is useful for accessing the parsed arguments and directives from the operation
+via `IExecutionContext.GetArguments` and `GetDirectives`.
 
 ## Breaking Changes
 
@@ -1416,6 +1422,32 @@ pursuant to GraphQL specifications.
 - `ErrorInfoProviderOptions.ExposeExceptionStackTrace` has been replaced with `ExposeExceptionDetails` and `ExposeExceptionDetailsMode`.
 
 See prior migration documents for more details concerning these changes.
+
+### 29. `IResolveFieldContext.ExecutionContext` added and `ExecutionContext.GetArguments` signature has changed
+
+If you are using the `ExecutionContext.GetArguments` method to parse arguments directly, for example to retrieve
+the arguments of child fields in a resolver, we suggest using the new `IExecutionContext.GetArguments` and
+`IExecutionContext.GetDirectives` methods instead. These take advantage of the fact that all arguments
+are parsed during the validation phase and need not be parsed again. See example below:
+
+```csharp
+// v7
+IResolveFieldContext context;       // parent context
+FieldType fieldDefinition;          // field definition from which to get arguments
+GraphQLField fieldAst;              // field AST from which to get arguments
+var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, fieldAst.Arguments, context.Variables);
+
+// v8
+IResolveFieldContext context;       // parent context
+FieldType fieldDefinition;          // field definition from which to get arguments
+GraphQLField fieldAst;              // field AST from which to get arguments
+var arguments = context.ExecutionContext.GetArguments(fieldDefinition, fieldAst);
+```
+
+To continue to use the `ExecutionHelper.GetArguments` method, you may need to refer to the GraphQL.NET source
+for reference.
+
+If you directly implement `IResolveFieldContext`, you must now also implement the `ExecutionContext` property.
 
 ## Appendix
 

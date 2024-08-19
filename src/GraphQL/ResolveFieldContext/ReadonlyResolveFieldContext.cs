@@ -70,12 +70,10 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
     }
 
     /// <inheritdoc/>
-    public IDictionary<string, ArgumentValue>? Arguments
-        => _executionContext.ArgumentValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : FieldDefinition.DefaultArgumentValues;
+    public IDictionary<string, ArgumentValue>? Arguments => _executionContext.GetArguments(FieldDefinition, FieldAst);
 
     /// <inheritdoc/>
-    public IDictionary<string, DirectiveInfo>? Directives
-        => _executionContext.DirectiveValues?.TryGetValue(FieldAst, out var ret) ?? false ? ret : null;
+    public IDictionary<string, DirectiveInfo>? Directives => _executionContext.GetDirectives(FieldAst);
 
     /// <inheritdoc/>
     public object? RootValue => _executionContext.RootValue;
@@ -130,4 +128,7 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
 
     /// <inheritdoc/>
     public ClaimsPrincipal? User => _executionContext.User;
+
+    /// <inheritdoc/>
+    public IExecutionContext ExecutionContext => _executionContext;
 }
