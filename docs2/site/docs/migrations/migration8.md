@@ -39,7 +39,7 @@ Most notably, if your server uses any of the following features, you are likely 
 - Generic graph types
 - Methods previously marked as obsolete
 - GraphQL types which improperly implement interfaces
-- Calls `ExecutionHelper.GetArguments`
+- Calls to `ExecutionHelper.GetArguments`
 
 Below we have documented each new feature and breaking change, outlining the steps you need to take to upgrade your
 application to v8.0. When possible, we have provided code examples to help you understand the changes required, and

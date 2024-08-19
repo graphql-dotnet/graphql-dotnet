@@ -153,6 +153,11 @@ namespace GraphQL
     {
         public static System.Threading.Tasks.Task<GraphQL.ExecutionResult> ExecuteAsync(this GraphQL.IDocumentExecuter executer, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
+    public static class ExecutionContextExtensions
+    {
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? GetArguments(this GraphQL.Execution.IExecutionContext executionContext, GraphQL.Types.FieldType fieldDefinition, GraphQLParser.AST.GraphQLField astField) { }
+        public static System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? GetDirectives(this GraphQL.Execution.IExecutionContext executionContext, GraphQLParser.AST.ASTNode astNode) { }
+    }
     [System.Serializable]
     public class ExecutionError : System.Exception
     {
