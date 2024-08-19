@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQL.Validation.Errors;
@@ -12,7 +11,12 @@ namespace GraphQL.Execution;
 /// </summary>
 public static class ExecutionHelper
 {
-    private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments = new ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+    private static readonly IDictionary<string, ArgumentValue> _emptyDirectiveArguments =
+#if NET5_0_OR_GREATER
+        System.Collections.Immutable.ImmutableDictionary<string, ArgumentValue>.Empty;
+#else
+        new System.Collections.ObjectModel.ReadOnlyDictionary<string, ArgumentValue>(new Dictionary<string, ArgumentValue>());
+#endif
 
     /// <summary>
     /// Returns a dictionary of directives with their arguments values for a node (field, fragment spread, inline fragment).
