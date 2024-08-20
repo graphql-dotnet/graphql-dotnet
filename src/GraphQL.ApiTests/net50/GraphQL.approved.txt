@@ -3408,7 +3408,6 @@ namespace GraphQL.Utilities
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
         protected virtual GraphQLParser.AST.GraphQLDirective ExportAppliedDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
         protected virtual GraphQLParser.AST.GraphQLArgument ExportAppliedDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
-        protected virtual GraphQLParser.AST.GraphQLArgumentDefinition ExportArgumentDefinition(GraphQL.Types.FieldType fieldType) { }
         protected virtual GraphQLParser.AST.GraphQLArgumentDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
         protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ExportDirectiveDefinition(GraphQL.Types.Directive directive) { }
         protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ExportEnumTypeDefinition(GraphQL.Types.EnumerationGraphType enumType) { }

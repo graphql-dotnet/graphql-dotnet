@@ -166,25 +166,11 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputValueDefinition"/>.
+    /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputFieldDefinition"/>.
     /// </summary>
     protected virtual GraphQLInputFieldDefinition ExportInputFieldDefinition(FieldType fieldType)
     {
         var ret = new GraphQLInputFieldDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
-        {
-            DefaultValue = fieldType.DefaultValue == null
-                ? null
-                : fieldType.ResolvedType!.ToAST(fieldType.DefaultValue),
-        };
-        return ApplyDescription(ApplyDirectives(ret, fieldType), fieldType);
-    }
-
-    /// <summary>
-    /// Exports the specified <see cref="FieldType"/> as a <see cref="GraphQLInputValueDefinition"/>.
-    /// </summary>
-    protected virtual GraphQLArgumentDefinition ExportArgumentDefinition(FieldType fieldType)
-    {
-        var ret = new GraphQLArgumentDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
         {
             DefaultValue = fieldType.DefaultValue == null
                 ? null
@@ -451,7 +437,7 @@ public class SchemaExporter
     }
 
     /// <summary>
-    /// Exports the specified <see cref="QueryArgument"/> as a <see cref="GraphQLInputValueDefinition"/>.
+    /// Exports the specified <see cref="QueryArgument"/> as a <see cref="GraphQLArgumentDefinition"/>.
     /// </summary>
     protected virtual GraphQLArgumentDefinition ExportArgumentDefinition(QueryArgument argument)
     {
