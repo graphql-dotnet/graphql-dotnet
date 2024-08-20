@@ -3408,12 +3408,12 @@ namespace GraphQL.Utilities
         public virtual GraphQLParser.AST.GraphQLDocument Export() { }
         protected virtual GraphQLParser.AST.GraphQLDirective ExportAppliedDirective(GraphQL.Types.AppliedDirective appliedDirective) { }
         protected virtual GraphQLParser.AST.GraphQLArgument ExportAppliedDirectiveArgument(GraphQL.Types.Directive directive, GraphQL.Types.DirectiveArgument argument) { }
-        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
+        protected virtual GraphQLParser.AST.GraphQLArgumentDefinition ExportArgumentDefinition(GraphQL.Types.QueryArgument argument) { }
         protected virtual GraphQLParser.AST.GraphQLDirectiveDefinition ExportDirectiveDefinition(GraphQL.Types.Directive directive) { }
         protected virtual GraphQLParser.AST.GraphQLEnumTypeDefinition ExportEnumTypeDefinition(GraphQL.Types.EnumerationGraphType enumType) { }
         protected virtual GraphQLParser.AST.GraphQLFieldDefinition ExportFieldDefinition(GraphQL.Types.FieldType fieldType) { }
+        protected virtual GraphQLParser.AST.GraphQLInputFieldDefinition ExportInputFieldDefinition(GraphQL.Types.FieldType fieldType) { }
         protected virtual GraphQLParser.AST.GraphQLInputObjectTypeDefinition ExportInputObjectTypeDefinition(GraphQL.Types.IInputObjectGraphType graphType) { }
-        protected virtual GraphQLParser.AST.GraphQLInputValueDefinition ExportInputValueDefinition(GraphQL.Types.FieldType fieldType) { }
         protected virtual GraphQLParser.AST.GraphQLInterfaceTypeDefinition ExportInterfaceTypeDefinition(GraphQL.Types.IInterfaceGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLObjectTypeDefinition ExportObjectTypeDefinition(GraphQL.Types.IObjectGraphType graphType) { }
         protected virtual GraphQLParser.AST.GraphQLScalarTypeDefinition ExportScalarTypeDefinition(GraphQL.Types.ScalarGraphType scalarType) { }
