@@ -71,9 +71,9 @@ public class TypeExtensionTests
     [InlineData(85, true, false, typeof(ConnectionType<StringGraphType>), "Connection")]
     [InlineData(86, true, false, typeof(Connection<string>), "Connection")]
     [InlineData(87, true, false, typeof(Test1<string>.Test2), "Test2")]
-    [InlineData(88, true, false, typeof(Test1<string>.Test3<int>), "Test3")]
+    [InlineData(88, true, false, typeof(Test1<string>.Test3<Class1>), "Test3")]
     [InlineData(89, true, true, typeof(Test1<string>.Test2), "Test2")]
-    [InlineData(90, true, true, typeof(Test1<string>.Test3<int>), "Test3")]
+    [InlineData(90, true, true, typeof(Test1<string>.Test3<Class1>), "Test3")]
 
     // note: cannot test F# anonymous class names within C# tests
     public void GraphQLNameTest(int i, bool useLegacyTypeNaming, bool useDeclaringTypeNames, Type type, string expected)
