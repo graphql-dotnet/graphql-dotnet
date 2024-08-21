@@ -615,4 +615,26 @@ public class AllowedOnAnalyzerTests
 
         await VerifyCS.VerifyCodeFixAsync(source, DiagnosticResult.EmptyDiagnosticResults, source);
     }
+
+    [Fact]
+    public async Task GraphQLAssemblyNamePrefix_NoException()
+    {
+        const string source =
+            """
+            namespace GraphQL;
+
+            public static class MyClass
+            {
+                public static string Method() =>
+                    nameof(MyClass.Method);
+            }
+            """;
+
+        await new GraphQLAssemblyPrefixTest { TestCode = source }.RunAsync();
+    }
+
+    public class GraphQLAssemblyPrefixTest : VerifyCS.Test
+    {
+        protected override string DefaultTestProjectName => "GraphQL.MyExt";
+    }
 }

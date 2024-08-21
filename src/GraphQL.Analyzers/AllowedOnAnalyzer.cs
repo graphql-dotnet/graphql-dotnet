@@ -141,5 +141,6 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
     private static ImmutableArray<ITypeSymbol>? GetAllowedTypes(ISymbol symbol) =>
         symbol.GetAttributes()
             .FirstOrDefault(data => data.AttributeClass?.Name == Constants.MetadataNames.AllowedOnAttribute)
-            ?.AttributeClass!.TypeArguments;
+            ?.AttributeClass!.TypeArguments
+        ?? ImmutableArray<ITypeSymbol>.Empty;
 }
