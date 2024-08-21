@@ -43,4 +43,13 @@
     </ItemGroup>
   </Target>
 
+  <!-- Add assembly level Description atrribute to all packable projects -->
+  <Target Name="AddGlobalAssemblyInfo" BeforeTargets="BeforeBuild" Condition="'$(IsPackable)' == 'true'">
+    <ItemGroup>
+      <AssemblyAttribute Include="System.ComponentModel.Description">
+        <_Parameter1>__GraphQL_NET_Assembly__</_Parameter1>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+
 </Project>
