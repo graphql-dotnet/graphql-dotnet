@@ -50,7 +50,7 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
         else if (symbolInfo.CandidateSymbols.Any())
         {
             allowedTypes = symbolInfo.CandidateSymbols
-                .SelectMany(symbol => GetAllowedTypes(symbol)?.Select(typeSymbol => typeSymbol))
+                .SelectMany(symbol => GetAllowedTypes(symbol).Select(typeSymbol => typeSymbol))
                 .Distinct<ITypeSymbol>(SymbolEqualityComparer.Default)
                 .ToImmutableArray();
         }
@@ -138,8 +138,9 @@ public class AllowedOnAnalyzer : DiagnosticAnalyzer
         context.ReportDiagnostic(diagnostic);
     }
 
-    private static ImmutableArray<ITypeSymbol>? GetAllowedTypes(ISymbol symbol) =>
+    private static ImmutableArray<ITypeSymbol> GetAllowedTypes(ISymbol symbol) =>
         symbol.GetAttributes()
             .FirstOrDefault(data => data.AttributeClass?.Name == Constants.MetadataNames.AllowedOnAttribute)
-            ?.AttributeClass!.TypeArguments;
+            ?.AttributeClass!.TypeArguments
+        ?? ImmutableArray<ITypeSymbol>.Empty;
 }
