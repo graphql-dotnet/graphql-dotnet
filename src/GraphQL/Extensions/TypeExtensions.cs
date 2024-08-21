@@ -137,7 +137,11 @@ public static class TypeExtensions
                 var name = type.Name;
 
                 if (type.IsGenericType)
-                    name = name.Substring(0, name.IndexOf('`'));
+                {
+                    var i = name.IndexOf('`');
+                    if (i >= 0)
+                        name = name.Substring(0, name.IndexOf('`'));
+                }
 
                 if (name != "GraphType" && name != "Type")
                 {
@@ -156,7 +160,11 @@ public static class TypeExtensions
                     var parent = type.DeclaringType;
                     while (parent != null)
                     {
-                        name = $"{parent.Name}_{name}";
+                        var parentName = parent.Name;
+                        var i = parentName.IndexOf('`');
+                        if (i >= 0)
+                            parentName = parentName.Substring(0, parentName.IndexOf('`'));
+                        name = $"{parentName}_{name}";
                         parent = parent.DeclaringType;
                     }
                 }
@@ -186,7 +194,9 @@ public static class TypeExtensions
 
         if (type.IsGenericType)
         {
-            typeName = typeName.Substring(0, typeName.IndexOf('`'));
+            var i = typeName.IndexOf('`');
+            if (i >= 0)
+                typeName = typeName.Substring(0, typeName.IndexOf('`'));
         }
 
         if (typeName == nameof(GraphType) || typeName == nameof(Type))
