@@ -34,18 +34,18 @@ public static class GraphQLExtensions
     public static bool IsGraphQLSymbol(this ISymbol symbol)
     {
         // GraphQL, GraphQL.MicrosoftDI...
-        var containingAssembly = symbol.ContainingAssembly;
-        if (containingAssembly == null)
+        var assembly = symbol.ContainingAssembly;
+        if (assembly == null)
         {
             return false;
         }
 
-        if (!containingAssembly.Identity.HasPublicKey)
+        if (!assembly.Identity.HasPublicKey)
         {
             return false;
         }
 
-        return containingAssembly.Identity.PublicKey.SequenceEqual(publicKey);
+        return assembly.Identity.PublicKey.SequenceEqual(publicKey);
     }
 
     /// <summary>
