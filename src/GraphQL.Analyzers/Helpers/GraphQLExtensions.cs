@@ -23,7 +23,7 @@ public static class GraphQLExtensions
                    .All(symbol => symbol.IsGraphQLSymbol());
     }
 
-    private readonly static byte[] publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
+    private static readonly byte[] _publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
 
     /// <summary>
     /// Checks if the given <see cref="ISymbol"/> represents a symbol defined by the GraphQL library.
@@ -44,7 +44,7 @@ public static class GraphQLExtensions
             return false;
         }
 
-        return assembly.Identity.PublicKey.SequenceEqual(publicKey);
+        return assembly.Identity.PublicKey.SequenceEqual(_publicKey);
     }
 
     /// <summary>
