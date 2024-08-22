@@ -5,6 +5,8 @@ namespace GraphQL.Analyzers.Helpers;
 
 public static class GraphQLExtensions
 {
+    private static readonly byte[] _publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
+
     /// <summary>
     /// Checks if the given <see cref="ExpressionSyntax"/> represents a symbol defined by the GraphQL library.
     /// </summary>
@@ -22,8 +24,6 @@ public static class GraphQLExtensions
                ?? symbolInfo.CandidateSymbols
                    .All(symbol => symbol.IsGraphQLSymbol());
     }
-
-    private static readonly byte[] _publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
 
     /// <summary>
     /// Checks if the given <see cref="ISymbol"/> represents a symbol defined by the GraphQL library.
