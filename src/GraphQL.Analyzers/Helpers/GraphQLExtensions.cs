@@ -23,14 +23,29 @@ public static class GraphQLExtensions
                    .All(symbol => symbol.IsGraphQLSymbol());
     }
 
+    private static readonly byte[] _publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
+
     /// <summary>
     /// Checks if the given <see cref="ISymbol"/> represents a symbol defined by the GraphQL library.
     /// </summary>
     /// <param name="symbol">The <see cref="ISymbol"/> to check.</param>
     /// <returns><see langword="true"/> if the symbol is a GraphQL symbol; otherwise, <see langword="false"/>.</returns>
-    public static bool IsGraphQLSymbol(this ISymbol symbol) =>
+    public static bool IsGraphQLSymbol(this ISymbol symbol)
+    {
         // GraphQL, GraphQL.MicrosoftDI...
-        symbol.ContainingAssembly?.Name.StartsWith(Constants.GraphQL) == true;
+        var assembly = symbol.ContainingAssembly;
+        if (assembly == null)
+        {
+            return false;
+        }
+
+        if (!assembly.Identity.HasPublicKey)
+        {
+            return false;
+        }
+
+        return assembly.Identity.PublicKey.SequenceEqual(_publicKey);
+    }
 
     /// <summary>
     /// Gets the return type symbol of the <see cref="ExpressionSyntax"/> which represents a method defined by
