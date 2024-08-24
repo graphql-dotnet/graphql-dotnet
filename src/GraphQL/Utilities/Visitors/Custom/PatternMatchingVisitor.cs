@@ -51,12 +51,7 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
         };
         if (regexObject == null)
             return null;
-        var regexString = value switch
-        {
-            string regex => regex,
-            Regex r => StripChars(r),
-            _ => throw new InvalidOperationException()
-        };
+        var regexString = value as string ?? StripChars((Regex)value!);
 
         return (value) =>
         {
