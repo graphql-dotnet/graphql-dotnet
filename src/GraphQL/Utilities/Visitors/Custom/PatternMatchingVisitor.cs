@@ -37,21 +37,46 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
     {
         // look for @pattern directive applied to the field argument or input field, and if found, use Validate to set the validation method
         var applied = fieldArgOrInputField.FindAppliedDirective("pattern");
-        if (applied?.FindArgument("regex")?.Value is not string regex)
-            return null;
+        var value = applied?.FindArgument("regex")?.Value;
 
-        // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
-        // the regex (or pull from the static cache if already compiled)
-        // (note that GlobalSwitches.DynamicallyCompileToObject is false for AOT schemas and scoped schemas)
-        var regexObject = new Regex($"^{regex}$",
-            GlobalSwitches.DynamicallyCompileToObject ? RegexOptions.Compiled : RegexOptions.None);
+        var regexObject = value switch
+        {
+            // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
+            // the regex (or pull from the static cache if already compiled)
+            // (note that GlobalSwitches.DynamicallyCompileToObject is false for AOT schemas and scoped schemas)
+            string regex => new Regex($"^{regex}$",
+                GlobalSwitches.DynamicallyCompileToObject ? RegexOptions.Compiled : RegexOptions.None),
+            Regex r => r,
+            _ => null
+        };
+        if (regexObject == null)
+            return null;
+        var regexString = value switch
+        {
+            string regex => regex,
+            Regex r => StripChars(r),
+            _ => throw new InvalidOperationException()
+        };
 
         return (value) =>
         {
             if (value is string stringValue && !regexObject.IsMatch(stringValue))
             {
-                throw new ArgumentException($"Value '{stringValue}' does not match the regex pattern '{regex}'.");
+                throw new ArgumentException($"Value '{stringValue}' does not match the regex pattern '{regexString}'.");
             }
         };
+
+        string StripChars(Regex r)
+        {
+            var s = r.ToString();
+            if (s.StartsWith("^") && s.EndsWith("$"))
+            {
+                s = s.Substring(1);
+                s = s.Substring(0, s.Length - 1);
+            }
+            else
+                throw new InvalidOperationException("Regex must start with ^ and end with $");
+            return s;
+        }
     }
 }
