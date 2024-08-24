@@ -82,7 +82,7 @@ public partial class PatternMatchingVisitorTests
 #if NET7_0_OR_GREATER
             Patterns.AlphabeticalPattern();
 #else
-            new Regex("[A-Z]+", RegexOptions.Compiled);
+            new Regex("^[A-Z]+$", RegexOptions.Compiled);
 #endif
 
         var query = new ObjectGraphType { Name = "Query" };
