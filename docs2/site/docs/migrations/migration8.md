@@ -1002,7 +1002,7 @@ rethrow the `OperationCanceledException` to the caller, regardless of the `Timeo
 ### 25. The complexity analyzer has been rewritten to support more complex scenarios
 
 Please review the documentation for the new complexity analyzer to understand how to use it and how to configure it.
-See the 'Complexity Analzyer' document with the 'Guides' section of the documentation for more information.
+See the [Complexity Analzyer](../../guides/complexity-analyzer) document for more information.
 
 ### 26. Optimization when returning lists of scalars
 
