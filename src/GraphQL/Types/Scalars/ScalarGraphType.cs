@@ -55,9 +55,9 @@ public abstract class ScalarGraphType : GraphType
             return allowNulls || ((T?[])list).FastAll(t => t.HasValue);
         if (listType.IsArray)
             return false;
-        if (listType is IEnumerable<T>)
+        if (list is IEnumerable<T>)
             return true;
-        if (listType is IEnumerable<T?> nullableList)
+        if (list is IEnumerable<T?> nullableList)
             return allowNulls || nullableList.FastAll(t => t.HasValue);
         return false;
     }

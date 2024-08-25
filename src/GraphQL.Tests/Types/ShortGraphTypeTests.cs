@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
@@ -33,12 +34,23 @@ public class ShortGraphTypeTests : ScalarGraphTypeTest<ShortGraphType>
     [InlineData(12, 12)]
     public void Coerces_given_inputs_to_short_value(object input, short expected)
         => type.ParseValue(input).ShouldBe(expected);
-}
 
-public class ScalarGraphTypeTest<T> where T : ScalarGraphType, new()
-{
-    protected readonly T type = new();
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        type.SerializeList(list).ShouldBe(list);
+    }
 
-    protected void AssertException<TArg>(object value) where TArg : Exception =>
-        Should.Throw<TArg>(() => type.ParseValue(value));
+    public static object?[][] SerializeListData = [
+        [new List<short> { 1, 2 }, true, true],
+        [new List<short?> { 1, 2 }, true, true],
+        [new List<short?> { 1, 2, null }, true, false],
+        [new short[] { 1, 2 }, true, true],
+        [new short?[] { 1, 2 }, true, true],
+        [new short?[] { 1, 2, null }, true, false],
+        [new ushort[] { 1, 2 }, false, false],
+    ];
 }

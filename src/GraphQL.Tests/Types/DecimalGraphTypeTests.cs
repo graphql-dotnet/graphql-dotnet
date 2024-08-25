@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -56,4 +57,19 @@ public class DecimalGraphTypeTests
 
         GC.GetAllocatedBytesForCurrentThread().ShouldBe(allocated);
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        _type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        _type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        _type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        [new List<decimal> { 1, 2 }, true, true],
+        [new List<decimal?> { 1, 2 }, true, true],
+        [new List<decimal?> { 1, 2, null }, true, false],
+    ];
 }

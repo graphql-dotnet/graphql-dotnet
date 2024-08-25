@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -37,4 +38,23 @@ public class ULongGraphTypeTests : ScalarGraphTypeTest<ULongGraphType>
     {
         Assert.Equal(18446744073709551615ul, (ulong)type.ParseLiteral(new GraphQLIntValue(System.Numerics.BigInteger.Parse("18446744073709551615")))!);
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        [new List<ulong> { 1, 2 }, true, true],
+        [new List<ulong?> { 1, 2 }, true, true],
+        [new List<ulong?> { 1, 2, null }, true, false],
+        [new ulong[] { 1, 2 }, true, true],
+        [new ulong?[] { 1, 2 }, true, true],
+        [new ulong?[] { 1, 2, null }, true, false],
+        [new long[] { 1, 2 }, false, false],
+    ];
 }

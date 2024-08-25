@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Numerics;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -112,4 +114,59 @@ public class IdGraphTypeTests
         ret.ShouldBeOfType(typeof(string));
         ret.ShouldBe(g.ToString("D", System.Globalization.CultureInfo.InvariantCulture));
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList, IEnumerable<string> expected)
+    {
+        _type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        _type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        if (canSerializeNonNullList || canSerializeNullableList)
+        {
+            var ret = _type.SerializeList(list);
+            var actual = ret.ShouldBeAssignableTo<IEnumerable<string>>();
+            actual.ShouldBe(expected);
+        }
+    }
+
+    public static object?[][] SerializeListData = [
+        // Int data type test cases
+        [new List<int> { 1, 2, 3 }, true, true, new string[] { "1", "2", "3" }],
+        [new List<int?> { 1, 2, 3 }, true, true, new string[] { "1", "2", "3" }],
+        [new List<int?> { 1, 2, null }, true, false, new string?[] { "1", "2", null }],
+        [new int[] { 1, 2, 3 }, true, true, new string[] { "1", "2", "3" }],
+        [new int?[] { 1, 2, 3 }, true, true, new string[] { "1", "2", "3" }],
+        [new int?[] { 1, 2, null }, true, false, new string?[] { "1", "2", null }],
+        [new uint[] { 1, 2, 3 }, false, false, null],
+        [new List<uint> { 1, 2, 3 }, false, false, null],
+
+        // Long data type test cases
+        [new List<long> { 1L, 2L, 3L }, true, true, new string[] { "1", "2", "3" }],
+        [new List<long?> { 1L, 2L, 3L }, true, true, new string[] { "1", "2", "3" }],
+        [new List<long?> { 1L, 2L, null }, true, false, new string?[] { "1", "2", null }],
+        [new long[] { 1L, 2L, 3L }, true, true, new string[] { "1", "2", "3" }],
+        [new long?[] { 1L, 2L, 3L }, true, true, new string[] { "1", "2", "3" }],
+        [new long?[] { 1L, 2L, null }, true, false, new string?[] { "1", "2", null }],
+        [new ulong[] { 1, 2, 3 }, false, false, null],
+        [new List<ulong> { 1, 2, 3 }, false, false, null],
+
+        // Guid data type test cases
+        [new List<Guid> { Guid.Parse("11111111-1111-1111-1111-111111111111"), Guid.Parse("22222222-2222-2222-2222-222222222222"), Guid.Parse("33333333-3333-3333-3333-333333333333") }, true, true, new string[] { "11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222", "33333333-3333-3333-3333-333333333333" }],
+        [new List<Guid?> { Guid.Parse("11111111-1111-1111-1111-111111111111"), Guid.Parse("22222222-2222-2222-2222-222222222222"), null }, true, false, new string?[] { "11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222", null }],
+        [new Guid[] { Guid.Parse("11111111-1111-1111-1111-111111111111"), Guid.Parse("22222222-2222-2222-2222-222222222222"), Guid.Parse("33333333-3333-3333-3333-333333333333") }, true, true, new string[] { "11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222", "33333333-3333-3333-3333-333333333333" }],
+        [new Guid?[] { Guid.Parse("11111111-1111-1111-1111-111111111111"), Guid.Parse("22222222-2222-2222-2222-222222222222"), null }, true, false, new string?[] { "11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222", null }],
+
+        // String data type test cases
+        [new List<string> { "a", "b", "c" }, true, true, new string[] { "a", "b", "c" }],
+        [new List<string?> { "a", "b", null }, true, false, new string?[] { "a", "b", null }],
+        [new string[] { "a", "b", "c" }, true, true, new string[] { "a", "b", "c" }],
+        [new string?[] { "a", "b", null }, true, false, new string?[] { "a", "b", null }],
+
+        // Other data types
+        [new byte[] { 1, 2, 3 }, false, false, null],
+        [new sbyte[] { 1, 2, 3 }, false, false, null],
+        [new short[] { 1, 2, 3 }, false, false, null],
+        [new ushort[] { 1, 2, 3 }, false, false, null],
+        [new BigInteger[] { 1, 2, 3 }, false, false, null],
+    ];
 }
