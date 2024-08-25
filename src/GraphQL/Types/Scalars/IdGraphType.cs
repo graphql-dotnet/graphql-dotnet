@@ -98,6 +98,7 @@ public class IdGraphType : ScalarGraphType
         IEnumerable<long?> values => values.Select(value => value?.ToString(CultureInfo.InvariantCulture)),
         IEnumerable<Guid> values => values.Select(value => value.ToString("D")),
         IEnumerable<Guid?> values => values.Select(value => value?.ToString("D")),
+        IEnumerable<string?> values => values,
         _ => throw new NotSupportedException(),
     };
 }
