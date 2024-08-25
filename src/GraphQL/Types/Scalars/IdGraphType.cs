@@ -86,7 +86,7 @@ public class IdGraphType : ScalarGraphType
         CanSerializeList<int>(list, allowNulls) ||
         CanSerializeList<long>(list, allowNulls) ||
         CanSerializeList<Guid>(list, allowNulls) ||
-        list is IEnumerable<string?> values && values.FastAll(static s => s != null);
+        list is IEnumerable<string?> values && (allowNulls || values.FastAll(static s => s != null));
 
     /// <inheritdoc/>
     public override IEnumerable SerializeList(IEnumerable list) => list switch
