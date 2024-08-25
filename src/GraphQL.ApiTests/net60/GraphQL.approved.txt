@@ -2932,6 +2932,13 @@ namespace GraphQL.Types
         public GraphQL.Types.QueryArgument? Find(GraphQLParser.ROM name) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.QueryArgument> GetEnumerator() { }
     }
+    public class RegexGraphType : GraphQL.Types.ScalarGraphType
+    {
+        public RegexGraphType() { }
+        public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
+        public override object? ParseValue(object? value) { }
+        public override GraphQLParser.AST.GraphQLValue ToAST(object? value) { }
+    }
     public class ResolvedInterfaces : System.Collections.Generic.IEnumerable<GraphQL.Types.IInterfaceGraphType>, System.Collections.IEnumerable
     {
         public ResolvedInterfaces() { }

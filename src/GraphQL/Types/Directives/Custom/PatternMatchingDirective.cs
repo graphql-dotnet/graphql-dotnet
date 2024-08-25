@@ -37,7 +37,7 @@ public class PatternMatchingDirective : Directive
     {
         Description = "Used to specify a regex pattern for an input field or argument.";
         Arguments = new QueryArguments(
-            new QueryArgument<NonNullGraphType<StringGraphType>>
+            new QueryArgument<NonNullGraphType<RegexGraphType>>
             {
                 Name = "regex",
                 Description = "The regex pattern that the input field or argument must match."
