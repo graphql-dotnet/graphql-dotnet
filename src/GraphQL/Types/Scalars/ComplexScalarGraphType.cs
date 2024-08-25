@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq.Expressions;
 using System.Numerics;
 using GraphQLParser.AST;
 
@@ -45,7 +46,25 @@ public class ComplexScalarGraphType : ScalarGraphType
 
     /// <inheritdoc/>
     public override bool CanSerializeList(IEnumerable list, bool allowNulls)
-        => allowNulls || list is IEnumerable<object?> objectList && objectList.FastAll(value => value != null);
+    {
+        if (allowNulls)
+            return true;
+
+        if (list == null)
+            return false;
+
+        if (list is IEnumerable<object?> objectList)
+            return objectList.FastAll(value => value != null);
+
+        // unfortunately this boxes each item in the list, but still faster than creating execution nodes, etc
+        foreach (var item in list)
+        {
+            if (item == null)
+                return false;
+        }
+
+        return true;
+    }
 
     /// <inheritdoc/>
     public override GraphQLValue ToAST(object? value)

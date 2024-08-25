@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Numerics;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
@@ -46,4 +48,19 @@ public class BooleanGraphTypeTests
     {
         type.Serialize(true).ShouldBe(true);
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        [new List<bool> { true, false }, true, true],
+        [new List<bool?> { true, false }, true, true],
+        [new List<bool?> { true, false, null }, true, false],
+    ];
 }

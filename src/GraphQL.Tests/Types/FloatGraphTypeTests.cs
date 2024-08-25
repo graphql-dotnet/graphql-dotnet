@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Numerics;
 using GraphQL.Types;
 using GraphQLParser.AST;
@@ -62,4 +63,19 @@ public class FloatGraphTypeTests
         type.ParseValue(new BigInteger(9999999999)).ShouldBeOfType<double>().ShouldBe(9999999999d);
         type.ParseLiteral(new GraphQLIntValue(9999999999)).ShouldBeOfType<double>().ShouldBe(9999999999d);
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        [new List<double> { 1, 2 }, true, true],
+        [new List<double?> { 1, 2 }, true, true],
+        [new List<double?> { 1, 2, null }, true, false],
+    ];
 }

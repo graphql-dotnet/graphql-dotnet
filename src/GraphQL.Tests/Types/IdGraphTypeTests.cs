@@ -117,7 +117,7 @@ public class IdGraphTypeTests
 
     [Theory]
     [MemberData(nameof(SerializeListData))]
-    public void serialize_int_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList, IEnumerable<string> expected)
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList, IEnumerable<string> expected)
     {
         _type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
         _type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
@@ -169,5 +169,4 @@ public class IdGraphTypeTests
         [new ushort[] { 1, 2, 3 }, false, false, null],
         [new BigInteger[] { 1, 2, 3 }, false, false, null],
     ];
-
 }

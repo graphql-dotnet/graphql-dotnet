@@ -1,3 +1,4 @@
+using System.Collections;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
@@ -52,4 +53,22 @@ public class StringGraphTypeTests
     {
         _type.ParseValue("\"").ShouldBe("\"");
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        _type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        _type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        _type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        [new List<string> { "1", "2" }, true, true],
+        [new List<string?> { "1", "2" }, true, true],
+        [new List<string?> { "1", "2", null }, true, false],
+        [new string[] { "1", "2" }, true, true],
+        [new string?[] { "1", "2" }, true, true],
+        [new string?[] { "1", "2", null }, true, false],
+    ];
 }

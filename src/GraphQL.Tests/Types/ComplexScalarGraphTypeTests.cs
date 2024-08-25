@@ -1,5 +1,6 @@
 #nullable enable
 
+using System.Collections;
 using GraphQL.Types;
 using GraphQLParser.AST;
 
@@ -63,4 +64,23 @@ public class ComplexScalarGraphTypeTests
         System.Text.Json.JsonSerializer.Serialize(obj)
             .ShouldBe(System.Text.Json.JsonSerializer.Serialize(parsed));
     }
+
+    [Theory]
+    [MemberData(nameof(SerializeListData))]
+    public void serialize_list(IEnumerable list, bool canSerializeNullableList, bool canSerializeNonNullList)
+    {
+        type.CanSerializeList(list, true).ShouldBe(canSerializeNullableList);
+        type.CanSerializeList(list, false).ShouldBe(canSerializeNonNullList);
+        type.SerializeList(list).ShouldBe(list);
+    }
+
+    public static object?[][] SerializeListData = [
+        // value type
+        [new List<bool> { true, false }, true, true],
+        [new List<bool?> { true, false }, true, true],
+        [new List<bool?> { true, false, null }, true, false],
+        // ref type
+        [new List<string> { "1", "2" }, true, true],
+        [new List<string?> { "1", "2", null }, true, false],
+    ];
 }
