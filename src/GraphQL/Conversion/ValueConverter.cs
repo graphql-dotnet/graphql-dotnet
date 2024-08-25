@@ -227,7 +227,9 @@ public static class ValueConverter
             return true;
         }
 
-        var conversion = GetConversion(sourceType ?? value.GetType(), targetType);
+        sourceType ??= value.GetType();
+        targetType = Nullable.GetUnderlyingType(targetType) ?? targetType;
+        var conversion = GetConversion(sourceType, targetType);
         if (conversion == null)
         {
             result = null;
