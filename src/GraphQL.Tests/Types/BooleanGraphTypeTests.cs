@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Numerics;
 using GraphQL.Types;
 
 namespace GraphQL.Tests.Types;
