@@ -2,6 +2,7 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/4042
 [Collection("StaticTests")]
 public class Bug4042
 {
@@ -15,7 +16,7 @@ public class Bug4042
     [InlineData(false, false)]
     [InlineData(true, true)]
     [InlineData(false, true)]
-    public async Task Test1(bool withExpression, bool viaReflection)
+    public async Task TestCoercingIdFieldsToIntWithinInputObjects(bool withExpression, bool viaReflection)
     {
         var defaultCompile = GlobalSwitches.DynamicallyCompileToObject;
         GlobalSwitches.DynamicallyCompileToObject = !viaReflection;
