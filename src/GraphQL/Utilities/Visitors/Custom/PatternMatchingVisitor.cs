@@ -37,8 +37,15 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
     {
         // look for @pattern directive applied to the field argument or input field, and if found, use Validate to set the validation method
         var applied = fieldArgOrInputField.FindAppliedDirective("pattern");
-        if (applied?.FindArgument("regex")?.Value is not string regex)
+        var regexArgument = applied?.FindArgument("regex");
+        if (regexArgument == null)
             return null;
+
+        if (regexArgument.Value == null)
+            throw new ArgumentException("Pattern directive 'regex' argument must have non-null value");
+
+        if(regexArgument.Value is not string regex)
+            throw new ArgumentException("Pattern directive 'regex' argument must be of 'string' type");
 
         // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
         // the regex (or pull from the static cache if already compiled)
