@@ -44,7 +44,7 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
         if (regexArgument.Value == null)
             throw new ArgumentException("Pattern directive 'regex' argument must have non-null value");
 
-        if(regexArgument.Value is not string regex)
+        if (regexArgument.Value is not string regex)
             throw new ArgumentException("Pattern directive 'regex' argument must be of 'string' type");
 
         // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
