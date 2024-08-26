@@ -59,8 +59,8 @@ public class PatternMatchingVisitorTests
     }
 
     [Theory]
-    [InlineData(null, "Pattern directive 'regex' argument must have non-null value")]
-    [InlineData(123, "Pattern directive 'regex' argument must be of 'string' type")]
+    [InlineData(null, "Pattern directive 'regex' argument at Query.hello.arg must have non-null value.")]
+    [InlineData(123, "Pattern directive 'regex' argument at Query.hello.arg must be of 'string' type.")]
     public void InvalidRegexValue(object? argumentValue, string message)
     {
         var query = new ObjectGraphType { Name = "Query" };

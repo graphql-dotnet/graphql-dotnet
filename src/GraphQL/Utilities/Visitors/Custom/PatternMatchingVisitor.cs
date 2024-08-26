@@ -23,18 +23,19 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
 {
     /// <inheritdoc/>
     public override void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema)
-        => field.Validator += GetValidator(field);
+        => field.Validator += GetValidator(null, field, type);
 
     /// <inheritdoc/>
     public override void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema)
-        => argument.Validator += GetValidator(argument);
+        => argument.Validator += GetValidator(argument, field, type);
 
     /// <inheritdoc/>
     public override void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema)
-        => field.Validator += GetValidator(argument);
+        => field.Validator += GetValidator(argument, field, type);
 
-    private static Action<object?>? GetValidator(IMetadataReader fieldArgOrInputField)
+    private static Action<object?>? GetValidator(QueryArgument? argument, FieldType field, INamedType type)
     {
+        var fieldArgOrInputField = (argument as IMetadataReader) ?? field;
         // look for @pattern directive applied to the field argument or input field, and if found, use Validate to set the validation method
         var applied = fieldArgOrInputField.FindAppliedDirective("pattern");
         var regexArgument = applied?.FindArgument("regex");
@@ -42,10 +43,10 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
             return null;
 
         if (regexArgument.Value == null)
-            throw new ArgumentException("Pattern directive 'regex' argument must have non-null value");
+            throw new ArgumentException($"Pattern directive 'regex' argument at {GetLocation()} must have non-null value.");
 
         if (regexArgument.Value is not string regex)
-            throw new ArgumentException("Pattern directive 'regex' argument must be of 'string' type");
+            throw new ArgumentException($"Pattern directive 'regex' argument at {GetLocation()} must be of 'string' type.");
 
         // if GlobalSwitches.DynamicallyCompileToObject is true, then compile
         // the regex (or pull from the static cache if already compiled)
@@ -60,5 +61,10 @@ public class PatternMatchingVisitor : BaseSchemaNodeVisitor
                 throw new ArgumentException($"Value '{stringValue}' does not match the regex pattern '{regex}'.");
             }
         };
+
+        string GetLocation()
+            => argument != null
+                ? $"{type.Name}.{field.Name}.{argument.Name}"
+                : $"{type.Name}.{field.Name}";
     }
 }
