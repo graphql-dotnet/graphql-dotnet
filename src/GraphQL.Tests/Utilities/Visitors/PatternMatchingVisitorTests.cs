@@ -18,7 +18,7 @@ public class PatternMatchingVisitorTests
                 s.RegisterVisitor(new PatternMatchingVisitor());
             }));
 
-        using var provider = services.BuildServiceProvider();
+        await using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
 
         var result = await schema.ExecuteAsync(o => o.Query = """{ hello(arg: "HELLO") }""");
@@ -56,5 +56,22 @@ public class PatternMatchingVisitorTests
             [Directive("pattern", "regex", "[A-Z]+")] // uppercase only
             string arg)
             => arg;
+    }
+
+    [Theory]
+    [InlineData(null, "Pattern directive 'regex' argument at Query.hello.arg must have non-null value.")]
+    [InlineData(123, "Pattern directive 'regex' argument at Query.hello.arg must be of 'string' type.")]
+    public void InvalidRegexValue(object? argumentValue, string message)
+    {
+        var query = new ObjectGraphType { Name = "Query" };
+        query.Field<string>("Hello")
+            .Argument<StringGraphType>("arg", argument => argument.ApplyDirective("pattern", "regex", argumentValue))
+            .Resolve(ctx => ctx.GetArgument<string>("arg"));
+
+        var schema = new Schema { Query = query };
+        schema.Directives.Register(new PatternMatchingDirective());
+        schema.RegisterVisitor(new PatternMatchingVisitor());
+
+        Should.Throw<ArgumentException>(schema.Initialize).Message.ShouldBe(message);
     }
 }
