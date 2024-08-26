@@ -100,10 +100,10 @@ namespace GraphQL
     {
         public System.Collections.Generic.Dictionary<string, object?> Arguments;
         public DirectiveAttribute(string name) { }
-        public DirectiveAttribute(string name, params object[] argsAndValues) { }
-        public DirectiveAttribute(string name, string argumentName, object argumentValue) { }
-        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2) { }
-        public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2, string argumentName3, object argumentValue3) { }
+        public DirectiveAttribute(string name, params object?[] argsAndValues) { }
+        public DirectiveAttribute(string name, string argumentName, object? argumentValue) { }
+        public DirectiveAttribute(string name, string argumentName1, object? argumentValue1, string argumentName2, object? argumentValue2) { }
+        public DirectiveAttribute(string name, string argumentName1, object? argumentValue1, string argumentName2, object? argumentValue2, string argumentName3, object? argumentValue3) { }
         public string Name { get; }
         public override void Modify(GraphQL.Types.EnumValueDefinition enumValueDefinition) { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }

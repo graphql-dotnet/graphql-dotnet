@@ -16,14 +16,14 @@ public class DirectiveAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc cref="DirectiveAttribute"/>
-    public DirectiveAttribute(string name, string argumentName, object argumentValue)
+    public DirectiveAttribute(string name, string argumentName, object? argumentValue)
     {
         Name = name;
         Arguments.Add(argumentName, argumentValue);
     }
 
     /// <inheritdoc cref="DirectiveAttribute"/>
-    public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2)
+    public DirectiveAttribute(string name, string argumentName1, object? argumentValue1, string argumentName2, object? argumentValue2)
     {
         Name = name;
         Arguments.Add(argumentName1, argumentValue1);
@@ -31,7 +31,7 @@ public class DirectiveAttribute : GraphQLAttribute
     }
 
     /// <inheritdoc cref="DirectiveAttribute"/>
-    public DirectiveAttribute(string name, string argumentName1, object argumentValue1, string argumentName2, object argumentValue2, string argumentName3, object argumentValue3)
+    public DirectiveAttribute(string name, string argumentName1, object? argumentValue1, string argumentName2, object? argumentValue2, string argumentName3, object? argumentValue3)
     {
         Name = name;
         Arguments.Add(argumentName1, argumentValue1);
@@ -44,12 +44,12 @@ public class DirectiveAttribute : GraphQLAttribute
     /// The <paramref name="argsAndValues"/> parameter must contain an even number of elements, where
     /// the first element of each pair is the argument name and the second element is the argument value.
     /// </remarks>
-    public DirectiveAttribute(string name, params object[] argsAndValues)
+    public DirectiveAttribute(string name, params object?[] argsAndValues)
     {
         Name = name;
         for (int i = 0; i < argsAndValues.Length; i += 2)
         {
-            Arguments.Add((string)argsAndValues[i], argsAndValues[i + 1]);
+            Arguments.Add((string)argsAndValues[i]!, argsAndValues[i + 1]);
         }
     }
 
