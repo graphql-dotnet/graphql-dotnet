@@ -51,6 +51,10 @@ public sealed class FieldArgumentsAreValidRule : ValidationRuleBase, INodeVisito
             {
                 await func(ctx).ConfigureAwait(false);
             }
+            catch (OperationCanceledException) when (ctx.CancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 ctx.ValidationContext.ReportError(new ValidationError(ctx.ValidationContext.Document.Source, null, ex.Message, ex, ctx.FieldAst));
