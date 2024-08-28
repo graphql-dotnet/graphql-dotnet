@@ -1,6 +1,4 @@
-using System.Reflection.Metadata;
 using GraphQL.Types;
-using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules;
