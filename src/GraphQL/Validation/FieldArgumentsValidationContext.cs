@@ -49,6 +49,9 @@ public struct FieldArgumentsValidationContext
     /// <inheritdoc cref="IResolveFieldContext.Directives"/>
     public IDictionary<string, DirectiveInfo>? Directives => ValidationContext.DirectiveValues?.TryGetValue(FieldAst, out var dirs) == true ? dirs : null;
 
+    /// <inheritdoc cref="IResolveFieldContext.RequestServices"/>
+    public IServiceProvider? RequestServices => ValidationContext.RequestServices;
+
     /// <inheritdoc cref="IResolveFieldContext.CancellationToken"/>
     public CancellationToken CancellationToken => ValidationContext.CancellationToken;
 

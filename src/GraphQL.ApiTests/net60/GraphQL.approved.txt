@@ -3703,6 +3703,7 @@ namespace GraphQL.Validation
         public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
         public GraphQL.Types.FieldType FieldDefinition { get; set; }
         public GraphQL.Types.IGraphType ParentType { get; }
+        public System.IServiceProvider? RequestServices { get; }
         public GraphQL.Validation.ValidationContext ValidationContext { get; set; }
         public T GetArgument<T>(string name, T defaultValue = default) { }
         public void SetArgument(string name, object? value) { }
