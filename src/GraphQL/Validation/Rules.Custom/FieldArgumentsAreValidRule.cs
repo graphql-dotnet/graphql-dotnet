@@ -21,6 +21,8 @@ public sealed class FieldArgumentsAreValidRule : ValidationRuleBase, INodeVisito
     /// <inheritdoc/>
     public override ValueTask<INodeVisitor?> GetPostNodeVisitorAsync(ValidationContext context)
         // only execute this validation rule when there's at least one field with argument validation
+        // since this triggers the TypeInfo visitor to run during this phase, whereas normally there are
+        // no post-node visitors
         => context.Schema.GetMetadata<bool>(HAS_FIELD_ARGUMENT_VALIDATION_KEY) ? new(this) : default;
 
     ValueTask INodeVisitor.EnterAsync(ASTNode node, ValidationContext context)
