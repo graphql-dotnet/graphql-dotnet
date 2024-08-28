@@ -11,6 +11,7 @@ namespace GraphQL.Utilities;
 public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 {
     private readonly List<Exception> _exceptions = new();
+    private bool _hasFieldArgumentValidation;
 
     private SchemaValidationVisitor()
     {
@@ -21,6 +22,8 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
     {
         var visitor = new SchemaValidationVisitor();
         visitor.Run(schema);
+        if (visitor._hasFieldArgumentValidation)
+            schema.Metadata[Validation.Rules.FieldArgumentsAreValidRule.HAS_FIELD_ARGUMENT_VALIDATION_KEY] = true;
         if (visitor._exceptions.Count > 0)
             throw visitor._exceptions.Count == 1
                 ? visitor._exceptions[0]
@@ -119,6 +122,8 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
                 return null;
             };
         }
+
+        _hasFieldArgumentValidation |= field.ValidateArguments != null;
     }
 
     /// <inheritdoc/>
@@ -261,6 +266,8 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 
         if (field.Validator != null)
             ReportError(new InvalidOperationException($"The field '{field.Name}' of an Interface type '{type.Name}' must not have Validator set. Each interface is translated to a concrete type during request execution. You should set Validator only for fields of input object types."));
+
+        _hasFieldArgumentValidation |= field.ValidateArguments != null;
     }
 
     /// <inheritdoc/>
@@ -360,6 +367,9 @@ public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
             if (field.DefaultValue != null)
                 ReportError(new InvalidOperationException($"The field '{field.Name}' of a OneOf Input Object type '{type.Name}' must not have a default value."));
         }
+
+        if (field.ValidateArguments != null)
+            ReportError(new InvalidOperationException($"The field '{field.Name}' of an Input Object type '{type.Name}' must not have ValidateArguments set. You should set ValidateArguments only for fields of output object types."));
     }
 
     #endregion

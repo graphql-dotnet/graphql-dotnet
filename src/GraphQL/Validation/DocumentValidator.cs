@@ -49,6 +49,7 @@ public partial class DocumentValidator : IDocumentValidator
         VariablesInAllowedPosition.Instance,
         UniqueInputFieldNames.Instance,
         OverlappingFieldsCanBeMerged.Instance,
+        FieldArgumentsAreValidRule.Instance,
     };
 
     /// <inheritdoc/>

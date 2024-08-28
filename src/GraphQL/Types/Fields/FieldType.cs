@@ -2,6 +2,8 @@ using System.Diagnostics;
 using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Utilities;
+using GraphQL.Validation;
+using GraphQLParser.AST;
 
 namespace GraphQL.Types;
 
@@ -107,6 +109,11 @@ public class FieldType : MetadataProvider, IFieldType
     /// Only applicable to fields of input graph types.
     /// </summary>
     public Action<object>? Validator { get; set; }
+
+    /// <summary>
+    /// Validates the arguments of the field.
+    /// </summary>
+    public Func<FieldArgumentsValidationContext, ValueTask>? ValidateArguments { get; set; }
 
     /// <inheritdoc/>
     public bool IsPrivate { get; set; }

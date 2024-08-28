@@ -1075,6 +1075,8 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Type(GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Validate(System.Action<object> validation) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Action<GraphQL.Validation.FieldArgumentsValidationContext> validation) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Func<GraphQL.Validation.FieldArgumentsValidationContext, System.Threading.Tasks.ValueTask> validation) { }
         [System.Obsolete("Please use the overload that accepts the name as the first argument. This method " +
             "will be removed in v9.")]
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
@@ -2579,6 +2581,7 @@ namespace GraphQL.Types
         public GraphQL.Resolvers.IFieldResolver? Resolver { get; set; }
         public GraphQL.Resolvers.ISourceStreamResolver? StreamResolver { get; set; }
         public System.Type? Type { get; set; }
+        public System.Func<GraphQL.Validation.FieldArgumentsValidationContext, System.Threading.Tasks.ValueTask>? ValidateArguments { get; set; }
         public System.Action<object>? Validator { get; set; }
     }
     public class FloatGraphType : GraphQL.Types.ScalarGraphType
@@ -3678,6 +3681,18 @@ namespace GraphQL.Validation
         public DocumentValidator() { }
         public System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options) { }
     }
+    public struct FieldArgumentsValidationContext
+    {
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.ArgumentValue>? Arguments { get; set; }
+        public System.Threading.CancellationToken CancellationToken { get; }
+        public System.Collections.Generic.IDictionary<string, GraphQL.Execution.DirectiveInfo>? Directives { get; }
+        public GraphQLParser.AST.GraphQLField FieldAst { get; set; }
+        public GraphQL.Types.FieldType FieldDefinition { get; set; }
+        public GraphQL.Types.IGraphType ParentType { get; }
+        public GraphQL.Validation.ValidationContext ValidationContext { get; set; }
+        public T GetArgument<T>(string name, T defaultValue = default) { }
+        public void SetArgument(string name, object? value) { }
+    }
     public interface IDocumentValidator
     {
         System.Threading.Tasks.Task<GraphQL.Validation.IValidationResult> ValidateAsync(in GraphQL.Validation.ValidationOptions options);
@@ -4098,6 +4113,13 @@ namespace GraphQL.Validation.Rules
         public static readonly GraphQL.Validation.Rules.DefaultValuesOfCorrectType Instance;
         public DefaultValuesOfCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+    }
+    public sealed class FieldArgumentsAreValidRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
+    {
+        public const string HAS_FIELD_ARGUMENT_VALIDATION_KEY = "__GraphQL_Has_Field_Argument_Validation__";
+        public FieldArgumentsAreValidRule() { }
+        public static GraphQL.Validation.Rules.FieldArgumentsAreValidRule Instance { get; }
+        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class FieldsOnCorrectType : GraphQL.Validation.ValidationRuleBase
     {

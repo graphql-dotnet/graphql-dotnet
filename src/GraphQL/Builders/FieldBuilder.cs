@@ -158,6 +158,24 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         return this;
     }
 
+    /// <inheritdoc cref="ValidateArguments(Func{Validation.FieldArgumentsValidationContext, ValueTask})"/>
+    public virtual FieldBuilder<TSourceType, TReturnType> ValidateArguments(Action<Validation.FieldArgumentsValidationContext> validation)
+    {
+        FieldType.ValidateArguments = ctx => { validation(ctx); return default; };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets argument validation to the field, replacing any existing validation function.
+    /// Runs after all arguments have been coerced and validated as appropriate.
+    /// Applies only to output fields.
+    /// </summary>
+    public virtual FieldBuilder<TSourceType, TReturnType> ValidateArguments(Func<Validation.FieldArgumentsValidationContext, ValueTask> validation)
+    {
+        FieldType.ValidateArguments = validation;
+        return this;
+    }
+
     /// <summary>
     /// Sets the resolver for the field.
     /// </summary>

@@ -245,6 +245,7 @@ public class ValidationQueryRoot : ObjectGraphType
 {
     public ValidationQueryRoot()
     {
+        Name = "Query";
         Field<Human>("human")
             .Argument<IdGraphType>("id", arg => arg.ApplyDirective("length", "min", 2, "max", 5));
         Field<Human>("human2")
@@ -255,6 +256,17 @@ public class ValidationQueryRoot : ObjectGraphType
         Field<DogOrHuman>("dogOrHuman");
         Field<HumanOrAlien>("humanOrAlien");
         Field<ComplicatedArgs>("complicatedArgs");
+        Field<string>("argValidation")
+            .Argument<string>("str1", true)
+            .Argument<string>("str2", true)
+            .ValidateArguments(ctx =>
+            {
+                var str1 = ctx.GetArgument<string>("str1");
+                var str2 = ctx.GetArgument<string>("str2");
+                if (str1 == null && str2 == null)
+                    throw new InvalidOperationException("Must provide str1 or str2");
+                ctx.SetArgument("str2", "str2override");
+            });
     }
 }
 
