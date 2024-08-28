@@ -1,4 +1,6 @@
+using System.Reflection.Metadata;
 using GraphQL.Types;
+using GraphQLParser;
 using GraphQLParser.AST;
 
 namespace GraphQL.Validation.Rules;
@@ -55,6 +57,12 @@ public sealed class FieldArgumentsAreValidRule : ValidationRuleBase, INodeVisito
             {
                 throw;
             }
+            catch (ValidationError ex)
+            {
+                ex.AddNode(ctx.ValidationContext.Document.Source, ctx.FieldAst);
+                ctx.ValidationContext.ReportError(ex);
+            }
+            // note: ValidationContext can only contain ValidationErrors, not ExecutionErrors
             catch (Exception ex)
             {
                 ctx.ValidationContext.ReportError(new ValidationError(ctx.ValidationContext.Document.Source, null, ex.Message, ex, ctx.FieldAst));
