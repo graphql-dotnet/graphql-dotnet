@@ -4132,7 +4132,6 @@ namespace GraphQL.Validation.Rules
     public sealed class FieldArgumentsAreValidRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
     {
         public const string HAS_FIELD_ARGUMENT_VALIDATION_KEY = "__GraphQL_Has_Field_Argument_Validation__";
-        public FieldArgumentsAreValidRule() { }
         public static GraphQL.Validation.Rules.FieldArgumentsAreValidRule Instance { get; }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }

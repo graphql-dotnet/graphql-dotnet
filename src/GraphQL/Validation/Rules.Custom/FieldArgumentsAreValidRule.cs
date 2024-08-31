@@ -13,6 +13,10 @@ public sealed class FieldArgumentsAreValidRule : ValidationRuleBase, INodeVisito
     /// </summary>
     public const string HAS_FIELD_ARGUMENT_VALIDATION_KEY = "__GraphQL_Has_Field_Argument_Validation__";
 
+    private FieldArgumentsAreValidRule()
+    {
+    }
+
     /// <summary>
     /// Returns a new instance of the rule.
     /// </summary>
