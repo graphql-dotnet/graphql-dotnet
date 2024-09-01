@@ -16,7 +16,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
-If you do not explicitly specify an endpoints through the optional `options` argument then
+If you do not explicitly specify an endpoint through the optional `options` argument then
 GraphiQL by default will run on `/ui/graphiql` endpoint and will send requests to `/graphql`
 GraphQL API endpoint.
 
