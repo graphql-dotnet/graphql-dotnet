@@ -1,6 +1,6 @@
 # GraphiQL
 
-> ℹ️ From GraphQL 8.x, GraphiQL 3.x will be used.
+> ℹ️ From GraphQL 8.x, GraphiQL 3.x will be used.  
 
 [GraphiQL](https://github.com/graphql/graphiql) is an interactive, in-browser GraphQL IDE.
 It's a fantastic developer tool that helps you form queries and explore your schema and documentation.
