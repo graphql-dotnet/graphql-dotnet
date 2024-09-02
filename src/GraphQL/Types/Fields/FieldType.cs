@@ -2,6 +2,7 @@ using System.Diagnostics;
 using GraphQL.Execution;
 using GraphQL.Resolvers;
 using GraphQL.Utilities;
+using GraphQL.Validation;
 
 namespace GraphQL.Types;
 
@@ -103,10 +104,21 @@ public class FieldType : MetadataProvider, IFieldType
     /// <summary>
     /// Validates the value received from the client when the value is not <see langword="null"/>.
     /// Occurs during validation after <see cref="Parser"/> has parsed the value.
-    /// Throw an exception if necessary to indicate a problem.
+    /// Throw an exception if necessary to indicate a problem; any thrown exceptions will be
+    /// reported as a validation error.
     /// Only applicable to fields of input graph types.
     /// </summary>
     public Action<object>? Validator { get; set; }
+
+    /// <summary>
+    /// Validates the arguments of the field.
+    /// Occurs during validation after field arguments have been parsed.
+    /// Throw a <see cref="ValidationError"/> exception if necessary to indicate a
+    /// problem; they will be reported as a validation error. Other exceptions bubble
+    /// up to the <see cref="DocumentExecuter"/> to be handled by the unhandled exception delegate.
+    /// Only applicable to fields of output graph types.
+    /// </summary>
+    public Func<FieldArgumentsValidationContext, ValueTask>? ValidateArguments { get; set; }
 
     /// <inheritdoc/>
     public bool IsPrivate { get; set; }

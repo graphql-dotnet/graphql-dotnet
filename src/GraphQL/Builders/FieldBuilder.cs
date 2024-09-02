@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL.Builders;
@@ -155,6 +156,29 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     public virtual FieldBuilder<TSourceType, TReturnType> Validate(Action<object> validation)
     {
         FieldType.Validator += validation;
+        return this;
+    }
+
+    /// <inheritdoc cref="ValidateArguments(Func{FieldArgumentsValidationContext, ValueTask})"/>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ValidateArguments(Action<FieldArgumentsValidationContext> validation)
+    {
+        FieldType.ValidateArguments = ctx => { validation(ctx); return default; };
+        return this;
+    }
+
+    /// <summary>
+    /// Sets argument validation to the field, replacing any existing validation function.
+    /// Runs after all arguments have been coerced and validated as appropriate.
+    /// Throw a <see cref="ValidationError"/> exception within the delegate if necessary to indicate
+    /// a problem; they will be reported as a validation error. Other exceptions bubble
+    /// up to the <see cref="DocumentExecuter"/> to be handled by the unhandled exception delegate.
+    /// Applies only to output fields.
+    /// </summary>
+    [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ValidateArguments(Func<FieldArgumentsValidationContext, ValueTask> validation)
+    {
+        FieldType.ValidateArguments = validation;
         return this;
     }
 

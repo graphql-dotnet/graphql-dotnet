@@ -6,12 +6,13 @@ using GraphQLParser.AST;
 namespace GraphQL.Tests.Validation;
 
 public class ValidationTestBase<TRule, TSchema>
-    where TRule : IValidationRule, new()
+    where TRule : IValidationRule
     where TSchema : ISchema, new()
 {
     public ValidationTestBase()
     {
-        Rule = new TRule();
+        // create an instance of the rule and schema, using the default private/public constructor
+        Rule = (TRule)typeof(TRule).GetConstructors(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).Single(x => x.GetParameters().Length == 0).Invoke([]);
         Schema = new TSchema();
     }
 
@@ -99,6 +100,6 @@ public class ValidationTestBase<TRule, TSchema>
             Rules = rules,
             Operation = document.Definitions.OfType<GraphQLOperationDefinition>().FirstOrDefault()!,
             Variables = variables
-        }).Result;
+        }).GetAwaiter().GetResult();
     }
 }

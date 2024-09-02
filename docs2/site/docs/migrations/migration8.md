@@ -12,6 +12,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 
 - Argument parsing now occurs during validation
 - Fields and arguments can have custom parsers applied, which will catch more coercion errors during validation rather than execution
+- Fields can configure validation code for argument values which will run during the validation stage
 - Validation rules can execute after arguments have been parsed
 - Complexity analyzer rewritten; can examine arguments to facilitate analysis
 - Federation support is simplified and Federation 2 is supported
@@ -313,7 +314,34 @@ At this time GraphQL.NET does not directly support the `MaxLength` and similar a
 implement your own attributes as shown above, or call the `Validate` method to set a validation
 function.
 
-### 6. `@pattern` custom directive added for validating input values against a regular expression pattern
+### 6. `ArgumentValidator` delegate added to input object/interface field definitions (since 8.1)
+
+This allows for custom validation of the coerced argument values. It can be used when you must
+enforce certain relationships between arguments, such as ensuring that at least one of multiple
+arguments are provided, or that a specific argument is provided when another argument is set to
+a specific value. It can be set by configuring the `ValidateArguments` delegate on the `FieldType`
+class or calling the `ValidateArguments` method on the field builder. Here is an example:
+
+```csharp
+Field<string>("example")
+    .Argument<string>("str1", true)
+    .Argument<string>("str2", true)
+    .ValidateArguments(ctx =>
+    {
+        var str1 = ctx.GetArgument<string>("str1");
+        var str2 = ctx.GetArgument<string>("str2");
+        if (str1 == null && str2 == null)
+            throw new ValidationError("Must provide str1 or str2");
+    });
+```
+
+Please throw a `ValidationError` exception or call `ctx.ReportError` to return a validation error to
+the client. Throwing `ExecutionError` will prevent further validation rules from being executed,
+and throwing other exceptions will be caught by the unhandled exception handler. This is different
+than the `Parser` and `Validator` delegates, or scalar coercion methods, which will not trigger the
+unhandled exception handler.
+
+### 7. `@pattern` custom directive added for validating input values against a regular expression pattern
 
 This directive allows for specifying a regular expression pattern to validate the input value.
 It can also be used as sample code for designing new custom directives, and is now the preferred
@@ -341,7 +369,7 @@ Field(x => x.FirstName)
     .ApplyDirective("pattern", "regex", "[A-Z]+"); // uppercase only
 ```
 
-### 7. DirectiveAttribute added to support applying directives to type-first graph types and fields
+### 8. DirectiveAttribute added to support applying directives to type-first graph types and fields
 
 For example:
 
@@ -355,7 +383,7 @@ private class Query
 }
 ```
 
-### 8. Validation rules can read or validate field arguments and directive arguments
+### 9. Validation rules can read or validate field arguments and directive arguments
 
 Validation rules can now execute validation code either before or after field arguments
 have been read. This is useful for edge cases, such as when a complexity analyzer needs
@@ -386,7 +414,7 @@ Documentation has been added to the [Query Validation](https://graphql-dotnet.gi
 section of the documentation to explain how to create custom validation rules using the
 revised `IValidationRule` interface and related classes.
 
-### 9. List coercion can be customized
+### 10. List coercion can be customized
 
 Previously only specific list types were natively supported, such as `List<T>` and `IEnumerable<T>`,
 and list types that implemented `IList`. Now, any list-like type such as `HashSet<T>` or `Queue<T>`
@@ -430,7 +458,7 @@ Finally, if you simply need to map an interface list type to a concrete list typ
 ValueConverter.RegisterListConverterFactory(typeof(IList<>), typeof(List<>)); // default mapping is T[]
 ```
 
-### 10. `IGraphType.IsPrivate` and `IFieldType.IsPrivate` properties added
+### 11. `IGraphType.IsPrivate` and `IFieldType.IsPrivate` properties added
 
 Allows to set a graph type or field as private within a schema visitor, effectively removing it from the schema.
 Introspection queries will not be able to query the type/field, and queries will not be able to reference the type/field.
@@ -445,18 +473,18 @@ This makes it possible to create a private type used within the schema but not e
 it is possible to dynamically create input object types to deserialize GraphQL Federation entity representations, which
 are normally sent via the `_Any` type.
 
-### 11. `IObjectGraphType.SkipTypeCheck` property added
+### 12. `IObjectGraphType.SkipTypeCheck` property added
 
 Allows to skip the type check for a specific object graph type during resolver execution. This is useful
 for schema-first schemas where the CLR type is not defined while the resolver is built, while allowing
 `IsTypeOf` to be set automatically for other use cases. Schema-first schemas will automatically set this
 property to `true` for all object graph types to retain the existing behavior.
 
-### 12. `ISchemaNodeVisitor.PostVisitSchema` method added
+### 13. `ISchemaNodeVisitor.PostVisitSchema` method added
 
 Allows to revisit the schema after all other methods (types/fields/etc) have been visited.
 
-### 13. GraphQL Federation v2 graph types added
+### 14. GraphQL Federation v2 graph types added
 
 These graph types have been added to the `GraphQL.Federation.Types` namespace:
 
@@ -468,7 +496,7 @@ These graph types have been added to the `GraphQL.Federation.Types` namespace:
 - `LinkPurposeGraphType`
 - `ServiceGraphType`
 
-### 14. Extension methods and attributes added to simplify applying GraphQL Federation directives in code-first and type-first schemas
+### 15. Extension methods and attributes added to simplify applying GraphQL Federation directives in code-first and type-first schemas
 
 These extension methods and attributes simplify the process of applying GraphQL Federation directives:
 
@@ -482,7 +510,7 @@ These extension methods and attributes simplify the process of applying GraphQL 
 | `@shareable` | `Shareable()` | `[Shareable]` | Indicates that an object type's field is allowed to be resolved by multiple subgraphs (by default in Federation 2, object fields can be resolved by only one subgraph). |
 | `@inaccessible` | `Inaccessible()` | `[Inaccessible]` | Indicates that a definition in the subgraph schema should be omitted from the router's API schema, even if that definition is also present in other subgraphs. This means that the field is not exposed to clients at all. |
 
-### 15. OneOf Input Object support added
+### 16. OneOf Input Object support added
 
 OneOf Input Objects are a special variant of Input Objects where the type system
 asserts that exactly one of the fields must be set and non-null, all others
@@ -500,7 +528,7 @@ Note: the feature is still a draft and has not made it into the official GraphQL
 It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
 It is not expected to change from the current draft.
 
-### 16. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
+### 17. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
 
 Extension methods have been added for defining entity resolvers in code-first and type-first schemas
 for GraphQL Federation.
@@ -669,12 +697,12 @@ public class Widget
 }
 ```
 
-### 17. Applied directives may contain metadata
+### 18. Applied directives may contain metadata
 
 `AppliedDirective` now implements `IProvideMetadata`, `IMetadataReader` and `IMetadataWriter`
 to allow for reading and writing metadata to applied directives.
 
-### 18. Support added for the Apollo `@link` directive
+### 19. Support added for the Apollo `@link` directive
 
 This directive indicates that some types and/or directives are to be imported from another schema.
 Types and directives can be explicitly imported, either with their original name or with an alias.
@@ -743,7 +771,7 @@ schema
 Note that you may call `LinkSchema` multiple times with the same URL to apply additional configuration
 options to the same url, or with a separate URL to link multiple schemas.
 
-### 19. `FromSchemaUrl` added to `AppliedDirective`
+### 20. `FromSchemaUrl` added to `AppliedDirective`
 
 This property supports using a directive that was separately imported via `@link`. After importing the schema as described
 above, apply imported directives to your schema similar to the example below:
@@ -758,7 +786,7 @@ During schema initialization, the name of the applied directive will be resolved
 In the above example, if `@shareable` was imported, the directive will be applied as `@shareable`, but if not, it will
 be applied as `@federation__shareable`. Aliases are also supported.
 
-### 20. `AddFederation` GraphQL builder call added to initialize any schema for federation support
+### 21. `AddFederation` GraphQL builder call added to initialize any schema for federation support
 
 This method will automatically add the necessary types and directives to support GraphQL Federation.
 Simply call `AddFederation` with the version number of the Federation specification that you wish to import
@@ -787,7 +815,7 @@ parts of your schema with `@extends`. This is not required for version 2.0 and l
 You may add additional configuration to the `AddFederation` call to import additional directives or types, remove imports,
 change import aliases, or change the namespace used for directives that are not explicitly imported.
 
-### 21. Infer field nullability from NRT annotations is enabled by default
+### 22. Infer field nullability from NRT annotations is enabled by default
 
 When defining the field with expression, the graph type nullability will be inferred from
 Null Reference Types (NRT) by default. To disable the feature, set the
@@ -834,14 +862,14 @@ type Person {
 }
 ```
 
-### 22. `ValidationContext.GetRecursivelyReferencedFragments` updated with `@skip` and `@include` directive support
+### 23. `ValidationContext.GetRecursivelyReferencedFragments` updated with `@skip` and `@include` directive support
 
 When developing a custom validation rule, such as an authorization rule, you may need to determine which fragments are
 recursively referenced by an operation by calling `GetRecursivelyReferencedFragments` with the `onlyUsed` argument
 set to `true`. The method will then ignore fragments that are conditionally skipped by the `@skip` or `@include`
 directives.
 
-### 23. Persisted Document support
+### 24. Persisted Document support
 
 GraphQL.NET now supports persisted documents based on the draft spec [listed here](https://github.com/graphql/graphql-over-http/pull/264).
 Persisted documents are a way to store a query string on the server and reference it by a unique identifier, typically
