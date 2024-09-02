@@ -4048,6 +4048,8 @@ namespace GraphQL.Validation.Rules
     public class InputFieldsAndArgumentsOfCorrectLength : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.InputFieldsAndArgumentsOfCorrectLength Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public InputFieldsAndArgumentsOfCorrectLength() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
@@ -4063,6 +4065,8 @@ namespace GraphQL.Validation.Rules
     public class KnownDirectivesInAllowedLocations : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownDirectivesInAllowedLocations Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public KnownDirectivesInAllowedLocations() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4101,6 +4105,8 @@ namespace GraphQL.Validation.Rules
     public class NoUndefinedVariables : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUndefinedVariables Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public NoUndefinedVariables() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4115,6 +4121,8 @@ namespace GraphQL.Validation.Rules
     public class NoUnusedVariables : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUnusedVariables Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public NoUnusedVariables() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4218,18 +4226,24 @@ namespace GraphQL.Validation.Rules
     public class UniqueVariableNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueVariableNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueVariableNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class VariablesAreInputTypes : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.VariablesAreInputTypes Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public VariablesAreInputTypes() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class VariablesInAllowedPosition : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.VariablesInAllowedPosition Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public VariablesInAllowedPosition() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4258,6 +4272,9 @@ namespace GraphQL.Validation.Rules.Custom
     }
     public class NoIntrospectionValidationRule : GraphQL.Validation.ValidationRuleBase
     {
+        public static readonly GraphQL.Validation.Rules.Custom.NoIntrospectionValidationRule Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public NoIntrospectionValidationRule() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
