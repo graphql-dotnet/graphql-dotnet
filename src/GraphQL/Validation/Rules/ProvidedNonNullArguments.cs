@@ -15,7 +15,15 @@ public class ProvidedNonNullArguments : ValidationRuleBase
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly ProvidedNonNullArguments Instance = new();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc cref="ProvidedNonNullArguments"/>
+    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
+    public ProvidedNonNullArguments()
+    {
+    }
 
     /// <inheritdoc/>
     /// <exception cref="ProvidedNonNullArgumentsError"/>
