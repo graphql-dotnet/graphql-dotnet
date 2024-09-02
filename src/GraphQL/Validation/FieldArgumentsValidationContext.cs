@@ -50,10 +50,10 @@ public struct FieldArgumentsValidationContext
     public IDictionary<string, DirectiveInfo>? Directives => ValidationContext.DirectiveValues?.TryGetValue(FieldAst, out var dirs) == true ? dirs : null;
 
     /// <inheritdoc cref="IResolveFieldContext.RequestServices"/>
-    public IServiceProvider? RequestServices => ValidationContext.RequestServices;
+    public readonly IServiceProvider? RequestServices => ValidationContext.RequestServices;
 
     /// <inheritdoc cref="IResolveFieldContext.CancellationToken"/>
-    public CancellationToken CancellationToken => ValidationContext.CancellationToken;
+    public readonly CancellationToken CancellationToken => ValidationContext.CancellationToken;
 
     /// <summary>
     /// Gets the argument specified by name.
@@ -72,5 +72,12 @@ public struct FieldArgumentsValidationContext
     public void SetArgument(string name, object? value)
     {
         (Arguments ??= new Dictionary<string, ArgumentValue>())[name] = new ArgumentValue(value, ArgumentSource.Literal);
+    }
+
+    /// <inheritdoc cref="ValidationContext.ReportError(ValidationError)"/>
+    public readonly void ReportError(ValidationError error)
+    {
+        error.AddNode(ValidationContext.Document.Source, FieldAst);
+        ValidationContext.ReportError(error);
     }
 }

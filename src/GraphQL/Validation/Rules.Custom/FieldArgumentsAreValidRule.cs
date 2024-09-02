@@ -55,20 +55,18 @@ public sealed class FieldArgumentsAreValidRule : ValidationRuleBase, INodeVisito
             {
                 await func(ctx).ConfigureAwait(false);
             }
-            catch (OperationCanceledException) when (ctx.CancellationToken.IsCancellationRequested)
-            {
-                throw;
-            }
             catch (ValidationError ex)
             {
                 ex.AddNode(ctx.ValidationContext.Document.Source, ctx.FieldAst);
                 ctx.ValidationContext.ReportError(ex);
             }
             // note: ValidationContext can only contain ValidationErrors, not ExecutionErrors
-            catch (Exception ex)
+            catch (ExecutionError ex)
             {
-                ctx.ValidationContext.ReportError(new ValidationError(ctx.ValidationContext.Document.Source, null, ex.Message, ex, ctx.FieldAst));
+                ex.AddLocation(ctx.FieldAst, ctx.ValidationContext.Document);
+                throw;
             }
+            // note: do not catch any other exceptions; let them bubble up to the DocumentExecuter to be handled by the unhandled exception delegate
         }
     }
 

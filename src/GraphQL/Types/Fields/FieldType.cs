@@ -113,8 +113,9 @@ public class FieldType : MetadataProvider, IFieldType
     /// <summary>
     /// Validates the arguments of the field.
     /// Occurs during validation after field arguments have been parsed.
-    /// Throw an exception if necessary to indicate a problem; any thrown exceptions will be
-    /// reported as a validation error.
+    /// Throw a <see cref="ValidationError"/> exception if necessary to indicate a
+    /// problem; they will be reported as a validation error. Other exceptions bubble
+    /// up to the <see cref="DocumentExecuter"/> to be handled by the unhandled exception delegate.
     /// Only applicable to fields of output graph types.
     /// </summary>
     public Func<FieldArgumentsValidationContext, ValueTask>? ValidateArguments { get; set; }

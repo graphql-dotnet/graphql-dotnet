@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQL.Validation;
 using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Validation;
@@ -264,7 +265,9 @@ public class ValidationQueryRoot : ObjectGraphType
                 var str1 = ctx.GetArgument<string>("str1");
                 var str2 = ctx.GetArgument<string>("str2");
                 if (str1 == null && str2 == null)
-                    throw new InvalidOperationException("Must provide str1 or str2");
+                    throw new ValidationError("Must provide str1 or str2");
+                if (str1 == "error")
+                    throw new InvalidOperationException("critical failure");
                 ctx.SetArgument("str2", "str2override");
             });
     }

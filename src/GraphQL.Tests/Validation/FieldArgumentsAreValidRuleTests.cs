@@ -51,4 +51,16 @@ public class FieldArgumentsAreValidRuleTests : ValidationTestBase<FieldArguments
             });
         });
     }
+
+    [Fact]
+    public void bubbles_unhandled_errors()
+    {
+        Should.Throw<InvalidOperationException>(() =>
+            ShouldPassRule("""
+                {
+                    argValidation (str1: "error")
+                }
+                """))
+            .Message.ShouldBe("critical failure");
+    }
 }
