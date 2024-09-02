@@ -331,7 +331,7 @@ Field<string>("example")
         var str1 = ctx.GetArgument<string>("str1");
         var str2 = ctx.GetArgument<string>("str2");
         if (str1 == null && str2 == null)
-            throw new InvalidOperationException("Must provide str1 or str2");
+            throw new ValidationError("Must provide str1 or str2");
     });
 ```
 
