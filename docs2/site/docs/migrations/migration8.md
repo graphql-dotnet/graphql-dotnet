@@ -335,6 +335,12 @@ Field<string>("example")
     });
 ```
 
+Please throw a `ValidationError` exception or call `ctx.ReportError` to return a validation error to
+the client. Throwing `ExecutionError` will prevent further validation rules from being executed,
+and throwing other exceptions will be caught by the unhandled exception handler. This is different
+than the `Parser` and `Validator` delegates, or scalar coercion methods, which will not trigger the
+unhandled exception handler.
+
 ### 7. `@pattern` custom directive added for validating input values against a regular expression pattern
 
 This directive allows for specifying a regular expression pattern to validate the input value.
