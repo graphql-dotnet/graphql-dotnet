@@ -17,7 +17,7 @@ public struct FieldArgumentsValidationContext
 
     private IGraphType? _parentType;
     /// <inheritdoc cref="IResolveFieldContext.ParentType"/>
-    public IGraphType ParentType => _parentType ??= (ValidationContext.TypeInfo.GetLastType() ?? throw new InvalidOperationException("Unable to retrieve the parent type for this field."));
+    public IGraphType? ParentType => _parentType ??= ValidationContext.TypeInfo.GetLastType();
 
     /// <inheritdoc cref="Validation.ValidationContext"/>
     public ValidationContext ValidationContext { get; set; }
