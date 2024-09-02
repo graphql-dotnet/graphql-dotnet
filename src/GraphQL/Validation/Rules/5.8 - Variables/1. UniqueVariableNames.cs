@@ -13,7 +13,15 @@ public class UniqueVariableNames : ValidationRuleBase
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly UniqueVariableNames Instance = new();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc cref="UniqueVariableNames"/>
+    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
+    public UniqueVariableNames()
+    {
+    }
 
     /// <inheritdoc/>
     /// <exception cref="UniqueVariableNamesError"/>

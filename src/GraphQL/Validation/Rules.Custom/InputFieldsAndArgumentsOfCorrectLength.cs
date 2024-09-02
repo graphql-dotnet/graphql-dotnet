@@ -20,6 +20,22 @@ namespace GraphQL.Validation.Rules;
 /// </remarks>
 public class InputFieldsAndArgumentsOfCorrectLength : ValidationRuleBase
 {
+    /// <summary>
+    /// Returns a static instance of this validation rule.
+    /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
+    public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc cref="InputFieldsAndArgumentsOfCorrectLength"/>
+    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
+    public InputFieldsAndArgumentsOfCorrectLength()
+    {
+    }
+
+    /// <inheritdoc/>
+    public override ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context) => new(FieldVisitor.Instance);
+
     private sealed class FieldVisitor : BaseVariableVisitor
     {
         public static readonly FieldVisitor Instance = new();
@@ -47,14 +63,6 @@ public class InputFieldsAndArgumentsOfCorrectLength : ValidationRuleBase
             return default;
         }
     }
-
-    /// <inheritdoc/>
-    public override ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context) => new(FieldVisitor.Instance);
-
-    /// <summary>
-    /// Returns a static instance of this validation rule.
-    /// </summary>
-    public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new();
 
     /// <inheritdoc/>
     /// <exception cref="InputFieldsAndArgumentsOfCorrectLengthError"/>

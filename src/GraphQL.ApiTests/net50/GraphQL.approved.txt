@@ -4090,24 +4090,32 @@ namespace GraphQL.Validation.Rules
     public class ArgumentsOfCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ArgumentsOfCorrectType Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public ArgumentsOfCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class DefaultValuesOfCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.DefaultValuesOfCorrectType Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public DefaultValuesOfCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class FieldsOnCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.FieldsOnCorrectType Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public FieldsOnCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class FragmentsOnCompositeTypes : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.FragmentsOnCompositeTypes Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public FragmentsOnCompositeTypes() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4121,6 +4129,8 @@ namespace GraphQL.Validation.Rules
     public class KnownArgumentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownArgumentNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public KnownArgumentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4133,24 +4143,32 @@ namespace GraphQL.Validation.Rules
     public class KnownFragmentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownFragmentNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public KnownFragmentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class KnownTypeNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownTypeNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public KnownTypeNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class LoneAnonymousOperation : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.LoneAnonymousOperation Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public LoneAnonymousOperation() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class NoFragmentCycles : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoFragmentCycles Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public NoFragmentCycles() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4163,6 +4181,8 @@ namespace GraphQL.Validation.Rules
     public class NoUnusedFragments : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUnusedFragments Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public NoUnusedFragments() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4175,6 +4195,8 @@ namespace GraphQL.Validation.Rules
     public class OverlappingFieldsCanBeMerged : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public OverlappingFieldsCanBeMerged() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public class Conflict
@@ -4200,30 +4222,40 @@ namespace GraphQL.Validation.Rules
     public class PossibleFragmentSpreads : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.PossibleFragmentSpreads Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public PossibleFragmentSpreads() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class ProvidedNonNullArguments : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ProvidedNonNullArguments Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public ProvidedNonNullArguments() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class ScalarLeafs : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ScalarLeafs Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public ScalarLeafs() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class SingleRootFieldSubscriptions : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.SingleRootFieldSubscriptions Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public SingleRootFieldSubscriptions() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueArgumentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueArgumentNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueArgumentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
@@ -4236,18 +4268,24 @@ namespace GraphQL.Validation.Rules
     public class UniqueFragmentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueFragmentNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueFragmentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueInputFieldNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueInputFieldNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueInputFieldNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public class UniqueOperationNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueOperationNames Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueOperationNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }

@@ -15,7 +15,15 @@ public class KnownTypeNames : ValidationRuleBase
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
+#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly KnownTypeNames Instance = new();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    /// <inheritdoc cref="KnownTypeNames"/>
+    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
+    public KnownTypeNames()
+    {
+    }
 
     /// <inheritdoc/>
     /// <exception cref="KnownTypeNamesError"/>
