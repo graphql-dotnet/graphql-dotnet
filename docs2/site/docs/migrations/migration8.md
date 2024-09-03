@@ -210,6 +210,38 @@ as occured in previous versions of GraphQL.NET. This will result in a server exc
 and processed by the unhandled exception handler if the value cannot be coerced to a `Uri`. Note that
 the parser function need not check for null values.
 
+For type-first schemas in v8.1 and later, you may use the `[Parser]` attribute to define a custom parser
+as shown in the below example:
+
+```csharp
+// sample for argument parsing
+public class OutputClass1
+{
+    // use local private static method
+    public static string Hello1([Parser(nameof(ParseHelloArgument))] string value) => value;
+
+    // use public static method from another class -- looks for ParserClass.Parser
+    public static string Hello2([Parser(typeof(ParserClass))] string value) => value;
+
+    // use public static method from another class with a specific name
+    public static string Hello3([Parser(typeof(HelperClass), nameof(HelperClass.ParseHelloArgument))] string value) => value;
+
+    // example custom parser
+    private static object ParseHelloArgument(object value) => (string)value + "test1";
+}
+
+// sample for input field parsing
+public class InputClass1
+{
+    [Parser(nameof(ParseHelloArgument))]
+    public string? Field1 { get; set; }
+
+    private static object ParseHelloArgument(object value) => (string)value + "test1";
+}
+```
+
+Note that this will replace the default parser configured by the auto-registering graph type.
+
 ### 5. `Validator` delegates added to input field and argument definitions
 
 This allows for custom validation of input values. It can be used to easily validate input values
@@ -306,6 +338,44 @@ private class MyMaxLength : GraphQLAttribute
 }
 ```
 
+In version 8.1 and newer, you can use the `[Validator]` attribute to define a custom validator
+as shown in the below example:
+
+```csharp
+// sample for argument validation
+public class OutputClass2
+{
+    // use local private static method
+    public static string Hello1([Validator(nameof(ValidateHelloArgument))] string value) => value;
+
+    // use public static method from another class -- looks for ValidatorClass.Validate
+    public static string Hello2([Validator(typeof(ValidatorClass))] string value) => value;
+
+    // use public static method from another class with a specific name
+    public static string Hello3([Validator(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))] string value) => value;
+
+    // example custom validator
+    private static void ValidateHelloArgument(object value)
+    {
+        if ((string)value != "hello")
+            throw new ArgumentException("Value must be 'hello'.");
+    }
+}
+
+// sample for input field validation
+public class InputClass2
+{
+    [Validator(nameof(ValidateHelloArgument))]
+    public string? Field1 { get; set; }
+
+    private static void ValidateHelloArgument(object value)
+    {
+        if ((string)value != "hello")
+            throw new ArgumentException("Value must be 'hello'.");
+    }
+}
+```
+
 Similar to the `Parser` delegate, the `Validator` delegate is called during the validation stage,
 and will not unnecessarily trigger the unhandled exception handler due to client input errors.
 
@@ -340,6 +410,29 @@ the client. Throwing `ExecutionError` will prevent further validation rules from
 and throwing other exceptions will be caught by the unhandled exception handler. This is different
 than the `Parser` and `Validator` delegates, or scalar coercion methods, which will not trigger the
 unhandled exception handler.
+
+In version 8.1 and newer, you may use the `[ArgumentValidator]` attribute to define a custom argument
+validator as shown in the below example:
+
+```csharp
+// sample for argument validation
+public class OutputClass3
+{
+    public static string Hello1(string str1, string str2) => str1 + str2;
+
+    [ArgumentValidator(nameof(ValidateHelloArguments))]
+    public static string Hello2(string str1, string str2) => str1 + str2;
+
+    private static ValueTask ValidateHelloArguments(FieldArgumentsValidationContext context)
+    {
+        var str1 = context.GetArgument<string>("str1");
+        var str2 = context.GetArgument<string>("str2");
+        if (str1 == null && str2 == null)
+            context.ReportError("Must provide str1 or str2");
+        return default;
+    }
+}
+```
 
 ### 7. `@pattern` custom directive added for validating input values against a regular expression pattern
 
