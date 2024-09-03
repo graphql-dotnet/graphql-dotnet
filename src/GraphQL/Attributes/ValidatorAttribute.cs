@@ -6,7 +6,7 @@ namespace GraphQL;
 /// <summary>
 /// Specifies a custom validator method for a field argument or a field of an input object in a GraphQL schema.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
 public sealed class ValidatorAttribute : GraphQLAttribute
 {
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]

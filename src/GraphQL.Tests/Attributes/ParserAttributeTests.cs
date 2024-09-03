@@ -63,6 +63,61 @@ public class ParserAttributeTests
         public string Hello([Parser(typeof(Dummy2), "InvalidMethod")] string value) => value;
     }
 
+    [Theory]
+    [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Parser' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a return type of object.")]
+    [InlineData(typeof(Class5b), "Method 'Parser' on CLR type 'Dummy2' must have a return type of object.")]
+    [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
+    public void method_not_found_input_fields(Type clrType, string expectedMessage)
+    {
+        // create a delegate to call the constructor of the AutoRegisteringInputObjectGraphType
+        var graphType = typeof(AutoRegisteringInputObjectGraphType<>).MakeGenericType(clrType);
+        var fn = Expression.Lambda<Func<object>>(Expression.New(graphType)).Compile();
+
+        Should.Throw<InvalidOperationException>(() => fn()).Message.ShouldBe(expectedMessage);
+    }
+
+    public class Class1b
+    {
+        [Parser("InvalidMethod")]
+        public string Hello { get; set; }
+        private object InvalidMethod(object value) => value; // not static
+        private static void InvalidMethod() { } // wrong signature
+    }
+
+    public class Class2b
+    {
+        [Parser(typeof(Dummy))]
+        public string Hello { get; set; }
+    }
+
+    public class Class3b
+    {
+        [Parser(typeof(Dummy), "InvalidMethod")]
+        public string Hello { get; set; }
+    }
+
+    public class Class4b
+    {
+        [Parser("InvalidMethod")]
+        public string Hello { get; set; }
+        private static string InvalidMethod(object value) => (string)value;
+    }
+
+    public class Class5b
+    {
+        [Parser(typeof(Dummy2))]
+        public string Hello { get; set; }
+    }
+
+    public class Class6b
+    {
+        [Parser(typeof(Dummy2), "InvalidMethod")]
+        public string Hello { get; set; }
+    }
+
     public class Dummy
     {
         public object Parser(object value) => value; // not static

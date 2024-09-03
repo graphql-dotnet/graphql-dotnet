@@ -7,7 +7,7 @@ namespace GraphQL;
 /// <summary>
 /// Specifies a custom argument validation method for a field in a GraphQL schema.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Method)]
 public sealed class ValidateArgumentsAttribute : GraphQLAttribute
 {
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]

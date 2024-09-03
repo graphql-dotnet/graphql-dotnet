@@ -6,7 +6,7 @@ namespace GraphQL;
 /// <summary>
 /// Specifies a custom parser method for a field argument or a field of an input object in a GraphQL schema.
 /// </summary>
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field)]
 public sealed class ParserAttribute : GraphQLAttribute
 {
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
