@@ -722,6 +722,17 @@ namespace GraphQL
     {
         public OutputTypeAttribute() { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public sealed class ParserAttribute : GraphQL.GraphQLAttribute
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
+        public ParserAttribute(string parserMethodName) { }
+        public ParserAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type parserType) { }
+        public ParserAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type parserType, string parserMethodName) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
+    }
     public static class QueryArgumentExtensions
     {
         public static GraphQL.Types.QueryArgument ParseValue(this GraphQL.Types.QueryArgument argument, System.Func<object, object> parseValue) { }
@@ -880,6 +891,27 @@ namespace GraphQL
         UseBuiltInScalarMappings = 0,
         InputType = 1,
         OutputType = 2,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method)]
+    public sealed class ValidateArgumentsAttribute : GraphQL.GraphQLAttribute
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
+        public ValidateArgumentsAttribute(string validationMethodName) { }
+        public ValidateArgumentsAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validationType) { }
+        public ValidateArgumentsAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validationType, string validationMethodName) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
+    public sealed class ValidatorAttribute : GraphQL.GraphQLAttribute
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure the specified method is not trimmed or use an alternative construct" +
+            "or.")]
+        public ValidatorAttribute(string validatorMethodName) { }
+        public ValidatorAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validatorType) { }
+        public ValidatorAttribute([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type validatorType, string validatorMethodName) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
     public static class ValueConverter
     {

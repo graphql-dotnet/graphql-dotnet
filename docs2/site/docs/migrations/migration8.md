@@ -411,7 +411,7 @@ and throwing other exceptions will be caught by the unhandled exception handler.
 than the `Parser` and `Validator` delegates, or scalar coercion methods, which will not trigger the
 unhandled exception handler.
 
-In version 8.1 and newer, you may use the `[ArgumentValidator]` attribute to define a custom argument
+In version 8.1 and newer, you may use the `[ValidateArguments]` attribute to define a custom argument
 validator as shown in the below example:
 
 ```csharp
@@ -420,7 +420,7 @@ public class OutputClass3
 {
     public static string Hello1(string str1, string str2) => str1 + str2;
 
-    [ArgumentValidator(nameof(ValidateHelloArguments))]
+    [ValidateArguments(nameof(ValidateHelloArguments))]
     public static string Hello2(string str1, string str2) => str1 + str2;
 
     private static ValueTask ValidateHelloArguments(FieldArgumentsValidationContext context)
