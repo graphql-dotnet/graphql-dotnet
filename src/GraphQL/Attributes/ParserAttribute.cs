@@ -43,7 +43,7 @@ public sealed class ParserAttribute : GraphQLAttribute
     }
 
     /// <summary>
-    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the specified method method from a specified type.
+    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the specified method from a specified type.
     /// The method must exist on the specified type and must be static and public.
     /// The method must have the signature 'object <paramref name="parserMethodName"/>(object value)'.
     /// </summary>
