@@ -43,7 +43,7 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     }
 
     /// <summary>
-    /// Specifies a custom validator method for a field of an input object in a GraphQL schema using the specified method method from a specified type.
+    /// Specifies a custom validator method for a field of an input object in a GraphQL schema using the specified method from a specified type.
     /// The method must exist on the specified type and must be static and public.
     /// The method must have the signature 'void <paramref name="validatorMethodName"/>(object value)'.
     /// </summary>
