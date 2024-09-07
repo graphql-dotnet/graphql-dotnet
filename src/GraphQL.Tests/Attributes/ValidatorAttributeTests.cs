@@ -143,6 +143,7 @@ public class ValidatorAttributeTests
               hello1(value: "abc")
               hello2(value: "def")
               hello3(value: "ghi")
+              hello4(value: "jkl")
             }
             """;
         var expected = """
@@ -187,6 +188,23 @@ public class ValidatorAttributeTests
                   "locations": [
                     {
                       "line": 4,
+                      "column": 17
+                    }
+                  ],
+                  "extensions": {
+                    "code": "INVALID_VALUE",
+                    "codes": [
+                      "INVALID_VALUE",
+                      "INVALID_OPERATION"
+                    ],
+                    "number": "5.6"
+                  }
+                },
+                {
+                  "message": "Invalid value for argument 'value' of field 'hello4'. jklpass1",
+                  "locations": [
+                    {
+                      "line": 5,
                       "column": 17
                     }
                   ],
@@ -216,6 +234,7 @@ public class ValidatorAttributeTests
         public static string Hello1([Validator(nameof(ValidateHelloArgument))] string value) => value;
         public static string Hello2([Validator(typeof(ValidatorClass))] string value) => value;
         public static string Hello3([Validator(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))] string value) => value;
+        public static string Hello4([Validator(typeof(ArgTests), nameof(ValidateHelloArgument))] string value) => value;
 
         private static void ValidateHelloArgument(object value) => throw new InvalidOperationException((string)value + "pass1");
     }
@@ -233,6 +252,9 @@ public class ValidatorAttributeTests
         queryType.Field<StringGraphType>("hello3")
             .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
             .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
+        queryType.Field<StringGraphType>("hello4")
+            .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
+            .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         var query = """
@@ -240,6 +262,7 @@ public class ValidatorAttributeTests
               hello1(value: { field1: "abc" })
               hello2(value: { field2: "def" })
               hello3(value: { field3: "ghi" })
+              hello4(value: { field4: "jkl" })
             }
             """;
         var expected = """
@@ -284,6 +307,23 @@ public class ValidatorAttributeTests
                   "locations": [
                     {
                       "line": 4,
+                      "column": 27
+                    }
+                  ],
+                  "extensions": {
+                    "code": "INVALID_VALUE",
+                    "codes": [
+                      "INVALID_VALUE",
+                      "INVALID_OPERATION"
+                    ],
+                    "number": "5.6"
+                  }
+                },
+                {
+                  "message": "Invalid value for argument 'value' of field 'hello4'. jklpass1",
+                  "locations": [
+                    {
+                      "line": 5,
                       "column": 27
                     }
                   ],
@@ -316,6 +356,8 @@ public class ValidatorAttributeTests
         public string? Field2 { get; set; }
         [Validator(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))]
         public string? Field3 { get; set; }
+        [Validator(typeof(FieldTests), nameof(ValidateHelloArgument))]
+        public string? Field4 { get; set; }
 
         private static void ValidateHelloArgument(object value) => throw new InvalidOperationException((string)value + "pass1");
     }
