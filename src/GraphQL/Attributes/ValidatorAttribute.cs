@@ -9,6 +9,8 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
 public sealed class ValidatorAttribute : GraphQLAttribute
 {
+    private const string DEFAULT_METHOD_NAME = "Validate";
+
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _validatorType;
     private readonly string _validatorMethodName;
@@ -29,9 +31,9 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     }
 
     /// <summary>
-    /// Specifies a custom validator method for a field of an input object in a GraphQL schema using the 'Validator' method from a specified type.
+    /// Specifies a custom validator method for a field of an input object in a GraphQL schema using the 'Validate' method from a specified type.
     /// The method must exist on the specified type and must be static and public.
-    /// The method must have the signature 'void Validator(object value)'.
+    /// The method must have the signature 'void Validate(object value)'.
     /// </summary>
     public ValidatorAttribute(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -39,7 +41,7 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     {
         _validatorType = validatorType
             ?? throw new ArgumentNullException(nameof(validatorType));
-        _validatorMethodName = nameof(FieldType.Validator);
+        _validatorMethodName = DEFAULT_METHOD_NAME;
     }
 
     /// <summary>

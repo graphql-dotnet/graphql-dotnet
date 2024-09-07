@@ -220,7 +220,7 @@ public class OutputClass1
     // use local private static method
     public static string Hello1([Parser(nameof(ParseHelloArgument))] string value) => value;
 
-    // use public static method from another class -- looks for ParserClass.Parser
+    // use public static method from another class -- looks for ParserClass.Parse
     public static string Hello2([Parser(typeof(ParserClass))] string value) => value;
 
     // use public static method from another class with a specific name

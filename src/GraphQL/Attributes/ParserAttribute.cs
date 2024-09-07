@@ -9,6 +9,8 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field)]
 public sealed class ParserAttribute : GraphQLAttribute
 {
+    private const string DEFAULT_METHOD_NAME = "Parse";
+
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _parserType;
     private readonly string _parserMethodName;
@@ -29,9 +31,9 @@ public sealed class ParserAttribute : GraphQLAttribute
     }
 
     /// <summary>
-    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the 'Parser' method from a specified type.
+    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the 'Parse' method from a specified type.
     /// The method must exist on the specified type and must be static and public.
-    /// The method must have the signature 'object Parser(object value)'.
+    /// The method must have the signature 'object Parse(object value)'.
     /// </summary>
     public ParserAttribute(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -39,7 +41,7 @@ public sealed class ParserAttribute : GraphQLAttribute
     {
         _parserType = parserType
             ?? throw new ArgumentNullException(nameof(parserType));
-        _parserMethodName = nameof(FieldType.Parser);
+        _parserMethodName = DEFAULT_METHOD_NAME;
     }
 
     /// <summary>

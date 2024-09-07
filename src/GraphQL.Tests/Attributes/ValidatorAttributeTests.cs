@@ -16,10 +16,10 @@ public class ValidatorAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2), "Could not find method 'Validator' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2), "Could not find method 'Validate' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4), "Method 'InvalidMethod' on CLR type 'Class4' must have a void return type.")]
-    [InlineData(typeof(Class5), "Method 'Validator' on CLR type 'Dummy2' must have a void return type.")]
+    [InlineData(typeof(Class5), "Method 'Validate' on CLR type 'Dummy2' must have a void return type.")]
     [InlineData(typeof(Class6), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a void return type.")]
     public void method_not_found_arguments(Type clrType, string expectedMessage)
     {
@@ -65,10 +65,10 @@ public class ValidatorAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2b), "Could not find method 'Validator' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Validate' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a void return type.")]
-    [InlineData(typeof(Class5b), "Method 'Validator' on CLR type 'Dummy2' must have a void return type.")]
+    [InlineData(typeof(Class5b), "Method 'Validate' on CLR type 'Dummy2' must have a void return type.")]
     [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a void return type.")]
     public void method_not_found_input_fields(Type clrType, string expectedMessage)
     {
@@ -120,15 +120,15 @@ public class ValidatorAttributeTests
 
     public class Dummy
     {
-        public void Validator(object value) { _ = value; } // not static
-        public static void Validator() { } // wrong signature
+        public void Validate(object value) { _ = value; } // not static
+        public static void Validate() { } // wrong signature
         public void InvalidMethod(object value) { _ = value; } // not static
         public static void InvalidMethod() { } // wrong signature
     }
 
     public class Dummy2
     {
-        public static string Validator(object value) => (string)value;
+        public static string Validate(object value) => (string)value;
         public static string InvalidMethod(object value) => (string)value;
     }
 
@@ -322,7 +322,7 @@ public class ValidatorAttributeTests
 
     public class ValidatorClass
     {
-        public static void Validator(object value) => throw new InvalidOperationException((string)value + "pass2");
+        public static void Validate(object value) => throw new InvalidOperationException((string)value + "pass2");
     }
 
     public class HelperClass
