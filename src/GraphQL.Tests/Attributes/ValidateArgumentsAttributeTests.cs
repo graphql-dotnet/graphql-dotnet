@@ -95,6 +95,7 @@ public class ValidateArgumentsAttributeTests
               hello1(value: "abc")
               hello2(value: "def")
               hello3(value: "ghi")
+              hello4(value: "jkl")
             }
             """;
         var expected = """
@@ -144,6 +145,21 @@ public class ValidateArgumentsAttributeTests
                       "VALIDATION_ERROR"
                     ]
                   }
+                },
+                {
+                  "message": "jklpass1",
+                  "locations": [
+                    {
+                      "line": 5,
+                      "column": 3
+                    }
+                  ],
+                  "extensions": {
+                    "code": "VALIDATION_ERROR",
+                    "codes": [
+                      "VALIDATION_ERROR"
+                    ]
+                  }
                 }
               ]
             }
@@ -165,6 +181,8 @@ public class ValidateArgumentsAttributeTests
         public static string Hello2(string value) => value;
         [ValidateArguments(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))]
         public static string Hello3(string value) => value;
+        [ValidateArguments(typeof(ArgTests), nameof(ValidateHelloArgument))]
+        public static string Hello4(string value) => value;
 
         private static ValueTask ValidateHelloArgument(FieldArgumentsValidationContext context) => throw new ValidationError(context.GetArgument<string>("value") + "pass1");
     }

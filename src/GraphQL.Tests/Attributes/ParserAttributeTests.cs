@@ -143,6 +143,7 @@ public class ParserAttributeTests
               hello1(value: "abc")
               hello2(value: "def")
               hello3(value: "ghi")
+              hello4(value: "jkl")
             }
             """;
         var expected = """
@@ -150,7 +151,8 @@ public class ParserAttributeTests
               "data": {
                 "hello1": "abctest1",
                 "hello2": "deftest2",
-                "hello3": "ghitest3"
+                "hello3": "ghitest3",
+                "hello4": "jkltest1"
               }
             }
             """;
@@ -168,6 +170,7 @@ public class ParserAttributeTests
         public static string Hello1([Parser(nameof(ParseHelloArgument))] string value) => value;
         public static string Hello2([Parser(typeof(ParserClass))] string value) => value;
         public static string Hello3([Parser(typeof(HelperClass), nameof(HelperClass.ParseHelloArgument))] string value) => value;
+        public static string Hello4([Parser(typeof(ArgTests), nameof(ParseHelloArgument))] string value) => value;
 
         private static object ParseHelloArgument(object value) => (string)value + "test1";
     }
@@ -185,6 +188,9 @@ public class ParserAttributeTests
         queryType.Field<StringGraphType>("hello3")
             .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
             .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
+        queryType.Field<StringGraphType>("hello4")
+            .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
+            .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field4);
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         var query = """
@@ -192,6 +198,7 @@ public class ParserAttributeTests
               hello1(value: { field1: "abc" })
               hello2(value: { field2: "def" })
               hello3(value: { field3: "ghi" })
+              hello4(value: { field4: "jkl" })
             }
             """;
         var expected = """
@@ -199,7 +206,8 @@ public class ParserAttributeTests
               "data": {
                 "hello1": "abctest1",
                 "hello2": "deftest2",
-                "hello3": "ghitest3"
+                "hello3": "ghitest3",
+                "hello4": "jkltest1"
               }
             }
             """;
@@ -220,6 +228,8 @@ public class ParserAttributeTests
         public string? Field2 { get; set; }
         [Parser(typeof(HelperClass), nameof(HelperClass.ParseHelloArgument))]
         public string? Field3 { get; set; }
+        [Parser(typeof(FieldTests), nameof(ParseHelloArgument))]
+        public string? Field4 { get; set; }
 
         private static object ParseHelloArgument(object value) => (string)value + "test1";
     }

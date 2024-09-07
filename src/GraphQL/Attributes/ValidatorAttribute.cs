@@ -14,7 +14,6 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _validatorType;
     private readonly string _validatorMethodName;
-    private readonly bool _includePrivate;
 
     /// <summary>
     /// Specifies a custom validator method for a field of an input object in a GraphQL schema using the specified validator method name.
@@ -27,7 +26,6 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     {
         _validatorMethodName = validatorMethodName
             ?? throw new ArgumentNullException(nameof(validatorMethodName));
-        _includePrivate = true;
     }
 
     /// <summary>
@@ -64,7 +62,7 @@ public sealed class ValidatorAttribute : GraphQLAttribute
             return;
         var validatorType = _validatorType ?? memberInfo.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-        if (_includePrivate)
+        if (validatorType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
 #pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validatorType.GetMethod(_validatorMethodName, bindingFlags, null, [typeof(object)], null)
@@ -80,7 +78,7 @@ public sealed class ValidatorAttribute : GraphQLAttribute
     {
         var validatorType = _validatorType ?? parameterInfo.Member.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-        if (_includePrivate)
+        if (validatorType == parameterInfo.Member.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
 #pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validatorType.GetMethod(_validatorMethodName, bindingFlags, null, [typeof(object)], null)

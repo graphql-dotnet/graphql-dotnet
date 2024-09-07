@@ -15,7 +15,6 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _validationType;
     private readonly string _validationMethodName;
-    private readonly bool _includePrivate;
 
     /// <summary>
     /// Specifies a custom argument validation method for a field in a GraphQL schema using the specified validation method name.
@@ -27,7 +26,6 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
     {
         _validationMethodName = validationMethodName
             ?? throw new ArgumentNullException(nameof(validationMethodName));
-        _includePrivate = true;
     }
 
     /// <summary>
@@ -64,7 +62,7 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
             return;
         var validationType = _validationType ?? memberInfo.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-        if (_includePrivate)
+        if (validationType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
 #pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = validationType.GetMethod(_validationMethodName, bindingFlags, null, [typeof(FieldArgumentsValidationContext)], null)
