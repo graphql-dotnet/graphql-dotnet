@@ -1,8 +1,8 @@
-using Microsoft.CodeAnalysis.Diagnostics;
-using Microsoft.CodeAnalysis;
 using GraphQL.Analyzers.Helpers;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace GraphQL.Analyzers;
 
