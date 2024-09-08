@@ -18,4 +18,8 @@ public static class HelpLinks
     public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = $"{DOCS_URL}/gql014";
     public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = $"{DOCS_URL}/gql015";
     public const string REQUIRE_PARAMETERLESS_CONSTRUCTOR = $"{DOCS_URL}/gql016";
+    public const string COULD_NOT_FIND_METHOD = $"{DOCS_URL}/gql017";
+    public const string PARSER_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql018";
+    public const string VALIDATOR_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql019";
+    public const string VALIDATE_ARGUMENTS_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql020";
 }

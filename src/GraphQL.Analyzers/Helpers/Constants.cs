@@ -13,6 +13,9 @@ public static class Constants
         public const string DefaultValue = "DefaultValue";
         public const string Ignore = "Ignore";
         public const string OneOf = "OneOf";
+        public const string Parser = "Parser";
+        public const string ValidateArguments = "ValidateArguments";
+        public const string Validator = "Validator";
     }
 
     public static class ArgumentNames
