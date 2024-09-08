@@ -39,7 +39,7 @@ public class ValidatorAttributeAnalyzerTests
                   {{attribute}}
                   public string Hello { get; set; }
 
-                  private static object PrivateValidator(object value) => value;
+                  private static void PrivateValidator(object value) { }
               }
 
               public class Constants
@@ -57,9 +57,9 @@ public class ValidatorAttributeAnalyzerTests
 
               public class ValidatorClass
               {
-                  public static object Validate(object value) => value;
-                  public static object ValidateValue(object value) => value;
-                  public static object ValidateValue(string value) => value; // invalid overload
+                  public static void Validate(object value) { }
+                  public static void ValidateValue(object value) { }
+                  public static void ValidateValue(string value) { } // invalid overload
               }
               """;
 
@@ -86,11 +86,11 @@ public class ValidatorAttributeAnalyzerTests
                   {|#0:[Validator(nameof({{methodName}}))]|}
                   public string Hello { get; set; }
 
-                  private object Validate1(object value) => value; // not static
+                  private void Validate1(object value) { } // not static
                   private static string Validate2(object value) => "value"; // wrong return type
-                  private static object Validate3(string value) => value; // wrong parameter type
-                  private static object Validate4(object value1, object value2) => value1; // too many parameters
-                  private static object Validate5() => "value"; // no parameters
+                  private static void Validate3(string value) { } // wrong parameter type
+                  private static void Validate4(object value1, object value2) { } // too many parameters
+                  private static void Validate5() { } // no parameters
               }
               """;
 
@@ -121,7 +121,7 @@ public class ValidatorAttributeAnalyzerTests
 
               public class ValidatorClass
               {
-                  {{accessor}} static object Validate(object value) => value;
+                  {{accessor}} static void Validate(object value) { }
               }
               """;
 

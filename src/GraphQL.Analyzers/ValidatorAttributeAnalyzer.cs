@@ -17,7 +17,7 @@ public class ValidatorAttributeAnalyzer : ParserValidatorAttributeAnalyzer
     public static readonly DiagnosticDescriptor ValidatorMethodMustBeValid = new(
         id: DiagnosticIds.VALIDATOR_METHOD_MUST_BE_VALID,
         title: "Validator method must be valid",
-        messageFormat: "Validator method '{0}' signature must be '{1}static object {0}(object value)'",
+        messageFormat: "Validator method '{0}' signature must be '{1}static void {0}(object value)'",
         category: DiagnosticCategories.USAGE,
         defaultSeverity: DiagnosticSeverity.Error,
         isEnabledByDefault: true,
@@ -84,7 +84,7 @@ public class ValidatorAttributeAnalyzer : ParserValidatorAttributeAnalyzer
             if (method.Parameters.Length != 1 || method.Parameters[0].Type.SpecialType != SpecialType.System_Object)
                 continue;
 
-            if (method.ReturnType.SpecialType != SpecialType.System_Object)
+            if (method.ReturnType.SpecialType != SpecialType.System_Void)
                 continue;
 
             if (!allowNonPublicMethods && method.DeclaredAccessibility != Accessibility.Public)
