@@ -16,10 +16,10 @@ public class ParserAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2), "Could not find method 'Parser' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2), "Could not find method 'Parse' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4), "Method 'InvalidMethod' on CLR type 'Class4' must have a return type of object.")]
-    [InlineData(typeof(Class5), "Method 'Parser' on CLR type 'Dummy2' must have a return type of object.")]
+    [InlineData(typeof(Class5), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
     public void method_not_found_arguments(Type clrType, string expectedMessage)
     {
@@ -65,10 +65,10 @@ public class ParserAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2b), "Could not find method 'Parser' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Parse' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a return type of object.")]
-    [InlineData(typeof(Class5b), "Method 'Parser' on CLR type 'Dummy2' must have a return type of object.")]
+    [InlineData(typeof(Class5b), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
     public void method_not_found_input_fields(Type clrType, string expectedMessage)
     {
@@ -120,15 +120,15 @@ public class ParserAttributeTests
 
     public class Dummy
     {
-        public object Parser(object value) => value; // not static
-        public static void Parser() { } // wrong signature
+        public object Parse(object value) => value; // not static
+        public static void Parse() { } // wrong signature
         public object InvalidMethod(object value) => value; // not static
         public static void InvalidMethod() { } // wrong signature
     }
 
     public class Dummy2
     {
-        public static string Parser(object value) => (string)value;
+        public static string Parse(object value) => (string)value;
         public static string InvalidMethod(object value) => (string)value;
     }
 
@@ -236,7 +236,7 @@ public class ParserAttributeTests
 
     public class ParserClass
     {
-        public static object Parser(object value) => (string)value + "test2";
+        public static object Parse(object value) => (string)value + "test2";
     }
 
     public class HelperClass

@@ -10,6 +10,8 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class ValidateArgumentsAttribute : GraphQLAttribute
 {
+    private const string DEFAULT_METHOD_NAME = "ValidateArguments";
+
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _validationType;
     private readonly string _validationMethodName;
@@ -37,7 +39,7 @@ public sealed class ValidateArgumentsAttribute : GraphQLAttribute
     {
         _validationType = validationType
             ?? throw new ArgumentNullException(nameof(validationType));
-        _validationMethodName = nameof(FieldType.ValidateArguments);
+        _validationMethodName = DEFAULT_METHOD_NAME;
     }
 
     /// <summary>
