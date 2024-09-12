@@ -44,7 +44,7 @@ public class __Field : ObjectGraphType<IFieldType>
                 {
                     var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
 
-                    bool includeDeprecated = context.GetArgument<bool>("includeDeprecated");
+                    bool includeDeprecated = context.GetArgument("includeDeprecated", !deprecationOfInputValues);
 
                     int index = 0;
                     foreach (var argument in source.Arguments.List!)
