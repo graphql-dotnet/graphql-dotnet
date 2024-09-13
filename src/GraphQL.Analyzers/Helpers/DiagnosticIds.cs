@@ -18,4 +18,8 @@ public static class DiagnosticIds
     public const string ONE_OF_FIELDS_MUST_NOT_HAVE_DEFAULT_VALUE = "GQL014";
     public const string CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION = "GQL015";
     public const string REQUIRE_PARAMETERLESS_CONSTRUCTOR = "GQL016";
+    public const string COULD_NOT_FIND_METHOD = "GQL017";
+    public const string PARSER_METHOD_MUST_BE_VALID = "GQL018";
+    public const string VALIDATOR_METHOD_MUST_BE_VALID = "GQL019";
+    public const string VALIDATE_ARGUMENTS_METHOD_MUST_BE_VALID = "GQL020";
 }
