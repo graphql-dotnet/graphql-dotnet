@@ -1215,7 +1215,7 @@ public class MyInputObject2
     public MyInputObject1 Json { get; set; }
 }
 
-// demonstrates setting a default value for an output field arguments
+// output type
 public class MyOutputObject
 {
     // typical way to set a default value of an output field argument
