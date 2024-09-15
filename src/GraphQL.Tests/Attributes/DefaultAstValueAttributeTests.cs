@@ -1,4 +1,5 @@
 using GraphQL.Types;
+using GraphQLParser.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Attributes;
@@ -107,5 +108,43 @@ public class DefaultAstValueAttributeTests
     public class TestObject2
     {
         public required string Field1 { get; set; }
+    }
+
+    [Fact]
+    public void TestInvalidAst()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<QueryType2>());
+        var provider = services.BuildServiceProvider();
+        Should.Throw<GraphQLSyntaxErrorException>(provider.GetRequiredService<ISchema>)
+            .Message.ShouldBe("""
+            Syntax Error GraphQL (1:2) Expected Name, found EOF; for more information see http://spec.graphql.org/October2021/#ObjectField
+            1: {
+                ^
+            
+            """, StringCompareShould.IgnoreLineEndings);
+    }
+
+    public class QueryType2
+    {
+        public string TestString([DefaultAstValue("{")] string value) => value;
+    }
+
+    [Fact]
+    public void TestAstCoercionError()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddAutoSchema<QueryType3>());
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        Should.Throw<InvalidOperationException>(schema.Initialize)
+            .Message.ShouldBe("Unable to convert '123' literal from AST representation to the scalar type 'String'");
+    }
+
+    public class QueryType3
+    {
+        public string TestString([DefaultAstValue("123")] string value) => value;
     }
 }
