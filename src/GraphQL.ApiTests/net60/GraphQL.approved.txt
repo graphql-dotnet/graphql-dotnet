@@ -91,6 +91,14 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public class DefaultAstValueAttribute : GraphQL.GraphQLAttribute
+    {
+        public DefaultAstValueAttribute(string astValue) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
