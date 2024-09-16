@@ -1194,6 +1194,38 @@ The `ExecutionContext` property has been added to the `IResolveFieldContext` int
 underlying execution context. This is useful for accessing the parsed arguments and directives from the operation
 via `IExecutionContext.GetArguments` and `GetDirectives`.
 
+### 29. `[DefaultAstValue]` attribute added (v8.1 and newer) to set default values for complex types with type-first schemas
+
+When defining an input object or output field argument in a type-first schema, you may now use the `[DefaultAstValue]`
+attribute to specify a default value for the argument. This is useful when the argument is a complex type that cannot
+be represented as a constant via `[DefaultValue]` or in the method signature.
+
+```csharp
+// typical way to set a default value of an input field, which is not possible for complex types
+public class MyInputObject1
+{
+    [DefaultValue("value")]
+    public required string Field1 { get; set; }
+}
+
+// demonstrates setting a default value for an input field that has a complex type
+public class MyInputObject2
+{
+    [DefaultAstValue("{ field1: \"value\" }")]
+    public MyInputObject1 Json { get; set; }
+}
+
+// output type
+public class MyOutputObject
+{
+    // typical way to set a default value of an output field argument
+    public string Field1(string arg = "abc") => arg;
+
+    // demonstrates setting a default value for an output field argument that has a complex type
+    public string Field2([DefaultAstValue("{ field1: \"sample2\" }")] MyInputObject1 arg) => arg.Field1;
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
