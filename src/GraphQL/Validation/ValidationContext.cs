@@ -330,7 +330,8 @@ public partial class ValidationContext : IProvideUserContext
 
             // note: a list can have a single child element which will automatically be interpreted as a list of 1 elements. (see below rule)
             // so, to prevent a string as being interpreted as a list of chars (which get converted to strings), we ignore considering a string as an IEnumerable
-            if (value is IEnumerable values && value is not string)
+            // also, we ignore dictionaries as they are considered enumerable key-value pairs
+            if (value is IEnumerable values && value is not string && value is not IDictionary<string, object?>)
             {
                 // create a list containing the parsed elements in the input list
                 if (values is IList list)
