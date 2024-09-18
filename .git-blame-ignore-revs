@@ -1,0 +1,4 @@
+# .git-blame-ignore-revs
+
+# Change solution to use file-scoped namespaces (#3864)
+12d4361b49e7ee77549176573dbd599c1572a08f
