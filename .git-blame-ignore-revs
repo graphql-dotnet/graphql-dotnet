@@ -2,3 +2,6 @@
 
 # Change solution to use file-scoped namespaces (#3864)
 12d4361b49e7ee77549176573dbd599c1572a08f
+
+# Clean and sort usings (#1776) 
+1047a9d80ee4a82f570898db148f139437751cf2
