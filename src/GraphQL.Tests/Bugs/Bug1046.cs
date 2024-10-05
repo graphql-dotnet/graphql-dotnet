@@ -35,39 +35,38 @@ query {
         });
         response.Data.ShouldNotBeNull();
     }
-}
-
-public class QueryGraphType : ObjectGraphType
-{
-    public QueryGraphType()
+    public class QueryGraphType : ObjectGraphType
     {
-        Field<InterfaceGraphType>("inst").Resolve(_ => new Implementation());
+        public QueryGraphType()
+        {
+            Field<InterfaceGraphType>("inst").Resolve(_ => new Implementation());
+        }
     }
-}
 
-public interface IInterface
-{
-    string Id { get; }
-}
-
-public class InterfaceGraphType : InterfaceGraphType<IInterface>
-{
-    public InterfaceGraphType()
+    public interface IInterface
     {
-        Field(i => i.Id);
+        string Id { get; }
     }
-}
 
-public class Implementation : IInterface
-{
-    public string Id => "Data!";
-}
-
-public class ImplementationGraphType : ObjectGraphType<Implementation>
-{
-    public ImplementationGraphType()
+    public class InterfaceGraphType : InterfaceGraphType<IInterface>
     {
-        Field(i => i.Id);
-        Interface<InterfaceGraphType>();
+        public InterfaceGraphType()
+        {
+            Field(i => i.Id);
+        }
+    }
+
+    public class Implementation : IInterface
+    {
+        public string Id => "Data!";
+    }
+
+    public class ImplementationGraphType : ObjectGraphType<Implementation>
+    {
+        public ImplementationGraphType()
+        {
+            Field(i => i.Id);
+            Interface<InterfaceGraphType>();
+        }
     }
 }

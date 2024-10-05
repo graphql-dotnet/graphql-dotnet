@@ -75,6 +75,7 @@ public static class ValueConverter
         Register<int, float>(value => value);
         Register<int, decimal>(value => value);
         Register<int, TimeSpan>(value => TimeSpan.FromSeconds(value));
+        Register<int, string>(value => value.ToString(CultureInfo.InvariantCulture));
 
         Register<long, sbyte>(value => checked((sbyte)value));
         Register<long, byte>(value => checked((byte)value));
@@ -88,6 +89,7 @@ public static class ValueConverter
         Register<long, float>(value => value);
         Register<long, decimal>(value => value);
         Register<long, TimeSpan>(value => TimeSpan.FromSeconds(value));
+        Register<long, string>(value => value.ToString(CultureInfo.InvariantCulture));
 
         Register<BigInteger, sbyte>(value => checked((sbyte)value));
         Register<BigInteger, byte>(value => checked((byte)value));
@@ -101,6 +103,7 @@ public static class ValueConverter
         Register<BigInteger, ulong>(value => checked((ulong)value));
         Register<BigInteger, int>(value => checked((int)value));
         Register<BigInteger, float>(value => checked((float)value));
+        Register<BigInteger, string>(value => value.ToString(CultureInfo.InvariantCulture));
 
         Register<uint, sbyte>(value => checked((sbyte)value));
         Register<uint, byte>(value => checked((byte)value));
