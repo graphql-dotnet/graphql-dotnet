@@ -1,7 +1,7 @@
 using System.Numerics;
 using GraphQL.Types;
 
-namespace GraphQL.Tests.Bugs.Bug1046;
+namespace GraphQL.Tests.Bugs;
 
 public class Issue4075
 {
