@@ -2,7 +2,8 @@ using GraphQL.Types;
 
 namespace GraphQL.Tests.Bugs;
 
-public class Issue4077
+// https://github.com/graphql-dotnet/graphql-dotnet/pull/4078
+public class Bug4078
 {
     [Fact]
     public async Task empty_string_for_operation_name_is_treated_as_null()
