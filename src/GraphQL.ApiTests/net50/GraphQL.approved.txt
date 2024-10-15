@@ -2863,7 +2863,7 @@ namespace GraphQL.Types
     }
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public ListGraphType(GraphQL.Types.IGraphType? type) { }
+        public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public virtual System.Type? Type { get; }
         public override string ToString() { }
@@ -2871,6 +2871,8 @@ namespace GraphQL.Types
     public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
+        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType? type) in" +
+            "stead.")]
         public ListGraphType() { }
         public override System.Type Type { get; }
     }
@@ -2884,7 +2886,7 @@ namespace GraphQL.Types
     }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public NonNullGraphType(GraphQL.Types.IGraphType? type) { }
+        public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public virtual System.Type? Type { get; }
         public override string ToString() { }
@@ -2892,6 +2894,8 @@ namespace GraphQL.Types
     public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.IGraphType
     {
+        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType? type)" +
+            " instead.")]
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }
