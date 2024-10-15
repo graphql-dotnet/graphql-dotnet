@@ -81,7 +81,8 @@ public static partial class ObjectExtensions
             return GetCoerceOrDefault(
                 member.Key,
                 member.ParameterInfo.ParameterType,
-                member.GraphType!);
+                member.GraphType!,
+                member.ParameterInfo.Name!);
         }
 
         static MemberAssignment GetBindingForMember(ReflectionInfo.MemberFieldInfo member)
@@ -90,10 +91,10 @@ public static partial class ObjectExtensions
 
             return Expression.Bind(
                 member.Member,
-                GetCoerceOrDefault(member.Key, type, member.GraphType));
+                GetCoerceOrDefault(member.Key, type, member.GraphType, member.Member.Name));
         }
 
-        static Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType)
+        static Expression GetCoerceOrDefault(string key, Type type, IGraphType graphType, string fieldName)
         {
             /*
              * ValueTuple<object?, bool> value;
@@ -126,7 +127,8 @@ public static partial class ObjectExtensions
                             Expression.MakeMemberAccess(param, typeof(ValueTuple<object?, bool>).GetField("Item1")!),
                             type,
                             graphType,
-                            false)),
+                            false,
+                            fieldName)),
                     Expression.Assign(ret, Expression.Default(type))),
                 ret);
         }
@@ -159,10 +161,11 @@ public static partial class ObjectExtensions
                             Expression.MakeMemberAccess(param, typeof(ValueTuple<object?, bool>).GetField("Item1")!),
                             type,
                             member.GraphType,
-                            false))));
+                            false,
+                            member.Member.Name))));
         }
 
-        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject)
+        static Expression CoerceExpression(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // if requested type is object, return the expression as is
             if (type == typeof(object))
@@ -181,10 +184,10 @@ public static partial class ObjectExtensions
                     Expression.Condition(
                         Expression.Equal(param, Expression.Constant(null, param.Type)),
                         Expression.Default(returnType),
-                        CoerceExpressionInternal(param, type, graphType, asObject))));
+                        CoerceExpressionInternal(param, type, graphType, asObject, fieldName))));
         }
 
-        static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject)
+        static Expression CoerceExpressionInternal(Expression expr, Type type, IGraphType graphType, bool asObject, string fieldName)
         {
             // unwrap non-null graph type
             graphType = graphType is NonNullGraphType nonNullGraphType
@@ -209,7 +212,7 @@ public static partial class ObjectExtensions
                 }
                 catch (Exception ex)
                 {
-                    throw new InvalidOperationException($"Failed to retrieve a list converter for type '{type.GetFriendlyName()}' for the list graph type '{graphType}': {ex.Message}", ex);
+                    throw new InvalidOperationException($"Failed to retrieve a list converter for type '{type.GetFriendlyName()}' for the list graph type '{graphType}' on field '{fieldName}': {ex.Message}", ex);
                 }
                 var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
                 Expression<Func<object?[], object>> converterExpression = (arg) => listConverter.Convert(arg);
@@ -217,7 +220,7 @@ public static partial class ObjectExtensions
                 Expression ret = Expression.Block(
                     [arrayVariable],
                     Expression.Assign(arrayVariable, Expression.Call(_convertToObjectArrayMethod, expr)),
-                    UpdateArray(arrayVariable, (loopVar) => CoerceExpression(loopVar, underlyingType, elementGraphType, true)),
+                    UpdateArray(arrayVariable, (loopVar) => CoerceExpression(loopVar, underlyingType, elementGraphType, true, fieldName)),
                     Expression.Invoke(converterExpression, arrayVariable));
 
                 if (!asObject)
