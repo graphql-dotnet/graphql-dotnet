@@ -1359,10 +1359,15 @@ namespace GraphQL.Execution
         public bool IgnoreLocations { get; set; }
         public int? MaxDepth { get; set; }
         public GraphQLParser.AST.GraphQLDocument Build(string body) { }
+        public GraphQLParser.AST.GraphQLDocument Build(string body, GraphQLParser.ParserOptions options) { }
     }
     public interface IDocumentBuilder
     {
+        bool IgnoreComments { get; set; }
+        bool IgnoreLocations { get; set; }
+        int? MaxDepth { get; set; }
         GraphQLParser.AST.GraphQLDocument Build(string body);
+        GraphQLParser.AST.GraphQLDocument Build(string body, GraphQLParser.ParserOptions options);
     }
     public interface IDocumentExecutionListener
     {
