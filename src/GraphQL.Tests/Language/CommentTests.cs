@@ -39,6 +39,23 @@ public class CommentTests
     }
 
     [Fact]
+    public void operation_comment_should_not_be_null_using_options()
+    {
+        const string query = """
+            #comment
+            query _ {
+                person {
+                    name
+                }
+            }
+            """;
+
+        GraphQLDocumentBuilder builder = new();
+        var document = builder.Build(query, new GraphQLParser.ParserOptions { Ignore = GraphQLParser.IgnoreOptions.None });
+        document.Operation().Comments![0].Value.ShouldBe("comment");
+    }
+
+    [Fact]
     public void field_comment_should_be_null()
     {
         const string query = """
