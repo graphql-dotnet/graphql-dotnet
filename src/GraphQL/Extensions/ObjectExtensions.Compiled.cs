@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Linq.Expressions;
 using System.Reflection;
+using GraphQL.Conversion;
 using GraphQL.Types;
 
 namespace GraphQL;
@@ -21,7 +22,14 @@ public static partial class ObjectExtensions
             return conv;
 
         var info = GetReflectionInformation(sourceType, graphType);
-        return CompileToObject(info);
+        try
+        {
+            return CompileToObject(info);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to compile input object conversion for CLR type '{sourceType.GetFriendlyName()}' and graph type '{graphType}': {ex.Message}", ex);
+        }
     }
 
     /// <summary>
@@ -194,7 +202,15 @@ public static partial class ObjectExtensions
                 // }
                 // ret = listConverter.GetConversion(type, elementType)(expr);
 
-                var listConverter = ValueConverter.GetListConverter(type);
+                IListConverter listConverter;
+                try
+                {
+                    listConverter = ValueConverter.GetListConverter(type);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Failed to retrieve a list converter for type '{type.GetFriendlyName()}' for the list graph type '{graphType}': {ex.Message}", ex);
+                }
                 var underlyingType = Nullable.GetUnderlyingType(listConverter.ElementType) ?? listConverter.ElementType;
                 Expression<Func<object?[], object>> converterExpression = (arg) => listConverter.Convert(arg);
                 var arrayVariable = Expression.Variable(typeof(object?[]), "expr2");
