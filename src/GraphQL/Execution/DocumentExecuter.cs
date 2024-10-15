@@ -324,7 +324,7 @@ public class DocumentExecuter : IDocumentExecuter
     /// <exception cref="NoOperationError">Thrown when the document does not include any operations.</exception>
     protected virtual GraphQLOperationDefinition GetOperation(string? operationName, GraphQLDocument document)
     {
-        if (operationName == null)
+        if (string.IsNullOrEmpty(operationName))
         {
             GraphQLOperationDefinition? match = null;
             foreach (var def in document.Definitions)
@@ -346,7 +346,7 @@ public class DocumentExecuter : IDocumentExecuter
                 return op;
         }
 
-        throw new InvalidOperationNameError(operationName);
+        throw new InvalidOperationNameError(operationName!);
     }
 
     /// <summary>
