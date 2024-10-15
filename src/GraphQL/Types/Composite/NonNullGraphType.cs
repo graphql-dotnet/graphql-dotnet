@@ -56,7 +56,7 @@ public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAcce
     /// <summary>
     /// Initializes a new instance for the specified inner graph type.
     /// </summary>
-    [Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType? type) instead.")]
+    [Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) instead.")]
     public NonNullGraphType()
         : base(null!)
     {

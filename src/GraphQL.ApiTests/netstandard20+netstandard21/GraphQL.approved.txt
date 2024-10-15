@@ -2791,8 +2791,8 @@ namespace GraphQL.Types
     public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
-        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType? type) in" +
-            "stead.")]
+        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) ins" +
+            "tead.")]
         public ListGraphType() { }
         public override System.Type Type { get; }
     }
@@ -2814,8 +2814,8 @@ namespace GraphQL.Types
     public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.IGraphType
     {
-        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType? type)" +
-            " instead.")]
+        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) " +
+            "instead.")]
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }

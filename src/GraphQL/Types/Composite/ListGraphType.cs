@@ -50,7 +50,7 @@ public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// <summary>
     /// Initializes a new instance for the specified inner graph type.
     /// </summary>
-    [Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType? type) instead.")]
+    [Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) instead.")]
     public ListGraphType()
         : base(null!)
     {
