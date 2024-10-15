@@ -57,7 +57,7 @@ public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAcce
     /// Initializes a new instance for the specified inner graph type.
     /// </summary>
     public NonNullGraphType()
-        : base(null)
+        : base(typeof(T) as IGraphType)
     {
         if (typeof(NonNullGraphType).IsAssignableFrom(typeof(T)))
         {
