@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -292,8 +293,8 @@ public class DocumentExecuter : IDocumentExecuter
 
             Operation = operation,
             Variables = validationResult.Variables ?? Variables.None,
-            ArgumentValues = validationResult.ArgumentValues,
-            DirectiveValues = validationResult.DirectiveValues,
+            ArgumentValues = validationResult.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(validationResult.ArgumentValues),
+            DirectiveValues = validationResult.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(validationResult.DirectiveValues),
             Errors = new ExecutionErrors(),
             InputExtensions = options.Extensions ?? Inputs.Empty,
             OutputExtensions = new Dictionary<string, object?>(),
