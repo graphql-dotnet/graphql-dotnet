@@ -293,8 +293,8 @@ public class DocumentExecuter : IDocumentExecuter
 
             Operation = operation,
             Variables = validationResult.Variables ?? Variables.None,
-            ArgumentValues = validationResult.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(validationResult.ArgumentValues),
-            DirectiveValues = validationResult.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(validationResult.DirectiveValues),
+            ArgumentValues = validationResult.ArgumentValues,
+            DirectiveValues = validationResult.DirectiveValues,
             Errors = new ExecutionErrors(),
             InputExtensions = options.Extensions ?? Inputs.Empty,
             OutputExtensions = new Dictionary<string, object?>(),
@@ -310,6 +310,12 @@ public class DocumentExecuter : IDocumentExecuter
         };
 
         context.ExecutionStrategy = SelectExecutionStrategy(context);
+
+        if (context.ExecutionStrategy is not SerialExecutionStrategy)
+        {
+            context.ArgumentValues = context.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(context.ArgumentValues);
+            context.DirectiveValues = context.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(context.DirectiveValues);
+        }
 
         return context;
     }
