@@ -1630,7 +1630,7 @@ public class MyGraphType : ObjectGraphType
     public override void Initialize(ISchema schema)
     {
         AddField(new FieldType {
-            Name = "field",
+            Name = "field", // name converter is not applied here, so the name must be exactly as desired
             ResolvedType = new StringGraphType()
         });
     }
