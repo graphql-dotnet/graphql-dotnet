@@ -336,11 +336,13 @@ public abstract class ExecutionStrategy : IExecutionStrategy
                 var argumentValues = context.ArgumentValues;
                 if (argumentValues != null && argumentValues.TryGetValue(original.Field, out var arguments))
                 {
+                    // TODO: remove cast for v9 - see #4085
                     ((IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>)argumentValues)[newField] = arguments;
                 }
                 var directiveValues = context.DirectiveValues;
                 if (directiveValues != null && directiveValues.TryGetValue(original.Field, out var directives))
                 {
+                    // TODO: remove cast for v9 - see #4085
                     ((IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>)directiveValues)[newField] = directives;
                 }
                 fields[name] = (newField, original.FieldType);

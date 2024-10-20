@@ -97,7 +97,7 @@ public partial class ValidationContext : IProvideUserContext
     /// unless no field arguments were found, in which case the value will be <see langword="null"/>.
     /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
     /// </summary>
-    public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; } // TODO: use a concurrent dictionary -- see PR #4083
+    public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; } // TODO: use a concurrent dictionary -- see #4085
 
     /// <summary>
     /// A dictionary of fields, and for each field, a dictionary of directives defined for the field with their values.
@@ -107,7 +107,7 @@ public partial class ValidationContext : IProvideUserContext
     /// unless no field arguments were found, in which case the value will be <see langword="null"/>.
     /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
     /// </summary>
-    public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; } // TODO: use a concurrent dictionary -- see PR #4083
+    public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; } // TODO: use a concurrent dictionary -- see #4085
 
     /// <summary>
     /// Adds a validation error to the list of validation errors.
