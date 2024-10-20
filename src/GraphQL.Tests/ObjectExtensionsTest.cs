@@ -560,8 +560,11 @@ public class ObjectExtensionsTests
         schema.RegisterType(inputType);
         if (compiled)
         {
-            Should.Throw<InvalidOperationException>(() => schema.Initialize())
-                .Message.ShouldBe("Type 'String' is not a list type or does not have a compatible public constructor.");
+            var ex = Should.Throw<InvalidOperationException>(schema.Initialize);
+            ex.Message.ShouldBe("Failed to compile input object conversion for CLR type 'MyInput13' and graph type 'MyInput13InputObject': Failed to retrieve a list converter for type 'String' for the list graph type '[Int]' on field 'Name': Type 'String' is not a list type or does not have a compatible public constructor.");
+            var inner = ex.InnerException.ShouldNotBeNull();
+            inner.Message.ShouldBe("Failed to retrieve a list converter for type 'String' for the list graph type '[Int]' on field 'Name': Type 'String' is not a list type or does not have a compatible public constructor.");
+            inner.InnerException.ShouldNotBeNull().Message.ShouldBe("Type 'String' is not a list type or does not have a compatible public constructor.");
         }
         else
         {
