@@ -313,6 +313,7 @@ public class DocumentExecuter : IDocumentExecuter
 
         if (context.ExecutionStrategy is not SerialExecutionStrategy)
         {
+            // TODO: remove for v9 after ValidationContext has been changed to use concurrent dictionaries
             context.ArgumentValues = context.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(context.ArgumentValues);
             context.DirectiveValues = context.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(context.DirectiveValues);
         }
