@@ -293,7 +293,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
                             var fieldType = GetFieldDefinition(context.Schema, (specificType as IComplexGraphType)!, field)
                                 ?? throw new InvalidOperationException($"Schema is not configured correctly to fetch field '{field.Name}' from type '{specificType.Name}'.");
 
-                            Add(fields, field, fieldType);
+                            Add(context, fields, field, fieldType);
                         }
                     }
                     else if (selection is GraphQLFragmentSpread spread)
@@ -319,20 +319,38 @@ public abstract class ExecutionStrategy : IExecutionStrategy
             }
         }
 
-        static void Add(Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
+        static void Add(ExecutionContext context, Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
         {
             string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
 
-            fields[name] = fields.TryGetValue(name, out var original)
-                ? (new GraphQLField(original.Field.Name) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
+            if (fields.TryGetValue(name, out var original))
+            {
+                var newField = new GraphQLField(original.Field.Name) // Sets a new field selection node with the child field selection nodes merged with another field's child field selection nodes.
                 {
                     Alias = original.Field.Alias,
                     Arguments = original.Field.Arguments,
                     SelectionSet = Merge(original.Field.SelectionSet, field.SelectionSet),
                     Directives = original.Field.Directives,
                     Location = original.Field.Location,
-                }, original.FieldType)
-                : (field, fieldType);
+                };
+                var argumentValues = context.ArgumentValues;
+                if (argumentValues != null && argumentValues.TryGetValue(original.Field, out var arguments))
+                {
+                    // TODO: remove cast for v9 - see #4085
+                    ((IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>)argumentValues)[newField] = arguments;
+                }
+                var directiveValues = context.DirectiveValues;
+                if (directiveValues != null && directiveValues.TryGetValue(original.Field, out var directives))
+                {
+                    // TODO: remove cast for v9 - see #4085
+                    ((IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>)directiveValues)[newField] = directives;
+                }
+                fields[name] = (newField, original.FieldType);
+            }
+            else
+            {
+                fields[name] = (field, fieldType);
+            }
         }
 
         // Returns a new selection set node with the contents merged with another selection set node's contents.

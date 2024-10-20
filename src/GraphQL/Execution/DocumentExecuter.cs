@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -309,6 +310,13 @@ public class DocumentExecuter : IDocumentExecuter
         };
 
         context.ExecutionStrategy = SelectExecutionStrategy(context);
+
+        if (context.ExecutionStrategy is not SerialExecutionStrategy)
+        {
+            // TODO: remove for v9 after ValidationContext has been changed to use concurrent dictionaries -- see issue #4085
+            context.ArgumentValues = context.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(context.ArgumentValues);
+            context.DirectiveValues = context.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(context.DirectiveValues);
+        }
 
         return context;
     }
