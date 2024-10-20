@@ -9,7 +9,7 @@ public class ListGraphType : GraphType, IProvideResolvedType
     /// <summary>
     /// Initializes a new instance for the specified inner graph type.
     /// </summary>
-    public ListGraphType(IGraphType? type)
+    public ListGraphType(IGraphType type)
     {
         ResolvedType = type;
     }
@@ -50,8 +50,9 @@ public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccesse
     /// <summary>
     /// Initializes a new instance for the specified inner graph type.
     /// </summary>
+    [Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) instead.")]
     public ListGraphType()
-        : base(null)
+        : base(null!)
     {
     }
 
