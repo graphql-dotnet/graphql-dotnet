@@ -123,13 +123,13 @@ public partial class DocumentValidator
         {
             // find the field definition for this field
             var schema = context.Schema;
-            var fieldType =
+            var fieldDefinition =
                 field.Name.Value == schema.TypeMetaFieldType.Name ? schema.TypeMetaFieldType :
                 field.Name.Value == schema.TypeNameMetaFieldType.Name ? schema.TypeNameMetaFieldType :
                 field.Name.Value == schema.SchemaMetaFieldType.Name ? schema.SchemaMetaFieldType :
                 context.Type?.Fields.Find(field.Name.Value);
             // should not be null, or the document would have failed validation
-            if (fieldType == null)
+            if (fieldDefinition == null)
                 return;
             // if any arguments were supplied in the document for the field, load all defined arguments
             // for the field
@@ -137,7 +137,7 @@ public partial class DocumentValidator
             {
                 try
                 {
-                    var arguments = ExecutionHelper.GetArguments(fieldType.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
+                    var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
                     if (arguments != null)
                     {
                         (context.ArgumentValues ??= new()).Add(field, arguments);
@@ -148,12 +148,18 @@ public partial class DocumentValidator
                     context.ValidationContext.ReportError(ex);
                 }
             }
-            // if the field's type is an object, process child fields
-            if (fieldType.ResolvedType?.GetNamedType() is IComplexGraphType type)
+            // if the field's type is an object or interface, process child fields
+            var fieldType = fieldDefinition.ResolvedType?.GetNamedType();
+            if (fieldType is IComplexGraphType type)
             {
                 context.Types.Push(type);
                 await base.VisitFieldAsync(field, context).ConfigureAwait(false);
                 context.Types.Pop();
+            }
+            else if (fieldType is UnionGraphType)
+            {
+                // union graph types may also contain field spreads (or __typename), but there is no concrete type defined as of yet
+                await base.VisitFieldAsync(field, context).ConfigureAwait(false);
             }
         }
 
@@ -161,7 +167,7 @@ public partial class DocumentValidator
         {
             public ISchema Schema => ValidationContext.Schema;
             public ValidationContext ValidationContext { get; set; }
-            public Stack<IComplexGraphType> Types { get; set; }
+            public Stack<IComplexGraphType?> Types { get; set; }
             public IComplexGraphType? Type => Types.Count > 0 ? Types.Peek() : null;
             public Variables Variables { get; set; }
             public CancellationToken CancellationToken => ValidationContext.CancellationToken;
@@ -169,7 +175,7 @@ public partial class DocumentValidator
             public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
             public HashSet<GraphQLParser.ROM>? VisitedFragments { get; set; }
 
-            private static Stack<IComplexGraphType>? _reusableTypes;
+            private static Stack<IComplexGraphType?>? _reusableTypes;
 
             public Context(ValidationContext validationContext, Variables variables)
             {
