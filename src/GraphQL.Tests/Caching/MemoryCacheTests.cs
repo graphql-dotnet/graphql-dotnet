@@ -54,17 +54,18 @@ public class MemoryCacheTests
     [InlineData("query1", null, "query2", null, false)]  // Cache by Query, retrieve by different Query
     [InlineData(null, "doc1", null, "doc1", true)]       // Cache by DocumentId, retrieve by same DocumentId
     [InlineData(null, "doc1", null, "doc2", false)]      // Cache by DocumentId, retrieve by different DocumentId
-    [InlineData("query1", "doc1", "query1", "doc1", true)] // Cache by both, retrieve by both
-    [InlineData("query1", "doc1", "query1", "doc2", false)] // Cache by both, retrieve with different DocumentId
-    [InlineData("query1", "doc1", "query2", "doc1", false)] // Cache by both, retrieve with different Query
-    [InlineData("query1", "doc1", "query2", "doc2", false)] // Cache by both, retrieve with different Query and DocumentId
     [InlineData("query1", null, null, null, false)]      // Cache by Query, retrieve without Query or DocumentId
-    [InlineData(null, "doc1", "query1", "doc1", false)]  // Cache by DocumentId, retrieve with Query and same DocumentId
     [InlineData("query1", "doc1", "query1", null, false)] // Cache by both, retrieve with only Query
-    [InlineData("query1", "doc1", null, "doc1", false)]   // Cache by both, retrieve with only DocumentId
+    [InlineData("query1", "doc1", null, "doc1", true)]   // Cache by both, retrieve with only DocumentId (typical scenario)
     [InlineData(null, null, "query1", null, false)]       // Cache by neither, retrieve with only Query
     [InlineData(null, null, null, "doc1", false)]         // Cache by neither, retrieve with only DocumentId
     [InlineData(null, null, null, null, false)]           // Cache by neither, retrieve with neither
+    // note: the following scenarios, retrieving by both, will throw an error in ExecuteAsync, but are provided here for completeness
+    [InlineData("query1", "doc1", "query1", "doc1", true)] // Cache by both, retrieve by both
+    [InlineData("query1", "doc1", "query1", "doc2", false)] // Cache by both, retrieve with different DocumentId
+    [InlineData("query1", "doc1", "query2", "doc1", true)] // Cache by both, retrieve with different Query
+    [InlineData("query1", "doc1", "query2", "doc2", false)] // Cache by both, retrieve with different Query and DocumentId
+    [InlineData(null, "doc1", "query1", "doc1", true)]  // Cache by DocumentId, retrieve with Query and same DocumentId
     public async Task GetAsync_And_SetAsync_Should_Handle_Query_And_DocumentId_Correctly(
         string? cacheQuery,
         string? cacheDocumentId,
@@ -171,6 +172,15 @@ public class MemoryCacheTests
                 doc.ShouldBe(mockDocument);
                 return default;
             });
+
+        if (querySet && documentIdSet && !docSet)
+        {
+            var errResult = await memoryDocumentCacheMock.Object.ExecuteAsync(options, (opts) => throw new InvalidOperationException());
+            errResult.Errors.ShouldNotBeNull();
+            errResult.Errors.Count.ShouldBe(1);
+            errResult.Errors[0].ShouldBeAssignableTo<PersistedDocuments.InvalidRequestError>();
+            return;
+        }
 
         var result = new ExecutionResult()
         {

@@ -1,4 +1,5 @@
 using GraphQL.DI;
+using GraphQL.PersistedDocuments;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
@@ -94,11 +95,21 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
         return default;
     }
 
+    /// <summary>
+    /// Create <see cref="ExecutionResult"/> with provided error.
+    /// Override this method to change the provided error responses.
+    /// </summary>
+    protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new(error);
+
     /// <inheritdoc />
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
         if (options.Document == null && (options.Query != null || options.DocumentId != null))
         {
+            // ensure that both documentId and query are not provided
+            if (options.DocumentId != null && options.Query != null)
+                return CreateExecutionResult(new InvalidRequestError());
+
             var document = await GetAsync(options).ConfigureAwait(false);
             if (document != null) // already in cache
             {
@@ -115,6 +126,9 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
                 document == null && // cache miss
                 result.Document != null)
             {
+                // note: at this point, the persisted document handler may have set Query, in which case both Query and
+                //   DocumentId will be set, and we will cache based on the documentId only
+                // but if only Query was initially provided, it will still be the only property set
                 await SetAsync(options, result.Document).ConfigureAwait(false);
             }
 
@@ -136,7 +150,8 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
 
         public CacheItem(ExecutionOptions options)
         {
-            Query = options.Query;
+            // cache based on the document id if present, or the query if not, but not both
+            Query = options.DocumentId != null ? null : options.Query;
             DocumentId = options.DocumentId;
         }
     }
