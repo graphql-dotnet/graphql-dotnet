@@ -151,4 +151,23 @@ public class PersistedDocumentTests
         });
         return serializer.Serialize(response);
     }
+
+    [Theory]
+    [InlineData(null, null)]
+    [InlineData("query", null)]
+    [InlineData(null, "doc")]
+    [InlineData("query", "doc")]
+    public async Task SkipExecutionsWithDocumentSet(string? query, string? documentId)
+    {
+        var handler = new PersistedDocumentHandler();
+        var options = new ExecutionOptions
+        {
+            Query = query,
+            DocumentId = documentId,
+            Document = new(new()),
+        };
+        var expected = new ExecutionResult();
+        var actual = await handler.ExecuteAsync(options, _ => Task.FromResult(expected));
+        actual.ShouldBe(expected);
+    }
 }
