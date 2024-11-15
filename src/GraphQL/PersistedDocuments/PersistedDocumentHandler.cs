@@ -60,6 +60,10 @@ public class PersistedDocumentHandler : IConfigureExecution
     /// <inheritdoc/>
     public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
+        // if the parsed GraphQL document is already provided (such as by a memory cache), continue execution
+        if (options.Document != null)
+            return await next(options).ConfigureAwait(false);
+
         // ensure that both documentId and query are not provided
         if (options.DocumentId != null && options.Query != null)
             return CreateExecutionResult(new InvalidRequestError());

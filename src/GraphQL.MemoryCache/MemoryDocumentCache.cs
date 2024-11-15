@@ -59,7 +59,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// </summary>
     protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options)
     {
-        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = options.Query!.Length };
+        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = options.Query?.Length ?? options.DocumentId?.Length ?? 100 };
     }
 
     /// <inheritdoc/>
@@ -75,7 +75,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
     protected virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
-        new(_memoryCache.TryGetValue<GraphQLDocument>(options.Query, out var value) ? value : null);
+        new(_memoryCache.TryGetValue<GraphQLDocument>(new CacheItem(options), out var value) ? value : null);
 
     /// <summary>
     /// Sets a document in the cache. Must be thread-safe.
@@ -89,7 +89,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             throw new ArgumentNullException(nameof(value));
         }
 
-        _memoryCache.Set(options.Query, value, GetMemoryCacheEntryOptions(options));
+        _memoryCache.Set(new CacheItem(options), value, GetMemoryCacheEntryOptions(options));
 
         return default;
     }
@@ -97,7 +97,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <inheritdoc />
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (options.Document == null && options.Query != null)
+        if (options.Document == null && (options.Query != null || options.DocumentId != null))
         {
             var document = await GetAsync(options).ConfigureAwait(false);
             if (document != null) // already in cache
@@ -128,4 +128,16 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
 
     /// <inheritdoc/>
     public virtual float SortOrder => 200;
+
+    private record class CacheItem
+    {
+        public string? Query { get; }
+        public string? DocumentId { get; }
+
+        public CacheItem(ExecutionOptions options)
+        {
+            Query = options.Query;
+            DocumentId = options.DocumentId;
+        }
+    }
 }
