@@ -116,7 +116,7 @@ public class MemoryCacheTests
     [InlineData(false, false, true, false, false, true, true, false)]
     [InlineData(true, false, true, false, false, true, true, false)]
     [InlineData(false, true, true, false, false, true, true, false)]
-    [InlineData(true, true, true, false, false, true, true, false)]
+    [InlineData(true, true, true, false, false, false, false, false)]
     // typical path with cache miss
     [InlineData(true, false, false, true, false, true, true, true)] // passed validation
     [InlineData(true, false, false, true, false, false, true, false)] // failed validation
@@ -126,10 +126,6 @@ public class MemoryCacheTests
     [InlineData(false, true, false, true, false, false, true, false)] // failed validation
     [InlineData(false, true, false, true, false, true, false, false)] // didn't set document (should not be possible)
     [InlineData(false, true, false, true, false, false, false, false)] // failed parse
-    [InlineData(true, true, false, true, false, true, true, true)] // passed validation
-    [InlineData(true, true, false, true, false, false, true, false)] // failed validation
-    [InlineData(true, true, false, true, false, true, false, false)] // didn't set document (should not be possible)
-    [InlineData(true, true, false, true, false, false, false, false)] // failed parse
     // typical path with cache hit; should never call SetAsync
     [InlineData(true, false, false, true, true, true, true, false)]
     [InlineData(true, false, false, true, true, false, true, false)]
@@ -139,10 +135,8 @@ public class MemoryCacheTests
     [InlineData(false, true, false, true, true, false, true, false)]
     [InlineData(false, true, false, true, true, true, false, false)]
     [InlineData(false, true, false, true, true, false, false, false)]
-    [InlineData(true, true, false, true, true, true, true, false)]
-    [InlineData(true, true, false, true, true, false, true, false)]
-    [InlineData(true, true, false, true, true, true, false, false)]
-    [InlineData(true, true, false, true, true, false, false, false)]
+    // query and documentId set; should return error
+    [InlineData(true, true, false, false, false, false, false, false)]
     public async Task ExecuteAsync(bool querySet, bool documentIdSet, bool docSet, bool getCalled, bool getReturned, bool executed, bool exectuedSetDocument, bool setCalled)
     {
         var mockDocument = new GraphQLDocument(new());
@@ -179,22 +173,23 @@ public class MemoryCacheTests
             errResult.Errors.ShouldNotBeNull();
             errResult.Errors.Count.ShouldBe(1);
             errResult.Errors[0].ShouldBeAssignableTo<PersistedDocuments.InvalidRequestError>();
-            return;
         }
-
-        var result = new ExecutionResult()
+        else
         {
-            Executed = executed,
-            Document = exectuedSetDocument ? mockDocument : null,
-        };
+            var result = new ExecutionResult()
+            {
+                Executed = executed,
+                Document = exectuedSetDocument ? mockDocument : null,
+            };
 
-        var ret = await memoryDocumentCacheMock.Object.ExecuteAsync(options, (opts) =>
-        {
-            opts.ShouldBe(options);
-            return Task.FromResult(result);
-        });
+            var ret = await memoryDocumentCacheMock.Object.ExecuteAsync(options, (opts) =>
+            {
+                opts.ShouldBe(options);
+                return Task.FromResult(result);
+            });
 
-        ret.ShouldBe(result);
+            ret.ShouldBe(result);
+        }
 
         memoryDocumentCacheMock.Protected().Verify("GetAsync", getCalled ? Times.Once() : Times.Never(), ItExpr.IsAny<ExecutionOptions>());
         memoryDocumentCacheMock.Protected().Verify("SetAsync", setCalled ? Times.Once() : Times.Never(), ItExpr.IsAny<ExecutionOptions>(), ItExpr.IsAny<GraphQLDocument>());
