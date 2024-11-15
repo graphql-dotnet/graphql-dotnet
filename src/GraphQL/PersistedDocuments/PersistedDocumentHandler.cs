@@ -3,7 +3,11 @@ using GraphQL.DI;
 namespace GraphQL.PersistedDocuments;
 
 /// <summary>
-/// Handles persisted document requests.
+/// Handles persisted document requests. Does not cache documents and the corresponding ids returned from
+/// <see cref="IPersistedDocumentLoader"/> or <see cref="PersistedDocumentOptions.GetQueryDelegate"/>.
+/// Please use MemoryDocumentCache prior to this handler to cache documents, or implement a custom cache
+/// within the <see cref="PersistedDocumentOptions.GetQueryDelegate"/> delegate or the
+/// <see cref="IPersistedDocumentLoader"/> implementation.
 /// </summary>
 public class PersistedDocumentHandler : IConfigureExecution
 {
