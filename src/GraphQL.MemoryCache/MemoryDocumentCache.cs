@@ -58,9 +58,26 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
     /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
     /// </summary>
+    protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options, GraphQLDocument document)
+    {
+        if (options.Query != null)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return GetMemoryCacheEntryOptions(options);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = document.Source.Length };
+    }
+
+    /// <summary>
+    /// Returns a <see cref="MemoryCacheEntryOptions"/> instance for the specified query.
+    /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
+    /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
+    /// </summary>
+    [Obsolete("This method is obsolete and will be removed in a future version. Use GetMemoryCacheEntryOptions(ExecutionOptions, GraphQLDocument) instead.")]
     protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options)
     {
-        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = options.Query?.Length ?? options.DocumentId?.Length ?? 100 };
+        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = options.Query!.Length };
     }
 
     /// <inheritdoc/>
@@ -90,7 +107,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             throw new ArgumentNullException(nameof(value));
         }
 
-        _memoryCache.Set(new CacheItem(options), value, GetMemoryCacheEntryOptions(options));
+        _memoryCache.Set(new CacheItem(options), value, GetMemoryCacheEntryOptions(options, value));
 
         return default;
     }
