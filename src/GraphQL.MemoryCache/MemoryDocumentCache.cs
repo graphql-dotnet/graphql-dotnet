@@ -1,4 +1,5 @@
 using GraphQL.DI;
+using GraphQL.PersistedDocuments;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
@@ -57,6 +58,31 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
     /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
     /// </summary>
+    protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options, GraphQLDocument document)
+    {
+        // use the length of the Query property if it is present
+        if (options.Query != null)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return GetMemoryCacheEntryOptions(options);
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
+
+        // document.Source is a struct and will never be null
+        // if it is not initialized, it will have a length of 0 (however, this should not occur with vanilla GraphQL code)
+        // so we set it to 100 if it is 0, to avoid a cache entry with a size of 0
+        var docLength = document.Source.Length;
+        if (docLength == 0)
+            docLength = 100;
+        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = docLength };
+    }
+
+    /// <summary>
+    /// Returns a <see cref="MemoryCacheEntryOptions"/> instance for the specified query.
+    /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
+    /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
+    /// </summary>
+    [Obsolete("This method is obsolete and will be removed in a future version. Use GetMemoryCacheEntryOptions(ExecutionOptions, GraphQLDocument) instead.")]
     protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options)
     {
         return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = options.Query!.Length };
@@ -75,7 +101,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
     protected virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
-        new(_memoryCache.TryGetValue<GraphQLDocument>(options.Query, out var value) ? value : null);
+        new(_memoryCache.TryGetValue<GraphQLDocument>(new CacheItem(options), out var value) ? value : null);
 
     /// <summary>
     /// Sets a document in the cache. Must be thread-safe.
@@ -89,16 +115,26 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             throw new ArgumentNullException(nameof(value));
         }
 
-        _memoryCache.Set(options.Query, value, GetMemoryCacheEntryOptions(options));
+        _memoryCache.Set(new CacheItem(options), value, GetMemoryCacheEntryOptions(options, value));
 
         return default;
     }
 
+    /// <summary>
+    /// Create <see cref="ExecutionResult"/> with provided error.
+    /// Override this method to change the provided error responses.
+    /// </summary>
+    protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new(error);
+
     /// <inheritdoc />
     public virtual async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
-        if (options.Document == null && options.Query != null)
+        if (options.Document == null && (options.Query != null || options.DocumentId != null))
         {
+            // ensure that both documentId and query are not provided
+            if (options.DocumentId != null && options.Query != null)
+                return CreateExecutionResult(new InvalidRequestError());
+
             var document = await GetAsync(options).ConfigureAwait(false);
             if (document != null) // already in cache
             {
@@ -115,6 +151,9 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
                 document == null && // cache miss
                 result.Document != null)
             {
+                // note: at this point, the persisted document handler may have set Query, in which case both Query and
+                //   DocumentId will be set, and we will cache based on the documentId only
+                // but if only Query was initially provided, it will still be the only property set
                 await SetAsync(options, result.Document).ConfigureAwait(false);
             }
 
@@ -128,4 +167,17 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
 
     /// <inheritdoc/>
     public virtual float SortOrder => 200;
+
+    private record class CacheItem
+    {
+        public string? Query { get; }
+        public string? DocumentId { get; }
+
+        public CacheItem(ExecutionOptions options)
+        {
+            // cache based on the document id if present, or the query if not, but not both
+            Query = options.DocumentId != null ? null : options.Query;
+            DocumentId = options.DocumentId;
+        }
+    }
 }
