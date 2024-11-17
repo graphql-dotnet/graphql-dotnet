@@ -60,13 +60,21 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// </summary>
     protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options, GraphQLDocument document)
     {
+        // use the length of the Query property if it is present
         if (options.Query != null)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
             return GetMemoryCacheEntryOptions(options);
 #pragma warning restore CS0618 // Type or member is obsolete
         }
-        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = document.Source.Length };
+
+        // document.Source is a struct and will never be null
+        // if it is not initialized, it will have a length of 0 (however, this should not occur with vanilla GraphQL code)
+        // so we set it to 100 if it is 0, to avoid a cache entry with a size of 0
+        var docLength = document.Source.Length;
+        if (docLength == 0)
+            docLength = 100;
+        return new MemoryCacheEntryOptions { SlidingExpiration = _options.SlidingExpiration, Size = docLength };
     }
 
     /// <summary>
