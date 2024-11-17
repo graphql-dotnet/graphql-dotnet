@@ -1056,8 +1056,8 @@ Sample persisted document request:
 
 The persisted document handler does not provide caching by default. You may implement your own caching mechanism
 within the `GetQueryAsync` method to cache the query strings based on the document identifier. Alternatively, you
-may add the `.UseMemoryCache()` method to enable in-memory caching. Be sure to call `UseMemoryCache` before calling
-`UsePeristedDocuments` to ensure that the cache is used.
+may add the `.UseMemoryCache()` method from the `GraphQL.MemoryCache` package to enable in-memory caching. Be sure
+to call `UseMemoryCache` before calling `UsePeristedDocuments` to ensure that the cache is used.
 
 ```csharp
 services.AddGraphQL(b => b
