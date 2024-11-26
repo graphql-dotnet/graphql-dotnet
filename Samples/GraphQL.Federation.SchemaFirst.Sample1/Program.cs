@@ -1,21 +1,23 @@
-using GraphQL.Federation.TypeFirst.Sample4.Schema;
+using System.Reflection;
+using GraphQL.Federation.SchemaFirst.Sample1.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Federation.TypeFirst.Sample4;
+namespace GraphQL.Federation.SchemaFirst.Sample1;
 
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
         // Configure services
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddSingleton<Data>();
+        builder.Services.AddSingleton<Query>();
         builder.Services.AddGraphQL(b => b
-            .AddAutoSchema<Query>()
+            .AddSchema(BuildSchema)
             .AddSystemTextJson()
-            .AddFederation("2.3"));
+            .AddFederation("1.0")); // specify Federation v1 compatibility
 
         // Build the web application
         var app = builder.Build();
@@ -34,6 +36,31 @@ public class Program
 
         // Start the application
         await app.RunAsync().ConfigureAwait(false);
+    }
+
+    private static ISchema BuildSchema(IServiceProvider serviceProvider)
+    {
+        // load the schema-first SDL from an embedded resource
+        var filename = "GraphQL.Federation.SchemaFirst.Sample1.Schema.gql";
+        var assembly = Assembly.GetExecutingAssembly();
+        var stream = assembly.GetManifestResourceStream(filename)
+            ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
+        var reader = new StreamReader(stream);
+        var schemaString = reader.ReadToEnd();
+
+        // note: this demonstrates GraphQL.NET v8 and newer configuration methods
+        // define the known types and their resolvers
+        var schemaBuilder = new SchemaBuilder
+        {
+            ServiceProvider = serviceProvider,
+        };
+        schemaBuilder.Types.Include<Query>();
+        schemaBuilder.Types.Include<Category>();
+        schemaBuilder.Types.For(nameof(Category)).ResolveReference(
+            new MyFederatedResolver<Category>((data, id) => data.GetCategoryById(id)));
+
+        // build the schema
+        return schemaBuilder.Build(schemaString);
     }
 
     private static async Task GraphQLHttpMiddlewareAsync(HttpContext context)

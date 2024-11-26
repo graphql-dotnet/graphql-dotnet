@@ -42,6 +42,14 @@ Provides the following packages:
 You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 Note that GitHub requires authentication to consume the feed. See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
 
+## Example Projects and Sibling Repositories
+| Route			     | Notes			           												      |  Link 								     |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------|
+| GraphQL.Net/Samples        | Sample Projects focussed on the Features of the Core GraphQL Library (this) an Implementation of the GraphQL Spec                      | https://github.com/graphql-dotnet/graphql-dotnet                        |
+| GraphQL.Net.Server/Samples | Sample Projects focussed on the Features of the Server Package (Utilities to hooking up a GraphQL Server  in tune with Dotnet Web APIs | https://github.com/graphql-dotnet/server/tree/master/samples            |
+| Examples/Src               | Community Provided Examples. Not necessary Patterns Supported by this project. Provide a way to see how other people use the Lib       | https://github.com/graphql-dotnet/examples/tree/master/src              |
+| GraphQl.Net.Client/Examples| Example Implementations for the GraphQL Client implementation.								              | https://github.com/graphql-dotnet/graphql-client/tree/master/examples   |
+
 ## Documentation
 
 1. http://graphql-dotnet.github.io - documentation site that is built from the [docs](/docs2/site/) folder in the `master` branch.
