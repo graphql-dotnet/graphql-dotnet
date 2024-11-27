@@ -1052,6 +1052,20 @@ Sample persisted document request:
 }
 ```
 
+#### Caching (v8.3.0+)
+
+The persisted document handler does not provide caching by default. You may implement your own caching mechanism
+within the `GetQueryAsync` method to cache the query strings based on the document identifier. Alternatively, you
+may add the `.UseMemoryCache()` method from the `GraphQL.MemoryCache` package to enable in-memory caching. Be sure
+to call `UseMemoryCache` before calling `UsePeristedDocuments` to ensure that the cache is used.
+
+```csharp
+services.AddGraphQL(b => b
+    .UseMemoryCache()
+    .UsePeristedDocuments<MyLoader>(GraphQL.DI.ServiceLifetime.Scoped)
+);
+```
+
 ### 24. Execution timeout support
 
 `ExecutionOptions.Timeout` has been added to allow a maximum time for the execution of a query. If the execution
@@ -1601,6 +1615,41 @@ To continue to use the `ExecutionHelper.GetArguments` method, you may need to re
 for reference.
 
 If you directly implement `IResolveFieldContext`, you must now also implement the `ExecutionContext` property.
+
+### 30. `GraphType.Initialize` method is now called after initialization is complete
+
+The `Initialize` method on each `GraphType` is now called after the schema has been fully initialized. As such,
+you cannot add fields to the graph type expecting `SchemaTypes` to resolve types and apply name converters.
+If it is necessary for your graph type to add fields dynamically, you should do so in the constructor or else
+set the `ResolvedType` property for the new fields. Failing to do so will result in a schema validation exception.
+
+Please note that the constructor is the preferred place to add fields to a graph type.
+
+```csharp
+// v7
+public class MyGraphType : ObjectGraphType
+{
+    public override void Initialize(ISchema schema)
+    {
+        AddField(new FieldType {
+            Name = "Field",
+            Type = typeof(StringGraphType)
+        });
+    }
+}
+
+// v8
+public class MyGraphType : ObjectGraphType
+{
+    public override void Initialize(ISchema schema)
+    {
+        AddField(new FieldType {
+            Name = "field", // name converter is not applied here, so the name must be exactly as desired
+            ResolvedType = new StringGraphType()
+        });
+    }
+}
+```
 
 ## Appendix
 

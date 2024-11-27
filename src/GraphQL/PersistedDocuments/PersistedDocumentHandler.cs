@@ -3,7 +3,11 @@ using GraphQL.DI;
 namespace GraphQL.PersistedDocuments;
 
 /// <summary>
-/// Handles persisted document requests.
+/// Handles persisted document requests. Does not cache documents and the corresponding ids returned from
+/// <see cref="IPersistedDocumentLoader"/> or <see cref="PersistedDocumentOptions.GetQueryDelegate"/>.
+/// Please use MemoryDocumentCache prior to this handler to cache documents, or implement a custom cache
+/// within the <see cref="PersistedDocumentOptions.GetQueryDelegate"/> delegate or the
+/// <see cref="IPersistedDocumentLoader"/> implementation.
 /// </summary>
 public class PersistedDocumentHandler : IConfigureExecution
 {
@@ -60,6 +64,10 @@ public class PersistedDocumentHandler : IConfigureExecution
     /// <inheritdoc/>
     public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
     {
+        // if the parsed GraphQL document is already provided (such as by a memory cache), continue execution
+        if (options.Document != null)
+            return await next(options).ConfigureAwait(false);
+
         // ensure that both documentId and query are not provided
         if (options.DocumentId != null && options.Query != null)
             return CreateExecutionResult(new InvalidRequestError());
