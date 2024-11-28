@@ -1,0 +1,18 @@
+federation_version: 2
+subgraphs:
+  sample1:
+    routing_url: http://localhost:5601/graphql
+    schema:
+      subgraph_url: http://localhost:5601/graphql
+  sample2:
+    routing_url: http://localhost:5602/graphql
+    schema:
+      subgraph_url: http://localhost:5602/graphql
+  sample3:
+    routing_url: http://localhost:5603/graphql
+    schema:
+      subgraph_url: http://localhost:5603/graphql
+  sample4:
+    routing_url: http://localhost:5604/graphql
+    schema:
+      subgraph_url: http://localhost:5604/graphql

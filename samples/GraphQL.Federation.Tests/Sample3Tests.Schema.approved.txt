@@ -1,0 +1,33 @@
+schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag"]) {
+  query: Query
+}
+
+scalar _Any
+
+type Query {
+  _service: _Service!
+  _entities(representations: [_Any!]!): [_Entity]!
+}
+
+type _Service {
+  sdl: String
+}
+
+union _Entity = Review | Product | User
+
+type Review @key(fields: "id") {
+  id: ID!
+  content: String!
+  product: Product!
+  author: User!
+}
+
+type Product @key(fields: "id") {
+  id: ID!
+  reviews: [Review!]!
+}
+
+type User @key(fields: "id") {
+  id: ID!
+  reviews: [Review!]!
+}
