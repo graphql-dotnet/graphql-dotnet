@@ -1,3 +1,0 @@
-{
-  "query": "{ categories { id name products { id name category { id name } reviews { id content product { id name } author { id username reviews { id content } } } } } }"
-}
