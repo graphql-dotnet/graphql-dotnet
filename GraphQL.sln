@@ -4,34 +4,35 @@ VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{C1C3FFFD-3369-42B1-BE2E-CA10AD9E2ADA}"
 	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
-		..\.gitignore = ..\.gitignore
-		Directory.Build.props = ..\Directory.Build.props
-		Directory.Build.targets = ..\Directory.Build.targets
-		global.json = ..\global.json
-		graphql.snk = ..\graphql.snk
-		..\LICENSE.md = ..\LICENSE.md
-		..\README.md = ..\README.md
-		Tests.props = ..\Tests.props
+		..\.editorconfig = .editorconfig
+		..\.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+		global.json = global.json
+		graphql.snk = graphql.snk
+		..\LICENSE.md = LICENSE.md
+		..\README.md = README.md
+		Tests.props = Tests.props
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "src\GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Tests", "src\GraphQL.Tests\GraphQL.Tests.csproj", "{65E750AC-4701-45A8-97C0-822B1CC42C1E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader.Tests", "GraphQL.DataLoader.Tests\GraphQL.DataLoader.Tests.csproj", "{21FA4059-CF8D-4A5B-8C1B-D4DB645311B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader.Tests", "src\GraphQL.DataLoader.Tests\GraphQL.DataLoader.Tests.csproj", "{21FA4059-CF8D-4A5B-8C1B-D4DB645311B9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{BC80C071-B8B6-42D2-9CF8-6169C6169B74}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "src\Tests", "{BC80C071-B8B6-42D2-9CF8-6169C6169B74}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Dummy", "GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Dummy", "src\GraphQL.Dummy\GraphQL.Dummy.csproj", "{17CA647F-903F-4A0A-BF8F-E5123AAA2617}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.ApiTests", "src\GraphQL.ApiTests\GraphQL.ApiTests.csproj", "{1CEB8BF8-2292-4B93-9C58-860887FEC9D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{EB92DFCF-A87E-4E8B-B068-8B396D00945A}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\sitemap.yml = ..\docs2\site\sitemap.yml
 	EndProjectSection
 EndProject
+
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-started", "{587B3CCD-8B68-491B-9AC5-0E04DF3E9507}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\getting-started\aliases.md = ..\docs2\site\docs\getting-started\aliases.md
@@ -66,7 +67,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "getting-started", "getting-
 		..\docs2\site\docs\getting-started\variables.md = ..\docs2\site\docs\getting-started\variables.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks", "GraphQL.Benchmarks\GraphQL.Benchmarks.csproj", "{F08D07D5-1BD7-41A7-8F1B-FF655517A058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks", "src\GraphQL.Benchmarks\GraphQL.Benchmarks.csproj", "{F08D07D5-1BD7-41A7-8F1B-FF655517A058}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F263-BCEB-4738-9111-C85139BC63A7}"
 	ProjectSection(SolutionItems) = preProject
@@ -80,9 +81,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "guides", "guides", "{F279F2
 		..\docs2\site\docs\guides\serialization.md = ..\docs2\site\docs\guides\serialization.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.NewtonsoftJson", "src\GraphQL.NewtonsoftJson\GraphQL.NewtonsoftJson.csproj", "{55968205-5F9A-4646-AFE4-F29913570DBA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.SystemTextJson", "GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj", "{FCE8E24C-29AA-4AED-93BA-08551D38823A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.SystemTextJson", "src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj", "{FCE8E24C-29AA-4AED-93BA-08551D38823A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Serialization", "Serialization", "{7BA2B19D-2839-4C7D-9BB0-4F3ADE691ADD}"
 EndProject
@@ -116,29 +117,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "migrations", "migrations", 
 		..\docs2\site\docs\migrations\v0_8_0.md = ..\docs2\site\docs\migrations\v0_8_0.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "Caching", "{3DB29B96-B428-46A6-A4D3-FA677110B654}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Caching", "src\Caching", "{3DB29B96-B428-46A6-A4D3-FA677110B654}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MemoryCache", "GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MemoryCache", "src\GraphQL.MemoryCache\GraphQL.MemoryCache.csproj", "{92C246A6-E740-41AA-B77A-B939C54B1D8E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI", "GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj", "{185923DF-89EE-457B-8DA0-3CBBE080EC32}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI", "src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj", "{185923DF-89EE-457B-8DA0-3CBBE080EC32}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks.Merge", "GraphQL.Benchmarks.Merge\GraphQL.Benchmarks.Merge.csproj", "{5287FEDA-83E8-4A71-9B02-94B1106C92F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Benchmarks.Merge", "src\GraphQL.Benchmarks.Merge\GraphQL.Benchmarks.Merge.csproj", "{5287FEDA-83E8-4A71-9B02-94B1106C92F0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI.Tests", "GraphQL.MicrosoftDI.Tests\GraphQL.MicrosoftDI.Tests.csproj", "{82BE75F5-9C90-427D-8268-1C640A90CE98}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.MicrosoftDI.Tests", "src\GraphQL.MicrosoftDI.Tests\GraphQL.MicrosoftDI.Tests.csproj", "{82BE75F5-9C90-427D-8268-1C640A90CE98}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "GraphQL.DataLoader\GraphQL.DataLoader.csproj", "{466AD883-96BD-458E-9872-3C14E49D18F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.DataLoader", "src\GraphQL.DataLoader\GraphQL.DataLoader.csproj", "{466AD883-96BD-458E-9872-3C14E49D18F8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "Analyzer", "{53446652-CE87-43A4-A9FA-10F8A4BB441C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzer", "src\Analyzer", "{53446652-CE87-43A4-A9FA-10F8A4BB441C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers", "GraphQL.Analyzers\GraphQL.Analyzers.csproj", "{2D135FB8-6250-4F31-A2EA-6E9E80ABD59F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers", "src\GraphQL.Analyzers\GraphQL.Analyzers.csproj", "{2D135FB8-6250-4F31-A2EA-6E9E80ABD59F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.CodeFixes", "GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj", "{DF91353F-1212-4938-AF04-69492910BCE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.CodeFixes", "src\GraphQL.Analyzers.CodeFixes\GraphQL.Analyzers.CodeFixes.csproj", "{DF91353F-1212-4938-AF04-69492910BCE1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Package", "GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj", "{05145332-BE71-460A-A63E-51931D8F7F67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Package", "src\GraphQL.Analyzers.Package\GraphQL.Analyzers.Package.csproj", "{05145332-BE71-460A-A63E-51931D8F7F67}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Tests", "GraphQL.Analyzers.Tests\GraphQL.Analyzers.Tests.csproj", "{754A684B-A13A-4A48-8C87-53FF84617B62}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL.Analyzers.Tests", "src\GraphQL.Analyzers.Tests\GraphQL.Analyzers.Tests.csproj", "{754A684B-A13A-4A48-8C87-53FF84617B62}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "src\analyzers", "{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B}"
 	ProjectSection(SolutionItems) = preProject
 		..\docs2\site\docs\analyzers\gql001.md = ..\docs2\site\docs\analyzers\gql001.md
 		..\docs2\site\docs\analyzers\gql002.md = ..\docs2\site\docs\analyzers\gql002.md
@@ -163,9 +164,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{
 		..\docs2\site\docs\analyzers\overview.md = ..\docs2\site\docs\analyzers\overview.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars", "GraphQL.StarWars\GraphQL.StarWars.csproj", "{7B067B2B-68B7-4982-94F6-3E6F4DEB0CCD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars", "src\GraphQL.StarWars\GraphQL.StarWars.csproj", "{7B067B2B-68B7-4982-94F6-3E6F4DEB0CCD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars.TypeFirst", "GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{F667AA1C-F624-4FDF-AB04-100376517E59}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars.TypeFirst", "src\GraphQL.StarWars.TypeFirst\GraphQL.StarWars.TypeFirst.csproj", "{F667AA1C-F624-4FDF-AB04-100376517E59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{90080504-5840-4624-B240-82A6F9E723B5}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness", "samples\GraphQL.Harness\GraphQL.Harness.csproj", "{1B0B9EEA-1C20-41C4-88D3-35CA91DDFB27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness.Tests", "samples\GraphQL.Harness.Tests\GraphQL.Harness.Tests.csproj", "{3480F5C4-462A-4C74-89AF-8DC84AFA63E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.AotCompilationSample.CodeFirst", "samples\GraphQL.AotCompilationSample.CodeFirst\GraphQL.AotCompilationSample.CodeFirst.csproj", "{8C73FC87-FEA6-4DCC-A74D-0DBD961AB9B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.AotCompilationSample.TypeFirst", "samples\GraphQL.AotCompilationSample.TypeFirst\GraphQL.AotCompilationSample.TypeFirst.csproj", "{178306CC-EC4B-4D73-AE97-609CE5B9DBF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.CodeFirst.Sample3", "samples\GraphQL.Federation.CodeFirst.Sample3\GraphQL.Federation.CodeFirst.Sample3.csproj", "{2356F3C3-C71C-4B54-8620-EEBB6B9498AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.SchemaFirst.Sample1", "samples\GraphQL.Federation.SchemaFirst.Sample1\GraphQL.Federation.SchemaFirst.Sample1.csproj", "{27B0B949-0B92-4EF2-86FC-9188A233378F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.SchemaFirst.Sample2", "samples\GraphQL.Federation.SchemaFirst.Sample2\GraphQL.Federation.SchemaFirst.Sample2.csproj", "{4851E9E1-6BCA-449C-AC35-07961011474A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.TypeFirst.Sample4", "samples\GraphQL.Federation.TypeFirst.Sample4\GraphQL.Federation.TypeFirst.Sample4.csproj", "{455E340D-9EF9-45B0-8B72-8362D66E58A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphQL.Net", "samples\GraphQL.Net", "{1D80A982-94E2-4C0A-8947-E36275CA6423}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -249,6 +271,22 @@ Global
 		{F667AA1C-F624-4FDF-AB04-100376517E59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F667AA1C-F624-4FDF-AB04-100376517E59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F667AA1C-F624-4FDF-AB04-100376517E59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C73FC87-FEA6-4DCC-A74D-0DBD961AB9B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C73FC87-FEA6-4DCC-A74D-0DBD961AB9B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{178306CC-EC4B-4D73-AE97-609CE5B9DBF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{178306CC-EC4B-4D73-AE97-609CE5B9DBF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2356F3C3-C71C-4B54-8620-EEBB6B9498AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2356F3C3-C71C-4B54-8620-EEBB6B9498AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27B0B949-0B92-4EF2-86FC-9188A233378F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27B0B949-0B92-4EF2-86FC-9188A233378F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4851E9E1-6BCA-449C-AC35-07961011474A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4851E9E1-6BCA-449C-AC35-07961011474A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{455E340D-9EF9-45B0-8B72-8362D66E58A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{455E340D-9EF9-45B0-8B72-8362D66E58A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B0B9EEA-1C20-41C4-88D3-35CA91DDFB27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B0B9EEA-1C20-41C4-88D3-35CA91DDFB27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3480F5C4-462A-4C74-89AF-8DC84AFA63E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3480F5C4-462A-4C74-89AF-8DC84AFA63E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -272,6 +310,16 @@ Global
 		{05145332-BE71-460A-A63E-51931D8F7F67} = {53446652-CE87-43A4-A9FA-10F8A4BB441C}
 		{754A684B-A13A-4A48-8C87-53FF84617B62} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 		{C42DD8F2-4B21-40A3-954F-EF736FF9CA0B} = {EB92DFCF-A87E-4E8B-B068-8B396D00945A}
+		{1B0B9EEA-1C20-41C4-88D3-35CA91DDFB27} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{3480F5C4-462A-4C74-89AF-8DC84AFA63E3} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{7B067B2B-68B7-4982-94F6-3E6F4DEB0CCD} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{F667AA1C-F624-4FDF-AB04-100376517E59} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{2356F3C3-C71C-4B54-8620-EEBB6B9498AD} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{27B0B949-0B92-4EF2-86FC-9188A233378F} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{4851E9E1-6BCA-449C-AC35-07961011474A} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{455E340D-9EF9-45B0-8B72-8362D66E58A7} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{8C73FC87-FEA6-4DCC-A74D-0DBD961AB9B8} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{178306CC-EC4B-4D73-AE97-609CE5B9DBF9} = {90080504-5840-4624-B240-82A6F9E723B5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}
