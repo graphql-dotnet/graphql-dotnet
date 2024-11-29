@@ -1,22 +1,22 @@
-using System.Reflection;
-using GraphQL.Federation.SchemaFirst.Sample2.Schema;
+using GraphQL.Federation.CodeFirst.Sample3.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
+using GraphQL.Utilities;
 
-namespace GraphQL.Federation.SchemaFirst.Sample2;
+namespace GraphQL.Federation.CodeFirst.Sample3;
 
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
         // Configure services
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddSingleton<Data>();
-        builder.Services.AddSingleton<Query>();
         builder.Services.AddGraphQL(b => b
-            .AddSchema(BuildSchema)
-            .AddSystemTextJson());
+            .AddSchema<Schema3>()
+            .AddSystemTextJson()
+            .AddGraphTypes()
+            .AddFederation("2.3"));
 
         // Build the web application
         var app = builder.Build();
@@ -35,36 +35,6 @@ public class Program
 
         // Start the application
         await app.RunAsync().ConfigureAwait(false);
-    }
-
-    private static ISchema BuildSchema(IServiceProvider serviceProvider)
-    {
-        // load the schema-first SDL from an embedded resource
-        var filename = "GraphQL.Federation.SchemaFirst.Sample2.Schema.gql";
-        var assembly = Assembly.GetExecutingAssembly();
-        var stream = assembly.GetManifestResourceStream(filename)
-            ?? throw new InvalidOperationException("Could not read schema definitions from embedded resource.");
-        var reader = new StreamReader(stream);
-        var schemaString = reader.ReadToEnd();
-
-        // note: this demonstrates GraphQL.NET v7 and prior configuration methods
-#pragma warning disable CS0618 // Type or member is obsolete
-        // define the known types and their resolvers
-        var schemaBuilder = new FederatedSchemaBuilder();
-        schemaBuilder.Types.Include<Query>();
-        schemaBuilder.Types.Include<Category>();
-        // categories do not actually exist in the data, so we use a pseudo-resolver
-        // which always returns a Category instance for the given ID, so that the product
-        // list can be resolved from it
-        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
-            new MyPseudoFederatedResolver<Category>());
-        schemaBuilder.Types.Include<Product>();
-        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(
-            new MyFederatedResolver<Product>((data, id) => data.GetProductById(id)));
-#pragma warning restore CS0618 // Type or member is obsolete
-
-        // build the schema
-        return schemaBuilder.Build(schemaString);
     }
 
     private static async Task GraphQLHttpMiddlewareAsync(HttpContext context)

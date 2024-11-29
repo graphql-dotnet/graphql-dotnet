@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../Tests.props" />
+  <Import Project="../../Tests.props" />
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\GraphQL.Tests\Shared\**">
+    <Compile Include="..\..\src\GraphQL.Tests\Shared\**">
       <Link>Shared\%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>

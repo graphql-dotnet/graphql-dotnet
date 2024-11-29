@@ -13,7 +13,7 @@ public class BomTests
         var callerFilePath = GetPath();
         var gitRoot = new FileInfo(callerFilePath).Directory!.Parent!.Parent!;
         // Protection from situations when this test is copied to another repo or the folder structure changed, etc.
-        var slnFile = Path.Combine(gitRoot.FullName, "src", "GraphQL.sln");
+        var slnFile = Path.Combine(gitRoot.FullName, "GraphQL.sln");
         if (!File.Exists(slnFile))
             throw new InvalidOperationException($"Unable to find repository root - '{slnFile}' missing; caller file path '{callerFilePath}'.");
 
