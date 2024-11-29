@@ -172,8 +172,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.SchemaFi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.TypeFirst.Sample4", "samples\GraphQL.Federation.TypeFirst.Sample4\GraphQL.Federation.TypeFirst.Sample4.csproj", "{455E340D-9EF9-45B0-8B72-8362D66E58A7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GraphQL.Net", "GraphQL.Net", "{1D80A982-94E2-4C0A-8947-E36275CA6423}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solution Items", "{8453C7C4-208D-4FA2-84E8-7C42727255F3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
