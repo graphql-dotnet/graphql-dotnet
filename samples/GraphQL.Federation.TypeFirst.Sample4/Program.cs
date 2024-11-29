@@ -1,11 +1,11 @@
-using GraphQL.Federation.CodeFirst.Sample3.Schema;
+using GraphQL.Federation.TypeFirst.Sample4.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
 using GraphQL.Utilities;
 
-namespace GraphQL.Federation.CodeFirst.Sample3;
+namespace GraphQL.Federation.TypeFirst.Sample4;
 
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -13,9 +13,8 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddSingleton<Data>();
         builder.Services.AddGraphQL(b => b
-            .AddSchema<Schema3>()
+            .AddAutoSchema<Query>()
             .AddSystemTextJson()
-            .AddGraphTypes()
             .AddFederation("2.3"));
 
         // Build the web application

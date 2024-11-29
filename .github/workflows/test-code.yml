@@ -41,18 +41,18 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Install dependencies
-        working-directory: src
+        working-directory: .
         run: dotnet restore
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
+        working-directory: .
         run: dotnet build --no-restore -c Release
       - name: Build solution [Debug]
-        working-directory: src
+        working-directory: .
         run: dotnet build --no-restore -c Debug -p:DeterministicSourcePaths=false
       - name: Test solution [Debug] with code coverage
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
+        working-directory: .
         run: >
           dotnet test
           --no-restore
@@ -64,15 +64,15 @@ jobs:
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
       - name: Test solution [Debug] without code coverage
         if: ${{ startsWith(matrix.os, 'windows') }}
-        working-directory: src
+        working-directory: .
         run: dotnet test --no-restore --no-build
       - name: Test code-first AOT compilation
-        working-directory: src/GraphQL.AotCompilationSample.CodeFirst
+        working-directory: samples/GraphQL.AotCompilationSample.CodeFirst
         run: |
           dotnet publish -c Release -o publish
           publish/GraphQL.AotCompilationSample.CodeFirst
       - name: Test type-first AOT compilation
-        working-directory: src/GraphQL.AotCompilationSample.TypeFirst
+        working-directory: samples/GraphQL.AotCompilationSample.TypeFirst
         run: |
           dotnet publish -c Release -o publish
           publish/GraphQL.AotCompilationSample.TypeFirst
@@ -99,31 +99,31 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Install dependencies
-        working-directory: src
+        working-directory: samples
         run: dotnet restore GraphQL.Federation.SchemaFirst.Sample1
       - name: Build Sample1
-        working-directory: src
+        working-directory: samples
         run: dotnet build --no-restore GraphQL.Federation.SchemaFirst.Sample1
       - name: Build Sample2
-        working-directory: src
+        working-directory: samples
         run: dotnet build GraphQL.Federation.SchemaFirst.Sample2
       - name: Build Sample3
-        working-directory: src
+        working-directory: samples
         run: dotnet build GraphQL.Federation.CodeFirst.Sample3
       - name: Build Sample4
-        working-directory: src
+        working-directory: samples
         run: dotnet build GraphQL.Federation.TypeFirst.Sample4
       - name: Start Sample1 on port 5601
-        working-directory: src
+        working-directory: samples
         run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample1 &
       - name: Start Sample2 on port 5602
-        working-directory: src
+        working-directory: samples
         run: dotnet run --no-build --project GraphQL.Federation.SchemaFirst.Sample2 &
       - name: Start Sample3 on port 5603
-        working-directory: src
+        working-directory: samples
         run: dotnet run --no-build --project GraphQL.Federation.CodeFirst.Sample3 &
       - name: Start Sample4 on port 5604
-        working-directory: src
+        working-directory: samples
         run: dotnet run --no-build --project GraphQL.Federation.TypeFirst.Sample4 &
       - name: Install Apollo Rover CLI
         run: |
@@ -193,16 +193,16 @@ jobs:
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Build supergraph with federation-${{ matrix.federationversion }}-supergraph-config.yaml
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: rover supergraph compose --config ./federation-${{ matrix.federationversion }}-supergraph-config.yaml --elv2-license=accept > supergraph.graphql
       - name: Print supergraph
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: cat supergraph.graphql
       - name: Download router
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: curl -sSL https://router.apollo.dev/download/nix/latest | sh
       - name: Start router
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: ./router --dev --supergraph supergraph.graphql &
       - name: Wait for router to spin up
         run: |
@@ -220,50 +220,50 @@ jobs:
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Run GraphQL queries
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           curl -X POST -H "Content-Type: application/json" -d @federation-request-1.json http://127.0.0.1:4000 > response-1.json
           curl -X POST -H "Content-Type: application/json" -d @federation-request-2.json http://127.0.0.1:4000 > response-2.json
           curl -X POST -H "Content-Type: application/json" -d @federation-request-3.json http://127.0.0.1:4000 > response-3.json
       - name: Run additional GraphQL queries
         if: matrix.federationversion == 2
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           curl -X POST -H "Content-Type: application/json" -d @federation-request-4.json http://127.0.0.1:4000 > response-4.json
       - name: Print query result 1
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: cat response-1.json
       - name: Print query result 2
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: cat response-2.json
       - name: Print query result 3
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: cat response-3.json
       - name: Print query result 4
         if: matrix.federationversion == 2
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: cat response-4.json
       - name: Compare query result 1 to expected response
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           jq . response-1.json > actual-response-1.json
           jq . federation-response-1.json > expected-response-1.json
           diff -b actual-response-1.json expected-response-1.json
       - name: Compare query result 2 to expected response
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           jq . response-2.json > actual-response-2.json
           jq . federation-response-2.json > expected-response-2.json
           diff -b actual-response-2.json expected-response-2.json
       - name: Compare query result 3 to expected response
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           jq . response-3.json > actual-response-3.json
           jq . federation-response-3.json > expected-response-3.json
           diff -b actual-response-3.json expected-response-3.json
       - name: Compare query result 4 to expected response
         if: matrix.federationversion == 2
-        working-directory: src/Federation
+        working-directory: samples/Federation
         run: |
           jq . response-4.json > actual-response-4.json
           jq . federation-response-4.json > expected-response-4.json

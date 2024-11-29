@@ -31,7 +31,7 @@ jobs:
         config-file: ./.github/codeql-config.yml
 
     - name: Install dependencies
-      working-directory: src
+      working-directory: .
       run: dotnet restore
 
     - name: Build CodeQL solution
