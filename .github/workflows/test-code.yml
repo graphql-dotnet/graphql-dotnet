@@ -41,18 +41,18 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Install dependencies
-        working-directory: src
+        working-directory: .
         run: dotnet restore
       - name: Build solution [Release]
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
+        working-directory: .
         run: dotnet build --no-restore -c Release
       - name: Build solution [Debug]
-        working-directory: src
+        working-directory: .
         run: dotnet build --no-restore -c Debug -p:DeterministicSourcePaths=false
       - name: Test solution [Debug] with code coverage
         if: ${{ startsWith(matrix.os, 'ubuntu') }}
-        working-directory: src
+        working-directory: .
         run: >
           dotnet test
           --no-restore
@@ -64,7 +64,7 @@ jobs:
           DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Exclude=[GraphQL.StarWars]*,[GraphQL.Harness]*,[GraphQL.Dummy]*
       - name: Test solution [Debug] without code coverage
         if: ${{ startsWith(matrix.os, 'windows') }}
-        working-directory: src
+        working-directory: .
         run: dotnet test --no-restore --no-build
       - name: Test code-first AOT compilation
         working-directory: samples/GraphQL.AotCompilationSample.CodeFirst
