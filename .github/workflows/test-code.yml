@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - src/**
+      - samples/**
       - .github/workflows/**
+      - '*'
   # Upload code coverage results when PRs are merged
   push:
     branches:
@@ -12,7 +14,9 @@ on:
       - develop
     paths:
       - src/**
+      - samples/**
       - .github/workflows/**
+      - '*'
 
 env:
   DOTNET_NOLOGO: true

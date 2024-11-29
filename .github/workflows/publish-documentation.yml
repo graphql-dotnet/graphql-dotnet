@@ -6,8 +6,6 @@ on:
       - master
     paths:
       - docs2/**
-      - package.json
-      - yarn.lock
       - .github/workflows/publish-documentation.yml
 
 env:

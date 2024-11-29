@@ -4,8 +4,6 @@ on:
   pull_request:
     paths:
       - docs2/**
-      - package.json
-      - yarn.lock
       - .github/workflows/**
 
 env:
