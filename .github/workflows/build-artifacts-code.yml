@@ -9,7 +9,9 @@ on:
       - develop
     paths:
       - src/**
+      - samples/**
       - .github/workflows/**
+      - '*'
 
 env:
   NODE_VERSION: '18.x'   # Node 18 LTS, see https://nodejs.org/en/about/releases/
