@@ -12,7 +12,7 @@ public class SalesmanGraphType : ObjectGraphType<Salesperson>
         Field(x => x.Name, type: typeof(StringGraphType)).Description("Name of the salesman");
         Field<ListGraphType<CarsGraphType>, List<Car>>("assignedCars").Description("Assigned cars").ResolveAsync(ctx =>
         {
-            var loader = ctx.RequestServices.GetRequiredService<CarsBySalespersonDataLoader>();
+            var loader = ctx.RequestServices!.GetRequiredService<CarsBySalespersonDataLoader>();
             return loader.LoadAsync(ctx.Source.Id);
         });
     }

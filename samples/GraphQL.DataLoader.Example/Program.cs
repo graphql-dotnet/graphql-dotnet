@@ -28,7 +28,8 @@ await app
     .ServiceProvider
     .GetRequiredService<DealershipDbContext>()
     .Database
-    .MigrateAsync();
+    .MigrateAsync()
+    .ConfigureAwait(false);
 
 await app
     .Services
@@ -37,5 +38,6 @@ await app
     .GetRequiredService<DealershipDbContext>()
     .Database
     //For making sure seed Data gets applied
-    .EnsureCreatedAsync();
+    .EnsureCreatedAsync()
+    .ConfigureAwait(false);
 app.Run();
