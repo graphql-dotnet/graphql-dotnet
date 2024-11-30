@@ -13,19 +13,19 @@ public class DealershipDbContext : DbContext
     {
         optionsBuilder
             .UseSqlite(
-            new SqliteConnectionStringBuilder()
-            {
-                Mode = SqliteOpenMode.ReadWriteCreate,
-                BrowsableConnectionString = true,
-                DataSource = "my.db"
-            }
-            .ToString()
+                new SqliteConnectionStringBuilder()
+                {
+                    Mode = SqliteOpenMode.ReadWriteCreate,
+                    BrowsableConnectionString = true,
+                    DataSource = "my.db"
+                }
+                    .ToString()
             )
             .UseSeeding((ctx, _) =>
             {
                 if (ctx.Set<Salesperson>().Any())
                     return;
-                ctx.Set<Salesperson>().AddRange(SeedSalespeople);
+                ctx.Set<Salesperson>().AddRange(_seedSalespeople);
                 ctx.SaveChanges();
             })
             .UseAsyncSeeding(async (ctx, _, cancellationToken) =>
@@ -33,7 +33,7 @@ public class DealershipDbContext : DbContext
                 if (await ctx.Set<Salesperson>().AnyAsync(cancellationToken).ConfigureAwait(false))
                     return;
                 await ctx.Set<Salesperson>()
-                    .AddRangeAsync(SeedSalespeople, cancellationToken)
+                    .AddRangeAsync(_seedSalespeople, cancellationToken)
                     .ConfigureAwait(false);
                 await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             });
@@ -47,7 +47,7 @@ public class DealershipDbContext : DbContext
             .HasForeignKey(car => car.SalesPersonId);
     }
 
-    private static readonly Salesperson[] SeedSalespeople =
+    private static readonly Salesperson[] _seedSalespeople =
     [
         new()
         {
