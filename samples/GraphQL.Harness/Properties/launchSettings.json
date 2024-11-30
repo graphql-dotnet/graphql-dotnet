@@ -12,7 +12,7 @@
     "GraphiQL": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "graphiql",
+      "launchUrl": "ui/graphiql",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

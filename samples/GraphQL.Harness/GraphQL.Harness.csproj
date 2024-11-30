@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
     <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\..\src\GraphQL.StarWars\GraphQL.StarWars.csproj" />
+    <ProjectReference Include="..\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj" />
   </ItemGroup>
 
   <ItemGroup>
