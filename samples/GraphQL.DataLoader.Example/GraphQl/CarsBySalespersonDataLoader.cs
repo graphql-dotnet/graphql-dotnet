@@ -1,10 +1,10 @@
-﻿using DataLoaderGql.Types;
+using DataLoaderGql.Types;
 using GraphQL.DataLoader;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataLoaderGql.GraphQl;
 
-public class CarsBySalespersonDataLoader(DealershipDbContext db): DataLoaderBase<int, List<Car>>
+public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBase<int, List<Car>>
 {
     protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, List<Car>>> list, CancellationToken cancellationToken)
     {

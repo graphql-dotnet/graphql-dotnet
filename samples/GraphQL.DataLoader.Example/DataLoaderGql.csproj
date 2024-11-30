@@ -1,26 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-      <IsPackable>false</IsPackable>
-      <IsTestProject>false</IsTestProject>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="GraphQL" Version="8.2.1" />
-        <PackageReference Include="GraphQL.DataLoader" Version="8.2.1" />
-        <PackageReference Include="GraphQL.MicrosoftDI" Version="8.2.1" />
-        <PackageReference Include="GraphQL.Server.All" Version="8.1.0" />
-        <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.1.0" />
-        <PackageReference Include="GraphQL.SystemTextJson" Version="8.2.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="GraphQL" Version="8.2.1" />
+    <PackageReference Include="GraphQL.DataLoader" Version="8.2.1" />
+    <PackageReference Include="GraphQL.MicrosoftDI" Version="8.2.1" />
+    <PackageReference Include="GraphQL.Server.All" Version="8.1.0" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.1.0" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="8.2.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+  </ItemGroup>
 
 </Project>

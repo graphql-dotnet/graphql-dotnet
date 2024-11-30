@@ -1,4 +1,4 @@
-﻿namespace DataLoaderGql.Types;
+namespace DataLoaderGql.Types;
 
 public class Salesperson
 {

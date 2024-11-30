@@ -1,4 +1,4 @@
-﻿using DataLoaderGql.Types;
+using DataLoaderGql.Types;
 using GraphQL;
 using GraphQL.Types;
 

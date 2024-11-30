@@ -1,7 +1,6 @@
 using DataLoaderGql;
 using DataLoaderGql.GraphQl;
 using GraphQL;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,34 +9,21 @@ builder.Services.AddScoped<SalespeopleByNameDataLoader>().AddScoped<CarsBySalesp
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddDbContext<DealershipDbContext>();
 
-builder.Services.AddGraphQL(builder =>
-{
-    builder
+builder.Services.AddGraphQL(b => b
         .AddSystemTextJson()
         .AddGraphTypes(typeof(CarsGraphType).Assembly)
-        .AddSchema<DealershipSchema>();
-});
+        .AddSchema<DealershipSchema>()
+);
 var app = builder.Build();
 
 app.UseGraphQL();
 app.UseGraphQLAltair();
-app.MapGraphQLAltair().AllowAnonymous();
-await app
-    .Services
-    .CreateAsyncScope()
-    .ServiceProvider
-    .GetRequiredService<DealershipDbContext>()
-    .Database
-    .MigrateAsync()
-    .ConfigureAwait(false);
 
-await app
-    .Services
-    .CreateAsyncScope()
-    .ServiceProvider
-    .GetRequiredService<DealershipDbContext>()
-    .Database
-    //For making sure seed Data gets applied
-    .EnsureCreatedAsync()
-    .ConfigureAwait(false);
-app.Run();
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DealershipDbContext>();
+    await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+}
+
+
+await app.RunAsync().ConfigureAwait(false);
