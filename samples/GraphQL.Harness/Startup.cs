@@ -1,7 +1,6 @@
 using Example;
 using GraphQL.Instrumentation;
 using GraphQL.StarWars;
-using GraphQL.Types;
 
 namespace GraphQL.Harness;
 
