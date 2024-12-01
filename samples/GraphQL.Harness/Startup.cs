@@ -40,9 +40,6 @@ public class Startup
         if (env.IsDevelopment())
             app.UseDeveloperExceptionPage();
 
-        app.ApplicationServices.GetRequiredService<ISchema>();
-        app.ApplicationServices.GetRequiredService<IDocumentExecuter<ISchema>>();
-        app.ApplicationServices.GetRequiredService<IGraphQLSerializer>();
         app.UseGraphQL();
         app.UseGraphQLPlayground();
         app.UseGraphQLGraphiQL();
