@@ -19,7 +19,7 @@ public class DealershipDbContext : DbContext
                     BrowsableConnectionString = true,
                     DataSource = "my.db"
                 }
-                    .ToString()
+                .ToString()
             )
             .UseSeeding((ctx, _) =>
             {
@@ -30,18 +30,25 @@ public class DealershipDbContext : DbContext
             })
             .UseAsyncSeeding(async (ctx, _, cancellationToken) =>
             {
-                if (await ctx.Set<Salesperson>().AnyAsync(cancellationToken).ConfigureAwait(false))
+                if (await ctx
+                        .Set<Salesperson>()
+                        .AnyAsync(cancellationToken)
+                        .ConfigureAwait(false))
                     return;
-                await ctx.Set<Salesperson>()
+                await ctx
+                    .Set<Salesperson>()
                     .AddRangeAsync(_seedSalespeople, cancellationToken)
                     .ConfigureAwait(false);
-                await ctx.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+                await ctx
+                    .SaveChangesAsync(cancellationToken)
+                    .ConfigureAwait(false);
             });
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Salesperson>()
+        modelBuilder
+            .Entity<Salesperson>()
             .HasMany(sp => sp.AssignedCars)
             .WithOne()
             .HasForeignKey(car => car.SalesPersonId);

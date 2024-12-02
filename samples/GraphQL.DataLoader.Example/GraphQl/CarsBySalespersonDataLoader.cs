@@ -8,13 +8,14 @@ public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBas
 {
     protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, List<Car>>> list, CancellationToken cancellationToken)
     {
-        var keys = list.Select(pair => pair.Key).ToHashSet();
+        var keys = list.Select(pair => pair.Key);
         var carsLookup =
-            await db.Cars.Where(car => keys.Contains(car.SalesPersonId))
-                .GroupBy(car => car.SalesPersonId)
-                .ToDictionaryAsync(
-                    group => group.Key,
-                    cancellationToken: cancellationToken).ConfigureAwait(false);
+            (await db.Cars.Where(car
+                => keys
+                .Contains(car.SalesPersonId))
+                .ToListAsync(cancellationToken: cancellationToken)
+                .ConfigureAwait(false))
+                .ToLookup(car => car.SalesPersonId);
 
 
         foreach (var pair in list)
