@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
+    <RootNamespace>GraphQL.DataLoader.Di.Sample</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.1.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GraphQL.DataLoader\GraphQL.DataLoader.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL\GraphQL.csproj"/>
+    <ProjectReference Include="..\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj"/>
+  </ItemGroup>
+
+</Project>
