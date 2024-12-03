@@ -4,8 +4,8 @@ namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
 public class DealershipSchema : Schema
 {
-    public DealershipSchema()
+    public DealershipSchema(IDataLoaderContextAccessor accessor, DealershipDbContext dbContext)
     {
-        Query = new DealerShipQuery();
+        Query = new DealerShipQuery(accessor, dbContext);
     }
 }

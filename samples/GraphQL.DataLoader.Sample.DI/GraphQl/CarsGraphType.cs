@@ -3,7 +3,7 @@ using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Sample.DI.GraphQl;
 
-public class CarsGraphType : ObjectGraphType<Car>
+public sealed class CarsGraphType : ObjectGraphType<Car>
 {
     public CarsGraphType()
     {

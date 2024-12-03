@@ -4,13 +4,13 @@ using GraphQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<SalespeopleByNameDataLoader>().AddScoped<CarsBySalespersonDataLoader>();
 builder.Services.AddDbContext<DealershipDbContext>();
 
 builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddGraphTypes(typeof(CarsGraphType).Assembly)
     .AddSchema<DealershipSchema>()
+    .AddDataLoader()
 );
 
 var app = builder.Build();

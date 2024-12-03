@@ -33,12 +33,9 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
-1. Register `IDataLoaderContextAccessor` in your IoC container.
-2. Register `DataLoaderDocumentListener` in your IoC container.
-
+1. Register the Dataloader Services
 ``` csharp
-services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
-services.AddSingleton<DataLoaderDocumentListener>();
+services.AddDataLoader();
 ```
 
 3. Hook up your GraphQL schema to your IoC container.
