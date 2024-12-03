@@ -1,4 +1,3 @@
-using GraphQL.DataLoader;
 using GraphQL.DataLoader.Sample.DI.Types;
 using Microsoft.EntityFrameworkCore;
 

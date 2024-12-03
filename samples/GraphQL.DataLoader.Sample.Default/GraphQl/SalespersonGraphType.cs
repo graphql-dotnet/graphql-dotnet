@@ -11,15 +11,15 @@ public sealed class SalespersonGraphType : ObjectGraphType<Salesperson>
         Field(x => x.Id, type: typeof(IntGraphType)).Description("Id of the salesman");
         Field(x => x.Name, type: typeof(StringGraphType)).Description("Name of the salesman");
 
-    Field<ListGraphType<CarsGraphType>, IEnumerable<Car>>("assignedCars").Description("Assigned cars")
-        .ResolveAsync(ctx =>
-        {
-            var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Car>("GetCarsBySalespeople", async salesPersonIds =>
+        Field<ListGraphType<CarsGraphType>, IEnumerable<Car>>("assignedCars").Description("Assigned cars")
+            .ResolveAsync(ctx =>
             {
-                var carsLookup = (await dbContext.Cars.Where(car => salesPersonIds.Contains(car.SalesPersonId)).ToListAsync()).ToLookup(car => car.SalesPersonId);
-                return carsLookup;
+                var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Car>("GetCarsBySalespeople", async salesPersonIds =>
+                {
+                    var carsLookup = (await dbContext.Cars.Where(car => salesPersonIds.Contains(car.SalesPersonId)).ToListAsync().ConfigureAwait(false)).ToLookup(car => car.SalesPersonId);
+                    return carsLookup;
+                });
+                return loader.LoadAsync(ctx.Source.Id);
             });
-            return loader.LoadAsync(ctx.Source.Id);
-        });
     }
 }

@@ -1,4 +1,3 @@
-using GraphQL;
 using GraphQL.DataLoader.Di.Sample.Types;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +10,9 @@ public sealed class DealerShipQuery : ObjectGraphType
     {
         Field<SalespersonGraphType>("salespeople")
             .Argument<string>("name")
-            .Resolve(ctx => {
-                var loader = accessor.Context.GetOrAddBatchLoader<string, Salesperson>("GetSalespeopleByName", async names =>
-                {
-                    return await dbContext.Salespeople.Where(s => names.Contains(s.Name)).ToDictionaryAsync(sp => sp.Name);
-                });
+            .Resolve(ctx =>
+            {
+                var loader = accessor.Context.GetOrAddBatchLoader<string, Salesperson>("GetSalespeopleByName", async names => await dbContext.Salespeople.Where(s => names.Contains(s.Name)).ToDictionaryAsync(sp => sp.Name).ConfigureAwait(false));
                 return loader.LoadAsync(ctx.GetArgument<string>("name"));
             });
     }

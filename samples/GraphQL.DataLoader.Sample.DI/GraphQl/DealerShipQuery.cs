@@ -1,4 +1,3 @@
-using GraphQL;
 using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Sample.DI.GraphQl;

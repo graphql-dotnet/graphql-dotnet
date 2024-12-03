@@ -1,6 +1,6 @@
+using GraphQL;
 using GraphQL.DataLoader.Sample.DI;
 using GraphQL.DataLoader.Sample.DI.GraphQl;
-using GraphQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
