@@ -3,11 +3,11 @@ using GraphQL.Types;
 
 namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
-public class DealerShipQuery : ObjectGraphType
+public sealed class DealerShipQuery : ObjectGraphType
 {
     public DealerShipQuery()
     {
-        Field<SalesmanGraphType>("salespeople")
+        Field<SalespersonGraphType>("salespeople")
             .Argument<string>("name")
             .Resolve(ctx =>
         {

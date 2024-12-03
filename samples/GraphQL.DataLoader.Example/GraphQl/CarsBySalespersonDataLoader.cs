@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
-public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBase<int, List<Car>>
+public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBase<int, IEnumerable<Car>>
 {
-    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, List<Car>>> list, CancellationToken cancellationToken)
+    protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<Car>>> list, CancellationToken cancellationToken)
     {
         var keys = list.Select(pair => pair.Key);
         var carsLookup =
@@ -20,7 +20,7 @@ public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBas
 
         foreach (var pair in list)
         {
-            pair.SetResult(carsLookup[pair.Key].ToList());
+            pair.SetResult(carsLookup[pair.Key]);
         }
     }
 }
