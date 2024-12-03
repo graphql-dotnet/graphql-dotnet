@@ -13,12 +13,11 @@ public class SalespeopleByNameDataLoader(DealershipDbContext db) : DataLoaderBas
 
         var lookup = await salesmen
             .Where(sm => names.Contains(sm.Name))
-            .GroupBy(sm => sm.Name)
-            .ToDictionaryAsync(group => group.Key, cancellationToken).ConfigureAwait(false);
+            .ToDictionaryAsync(p => p.Name, cancellationToken).ConfigureAwait(false);
 
         foreach (var pair in list)
         {
-            pair.SetResult(lookup[pair.Key].Single());
+            pair.SetResult(lookup[pair.Key]);
         }
     }
 }

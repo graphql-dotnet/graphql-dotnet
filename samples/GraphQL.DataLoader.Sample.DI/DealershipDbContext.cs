@@ -52,6 +52,7 @@ public class DealershipDbContext : DbContext
             .HasMany(sp => sp.AssignedCars)
             .WithOne()
             .HasForeignKey(car => car.SalesPersonId);
+        modelBuilder.Entity<Salesperson>().HasIndex(sp => sp.Name).IsUnique();
     }
 
     private static readonly Salesperson[] _seedSalespeople =
