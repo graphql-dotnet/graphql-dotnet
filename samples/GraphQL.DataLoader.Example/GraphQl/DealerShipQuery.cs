@@ -1,7 +1,7 @@
 using GraphQL;
 using GraphQL.Types;
 
-namespace DataLoaderGql.GraphQl;
+namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
 public class DealerShipQuery : ObjectGraphType
 {

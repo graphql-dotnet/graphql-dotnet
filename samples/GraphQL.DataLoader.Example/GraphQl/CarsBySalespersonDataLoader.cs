@@ -1,8 +1,8 @@
-using DataLoaderGql.Types;
 using GraphQL.DataLoader;
+using GraphQL.DataLoader.Di.Sample.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace DataLoaderGql.GraphQl;
+namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
 public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBase<int, List<Car>>
 {

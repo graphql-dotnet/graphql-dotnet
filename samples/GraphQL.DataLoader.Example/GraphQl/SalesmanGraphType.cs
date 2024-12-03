@@ -1,8 +1,8 @@
-using DataLoaderGql.Types;
 using GraphQL;
+using GraphQL.DataLoader.Di.Sample.Types;
 using GraphQL.Types;
 
-namespace DataLoaderGql.GraphQl;
+namespace GraphQL.DataLoader.Di.Sample.GraphQl;
 
 public class SalesmanGraphType : ObjectGraphType<Salesperson>
 {

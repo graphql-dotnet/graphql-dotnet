@@ -185,7 +185,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".Solution Items", ".Solutio
 		Tests.props = Tests.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLoaderGql", "samples\GraphQL.DataLoader.Example\DataLoaderGql.csproj", "{096D5EB2-6A1D-4A46-8625-C6BB8C6D19B7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.DataLoader.Di.Sample", "samples\GraphQL.DataLoader.Example\GraphQL.DataLoader.Di.Sample.csproj", "{096D5EB2-6A1D-4A46-8625-C6BB8C6D19B7}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Server.Polyfill", "samples\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj", "{9555B98B-4088-459A-A42F-187F7A33A4DA}"
 EndProject
 Global
