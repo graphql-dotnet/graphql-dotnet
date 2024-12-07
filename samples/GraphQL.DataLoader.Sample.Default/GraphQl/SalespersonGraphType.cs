@@ -11,7 +11,7 @@ public sealed class SalespersonGraphType : ObjectGraphType<Salesperson>
         Field(x => x.Id).Description("Id of the salesman");
         Field(x => x.Name).Description("Name of the salesman");
 
-        Field<ListGraphType<CarsGraphType>, IEnumerable<Car>>("assignedCars").Description("Assigned cars")
+        Field<IEnumerable<Car>>("assignedCars", false).Description("Assigned cars")
             .ResolveAsync(ctx =>
             {
                 var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Car>("GetCarsBySalespeople", async salesPersonIds =>
