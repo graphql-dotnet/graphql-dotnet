@@ -42,7 +42,7 @@ services.AddGraphQL(b => b
 );
 ```
 
-3. Hook up your GraphQL schema to your IoC container.
+2Hook up your GraphQL schema to your IoC container.
 
 ``` csharp
 public class MySchema : Schema
@@ -57,7 +57,7 @@ public class MySchema : Schema
 services.AddSingleton<MySchema>();
 ```
 
-4. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+3. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
 
 ``` csharp
 var listener = Services.GetRequiredService<DataLoaderDocumentListener>();
