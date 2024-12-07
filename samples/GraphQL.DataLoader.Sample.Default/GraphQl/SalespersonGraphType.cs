@@ -8,8 +8,8 @@ public sealed class SalespersonGraphType : ObjectGraphType<Salesperson>
 {
     public SalespersonGraphType(IDataLoaderContextAccessor accessor, DealershipDbContext dbContext)
     {
-        Field(x => x.Id, type: typeof(IntGraphType)).Description("Id of the salesman");
-        Field(x => x.Name, type: typeof(StringGraphType)).Description("Name of the salesman");
+        Field(x => x.Id).Description("Id of the salesman");
+        Field(x => x.Name).Description("Name of the salesman");
 
         Field<ListGraphType<CarsGraphType>, IEnumerable<Car>>("assignedCars").Description("Assigned cars")
             .ResolveAsync(ctx =>
