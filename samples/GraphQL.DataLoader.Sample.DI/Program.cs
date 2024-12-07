@@ -23,7 +23,7 @@ app.UseGraphQLAltair();
 await using (var scope = app.Services.CreateAsyncScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DealershipDbContext>();
-    await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
-await app.RunAsync().ConfigureAwait(false);
+await app.RunAsync();

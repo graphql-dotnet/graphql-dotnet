@@ -33,15 +33,15 @@ public class DealershipDbContext : DbContext
                 if (await ctx
                         .Set<Salesperson>()
                         .AnyAsync(cancellationToken)
-                        .ConfigureAwait(false))
+                        )
                     return;
                 await ctx
                     .Set<Salesperson>()
                     .AddRangeAsync(_seedSalespeople, cancellationToken)
-                    .ConfigureAwait(false);
+                    ;
                 await ctx
                     .SaveChangesAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                    ;
             });
     }
 

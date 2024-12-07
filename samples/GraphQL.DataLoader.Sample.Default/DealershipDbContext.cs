@@ -1,8 +1,8 @@
-using GraphQL.DataLoader.Di.Sample.Types;
+using GraphQL.DataLoader.DI.Sample.Types;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.Di.Sample;
+namespace GraphQL.DataLoader.DI.Sample;
 
 public class DealershipDbContext : DbContext
 {
@@ -33,13 +33,13 @@ public class DealershipDbContext : DbContext
                 if (await ctx
                         .Set<Salesperson>()
                         .AnyAsync(cancellationToken)
-                        .ConfigureAwait(false))
+                        )
                     return;
                 ctx.Set<Salesperson>()
                     .AddRange(_seedSalespeople);
                 await ctx
                     .SaveChangesAsync(cancellationToken)
-                    .ConfigureAwait(false);
+                    ;
             });
     }
 

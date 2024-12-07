@@ -1,8 +1,8 @@
-using GraphQL.DataLoader.Di.Sample.Types;
+using GraphQL.DataLoader.DI.Sample.Types;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.Di.Sample.GraphQl;
+namespace GraphQL.DataLoader.DI.Sample.GraphQl;
 
 public sealed class SalespersonGraphType : ObjectGraphType<Salesperson>
 {
@@ -16,7 +16,7 @@ public sealed class SalespersonGraphType : ObjectGraphType<Salesperson>
             {
                 var loader = accessor.Context.GetOrAddCollectionBatchLoader<int, Car>("GetCarsBySalespeople", async salesPersonIds =>
                 {
-                    var carsLookup = (await dbContext.Cars.Where(car => salesPersonIds.Contains(car.SalesPersonId)).ToListAsync().ConfigureAwait(false)).ToLookup(car => car.SalesPersonId);
+                    var carsLookup = (await dbContext.Cars.Where(car => salesPersonIds.Contains(car.SalesPersonId)).ToListAsync()).ToLookup(car => car.SalesPersonId);
                     return carsLookup;
                 });
                 return loader.LoadAsync(ctx.Source.Id);

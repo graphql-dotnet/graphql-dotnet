@@ -13,7 +13,7 @@ public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBas
                 => keys
                 .Contains(car.SalesPersonId))
                 .ToListAsync(cancellationToken: cancellationToken)
-                .ConfigureAwait(false))
+                )
                 .ToLookup(car => car.SalesPersonId);
 
 

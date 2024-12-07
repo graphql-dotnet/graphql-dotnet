@@ -1,6 +1,6 @@
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader.Di.Sample.GraphQl;
+namespace GraphQL.DataLoader.DI.Sample.GraphQl;
 
 public class DealershipSchema : Schema
 {

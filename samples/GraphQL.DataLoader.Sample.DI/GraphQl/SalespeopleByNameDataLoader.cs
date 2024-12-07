@@ -12,7 +12,7 @@ public class SalespeopleByNameDataLoader(DealershipDbContext db) : DataLoaderBas
 
         var lookup = await salesmen
             .Where(sm => names.Contains(sm.Name))
-            .ToDictionaryAsync(p => p.Name, cancellationToken).ConfigureAwait(false);
+            .ToDictionaryAsync(p => p.Name, cancellationToken);
 
         foreach (var pair in list)
         {

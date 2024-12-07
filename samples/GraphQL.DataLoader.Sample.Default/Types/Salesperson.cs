@@ -1,4 +1,4 @@
-namespace GraphQL.DataLoader.Di.Sample.Types;
+namespace GraphQL.DataLoader.DI.Sample.Types;
 
 public class Salesperson
 {

@@ -1,6 +1,6 @@
 using GraphQL;
-using GraphQL.DataLoader.Di.Sample;
-using GraphQL.DataLoader.Di.Sample.GraphQl;
+using GraphQL.DataLoader.DI.Sample;
+using GraphQL.DataLoader.DI.Sample.GraphQl;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +23,7 @@ app.UseGraphQLAltair();
 await using (var scope = app.Services.CreateAsyncScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DealershipDbContext>();
-    await dbContext.Database.EnsureCreatedAsync().ConfigureAwait(false);
+    await dbContext.Database.EnsureCreatedAsync();
 }
 
-await app.RunAsync().ConfigureAwait(false);
+await app.RunAsync();
