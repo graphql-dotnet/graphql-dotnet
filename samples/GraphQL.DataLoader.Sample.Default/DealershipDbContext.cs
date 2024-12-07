@@ -35,10 +35,8 @@ public class DealershipDbContext : DbContext
                         .AnyAsync(cancellationToken)
                         .ConfigureAwait(false))
                     return;
-                await ctx
-                    .Set<Salesperson>()
-                    .AddRangeAsync(_seedSalespeople, cancellationToken)
-                    .ConfigureAwait(false);
+                ctx.Set<Salesperson>()
+                    .AddRange(_seedSalespeople);
                 await ctx
                     .SaveChangesAsync(cancellationToken)
                     .ConfigureAwait(false);
