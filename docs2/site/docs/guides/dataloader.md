@@ -3,8 +3,7 @@
 GraphQL.NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader) within the
 [`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader) NuGet package.
 
-Sample projects for the Default Dataloaders described at the Top of this Page and the [DI based DataLoaders](#di-based-data-loaders) can be found in the [GraphQL.Net source repository](https://github.com/graphql-dotnet/graphql-dotnet).
-
+Sample projects demonstrating both default data loaders (as described below on this page) and [DI-based data loaders](#di-based-data-loaders) are available in the [GraphQL.NET source repository](https://github.com/graphql-dotnet/graphql-dotnet/samples). These projects cover examples of data loaders accessed via `IDataLoaderContextAccessor` as well as those implemented using dependency injection (DI).
 
 Consider a GraphQL query like this:
 
