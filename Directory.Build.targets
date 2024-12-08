@@ -14,6 +14,10 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup Condition="$(MSBuildProjectDirectory.StartsWith('$(MSBuildThisFileDirectory)samples\'))">
+    <NoWarn>$(NoWarn);RCS1090</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(SignAssembly)' == 'true'">
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)graphql.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

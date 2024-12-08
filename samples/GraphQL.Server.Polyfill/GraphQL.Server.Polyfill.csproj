@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GraphQL\GraphQL.csproj" />
+    <!-- to simulate GraphQL.Server.Transports.AspNetCore, this project includes references to GraphQL.MicrosoftDI and GraphQL.SystemTextJson for .NET Core 3.1+ -->
+    <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj"/>
   </ItemGroup>
 
 </Project>

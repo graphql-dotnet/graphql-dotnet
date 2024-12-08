@@ -3,6 +3,8 @@
 GraphQL.NET includes an implementation of Facebook's [DataLoader](https://github.com/facebook/dataloader) within the
 [`GraphQL.DataLoader`](https://www.nuget.org/packages/GraphQL.DataLoader) NuGet package.
 
+Sample projects demonstrating both default data loaders (as described below on this page) and [DI-based data loaders](#di-based-data-loaders) are available in the [GraphQL.NET source repository](https://github.com/graphql-dotnet/graphql-dotnet/samples). These projects cover examples of data loaders accessed via `IDataLoaderContextAccessor` as well as those implemented using dependency injection (DI).
+
 Consider a GraphQL query like this:
 
 ```graphql
@@ -30,15 +32,16 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
-1. Register `IDataLoaderContextAccessor` in your IoC container.
-2. Register `DataLoaderDocumentListener` in your IoC container.
+1. Register the DataLoader services
 
 ``` csharp
-services.AddSingleton<IDataLoaderContextAccessor, DataLoaderContextAccessor>();
-services.AddSingleton<DataLoaderDocumentListener>();
+services.AddGraphQL(b => b
+    .AddDataLoader()
+    // other configurations
+);
 ```
 
-3. Hook up your GraphQL schema to your IoC container.
+2. Hook up your GraphQL schema to your IoC container.
 
 ``` csharp
 public class MySchema : Schema
@@ -53,7 +56,7 @@ public class MySchema : Schema
 services.AddSingleton<MySchema>();
 ```
 
-4. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
+3. Add the `DataLoaderDocumentListener` to the `DocumentExecuter`.
 
 ``` csharp
 var listener = Services.GetRequiredService<DataLoaderDocumentListener>();
