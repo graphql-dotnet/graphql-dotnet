@@ -32,7 +32,8 @@ In the example above, a using a DataLoader will allow us to batch together all o
 
 ## Setup
 
-1. Register the Dataloader Services
+1. Register the DataLoader services
+
 ``` csharp
 services.AddGraphQL(b => b
     .AddDataLoader()
