@@ -7,7 +7,7 @@ public sealed class DealershipQuery : ObjectGraphType
 {
     public DealershipQuery()
     {
-        Field<Salesperson>("salespeople", true)
+        Field<Salesperson?>("salesPerson", true)
             .Argument<string>("name")
             .ResolveAsync(ctx =>
             {
