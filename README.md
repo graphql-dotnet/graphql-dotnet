@@ -20,7 +20,7 @@
 |-|-|
 
 
-This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
+This is an implementation of [GraphQL](https://github.com/graphql/graphql-spec) in .NET.
 
 Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the
 [GraphQL Foundation](https://foundation.graphql.org/).
