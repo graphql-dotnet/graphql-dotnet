@@ -8,14 +8,10 @@ public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBas
     protected override async Task FetchAsync(IEnumerable<DataLoaderPair<int, IEnumerable<Car>>> list, CancellationToken cancellationToken)
     {
         var keys = list.Select(pair => pair.Key);
-        var carsLookup =
-            (await db.Cars.Where(car
-                => keys
-                .Contains(car.SalesPersonId))
-                .ToListAsync(cancellationToken: cancellationToken)
-                )
-                .ToLookup(car => car.SalesPersonId);
-
+        var carsLookup = (await db.Cars
+            .Where(car => keys.Contains(car.SalesPersonId))
+            .ToListAsync(cancellationToken: cancellationToken))
+            .ToLookup(car => car.SalesPersonId);
 
         foreach (var pair in list)
         {
