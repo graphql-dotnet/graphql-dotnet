@@ -1,6 +1,7 @@
 using GraphQL;
 using GraphQL.DataLoader.Sample.DI;
-using GraphQL.DataLoader.Sample.DI.GraphQl;
+using GraphQL.DataLoader.Sample.DI.GraphQL;
+using GraphQL.Execution;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddGraphTypes(typeof(CarsGraphType).Assembly)
     .AddSchema<DealershipSchema>()
+    .AddExecutionStrategy<SerialExecutionStrategy>(GraphQLParser.AST.OperationType.Query)
 );
 
 var app = builder.Build();

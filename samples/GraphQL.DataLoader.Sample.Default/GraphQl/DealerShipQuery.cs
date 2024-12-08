@@ -1,17 +1,18 @@
-using GraphQL.DataLoader.DI.Sample.Types;
+using GraphQL.DataLoader.Sample.Default.Types;
 using GraphQL.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.DI.Sample.GraphQl;
+namespace GraphQL.DataLoader.Sample.Default.GraphQL;
 
-public sealed class DealerShipQuery : ObjectGraphType
+public sealed class DealershipQuery : ObjectGraphType
 {
-    public DealerShipQuery(IDataLoaderContextAccessor accessor, DealershipDbContext dbContext)
+    public DealershipQuery(IDataLoaderContextAccessor accessor)
     {
         Field<SalespersonGraphType>("salespeople")
             .Argument<string>("name")
             .Resolve(ctx =>
             {
+                var dbContext = ctx.RequestServices!.GetRequiredService<DealershipDbContext>();
                 var loader = accessor.Context.GetOrAddBatchLoader<string, Salesperson>("GetSalespeopleByName", async names => await dbContext.Salespeople.Where(s => names.Contains(s.Name)).ToDictionaryAsync(sp => sp.Name));
                 return loader.LoadAsync(ctx.GetArgument<string>("name"));
             });

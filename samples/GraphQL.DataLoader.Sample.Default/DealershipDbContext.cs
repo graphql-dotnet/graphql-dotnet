@@ -1,8 +1,8 @@
-using GraphQL.DataLoader.DI.Sample.Types;
+using GraphQL.DataLoader.Sample.Default.Types;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.DI.Sample;
+namespace GraphQL.DataLoader.Sample.Default;
 
 public class DealershipDbContext : DbContext
 {

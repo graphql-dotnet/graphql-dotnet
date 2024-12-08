@@ -6,7 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>false</IsTestProject>
-    <RootNamespace>GraphQL.DataLoader.Di.Sample</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GraphQL.DataLoader\GraphQL.DataLoader.csproj"/>
-    <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj"/>
-    <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj"/>
-    <ProjectReference Include="..\..\src\GraphQL\GraphQL.csproj"/>
     <ProjectReference Include="..\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj"/>
   </ItemGroup>
 

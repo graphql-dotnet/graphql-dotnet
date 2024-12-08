@@ -1,7 +1,7 @@
 using GraphQL.DataLoader.Sample.DI.Types;
 using Microsoft.EntityFrameworkCore;
 
-namespace GraphQL.DataLoader.Sample.DI.GraphQl;
+namespace GraphQL.DataLoader.Sample.DI.GraphQL;
 
 public class CarsBySalespersonDataLoader(DealershipDbContext db) : DataLoaderBase<int, IEnumerable<Car>>
 {

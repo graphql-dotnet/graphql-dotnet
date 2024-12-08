@@ -30,18 +30,10 @@ public class DealershipDbContext : DbContext
             })
             .UseAsyncSeeding(async (ctx, _, cancellationToken) =>
             {
-                if (await ctx
-                        .Set<Salesperson>()
-                        .AnyAsync(cancellationToken)
-                        )
+                if (await ctx.Set<Salesperson>().AnyAsync(cancellationToken))
                     return;
-                await ctx
-                    .Set<Salesperson>()
-                    .AddRangeAsync(_seedSalespeople, cancellationToken)
-                    ;
-                await ctx
-                    .SaveChangesAsync(cancellationToken)
-                    ;
+                ctx.Set<Salesperson>().AddRange(_seedSalespeople);
+                await ctx.SaveChangesAsync(cancellationToken);
             });
     }
 

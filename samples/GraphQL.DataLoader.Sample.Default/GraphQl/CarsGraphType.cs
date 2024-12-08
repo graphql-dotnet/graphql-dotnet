@@ -1,7 +1,7 @@
-using GraphQL.DataLoader.DI.Sample.Types;
+using GraphQL.DataLoader.Sample.Default.Types;
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader.DI.Sample.GraphQl;
+namespace GraphQL.DataLoader.Sample.Default.GraphQL;
 
 public sealed class CarsGraphType : ObjectGraphType<Car>
 {

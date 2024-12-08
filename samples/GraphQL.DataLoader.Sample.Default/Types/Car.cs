@@ -1,4 +1,4 @@
-namespace GraphQL.DataLoader.DI.Sample.Types;
+namespace GraphQL.DataLoader.Sample.Default.Types;
 
 public class Car
 {

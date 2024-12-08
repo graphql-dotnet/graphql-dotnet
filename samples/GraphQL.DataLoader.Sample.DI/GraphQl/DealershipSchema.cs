@@ -1,11 +1,11 @@
 using GraphQL.Types;
 
-namespace GraphQL.DataLoader.Sample.DI.GraphQl;
+namespace GraphQL.DataLoader.Sample.DI.GraphQL;
 
 public class DealershipSchema : Schema
 {
-    public DealershipSchema()
+    public DealershipSchema(DealershipQuery query)
     {
-        Query = new DealerShipQuery();
+        Query = query;
     }
 }
