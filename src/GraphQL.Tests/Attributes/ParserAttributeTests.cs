@@ -16,10 +16,10 @@ public class ParserAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2), "Could not find method 'Parser' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2), "Could not find method 'Parse' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4), "Method 'InvalidMethod' on CLR type 'Class4' must have a return type of object.")]
-    [InlineData(typeof(Class5), "Method 'Parser' on CLR type 'Dummy2' must have a return type of object.")]
+    [InlineData(typeof(Class5), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
     public void method_not_found_arguments(Type clrType, string expectedMessage)
     {
@@ -65,10 +65,10 @@ public class ParserAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2b), "Could not find method 'Parser' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Parse' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a return type of object.")]
-    [InlineData(typeof(Class5b), "Method 'Parser' on CLR type 'Dummy2' must have a return type of object.")]
+    [InlineData(typeof(Class5b), "Method 'Parse' on CLR type 'Dummy2' must have a return type of object.")]
     [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a return type of object.")]
     public void method_not_found_input_fields(Type clrType, string expectedMessage)
     {
@@ -120,15 +120,15 @@ public class ParserAttributeTests
 
     public class Dummy
     {
-        public object Parser(object value) => value; // not static
-        public static void Parser() { } // wrong signature
+        public object Parse(object value) => value; // not static
+        public static void Parse() { } // wrong signature
         public object InvalidMethod(object value) => value; // not static
         public static void InvalidMethod() { } // wrong signature
     }
 
     public class Dummy2
     {
-        public static string Parser(object value) => (string)value;
+        public static string Parse(object value) => (string)value;
         public static string InvalidMethod(object value) => (string)value;
     }
 
@@ -143,6 +143,7 @@ public class ParserAttributeTests
               hello1(value: "abc")
               hello2(value: "def")
               hello3(value: "ghi")
+              hello4(value: "jkl")
             }
             """;
         var expected = """
@@ -150,7 +151,8 @@ public class ParserAttributeTests
               "data": {
                 "hello1": "abctest1",
                 "hello2": "deftest2",
-                "hello3": "ghitest3"
+                "hello3": "ghitest3",
+                "hello4": "jkltest1"
               }
             }
             """;
@@ -168,6 +170,7 @@ public class ParserAttributeTests
         public static string Hello1([Parser(nameof(ParseHelloArgument))] string value) => value;
         public static string Hello2([Parser(typeof(ParserClass))] string value) => value;
         public static string Hello3([Parser(typeof(HelperClass), nameof(HelperClass.ParseHelloArgument))] string value) => value;
+        public static string Hello4([Parser(typeof(ArgTests), nameof(ParseHelloArgument))] string value) => value;
 
         private static object ParseHelloArgument(object value) => (string)value + "test1";
     }
@@ -185,6 +188,9 @@ public class ParserAttributeTests
         queryType.Field<StringGraphType>("hello3")
             .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
             .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
+        queryType.Field<StringGraphType>("hello4")
+            .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
+            .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field4);
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         var query = """
@@ -192,6 +198,7 @@ public class ParserAttributeTests
               hello1(value: { field1: "abc" })
               hello2(value: { field2: "def" })
               hello3(value: { field3: "ghi" })
+              hello4(value: { field4: "jkl" })
             }
             """;
         var expected = """
@@ -199,7 +206,8 @@ public class ParserAttributeTests
               "data": {
                 "hello1": "abctest1",
                 "hello2": "deftest2",
-                "hello3": "ghitest3"
+                "hello3": "ghitest3",
+                "hello4": "jkltest1"
               }
             }
             """;
@@ -220,13 +228,15 @@ public class ParserAttributeTests
         public string? Field2 { get; set; }
         [Parser(typeof(HelperClass), nameof(HelperClass.ParseHelloArgument))]
         public string? Field3 { get; set; }
+        [Parser(typeof(FieldTests), nameof(ParseHelloArgument))]
+        public string? Field4 { get; set; }
 
         private static object ParseHelloArgument(object value) => (string)value + "test1";
     }
 
     public class ParserClass
     {
-        public static object Parser(object value) => (string)value + "test2";
+        public static object Parse(object value) => (string)value + "test2";
     }
 
     public class HelperClass

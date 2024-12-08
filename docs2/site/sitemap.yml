@@ -126,6 +126,14 @@
             file: gql015.md
           - title: GQL016
             file: gql016.md
+          - title: GQL017
+            file: gql017.md
+          - title: GQL018
+            file: gql018.md
+          - title: GQL019
+            file: gql019.md
+          - title: GQL020
+            file: gql020.md
       - title: Migration Guides
         dir: migrations
         items:

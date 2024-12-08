@@ -4,7 +4,9 @@ on:
   pull_request:
     paths:
       - src/**
+      - samples/**
       - .github/workflows/**
+      - '*'
 
 env:
   DOTNET_NOLOGO: true
@@ -24,9 +26,9 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - name: Install dependencies
-        working-directory: src
+        working-directory: .
         run: dotnet restore
       - name: Check formatting
-        working-directory: src
+        working-directory: .
         run: |
-          dotnet format --no-restore --verify-no-changes --severity error --exclude ./GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)
+          dotnet format --no-restore --verify-no-changes --severity error --exclude ./src/GraphQL/obj/**/*.cs || (echo "Run 'dotnet format' to fix issues" && exit 1)

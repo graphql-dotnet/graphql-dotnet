@@ -91,6 +91,14 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter)]
+    public class DefaultAstValueAttribute : GraphQL.GraphQLAttribute
+    {
+        public DefaultAstValueAttribute(string astValue) { }
+        public override void Modify(GraphQL.Types.QueryArgument queryArgument) { }
+        public override void Modify(GraphQL.Utilities.FieldConfig field) { }
+        public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
+    }
     public sealed class DefaultServiceProvider : System.IServiceProvider
     {
         public DefaultServiceProvider() { }
@@ -2855,7 +2863,7 @@ namespace GraphQL.Types
     }
     public class ListGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public ListGraphType(GraphQL.Types.IGraphType? type) { }
+        public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public virtual System.Type? Type { get; }
         public override string ToString() { }
@@ -2863,6 +2871,8 @@ namespace GraphQL.Types
     public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
         where T : GraphQL.Types.IGraphType
     {
+        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) ins" +
+            "tead.")]
         public ListGraphType() { }
         public override System.Type Type { get; }
     }
@@ -2876,7 +2886,7 @@ namespace GraphQL.Types
     }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
-        public NonNullGraphType(GraphQL.Types.IGraphType? type) { }
+        public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
         public virtual System.Type? Type { get; }
         public override string ToString() { }
@@ -2884,6 +2894,8 @@ namespace GraphQL.Types
     public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
         where T : GraphQL.Types.IGraphType
     {
+        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) " +
+            "instead.")]
         public NonNullGraphType() { }
         public override System.Type Type { get; }
     }

@@ -9,10 +9,11 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field)]
 public sealed class ParserAttribute : GraphQLAttribute
 {
+    private const string DEFAULT_METHOD_NAME = "Parse";
+
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
     private readonly Type? _parserType;
     private readonly string _parserMethodName;
-    private readonly bool _includePrivate;
 
     /// <summary>
     /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the specified parser method name.
@@ -25,13 +26,12 @@ public sealed class ParserAttribute : GraphQLAttribute
     {
         _parserMethodName = parserMethodName
             ?? throw new ArgumentNullException(nameof(parserMethodName));
-        _includePrivate = true;
     }
 
     /// <summary>
-    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the 'Parser' method from a specified type.
+    /// Specifies a custom parser method for a field of an input object in a GraphQL schema using the 'Parse' method from a specified type.
     /// The method must exist on the specified type and must be static and public.
-    /// The method must have the signature 'object Parser(object value)'.
+    /// The method must have the signature 'object Parse(object value)'.
     /// </summary>
     public ParserAttribute(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicMethods)]
@@ -39,7 +39,7 @@ public sealed class ParserAttribute : GraphQLAttribute
     {
         _parserType = parserType
             ?? throw new ArgumentNullException(nameof(parserType));
-        _parserMethodName = nameof(FieldType.Parser);
+        _parserMethodName = DEFAULT_METHOD_NAME;
     }
 
     /// <summary>
@@ -62,7 +62,7 @@ public sealed class ParserAttribute : GraphQLAttribute
             return;
         var parserType = _parserType ?? memberInfo.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-        if (_includePrivate)
+        if (parserType == memberInfo.DeclaringType!)
             bindingFlags |= BindingFlags.NonPublic;
 #pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)
@@ -78,7 +78,7 @@ public sealed class ParserAttribute : GraphQLAttribute
     {
         var parserType = _parserType ?? parameterInfo.Member.DeclaringType!;
         var bindingFlags = BindingFlags.Public | BindingFlags.Static;
-        if (_includePrivate)
+        if (parserType == parameterInfo.Member.DeclaringType)
             bindingFlags |= BindingFlags.NonPublic;
 #pragma warning disable IL2075 // UnrecognizedReflectionPattern
         var method = parserType.GetMethod(_parserMethodName, bindingFlags, null, [typeof(object)], null)

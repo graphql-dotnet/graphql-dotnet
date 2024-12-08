@@ -505,7 +505,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <summary>
     /// Coerces input types' default values when those values are <see cref="GraphQLValue"/> nodes.
-    /// This is applicable when the <see cref="SchemaBuilder"/> is used to build the schema.
+    /// This is applicable when the <see cref="SchemaBuilder"/> is used to build the schema
+    /// or when <see cref="DefaultAstValueAttribute"/> applies a default value.
     /// </summary>
     protected virtual void CoerceInputTypeDefaultValues()
     {

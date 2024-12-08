@@ -8,7 +8,9 @@ public static class MemoryCacheGraphQLBuilderExtensions
 {
     /// <summary>
     /// Caches parsed and validated documents in memory. This is useful for reducing the overhead of parsing
-    /// and validating the same document multiple times.
+    /// and validating the same document multiple times. Be sure to call this method before
+    /// <see cref="GraphQLBuilderExtensions.UsePersistedDocuments(IGraphQLBuilder, Action{PersistedDocuments.PersistedDocumentOptions}?)">UsePersistedDocuemnts</see>
+    /// if you are using both to eliminate the need to lookup persisted documents from the persisted document storage for cached document identifiers.
     /// </summary>
     public static IGraphQLBuilder UseMemoryCache(this IGraphQLBuilder builder, Action<MemoryDocumentCacheOptions>? action = null)
      => builder.UseMemoryCache(action == null ? null : (options, _) => action(options));

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Since GraphQL.NET Server resides in another repository, this project serves to serve as a replacement for sample projects within this repository -->
+  <!-- When creating projects based on one of the included samples, replace references to this project with the GraphQL.Server.Transports.AspNetCore NuGet package -->
+  
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- to simulate GraphQL.Server.Transports.AspNetCore, this project includes references to GraphQL.MicrosoftDI and GraphQL.SystemTextJson for .NET Core 3.1+ -->
+    <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj"/>
+  </ItemGroup>
+
+</Project>

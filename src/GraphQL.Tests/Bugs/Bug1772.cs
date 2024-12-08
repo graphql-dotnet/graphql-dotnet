@@ -26,7 +26,6 @@ public class Bug1772 : QueryTestBase<Bug1772Schema>
     }
 
     [Theory]
-    [InlineData("")]
     [InlineData("thirdQuery")]
     [InlineData("query")]
     [InlineData("test")]

@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
@@ -310,6 +311,13 @@ public class DocumentExecuter : IDocumentExecuter
 
         context.ExecutionStrategy = SelectExecutionStrategy(context);
 
+        if (context.ExecutionStrategy is not SerialExecutionStrategy)
+        {
+            // TODO: remove for v9 after ValidationContext has been changed to use concurrent dictionaries -- see issue #4085
+            context.ArgumentValues = context.ArgumentValues == null ? null : new ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>(context.ArgumentValues);
+            context.DirectiveValues = context.DirectiveValues == null ? null : new ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>(context.DirectiveValues);
+        }
+
         return context;
     }
 
@@ -324,7 +332,7 @@ public class DocumentExecuter : IDocumentExecuter
     /// <exception cref="NoOperationError">Thrown when the document does not include any operations.</exception>
     protected virtual GraphQLOperationDefinition GetOperation(string? operationName, GraphQLDocument document)
     {
-        if (operationName == null)
+        if (string.IsNullOrEmpty(operationName))
         {
             GraphQLOperationDefinition? match = null;
             foreach (var def in document.Definitions)
@@ -346,7 +354,7 @@ public class DocumentExecuter : IDocumentExecuter
                 return op;
         }
 
-        throw new InvalidOperationNameError(operationName);
+        throw new InvalidOperationNameError(operationName!);
     }
 
     /// <summary>

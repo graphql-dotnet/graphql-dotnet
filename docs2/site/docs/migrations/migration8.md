@@ -220,7 +220,7 @@ public class OutputClass1
     // use local private static method
     public static string Hello1([Parser(nameof(ParseHelloArgument))] string value) => value;
 
-    // use public static method from another class -- looks for ParserClass.Parser
+    // use public static method from another class -- looks for ParserClass.Parse
     public static string Hello2([Parser(typeof(ParserClass))] string value) => value;
 
     // use public static method from another class with a specific name
@@ -1052,6 +1052,20 @@ Sample persisted document request:
 }
 ```
 
+#### Caching (v8.3.0+)
+
+The persisted document handler does not provide caching by default. You may implement your own caching mechanism
+within the `GetQueryAsync` method to cache the query strings based on the document identifier. Alternatively, you
+may add the `.UseMemoryCache()` method from the `GraphQL.MemoryCache` package to enable in-memory caching. Be sure
+to call `UseMemoryCache` before calling `UsePeristedDocuments` to ensure that the cache is used.
+
+```csharp
+services.AddGraphQL(b => b
+    .UseMemoryCache()
+    .UsePeristedDocuments<MyLoader>(GraphQL.DI.ServiceLifetime.Scoped)
+);
+```
+
 ### 24. Execution timeout support
 
 `ExecutionOptions.Timeout` has been added to allow a maximum time for the execution of a query. If the execution
@@ -1193,6 +1207,38 @@ public interface Character : Node
 The `ExecutionContext` property has been added to the `IResolveFieldContext` interface to allow access to the
 underlying execution context. This is useful for accessing the parsed arguments and directives from the operation
 via `IExecutionContext.GetArguments` and `GetDirectives`.
+
+### 29. `[DefaultAstValue]` attribute added (v8.1 and newer) to set default values for complex types with type-first schemas
+
+When defining an input object or output field argument in a type-first schema, you may now use the `[DefaultAstValue]`
+attribute to specify a default value for the argument. This is useful when the argument is a complex type that cannot
+be represented as a constant via `[DefaultValue]` or in the method signature.
+
+```csharp
+// typical way to set a default value of an input field, which is not possible for complex types
+public class MyInputObject1
+{
+    [DefaultValue("value")]
+    public required string Field1 { get; set; }
+}
+
+// demonstrates setting a default value for an input field that has a complex type
+public class MyInputObject2
+{
+    [DefaultAstValue("{ field1: \"value\" }")]
+    public MyInputObject1 Json { get; set; }
+}
+
+// output type
+public class MyOutputObject
+{
+    // typical way to set a default value of an output field argument
+    public string Field1(string arg = "abc") => arg;
+
+    // demonstrates setting a default value for an output field argument that has a complex type
+    public string Field2([DefaultAstValue("{ field1: \"sample2\" }")] MyInputObject1 arg) => arg.Field1;
+}
+```
 
 ## Breaking Changes
 
@@ -1569,6 +1615,41 @@ To continue to use the `ExecutionHelper.GetArguments` method, you may need to re
 for reference.
 
 If you directly implement `IResolveFieldContext`, you must now also implement the `ExecutionContext` property.
+
+### 30. `GraphType.Initialize` method is now called after initialization is complete
+
+The `Initialize` method on each `GraphType` is now called after the schema has been fully initialized. As such,
+you cannot add fields to the graph type expecting `SchemaTypes` to resolve types and apply name converters.
+If it is necessary for your graph type to add fields dynamically, you should do so in the constructor or else
+set the `ResolvedType` property for the new fields. Failing to do so will result in a schema validation exception.
+
+Please note that the constructor is the preferred place to add fields to a graph type.
+
+```csharp
+// v7
+public class MyGraphType : ObjectGraphType
+{
+    public override void Initialize(ISchema schema)
+    {
+        AddField(new FieldType {
+            Name = "Field",
+            Type = typeof(StringGraphType)
+        });
+    }
+}
+
+// v8
+public class MyGraphType : ObjectGraphType
+{
+    public override void Initialize(ISchema schema)
+    {
+        AddField(new FieldType {
+            Name = "field", // name converter is not applied here, so the name must be exactly as desired
+            ResolvedType = new StringGraphType()
+        });
+    }
+}
+```
 
 ## Appendix
 

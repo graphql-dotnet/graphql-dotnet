@@ -16,10 +16,10 @@ public class ValidatorAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1), "Could not find method 'InvalidMethod' on CLR type 'Class1' while initializing argument 'value'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2), "Could not find method 'Validator' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2), "Could not find method 'Validate' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing argument 'value'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4), "Method 'InvalidMethod' on CLR type 'Class4' must have a void return type.")]
-    [InlineData(typeof(Class5), "Method 'Validator' on CLR type 'Dummy2' must have a void return type.")]
+    [InlineData(typeof(Class5), "Method 'Validate' on CLR type 'Dummy2' must have a void return type.")]
     [InlineData(typeof(Class6), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a void return type.")]
     public void method_not_found_arguments(Type clrType, string expectedMessage)
     {
@@ -65,10 +65,10 @@ public class ValidatorAttributeTests
 
     [Theory]
     [InlineData(typeof(Class1b), "Could not find method 'InvalidMethod' on CLR type 'Class1b' while initializing 'Class1b.Hello'. The method must have a single parameter of type object.")]
-    [InlineData(typeof(Class2b), "Could not find method 'Validator' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
+    [InlineData(typeof(Class2b), "Could not find method 'Validate' on CLR type 'Dummy' while initializing 'Class2b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class3b), "Could not find method 'InvalidMethod' on CLR type 'Dummy' while initializing 'Class3b.Hello'. The method must have a single parameter of type object.")]
     [InlineData(typeof(Class4b), "Method 'InvalidMethod' on CLR type 'Class4b' must have a void return type.")]
-    [InlineData(typeof(Class5b), "Method 'Validator' on CLR type 'Dummy2' must have a void return type.")]
+    [InlineData(typeof(Class5b), "Method 'Validate' on CLR type 'Dummy2' must have a void return type.")]
     [InlineData(typeof(Class6b), "Method 'InvalidMethod' on CLR type 'Dummy2' must have a void return type.")]
     public void method_not_found_input_fields(Type clrType, string expectedMessage)
     {
@@ -120,15 +120,15 @@ public class ValidatorAttributeTests
 
     public class Dummy
     {
-        public void Validator(object value) { _ = value; } // not static
-        public static void Validator() { } // wrong signature
+        public void Validate(object value) { _ = value; } // not static
+        public static void Validate() { } // wrong signature
         public void InvalidMethod(object value) { _ = value; } // not static
         public static void InvalidMethod() { } // wrong signature
     }
 
     public class Dummy2
     {
-        public static string Validator(object value) => (string)value;
+        public static string Validate(object value) => (string)value;
         public static string InvalidMethod(object value) => (string)value;
     }
 
@@ -143,6 +143,7 @@ public class ValidatorAttributeTests
               hello1(value: "abc")
               hello2(value: "def")
               hello3(value: "ghi")
+              hello4(value: "jkl")
             }
             """;
         var expected = """
@@ -187,6 +188,23 @@ public class ValidatorAttributeTests
                   "locations": [
                     {
                       "line": 4,
+                      "column": 17
+                    }
+                  ],
+                  "extensions": {
+                    "code": "INVALID_VALUE",
+                    "codes": [
+                      "INVALID_VALUE",
+                      "INVALID_OPERATION"
+                    ],
+                    "number": "5.6"
+                  }
+                },
+                {
+                  "message": "Invalid value for argument 'value' of field 'hello4'. jklpass1",
+                  "locations": [
+                    {
+                      "line": 5,
                       "column": 17
                     }
                   ],
@@ -216,6 +234,7 @@ public class ValidatorAttributeTests
         public static string Hello1([Validator(nameof(ValidateHelloArgument))] string value) => value;
         public static string Hello2([Validator(typeof(ValidatorClass))] string value) => value;
         public static string Hello3([Validator(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))] string value) => value;
+        public static string Hello4([Validator(typeof(ArgTests), nameof(ValidateHelloArgument))] string value) => value;
 
         private static void ValidateHelloArgument(object value) => throw new InvalidOperationException((string)value + "pass1");
     }
@@ -233,6 +252,9 @@ public class ValidatorAttributeTests
         queryType.Field<StringGraphType>("hello3")
             .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
             .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
+        queryType.Field<StringGraphType>("hello4")
+            .Argument<AutoRegisteringInputObjectGraphType<FieldTests>>("value")
+            .Resolve(ctx => ctx.GetArgument<FieldTests>("value").Field3);
         var schema = new Schema { Query = queryType };
         schema.Initialize();
         var query = """
@@ -240,6 +262,7 @@ public class ValidatorAttributeTests
               hello1(value: { field1: "abc" })
               hello2(value: { field2: "def" })
               hello3(value: { field3: "ghi" })
+              hello4(value: { field4: "jkl" })
             }
             """;
         var expected = """
@@ -284,6 +307,23 @@ public class ValidatorAttributeTests
                   "locations": [
                     {
                       "line": 4,
+                      "column": 27
+                    }
+                  ],
+                  "extensions": {
+                    "code": "INVALID_VALUE",
+                    "codes": [
+                      "INVALID_VALUE",
+                      "INVALID_OPERATION"
+                    ],
+                    "number": "5.6"
+                  }
+                },
+                {
+                  "message": "Invalid value for argument 'value' of field 'hello4'. jklpass1",
+                  "locations": [
+                    {
+                      "line": 5,
                       "column": 27
                     }
                   ],
@@ -316,13 +356,15 @@ public class ValidatorAttributeTests
         public string? Field2 { get; set; }
         [Validator(typeof(HelperClass), nameof(HelperClass.ValidateHelloArgument))]
         public string? Field3 { get; set; }
+        [Validator(typeof(FieldTests), nameof(ValidateHelloArgument))]
+        public string? Field4 { get; set; }
 
         private static void ValidateHelloArgument(object value) => throw new InvalidOperationException((string)value + "pass1");
     }
 
     public class ValidatorClass
     {
-        public static void Validator(object value) => throw new InvalidOperationException((string)value + "pass2");
+        public static void Validate(object value) => throw new InvalidOperationException((string)value + "pass2");
     }
 
     public class HelperClass
