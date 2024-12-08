@@ -10,7 +10,8 @@ builder.Services.AddDbContext<DealershipDbContext>();
 
 builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
-    .AddGraphTypes(typeof(CarsGraphType).Assembly)
+    .AddGraphTypes()
+    .AddClrTypeMappings()
     .AddSchema<DealershipSchema>()
     .AddExecutionStrategy<SerialExecutionStrategy>(GraphQLParser.AST.OperationType.Query)
 );
