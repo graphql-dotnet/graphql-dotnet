@@ -41,7 +41,7 @@ services.AddGraphQL(b => b
 );
 ```
 
-2Hook up your GraphQL schema to your IoC container.
+2. Hook up your GraphQL schema to your IoC container.
 
 ``` csharp
 public class MySchema : Schema
