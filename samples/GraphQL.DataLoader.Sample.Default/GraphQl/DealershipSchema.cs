@@ -4,7 +4,7 @@ namespace GraphQL.DataLoader.Sample.Default.GraphQL;
 
 public class DealershipSchema : Schema
 {
-    public DealershipSchema(DealershipQuery query)
+    public DealershipSchema(IServiceProvider serviceProvider, DealershipQuery query) : base(serviceProvider)
     {
         Query = query;
     }
