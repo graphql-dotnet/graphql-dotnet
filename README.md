@@ -119,16 +119,32 @@ For more information see [DataLoader](https://graphql-dotnet.github.io/docs/guid
 `DocumentExecuter` can handle subscriptions as well as queries and mutations.
 For more information see [Subscriptions](https://graphql-dotnet.github.io/docs/getting-started/subscriptions).
 
-#### 6. Advanced Dependency Injection
+#### 6. Dependency Injection
 
-Also we provide some extra classes for advanced dependency injection usage on top of
-`Microsoft.Extensions.DependencyInjection.Abstractions` package.
+To easily configure GraphQL.NET with the Microsoft dependency injection provider,
+you can use the `GraphQL.MicrosoftDI` package. This package provides a `AddGraphQL`
+extension method to register the necessary services. This package can also be used with
+other dependency injection providers that support the `Microsoft.Extensions.DependencyInjection`
+abstraction such as Autofac, Castle Windsor, and StructureMap.
 
 ```
 > dotnet add package GraphQL.MicrosoftDI
 ```
 
-For more information see [Thread safety with scoped services](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection#thread-safety-with-scoped-services).
+You can then configure GraphQL.NET in your `Startup.cs` file like this:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddGraphQL(b => b
+        .AddSchema<MySchema>()
+        .AddSystemTextJson()
+        .AddDataLoader()
+    );
+}
+```
+
+For more information see [Dependency Injection](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/).
 
 ## Examples
 
