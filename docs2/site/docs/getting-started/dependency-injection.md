@@ -61,11 +61,20 @@ configuration.
 
 The `AddGraphQL()` method will register default implementations of the following services within the dependency injection framework:
 
-* `IDocumentExecuter`
+* `IDocumentExecuter` and `IDocumentExecuter<>`
 * `IDocumentBuilder`
 * `IDocumentValidator`
 * `IErrorInfoProvider`
-* `IExecutionStrategySelector` - which does not support subscriptions by default
+* `IExecutionStrategySelector`
+
+These generic graph types are also registered:
+
+* `EdgeType<>`, `ConnectionType<>`, `ConnectionType<,>` and `PageInfoType`
+* `EnumerationGraphType<>`
+* `InputObjectGraphType<>`
+* `AutoRegisteringInputObjectGraphType<>`
+* `AutoRegisteringObjectGraphType<>`
+* `AutoRegisteringInterfaceGraphType<>`
 
 A list of the available extension methods is below:
 
