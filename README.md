@@ -44,12 +44,12 @@ Note that GitHub requires authentication to consume the feed. See [here](https:/
 
 ## Example Projects and Sibling Repositories
 
-| Project/Route               | Description                                                                                                            |
+| Project / Repository        | Description                                                                                                            |
 |-----------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [GraphQL.Net/Samples](https://github.com/graphql-dotnet/graphql-dotnet)                              | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
-| [GraphQL.Net.Server/Samples](https://github.com/graphql-dotnet/server/tree/master/samples)           | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
-| [Examples/Src](https://github.com/graphql-dotnet/examples/tree/master/src)                           | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
-| [GraphQL.Net.Client/Examples](https://github.com/graphql-dotnet/graphql-client/tree/master/examples) | Example implementations for the GraphQL client library.                                                                               |
+| [GraphQL.Net](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/samples)                  | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
+| [GraphQL.Net Server](https://github.com/graphql-dotnet/server/tree/master/samples)                   | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
+| [Examples](https://github.com/graphql-dotnet/examples/tree/master/src)                               | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
+| [GraphQL.Net Client](https://github.com/graphql-dotnet/graphql-client/tree/master/examples)          | Example implementations for the GraphQL client library.                                                                               |
 
 ## Documentation
 
