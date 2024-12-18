@@ -54,8 +54,9 @@ public sealed class TransitiveInterfaceVisitor : BaseSchemaNodeVisitor
             {
                 foreach (var transitiveInterface in iface.ResolvedInterfaces.List)
                 {
+                    // Ignore circular references (will be caught in SchemaValidationVisitor)
                     if (transitiveInterface == baseType)
-                        throw new InvalidOperationException($"'{baseType.Name}' cannot implement interface '{iface.Name}' because it creates a circular reference.");
+                        continue;
 
                     transitiveInterfaces.Add(transitiveInterface);
                 }

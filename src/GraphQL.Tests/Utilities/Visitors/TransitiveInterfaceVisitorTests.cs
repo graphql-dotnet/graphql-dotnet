@@ -66,7 +66,7 @@ public class TransitiveInterfaceVisitorTests
     }
 
     [Fact]
-    public void Should_Detect_Circular_References()
+    public void Should_Ignore_Circular_References()
     {
         // Arrange
         var schema = new Schema();
@@ -77,13 +77,10 @@ public class TransitiveInterfaceVisitorTests
         interfaceA.AddResolvedInterface(interfaceB);
         interfaceB.AddResolvedInterface(interfaceA);
 
-        var objectType = new ObjectGraphType { Name = "TestObject" };
-        objectType.AddResolvedInterface(interfaceA);
-
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() =>
-            TransitiveInterfaceVisitor.Instance.VisitInterface(interfaceA, schema))
-            .Message.ShouldBe("'A' cannot implement interface 'B' because it creates a circular reference.");
+        TransitiveInterfaceVisitor.Instance.VisitInterface(interfaceA, schema);
+        interfaceA.ResolvedInterfaces.Count.ShouldBe(1);
+        interfaceA.ResolvedInterfaces.ShouldContain(interfaceB);
     }
 
     [Fact]
