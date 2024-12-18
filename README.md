@@ -19,11 +19,13 @@
 | :heavy_dollar_sign: [Get paid for contributing!](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
 |-|-|
 
+This is an implementation of GraphQL, a query language and execution engine originally created
+by Facebook in 2012, in .NET.
 
-This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
-
-Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the
-[GraphQL Foundation](https://foundation.graphql.org/).
+The [GraphQL specification](https://spec.graphql.org/) is now being developed and
+maintained by the [GraphQL Foundation](https://foundation.graphql.org/), established in 2019 to
+support the GraphQL ecosystem. You can also find the specification's source and discussions
+on GitHub at [graphql/graphql-spec](https://github.com/graphql/graphql-spec).
 
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
 by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
