@@ -44,15 +44,6 @@ Provides the following packages:
 You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 Note that GitHub requires authentication to consume the feed. See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
 
-## Example Projects and Sibling Repositories
-
-| Project/Route               | Description                                                                                                            |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [GraphQL.Net/Samples](https://github.com/graphql-dotnet/graphql-dotnet)                              | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
-| [GraphQL.Net.Server/Samples](https://github.com/graphql-dotnet/server/tree/master/samples)           | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
-| [Examples/Src](https://github.com/graphql-dotnet/examples/tree/master/src)                           | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
-| [GraphQL.Net.Client/Examples](https://github.com/graphql-dotnet/graphql-client/tree/master/examples) | Example implementations for the GraphQL client library.                                                                               |
-
 ## Documentation
 
 1. http://graphql-dotnet.github.io - documentation site that is built from the [docs](/docs2/site/) folder in the `master` branch.
@@ -150,9 +141,14 @@ For more information see [Dependency Injection](https://graphql-dotnet.github.io
 
 ## Examples
 
-https://github.com/graphql-dotnet/examples
+| Project / Repository        | Description                                                                                                            |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
+| [GraphQL.Net](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/samples)                  | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
+| [GraphQL.Net Server](https://github.com/graphql-dotnet/server/tree/master/samples)                   | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
+| [Examples](https://github.com/graphql-dotnet/examples/tree/master/src)                               | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
+| [GraphQL.Net Client](https://github.com/graphql-dotnet/graphql-client/tree/master/examples)          | Example implementations for the GraphQL client library.                                                                               |
 
-You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](samples/GraphQL.Harness/GraphQL.Harness.csproj).
 It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
 - [Altair](https://github.com/imolorhe/altair)
 - [Firecamp](https://firecamp.io/graphql/)
