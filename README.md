@@ -162,7 +162,7 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Ahead-of-time compilation
 
-GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows
+GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7+. This allows
 for use within iOS and Android apps, as well as other environments where such features as JIT compilation or
 dynamic code generation are not available. It may be necessary to explicitly instruct the AOT compiler
 to include the .NET types necessary for your schema to operate correctly. Of particular note, your query,
@@ -170,7 +170,7 @@ mutation and subscription types' constructors may be trimmed; register them in y
 Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
 `RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
 demonstration of AOT compilation. Schema-first and type-first schemas have additional limtations and configuration requirements.
-AOT compilation has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
+AOT compilation has not been tested with frameworks other than .NET 7+ on Windows and Linux (e.g. Xamarin).
 
 ## Training
 
@@ -179,8 +179,9 @@ AOT compilation has not been tested with frameworks other than .NET 7 on Windows
 
 ## Upgrade Guides
 
-You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.3/).
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/8.2.1/lib/netstandard2.1/diff/7.9.0/).
 
+* [7.x to 8.x](https://graphql-dotnet.github.io/docs/migrations/migration8)
 * [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)
 * [3.x to 4.x](https://graphql-dotnet.github.io/docs/migrations/migration4)
