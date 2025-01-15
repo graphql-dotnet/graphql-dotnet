@@ -483,13 +483,13 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
     /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
     [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Field<TGraphType, [NotAGraphType] TReturnType>()
+    public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>()
         where TGraphType : IGraphType
         => Field<TGraphType, TReturnType>("default");
 
     /// <inheritdoc cref="Field{TGraphType}(string)"/>
     [Obsolete("Please call Field<TGraphType>(string name) instead. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, object> Field<TGraphType>()
+    public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>()
         where TGraphType : IGraphType
         => Field<TGraphType, object>("default");
 
@@ -498,7 +498,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// </summary>
     /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
     /// <param name="name">The name of the field.</param>
-    public virtual FieldBuilder<TSourceType, object> Field<TGraphType>(string name)
+    public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(string name)
         where TGraphType : IGraphType
         => Field<TGraphType, object>(name);
 
@@ -804,7 +804,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
     [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public ConnectionBuilder<TSourceType> Connection<TNodeType>()
+    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>()
         where TNodeType : IGraphType
     {
         var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
@@ -813,7 +813,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<TNodeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
         where TNodeType : IGraphType
     {
         var builder = ConnectionBuilder.Create<TNodeType, TSourceType>(name);
@@ -833,7 +833,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
     {
@@ -844,7 +844,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
     [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>()
+    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>()
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>
@@ -855,7 +855,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType, TConnectionType>(string name)
+    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>(string name)
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         where TConnectionType : ConnectionType<TNodeType, TEdgeType>

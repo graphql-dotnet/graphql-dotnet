@@ -89,6 +89,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// Create an instance of <see cref="Schema"/> with the <see cref="DefaultServiceProvider"/>, which
     /// uses <see cref="Activator.CreateInstance(Type)"/> to create required objects.
     /// </summary>
+    [RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type's constructor.")]
     public Schema()
         : this(new DefaultServiceProvider())
     {

@@ -237,7 +237,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="description">The description of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name, string? description, Action<QueryArgument>? configure = null)
         where TArgumentGraphType : IGraphType
         => Argument<TArgumentGraphType>(name, arg =>
         {
@@ -255,7 +255,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <param name="defaultValue">The default value of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads to set default value for parameter or use Arguments() method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
         TArgumentType? defaultValue = default, Action<QueryArgument>? configure = null)
         where TArgumentGraphType : IGraphType
         => Argument<TArgumentGraphType>(name, arg =>
@@ -271,7 +271,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
     /// <param name="name">The name of the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType>(string name)
         where TArgumentGraphType : IGraphType
         => Argument<TArgumentGraphType>(name, null);
 
