@@ -19,11 +19,13 @@
 | :heavy_dollar_sign: [Get paid for contributing!](https://github.com/graphql-dotnet/graphql-dotnet/blob/master/BOUNTY.md) :heavy_dollar_sign: | [![GitHub issues by-label](https://img.shields.io/github/issues-raw/graphql-dotnet/graphql-dotnet/bounty?color=blue&label=open%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aopen+is%3Aissue+label%3Abounty) [![GitHub closed issues by-label](https://img.shields.io/github/issues-closed-raw/graphql-dotnet/graphql-dotnet/bounty-paid?color=blue&label=paid%20bounties)](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=is%3Aclosed+is%3Aissue+label%3Abounty-paid)
 |-|-|
 
+This is an implementation of GraphQL, a query language and execution engine originally created
+by Facebook in 2012, in .NET.
 
-This is an implementation of [Facebook's GraphQL](https://github.com/facebook/graphql) in .NET.
-
-Now the [specification](https://github.com/graphql/graphql-spec) is being developed by the
-[GraphQL Foundation](https://foundation.graphql.org/).
+The [GraphQL specification](https://spec.graphql.org/) is now being developed and
+maintained by the [GraphQL Foundation](https://foundation.graphql.org/), established in 2019 to
+support the GraphQL ecosystem. You can also find the specification's source and discussions
+on GitHub at [graphql/graphql-spec](https://github.com/graphql/graphql-spec).
 
 This project uses a [lexer/parser](http://github.com/graphql-dotnet/parser) originally written
 by [Marek Magdziak](https://github.com/mkmarek) and released with a MIT license. Thank you Marek!
@@ -41,15 +43,6 @@ Provides the following packages:
 
 You can get all preview versions from [GitHub Packages](https://github.com/orgs/graphql-dotnet/packages?repo_name=graphql-dotnet).
 Note that GitHub requires authentication to consume the feed. See [here](https://docs.github.com/en/free-pro-team@latest/packages/publishing-and-managing-packages/about-github-packages#authenticating-to-github-packages).
-
-## Example Projects and Sibling Repositories
-
-| Project/Route               | Description                                                                                                            |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
-| [GraphQL.Net/Samples](https://github.com/graphql-dotnet/graphql-dotnet)                              | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
-| [GraphQL.Net.Server/Samples](https://github.com/graphql-dotnet/server/tree/master/samples)           | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
-| [Examples/Src](https://github.com/graphql-dotnet/examples/tree/master/src)                           | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
-| [GraphQL.Net.Client/Examples](https://github.com/graphql-dotnet/graphql-client/tree/master/examples) | Example implementations for the GraphQL client library.                                                                               |
 
 ## Documentation
 
@@ -119,22 +112,43 @@ For more information see [DataLoader](https://graphql-dotnet.github.io/docs/guid
 `DocumentExecuter` can handle subscriptions as well as queries and mutations.
 For more information see [Subscriptions](https://graphql-dotnet.github.io/docs/getting-started/subscriptions).
 
-#### 6. Advanced Dependency Injection
+#### 6. Dependency Injection
 
-Also we provide some extra classes for advanced dependency injection usage on top of
-`Microsoft.Extensions.DependencyInjection.Abstractions` package.
+To easily configure GraphQL.NET with the Microsoft dependency injection provider,
+you can use the `GraphQL.MicrosoftDI` package. This package provides a `AddGraphQL`
+extension method to register the necessary services. This package can also be used with
+other dependency injection providers that support the `Microsoft.Extensions.DependencyInjection`
+abstraction such as Autofac, Castle Windsor, and StructureMap.
 
 ```
 > dotnet add package GraphQL.MicrosoftDI
 ```
 
-For more information see [Thread safety with scoped services](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection#thread-safety-with-scoped-services).
+You can then configure GraphQL.NET in your `Startup.cs` file like this:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddGraphQL(b => b
+        .AddSchema<MySchema>()
+        .AddSystemTextJson()
+        .AddDataLoader()
+    );
+}
+```
+
+For more information see [Dependency Injection](https://graphql-dotnet.github.io/docs/getting-started/dependency-injection/).
 
 ## Examples
 
-https://github.com/graphql-dotnet/examples
+| Project / Repository        | Description                                                                                                            |
+|-----------------------------|------------------------------------------------------------------------------------------------------------------------|
+| [GraphQL.Net](https://github.com/graphql-dotnet/graphql-dotnet/tree/master/samples)                  | Sample projects focused on showcasing features of the core GraphQL library, an implementation of the GraphQL specification.           |
+| [GraphQL.Net Server](https://github.com/graphql-dotnet/server/tree/master/samples)                   | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
+| [Examples](https://github.com/graphql-dotnet/examples/tree/master/src)                               | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
+| [GraphQL.Net Client](https://github.com/graphql-dotnet/graphql-client/tree/master/examples)          | Example implementations for the GraphQL client library.                                                                               |
 
-You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](src/GraphQL.Harness/GraphQL.Harness.csproj).
+You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](samples/GraphQL.Harness/GraphQL.Harness.csproj).
 It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
 - [Altair](https://github.com/imolorhe/altair)
 - [Firecamp](https://firecamp.io/graphql/)
@@ -144,7 +158,7 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 
 ## Ahead-of-time compilation
 
-GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7. This allows
+GraphQL.NET supports ahead-of-time (AOT) compilation for execution of code-first schemas with .NET 7+. This allows
 for use within iOS and Android apps, as well as other environments where such features as JIT compilation or
 dynamic code generation are not available. It may be necessary to explicitly instruct the AOT compiler
 to include the .NET types necessary for your schema to operate correctly. Of particular note, your query,
@@ -152,7 +166,7 @@ mutation and subscription types' constructors may be trimmed; register them in y
 Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
 `RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
 demonstration of AOT compilation. Schema-first and type-first schemas have additional limtations and configuration requirements.
-AOT compilation has not been tested with frameworks other than .NET 7 on Windows and Linux (e.g. Xamarin).
+AOT compilation has not been tested with frameworks other than .NET 7+ on Windows and Linux (e.g. Xamarin).
 
 ## Training
 
@@ -161,8 +175,9 @@ AOT compilation has not been tested with frameworks other than .NET 7 on Windows
 
 ## Upgrade Guides
 
-You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/7.0.0/lib/netstandard2.0/diff/5.3.3/).
+You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/8.2.1/lib/netstandard2.1/diff/7.9.0/).
 
+* [7.x to 8.x](https://graphql-dotnet.github.io/docs/migrations/migration8)
 * [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)
 * [3.x to 4.x](https://graphql-dotnet.github.io/docs/migrations/migration4)

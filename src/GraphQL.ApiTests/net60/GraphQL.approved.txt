@@ -3553,6 +3553,12 @@ namespace GraphQL.Utilities
         public static string QuotedOrList(System.Collections.Generic.IEnumerable<string> items, int maxLength = 5) { }
         public static string[] SuggestionList(string input, System.Collections.Generic.IEnumerable<string>? options) { }
     }
+    public sealed class TransitiveInterfaceVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public static GraphQL.Utilities.TransitiveInterfaceVisitor Instance { get; }
+        public override void VisitInterface(GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObject(GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+    }
     public class TypeConfig : GraphQL.Utilities.MetadataProvider
     {
         public TypeConfig(string name) { }

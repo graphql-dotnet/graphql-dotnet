@@ -494,6 +494,8 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         ParseLinkVisitor.Instance.Run(this);
         // rename any applied directives that were imported from another schema to use the alias defined in the @link directive or the proper namespace
         RenameImportedDirectivesVisitor.Run(this);
+        // add direct references to transitively implemented interfaces
+        TransitiveInterfaceVisitor.Instance.Run(this);
         // run general schema validation code
         SchemaValidationVisitor.Run(this);
         // validate that all applied directives are valid
