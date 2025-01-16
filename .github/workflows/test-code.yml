@@ -48,7 +48,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libicu-dev
+          sudo apt-get install -y libicu70
       - name: Install dependencies
         working-directory: .
         run: dotnet restore
