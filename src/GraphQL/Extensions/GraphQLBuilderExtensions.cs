@@ -119,7 +119,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for both the implementation and service
     /// </summary>
-    private static IServiceRegister RegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+    private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
         where TService : class
         where TImplementation : class, TService
         => services.Register(implementationFactory, serviceLifetime).Register<TService>(implementationFactory, serviceLifetime);
@@ -127,7 +127,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for both the implementation and service
     /// </summary>
-    private static IServiceRegister RegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
+    private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
         where TService : class
         where TImplementation : class, TService
         => services.Register(implementationInstance).Register<TService>(implementationInstance);
@@ -143,7 +143,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for the implementation and TryRegister for the service
     /// </summary>
-    private static IServiceRegister TryRegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
+    private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, Func<IServiceProvider, TImplementation> implementationFactory, ServiceLifetime serviceLifetime)
         where TService : class
         where TImplementation : class, TService
         => services.Register(implementationFactory, serviceLifetime).TryRegister<TService>(implementationFactory, serviceLifetime);
@@ -151,7 +151,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for the implementation and TryRegister for the service
     /// </summary>
-    private static IServiceRegister TryRegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
+    private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, TImplementation implementationInstance)
         where TService : class
         where TImplementation : class, TService
         => services.Register(implementationInstance).TryRegister<TService>(implementationInstance);
