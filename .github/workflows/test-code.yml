@@ -44,11 +44,6 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Install ICU package on Linux # patch for .NET Core 3.1 testing
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libicu70
       - name: Install dependencies
         working-directory: .
         run: dotnet restore
