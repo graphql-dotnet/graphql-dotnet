@@ -6,6 +6,10 @@ namespace GraphQL;
 /// <seealso cref="IServiceProvider" />
 public sealed class DefaultServiceProvider : IServiceProvider
 {
+    /// <inheritdoc cref="DefaultServiceProvider"/>
+    [RequiresUnreferencedCode("This class uses Activator.CreateInstance which requires access to the target type's constructor.")]
+    public DefaultServiceProvider() { }
+
     /// <summary>
     /// Gets an instance of the specified type. Returns <see langword="null"/> for interfaces.
     /// Can not return <see langword="null"/> for classes but may throw exception.
@@ -25,7 +29,9 @@ public sealed class DefaultServiceProvider : IServiceProvider
 
         try
         {
+#pragma warning disable IL2067
             return Activator.CreateInstance(serviceType);
+#pragma warning restore IL2067
         }
         catch (Exception exception)
         {

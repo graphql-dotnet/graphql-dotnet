@@ -111,7 +111,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for both the implementation and service
     /// </summary>
-    private static IServiceRegister RegisterAsBoth<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+    private static IServiceRegister RegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
         where TService : class
         where TImplementation : class, TService
         => services.Register<TImplementation>(serviceLifetime).Register<TService, TImplementation>(serviceLifetime);
@@ -135,7 +135,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Calls Register for the implementation and TryRegister for the service
     /// </summary>
-    private static IServiceRegister TryRegisterAsBoth<TService, TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
+    private static IServiceRegister TryRegisterAsBoth<TService, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TImplementation>(this IServiceRegister services, ServiceLifetime serviceLifetime)
         where TService : class
         where TImplementation : class, TService
         => services.Register<TImplementation>(serviceLifetime).TryRegister<TService, TImplementation>(serviceLifetime);
@@ -167,7 +167,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
     /// memory leak if requested from the root service provider.
     /// </remarks>
-    public static IGraphQLBuilder AddSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+    public static IGraphQLBuilder AddSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TSchema : class, ISchema
     {
         if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
@@ -254,7 +254,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// For instance, unmapped CLR output types can be mapped to <see cref="AutoRegisteringObjectGraphType{TSourceType}"/>
     /// types.
     /// </summary>
-    public static IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddGraphTypeMappingProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphTypeMappingProvider>(this IGraphQLBuilder builder)
         where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
     {
         builder.Services.Register<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton);
@@ -352,7 +352,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Registers <typeparamref name="TDocumentExecuter"/> as a singleton of type <see cref="IDocumentExecuter"/> within the
     /// dependency injection framework.
     /// </summary>
-    public static IGraphQLBuilder AddDocumentExecuter<TDocumentExecuter>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddDocumentExecuter<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDocumentExecuter>(this IGraphQLBuilder builder)
         where TDocumentExecuter : class, IDocumentExecuter
     {
         builder.Services.Register<IDocumentExecuter, TDocumentExecuter>(ServiceLifetime.Singleton);
@@ -443,7 +443,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Registers <typeparamref name="TProvider"/> as a singleton of type <see cref="IErrorInfoProvider"/> within the
     /// dependency injection framework.
     /// </summary>
-    public static IGraphQLBuilder AddErrorInfoProvider<TProvider>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddErrorInfoProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProvider>(this IGraphQLBuilder builder)
         where TProvider : class, IErrorInfoProvider
     {
         builder.Services.Register<IErrorInfoProvider, TProvider>(ServiceLifetime.Singleton);
@@ -607,7 +607,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <remarks>
     /// Do not separately add the document listener to your execution code or the document listener may be registered twice for the same execution.
     /// </remarks>
-    public static IGraphQLBuilder AddDocumentListener<TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+    public static IGraphQLBuilder AddDocumentListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TDocumentListener : class, IDocumentExecutionListener
     {
         builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
@@ -665,7 +665,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="install"/> is <see langword="true"/>, do not separately install the middleware within your schema constructor or the
     /// middleware may be registered twice within the schema.
     /// </remarks>
-    public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    public static IGraphQLBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(this IGraphQLBuilder builder, bool install = true, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         where TMiddleware : class, IFieldMiddleware
     {
         if (serviceLifetime == ServiceLifetime.Scoped)
@@ -693,7 +693,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <remarks>
     /// Do not separately install the middleware within your schema constructor or the middleware may be registered twice within the schema.
     /// </remarks>
-    public static IGraphQLBuilder UseMiddleware<TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    public static IGraphQLBuilder UseMiddleware<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TMiddleware>(this IGraphQLBuilder builder, Func<IServiceProvider, ISchema, bool> installPredicate, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
         where TMiddleware : class, IFieldMiddleware
     {
         if (installPredicate == null)
@@ -832,7 +832,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
 
     /// <inheritdoc cref="ConfigureSchema(IGraphQLBuilder, Action{ISchema})"/>
-    public static IGraphQLBuilder ConfigureSchema<TConfigureSchema>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder ConfigureSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConfigureSchema>(this IGraphQLBuilder builder)
         where TConfigureSchema : class, IConfigureSchema
     {
         builder.Services.TryRegister<IConfigureSchema, TConfigureSchema>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
@@ -871,7 +871,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <summary>
     /// Configures an action that can modify or replace document execution behavior.
     /// </summary>
-    public static IGraphQLBuilder ConfigureExecution<TConfigureExecution>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder ConfigureExecution<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConfigureExecution>(this IGraphQLBuilder builder)
         where TConfigureExecution : class, IConfigureExecution
     {
         builder.Services.TryRegister<IConfigureExecution, TConfigureExecution>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
@@ -907,7 +907,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// If <paramref name="useForCachedDocuments"/> is <see langword="true"/>, do not separately install the validation rule within
     /// your execution code or the validation rule may be run twice for each execution.
     /// </remarks>
-    public static IGraphQLBuilder AddValidationRule<TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+    public static IGraphQLBuilder AddValidationRule<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
         builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(serviceLifetime);
@@ -1022,7 +1022,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Registers <typeparamref name="TExecutionStrategySelector"/> with the dependency injection framework as
     /// a singleton of type <see cref="IExecutionStrategySelector"/>.
     /// </summary>
-    public static IGraphQLBuilder AddExecutionStrategySelector<TExecutionStrategySelector>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddExecutionStrategySelector<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TExecutionStrategySelector>(this IGraphQLBuilder builder)
         where TExecutionStrategySelector : class, IExecutionStrategySelector
     {
         builder.Services.Register<IExecutionStrategySelector, TExecutionStrategySelector>(ServiceLifetime.Singleton);
@@ -1061,7 +1061,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// a singleton, and registers an <see cref="ExecutionStrategyRegistration"/> for this <typeparamref name="TExecutionStrategy"/>
     /// configured for the selected <paramref name="operationType"/>.
     /// </summary>
-    public static IGraphQLBuilder AddExecutionStrategy<TExecutionStrategy>(this IGraphQLBuilder builder, OperationType operationType)
+    public static IGraphQLBuilder AddExecutionStrategy<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TExecutionStrategy>(this IGraphQLBuilder builder, OperationType operationType)
         where TExecutionStrategy : class, IExecutionStrategy
     {
         builder.Services.Register<TExecutionStrategy>(ServiceLifetime.Singleton);
@@ -1141,23 +1141,23 @@ public static class GraphQLBuilderExtensions // TODO: split
         => UseTelemetry<GraphQLTelemetryProvider>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
+    public static IGraphQLBuilder UseTelemetry<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions>? configure = null)
         where TProvider : GraphQLTelemetryProvider
         => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
+    public static IGraphQLBuilder UseTelemetry<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProvider>(this IGraphQLBuilder builder, Action<GraphQLTelemetryOptions, IServiceProvider>? configure)
         where TProvider : GraphQLTelemetryProvider
         => UseTelemetry<TProvider, GraphQLTelemetryOptions>(builder, configure);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions>? configure = null)
+    public static IGraphQLBuilder UseTelemetry<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions>? configure = null)
         where TProvider : GraphQLTelemetryProvider
         where TOptions : GraphQLTelemetryOptions, new()
         => UseTelemetry<TProvider, TOptions>(builder, configure != null ? (opts, _) => configure(opts) : null);
 
     /// <inheritdoc cref="UseTelemetry(IGraphQLBuilder, Action{GraphQLTelemetryOptions}?)"/>
-    public static IGraphQLBuilder UseTelemetry<TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions, IServiceProvider>? configure)
+    public static IGraphQLBuilder UseTelemetry<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TProvider, TOptions>(this IGraphQLBuilder builder, Action<TOptions, IServiceProvider>? configure)
         where TProvider : GraphQLTelemetryProvider
         where TOptions : GraphQLTelemetryOptions, new()
     {
@@ -1262,7 +1262,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// Registers <typeparamref name="TSchemaVisitor"/> with the dependency injection framework as
     /// a singleton and registers <typeparamref name="TSchemaVisitor"/> within the schema configuration.
     /// </summary>
-    public static IGraphQLBuilder AddSchemaVisitor<TSchemaVisitor>(this IGraphQLBuilder builder)
+    public static IGraphQLBuilder AddSchemaVisitor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSchemaVisitor>(this IGraphQLBuilder builder)
         where TSchemaVisitor : class, ISchemaNodeVisitor
     {
         builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
@@ -1305,7 +1305,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// By default, arbitrary queries will be disabled; configure <see cref="PersistedDocumentOptions.AllowOnlyPersistedDocuments"/>
     /// if desired.
     /// </summary>
-    public static IGraphQLBuilder UsePersistedDocuments<TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, Action<PersistedDocumentOptions>? action = null)
+    public static IGraphQLBuilder UsePersistedDocuments<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TLoader>(this IGraphQLBuilder builder, DI.ServiceLifetime serviceLifetime = ServiceLifetime.Singleton, Action<PersistedDocumentOptions>? action = null)
         where TLoader : class, IPersistedDocumentLoader
         => builder.UsePersistedDocuments<TLoader>(serviceLifetime, action == null ? null : (options, _) => action(options));
 

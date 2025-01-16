@@ -17,7 +17,7 @@ internal static class AutoRegisteringInputObjectGraphType
 /// Also it can get descriptions for fields from the XML comments.
 /// Note that now __InputValue has no isDeprecated and deprecationReason fields but in the future they may appear - https://github.com/graphql/graphql-spec/pull/525
 /// </summary>
-public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors)][NotAGraphType] TSourceType> : InputObjectGraphType<TSourceType>
+public class AutoRegisteringInputObjectGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields)][NotAGraphType] TSourceType> : InputObjectGraphType<TSourceType>
 {
     private readonly Expression<Func<TSourceType, object?>>[]? _excludedProperties;
 
