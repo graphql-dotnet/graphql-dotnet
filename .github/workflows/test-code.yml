@@ -44,11 +44,6 @@ jobs:
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - name: Install ICU package on Linux # patch for .NET Core 3.1 testing
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libicu70
       - name: Install dependencies
         working-directory: .
         run: dotnet restore
@@ -143,6 +138,7 @@ jobs:
         run: sudo apt-get install -y jq
       - name: Wait for Sample1 to spin up
         run: |
+          set +e  # disable exit on error
           for i in {1..60}
           do
             echo "Request $i to the URL..."
@@ -154,10 +150,12 @@ jobs:
             echo "Did not receive a 200 response, sleeping for 0.5 second..."
             sleep 0.5
           done
+          set -e  # enable exit on error
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Wait for Sample2 to spin up
         run: |
+          set +e  # disable exit on error
           for i in {1..60}
           do
             echo "Request $i to the URL..."
@@ -169,10 +167,12 @@ jobs:
             echo "Did not receive a 200 response, sleeping for 0.5 second..."
             sleep 0.5
           done
+          set -e  # enable exit on error
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Wait for Sample3 to spin up
         run: |
+          set +e  # disable exit on error
           for i in {1..60}
           do
             echo "Request $i to the URL..."
@@ -184,10 +184,12 @@ jobs:
             echo "Did not receive a 200 response, sleeping for 0.5 second..."
             sleep 0.5
           done
+          set -e  # enable exit on error
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Wait for Sample4 to spin up
         run: |
+          set +e  # disable exit on error
           for i in {1..60}
           do
             echo "Request $i to the URL..."
@@ -199,6 +201,7 @@ jobs:
             echo "Did not receive a 200 response, sleeping for 0.5 second..."
             sleep 0.5
           done
+          set -e  # enable exit on error
           echo "Timed out after 30 seconds, step failed."
           exit 1
       - name: Build supergraph with federation-${{ matrix.federationversion }}-supergraph-config.yaml
