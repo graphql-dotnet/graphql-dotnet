@@ -36,7 +36,7 @@ public static class MicrosoftDIGraphQLBuilderExtensions
     /// Schemas that implement <see cref="IDisposable"/> of a transient lifetime are not supported, as this will cause a
     /// memory leak if requested from the root service provider.
     /// </remarks>
-    public static IGraphQLBuilder AddSelfActivatingSchema<TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
+    public static IGraphQLBuilder AddSelfActivatingSchema<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSchema>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TSchema : class, ISchema
     {
         if (serviceLifetime == ServiceLifetime.Transient && typeof(IDisposable).IsAssignableFrom(typeof(TSchema)))
