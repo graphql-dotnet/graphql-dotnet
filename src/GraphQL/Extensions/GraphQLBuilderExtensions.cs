@@ -509,7 +509,6 @@ public static class GraphQLBuilderExtensions // TODO: split
     /// <see cref="InputObjectGraphType{TSourceType}"/>, <see cref="AutoRegisteringInputObjectGraphType{TSourceType}"/>, and
     /// <see cref="AutoRegisteringObjectGraphType{TSourceType}"/> as generic types.
     /// </summary>
-    [DynamicDependency(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(EnumerationGraphType<DayOfWeek>))]
     public static IGraphQLBuilder AddGraphTypes(this IGraphQLBuilder builder, Assembly assembly)
     {
         // Graph types are always created with the transient lifetime, since they are only instantiated once

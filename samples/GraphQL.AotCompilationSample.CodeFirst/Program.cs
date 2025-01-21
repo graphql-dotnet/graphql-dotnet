@@ -12,12 +12,10 @@ IServiceCollection serviceCollection = new ServiceCollection();
 //   - AddClrTypeMappings
 //   - AddAutoClrMappings
 //   - AddAutoSchema
-//   - AddGraphTypes
 serviceCollection.AddGraphQL(b => b
     .AddSystemTextJson()
-    //.AddSchema<StarWarsSchema>()
-    .AddGraphTypes(typeof(StarWarsSchema).Assembly)
-    .AddSelfActivatingSchema<StarWarsSchema>()
+    .AddSchema<StarWarsSchema>()
+    .AddGraphTypes(typeof(StarWarsSchema).Assembly) //.AddSelfActivatingSchema<StarWarsSchema>()
 );
 
 serviceCollection.AddSingleton<StarWarsData>();

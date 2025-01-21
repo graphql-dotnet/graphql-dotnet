@@ -372,7 +372,6 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypeMappingProvider<TGraphTypeMappingProvider>(this GraphQL.DI.IGraphQLBuilder builder, TGraphTypeMappingProvider instance)
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
-        [System.Diagnostics.CodeAnalysis.DynamicDependency(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor, typeof(GraphQL.Types.EnumerationGraphType<System.DayOfWeek>))]
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
         [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
             "d in v9.")]

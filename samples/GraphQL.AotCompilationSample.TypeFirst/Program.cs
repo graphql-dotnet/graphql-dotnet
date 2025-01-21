@@ -34,6 +34,9 @@ serviceCollection.AddGraphQL(b => b
 #pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 
 serviceCollection.AddSingleton<StarWarsData>();
+// for enumeration types, although the EnumerationGraphType<Episodes> type has been properly rooted, the
+// .NET 8 DI provider will refuse to create open generic types of value types, so they must be registered manually
+serviceCollection.AddTransient<EnumerationGraphType<Episodes>>();
 
 using var services = serviceCollection.BuildServiceProvider();
 
