@@ -16,7 +16,7 @@ IServiceCollection serviceCollection = new ServiceCollection();
 serviceCollection.AddGraphQL(b => b
     .AddSystemTextJson()
     //.AddSchema<StarWarsSchema>()
-    //.AddGraphTypes(typeof(StarWarsSchema).Assembly)
+    .AddGraphTypes(typeof(StarWarsSchema).Assembly)
     .AddSelfActivatingSchema<StarWarsSchema>()
 );
 
