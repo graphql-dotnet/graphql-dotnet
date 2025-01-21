@@ -315,7 +315,6 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.AddSchema(provider => new AutoSchema<TQueryClrType>(provider), ServiceLifetime.Singleton);
         builder.Services.TryRegister<IGraphTypeMappingProvider, AutoRegisteringGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         configure?.Invoke(new ConfigureAutoSchema<TQueryClrType>(builder));
-        builder.AddGenericGraphTypes();
         return builder;
     }
 
@@ -526,13 +525,6 @@ public static class GraphQLBuilderExtensions // TODO: split
             builder.Services.TryRegister(type, type, ServiceLifetime.Transient);
         }
 
-        builder.AddGenericGraphTypes();
-
-        return builder;
-    }
-
-    private static IGraphQLBuilder AddGenericGraphTypes(this IGraphQLBuilder builder)
-    {
         builder.Services.TryRegister(typeof(EnumerationGraphType<>), typeof(EnumerationGraphType<>), ServiceLifetime.Transient);
         builder.Services.TryRegister(typeof(ConnectionType<>), typeof(ConnectionType<>), ServiceLifetime.Transient);
         builder.Services.TryRegister(typeof(ConnectionType<,>), typeof(ConnectionType<,>), ServiceLifetime.Transient);
