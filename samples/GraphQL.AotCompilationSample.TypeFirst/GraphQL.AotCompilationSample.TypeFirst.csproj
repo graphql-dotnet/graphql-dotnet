@@ -8,7 +8,7 @@
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
-    <VerifyOpenGenericServiceTrimmability>false</VerifyOpenGenericServiceTrimmability>
+    <VerifyDependencyInjectionOpenGenericServiceTrimmability>false</VerifyDependencyInjectionOpenGenericServiceTrimmability>
   </PropertyGroup>
 
   <ItemGroup>
