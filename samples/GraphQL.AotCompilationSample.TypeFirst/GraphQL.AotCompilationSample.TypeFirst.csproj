@@ -7,8 +7,17 @@
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
+
+    <!-- GraphQL.NET currently requires this option for serialization to work properly -->
+    <!-- Serialization and deserialization takes place primarily within dedicated JsonConverters and so little reflection is used in practice -->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    
+    <!-- Open generic types of value types cannot be constructed even if they are rooted unless the following non-public option is configured -->
+    <!-- This is necessary for EnumerationGraphType<T> as T is always a value type -->
+    <!-- https://github.com/dotnet/runtime/blob/v8.0.0/docs/workflow/trimming/feature-switches.md -->
+    <!-- https://github.com/dotnet/runtime/blob/v9.0.0/docs/workflow/trimming/feature-switches.md -->
     <VerifyDependencyInjectionOpenGenericServiceTrimmability>false</VerifyDependencyInjectionOpenGenericServiceTrimmability>
+    
   </PropertyGroup>
 
   <ItemGroup>
