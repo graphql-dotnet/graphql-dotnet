@@ -35,9 +35,7 @@ serviceCollection.AddGraphQL(b => b
 
 serviceCollection.AddSingleton<StarWarsData>();
 
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 using var services = serviceCollection.BuildServiceProvider();
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 
