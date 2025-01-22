@@ -12,18 +12,8 @@
     <!-- Serialization and deserialization takes place primarily within dedicated JsonConverters and so little reflection is used in practice -->
     <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
     
-    <DummyVerifyDependencyInjectionOpenGenericServiceTrimmability>false</DummyVerifyDependencyInjectionOpenGenericServiceTrimmability>
-    
   </PropertyGroup>
 
-  <ItemGroup>
-    <!-- Open generic types of value types cannot be constructed even if they are rooted unless the following non-public option is configured -->
-    <!-- This is necessary for EnumerationGraphType<T> as T is always a value type -->
-    <!-- https://github.com/dotnet/runtime/blob/v8.0.0/docs/workflow/trimming/feature-switches.md -->
-    <!-- https://github.com/dotnet/runtime/blob/v9.0.0/docs/workflow/trimming/feature-switches.md -->
-    <RuntimeHostConfigurationOption Include="Microsoft.Extensions.DependencyInjection.VerifyOpenGenericServiceTrimmability" Value="false" Trim="true" />
-  </ItemGroup>
-  
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.*" />

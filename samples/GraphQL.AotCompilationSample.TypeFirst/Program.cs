@@ -26,17 +26,18 @@ serviceCollection.AddGraphQL(b => b
         // For enumeration types, and types not in the GraphQL.StarWars.TypeFirst assembly, manually calling
         // RegisterTypeMapping or AutoRegister will root the proper classes necessary for the schema to work.
         s.RegisterTypeMapping<Episodes, EnumerationGraphType<Episodes>>();
-        s.AutoRegister<Connection<IStarWarsCharacter>>();
+        //s.AutoRegister<Connection<IStarWarsCharacter>>();
         s.AutoRegister<Edge<IStarWarsCharacter>>();
-        s.AutoRegister<PageInfo>();
+        //s.AutoRegister<PageInfo>();
     })
 );
 #pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
 
 serviceCollection.AddSingleton<StarWarsData>();
+
 // for enumeration types, although the EnumerationGraphType<Episodes> type has been properly rooted, the
 // .NET 8 DI provider will refuse to create open generic types of value types, so they must be registered manually
-//serviceCollection.AddTransient<EnumerationGraphType<Episodes>>();
+serviceCollection.AddTransient<EnumerationGraphType<Episodes>>();
 
 using var services = serviceCollection.BuildServiceProvider();
 
