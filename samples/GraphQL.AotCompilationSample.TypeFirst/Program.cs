@@ -26,9 +26,9 @@ serviceCollection.AddGraphQL(b => b
         // For enumeration types, and types not in the GraphQL.StarWars.TypeFirst assembly, manually calling
         // RegisterTypeMapping or AutoRegister will root the proper classes necessary for the schema to work.
         s.RegisterTypeMapping<Episodes, EnumerationGraphType<Episodes>>();
-        //s.AutoRegister<Connection<IStarWarsCharacter>>();
+        s.AutoRegister<Connection<IStarWarsCharacter>>();
         s.AutoRegister<Edge<IStarWarsCharacter>>();
-        //s.AutoRegister<PageInfo>();
+        s.AutoRegister<PageInfo>();
     })
 );
 #pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
