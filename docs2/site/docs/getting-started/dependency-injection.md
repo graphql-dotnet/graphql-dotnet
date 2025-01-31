@@ -365,7 +365,7 @@ public class MyGraphType : ObjectGraphType<Category>
             .Resolve()
             .WithScope() // creates a service scope as described above; not necessary for serial execution
             .WithService<MyDbContext>()
-            .ResolveAsync((context, db) => db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync());
+            .ResolveAsync(async (context, db) => await db.Products.Where(x => x.CategoryId == context.Source.Id).ToListAsync());
     }
 }
 ```
