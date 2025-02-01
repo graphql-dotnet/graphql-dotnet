@@ -33,9 +33,7 @@ serviceCollection.AddTransient<StarWarsMutation>();
 // - field builders that do not include a resolver such as Field<StringGraphType>("Name") are not supported
 // - strongly recommend each field has the explicit graph type specified and a resolver specified
 
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 using var services = serviceCollection.BuildServiceProvider();
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 

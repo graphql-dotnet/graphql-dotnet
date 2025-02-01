@@ -35,9 +35,11 @@ serviceCollection.AddGraphQL(b => b
 
 serviceCollection.AddSingleton<StarWarsData>();
 
-#pragma warning disable IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
+// for enumeration types, although the EnumerationGraphType<Episodes> type has been properly rooted, the
+// .NET 8 DI provider will refuse to create open generic types of value types, so they must be registered manually
+serviceCollection.AddTransient<EnumerationGraphType<Episodes>>();
+
 using var services = serviceCollection.BuildServiceProvider();
-#pragma warning restore IL3050 // Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.
 
 var executer = services.GetRequiredService<IDocumentExecuter>();
 

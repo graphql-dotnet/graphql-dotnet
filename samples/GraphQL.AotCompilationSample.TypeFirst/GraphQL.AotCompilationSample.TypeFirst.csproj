@@ -2,16 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
+
+    <!-- GraphQL.NET currently requires this option for serialization to work properly -->
+    <!-- Serialization and deserialization takes place primarily within dedicated JsonConverters and so little reflection is used in practice -->
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+    
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.*" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.*" />
   </ItemGroup>
 
   <ItemGroup>
