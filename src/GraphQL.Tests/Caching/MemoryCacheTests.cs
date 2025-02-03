@@ -1,4 +1,5 @@
 using GraphQL.Caching;
+using GraphQL.Types;
 using GraphQLParser.AST;
 using Moq;
 using Moq.Protected;
@@ -193,5 +194,61 @@ public class MemoryCacheTests
 
         memoryDocumentCacheMock.Protected().Verify("GetAsync", getCalled ? Times.Once() : Times.Never(), ItExpr.IsAny<ExecutionOptions>());
         memoryDocumentCacheMock.Protected().Verify("SetAsync", setCalled ? Times.Once() : Times.Never(), ItExpr.IsAny<ExecutionOptions>(), ItExpr.IsAny<GraphQLDocument>());
+    }
+
+    [Theory]
+    [InlineData("schema1", "query1", "schema1", "query1", true)]
+    [InlineData("schema1", "query1", "schema2", "query1", false)]
+    [InlineData("schema2", "query2", "schema2", "query2", true)]
+    [InlineData("schema2", "query2", "schema1", "query2", false)]
+    [InlineData("schema1", "query1", "schema2", "query2", false)]
+    public async Task Validate_Query_Cached_Per_Schema(
+        string cacheSchema,
+        string cacheQuery,
+        string retrieveSchema,
+        string retrieveQuery,
+        bool expectCached)
+    {
+        // Arrange
+        var schemas = new Dictionary<string, ISchema>
+        {
+            { "schema1", new Schema { Description = "schema1" } },
+            { "schema2", new Schema { Description = "schema2" } }
+        };
+
+        var document = new GraphQLDocument(new());
+        var cacheOptions = new ExecutionOptions
+        {
+            Schema = schemas[cacheSchema],
+            Query = cacheQuery
+        };
+
+        var retrieveOptions = new ExecutionOptions
+        {
+            Schema = schemas[retrieveSchema],
+            Query = retrieveQuery
+        };
+        var memoryCache = new MyMemoryDocumentCache();
+
+        // Act
+        var initialDocument = await memoryCache.GetAsyncPublic(retrieveOptions);
+
+        if (cacheQuery != null)
+        {
+            await memoryCache.SetAsyncPublic(cacheOptions, document);
+        }
+
+        var cachedDocument = await memoryCache.GetAsyncPublic(retrieveOptions);
+
+        // Assert
+        initialDocument.ShouldBeNull();
+        if (expectCached)
+        {
+            cachedDocument.ShouldBe(document);
+        }
+        else
+        {
+            cachedDocument.ShouldBeNull();
+        }
     }
 }

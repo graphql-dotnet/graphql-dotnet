@@ -1,5 +1,6 @@
 using GraphQL.DI;
 using GraphQL.PersistedDocuments;
+using GraphQL.Types;
 using GraphQL.Validation;
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
@@ -170,11 +171,13 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
 
     private record class CacheItem
     {
+        public ISchema? Schema { get; }
         public string? Query { get; }
         public string? DocumentId { get; }
 
         public CacheItem(ExecutionOptions options)
         {
+            Schema = options.Schema;
             // cache based on the document id if present, or the query if not, but not both
             Query = options.DocumentId != null ? null : options.Query;
             DocumentId = options.DocumentId;
