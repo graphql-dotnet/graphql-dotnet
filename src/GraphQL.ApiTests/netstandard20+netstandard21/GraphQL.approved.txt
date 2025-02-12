@@ -252,6 +252,11 @@ namespace GraphQL
     {
         public static GraphQL.DI.IGraphQLBuilder AddFederation(this GraphQL.DI.IGraphQLBuilder builder, string version, System.Action<GraphQL.Utilities.LinkConfiguration>? configureLinkDirective = null) { }
     }
+    public static class FieldExtensions
+    {
+        public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter graphType)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+    }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {

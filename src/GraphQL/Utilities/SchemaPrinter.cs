@@ -391,6 +391,8 @@ public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
         foreach (var field in input.Fields.OrderBy(Options.Comparer?.FieldComparer(input)))
         {
             string propertyName = field.GetMetadata<string>(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? field.Name;
+            if (propertyName == InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME)
+                continue;
 
             // if 'value' is stored as a dictionary of key/value pairs, pull the field value from the dictionary by the property name
             object? propertyValue;
