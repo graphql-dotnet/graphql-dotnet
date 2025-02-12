@@ -41,12 +41,12 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
 
     /// <summary>
     /// Initializes a new instance with the specified memory cache and options.
-    /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(ExecutionOptions)"/>, the sliding expiration
-    /// time specified within <paramref name="options"/> can be ignored.
+    /// Note that by overriding <see cref="GetMemoryCacheEntryOptions(ExecutionOptions, GraphQLDocument)"/>,
+    /// the sliding expiration time specified within <paramref name="options"/> can be ignored.
     /// </summary>
     /// <param name="memoryCache">The memory cache instance to use.</param>
     /// <param name="disposeMemoryCache">Indicates if the memory cache is disposed when this instance is disposed.</param>
-    /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(ExecutionOptions)"/>; optional.</param>
+    /// <param name="options">Provides option values for use by <see cref="GetMemoryCacheEntryOptions(ExecutionOptions, GraphQLDocument)"/>; optional.</param>
     protected MemoryDocumentCache(IMemoryCache memoryCache, bool disposeMemoryCache, IOptions<MemoryDocumentCacheOptions> options)
     {
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
@@ -55,13 +55,13 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     }
 
     /// <summary>
-    /// Returns a <see cref="MemoryCacheEntryOptions"/> instance for the specified query.
+    /// Returns a <see cref="MemoryCacheEntryOptions"/> instance for the specified document.
     /// Defaults to setting the <see cref="MemoryCacheEntryOptions.SlidingExpiration"/> value as specified
-    /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the query.
+    /// in options, and the <see cref="MemoryCacheEntryOptions.Size"/> value to the length of the document's source.
     /// </summary>
     protected virtual MemoryCacheEntryOptions GetMemoryCacheEntryOptions(ExecutionOptions options, GraphQLDocument document)
     {
-        // use the length of the Query property if it is present
+        // If the ExecutionOptions contains a query, use the obsolete method.
         if (options.Query != null)
         {
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -97,12 +97,42 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     }
 
     /// <summary>
+    /// Gets the cache key for the current <see cref="ExecutionOptions"/>.
+    /// The key is a <see cref="CacheItem"/> record that always contains the query (or document id)
+    /// plus an extra property computed via the delegate supplied in options.
+    /// </summary>
+    private CacheItem GetCacheKey(ExecutionOptions options)
+    {
+        // Compute the extra value via the delegate. By default, this returns the schema.
+        var selector = _options.AdditionalCacheKeySelector
+            ?? DefaultSelector;
+        var extra = selector.Invoke(options);
+        return new CacheItem(options, extra);
+
+        static object? DefaultSelector(ExecutionOptions options)
+        {
+            // pull the schema; omit the selector if the schema is not present
+            var schema = options.Schema;
+            if (schema == null)
+                return null;
+
+            // for schema-first or manually created schemas, return the schema instance
+            var schemaType = schema.GetType();
+            if (schemaType == typeof(Schema))
+                return schema;
+
+            // for code-first and type-first schemas, return the schema type, thus supporting scoped schemas
+            return schemaType;
+        }
+    }
+
+    /// <summary>
     /// Gets a document in the cache. Must be thread-safe.
     /// </summary>
     /// <param name="options"><see cref="ExecutionOptions"/></param>
     /// <returns>The cached document object. Returns <see langword="null"/> if no entry is found.</returns>
     protected virtual ValueTask<GraphQLDocument?> GetAsync(ExecutionOptions options) =>
-        new(_memoryCache.TryGetValue<GraphQLDocument>(new CacheItem(options), out var value) ? value : null);
+        new(_memoryCache.TryGetValue<GraphQLDocument>(GetCacheKey(options), out var value) ? value : null);
 
     /// <summary>
     /// Sets a document in the cache. Must be thread-safe.
@@ -116,14 +146,14 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
             throw new ArgumentNullException(nameof(value));
         }
 
-        _memoryCache.Set(new CacheItem(options), value, GetMemoryCacheEntryOptions(options, value));
+        _memoryCache.Set(GetCacheKey(options), value, GetMemoryCacheEntryOptions(options, value));
 
         return default;
     }
 
     /// <summary>
-    /// Create <see cref="ExecutionResult"/> with provided error.
-    /// Override this method to change the provided error responses.
+    /// Creates an <see cref="ExecutionResult"/> containing the provided error.
+    /// Override this method to change the error response.
     /// </summary>
     protected virtual ExecutionResult CreateExecutionResult(ExecutionError error) => new(error);
 
@@ -132,29 +162,27 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     {
         if (options.Document == null && (options.Query != null || options.DocumentId != null))
         {
-            // ensure that both documentId and query are not provided
+            // Ensure that both documentId and query are not provided.
             if (options.DocumentId != null && options.Query != null)
                 return CreateExecutionResult(new InvalidRequestError());
 
             var document = await GetAsync(options).ConfigureAwait(false);
-            if (document != null) // already in cache
+            if (document != null) // Cache hit.
             {
                 options.Document = document;
-                // none of the default validation rules yet are dependent on the inputs, and the
-                // operation name is not passed to the document validator, so any successfully cached
-                // document should not need any validation rules run on it
+                // None of the default validation rules are dependent on the inputs; thus,
+                // a successfully cached document should not need additional validation.
                 options.ValidationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
             }
 
             var result = await next(options).ConfigureAwait(false);
 
-            if (result.Executed && // that is, validation was successful
-                document == null && // cache miss
+            if (result.Executed && // Validation succeeded.
+                document == null && // Cache miss.
                 result.Document != null)
             {
-                // note: at this point, the persisted document handler may have set Query, in which case both Query and
-                //   DocumentId will be set, and we will cache based on the documentId only
-                // but if only Query was initially provided, it will still be the only property set
+                // Note: At this point, the persisted document handler may have set Query.
+                // In that case, both Query and DocumentId are set and caching is based on DocumentId only.
                 await SetAsync(options, result.Document).ConfigureAwait(false);
             }
 
@@ -169,18 +197,19 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
     /// <inheritdoc/>
     public virtual float SortOrder => 200;
 
+    // Private cache key type that includes the query (or document id) plus an extra value.
     private record class CacheItem
     {
-        public ISchema? Schema { get; }
         public string? Query { get; }
         public string? DocumentId { get; }
+        public object? Extra { get; }
 
-        public CacheItem(ExecutionOptions options)
+        public CacheItem(ExecutionOptions options, object? extra)
         {
-            Schema = options.Schema;
-            // cache based on the document id if present, or the query if not, but not both
+            // Cache based on the document id if present, or the query if not.
             Query = options.DocumentId != null ? null : options.Query;
             DocumentId = options.DocumentId;
+            Extra = extra;
         }
     }
 }

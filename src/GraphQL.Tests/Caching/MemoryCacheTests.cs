@@ -1,6 +1,8 @@
 using GraphQL.Caching;
+using GraphQL.StarWars;
 using GraphQL.Types;
 using GraphQLParser.AST;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Moq.Protected;
 
@@ -202,6 +204,10 @@ public class MemoryCacheTests
     [InlineData("schema2", "query2", "schema2", "query2", true)]
     [InlineData("schema2", "query2", "schema1", "query2", false)]
     [InlineData("schema1", "query1", "schema2", "query2", false)]
+    [InlineData("starwars1", "query1", "starwars1", "query1", true)]
+    [InlineData("starwars1", "query1", "starwars1", "query2", false)]
+    [InlineData("starwars1", "query1", "starwars2", "query1", true)]
+    [InlineData("starwars1", "query1", "starwars2", "query2", false)]
     public async Task Validate_Query_Cached_Per_Schema(
         string cacheSchema,
         string cacheQuery,
@@ -209,11 +215,18 @@ public class MemoryCacheTests
         string retrieveQuery,
         bool expectCached)
     {
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddTransient<StarWarsQuery>();
+        serviceCollection.AddTransient<StarWarsMutation>();
+        serviceCollection.AddTransient<StarWarsData>();
+        using var serviceProvider = serviceCollection.BuildServiceProvider();
         // Arrange
         var schemas = new Dictionary<string, ISchema>
         {
             { "schema1", new Schema { Description = "schema1" } },
-            { "schema2", new Schema { Description = "schema2" } }
+            { "schema2", new Schema { Description = "schema2" } },
+            { "starwars1", new StarWarsSchema(serviceProvider) },
+            { "starwars2", new StarWarsSchema(serviceProvider) }
         };
 
         var document = new GraphQLDocument(new());

@@ -22,5 +22,12 @@ public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDoc
     /// </summary>
     public TimeSpan? SlidingExpiration { get; set; }
 
+    /// <summary>
+    /// A delegate that supplies an extra value to be included in the cache key.
+    /// By default, this returns the <see cref="ExecutionOptions.Schema"/>. You can override
+    /// this behavior to incorporate additional uniqueness.
+    /// </summary>
+    public Func<ExecutionOptions, object?>? AdditionalCacheKeySelector { get; set; }
+
     MemoryDocumentCacheOptions IOptions<MemoryDocumentCacheOptions>.Value => this;
 }
