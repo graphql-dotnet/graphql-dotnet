@@ -24,8 +24,9 @@ public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDoc
 
     /// <summary>
     /// A delegate that supplies an extra value to be included in the cache key.
-    /// By default, this returns the <see cref="ExecutionOptions.Schema"/>. You can override
-    /// this behavior to incorporate additional uniqueness.
+    /// When not configured, the extra value is computed from <see cref="ExecutionOptions.Schema"/> as follows:
+    /// The schema instance is used for schema-first and dynamic schemas (when the type <see cref="Types.Schema"/>),
+    /// and the schema type is used for type-first and code-first schemas (when the type is derived from <see cref="Types.Schema"/>).
     /// </summary>
     public Func<ExecutionOptions, object?>? AdditionalCacheKeySelector { get; set; }
 
