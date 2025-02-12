@@ -160,6 +160,36 @@ public partial class InputGraphTypeAnalyzerTests
     }
 
     [Fact]
+    public async Task NoClrMapping_NoDiagnostics()
+    {
+        const string source =
+           """
+              using GraphQL;
+              using GraphQL.Types;
+
+              namespace Sample.Server;
+
+              public class PersonInputType : InputObjectGraphType<Person>
+              {
+                  public PersonInputType()
+                  {
+                      Field<NonNullGraphType<StringGraphType>>("firstName").NoClrMapping();
+                      this.Field<NonNullGraphType<StringGraphType>>("lastName").NoClrMapping();
+                      Field(x => x.Age);
+                  }
+              }
+
+              public class Person
+              {
+                  public string FullName { get; set; } = string.Empty;
+                  public int Age { get; set; }
+              }
+              """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source, DiagnosticResult.EmptyDiagnosticResults);
+    }
+
+    [Fact]
     public async Task DefaultConstructor_GQL006()
     {
         const string source =
