@@ -213,7 +213,7 @@ jobs:
       - name: Download router for federation 1
         if: matrix.federationversion == 1
         working-directory: samples/Federation
-        run: curl -sSL https://router.apollo.dev/download/nix/1.59.0 | sh
+        run: curl -sSL https://router.apollo.dev/download/nix/v1.59.0 | sh
       - name: Download router for federation 2
         if: matrix.federationversion == 2
         working-directory: samples/Federation
