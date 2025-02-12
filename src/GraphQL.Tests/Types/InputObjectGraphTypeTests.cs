@@ -1,6 +1,7 @@
 #nullable enable
 
 using GraphQL.Types;
+using GraphQLParser.AST;
 
 namespace GraphQL.Tests.Types;
 
@@ -286,5 +287,97 @@ public class InputObjectGraphTypeTests
     private class Class3
     {
         public int Id { get; set; }
+    }
+
+    /// <summary>
+    /// CLR type with a single property that is intended to be mapped.
+    /// </summary>
+    public class TestInput
+    {
+        public string? Mapped { get; set; }
+    }
+
+    /// <summary>
+    /// An input graph type for <see cref="TestInput"/> that defines two fields.
+    /// The "mapped" field is bound to the CLR property, whereas the "skipped" field is
+    /// marked with NoClrMapping so that its value is ignored when constructing the CLR object.
+    /// </summary>
+    public class TestInputGraphType : InputObjectGraphType<TestInput>
+    {
+        public TestInputGraphType()
+        {
+            Name = "TestInput";
+
+            // This field is automatically mapped to TestInput.Mapped.
+            Field("mapped", x => x.Mapped);
+
+            // This field is defined on the graph type but is marked to skip CLR mapping.
+            // Its value will be available during query execution (if needed) but will not be used
+            // when constructing the CLR instance via ParseDictionary.
+            Field<StringGraphType>("skipped").NoClrMapping();
+
+            // Manually initialize the graph type.
+            foreach (var field in Fields)
+                field.ResolvedType = new StringGraphType();
+        }
+    }
+
+    /// <summary>
+    /// Verifies that when both a mapped field and a no-CLR-mapping field are present in the input,
+    /// only the mapped field is used to populate the CLR object.
+    /// </summary>
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ParseDictionary_PopulatesMappedFieldAndSkipsNoClrMappingField(bool compiled)
+    {
+        // Arrange
+        var inputData = new Dictionary<string, object?>
+        {
+            { "mapped", "mappedValue" },
+            { "skipped", "skippedValue" }
+        };
+        var inputType = new TestInputGraphType();
+        if (compiled)
+            inputType.Initialize(null!);
+
+        // Act: Parse the input dictionary into a CLR object.
+        var result = inputType.ParseDictionary(inputData) as TestInput;
+
+        // Assert
+        result.ShouldNotBeNull();
+        result.Mapped.ShouldBe("mappedValue");
+        // There is no CLR property for "skipped", so its value is correctly ignored.
+    }
+
+    /// <summary>
+    /// Verifies that IsValidDefault and ToAST skips fields marked with NoClrMapping.
+    /// </summary>
+    [Fact]
+    public void IsValidDefaultAndToAST_SkipsNoClrMappingField()
+    {
+        // Arrange: create a CLR instance with the mapped property set.
+        var clrObject = new TestInput
+        {
+            Mapped = "defaultMapped"
+        };
+        var inputType = new TestInputGraphType();
+
+        // Act & Assert: Validate that the default CLR object is considered valid.
+        inputType.IsValidDefault(clrObject).ShouldBeTrue();
+
+        // Act: Convert the CLR object to an AST representation.
+        var ast = inputType.ToAST(clrObject);
+
+        // Assert: The resulting AST should be an GraphQLObjectValue containing only the "mapped" field.
+        var objValue = ast.ShouldBeOfType<GraphQLObjectValue>();
+        objValue.Fields.ShouldNotBeNull().Count.ShouldBe(1);
+
+        var field = objValue.Fields.First();
+        field.Name.StringValue.ShouldBe("mapped");
+
+        // The field value should be a StringValue with the value "defaultMapped".
+        var stringValue = field.Value.ShouldBeOfType<GraphQLStringValue>();
+        stringValue.Value.ShouldBe("defaultMapped");
     }
 }

@@ -13,6 +13,7 @@ namespace GraphQL.Types;
 public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType, IComplexGraphType
 {
     internal const string ORIGINAL_EXPRESSION_PROPERTY_NAME = nameof(ORIGINAL_EXPRESSION_PROPERTY_NAME);
+    internal const string SKIP_EXPRESSION_VALUE_NAME = "-- skip --"; // CLR names cannot contain spaces
 
     /// <inheritdoc/>
     protected ComplexGraphType()
