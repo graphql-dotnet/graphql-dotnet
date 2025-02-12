@@ -138,7 +138,10 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
 
         foreach (var field in Fields)
         {
-            if (!field.ResolvedType!.IsValidDefault(GetFieldValue(field, value)))
+            var (fieldValue, skip) = GetFieldValue(field, value);
+            if (skip)
+                continue;
+            if (!field.ResolvedType!.IsValidDefault(fieldValue))
                 return false;
         }
 
@@ -170,23 +173,28 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
 
         foreach (var field in Fields)
         {
-            var fieldValue = field.ResolvedType!.ToAST(GetFieldValue(field, value));
-            if (fieldValue is not GraphQLNullValue)
+            var (fieldValue, skip) = GetFieldValue(field, value);
+            if (skip)
+                continue;
+            var fieldValueAst = field.ResolvedType!.ToAST(fieldValue);
+            if (fieldValueAst is not GraphQLNullValue)
             {
-                objectValue.Fields.Add(new GraphQLObjectField(new GraphQLName(field.Name), fieldValue));
+                objectValue.Fields.Add(new GraphQLObjectField(new GraphQLName(field.Name), fieldValueAst));
             }
         }
 
         return objectValue;
     }
 
-    private static object? GetFieldValue(FieldType field, object? value)
+    private static (object? Value, bool Skip) GetFieldValue(FieldType field, object? value)
     {
         if (value == null)
-            return null;
+            return (null, false);
 
         // Given Field("FirstName", x => x.FName) and key == "FirstName" returns "FName"
         string propertyName = field.GetMetadata(ComplexGraphType<object>.ORIGINAL_EXPRESSION_PROPERTY_NAME, field.Name) ?? field.Name;
+        if (propertyName == InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME)
+            return (null, true);
         PropertyInfo? propertyInfo;
         try
         {
@@ -197,8 +205,8 @@ public class InputObjectGraphType<[NotAGraphType][DynamicallyAccessedMembers(Dyn
             propertyInfo = value.GetType().GetProperty(propertyName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
         }
 
-        return propertyInfo?.CanRead == true
+        return (propertyInfo?.CanRead == true
             ? propertyInfo.GetValue(value)
-            : null;
+            : null, false);
     }
 }

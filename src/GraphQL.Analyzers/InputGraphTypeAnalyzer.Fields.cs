@@ -47,6 +47,13 @@ public partial class InputGraphTypeAnalyzer
 
         foreach (var fieldInvocationExpression in GetDeclaredFields(inputObjectDeclarationSyntax))
         {
+            // don't analyze fields marked with NoClrMapping
+            var noClrMapping = (fieldInvocationExpression.Parent as ExpressionSyntax)
+                ?.FindMethodInvocationExpression(Constants.MethodNames.NoClrMapping);
+
+            if (noClrMapping != null)
+                continue;
+
             var nameArg = fieldInvocationExpression
                 .GetMethodArgument(Constants.ArgumentNames.Name, context.SemanticModel)
                 ?.Expression;

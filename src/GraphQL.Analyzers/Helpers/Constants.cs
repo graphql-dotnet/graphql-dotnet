@@ -48,6 +48,7 @@ public static class Constants
         public const string FieldSubscribe = "FieldSubscribe";
         public const string FieldSubscribeAsync = "FieldSubscribeAsync";
         public const string Name = "Name";
+        public const string NoClrMapping = "NoClrMapping";
         public const string ParseDictionary = "ParseDictionary";
         public const string Resolve = "Resolve";
         public const string ResolveAsync = "ResolveAsync";

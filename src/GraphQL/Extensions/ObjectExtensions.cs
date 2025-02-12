@@ -181,11 +181,17 @@ public static partial class ObjectExtensions
     {
         // gather for each field: dictionary key, clr property name, and graph type
         var fields = new (string Key, string? MemberName, IGraphType ResolvedType)[graphType.Fields.Count];
+        int skippedCount = 0;
         for (var i = 0; i < graphType.Fields.Count; i++)
         {
             var fieldType = graphType.Fields.List[i];
             // get clr property name (also used for matching on field name or constructor parameter name)
             var fieldName = fieldType.GetMetadata<string>(InputObjectGraphType.ORIGINAL_EXPRESSION_PROPERTY_NAME) ?? fieldType.Name;
+            if (fieldName == InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME)
+            {
+                skippedCount++;
+                continue;
+            }
             // get graph type
             var resolvedType = fieldType.ResolvedType
                 ?? throw new InvalidOperationException($"Field '{fieldType.Name}' of graph type '{graphType.Name}' does not have the ResolvedType property set.");
@@ -196,8 +202,10 @@ public static partial class ObjectExtensions
                     throw new InvalidOperationException($"Two fields within graph type '{graphType.Name}' were mapped to the same member '{fieldName}'.");
             }
             // add to list
-            fields[i] = (fieldType.Name, fieldName, resolvedType);
+            fields[i - skippedCount] = (fieldType.Name, fieldName, resolvedType);
         }
+        if (skippedCount > 0)
+            Array.Resize(ref fields, fields.Length - skippedCount);
 
         // find best constructor to use
         var (bestConstructor, ctorParameters) = _types.GetOrAdd(

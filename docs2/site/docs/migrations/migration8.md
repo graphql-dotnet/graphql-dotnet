@@ -1240,6 +1240,64 @@ public class MyOutputObject
 }
 ```
 
+### 30. NoClrMapping Extension for Input Fields with Custom CLR Mapping (from version 8.4.0)
+
+A new extension method, `NoClrMapping`, has been introduced to give you fine-grained control
+over how input object fields are mapped to CLR types. In many scenarios, your input types may
+include fields that are computed or require custom processing before being set on your CLR model.
+For example, you might have a CLR type with a single `FullName` property but want your input
+object to accept separate `firstName` and `lastName` fields. By marking these fields with
+`NoClrMapping()`, they are excluded from the automatic binding process. You can then override
+the `ParseDictionary` method to manually combine these values into the CLR's `FullName` property,
+while letting the base implementation handle any automatically mapped fields (such as `Age`). The
+following example illustrates this pattern:
+
+```csharp
+public class Person
+{
+    public string FullName { get; set; } = string.Empty;
+    public int Age { get; set; }
+}
+
+public class PersonInputType : InputObjectGraphType<Person>
+{
+    public PersonInputType()
+    {
+        Name = "PersonInput";
+
+        // Define fields for 'firstName' and 'lastName' that are not automatically mapped.
+        Field<NonNullGraphType<StringGraphType>>("firstName").NoClrMapping();
+        Field<NonNullGraphType<StringGraphType>>("lastName").NoClrMapping();
+
+        // Define the 'age' field which is automatically mapped to Person.Age.
+        Field(x => x.Age);
+    }
+
+    public override object ParseDictionary(IDictionary<string, object?> value)
+    {
+        // Use base.ParseDictionary to handle automatic mapping (e.g., Age).
+        var person = (Person)base.ParseDictionary(value);
+
+        // Manually combine firstName and lastName into FullName.
+        if (value.TryGetValue("firstName", out var firstNameObj) && firstNameObj is string firstName &&
+            value.TryGetValue("lastName", out var lastNameObj) && lastNameObj is string lastName)
+        {
+            person.FullName = $"{firstName} {lastName}";
+        }
+
+        return person;
+    }
+}
+```
+
+In this example, the input object defines three fields: `firstName`, `lastName`, and `age`.
+The `firstName` and `lastName` fields are marked with `NoClrMapping()` so that they are not
+automatically bound to any CLR properties. Instead, the overridden `ParseDictionary` method
+combines these two fields into the `FullName` property of the `Person` CLR type. Meanwhile,
+the `Age` field is processed via the standard mapping mechanism by calling `base.ParseDictionary`.
+This approach allows you to seamlessly mix automatic and custom binding, providing greater
+flexibility in how your input objects are processed and mapped.
+
 ## Breaking Changes
 
 ### 1. Query type is required
