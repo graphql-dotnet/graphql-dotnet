@@ -1298,6 +1298,42 @@ the `Age` field is processed via the standard mapping mechanism by calling `base
 This approach allows you to seamlessly mix automatic and custom binding, providing greater
 flexibility in how your input objects are processed and mapped.
 
+### 31. Unique Cache Keys for Multi-Schema Environments (from version 8.4.0)
+
+Document caching now supports unique cache keys for applications using multiple or dynamic
+schemas. The cache key has been enhanced to include an extra property computed by the new
+`AdditionalCacheKeySelector` delegate. By default, this delegate distinguishes between
+schema-first and code-first implementations by returning the schema instance for
+schema-first and dynamic schemas (those that are direct implementations of
+`Schema`), and the schema type for code-first and type-first schemas (schemas that derive
+from `Schema`). This change ensures that cached documents are uniquely identified even
+when multiple schemas are configured in the same application, while still supporting
+caching for scoped code-first and type-first schemas.
+
+To migrate, you may continue using the default behavior. However, if you need further
+customization -- such as incorporating additional context to identify unique dynamic schemas
+-- you can override the default selector as shown in the example below:
+
+```csharp
+services.AddGraphQL(b => b
+    .UseMemoryCache(options =>
+    {
+        options.AdditionalCacheKeySelector = execOptions =>
+        {
+            if (execOptions.UserContext is IDictionary<string, object> context &&
+                context.TryGetValue("CustomHeader", out var header))
+            {
+                return header;
+            }
+            return null;
+        };
+    })
+);
+```
+
+These changes help ensure that cached documents are correctly associated with the appropriate
+schema when multiple schemas are in use.
+
 ## Breaking Changes
 
 ### 1. Query type is required
