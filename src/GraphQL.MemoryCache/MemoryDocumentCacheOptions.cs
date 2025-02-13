@@ -22,5 +22,13 @@ public class MemoryDocumentCacheOptions : MemoryCacheOptions, IOptions<MemoryDoc
     /// </summary>
     public TimeSpan? SlidingExpiration { get; set; }
 
+    /// <summary>
+    /// A delegate that supplies an extra value to be included in the cache key.
+    /// When not configured, the extra value is computed from <see cref="ExecutionOptions.Schema"/> as follows:
+    /// The schema instance is used for schema-first and dynamic schemas (when the type is <see cref="Types.Schema"/>),
+    /// and the schema type is used for type-first and code-first schemas (when the type is derived from <see cref="Types.Schema"/>).
+    /// </summary>
+    public Func<ExecutionOptions, object?>? AdditionalCacheKeySelector { get; set; }
+
     MemoryDocumentCacheOptions IOptions<MemoryDocumentCacheOptions>.Value => this;
 }

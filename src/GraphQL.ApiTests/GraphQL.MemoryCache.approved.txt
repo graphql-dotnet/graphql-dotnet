@@ -48,6 +48,7 @@ namespace GraphQL.Caching
     public class MemoryDocumentCacheOptions : Microsoft.Extensions.Caching.Memory.MemoryCacheOptions, Microsoft.Extensions.Options.IOptions<GraphQL.Caching.MemoryDocumentCacheOptions>
     {
         public MemoryDocumentCacheOptions() { }
+        public System.Func<GraphQL.ExecutionOptions, object?>? AdditionalCacheKeySelector { get; set; }
         public System.TimeSpan? SlidingExpiration { get; set; }
     }
     public class PersistedQueryBadHashError : GraphQL.Execution.RequestError
