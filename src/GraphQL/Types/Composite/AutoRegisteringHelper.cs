@@ -352,17 +352,27 @@ public static class AutoRegisteringHelper
     /// Identifies the constructor to use when constructing instances of <paramref name="sourceType"/>.
     /// Selects any public constructor marked with <see cref="GraphQLConstructorAttribute"/>, or the public
     /// parameterless constructor, or the only public contructor, or throws an exception otherwise.
+    /// May return <see langword="null"/> for the implicit public parameterless constructor for structs.
     /// </summary>
-    internal static ConstructorInfo GetConstructor([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type sourceType)
+    internal static ConstructorInfo? GetConstructor([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type sourceType)
     {
         var ret = GetConstructorOrDefault(sourceType);
         // if there are no valid constructors, throw the proper exception
         if (ret == null)
         {
             if (sourceType.GetConstructors().Length == 0)
+            {
+                if (sourceType.IsValueType)
+                {
+                    // structs have an implicit parameterless constructor
+                    return null;
+                }
                 throw new InvalidOperationException($"No public constructors found on CLR type '{sourceType.GetFriendlyName()}'.");
+            }
             else
+            {
                 throw new InvalidOperationException($"CLR type '{sourceType.GetFriendlyName()}' must have a public parameterless constructor, a single constructor, or a public constructor marked with " + nameof(GraphQLConstructorAttribute) + ".");
+            }
         }
         return ret;
     }
