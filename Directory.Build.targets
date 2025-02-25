@@ -2,7 +2,7 @@
 
   <PropertyGroup Condition="'$(IsPackable)' == 'true'">
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>See https://github.com/graphql-dotnet/graphql-dotnet/releases and https://graphql-dotnet.github.io/docs/migrations/migration7</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/graphql-dotnet/graphql-dotnet/releases and https://graphql-dotnet.github.io/docs/migrations/migration8</PackageReleaseNotes>
     <Nullable>enable</Nullable>
     <EnableTrimAnalyzer Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</EnableTrimAnalyzer>
     <!--<EnableAotAnalyzer>true</EnableAotAnalyzer> PublishAot property enables it-->
