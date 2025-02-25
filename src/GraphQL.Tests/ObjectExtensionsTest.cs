@@ -492,6 +492,17 @@ public class ObjectExtensionsTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
+    public void toobject_key_value_pair(bool compile)
+    {
+        var inputs = """{ "key": "k", "value": "v" }""".ToInputs();
+        var value = inputs.ToObject<KeyValuePair<string, string>>(compile);
+        value.Key.ShouldBe("k");
+        value.Value.ShouldBe("v");
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
     public void toobject_throws_for_constructor_with_unknown_parameters(bool compile)
     {
         var inputs = """{ "name": "tom" }""".ToInputs();

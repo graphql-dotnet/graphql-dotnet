@@ -17,7 +17,7 @@ internal static class ObjectExtensions
         schema.Initialize();
         var type = schema.Query.Fields.Find("test")!.Arguments!.Single().ResolvedType!;
         if (compile)
-            return (T?)GraphQL.ObjectExtensions.CompileToObject(typeof(T), (IInputObjectGraphType)type)(data);
+            return (T?)GraphQL.ObjectExtensions.CompileToObject(typeof(T), (IInputObjectGraphType)type.GetNamedType())(data);
         return (T?)data.ToObject(typeof(T), type);
     }
 
