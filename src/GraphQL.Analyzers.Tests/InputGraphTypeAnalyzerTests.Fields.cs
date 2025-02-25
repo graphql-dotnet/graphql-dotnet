@@ -914,6 +914,91 @@ public partial class InputGraphTypeAnalyzerTests
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
 
+    [Fact]
+    public async Task KeyValuePair_NoDiagnostics()
+    {
+        const string source =
+            """
+              using GraphQL.Types;
+              using System.Collections.Generic;
+
+              namespace Sample.Server;
+
+              public class KeyValueInputGraphType : InputObjectGraphType<KeyValuePair<string, string>>
+              {
+                  public KeyValueInputGraphType()
+                  {
+                      Field<StringGraphType>("key");
+                      Field<StringGraphType>("value");
+                  }
+              }
+              """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task WritableStruct_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class KeyValueInputGraphType : InputObjectGraphType<TestStructWritableProperties>
+            {
+                public KeyValueInputGraphType()
+                {
+                    Field<StringGraphType>("id");
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public struct TestStructWritableProperties
+            {
+                public int Id { get; set; }
+                public string Name { get; set; }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
+    [Fact]
+    public async Task ReadOnlyStruct_NoDiagnostics()
+    {
+        const string source =
+            """
+            using GraphQL.Types;
+
+            namespace Sample.Server;
+
+            public class KeyValueInputGraphType : InputObjectGraphType<TestStructReadOnlyProperties>
+            {
+                public KeyValueInputGraphType()
+                {
+                    Field<StringGraphType>("id");
+                    Field<StringGraphType>("Name");
+                }
+            }
+
+            public struct TestStructReadOnlyProperties
+            {
+                public int Id { get; }
+                public string Name { get; }
+
+                public TestStructReadOnlyProperties(int id, string name)
+                {
+                    Id = id;
+                    Name = name;
+                }
+            }
+            """;
+
+        await VerifyCS.VerifyAnalyzerAsync(source);
+    }
+
     [Theory]
     [InlineData("", true)]
     [InlineData("private", false)]

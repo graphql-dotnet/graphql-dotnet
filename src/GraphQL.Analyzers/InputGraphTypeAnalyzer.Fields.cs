@@ -140,7 +140,8 @@ public partial class InputGraphTypeAnalyzer
             .Where(method => method is
             {
                 MethodKind: MethodKind.Constructor,
-                DeclaredAccessibility: Accessibility.Public
+                DeclaredAccessibility: Accessibility.Public,
+                IsImplicitlyDeclared: false
             })
             .ToList();
 
