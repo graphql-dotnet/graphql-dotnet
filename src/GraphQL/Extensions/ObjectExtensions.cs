@@ -13,7 +13,7 @@ namespace GraphQL;
 /// </summary>
 public static partial class ObjectExtensions
 {
-    private static readonly ConcurrentDictionary<Type, (ConstructorInfo Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
+    private static readonly ConcurrentDictionary<Type, (ConstructorInfo? Constructor, ParameterInfo[] ConstructorParameters)> _types = new();
     private static readonly ConcurrentDictionary<(Type Type, string PropertyName), (MemberInfo MemberInfo, bool IsInitOnly, bool IsRequired)> _members = new();
 
     /// <summary>
@@ -76,7 +76,7 @@ public static partial class ObjectExtensions
         {
             obj = reflectionInfo.CtorFields.Length == 0
                 ? Activator.CreateInstance(reflectionInfo.Type)!
-                : reflectionInfo.Constructor.Invoke(ctorArguments);
+                : reflectionInfo.Constructor!.Invoke(ctorArguments);
         }
         catch (TargetInvocationException ex)
         {
@@ -121,14 +121,14 @@ public static partial class ObjectExtensions
     {
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
         public readonly Type Type;
-        public readonly ConstructorInfo Constructor;
+        public readonly ConstructorInfo? Constructor; // can be null for implicit public parameterless constructors of structs
         public readonly CtorParameterInfo[] CtorFields;
         public readonly MemberFieldInfo[] MemberFields;
 
         public ReflectionInfo(
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicProperties)]
             Type type,
-            ConstructorInfo constructor,
+            ConstructorInfo? constructor,
             CtorParameterInfo[] ctorFields,
             MemberFieldInfo[] memberFields)
         {
@@ -215,7 +215,7 @@ public static partial class ObjectExtensions
 #pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                 var constructor = AutoRegisteringHelper.GetConstructor(clrType);
 #pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                var parameters = constructor.GetParameters();
+                var parameters = constructor?.GetParameters() ?? Array.Empty<ParameterInfo>();
                 return (constructor, parameters);
             });
 
