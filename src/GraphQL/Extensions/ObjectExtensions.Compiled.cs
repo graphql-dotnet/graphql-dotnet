@@ -50,7 +50,9 @@ public static partial class ObjectExtensions
             Expression.Assign(
                 objParam,
                 Expression.MemberInit(
-                    Expression.New(bestConstructor, ctorFields.Select(GetExpressionForCtorParameter)),
+                    bestConstructor == null
+                        ? Expression.New(info.Type) // implicit public parameterless constructor of structs
+                        : Expression.New(bestConstructor, ctorFields.Select(GetExpressionForCtorParameter)),
                     members.Where(x => x.IsRequired || x.IsInitOnly).Select(GetBindingForMember)))
         };
 

@@ -262,15 +262,7 @@ public class AutoRegisteringInputObjectGraphTypeTests
             { "field6AltName", 16 },
         };
         var graph = new TestFieldSupport<TestClass>();
-
-        // initialize schema
-        var queryType = new ObjectGraphType();
-        queryType.Field<StringGraphType>("test");
-        var schema = new Schema() { Query = queryType };
-        schema.RegisterType(graph);
-        schema.Initialize();
-
-        var actual = graph.ParseDictionary(dic).ShouldBeOfType<TestClass>();
+        var actual = TestParse<TestClass>(graph, dic);
         actual.Field1.ShouldBe(11);
         actual.Field3Value.ShouldBe(13);
         actual.Field5.ShouldBe(15);
@@ -284,6 +276,10 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
+
+        var actual = TestParse<TestBasicClass>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
     }
 
     [Fact]
@@ -293,6 +289,10 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
+
+        var actual = TestParse<TestBasicRecord>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
     }
 
     [Fact]
@@ -302,6 +302,36 @@ public class AutoRegisteringInputObjectGraphTypeTests
         graphType.Fields.Find("Id").ShouldNotBeNull();
         graphType.Fields.Find("Name").ShouldNotBeNull();
         graphType.Fields.Count.ShouldBe(2);
+
+        var actual = TestParse<TestBasicRecordStruct>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
+    }
+
+    [Fact]
+    public void TestWritableStruct()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<TestStructWritableProperties>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(2);
+
+        var actual = TestParse<TestStructWritableProperties>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
+    }
+
+    [Fact]
+    public void TestReadOnlyStruct()
+    {
+        var graphType = new AutoRegisteringInputObjectGraphType<TestStructReadOnlyProperties>();
+        graphType.Fields.Find("Id").ShouldNotBeNull();
+        graphType.Fields.Find("Name").ShouldNotBeNull();
+        graphType.Fields.Count.ShouldBe(2);
+
+        var actual = TestParse<TestStructReadOnlyProperties>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
     }
 
     [Fact]
@@ -310,25 +340,8 @@ public class AutoRegisteringInputObjectGraphTypeTests
         var graphType = new AutoRegisteringInputObjectGraphType<FieldTests>();
         graphType.Fields.Find(nameof(FieldTests.FieldWithInitSetter)).ShouldNotBeNull();
 
-        // initialize graphType
-        var queryType = new ObjectGraphType();
-        queryType.Field<StringGraphType>("test");
-        new ServiceCollection()
-            .AddSingleton<AnyScalarGraphType>()
-            .AddGraphQL(b => b
-                .AddAutoSchema<Class1>()
-                .ConfigureSchema(s =>
-                {
-                    s.RegisterType(graphType);
-                    s.RegisterTypeMapping<object, AnyScalarGraphType>();
-                }))
-            .BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
-
-        // also verify the data is injected into the class properly
-        var dic = new Dictionary<string, object?>() { { nameof(FieldTests.FieldWithInitSetter).ToCamelCase(), "hello" } };
-        object obj = graphType.ParseDictionary(dic);
-        var fieldTests = obj.ShouldBeOfType<FieldTests>();
-        fieldTests.FieldWithInitSetter.ShouldBe("hello");
+        var actual = TestParse<FieldTests>(graphType, """{"fieldWithInitSetter":"hello"}""");
+        actual.FieldWithInitSetter.ShouldBe("hello");
     }
 
     [Fact]
@@ -342,24 +355,9 @@ public class AutoRegisteringInputObjectGraphTypeTests
         nameField.Name.ShouldBe("Name");
         nameField.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>));
 
-        // initialize graphType
-        var queryType = new ObjectGraphType();
-        queryType.Field<StringGraphType>("test");
-        new ServiceCollection()
-            .AddGraphQL(b => b
-                .AddAutoSchema<Class1>()
-                .ConfigureSchema(s => s.RegisterType(graphType)))
-            .BuildServiceProvider().GetRequiredService<ISchema>().Initialize();
-
-        // also verify the data is injected into the class properly
-        var dic = new Dictionary<string, object?>() {
-            { nameof(ReadOnlyClass.Id).ToCamelCase(), "123" },
-            { nameof(ReadOnlyClass.Name).ToCamelCase(), "John Doe" },
-        };
-        object obj = graphType.ParseDictionary(dic);
-        var data = obj.ShouldBeOfType<ReadOnlyClass>();
-        data.Id.ShouldBe(123);
-        data.Name.ShouldBe("John Doe");
+        var actual = TestParse<ReadOnlyClass>(graphType, """{"id":123,"name":"John Doe"}""");
+        actual.Id.ShouldBe(123);
+        actual.Name.ShouldBe("John Doe");
     }
 
     [Fact]
@@ -555,6 +553,24 @@ public class AutoRegisteringInputObjectGraphTypeTests
 
     private record struct TestBasicRecordStruct(int Id, string Name);
 
+    private struct TestStructWritableProperties
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    private struct TestStructReadOnlyProperties
+    {
+        public int Id { get; }
+        public string Name { get; }
+
+        public TestStructReadOnlyProperties(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
+
     private class TestBasicClass
     {
         public int Id { get; set; }
@@ -572,5 +588,26 @@ public class AutoRegisteringInputObjectGraphTypeTests
         [Id]
         public int Id { get; }
         public string Name { get; }
+    }
+
+    private T TestParse<T>(IInputObjectGraphType graphType, string inputJson)
+        => TestParse<T>(graphType, inputJson.ToDictionary());
+
+    private T TestParse<T>(IInputObjectGraphType graphType, Dictionary<string, object?> dictionary)
+    {
+        var queryType = new ObjectGraphType();
+        queryType.Field<StringGraphType>("test");
+        using var provider = new ServiceCollection()
+            .AddSingleton<AnyScalarGraphType>()
+            .AddGraphQL(b => b
+                .AddAutoSchema<Class1>()
+                .ConfigureSchema(s =>
+                {
+                    s.RegisterType(graphType);
+                    s.RegisterTypeMapping<object, AnyScalarGraphType>();
+                }))
+            .BuildServiceProvider();
+        provider.GetRequiredService<ISchema>().Initialize();
+        return graphType.ParseDictionary(dictionary).ShouldBeOfType<T>();
     }
 }
