@@ -9,79 +9,6 @@ Analyzers in GraphQL.NET are tools that help you identify and address potential
 issues or improvements in your GraphQL code. This documentation covers currently
 available analyzers and code fixes, along with the methods to configure them.
 
-## Included Analyzers
-
-### 1. FieldBuilderAnalyzer
-
-This analyzer focuses on replacing obsolete methods involving field building. It
-aims to enhance code clarity and consistency by updating the way fields are
-defined. The primary transformation performed by this analyzer is as follows:
-
-Replace:
-
-```csharp
-Field(name: "name", description..., resolver: ...)
-```
-
-With:
-
-```csharp
-Field("name").Description(...).Resolve(...)
-```
-
-### 2. FieldNameAnalyzer
-
-The `FieldNameAnalyzer` detects the usage of the obsolete `Name` method on the
-field and connection builders and helps to rewrite the code to use builder
-creating methods that accept the name as an argument.
-
-Replace:
-
-```csharp
-Field<TGraphType>().Name("name")
-Connection<TGraphType, TSourceType>().Name("name")
-```
-
-With:
-
-```csharp
-Field<TGraphType>("name")
-Connection<TGraphType, TSourceType>("name")
-```
-
-### 3. ResolverAnalyzer
-
-The `ResolverAnalyzer` focuses on identifying incorrect usage of resolver
-methods. It ensures that resolver methods are used only on output graph types
-and flags usage on other types as errors. Additionally, it offers a code fix
-that removes these incorrect usages.
-
-### 4. InputGraphTypeAnalyzer
-
-The analyzer verifies the input source type can be constructed and input graph
-type fields can be mapped to the source type during deserialization process.
-
-### 5. FieldArgumentAnalyzer
-
-The analyzer detects an obsolete `Argument` method usage and offers a code fix
-to automatically replace it with with another `Argument` overload.
-
-### 6. AwaitableResolverAnalyzer
-
-The analyzer detects awaitable resolver delegates used in sync `Resolve` or
-`ResolveScoped` methods and provides a code fix to replace them with an
-appropriate async version.
-
-### 7. NotAGraphTypeAnalyzer
-
-The analyzer identifies instances of incorrectly using `GraphType` as generic
-type argument, where the type argument should not be of type `IGraphType`.
-
-### 8. OneOfAnalyzer
-
-The analyzer validates the correct definition of the `OneOf` input object
-fields.
-
 ## Configuration in .editorconfig
 
 Certain analyzers and code fixes offer configuration options that control when
@@ -108,3 +35,28 @@ dotnet_diagnostic.GQL001.severity = none
 
 For more information about analyzers configuration see
 [Code Analysis Configuration Overview](https://learn.microsoft.com/en-us/visualstudio/code-quality/use-roslyn-analyzers?view=vs-2022)
+
+## Included Analyzers
+
+| Identifier          | Name                                                                                              |
+| ------------------- | ------------------------------------------------------------------------------------------------- |
+| [GQL001](../gql001) | Define the name in Field, `Connection` or `ConnectionBuilder.Create` method                       |
+| [GQL002](../gql002) | `Name` method invocation can be removed                                                           |
+| [GQL003](../gql003) | Different names defined by `Field`, `Connection` or `ConnectionBuilder.Create` and `Name` methods |
+| [GQL004](../gql004) | Don't use obsolete `Field` methods                                                                |
+| [GQL005](../gql005) | Illegal resolver usage                                                                            |
+| [GQL006](../gql006) | Can not match input field to the source field                                                     |
+| [GQL007](../gql007) | Can not set source field                                                                          |
+| [GQL008](../gql008) | Don't use an obsolete `Argument` method                                                           |
+| [GQL009](../gql009) | Use async resolver                                                                                |
+| [GQL010](../gql010) | Can not resolve input source type constructor                                                     |
+| [GQL011](../gql011) | The type must not be convertible to `IGraphType`                                                  |
+| [GQL012](../gql012) | Illegal method usage                                                                              |
+| [GQL013](../gql013) | `OneOf` fields must be nullable                                                                   |
+| [GQL014](../gql014) | `OneOf` fields must not have default value                                                        |
+| [GQL015](../gql015) | Can't infer a `Field` name from expression                                                        |
+| [GQL016](../gql016) | Require parameterless constructor                                                                 |
+| [GQL017](../gql017) | Could not find method                                                                             |
+| [GQL018](../gql018) | `Parser` method must be valid                                                                     |
+| [GQL019](../gql019) | `Validator` method must be valid                                                                  |
+| [GQL020](../gql020) | `ValidateArguments` method must be valid                                                          |
