@@ -22,7 +22,7 @@
     "gatsby-transformer-remark": "^6.8.0",
     "gatsby-transformer-yaml": "^5.8.0",
     "normalize.css": "^8.0.1",
-    "prismjs": "^1.29.0",
+    "prismjs": "^1.30.0",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
