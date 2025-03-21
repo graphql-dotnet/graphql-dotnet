@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="../Tests.props" />
+  <Import Project="../../Tests.props" />
 
   <PropertyGroup>
     <TargetFrameworks>$(SingleFramework)</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
-    <ProjectReference Include="..\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
-    <ProjectReference Include="..\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
+    <ProjectReference Include="..\..\src\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
+    <ProjectReference Include="..\..\src\GraphQL.MicrosoftDI\GraphQL.MicrosoftDI.csproj" />
+    <ProjectReference Include="..\..\src\GraphQL.SystemTextJson\GraphQL.SystemTextJson.csproj" />
     <ProjectReference Include="..\GraphQL.Federation.SchemaFirst.Sample1\GraphQL.Federation.SchemaFirst.Sample1.csproj" />
     <ProjectReference Include="..\GraphQL.Federation.SchemaFirst.Sample2\GraphQL.Federation.SchemaFirst.Sample2.csproj" />
     <ProjectReference Include="..\GraphQL.Federation.CodeFirst.Sample3\GraphQL.Federation.CodeFirst.Sample3.csproj" />
