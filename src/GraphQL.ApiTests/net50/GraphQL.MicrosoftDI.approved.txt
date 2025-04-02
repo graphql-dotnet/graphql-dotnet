@@ -182,6 +182,7 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddScopedSubscriptionExecutionStrategy(this GraphQL.DI.IGraphQLBuilder builder, bool serialExecution = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddSelfActivatingSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
+        public static GraphQL.DI.IGraphQLBuilder ValidateServices(this GraphQL.DI.IGraphQLBuilder builder, bool enabled = true) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Method)]
     public class ScopedAttribute : GraphQL.GraphQLAttribute

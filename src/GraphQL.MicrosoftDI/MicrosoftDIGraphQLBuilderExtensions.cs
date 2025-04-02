@@ -88,4 +88,15 @@ public static class MicrosoftDIGraphQLBuilderExtensions
             GraphQLParser.AST.OperationType.Subscription);
         return builder;
     }
+
+    /// <summary>
+    /// Verifies that all injected services can be created during GraphQL field execution.
+    /// Requires support for IServiceProviderIsService by the dependency injection framework.
+    /// </summary>
+    public static IGraphQLBuilder ValidateServices(this IGraphQLBuilder builder, bool enabled = true)
+    {
+        builder.Services.Configure<ValidateServicesOptions>(options => options.Enabled = enabled);
+        builder.Services.TryRegister<IConfigureSchema, ValidateServicesSchemaConfigurator>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        return builder;
+    }
 }

@@ -47,9 +47,15 @@ public class GraphQLBuilderTests
         {
             var toRemove = new ServiceDescriptor(serviceType, implementationType, ServiceLifetime.Transient);
             descriptorList.Add(toRemove);
-            mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            mockServiceCollection.Setup(x => x.RemoveAt(It.IsAny<int>())).Callback<int>(i =>
+            {
+                descriptorList[i].ShouldBe(toRemove);
+                descriptorList.RemoveAt(i);
+            });
         }
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.Register(serviceType, implementationType, serviceLifetime, replace));
         mockServiceCollection.Verify();
@@ -89,9 +95,15 @@ public class GraphQLBuilderTests
         {
             var toRemove = new ServiceDescriptor(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient);
             descriptorList.Add(toRemove);
-            mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            mockServiceCollection.Setup(x => x.RemoveAt(It.IsAny<int>())).Callback<int>(i =>
+            {
+                descriptorList[i].ShouldBe(toRemove);
+                descriptorList.RemoveAt(i);
+            }).Verifiable();
         }
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.Register<Interface1>(factory, serviceLifetime, replace));
         mockServiceCollection.Verify();
@@ -123,9 +135,15 @@ public class GraphQLBuilderTests
         {
             var toRemove = new ServiceDescriptor(typeof(Interface1), typeof(Class1), ServiceLifetime.Transient);
             descriptorList.Add(toRemove);
-            mockServiceCollection.Setup(x => x.Remove(toRemove)).Returns<ServiceDescriptor>(d => descriptorList.Remove(d)).Verifiable();
+            mockServiceCollection.Setup(x => x.RemoveAt(It.IsAny<int>())).Callback<int>(i =>
+            {
+                descriptorList[i].ShouldBe(toRemove);
+                descriptorList.RemoveAt(i);
+            }).Verifiable();
         }
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.Register<Interface1>(instance, replace));
         mockServiceCollection.Verify();
@@ -162,6 +180,8 @@ public class GraphQLBuilderTests
             descriptorList.Add(d);
         }).Verifiable();
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.TryRegister(serviceType, implementationType, serviceLifetime));
         mockServiceCollection.Verify();
@@ -193,8 +213,10 @@ public class GraphQLBuilderTests
             descriptorList.Add(d);
         }).Verifiable();
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
-        services.AddTransient(serviceType, _ => null);
+        services.AddTransient(serviceType, _ => null!);
         var builder = new GraphQLBuilder(services, b => b.Services.TryRegister(serviceType, implementationType, serviceLifetime));
         mockServiceCollection.Verify();
         match.ShouldBeTrue();
@@ -228,6 +250,8 @@ public class GraphQLBuilderTests
             descriptorList.Add(d);
         }).Verifiable();
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.TryRegister<Interface1>(factory, serviceLifetime));
         mockServiceCollection.Verify();
@@ -253,6 +277,8 @@ public class GraphQLBuilderTests
             descriptorList.Add(d);
         }).Verifiable();
         mockServiceCollection.Setup(x => x.GetEnumerator()).Returns(() => descriptorList.GetEnumerator());
+        mockServiceCollection.Setup(x => x.Count).Returns(() => descriptorList.Count);
+        mockServiceCollection.As<IList<ServiceDescriptor>>().Setup(x => x[It.IsAny<int>()]).Returns<int>(i => descriptorList[i]);
         var services = mockServiceCollection.Object;
         var builder = new GraphQLBuilder(services, b => b.Services.TryRegister<Interface1>(instance));
         mockServiceCollection.Verify();

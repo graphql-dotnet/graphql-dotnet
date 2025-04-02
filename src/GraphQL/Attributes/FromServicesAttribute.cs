@@ -9,6 +9,13 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Parameter)]
 public class FromServicesAttribute : GraphQLAttribute
 {
+    /// <summary>
+    /// The metadata key used to store a list of the required DI-injected services for a given <see cref="QueryArgument"/>.
+    /// This information can be used during schema validation to ensure that all required services have been registered.
+    /// The type of the metadata value is <see cref="List{Type}"/>.
+    /// </summary>
+    public const string REQUIRED_SERVICES_METADATA = "__RequiredServices__";
+
     /* This is a typed copy of the below code, but does not work in AOT compilation scenarios.
      * However, this is the recommended pattern for user-defined attributes.
      * 
@@ -19,5 +26,8 @@ public class FromServicesAttribute : GraphQLAttribute
 
     /// <inheritdoc/>
     public override void Modify(ArgumentInformation argumentInformation)
-        => argumentInformation.SetDelegateWithCast(context => context.RequestServicesOrThrow().GetRequiredService(argumentInformation.ParameterInfo.ParameterType));
+    {
+        argumentInformation.SetDelegateWithCast(context => context.RequestServicesOrThrow().GetRequiredService(argumentInformation.ParameterInfo.ParameterType));
+        argumentInformation.FieldType?.DependsOn(argumentInformation.ParameterInfo.ParameterType);
+    }
 }

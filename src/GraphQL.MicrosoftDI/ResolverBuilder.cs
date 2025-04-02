@@ -123,6 +123,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
                 context,
                 context.RequestServices.GetRequiredService<T1>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
         return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
@@ -134,6 +135,7 @@ public class ResolverBuilder<TSourceType, TReturnType, T1>
                 context,
                 context.RequestServices.GetRequiredService<T1>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 
@@ -197,6 +199,8 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
                 context.RequestServices.GetRequiredService<T1>(),
                 context.RequestServices.GetRequiredService<T2>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
         return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
@@ -209,6 +213,8 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2>
                 context.RequestServices.GetRequiredService<T1>(),
                 context.RequestServices.GetRequiredService<T2>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 
@@ -273,6 +279,9 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
                 context.RequestServices.GetRequiredService<T2>(),
                 context.RequestServices.GetRequiredService<T3>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
         return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
@@ -286,6 +295,9 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3>
                 context.RequestServices.GetRequiredService<T2>(),
                 context.RequestServices.GetRequiredService<T3>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 
@@ -351,6 +363,10 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
                 context.RequestServices.GetRequiredService<T3>(),
                 context.RequestServices.GetRequiredService<T4>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
+        _builder.FieldType.DependsOn(typeof(T4));
         return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
@@ -365,6 +381,10 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4>
                 context.RequestServices.GetRequiredService<T3>(),
                 context.RequestServices.GetRequiredService<T4>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
+        _builder.FieldType.DependsOn(typeof(T4));
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 
@@ -427,6 +447,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
                 context.RequestServices.GetRequiredService<T4>(),
                 context.RequestServices.GetRequiredService<T5>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
+        _builder.FieldType.DependsOn(typeof(T4));
+        _builder.FieldType.DependsOn(typeof(T5));
         return _scoped ? _builder.ResolveScoped(resolver2) : _builder.Resolve(resolver2);
     }
 
@@ -442,6 +467,11 @@ public class ResolverBuilder<TSourceType, TReturnType, T1, T2, T3, T4, T5>
                 context.RequestServices.GetRequiredService<T4>(),
                 context.RequestServices.GetRequiredService<T5>());
 
+        _builder.FieldType.DependsOn(typeof(T1));
+        _builder.FieldType.DependsOn(typeof(T2));
+        _builder.FieldType.DependsOn(typeof(T3));
+        _builder.FieldType.DependsOn(typeof(T4));
+        _builder.FieldType.DependsOn(typeof(T5));
         return _scoped ? _builder.ResolveScopedAsync(resolver2) : _builder.ResolveAsync(resolver2);
     }
 

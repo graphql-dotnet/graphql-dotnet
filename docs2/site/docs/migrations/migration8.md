@@ -1334,6 +1334,34 @@ services.AddGraphQL(b => b
 These changes help ensure that cached documents are correctly associated with the appropriate
 schema when multiple schemas are in use.
 
+### 32. `IGraphQLBuilder.ValidateServices` added to validate services during schema initialization (8.5.0+)
+
+A new method, `ValidateServices`, has been added to the `IGraphQLBuilder` interface to allow
+you to validate field resolver dependencies during schema initialization. Validation occurs during
+schema initialization, verifying that any field arguments marked with `[FromServices]` can be
+resolved by the DI container, as well as any services referenced via `.WithService<T>()`.
+This method is useful for detecting potential runtime errors caused by missing services or
+incorrectly registered dependencies. The following example demonstrates how to use this method:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .ValidateServices()
+);
+```
+
+You may also manually mark a `FieldType` as requiring a service by calling `.DependsOn<T>()`:
+
+```csharp
+Field<StringGraphType>("myField")
+    .DependsOn<IMyService>()
+    .Resolve(context =>
+    {
+        var service = context.RequestServices!.GetRequiredService<IMyService>();
+        return service.GetMyValue();
+    });
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
