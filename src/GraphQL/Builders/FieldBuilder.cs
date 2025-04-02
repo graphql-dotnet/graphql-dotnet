@@ -481,4 +481,10 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     TType IProvideMetadata.GetMetadata<TType>(string key, TType defaultValue) => FieldType.GetMetadata(key, defaultValue);
     TType IProvideMetadata.GetMetadata<TType>(string key, Func<TType> defaultValueFactory) => FieldType.GetMetadata(key, defaultValueFactory);
     bool IProvideMetadata.HasMetadata(string key) => FieldType.HasMetadata(key);
+
+    /// <summary>
+    /// Specifies that the field depends on <typeparamref name="TService"/> to be provided by the dependency injection provider.
+    /// </summary>
+    public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
+        => this.DependsOn(typeof(TService));
 }
