@@ -485,6 +485,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <summary>
     /// Specifies that the field depends on <typeparamref name="TService"/> to be provided by the dependency injection provider.
     /// </summary>
+    [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
 }
