@@ -1,6 +1,6 @@
 using GraphQL.Types;
-using Microsoft.Extensions.DependencyInjection;
 using GraphQL.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.MicrosoftDI.Tests;
 

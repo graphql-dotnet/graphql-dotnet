@@ -1350,6 +1350,18 @@ services.AddGraphQL(b => b
 );
 ```
 
+You may also manually mark a `FieldType` as requiring a service by calling `.DependsOn<T>()`:
+
+```csharp
+Field<StringGraphType>("myField")
+    .DependsOn<IMyService>()
+    .Resolve(context =>
+    {
+        var service = context.RequestServices!.GetRequiredService<IMyService>();
+        return service.GetMyValue();
+    });
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
