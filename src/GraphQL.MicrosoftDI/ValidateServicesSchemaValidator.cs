@@ -62,8 +62,6 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
             if (diProvider == null)
                 return null;
 
-            var providerType = diProvider.GetType();
-
             // Get the assembly that contains IServiceCollection
             var assembly = typeof(IServiceCollection).Assembly;
 
