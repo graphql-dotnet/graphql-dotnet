@@ -142,6 +142,7 @@ public class GraphQLBuilderExtensionTests
         services.AddSingleton<Service13>();
         services.AddSingleton<Service14>();
         services.AddSingleton<Service15>();
+        services.AddSingleton<Service16>();
 
         // Act
         services.AddGraphQL(builder => builder
@@ -178,7 +179,7 @@ public class GraphQLBuilderExtensionTests
 
         // Verify that the error message contains all 15 missing services
         exception.Message.ShouldContain("The following service validation errors were found:");
-        for (int i = 1; i <= 15; i++)
+        for (int i = 1; i <= 16; i++)
         {
             exception.Message.ShouldContain($"The service 'GraphQL.MicrosoftDI.Tests.GraphQLBuilderExtensionTests+Service{i}' required by ");
         }
@@ -314,6 +315,7 @@ public class GraphQLBuilderExtensionTests
     private class Service13 { }
     private class Service14 { }
     private class Service15 { }
+    private class Service16 { }
 
     // Regular ObjectGraphType for the query
     private class RegularQueryType : ObjectGraphType
@@ -361,6 +363,10 @@ public class GraphQLBuilderExtensionTests
                 .WithService<Service14>()
                 .WithService<Service15>()
                 .Resolve((context, service11, service12, service13, service14, service15) => "");
+
+            Field<StringGraphType>("field6")
+                .DependsOn<Service16>()
+                .Resolve((context) => "");
         }
     }
 
