@@ -95,7 +95,7 @@ public static class MicrosoftDIGraphQLBuilderExtensions
     /// </summary>
     public static IGraphQLBuilder ValidateServices(this IGraphQLBuilder builder)
     {
-        builder.Services.TryRegister<IConfigureSchema, ValidateServicesSchemaConfigurator>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IConfigureSchema, ValidateServicesSchemaConfigurator>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 }
