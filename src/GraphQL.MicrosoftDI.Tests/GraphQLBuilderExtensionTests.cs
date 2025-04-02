@@ -96,8 +96,10 @@ public class GraphQLBuilderExtensionTests
             """, StringCompareShould.IgnoreLineEndings);
     }
 
-    [Fact]
-    public void VerifyServices_ThrowsWhenBothServicesAreMissing()
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void VerifyServices_ThrowsWhenBothServicesAreMissing(bool enable)
     {
         // Arrange
         var services = new ServiceCollection();
@@ -105,20 +107,29 @@ public class GraphQLBuilderExtensionTests
         // Act & Assert
         services.AddGraphQL(builder => builder
             .AddSchema<VerifyServicesTestSchema>()
-            .ValidateServices());
+            .ValidateServices(enable));
 
         var serviceProvider = services.BuildServiceProvider();
 
-        // This should throw because TestService is not registered
-        Should.Throw<InvalidOperationException>(() =>
+        if (enable)
         {
-            var schema = serviceProvider.GetRequiredService<ISchema>();
-            schema.Initialize();
-        }).Message.ShouldBe("""
+            // This should throw because TestService is not registered
+            Should.Throw<InvalidOperationException>(() =>
+            {
+                var schema = serviceProvider.GetRequiredService<ISchema>();
+                schema.Initialize();
+            }).Message.ShouldBe("""
             The following service validation errors were found:
             The service 'GraphQL.MicrosoftDI.Tests.GraphQLBuilderExtensionTests+TestService1' required by 'Class3.getData' is not registered.
             The service 'GraphQL.MicrosoftDI.Tests.GraphQLBuilderExtensionTests+TestService2' required by 'Class3.getData' is not registered.
             """, StringCompareShould.IgnoreLineEndings);
+        }
+        else
+        {
+            // This should not throw because service validation is disabled
+            var schema = serviceProvider.GetRequiredService<ISchema>();
+            schema.Initialize();
+        }
     }
 
     [Fact]
