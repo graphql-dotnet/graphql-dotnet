@@ -113,6 +113,7 @@ A list of the available extension methods is below:
 | `UseMiddleware<>`       | Registers the specified middleware and configures it to be installed during schema initialization | |
 | `UsePersistedDocuments` | Registers the persisted document handler and configures its options | |
 | `UseTelemetry`          | Creates telemetry events based on the System.Diagnostics.Activity API, primarily for use with OpenTelemetry | .NET 5+ |
+| `ValidateServices`      | Verifies that all injected services can be created during GraphQL field execution | |
 | `WithTimeout`           | Configures the execution timeout | |
 
 The above methods will register the specified services typically as singletons unless otherwise specified. Graph types and middleware are registered

@@ -23,6 +23,7 @@ public class Startup
             .AddGraphTypes(typeof(StarWarsQuery).Assembly)
             .UseMiddleware<CountFieldMiddleware>(false) // do not auto-install middleware
             .UseMiddleware<InstrumentFieldsMiddleware>(false) // do not auto-install middleware
+            .ValidateServices()
         );
 
         // add something like repository
