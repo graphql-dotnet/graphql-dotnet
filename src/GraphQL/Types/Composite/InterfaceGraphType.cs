@@ -5,7 +5,6 @@ namespace GraphQL.Types;
 /// </summary>
 public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType, IImplementInterfaces
 {
-    // todo: add Types and Type<T>() and Type(Type t) -- or add into IAbstractGraphType
 }
 
 // todo: merge these members into IAbstractGraphType for v9 (which already match the members in UnionGraphType)
