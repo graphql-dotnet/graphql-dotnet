@@ -1362,6 +1362,43 @@ Field<StringGraphType>("myField")
     });
 ```
 
+### 33. Added capability to reference object graph types from their implementing interfaces (8.5.0+)
+
+GraphQL.NET allows developers to configure object graph types to reference interfaces that they
+implement via the `Interface<T>()` or `AddResolvedInterface(IInterfaceGraphType type)`.
+Alternatively, you may reference the object graph type from the interface by using
+`AddPossibleType(IObjectGraphType type)`. However, this requires a concrete reference to the
+instantiated class rather than just the `Type` to be resolved during schema initialization.
+
+In version 8.5.0+, you may use `Type<TObjectType>()` or `Type(Type objectType)` to reference
+the object type from the interface type. This matches the same methods already available on
+`UnionGraphType`, unifying the API between unions and interfaces. The new methods will be
+added to `IAbstractGraphType` in version 9, which is implemented by both `UnionGraphType`
+and `IInterfaceGraphType`. For example:
+
+```csharp
+public class MyInterfaceGraphType : InterfaceGraphType
+{
+    public MyInterfaceGraphType()
+    {
+        Type<MyObjectGraphType>();
+        Field<string>("Name");
+    }
+}
+```
+
+For type-first users, a new attribute `[PossibleType(Type objectType)]` has been added which
+can be marked on interface CLR types to reference an object CLR or graph type that the interface
+type implements. For instance:
+
+```csharp
+[PossibleType(typeof(MyObject))]
+public interface IMyInterface
+{
+    public string Name { get; set; }
+}
+```
+
 ## Breaking Changes
 
 ### 1. Query type is required
