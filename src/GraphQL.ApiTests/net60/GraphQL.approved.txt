@@ -2966,13 +2966,6 @@ namespace GraphQL.Types
         public PatternMatchingDirective() { }
         public override bool? Introspectable { get; }
     }
-    public class PossibleTypeReferences : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
-    {
-        public PossibleTypeReferences() { }
-        public int Count { get; }
-        public bool Contains(System.Type type) { }
-        public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
-    }
     public class PossibleTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IObjectGraphType>, System.Collections.IEnumerable
     {
         public PossibleTypes() { }
