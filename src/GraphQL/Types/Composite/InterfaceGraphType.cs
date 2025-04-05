@@ -5,10 +5,19 @@ namespace GraphQL.Types;
 /// </summary>
 public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType, IImplementInterfaces
 {
+    // todo: add Types and Type<T>() and Type(Type t) -- or add into IAbstractGraphType
+}
+
+// todo: merge these members into IAbstractGraphType for v9 (which already match the members in UnionGraphType)
+internal interface IInterfaceGraphType2 : IInterfaceGraphType
+{
+    public IEnumerable<Type> Types { get; set; }
+    public void Type(Type type);
+    public void Type<TType>() where TType : IObjectGraphType;
 }
 
 /// <inheritdoc cref="InterfaceGraphType"/>
-public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType
+public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType2
 {
     /// <summary>
     /// Initializes a new instance.
@@ -27,12 +36,21 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
                 throw new InvalidOperationException("Cannot clone interface containing possible types.");
             if (copyFrom.ResolveType != null)
                 throw new InvalidOperationException("Cannot clone interface with configured ResolveType property.");
+            _types.AddRange(copyFrom._types);
         }
         // else { /* initialization logic */ }
     }
 
     /// <inheritdoc/>
     public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
+
+    private List<Type> _types = new();
+    /// <inheritdoc cref="PossibleTypes"/>
+    public IEnumerable<Type> Types
+    {
+        get => _types;
+        set => _types = new(value);
+    }
 
     /// <inheritdoc/>
     public Func<object, IObjectGraphType?>? ResolveType { get; set; }
@@ -61,6 +79,27 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
 
         this.IsValidInterfaceFor(type, throwError: true);
         PossibleTypes.Add(type);
+    }
+
+    /// <inheritdoc cref="IAbstractGraphType.AddPossibleType"/>
+    public void Type<TType>()
+        where TType : IObjectGraphType
+    {
+        if (!_types.Contains(typeof(TType)))
+            _types.Add(typeof(TType));
+    }
+
+    /// <inheritdoc cref="IAbstractGraphType.AddPossibleType"/>
+    public void Type(Type type)
+    {
+        if (type == null)
+            throw new ArgumentNullException(nameof(type));
+
+        if (!typeof(IObjectGraphType).IsAssignableFrom(type))
+            throw new ArgumentException($"Added type '{type.Name}' must implement {nameof(IObjectGraphType)}", nameof(type));
+
+        if (!_types.Contains(type))
+            _types.Add(type);
     }
 
     /// <summary>
