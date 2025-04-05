@@ -18,7 +18,24 @@ public static class FieldExtensions
     /// to handle the conversion between the input and CLR object.
     /// </remarks>
     [AllowedOn<IInputObjectGraphType>]
-    public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter graphType)
+    public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter fieldType)
         where TMetadataWriter : IFieldMetadataWriter
-        => graphType.WithMetadata(InputObjectGraphType.ORIGINAL_EXPRESSION_PROPERTY_NAME, InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME);
+        => fieldType.WithMetadata(InputObjectGraphType.ORIGINAL_EXPRESSION_PROPERTY_NAME, InputObjectGraphType.SKIP_EXPRESSION_VALUE_NAME);
+
+    /// <summary>
+    /// Specifies that the field depends on a specific service type provided by the dependency injection provider.
+    /// </summary>
+    [AllowedOn<IObjectGraphType>]
+    public static TMetadataWriter DependsOn<TMetadataWriter>(this TMetadataWriter fieldType, Type serviceType)
+        where TMetadataWriter : IFieldMetadataWriter
+    {
+        var keys = fieldType.GetMetadata<List<Type>>(FromServicesAttribute.REQUIRED_SERVICES_METADATA);
+        if (keys == null)
+        {
+            keys = new List<Type>();
+            fieldType.Metadata[FromServicesAttribute.REQUIRED_SERVICES_METADATA] = keys;
+        }
+        keys.Add(serviceType);
+        return fieldType;
+    }
 }

@@ -5,7 +5,7 @@ using GraphQL.Utilities;
 
 namespace GraphQL.Federation.TypeFirst.Sample4;
 
-public static class Program
+public class Program
 {
     public static async Task Main(string[] args)
     {

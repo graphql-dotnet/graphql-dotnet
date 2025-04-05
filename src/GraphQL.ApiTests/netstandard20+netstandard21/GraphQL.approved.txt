@@ -254,12 +254,15 @@ namespace GraphQL
     }
     public static class FieldExtensions
     {
-        public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter graphType)
+        public static TMetadataWriter DependsOn<TMetadataWriter>(this TMetadataWriter fieldType, System.Type serviceType)
+            where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
+        public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter fieldType)
             where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
     }
     [System.AttributeUsage(System.AttributeTargets.Parameter)]
     public class FromServicesAttribute : GraphQL.GraphQLAttribute
     {
+        public const string REQUIRED_SERVICES_METADATA = "__RequiredServices__";
         public FromServicesAttribute() { }
         public override void Modify(GraphQL.Types.ArgumentInformation argumentInformation) { }
     }
@@ -1064,6 +1067,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType? defaultValue = default) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DependsOn<TService>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string? description) { }
         [System.Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
