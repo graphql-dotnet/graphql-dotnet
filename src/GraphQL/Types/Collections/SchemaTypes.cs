@@ -589,6 +589,30 @@ public class SchemaTypes : IEnumerable<IGraphType>
                     iface.AddResolvedInterface(interfaceInstance);
                 }
             }
+
+            if (type is IInterfaceGraphType2 iface2) //todo: use IInterfaceGraphType.Types instead of InterfaceGraphType.Types
+            {
+                foreach (var possibleType in iface2.Types)
+                {
+                    using var __ = context.Trace("Possible clr type '{0}'", possibleType.Name);
+                    object typeOrError = RebuildType(possibleType, false, context.ClrToGraphTypeMappings);
+                    if (typeOrError is string error)
+                        throw new InvalidOperationException($"The GraphQL type '{possibleType.GetFriendlyName()}' for interface graph type '{type.Name}' could not be derived implicitly. " + error);
+                    var unionedType2 = (Type)typeOrError;
+                    if (AddTypeIfNotRegistered(unionedType2, context) is not IObjectGraphType objType)
+                        throw new InvalidOperationException($"The GraphQL type '{possibleType.GetFriendlyName()}' for interface graph type '{type.Name}' could not be derived implicitly. The resolved type is not an {nameof(IObjectGraphType)}.");
+
+                    if (iface2.ResolveType == null && objType != null && objType.IsTypeOf == null)
+                    {
+                        throw new InvalidOperationException(
+                           $"Interface type '{iface2.Name}' does not provide a 'resolveType' function " +
+                           $"and possible Type '{objType.Name}' does not provide a 'isTypeOf' function. " +
+                            "There is no way to resolve this possible type during execution.");
+                    }
+
+                    iface2.AddPossibleType(objType!);
+                }
+            }
         }
 
         if (type is UnionGraphType union)

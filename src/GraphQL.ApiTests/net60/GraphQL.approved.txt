@@ -751,6 +751,13 @@ namespace GraphQL
         public override void Modify(GraphQL.Types.QueryArgument queryArgument, System.Reflection.ParameterInfo parameterInfo) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType, GraphQL.Types.IGraphType graphType, System.Reflection.MemberInfo memberInfo, ref bool ignore) { }
     }
+    [System.AttributeUsage(System.AttributeTargets.Interface, AllowMultiple=true)]
+    public class PossibleTypeAttribute : GraphQL.GraphQLAttribute
+    {
+        public PossibleTypeAttribute(System.Type type) { }
+        public System.Type ObjectGraphType { get; }
+        public override void Modify(GraphQL.Types.IGraphType graphType) { }
+    }
     public static class QueryArgumentExtensions
     {
         public static GraphQL.Types.QueryArgument ParseValue(this GraphQL.Types.QueryArgument argument, System.Func<object, object> parseValue) { }
@@ -2857,11 +2864,15 @@ namespace GraphQL.Types
         public GraphQL.Types.PossibleTypes PossibleTypes { get; }
         public System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
         public GraphQL.Types.ResolvedInterfaces ResolvedInterfaces { get; }
+        public System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         public void AddPossibleType(GraphQL.Types.IObjectGraphType type) { }
         public void AddResolvedInterface(GraphQL.Types.IInterfaceGraphType graphType) { }
         public void Interface(System.Type type) { }
         public void Interface<TInterface>()
             where TInterface : GraphQL.Types.IInterfaceGraphType { }
+        public void Type(System.Type type) { }
+        public void Type<TType>()
+            where TType : GraphQL.Types.IObjectGraphType { }
     }
     public class Interfaces : System.Collections.Generic.IEnumerable<System.Type>, System.Collections.IEnumerable
     {

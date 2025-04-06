@@ -250,7 +250,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
     [InlineData(22, typeof(Interface9), typeof(Interface10), false)]
     [InlineData(23, typeof(Interface8), typeof(Interface11), true)]
     [InlineData(24, typeof(Interface11), typeof(Interface8), false)]
-    private void IsValidInterfaceFor(int i, Type interfaceType, Type superType, bool isValidInterface)
+    public void IsValidInterfaceFor(int i, Type interfaceType, Type superType, bool isValidInterface)
     {
         _ = i;
         var schema = new Schema() { Query = new ObjectGraphType() };
@@ -261,6 +261,63 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         var superGraphType = schema.AllTypes[((IGraphType)Activator.CreateInstance(superType)!).Name].ShouldBeAssignableTo<IComplexGraphType>().ShouldNotBeNull();
         var interfaceGraphType = schema.AllTypes[((IGraphType)Activator.CreateInstance(interfaceType)!).Name].ShouldBeAssignableTo<IInterfaceGraphType>().ShouldNotBeNull();
         interfaceGraphType.IsValidInterfaceFor(superGraphType, false).ShouldBe(isValidInterface);
+    }
+
+    [Fact]
+    public void SupportsType()
+    {
+        var schema = new Schema() { Query = new ObjectGraphType() };
+        schema.Query.AddField(new FieldType { Name = "dummy", Type = typeof(StringGraphType) });
+        schema.RegisterType<Interface12>();
+        schema.Initialize();
+        var iface = schema.AllTypes["Interface12"].ShouldBeOfType<Interface12>();
+        var objType = schema.AllTypes["MyObject2"].ShouldBeOfType<MyObject2Type>();
+        var obj = new MyObject2();
+        iface.PossibleTypes.FirstOrDefault(possibleType => possibleType.IsTypeOf.ShouldNotBeNull()(obj)).ShouldBe(objType);
+    }
+
+    [Fact]
+    public void SupportsTypeViaAttribute()
+    {
+        var schema = new Schema() { Query = new ObjectGraphType() };
+        schema.Query.AddField(new FieldType { Name = "dummy", Type = typeof(StringGraphType) });
+        schema.RegisterType<AutoRegisteringInterfaceGraphType<Interface13>>(); // uses InterfaceGraphType<Interface13> as the base type
+        schema.RegisterTypeMapping<MyObject2, MyObject2Type>();
+        schema.Initialize();
+        var iface = schema.AllTypes["Interface13"].ShouldBeOfType<AutoRegisteringInterfaceGraphType<Interface13>>();
+        var objType = schema.AllTypes["MyObject2"].ShouldBeOfType<MyObject2Type>();
+        var obj = new MyObject2();
+        iface.PossibleTypes.FirstOrDefault(possibleType => possibleType.IsTypeOf.ShouldNotBeNull()(obj)).ShouldBe(objType);
+    }
+
+    [PossibleType(typeof(MyObject2))]
+    public interface Interface13
+    {
+        public string Name { get; set; }
+    }
+
+    public class Interface12 : InterfaceGraphType
+    {
+        public Interface12()
+        {
+            Type<MyObject2Type>();
+            Field<string>("Name");
+        }
+    }
+
+    public class MyObject2
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class MyObject2Type : ObjectGraphType<MyObject2>
+    {
+        public MyObject2Type()
+        {
+            Field(x => x.Name);
+            Field(x => x.Age);
+        }
     }
 
     public class MySchema : Schema
