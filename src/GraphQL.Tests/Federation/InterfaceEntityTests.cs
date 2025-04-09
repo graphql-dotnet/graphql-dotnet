@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Federation;
 
-public class MediaEntityTests
+public class InterfaceEntityTests
 {
     private const string approvedSdl = """
         schema @link(import: ["@link"], url: "https://specs.apollo.dev/link/v1.0") @link(import: ["@key", "@external", "@requires", "@provides", "@shareable", "@inaccessible", "@override", "@tag", "@interfaceObject"], url: "https://specs.apollo.dev/federation/v2.3") {
