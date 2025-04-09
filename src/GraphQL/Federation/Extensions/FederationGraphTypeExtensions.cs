@@ -58,6 +58,18 @@ public static class FederationGraphTypeExtensions
     }
 
     /// <summary>
+    /// Configures synchronous resolution of a reference using a resolver function with a return type.
+    /// </summary>
+    /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>
+    /// <param name="graphType">The graph type to apply the resolver to.</param>
+    /// <param name="resolver">The function used to resolve the source representation.</param>
+    public static void ResolveReference<TSourceType>(this IInterfaceGraphType<TSourceType> graphType, Func<IResolveFieldContext, TSourceType, TSourceType?> resolver)
+        where TSourceType : new()
+    {
+        graphType.Metadata[RESOLVER_METADATA] = new FederationResolver<TSourceType>(resolver);
+    }
+
+    /// <summary>
     /// Configures asynchronous resolution of a reference using a task-based resolver function with a return type.
     /// </summary>
     /// <typeparam name="TSourceType">The CLR type of the entity type, populated by the representation.</typeparam>

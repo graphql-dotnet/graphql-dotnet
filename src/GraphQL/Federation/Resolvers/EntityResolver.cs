@@ -63,8 +63,8 @@ public sealed class EntityResolver : IFieldResolver
             // now find the graph type instance for the type name, ensuring it is an object type
             var graphTypeInstance = schema.AllTypes[typeName]
                 ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
-            if (graphTypeInstance is not IObjectGraphType objectGraphType)
-                throw new InvalidOperationException($"The type '{typeName}' is not an object graph type.");
+            if (graphTypeInstance is not IComplexGraphType complexGraphType)
+                throw new InvalidOperationException($"The type '{typeName}' is not an object or interface graph type.");
 
             // find the federation resolver to use based on the representation
             var resolver = SelectFederationResolver(graphTypeInstance.GetMetadata<object>(RESOLVER_METADATA), typeName, rep);
@@ -75,7 +75,7 @@ public sealed class EntityResolver : IFieldResolver
             object value;
             try
             {
-                value = resolver.ParseRepresentation(objectGraphType, rep);
+                value = resolver.ParseRepresentation(complexGraphType, rep);
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ public sealed class EntityResolver : IFieldResolver
                 throw new InvalidOperationException($"Error converting representation for type '{typeName}'. Please verify your supergraph is up to date.", ex);
             }
 
-            ret.Add(new Representation(objectGraphType, resolver, value));
+            ret.Add(new Representation(complexGraphType, resolver, value));
         }
         return ret;
     }

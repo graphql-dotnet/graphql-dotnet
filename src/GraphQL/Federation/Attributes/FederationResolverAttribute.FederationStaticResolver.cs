@@ -52,7 +52,7 @@ public partial class FederationResolverAttribute
             return true;
         }
 
-        public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
+        public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
         {
             // Creates a dictionary of arguments for the field type based on the entity representation properties.
             // The argument dictionary is returned as the parsed representation, to be used by the synthesized IResolveFieldContext.
@@ -84,7 +84,7 @@ public partial class FederationResolverAttribute
             return arguments;
         }
 
-        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation)
         {
             // create a synthesized IResolveFieldContext with the arguments and a null source
             var context2 = new Context(context, _fieldType, (Dictionary<string, ArgumentValue>?)parsedRepresentation);

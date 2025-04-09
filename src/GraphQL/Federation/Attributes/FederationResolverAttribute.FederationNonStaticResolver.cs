@@ -35,7 +35,7 @@ public partial class FederationResolverAttribute
 
         public override Type SourceType { get; }
 
-        public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object source)
+        public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object source)
         {
             var context2 = new Context(context, source);
             var resolver = _fieldType.Resolver ?? ThrowForNoResolver();
