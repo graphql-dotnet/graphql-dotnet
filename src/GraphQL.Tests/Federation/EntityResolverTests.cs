@@ -167,7 +167,7 @@ public class EntityResolverTests
         var schema = CreateSchema<TestObject>("id");
         var representations = new List<object> { new Dictionary<string, object>() { { "__typename", "TestInput" }, { "id", "1" } } };
         Should.Throw<InvalidOperationException>(() => _resolver.ConvertRepresentations(schema, representations))
-            .Message.ShouldBe("The type 'TestInput' is not an object graph type.");
+            .Message.ShouldBe("The type 'TestInput' is not an object or interface graph type.");
     }
 
     [Fact]

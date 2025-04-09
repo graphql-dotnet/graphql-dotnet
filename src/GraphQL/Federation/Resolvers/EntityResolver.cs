@@ -63,7 +63,7 @@ public sealed class EntityResolver : IFieldResolver
             // now find the graph type instance for the type name, ensuring it is an object type
             var graphTypeInstance = schema.AllTypes[typeName]
                 ?? throw new InvalidOperationException($"The type '{typeName}' could not be found.");
-            if (graphTypeInstance is not IComplexGraphType complexGraphType)
+            if (graphTypeInstance is not IComplexGraphType complexGraphType || graphTypeInstance is IInputObjectGraphType)
                 throw new InvalidOperationException($"The type '{typeName}' is not an object or interface graph type.");
 
             // find the federation resolver to use based on the representation

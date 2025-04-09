@@ -1630,10 +1630,23 @@ namespace GraphQL.Federation
     }
     public static class FederationGraphTypeExtensions
     {
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver)
+            where TSourceType : new() { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver)
+            where TSourceType : new() { }
+        public static void ResolveReference<TSourceType>(this GraphQL.Types.IInterfaceGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver)
+            where TSourceType : new() { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, GraphQL.Federation.Resolvers.IFederationResolver resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TSourceType?>> resolver) { }
         public static void ResolveReference<TSourceType>(this GraphQL.Types.ObjectGraphType<TSourceType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TSourceType?> resolver) { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver)
+            where TSourceType : new() { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver)
+            where TSourceType : new() { }
+        public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.IInterfaceGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver)
+            where TSourceType : new() { }
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, GraphQL.DataLoader.IDataLoaderResult<TReturnType?>> resolver) { }
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
         public static void ResolveReference<TSourceType, TReturnType>(this GraphQL.Types.ObjectGraphType<TReturnType> graphType, System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolver) { }
@@ -1746,15 +1759,15 @@ namespace GraphQL.Federation.Resolvers
         protected FederationResolverBase() { }
         public abstract System.Type SourceType { get; }
         public virtual bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation) { }
-        public object ParseRepresentation(GraphQL.Types.IObjectGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation) { }
-        public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, object parsedRepresentation);
+        public object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation) { }
+        public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation);
     }
     public abstract class FederationResolverBase<TParsedType> : GraphQL.Federation.Resolvers.FederationResolverBase
     {
         protected FederationResolverBase() { }
         public override System.Type SourceType { get; }
-        public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, object parsedRepresentation) { }
-        public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, TParsedType parsedRepresentation);
+        public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation) { }
+        public abstract System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TParsedType parsedRepresentation);
     }
     public class FederationResolver<TClrType> : GraphQL.Federation.Resolvers.FederationResolver<TClrType, TClrType>
     {
@@ -1768,18 +1781,18 @@ namespace GraphQL.Federation.Resolvers
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, System.Threading.Tasks.Task<TReturnType?>> resolveFunc) { }
         public FederationResolver(System.Func<GraphQL.IResolveFieldContext, TSourceType, TReturnType?> resolveFunc) { }
         public override System.Type SourceType { get; }
-        public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, TSourceType source) { }
+        public override System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, TSourceType source) { }
     }
     public interface IFederationResolver
     {
         bool MatchKeys(System.Collections.Generic.IDictionary<string, object?> representation);
-        object ParseRepresentation(GraphQL.Types.IObjectGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation);
-        System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IObjectGraphType graphType, object parsedRepresentation);
+        object ParseRepresentation(GraphQL.Types.IComplexGraphType graphType, System.Collections.Generic.IDictionary<string, object?> representation);
+        System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Types.IComplexGraphType graphType, object parsedRepresentation);
     }
     public class Representation : System.IEquatable<GraphQL.Federation.Resolvers.Representation>
     {
-        public Representation(GraphQL.Types.IObjectGraphType GraphType, GraphQL.Federation.Resolvers.IFederationResolver Resolver, object Value) { }
-        public GraphQL.Types.IObjectGraphType GraphType { get; init; }
+        public Representation(GraphQL.Types.IComplexGraphType GraphType, GraphQL.Federation.Resolvers.IFederationResolver Resolver, object Value) { }
+        public GraphQL.Types.IComplexGraphType GraphType { get; init; }
         public GraphQL.Federation.Resolvers.IFederationResolver Resolver { get; init; }
         public object Value { get; init; }
     }
@@ -2663,6 +2676,7 @@ namespace GraphQL.Types
         GraphQLParser.AST.GraphQLValue ToAST(object value);
     }
     public interface IInterfaceGraphType : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public interface IInterfaceGraphType<in TObject> : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
     public interface IMetadataReader : GraphQL.Types.IProvideMetadata { }
     public interface IMetadataWriter : GraphQL.Types.IProvideMetadata
     {
@@ -2768,7 +2782,7 @@ namespace GraphQL.Types
     {
         public InterfaceGraphType() { }
     }
-    public class InterfaceGraphType<TSource> : GraphQL.Types.ComplexGraphType<TSource>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public class InterfaceGraphType<TSource> : GraphQL.Types.ComplexGraphType<TSource>, GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IInterfaceGraphType<TSource>, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public InterfaceGraphType() { }
         public GraphQL.Types.Interfaces Interfaces { get; }
