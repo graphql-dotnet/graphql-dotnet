@@ -98,7 +98,17 @@ public class AutoRegisteringInterfaceGraphType<[DynamicallyAccessedMembers(Dynam
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.CreateField(MemberInfo)"/>
     protected virtual FieldType? CreateField(MemberInfo memberInfo)
-        => AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
+    {
+        var field = AutoRegisteringHelper.CreateField(this, memberInfo, GetTypeInformation, BuildFieldType, false);
+        // clear the field resolver after the attributes are applied, which may set IsPrivate
+        // private fields are ignored, as [FederationResolver] uses a private field and requires the resolver to execute
+        if (field != null && !field.IsPrivate)
+        {
+            field.Resolver = null;
+            field.StreamResolver = null;
+        }
+        return field;
+    }
 
     /// <inheritdoc cref="AutoRegisteringObjectGraphType{TSourceType}.BuildFieldType(FieldType, MemberInfo)"/>
     protected void BuildFieldType(FieldType fieldType, MemberInfo memberInfo)
