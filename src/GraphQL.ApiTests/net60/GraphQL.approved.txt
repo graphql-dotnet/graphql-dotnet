@@ -1742,7 +1742,7 @@ namespace GraphQL.Federation
         public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
     }
-    [System.AttributeUsage(System.AttributeTargets.Class, AllowMultiple=true)]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple=true)]
     public class KeyAttribute : GraphQL.GraphQLAttribute
     {
         public KeyAttribute(string fields) { }
@@ -2173,9 +2173,9 @@ namespace GraphQL.Resolvers
     }
     public class MemberResolver : GraphQL.Resolvers.IFieldResolver
     {
-        public MemberResolver(System.Reflection.FieldInfo fieldInfo, System.Linq.Expressions.LambdaExpression instanceExpression) { }
-        public MemberResolver(System.Reflection.PropertyInfo propertyInfo, System.Linq.Expressions.LambdaExpression instanceExpression) { }
-        public MemberResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
+        public MemberResolver(System.Reflection.FieldInfo fieldInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        public MemberResolver(System.Reflection.PropertyInfo propertyInfo, System.Linq.Expressions.LambdaExpression? instanceExpression) { }
+        public MemberResolver(System.Reflection.MethodInfo methodInfo, System.Linq.Expressions.LambdaExpression? instanceExpression, System.Collections.Generic.IList<System.Linq.Expressions.LambdaExpression> methodArgumentExpressions) { }
         protected virtual System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<object?>> BuildFieldResolver(System.Linq.Expressions.ParameterExpression resolveFieldContextParameter, System.Linq.Expressions.Expression bodyExpression) { }
         public virtual System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context) { }
     }

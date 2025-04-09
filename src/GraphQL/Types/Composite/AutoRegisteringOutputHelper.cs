@@ -37,9 +37,9 @@ internal static class AutoRegisteringOutputHelper
         if (memberInfo is PropertyInfo propertyInfo)
         {
             fieldType.Arguments = null;
-            if (buildMemberInstanceExpressionFunc != null)
+            if (buildMemberInstanceExpressionFunc != null || (propertyInfo.GetMethod?.IsStatic ?? false))
             {
-                var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc(memberInfo));
+                var resolver = new MemberResolver(propertyInfo, buildMemberInstanceExpressionFunc?.Invoke(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -63,10 +63,10 @@ internal static class AutoRegisteringOutputHelper
                     queryArgument ?? throw new InvalidOperationException("Invalid response from ConstructQueryArgument: queryArgument and expression cannot both be null"));
                 expressions.Add(expression);
             }
-            if (buildMemberInstanceExpressionFunc != null)
+            if (buildMemberInstanceExpressionFunc != null || methodInfo.IsStatic)
             {
-                var memberInstanceExpression = buildMemberInstanceExpressionFunc(methodInfo);
-                if (IsObservableOrAsyncEnumerable(methodInfo.ReturnType))
+                var memberInstanceExpression = buildMemberInstanceExpressionFunc?.Invoke(methodInfo);
+                if (IsObservableOrAsyncEnumerable(methodInfo.ReturnType) && memberInstanceExpression != null) // static support for interfaces is only for federation resolvers, not needed for subscriptions
                 {
                     var resolver = new SourceStreamMethodResolver(methodInfo, memberInstanceExpression, expressions);
                     fieldType.Resolver = resolver;
@@ -84,9 +84,9 @@ internal static class AutoRegisteringOutputHelper
         else if (memberInfo is FieldInfo fieldInfo)
         {
             fieldType.Arguments = null;
-            if (buildMemberInstanceExpressionFunc != null)
+            if (buildMemberInstanceExpressionFunc != null || fieldInfo.IsStatic)
             {
-                var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc(memberInfo));
+                var resolver = new MemberResolver(fieldInfo, buildMemberInstanceExpressionFunc?.Invoke(memberInfo));
                 fieldType.Resolver = resolver;
                 fieldType.StreamResolver = null;
             }
@@ -98,12 +98,6 @@ internal static class AutoRegisteringOutputHelper
         else
         {
             throw new ArgumentOutOfRangeException(nameof(memberInfo), "Member must be a field, property or method.");
-        }
-        if (buildMemberInstanceExpressionFunc == null)
-        {
-            // interface types do not set resolvers
-            fieldType.Resolver = null;
-            fieldType.StreamResolver = null;
         }
     }
 

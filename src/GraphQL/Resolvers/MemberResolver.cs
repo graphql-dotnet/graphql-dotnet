@@ -18,25 +18,27 @@ public class MemberResolver : IFieldResolver
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
-    public MemberResolver(FieldInfo fieldInfo, LambdaExpression instanceExpression)
+    public MemberResolver(FieldInfo fieldInfo, LambdaExpression? instanceExpression)
     {
         if (fieldInfo == null)
             throw new ArgumentNullException(nameof(fieldInfo));
-        if (instanceExpression == null)
-            throw new ArgumentNullException(nameof(instanceExpression));
+        if (instanceExpression == null && !fieldInfo.IsStatic)
+            throw new ArgumentNullException(nameof(instanceExpression), "Instance methods require an instance expression.");
 
-        if (instanceExpression.Parameters.Count != 1 ||
+        if (instanceExpression != null && (
+            instanceExpression.Parameters.Count != 1 ||
             instanceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
-            !fieldInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType))
+            !fieldInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType)))
         {
             throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {fieldInfo.DeclaringType!.Name}>.", nameof(instanceExpression));
         }
 
         var methodCallExpr = Expression.MakeMemberAccess(
-            fieldInfo.IsStatic ? null : instanceExpression.Body,
+            fieldInfo.IsStatic ? null : instanceExpression!.Body,
             fieldInfo);
 
-        _resolver = BuildFieldResolver(instanceExpression.Parameters[0], methodCallExpr);
+        var resolveFieldContextParameter = instanceExpression?.Parameters[0] ?? Expression.Parameter(typeof(IResolveFieldContext), "context");
+        _resolver = BuildFieldResolver(resolveFieldContextParameter, methodCallExpr);
     }
 
     /// <summary>
@@ -45,7 +47,7 @@ public class MemberResolver : IFieldResolver
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
-    public MemberResolver(PropertyInfo propertyInfo, LambdaExpression instanceExpression)
+    public MemberResolver(PropertyInfo propertyInfo, LambdaExpression? instanceExpression)
         : this((propertyInfo ?? throw new ArgumentNullException(nameof(propertyInfo))).GetMethod ?? throw new ArgumentException($"No 'get' method for the supplied {propertyInfo.Name} property.", nameof(propertyInfo)), instanceExpression, Array.Empty<LambdaExpression>())
     {
     }
@@ -58,12 +60,12 @@ public class MemberResolver : IFieldResolver
     /// An example of an instance expression would be as follows:
     /// <code>context =&gt; (TSourceType)context.Source</code>
     /// </summary>
-    public MemberResolver(MethodInfo methodInfo, LambdaExpression instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
+    public MemberResolver(MethodInfo methodInfo, LambdaExpression? instanceExpression, IList<LambdaExpression> methodArgumentExpressions)
     {
         if (methodInfo == null)
             throw new ArgumentNullException(nameof(methodInfo));
-        if (instanceExpression == null)
-            throw new ArgumentNullException(nameof(instanceExpression));
+        if (instanceExpression == null && !methodInfo.IsStatic)
+            throw new ArgumentNullException(nameof(instanceExpression), "Instance methods require an instance expression.");
         if (methodArgumentExpressions == null)
             throw new ArgumentNullException(nameof(methodArgumentExpressions));
         // verify that the expressions provided match the number of parameters
@@ -72,9 +74,10 @@ public class MemberResolver : IFieldResolver
         {
             throw new InvalidOperationException("The number of expressions must equal the number of method parameters.");
         }
-        if (instanceExpression.Parameters.Count != 1 ||
+        if (instanceExpression != null && (
+            instanceExpression.Parameters.Count != 1 ||
             instanceExpression.Parameters[0].Type != typeof(IResolveFieldContext) ||
-            !methodInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType))
+            !methodInfo.DeclaringType!.IsAssignableFrom(instanceExpression.ReturnType)))
         {
             throw new ArgumentException($"Source lambda must be of type Func<IResolveFieldContext, {methodInfo.DeclaringType!.Name}>.", nameof(instanceExpression));
         }
@@ -100,7 +103,7 @@ public class MemberResolver : IFieldResolver
             Expression.Call(
                 methodInfo.IsStatic
                     ? null
-                    : instanceExpression.Body.Replace(
+                    : instanceExpression!.Body.Replace(
                         instanceExpression.Parameters[0],
                         resolveFieldContextParameter),
                 methodInfo,
