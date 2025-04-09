@@ -184,6 +184,9 @@ public static class GraphQLExtensions
         // loop through all fields defined in the interface
         foreach (var implementedField in implementedType.Fields)
         {
+            if (implementedField.IsPrivate)
+                continue;
+
             // find the field on the object type that implements the interface field
             // note: "object type" may refer to an object or interface type that implements the interface
             var field = type.GetField(implementedField.Name);

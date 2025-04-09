@@ -10,11 +10,11 @@ public abstract class FederationResolverBase<TParsedType> : FederationResolverBa
     public override Type SourceType => typeof(TParsedType);
 
     /// <inheritdoc/>
-    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
+    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation)
         => ResolveAsync(context, graphType, (TParsedType)parsedRepresentation);
 
-    /// <inheritdoc cref="IFederationResolver.ResolveAsync(IResolveFieldContext, IObjectGraphType, object)"/>
-    public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, TParsedType parsedRepresentation);
+    /// <inheritdoc cref="IFederationResolver.ResolveAsync(IResolveFieldContext, IComplexGraphType, object)"/>
+    public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, TParsedType parsedRepresentation);
 }
 
 /// <summary>
@@ -26,7 +26,7 @@ public abstract class FederationResolverBase : IFederationResolver
     /// <summary>
     /// Gets the CLR type of the representation that this resolver is responsible for.
     /// This property indicates the type to which the 'parsedRepresentation' parameter's representation
-    /// will be converted before being passed to the <see cref="ResolveAsync(IResolveFieldContext, IObjectGraphType, object)"/> method.
+    /// will be converted before being passed to the <see cref="ResolveAsync(IResolveFieldContext, IComplexGraphType, object)"/> method.
     /// </summary>
     public abstract Type SourceType { get; }
 
@@ -34,10 +34,10 @@ public abstract class FederationResolverBase : IFederationResolver
     public virtual bool MatchKeys(IDictionary<string, object?> representation) => true;
 
     /// <inheritdoc/>
-    public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation);
+    public abstract ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation);
 
     /// <inheritdoc/>
-    public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
+    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
     {
         // entity resolvers that derive from FederationResolverBase define a source CLR type (stored in SourceType)
         //   that the representation should be converted to (for convenience).
@@ -60,7 +60,7 @@ public abstract class FederationResolverBase : IFederationResolver
     /// Deserializes an object based on properties provided in a dictionary, using graph type information from
     /// an output graph type. Requires that the object type has a parameterless constructor.
     /// </summary>
-    private static object ToObject(Type objectType, IObjectGraphType objectGraphType, IDictionary<string, object?> map)
+    private static object ToObject(Type objectType, IComplexGraphType objectGraphType, IDictionary<string, object?> map)
     {
         // create an instance of the target CLR type
         var obj = Activator.CreateInstance(objectType)!;

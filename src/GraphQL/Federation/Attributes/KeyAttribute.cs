@@ -12,7 +12,7 @@ namespace GraphQL.Federation;
 /// <remarks>
 /// See <see href="https://www.apollographql.com/docs/federation/federated-types/federated-directives#key"/>.
 /// </remarks>
-[AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
 public class KeyAttribute : GraphQLAttribute
 {
     private readonly string _fields;
@@ -52,8 +52,17 @@ public class KeyAttribute : GraphQLAttribute
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the <paramref name="graphType"/> is not an <see cref="IObjectGraphType"/>.</exception>
     public override void Modify(IGraphType graphType)
     {
-        if (graphType is not IObjectGraphType objectGraphType)
-            throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Only ObjectGraphType is supported.");
-        objectGraphType.Key(_fields, Resolvable);
+        if (graphType is IObjectGraphType objectGraphType)
+        {
+            objectGraphType.Key(_fields, Resolvable);
+        }
+        else if (graphType is IInterfaceGraphType interfaceGraphType)
+        {
+            interfaceGraphType.Key(_fields, Resolvable);
+        }
+        else
+        {
+            throw new ArgumentOutOfRangeException(nameof(graphType), graphType, "Only object and interface graph types are supported.");
+        }
     }
 }

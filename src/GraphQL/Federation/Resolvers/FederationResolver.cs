@@ -85,6 +85,6 @@ public class FederationResolver<TSourceType, TReturnType> : FederationResolverBa
     }
 
     /// <inheritdoc/>
-    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, TSourceType source)
+    public override ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, TSourceType source)
         => _resolveFunc(context, source)!;
 }

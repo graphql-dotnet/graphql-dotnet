@@ -7,6 +7,11 @@ public interface IInterfaceGraphType : IAbstractGraphType, IComplexGraphType, II
 {
 }
 
+/// <inheritdoc cref="IInterfaceGraphType"/>
+public interface IInterfaceGraphType<in TObject> : IInterfaceGraphType
+{
+}
+
 // todo: merge these members into IAbstractGraphType for v9 (which already match the members in UnionGraphType)
 internal interface IInterfaceGraphType2 : IInterfaceGraphType
 {
@@ -16,7 +21,7 @@ internal interface IInterfaceGraphType2 : IInterfaceGraphType
 }
 
 /// <inheritdoc cref="InterfaceGraphType"/>
-public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType2
+public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType2, IInterfaceGraphType<TSource>
 {
     /// <summary>
     /// Initializes a new instance.

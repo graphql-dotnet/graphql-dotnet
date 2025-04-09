@@ -20,10 +20,10 @@ public class MyFederatedResolver<T> : IFederationResolver
 
     public bool MatchKeys(IDictionary<string, object?> representation) => true;
 
-    public object ParseRepresentation(IObjectGraphType graphType, IDictionary<string, object?> representation)
+    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
         => (int)Convert.ChangeType(representation["id"], typeof(int), CultureInfo.InvariantCulture)!;
 
-    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, IObjectGraphType graphType, object parsedRepresentation)
+    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation)
     {
         int id = (int)parsedRepresentation;
         var data = context.RequestServices!.GetRequiredService<Data>();
