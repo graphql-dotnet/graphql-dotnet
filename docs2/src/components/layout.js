@@ -4,13 +4,13 @@ import Helmet from 'react-helmet'
 import { graphql, useStaticQuery } from 'gatsby'
 
 import './reset.css'
-import 'prismjs/themes/prism-solarizedlight.css'
 
 import Header from './header'
 import SideNav from './SideNav'
 import './layout.css'
 
 import { findMatchingPage  } from '../utils/navigation'
+import { THEMES, useTheme } from '../utils/themeManager'
 
 const getPathName = (location, pathNamePrefix = '') => {
   let pathName = location.pathname
@@ -52,6 +52,10 @@ const Layout = ({ children, location }) => {
   const pathName = getPathName(location)
   const pageConfig = findMatchingPage(data.menu.pages, pathName)
   const nav = hasMenu(pageConfig) ? <SideNav activeItem={pageConfig} pathName={pathName} /> : null
+
+  const {theme} = useTheme();
+  const prismTheme = theme === THEMES.DARK ? 'prism-tomorrow' : 'prism-solarizedlight'
+
   return (
     <Fragment>
       <Helmet
@@ -60,6 +64,8 @@ const Layout = ({ children, location }) => {
           { name: 'description', content: data.site.siteMetadata.description },
           { name: 'keywords', content: data.site.siteMetadata.keywords }
         ]}
+        htmlAttributes={{ ['data-theme']: theme }}
+        link={[{ rel: 'stylesheet', href: `/themes/${prismTheme}.min.css` }]}
       />
       <Header
         siteTitle={data.site.siteMetadata.title}
