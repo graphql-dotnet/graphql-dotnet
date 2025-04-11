@@ -2078,6 +2078,11 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
+"@theme-toggles/react@^4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@theme-toggles/react/-/react-4.1.0.tgz#8b20055749f93bee3d6e4b6bbfaa2d5573caa18a"
+  integrity sha512-h3SuJMsej8DfelHt5fjNIlaMfJOK52Vku4pPDVoHaTwjAcoTr4fn8hzeur2oiqWBYFYfKugvv1RdQaBFXaiPKg==
+
 "@tokenizer/token@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@tokenizer/token/-/token-0.3.0.tgz#fe98a93fe789247e998c75e74e9c7c63217aa276"
