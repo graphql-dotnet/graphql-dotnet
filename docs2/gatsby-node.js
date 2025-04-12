@@ -16,14 +16,14 @@ module.exports = {
             {
               from: path.resolve(
                 __dirname,
-                'node_modules/prismjs/themes/prism-tomorrow.css'
+                'node_modules/prismjs/themes/prism-tomorrow.min.css'
               ),
               to: 'themes/prism-tomorrow.min.css' // this will be output in /dist/themes/
             },
             {
               from: path.resolve(
                 __dirname,
-                'node_modules/prismjs/themes/prism-solarizedlight.css'
+                'node_modules/prismjs/themes/prism-solarizedlight.min.css'
               ),
               to: 'themes/prism-solarizedlight.min.css' // this will be output in /dist/themes/
             }
