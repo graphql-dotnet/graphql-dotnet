@@ -149,20 +149,23 @@ constructor an instance of `IErrorInfoProvider` (see [Error Serialization](#erro
 The converter can be registered within an instance of `JsonSerializerOptions` so that serializing an
 `ExecutionResult` produces the proper output.
 
-To assist, a `DocumentWriter` class is provided with a single method, `WriteAsync`, which
-handles constructing the options, registering the converter, and serializing a specified
-`ExecutionResult` to a data stream. This class is designed to be registered as a singleton
+GraphQL.NET provides two interfaces for serialization:
+* `IGraphQLSerializer` - For serializing to/from streams
+* `IGraphQLTextSerializer` - Extends `IGraphQLSerializer` with methods for serializing to/from strings
+
+These interfaces are implemented by the `GraphQLSerializer` class in the `GraphQL.SystemTextJson` package and
+a similar class in the `GraphQL.NewtonsoftJson` package. These classes are designed to be registered as singletons
 within your dependency injection framework, if applicable.
 
 ```csharp
 // Manually construct an instance
-var documentWriter = new DocumentWriter();
+var serializer = new GraphQLSerializer();
 
 // Or register it within your DI framework (Microsoft DI sample below)
-services.AddSingleton<IDocumentWriter, DocumentWriter>();
+services.AddSingleton<IGraphQLTextSerializer, GraphQLSerializer>();
 ```
 
-Here is an example of the `DocumentWriter`'s use within the `Harness` sample project:
+Here is an example of the serializer's use within a middleware:
 
 ```csharp
 private async Task WriteResponseAsync(HttpContext context, ExecutionResult result, CancellationToken cancellationToken)
@@ -170,24 +173,24 @@ private async Task WriteResponseAsync(HttpContext context, ExecutionResult resul
     context.Response.ContentType = "application/json";
     context.Response.StatusCode = 200; // OK
 
-    await _documentWriter.WriteAsync(context.Response.Body, result, cancellationToken);
+    await _serializer.WriteAsync(context.Response.Body, result, cancellationToken);
 }
 ```
 
-You can also write the result to a string with the `WriteToStringAsync` extension method:
+You can also write the result to a string with the `Serialize` method:
 
 ```csharp
-var resultText = await _documentWriter.WriteToStringAsync(result);
+var resultText = _serializer.Serialize(result);
 ```
 
 ## Error Serialization
 
 The GraphQL spec allows for four properties to be returned within each
-error: `message`, `locations`, `path`, and `extensions`. The `IDocumentWriter` implementations
+error: `message`, `locations`, `path`, and `extensions`. The `IGraphQLSerializer` implementations
 provided for the [`Newtonsoft.Json`](https://www.nuget.org/packages/GraphQL.NewtonsoftJson) and
 [`System.Text.Json`](https://www.nuget.org/packages/GraphQL.SystemTextJson) packages allow you to control the
 serialization of `ExecutionError`s into the resulting json data by providing an `IErrorInfoProvider`
-to the constructor of the document writer. The `ErrorInfoProvider` class (default implementation of
+to the constructor of the serializer. The `ErrorInfoProvider` class (default implementation of
 `IErrorInfoProvider`) contains 5 properties to control serialization behavior:
 
 * `ExposeExceptionStackTrace` when enabled sets the `message` property for errors to equal the
@@ -208,9 +211,9 @@ For example, to show the stack traces for unhandled errors during development, y
 
 ```csharp
 #if DEBUG
-    var documentWriter = new DocumentWriter(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
+    var serializer = new GraphQLSerializer(true, new ErrorInfoProvider(options => options.ExposeExceptionStackTrace = true));
 #else
-    var documentWriter = new DocumentWriter();
+    var serializer = new GraphQLSerializer();
 #endif
 ```
 
