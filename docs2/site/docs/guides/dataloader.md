@@ -310,7 +310,6 @@ public interface IItemsStore
     Task<ILookup<int, Item>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds, CancellationToken cancellationToken);
 }
 ```
-> See this [blog series](https://fiyazhasan.me/graphql-with-net-core-part-xi-dataloader/) for an in depth example using Entity Framework.
 
 ## Exceptions
 
