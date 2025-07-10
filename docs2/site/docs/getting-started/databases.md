@@ -4,7 +4,7 @@ The first thing you need to know is that GraphQL itself is not in any way a data
 This library will work with any data source that you provide. Here are a few resources for specific data sources.
 
 ## Entity Framework
-* [Entity Framework Blog Series](https://fiyazhasan.me/tag/graphql/) by [Fiyaz Hasan](https://github.com/fiyazbinhasan)
+* [Entity Framework Blog Series](https://fiyazhasan.work/tag/graphql/) by [Fiyaz Hasan](https://github.com/fiyazbinhasan)
 * [Entity Framework](https://github.com/JacekKosciesza/StarWars) by [Jacek Kościesza](https://github.com/JacekKosciesza)
 * [GraphQL.EntityFramework](https://github.com/SimonCropp/GraphQL.EntityFramework) Adds EntityFramework Core IQueryable support by [Simon Cropp](https://github.com/SimonCropp/)
 
