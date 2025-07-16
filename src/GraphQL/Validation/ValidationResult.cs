@@ -39,10 +39,10 @@ public class ValidationResult : IValidationResult
     public Variables? Variables { get; set; }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+    public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+    public IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 }
 
 // Optimization for validation "green path" - does not allocate memory in managed heap.
@@ -72,8 +72,8 @@ internal sealed class SuccessfullyValidatedResult : IValidationResult
     public Variables? Variables => Variables.None;
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
+    public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues => null;
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
+    public IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues => null;
 }

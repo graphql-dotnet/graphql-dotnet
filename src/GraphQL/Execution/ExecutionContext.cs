@@ -69,10 +69,10 @@ public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposa
     public Variables Variables { get; set; }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; } // TODO: change to IDictionary for v9 - see #4085
+    public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
     /// <inheritdoc/>
-    public IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; } // TODO: change to IDictionary for v9 - see #4085
+    public IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
 
     /// <inheritdoc/>
     public ExecutionErrors Errors { get; set; }

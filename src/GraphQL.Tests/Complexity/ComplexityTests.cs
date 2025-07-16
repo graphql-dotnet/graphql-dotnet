@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -326,8 +327,8 @@ public class ComplexityTests
         }
         var validationContext = new ValidationContext
         {
-            ArgumentValues = validationResult.ArgumentValues as Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>,
-            DirectiveValues = validationResult.DirectiveValues as Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>,
+            ArgumentValues = validationResult.ArgumentValues as ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>,
+            DirectiveValues = validationResult.DirectiveValues as ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>,
             Document = document,
             Operation = document.Operation(),
             Schema = schema,

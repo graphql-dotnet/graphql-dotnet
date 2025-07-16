@@ -31,12 +31,12 @@ public interface IValidationResult
     /// If the document did not pass validation, or if no field arguments were found, this value will be <see langword="null"/>.
     /// Note that fields will not be present in this dictionary if they would only contain arguments with default values.
     /// </summary>
-    IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+    IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
     /// <summary>
     /// Returns a dictionary of fields, and for each field, a dictionary of directives defined for the field with argument
     /// values for each directive.
     /// If the document did not pass validation, or if no directives were found, this value will be <see langword="null"/>.
     /// </summary>
-    IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+    IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 }
