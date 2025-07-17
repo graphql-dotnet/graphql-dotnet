@@ -91,7 +91,7 @@ public partial class ValidationContext : IProvideUserContext
     public CancellationToken CancellationToken { get; set; }
 
     /// <summary>
-    /// A dictionary of fields, and for each field, a dictionary of arguments defined for the field with their values.
+    /// A concurrent dictionary of fields, and for each field, a dictionary of arguments defined for the field with their values.
     /// During validation rule execution via <see cref="IValidationRule.GetPreNodeVisitorAsync(ValidationContext)"/>,
     /// this value will be <see langword="null"/>. While executing variable validation via
     /// <see cref="IValidationRule.GetPostNodeVisitorAsync(ValidationContext)"/>, this value will be initialized
@@ -101,7 +101,7 @@ public partial class ValidationContext : IProvideUserContext
     public ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
 
     /// <summary>
-    /// A dictionary of fields, and for each field, a dictionary of directives defined for the field with their values.
+    /// A concurrent dictionary of fields, and for each field, a dictionary of directives defined for the field with their values.
     /// During validation rule execution via <see cref="IValidationRule.GetPreNodeVisitorAsync(ValidationContext)"/>,
     /// this value will be <see langword="null"/>. While executing variable validation via
     /// <see cref="IValidationRule.GetPostNodeVisitorAsync(ValidationContext)"/>, this value will be initialized
