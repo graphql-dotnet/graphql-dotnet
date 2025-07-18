@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
