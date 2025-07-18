@@ -38,9 +38,9 @@ public struct FieldArgumentsValidationContext
         {
             ValidationContext.ArgumentValues ??= new();
             if (value != null)
-                ValidationContext.ArgumentValues[FieldAst] = value;
+                ValidationContext.ArgumentValues.TryAdd(FieldAst, value);
             else
-                ValidationContext.ArgumentValues.Remove(FieldAst);
+                ValidationContext.ArgumentValues.TryRemove(FieldAst, out _);
             _arguments = value;
             _argumentsSet = true;
         }

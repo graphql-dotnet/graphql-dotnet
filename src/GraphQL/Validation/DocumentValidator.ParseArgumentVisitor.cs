@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using GraphQL.Execution;
 using GraphQL.Types;
 using GraphQLParser;
@@ -30,7 +31,7 @@ public partial class DocumentValidator
                         var directives = ExecutionHelper.GetDirectives(hasDirectivesNode, context.Variables, context.Schema, context.ValidationContext.Document);
                         if (directives != null)
                         {
-                            (context.DirectiveValues ??= new()).Add(node, directives);
+                            (context.DirectiveValues ??= new()).TryAdd(node, directives);
                         }
                     }
                     catch (ValidationError ex)
@@ -140,7 +141,7 @@ public partial class DocumentValidator
                     var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
                     if (arguments != null)
                     {
-                        (context.ArgumentValues ??= new()).Add(field, arguments);
+                        (context.ArgumentValues ??= new()).TryAdd(field, arguments);
                     }
                 }
                 catch (ValidationError ex)
@@ -171,8 +172,8 @@ public partial class DocumentValidator
             public IComplexGraphType? Type => Types.Count > 0 ? Types.Peek() : null;
             public Variables Variables { get; set; }
             public CancellationToken CancellationToken => ValidationContext.CancellationToken;
-            public Dictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
-            public Dictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
+            public ConcurrentDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; set; }
+            public ConcurrentDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; set; }
             public HashSet<GraphQLParser.ROM>? VisitedFragments { get; set; }
 
             private static Stack<IComplexGraphType?>? _reusableTypes;
