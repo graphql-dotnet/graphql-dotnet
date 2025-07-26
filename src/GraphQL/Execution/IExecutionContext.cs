@@ -79,10 +79,10 @@ public interface IExecutionContext : IProvideUserContext
     Variables Variables { get; }
 
     /// <inheritdoc cref="IValidationResult.ArgumentValues"/>
-    IReadOnlyDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+    IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
     /// <inheritdoc cref="IValidationResult.DirectiveValues"/>
-    IReadOnlyDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+    IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 
     /// <summary>
     /// A dictionary of extra information supplied with the GraphQL request.
