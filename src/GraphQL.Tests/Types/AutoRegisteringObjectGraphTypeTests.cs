@@ -200,6 +200,8 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
     [InlineData("TaskIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+    [InlineData("ValueTaskStringField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+    [InlineData("AsyncEnumerableIntField", typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
     [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
@@ -214,7 +216,9 @@ public class AutoRegisteringObjectGraphTypeTests
     public void Field_RemovesAsyncSuffix()
     {
         var graphType = new AutoRegisteringObjectGraphType<FieldTests>();
-        var fieldType = graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
+        graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
+        graphType.Fields.Find("ValueTaskStringField").ShouldNotBeNull();
+        graphType.Fields.Find("AsyncEnumerableIntField").ShouldNotBeNull();
     }
 
     [Fact]
@@ -766,6 +770,8 @@ public class AutoRegisteringObjectGraphTypeTests
         public int?[]?[]? ListOfListOfIntsField { get; set; }
         public Task<string> TaskStringField() => null!;
         public Task<int> TaskIntFieldAsync() => Task.FromResult(0);
+        public ValueTask<string> ValueTaskStringFieldAsync() => default;
+        public IAsyncEnumerable<int> AsyncEnumerableIntFieldAsync() => null!;
         public IDataLoaderResult<string?> DataLoaderNullableStringField() => null!;
         public IDataLoaderResult<string>? NullableDataLoaderStringField() => null!;
         public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField() => null!;
