@@ -25,3 +25,7 @@ To address both concerns:
   - `ExecutionContext.ArgumentValues` and `ExecutionContext.DirectiveValues`
   - `IValidationResult.ArgumentValues` and `IValidationResult.DirectiveValues`
   - `ValidationResult.ArgumentValues` and `ValidationResult.DirectiveValues`
+
+### 2. `ParseLinkVisitor.Run` method removed
+
+The `ParseLinkVisitor.Run` method has been removed. However, no changes should be required in your code since an equivalent extension method `Run` already exists for all `ISchemaNodeVisitor` instances, including `ParseLinkVisitor`.
