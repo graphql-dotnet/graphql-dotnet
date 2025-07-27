@@ -201,7 +201,7 @@ public class AutoRegisteringObjectGraphTypeTests
     [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
     [InlineData("TaskIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
     [InlineData("ValueTaskStringField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
-    [InlineData("AsyncEnumerableIntField", typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>))]
+    [InlineData("AsyncEnumerableIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
     [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
