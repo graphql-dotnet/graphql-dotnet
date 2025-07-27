@@ -25,3 +25,13 @@ To address both concerns:
   - `ExecutionContext.ArgumentValues` and `ExecutionContext.DirectiveValues`
   - `IValidationResult.ArgumentValues` and `IValidationResult.DirectiveValues`
   - `ValidationResult.ArgumentValues` and `ValidationResult.DirectiveValues`
+
+### 2. New methods added to `IAbstractGraphType`
+
+The `IAbstractGraphType` interface has been extended with new methods that were previously only available on `InterfaceGraphType` and `UnionGraphType`. Since both interface and union graph types require the same methods for the same purpose, these methods have been moved to the common interface:
+
+- `Type(Type)` - Adds the specified graph type to the list of possible graph types
+- `Type<TType>()` - Generic version to add a graph type to the list of possible graph types
+- `Types` - Property to get or set the collection of possible types
+
+If you have custom implementations of `IAbstractGraphType`, you will need to implement these new methods and property. Most users who inherit from `InterfaceGraphType` or `UnionGraphType` will not be affected as these base classes already provide the implementations.
