@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
-using GraphQL.Validation.Rules.Custom;
 
 namespace GraphQL.Builders;
 
@@ -29,22 +28,6 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// <summary>
     /// Returns a builder for a new field.
     /// </summary>
-    /// <param name="type">The graph type of the field.</param>
-    /// <param name="name">The name of the field.</param>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
-    public static FieldBuilder<TSourceType, TReturnType> Create(IGraphType type, string name = "default")
-    {
-        var fieldType = new FieldType
-        {
-            Name = name,
-            ResolvedType = type,
-        };
-        return new FieldBuilder<TSourceType, TReturnType>(fieldType);
-    }
-
-    /// <summary>
-    /// Returns a builder for a new field.
-    /// </summary>
     /// <param name="name">The name of the field.</param>
     /// <param name="type">The graph type of the field.</param>
     public static FieldBuilder<TSourceType, TReturnType> Create(string name, IGraphType type)
@@ -53,18 +36,6 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         {
             Name = name,
             ResolvedType = type,
-        };
-        return new FieldBuilder<TSourceType, TReturnType>(fieldType);
-    }
-
-    /// <inheritdoc cref="Create(IGraphType, string)"/>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
-    public static FieldBuilder<TSourceType, TReturnType> Create([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type = null, string name = "default")
-    {
-        var fieldType = new FieldType
-        {
-            Name = name,
-            Type = type,
         };
         return new FieldBuilder<TSourceType, TReturnType>(fieldType);
     }
@@ -87,16 +58,6 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     public virtual FieldBuilder<TSourceType, TReturnType> Type(IGraphType type)
     {
         FieldType.ResolvedType = type;
-        return this;
-    }
-
-    /// <summary>
-    /// Sets the name of the field.
-    /// </summary>
-    [Obsolete("Please configure the field name by providing the name as an argument to the 'Field' method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Name(string name)
-    {
-        FieldType.Name = name;
         return this;
     }
 
@@ -242,26 +203,6 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         => Argument<TArgumentGraphType>(name, arg =>
         {
             arg.Description = description;
-            configure?.Invoke(arg);
-        });
-
-    /// <summary>
-    /// Adds an argument to the field.
-    /// </summary>
-    /// <typeparam name="TArgumentGraphType">The graph type of the argument.</typeparam>
-    /// <typeparam name="TArgumentType">The type of the argument value.</typeparam>
-    /// <param name="name">The name of the argument.</param>
-    /// <param name="description">The description of the argument.</param>
-    /// <param name="defaultValue">The default value of the argument.</param>
-    /// <param name="configure">A delegate to further configure the argument.</param>
-    [Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads to set default value for parameter or use Arguments() method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TArgumentGraphType, [NotAGraphType] TArgumentType>(string name, string? description,
-        TArgumentType? defaultValue = default, Action<QueryArgument>? configure = null)
-        where TArgumentGraphType : IGraphType
-        => Argument<TArgumentGraphType>(name, arg =>
-        {
-            arg.Description = description;
-            arg.DefaultValue = defaultValue;
             configure?.Invoke(arg);
         });
 
@@ -422,56 +363,6 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         FieldType.Resolver ??= SourceFieldResolver.Instance;
         return this;
     }
-
-    /// <summary>
-    /// Apply directive to field without specifying arguments. If the directive declaration has arguments,
-    /// then their default values (if any) will be used.
-    /// </summary>
-    /// <param name="name">Directive name.</param>
-    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name)
-        => this.ApplyDirective(name);
-
-    /// <summary>
-    /// Apply directive to field specifying one argument. If the directive declaration has other arguments,
-    /// then their default values (if any) will be used.
-    /// </summary>
-    /// <param name="name">Directive name.</param>
-    /// <param name="argumentName">Argument name.</param>
-    /// <param name="argumentValue">Argument value.</param>
-    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue)
-        => this.ApplyDirective(name, argumentName, argumentValue);
-
-    /// <summary>
-    /// Apply directive specifying two arguments. If the directive declaration has other arguments,
-    /// then their default values (if any) will be used.
-    /// </summary>
-    /// <param name="name">Directive name.</param>
-    /// <param name="argument1Name">First argument name.</param>
-    /// <param name="argument1Value">First argument value.</param>
-    /// <param name="argument2Name">Second argument name.</param>
-    /// <param name="argument2Value">Second argument value.</param>
-    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value)
-        => this.ApplyDirective(name, argument1Name, argument1Value, argument2Name, argument2Value);
-
-    /// <summary>
-    /// Apply directive to field specifying configuration delegate.
-    /// </summary>
-    /// <param name="name">Directive name.</param>
-    /// <param name="configure">Configuration delegate.</param>
-    [Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Directive(string name, Action<AppliedDirective> configure)
-        => this.ApplyDirective(name, configure);
-
-    /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
-    /// </summary>
-    /// <param name="impact">Field's complexity impact.</param>
-    [Obsolete("Please use the WithComplexityImpact method. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact)
-        => this.WithComplexityImpact(impact);
 
     // Allows metadata builder extension methods to read/write to the underlying field type without unnecessarily
     // exposing metadata methods directly on the field builder; users can always use the FieldType property

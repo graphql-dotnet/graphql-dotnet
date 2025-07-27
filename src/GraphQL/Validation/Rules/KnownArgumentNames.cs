@@ -9,20 +9,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL field is only valid if all supplied arguments are defined by
 /// that field.
 /// </summary>
-public class KnownArgumentNames : ValidationRuleBase
+public sealed class KnownArgumentNames : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly KnownArgumentNames Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="KnownArgumentNames"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public KnownArgumentNames()
-    {
-    }
+    private KnownArgumentNames() { }
 
     /// <inheritdoc/>
     /// <exception cref="KnownArgumentNamesError"/>

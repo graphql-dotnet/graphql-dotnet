@@ -57,9 +57,6 @@ namespace GraphQL
     }
     public static class ComplexityAnalayzerMetadataExtensions
     {
-        [System.Obsolete("Please use GetComplexityImpactDelegate instead. This method will be removed in v9" +
-            ".")]
-        public static double? GetComplexityImpact(this GraphQL.Types.IMetadataReader provider) { }
         public static System.Func<GraphQL.Validation.Complexity.FieldImpactContext, GraphQL.Validation.Complexity.FieldComplexityResult>? GetComplexityImpactDelegate(this GraphQL.Types.FieldType provider) { }
         public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, double impact)
             where TMetadataProvider : GraphQL.Types.IFieldMetadataWriter { }
@@ -297,14 +294,8 @@ namespace GraphQL
         public static bool EnableReadDescriptionFromXmlDocumentation { get; set; }
         public static bool EnableReflectionCaching { get; set; }
         public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
-        [System.Obsolete("The query root operation type must be provided and must be an Object type. See ht" +
-            "tps://spec.graphql.org/October2021/#sec-Root-Operation-Types. This property will" +
-            " be removed in v9.")]
-        public static bool RequireRootQueryType { get; set; }
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
-        [System.Obsolete("This property will be removed in v9.")]
-        public static bool UseLegacyTypeNaming { get; set; }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter, AllowMultiple=true)]
     public abstract class GraphQLAttribute : System.Attribute
@@ -381,12 +372,6 @@ namespace GraphQL
             where TGraphTypeMappingProvider :  class, GraphQL.Types.IGraphTypeMappingProvider { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddGraphTypes(this GraphQL.DI.IGraphQLBuilder builder, System.Reflection.Assembly assembly) { }
-        [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
-            "d in v9.")]
-        public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration>? action = null) { }
-        [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
-            "d in v9.")]
-        public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration, System.IServiceProvider>? action) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
@@ -406,9 +391,6 @@ namespace GraphQL
         public static GraphQL.DI.IGraphQLBuilder AddSerializer<TSerializer>(this GraphQL.DI.IGraphQLBuilder builder, TSerializer serializer)
             where TSerializer :  class, GraphQL.IGraphQLSerializer { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext> unhandledExceptionDelegate) { }
-        [System.Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of usin" +
-            "g this overload. This method will be removed in v9.")]
-        public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddUnhandledExceptionHandler(this GraphQL.DI.IGraphQLBuilder builder, System.Func<GraphQL.Execution.UnhandledExceptionContext, GraphQL.ExecutionOptions, System.Threading.Tasks.Task> unhandledExceptionDelegate) { }
         public static GraphQL.DI.IGraphQLBuilder AddValidationRule<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TValidationRule>(this GraphQL.DI.IGraphQLBuilder builder, bool useForCachedDocuments = false, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
@@ -971,26 +953,11 @@ namespace GraphQL.Builders
 {
     public static class ConnectionBuilder
     {
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, TSourceType>()
-            where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, TSourceType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType, TSourceType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
-            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType, TSourceType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
@@ -1017,34 +984,16 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
-        [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
-            "\'Connection\' method.")]
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object?> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<object?>> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> ReturnAll() { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TNewReturnType> Returns<TNewReturnType>() { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>()
-            where TNodeType : GraphQL.Types.IGraphType { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
-            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         public static GraphQL.Builders.ConnectionBuilder<TSourceType> Create<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
@@ -1067,9 +1016,6 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
-        [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
-            "\'Connection\' method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> PageSize(int? pageSize) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, TReturnType?> resolver) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType, TReturnType> ResolveAsync(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
@@ -1098,31 +1044,13 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null)
             where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentClrType>(string name, bool nullable, string? description, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
-        [System.Obsolete("Please use Action<QueryArgument> parameter from other Argument() method overloads" +
-            " to set default value for parameter or use Arguments() method. This method will " +
-            "be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType, TArgumentType>(string name, string? description, TArgumentType? defaultValue = default, System.Action<GraphQL.Types.QueryArgument>? configure = null)
-            where TArgumentGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Arguments(params GraphQL.Types.QueryArgument[] arguments) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Arguments(System.Collections.Generic.IEnumerable<GraphQL.Types.QueryArgument> arguments) { }
-        [System.Obsolete("Please use the WithComplexityImpact method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ComplexityImpact(double impact) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Configure(System.Action<GraphQL.Types.FieldType> configure) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DefaultValue(TReturnType? defaultValue = default) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DependsOn<TService>() { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> DeprecationReason(string? deprecationReason) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Description(string? description) { }
-        [System.Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name) { }
-        [System.Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
-        [System.Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argumentName, object? argumentValue) { }
-        [System.Obsolete("Please use the ApplyDirective method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Directive(string name, string argument1Name, object? argument1Value, string argument2Name, object? argument2Value) { }
-        [System.Obsolete("Please configure the field name by providing the name as an argument to the \'Fiel" +
-            "d\' method. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Name(string name) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ParseValue(System.Func<object, object> parseValue) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(GraphQL.Resolvers.IFieldResolver? resolver) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Resolve(System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolve) { }
@@ -1135,14 +1063,8 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Validate(System.Action<object> validation) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Action<GraphQL.Validation.FieldArgumentsValidationContext> validation) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ValidateArguments(System.Func<GraphQL.Validation.FieldArgumentsValidationContext, System.Threading.Tasks.ValueTask> validation) { }
-        [System.Obsolete("Please use the overload that accepts the name as the first argument. This method " +
-            "will be removed in v9.")]
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(GraphQL.Types.IGraphType type, string name = "default") { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, GraphQL.Types.IGraphType type) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null) { }
-        [System.Obsolete("Please use the overload that accepts the name as the first argument. This method " +
-            "will be removed in v9.")]
-        public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type = null, string name = "default") { }
     }
     public interface IResolveConnectionContext : GraphQL.Execution.IProvideUserContext, GraphQL.IResolveFieldContext
     {
@@ -1731,16 +1653,6 @@ namespace GraphQL.Federation
         public InaccessibleAttribute() { }
         public override void Modify(GraphQL.Types.IGraphType graphType) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-    }
-    [System.Obsolete("This class will be removed in GraphQL.NET v9.")]
-    public class InjectTypenameValidationRule : GraphQL.Validation.INodeVisitor, GraphQL.Validation.IValidationRule
-    {
-        public InjectTypenameValidationRule() { }
-        public System.Threading.Tasks.ValueTask EnterAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public System.Threading.Tasks.ValueTask LeaveAsync(GraphQLParser.AST.ASTNode node, GraphQL.Validation.ValidationContext context) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Interface, AllowMultiple=true)]
     public class KeyAttribute : GraphQL.GraphQLAttribute
@@ -2397,48 +2309,19 @@ namespace GraphQL.Types
         protected ComplexGraphType() { }
         public GraphQL.Types.TypeFields Fields { get; }
         public virtual GraphQL.Types.FieldType AddField(GraphQL.Types.FieldType fieldType) { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>()
-            where TNodeType : GraphQL.Types.IGraphType { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType> { }
-        [System.Obsolete("Please use the overload that accepts the mandatory name argument. This method wil" +
-            "l be removed in v9.")]
-        public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>()
-            where TNodeType : GraphQL.Types.IGraphType
-            where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
-            where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
         public GraphQL.Builders.ConnectionBuilder<TSourceType> Connection<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TNodeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TEdgeType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TConnectionType>(string name)
             where TNodeType : GraphQL.Types.IGraphType
             where TEdgeType : GraphQL.Types.Relay.EdgeType<TNodeType>
             where TConnectionType : GraphQL.Types.Relay.ConnectionType<TNodeType, TEdgeType> { }
-        [System.Obsolete("Please use the overload that accepts the name as the first argument. This method " +
-            "will be removed in v9.")]
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(GraphQL.Types.IGraphType type) { }
-        [System.Obsolete("Please use the overload that accepts the name as the first argument. This method " +
-            "will be removed in v9.")]
-        protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, GraphQL.Types.IGraphType type) { }
         protected virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> CreateBuilder<TReturnType>(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, GraphQL.Types.IGraphType type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field(string name, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType Field([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please call Field<TGraphType>(string name) instead. This method will be removed i" +
-            "n v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, object> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name)
             where TGraphType : GraphQL.Types.IGraphType { }
@@ -2446,53 +2329,9 @@ namespace GraphQL.Types
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<TReturnType>(string name, bool nullable = false) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
-        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
-            "guments. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
-        [System.Obsolete("Please use another overload that receives only one of the \'nullable\' or \'type\' ar" +
-            "guments. This method will be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TProperty> Field<TProperty>(string name, System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression, bool nullable, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type? type) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead. This method will" +
-            " be removed in v9.")]
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>()
-            where TGraphType : GraphQL.Types.IGraphType { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Field<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldAsync([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<object?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType, TReturnType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>>? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldDelegate<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Delegate? resolve = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldSubscribe<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.IObservable<object?>>? subscribe = null, string? deprecationReason = null)
-            where TGraphType : GraphQL.Types.IGraphType { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defi" +
-            "ned on it or just use AddField() method directly. This method will be removed in" +
-            " v9.")]
-        public GraphQL.Types.FieldType FieldSubscribeAsync<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TGraphType>(string name, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext<TSourceType>, object?>? resolve = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<System.IObservable<object?>>>? subscribeAsync = null, string? deprecationReason = null)
             where TGraphType : GraphQL.Types.IGraphType { }
         public GraphQL.Types.FieldType? GetField(GraphQLParser.ROM name) { }
         public bool HasField(string name) { }
@@ -2945,18 +2784,6 @@ namespace GraphQL.Types
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
-    }
-    [System.Obsolete("This class will be removed in v9.")]
-    public static class ObjectGraphTypeExtensions
-    {
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
-            "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v9.")]
-        public static void Field(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, object?>? resolve = null) { }
-        [System.Obsolete("Please use one of the Field() methods returning FieldBuilder and then methods def" +
-            "ined on it or just use AddField() method directly. This method will be removed i" +
-            "n v9.")]
-        public static void FieldAsync(this GraphQL.Types.IObjectGraphType obj, string name, GraphQL.Types.IGraphType type, string? description = null, GraphQL.Types.QueryArguments? arguments = null, System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.Task<object?>>? resolve = null) { }
     }
     public class ObjectGraphType<TSourceType> : GraphQL.Types.ComplexGraphType<TSourceType>, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -3525,49 +3352,6 @@ namespace GraphQL.Utilities
         protected static bool IsBuiltInScalar(string typeName) { }
         protected static bool IsIntrospectionType(string typeName) { }
     }
-    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
-        "d in v9.")]
-    public class SchemaPrinter
-    {
-        public SchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
-        protected GraphQL.Utilities.SchemaPrinterOptions Options { get; }
-        protected GraphQL.Types.ISchema Schema { get; set; }
-        public string[] BreakLine(string line, int len) { }
-        public string FormatDefaultValue(object? value, GraphQL.Types.IGraphType graphType) { }
-        protected string FormatDescription(string? description, string indentation = "") { }
-        protected virtual bool IsDefinedDirective(string directiveName) { }
-        protected virtual bool IsDefinedType(string typeName) { }
-        public bool IsSchemaOfCommonNames(GraphQL.Types.ISchema schema) { }
-        public string Print() { }
-        public virtual string PrintArgs(GraphQL.Types.FieldType field) { }
-        public virtual string PrintComment(string? comment, string indentation = "", bool firstInBlock = true) { }
-        public string PrintDeprecation(string? reason) { }
-        public string PrintDescription(string? description, string indentation = "", bool firstInBlock = true) { }
-        public string PrintDirective(GraphQL.Types.Directive directive) { }
-        public virtual string PrintEnum(GraphQL.Types.EnumerationGraphType type) { }
-        public virtual string PrintFields(GraphQL.Types.IComplexGraphType type) { }
-        public string PrintFilteredSchema(System.Func<string, bool> directiveFilter, System.Func<string, bool> typeFilter) { }
-        public virtual string PrintInputObject(GraphQL.Types.IInputObjectGraphType type) { }
-        public string PrintInputValue(GraphQL.Types.FieldType field) { }
-        public string PrintInputValue(GraphQL.Types.QueryArgument argument) { }
-        public virtual string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
-        public string PrintIntrospectionSchema() { }
-        public virtual string PrintObject(GraphQL.Types.IObjectGraphType type) { }
-        public virtual string PrintScalar(GraphQL.Types.ScalarGraphType type) { }
-        public string? PrintSchemaDefinition(GraphQL.Types.ISchema schema) { }
-        public string PrintType(GraphQL.Types.IGraphType type) { }
-        public virtual string PrintUnion(GraphQL.Types.UnionGraphType type) { }
-        protected static bool IsBuiltInDirective(string directiveName) { }
-        protected static bool IsBuiltInScalar(string typeName) { }
-        protected static bool IsIntrospectionType(string typeName) { }
-    }
-    public class SchemaPrinterOptions
-    {
-        public SchemaPrinterOptions() { }
-        public GraphQL.Introspection.ISchemaComparer? Comparer { get; set; }
-        public bool IncludeDeprecationReasons { get; set; }
-        public bool IncludeDescriptions { get; set; }
-    }
     public sealed class SchemaValidationVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public override void VisitDirective(GraphQL.Types.Directive directive, GraphQL.Types.ISchema schema) { }
@@ -3622,70 +3406,6 @@ namespace GraphQL.Utilities
         public void Include<TType>(string name) { }
         public void Include<TType, TTypeOfType>() { }
         public void Include<TType, TTypeOfType>(string name) { }
-    }
-}
-namespace GraphQL.Utilities.Federation
-{
-    [System.Obsolete("This class will be removed in v9 as it is not needed with GraphQL.Federation.Reso" +
-        "lvers.IFederationResolver.")]
-    public class FederatedResolveContext
-    {
-        public FederatedResolveContext() { }
-        public System.Collections.Generic.Dictionary<string, object?> Arguments { get; set; }
-        public GraphQL.IResolveFieldContext ParentFieldContext { get; set; }
-    }
-    [System.Obsolete("Please use Schema.For with graphQlBuilder.AddFederation() instead. This class wil" +
-        "l be removed in v9.")]
-    public class FederatedSchema
-    {
-        public FederatedSchema() { }
-        public static GraphQL.Types.Schema For(string typeDefinitions, System.Action<GraphQL.Utilities.Federation.FederatedSchemaBuilder>? configure = null) { }
-        public static GraphQL.Types.Schema For<TFederatedSchemaBuilder>(string typeDefinitions, System.Action<TFederatedSchemaBuilder>? configure = null)
-            where TFederatedSchemaBuilder : GraphQL.Utilities.Federation.FederatedSchemaBuilder, new () { }
-    }
-    [System.Obsolete("Please use SchemaBuilder with graphQlBuilder.AddFederation() instead. This class " +
-        "will be removed in v9.")]
-    public class FederatedSchemaBuilder : GraphQL.Utilities.SchemaBuilder
-    {
-        public FederatedSchemaBuilder() { }
-        public override GraphQL.Types.Schema Build(string typeDefinitions) { }
-        protected override void PreConfigure(GraphQL.Types.Schema schema) { }
-    }
-    [System.Obsolete("Please use the schema.Print() extension method instead. This class will be remove" +
-        "d in v9.")]
-    public class FederatedSchemaPrinter : GraphQL.Utilities.SchemaPrinter
-    {
-        public FederatedSchemaPrinter(GraphQL.Types.ISchema schema, GraphQL.Utilities.SchemaPrinterOptions? options = null) { }
-        public bool IsFederatedDirective(string directiveName) { }
-        public bool IsFederatedType(string typeName) { }
-        public string PrintAstDirective(GraphQLParser.AST.GraphQLDirective directive) { }
-        public string PrintFederatedDirectives(GraphQL.Types.IGraphType type) { }
-        public string PrintFederatedDirectivesFromAst(GraphQL.Types.IMetadataReader type) { }
-        public string PrintFederatedSchema() { }
-        public override string PrintFields(GraphQL.Types.IComplexGraphType type) { }
-        public override string PrintInterface(GraphQL.Types.IInterfaceGraphType type) { }
-        public override string PrintObject(GraphQL.Types.IObjectGraphType type) { }
-    }
-    [System.Obsolete("Please use the GraphQL.Federation.FederationResolver class instead. This class wi" +
-        "ll be removed in v9.")]
-    public class FuncFederatedResolver<TReturn> : GraphQL.Federation.Resolvers.FederationResolver<System.Collections.Generic.Dictionary<string, object?>, TReturn>, GraphQL.Utilities.Federation.IFederatedResolver
-    {
-        public FuncFederatedResolver(System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<TReturn?>> func) { }
-        public System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context) { }
-    }
-    [System.Obsolete("Please use IFederationResolver instead. This interface will be removed in v9.")]
-    public interface IFederatedResolver
-    {
-        System.Threading.Tasks.Task<object?> Resolve(GraphQL.Utilities.Federation.FederatedResolveContext context);
-    }
-    public static class TypeConfigExtensions
-    {
-        [System.Obsolete("Please use ResolveReference instead, found in the GraphQL.Federation namespace. T" +
-            "his method will be removed in v9.")]
-        public static void ResolveReferenceAsync(this GraphQL.Utilities.TypeConfig config, GraphQL.Utilities.Federation.IFederatedResolver resolver) { }
-        [System.Obsolete("Please use another overload instead, found in the GraphQL.Federation namespace. T" +
-            "his method will be removed in v9.")]
-        public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
     }
 }
 namespace GraphQL.Utilities.Visitors
@@ -4020,23 +3740,6 @@ namespace GraphQL.Validation.Complexity
     {
         GraphQL.Validation.Complexity.FieldComplexityResult Analyze(GraphQL.Validation.Complexity.FieldImpactContext context);
     }
-    [System.Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
-    public class LegacyComplexityConfiguration
-    {
-        public LegacyComplexityConfiguration() { }
-        public double? FieldImpact { get; set; }
-        public int? MaxComplexity { get; set; }
-        public int? MaxDepth { get; set; }
-        public int MaxRecursionCount { get; set; }
-    }
-    [System.Obsolete("Please use the new complexity analyzer. This class will be removed in v9.")]
-    public class LegacyComplexityResult
-    {
-        public LegacyComplexityResult() { }
-        public double Complexity { get; set; }
-        public System.Collections.Generic.Dictionary<GraphQLParser.AST.ASTNode, double> ComplexityMap { get; }
-        public int TotalQueryDepth { get; set; }
-    }
 }
 namespace GraphQL.Validation.Errors
 {
@@ -4206,20 +3909,14 @@ namespace GraphQL.Validation.Errors.Custom
 }
 namespace GraphQL.Validation.Rules
 {
-    public class ArgumentsOfCorrectType : GraphQL.Validation.ValidationRuleBase
+    public sealed class ArgumentsOfCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ArgumentsOfCorrectType Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public ArgumentsOfCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class DefaultValuesOfCorrectType : GraphQL.Validation.ValidationRuleBase
+    public sealed class DefaultValuesOfCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.DefaultValuesOfCorrectType Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public DefaultValuesOfCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
     public sealed class FieldArgumentsAreValidRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
@@ -4228,109 +3925,70 @@ namespace GraphQL.Validation.Rules
         public static GraphQL.Validation.Rules.FieldArgumentsAreValidRule Instance { get; }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class FieldsOnCorrectType : GraphQL.Validation.ValidationRuleBase
+    public sealed class FieldsOnCorrectType : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.FieldsOnCorrectType Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public FieldsOnCorrectType() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class FragmentsOnCompositeTypes : GraphQL.Validation.ValidationRuleBase
+    public sealed class FragmentsOnCompositeTypes : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.FragmentsOnCompositeTypes Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public FragmentsOnCompositeTypes() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class InputFieldsAndArgumentsOfCorrectLength : GraphQL.Validation.ValidationRuleBase
+    public sealed class InputFieldsAndArgumentsOfCorrectLength : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.InputFieldsAndArgumentsOfCorrectLength Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public InputFieldsAndArgumentsOfCorrectLength() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.IVariableVisitor?> GetVariableVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class KnownArgumentNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class KnownArgumentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownArgumentNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public KnownArgumentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class KnownDirectivesInAllowedLocations : GraphQL.Validation.ValidationRuleBase
+    public sealed class KnownDirectivesInAllowedLocations : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownDirectivesInAllowedLocations Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public KnownDirectivesInAllowedLocations() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class KnownFragmentNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class KnownFragmentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownFragmentNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public KnownFragmentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class KnownTypeNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class KnownTypeNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.KnownTypeNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public KnownTypeNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class LoneAnonymousOperation : GraphQL.Validation.ValidationRuleBase
+    public sealed class LoneAnonymousOperation : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.LoneAnonymousOperation Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public LoneAnonymousOperation() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class NoFragmentCycles : GraphQL.Validation.ValidationRuleBase
+    public sealed class NoFragmentCycles : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoFragmentCycles Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public NoFragmentCycles() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class NoUndefinedVariables : GraphQL.Validation.ValidationRuleBase
+    public sealed class NoUndefinedVariables : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUndefinedVariables Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public NoUndefinedVariables() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class NoUnusedFragments : GraphQL.Validation.ValidationRuleBase
+    public sealed class NoUnusedFragments : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUnusedFragments Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public NoUnusedFragments() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class NoUnusedVariables : GraphQL.Validation.ValidationRuleBase
+    public sealed class NoUnusedVariables : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.NoUnusedVariables Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public NoUnusedVariables() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class OverlappingFieldsCanBeMerged : GraphQL.Validation.ValidationRuleBase
+    public sealed class OverlappingFieldsCanBeMerged : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public OverlappingFieldsCanBeMerged() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         public class Conflict
         {
@@ -4352,98 +4010,64 @@ namespace GraphQL.Validation.Rules
             public System.Collections.Generic.List<GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged.ConflictReason>? Msgs { get; set; }
         }
     }
-    public class PossibleFragmentSpreads : GraphQL.Validation.ValidationRuleBase
+    public sealed class PossibleFragmentSpreads : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.PossibleFragmentSpreads Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public PossibleFragmentSpreads() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class ProvidedNonNullArguments : GraphQL.Validation.ValidationRuleBase
+    public sealed class ProvidedNonNullArguments : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ProvidedNonNullArguments Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public ProvidedNonNullArguments() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class ScalarLeafs : GraphQL.Validation.ValidationRuleBase
+    public sealed class ScalarLeafs : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.ScalarLeafs Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public ScalarLeafs() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class SingleRootFieldSubscriptions : GraphQL.Validation.ValidationRuleBase
+    public sealed class SingleRootFieldSubscriptions : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.SingleRootFieldSubscriptions Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public SingleRootFieldSubscriptions() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueArgumentNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueArgumentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueArgumentNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public UniqueArgumentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueDirectivesPerLocation : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueDirectivesPerLocation : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueDirectivesPerLocation Instance;
-        public UniqueDirectivesPerLocation() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueFragmentNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueFragmentNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueFragmentNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public UniqueFragmentNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueInputFieldNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueInputFieldNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueInputFieldNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public UniqueInputFieldNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueOperationNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueOperationNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueOperationNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public UniqueOperationNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class UniqueVariableNames : GraphQL.Validation.ValidationRuleBase
+    public sealed class UniqueVariableNames : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueVariableNames Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public UniqueVariableNames() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class VariablesAreInputTypes : GraphQL.Validation.ValidationRuleBase
+    public sealed class VariablesAreInputTypes : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.VariablesAreInputTypes Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public VariablesAreInputTypes() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
-    public class VariablesInAllowedPosition : GraphQL.Validation.ValidationRuleBase
+    public sealed class VariablesInAllowedPosition : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.VariablesInAllowedPosition Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public VariablesInAllowedPosition() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
 }
@@ -4460,21 +4084,9 @@ namespace GraphQL.Validation.Rules.Custom
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         protected virtual System.Threading.Tasks.ValueTask ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
     }
-    [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
-        "d in v9.")]
-    public class LegacyComplexityValidationRule : GraphQL.Validation.ValidationRuleBase, GraphQL.Validation.INodeVisitor
-    {
-        public LegacyComplexityValidationRule(GraphQL.Validation.Complexity.LegacyComplexityConfiguration complexityConfiguration) { }
-        protected virtual void Analyzed(GraphQLParser.AST.GraphQLDocument document, GraphQL.Validation.Complexity.LegacyComplexityResult complexityResult) { }
-        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        public void Validate(GraphQLParser.AST.GraphQLDocument document, GraphQL.Types.ISchema schema) { }
-    }
-    public class NoIntrospectionValidationRule : GraphQL.Validation.ValidationRuleBase
+    public sealed class NoIntrospectionValidationRule : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.Custom.NoIntrospectionValidationRule Instance;
-        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
-            "will be removed in v9.")]
-        public NoIntrospectionValidationRule() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
 }
