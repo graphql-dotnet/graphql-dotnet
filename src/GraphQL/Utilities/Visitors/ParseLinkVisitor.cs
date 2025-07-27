@@ -14,12 +14,6 @@ public sealed class ParseLinkVisitor : BaseSchemaNodeVisitor
     /// <inheritdoc cref="ParseLinkVisitor"/>
     public static ParseLinkVisitor Instance { get; } = new();
 
-    /// <inheritdoc cref="SchemaExtensions.Run(ISchemaNodeVisitor, ISchema)"/>
-    public void Run(ISchema schema)
-    {
-        VisitSchema(schema);
-    }
-
     /// <inheritdoc/>
     public override void VisitSchema(ISchema schema)
     {
