@@ -1,15 +1,48 @@
 # Migrating from v8.x to v9.x
 
+:warning: For the best upgrade experience, please upgrade to v8.x and resolve all obsolete code warnings
+before upgrading to v9.0. Many members that were marked as obsolete in v8.x have been removed in v9.0. :warning:
+
 See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A9.0.0+is%3Aissue+is%3Aclosed) and
 [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A9.0.0+is%3Aclosed) done in v9.
 
 ## Overview
 
+GraphQL.NET v9 is a major release that focuses on removing obsolete APIs and improving performance. The primary changes include:
+
+- Removal of many members that were marked as obsolete in v8.x
+- Improved concurrency support
+
+For the smoothest migration experience, we strongly recommend:
+
+1. Upgrade to the latest v8.x version
+2. Resolve all compiler warnings about obsolete members
+3. Test your application thoroughly
+4. Then upgrade to v9.0
+
 ## New Features
 
 ## Breaking Changes
 
-### 1. `ConcurrentDictionary` in `ValidationContext`
+### 1. Removal of Obsolete Members
+
+Many members that were marked as obsolete in v8.x have been removed in v9.0. The following is a summary of the key members that have been removed:
+
+- `GlobalSwitches.UseLegacyTypeNaming`
+- `GlobalSwitches.RequireRootQueryType`
+- `FieldBuilder.Directive()` method - use `ApplyDirective()` instead
+- `SchemaPrinter` class - use `schema.Print()` extension method instead
+- `LegacyComplexityValidationRule` - use the newer complexity analyzer instead
+- `IFederatedResolver` interface - use `IFederationResolver` instead
+- `FederatedSchemaBuilder` - use `SchemaBuilder` with `.AddFederation()` instead
+- Related classes within `GraphQL.Utilities.Federation`
+- Built-in validation rule constructors - use `.Instance` instead
+- Field registration methods that use default field names - use overload with field name instead
+- Field argument registration methods that include default values - use configuration overload instead
+
+> **Note:** The GraphQL.NET v8 analyzers can help automatically update obsolete API calls with code fixes, prior to upgrading to v9.
+
+### 2. `ConcurrentDictionary` in `ValidationContext`
 
 Previously, `ValidationContext` used `Dictionary`-typed members, which prevented the use of `ConcurrentDictionary` even when concurrent access would have been beneficial. This limitation became apparent in two key issues:
 
