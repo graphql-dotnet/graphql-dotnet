@@ -35,9 +35,11 @@ Many members that were marked as obsolete in v8.x have been removed in v9.0. The
 - `LegacyComplexityValidationRule` - use the newer complexity analyzer instead
 - `IFederatedResolver` interface - use `IFederationResolver` instead
 - `FederatedSchemaBuilder` - use `SchemaBuilder` with `.AddFederation()` instead
-- Related classes within `GraphQL.Utilities.Federation`
+- Related classes within `GraphQL.Utilities.Federation` including `InjectTypenameValidationRule`
 - Built-in validation rule constructors - use `.Instance` instead
-- Field registration methods that use default field names - use overload with field name instead
+- Field registration methods which do not include the name explicitly or implicitly - use overload with field name instead
+- Field registration methods that include both the bool nullable and Type graphType parameters - use overload with field name and type instead
+- Field methods which include arguments and the resolver as parameters - use field builder methods instead
 - Field argument registration methods that include default values - use configuration overload instead
 
 > **Note:** The GraphQL.NET v8 analyzers can help automatically update obsolete API calls with code fixes, prior to upgrading to v9.
