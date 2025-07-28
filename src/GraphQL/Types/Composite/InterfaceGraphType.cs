@@ -12,16 +12,8 @@ public interface IInterfaceGraphType<in TObject> : IInterfaceGraphType
 {
 }
 
-// todo: merge these members into IAbstractGraphType for v9 (which already match the members in UnionGraphType)
-internal interface IInterfaceGraphType2 : IInterfaceGraphType
-{
-    public IEnumerable<Type> Types { get; set; }
-    public void Type(Type type);
-    public void Type<TType>() where TType : IObjectGraphType;
-}
-
 /// <inheritdoc cref="InterfaceGraphType"/>
-public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType2, IInterfaceGraphType<TSource>
+public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSource>, IInterfaceGraphType<TSource>
 {
     /// <summary>
     /// Initializes a new instance.
