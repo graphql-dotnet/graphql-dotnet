@@ -1,4 +1,3 @@
-using GraphQL.Federation;
 using GraphQL.Types;
 using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
