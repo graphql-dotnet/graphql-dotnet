@@ -590,7 +590,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
                 }
             }
 
-            if (type is IInterfaceGraphType2 iface2) //todo: use IInterfaceGraphType.Types instead of InterfaceGraphType.Types
+            if (type is IInterfaceGraphType iface2)
             {
                 foreach (var possibleType in iface2.Types)
                 {
