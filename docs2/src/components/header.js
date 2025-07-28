@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Link} from 'gatsby'
+import { ThemeToggler } from './ThemeToggler'
 
 const buildLinks = links => {
   return links.map(link => (
@@ -17,6 +18,10 @@ const Header = ({ siteTitle, links, githubUrl }) => (
       <li key="github-link">
         <a href={githubUrl} rel="noopener noreferrer" target="_blank">GitHub</a>
       </li>
+    </ul>
+
+    <ul>
+      <ThemeToggler />
     </ul>
   </nav>
 )
