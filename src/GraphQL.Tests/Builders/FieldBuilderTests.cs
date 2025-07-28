@@ -279,7 +279,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<IntGraphType, int?>("skip", "desc1")
+            .Argument<IntGraphType>("skip", "desc1")
             .Resolve(context =>
             {
                 context.GetArgument<int?>("skip").ShouldBe(null);
@@ -322,7 +322,7 @@ public class FieldBuilderTests
     {
         var objectType = new ObjectGraphType();
         objectType.Field<StringGraphType>("_")
-            .Argument<EpisodeEnum, Episodes>("episode", "episodes")
+            .Argument<EpisodeEnum>("episode", "episodes")
             .Resolve(context =>
             {
                 context.GetArgument("episode", Episodes.EMPIRE).ShouldBe(Episodes.EMPIRE);

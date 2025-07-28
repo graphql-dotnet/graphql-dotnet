@@ -52,21 +52,10 @@ public class ObjectGraphTypeTests
         }
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public void should_ignore_graphqlmetadata_attribute(bool useLegacyTypeNaming)
+    [Fact]
+    public void should_ignore_graphqlmetadata_attribute()
     {
-        var oldUseLegacyTypeNaming = GlobalSwitches.UseLegacyTypeNaming;
-        GlobalSwitches.UseLegacyTypeNaming = useLegacyTypeNaming;
-        try
-        {
-            var type = new TypeWithAttribute();
-            type.Name.ShouldBe("TypeWithAttribute");
-        }
-        finally
-        {
-            GlobalSwitches.UseLegacyTypeNaming = oldUseLegacyTypeNaming;
-        }
+        var type = new TypeWithAttribute();
+        type.Name.ShouldBe("TypeWithAttribute");
     }
 }

@@ -61,8 +61,8 @@ public class UnionGraphTypeTests
             Types = new[] { typeof(GraphQLClrOutputTypeReference<Model1>) }
         };
         unionType.AddPossibleType(new GraphQLTypeReference("Type2"));
-        queryType.Field("union1", unionType, resolve: _ => new Model1());
-        queryType.Field("union2", unionType, resolve: _ => new Model2());
+        queryType.Field("union1", unionType).Resolve(_ => new Model1());
+        queryType.Field("union2", unionType).Resolve(_ => new Model2());
 
         var schema = new Schema() { Query = queryType };
         schema.RegisterTypeMapping<Model1, Type1>();
@@ -82,7 +82,7 @@ public class UnionGraphTypeTests
             Name = "UnionType",
             Types = new[] { typeof(GraphQLClrOutputTypeReference<Model1>) }
         };
-        queryType.Field("union1", unionType, resolve: _ => new Model1());
+        queryType.Field("union1", unionType).Resolve(_ => new Model1());
 
         var schema = new Schema() { Query = queryType };
         Should.Throw<InvalidOperationException>(() => schema.Initialize())

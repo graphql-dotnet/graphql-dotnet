@@ -107,106 +107,73 @@ public static class TypeExtensions
 
     /// <summary>
     /// Gets the GraphQL name of the type. This is derived from the type name and can
-    /// be overridden by the <see cref="GraphQLMetadataAttribute"/>. The name is chosen
-    /// depending on <see cref="GlobalSwitches.UseLegacyTypeNaming"/>.
+    /// be overridden by the <see cref="GraphQLMetadataAttribute"/>.
     /// </summary>
     /// <param name="type">The indicated type.</param>
     /// <returns>A string containing a GraphQL compatible type name.</returns>
     public static string GraphQLName(this Type type)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (!GlobalSwitches.UseLegacyTypeNaming)
-#pragma warning restore CS0618 // Type or member is obsolete
-        {
-            return NameOf(type)
-                .Replace('@', '_'); // F# anonymous class support
+        return NameOf(type)
+            .Replace('@', '_'); // F# anonymous class support
 
-            static string NameOf(Type type)
+        static string NameOf(Type type)
+        {
+            type = type.GetNamedType();
+
+            if (!typeof(IGraphType).IsAssignableFrom(type))
             {
-                type = type.GetNamedType();
-
-                if (!typeof(IGraphType).IsAssignableFrom(type))
+                var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
+                if (!string.IsNullOrEmpty(attr?.Name))
                 {
-                    var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-                    if (!string.IsNullOrEmpty(attr?.Name))
-                    {
-                        return attr!.Name!;
-                    }
+                    return attr!.Name!;
                 }
-
-                var name = type.Name;
-
-                if (type.IsGenericType)
-                {
-                    var i = name.IndexOf('`');
-                    if (i >= 0)
-                        name = name.Substring(0, name.IndexOf('`'));
-                }
-
-                if (name != "GraphType" && name != "Type")
-                {
-                    if (name.EndsWith("GraphType", StringComparison.Ordinal))
-                    {
-                        name = name.Substring(0, name.Length - "GraphType".Length);
-                    }
-                    else if (name.EndsWith("Type", StringComparison.Ordinal))
-                    {
-                        name = name.Substring(0, name.Length - "Type".Length);
-                    }
-                }
-
-                if (GlobalSwitches.UseDeclaringTypeNames)
-                {
-                    var parent = type.DeclaringType;
-                    while (parent != null)
-                    {
-                        var parentName = parent.Name;
-                        var i = parentName.IndexOf('`');
-                        if (i >= 0)
-                            parentName = parentName.Substring(0, parentName.IndexOf('`'));
-                        name = $"{parentName}_{name}";
-                        parent = parent.DeclaringType;
-                    }
-                }
-
-                if (!type.IsGenericType)
-                    return name;
-                var sb = new StringBuilder();
-                foreach (var arg in type.GetGenericArguments())
-                {
-                    sb.Append(NameOf(arg));
-                }
-                sb.Append(name);
-                return sb.ToString();
             }
+
+            var name = type.Name;
+
+            if (type.IsGenericType)
+            {
+                var i = name.IndexOf('`');
+                if (i >= 0)
+                    name = name.Substring(0, name.IndexOf('`'));
+            }
+
+            if (name != "GraphType" && name != "Type")
+            {
+                if (name.EndsWith("GraphType", StringComparison.Ordinal))
+                {
+                    name = name.Substring(0, name.Length - "GraphType".Length);
+                }
+                else if (name.EndsWith("Type", StringComparison.Ordinal))
+                {
+                    name = name.Substring(0, name.Length - "Type".Length);
+                }
+            }
+
+            if (GlobalSwitches.UseDeclaringTypeNames)
+            {
+                var parent = type.DeclaringType;
+                while (parent != null)
+                {
+                    var parentName = parent.Name;
+                    var i = parentName.IndexOf('`');
+                    if (i >= 0)
+                        parentName = parentName.Substring(0, parentName.IndexOf('`'));
+                    name = $"{parentName}_{name}";
+                    parent = parent.DeclaringType;
+                }
+            }
+
+            if (!type.IsGenericType)
+                return name;
+            var sb = new StringBuilder();
+            foreach (var arg in type.GetGenericArguments())
+            {
+                sb.Append(NameOf(arg));
+            }
+            sb.Append(name);
+            return sb.ToString();
         }
-
-        type = type.GetNamedType();
-
-        var attr = type.GetCustomAttribute<GraphQLMetadataAttribute>();
-
-        if (!string.IsNullOrEmpty(attr?.Name))
-        {
-            return attr!.Name!;
-        }
-
-        var typeName = type.Name;
-
-        if (type.IsGenericType)
-        {
-            var i = typeName.IndexOf('`');
-            if (i >= 0)
-                typeName = typeName.Substring(0, typeName.IndexOf('`'));
-        }
-
-        if (typeName == nameof(GraphType) || typeName == nameof(Type))
-            return typeName;
-
-        typeName = typeName.Replace(nameof(GraphType), nameof(Type));
-
-        return typeName.EndsWith(nameof(Type), StringComparison.InvariantCulture)
-            ? typeName.Remove(typeName.Length - nameof(Type).Length)
-            : typeName;
     }
 
     /// <summary>

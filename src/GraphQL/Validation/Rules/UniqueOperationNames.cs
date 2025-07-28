@@ -9,20 +9,13 @@ namespace GraphQL.Validation.Rules;
 ///
 /// A GraphQL document is only valid if all defined operations have unique names.
 /// </summary>
-public class UniqueOperationNames : ValidationRuleBase
+public sealed class UniqueOperationNames : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly UniqueOperationNames Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="UniqueOperationNames"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public UniqueOperationNames()
-    {
-    }
+    private UniqueOperationNames() { }
 
     /// <inheritdoc/>
     /// <exception cref="UniqueOperationNamesError"/>

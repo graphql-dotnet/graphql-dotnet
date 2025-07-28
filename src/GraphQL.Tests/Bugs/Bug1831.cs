@@ -80,15 +80,15 @@ public class Bug1831InputGraphType : InputObjectGraphType<Bug1831Class>
 {
     public Bug1831InputGraphType()
     {
-        Field("id", x => x.Id, true, typeof(StringGraphType));
-        Field("rows", x => x.Rows, true, typeof(ListGraphType<Bug1831RowInputGraphType>));
+        Field("id", x => x.Id, typeof(StringGraphType));
+        Field("rows", x => x.Rows, typeof(ListGraphType<Bug1831RowInputGraphType>));
     }
 }
 public class Bug1831RowInputGraphType : InputObjectGraphType<Bug1831Row>
 {
     public Bug1831RowInputGraphType()
     {
-        Field("id", x => x.Id, true, typeof(StringGraphType));
-        Field("name", x => x.Name, true, typeof(StringGraphType));
+        Field("id", x => x.Id, typeof(StringGraphType));
+        Field("name", x => x.Name, typeof(StringGraphType));
     }
 }

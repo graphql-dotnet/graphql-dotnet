@@ -10,20 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// can only be spread into a composite type (object, interface, or union), the
 /// type condition must also be a composite type.
 /// </summary>
-public class FragmentsOnCompositeTypes : ValidationRuleBase
+public sealed class FragmentsOnCompositeTypes : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly FragmentsOnCompositeTypes Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="FragmentsOnCompositeTypes"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public FragmentsOnCompositeTypes()
-    {
-    }
+    private FragmentsOnCompositeTypes() { }
 
     /// <inheritdoc/>
     /// <exception cref="FragmentsOnCompositeTypesError"/>

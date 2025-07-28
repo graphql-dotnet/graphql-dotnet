@@ -159,15 +159,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <summary>
     /// Creates a field builder used by Field() methods.
     /// </summary>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
-    protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
-    {
-        return FieldBuilder<TSourceType, TReturnType>.Create(type);
-    }
-
-    /// <summary>
-    /// Creates a field builder used by Field() methods.
-    /// </summary>
     protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type)
     {
         return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
@@ -176,296 +167,9 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <summary>
     /// Creates a field builder used by Field() methods.
     /// </summary>
-    [Obsolete("Please use the overload that accepts the name as the first argument. This method will be removed in v9.")]
-    protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(IGraphType type)
-    {
-        return FieldBuilder<TSourceType, TReturnType>.Create(type);
-    }
-
-    /// <summary>
-    /// Creates a field builder used by Field() methods.
-    /// </summary>
     protected virtual FieldBuilder<TSourceType, TReturnType> CreateBuilder<[NotAGraphType] TReturnType>(string name, IGraphType type)
     {
         return FieldBuilder<TSourceType, TReturnType>.Create(name, type);
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <param name="type">The .NET type of the graph type of this field.</param>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType Field(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-        string? deprecationReason = null)
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = type,
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(resolve)
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, object?>? resolve = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(resolve)
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldDelegate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Delegate? resolve = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        IFieldResolver? resolver = null;
-
-        if (resolve != null)
-        {
-            // create an instance expression that points to the instance represented by the delegate
-            // for instance, if the delegate represents obj.MyMethod,
-            // then the lambda would be: _ => obj
-            var param = Expression.Parameter(typeof(IResolveFieldContext), "context");
-            var body = Expression.Constant(resolve.Target, resolve.Method.DeclaringType!);
-            var lambda = Expression.Lambda(body, param);
-            resolver = AutoRegisteringHelper.BuildFieldResolver(resolve.Method, null, null, lambda);
-        }
-
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolver,
-        });
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <param name="type">The .NET type of the graph type of this field.</param>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldAsync(
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type,
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
-        string? deprecationReason = null)
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = type,
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, Task<object?>>? resolve = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(context => new ValueTask<object?>(resolve(context)))
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <typeparam name="TReturnType">The type of the return value of the field resolver delegate.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of the field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Only applicable to fields of output graph types. If not specified, <see cref="NameFieldResolver"/> will be used.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field. Applicable only for output graph types.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>>? resolve = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context)))
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a subscription field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of this field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
-    /// <param name="subscribe">A source stream resolver delegate.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldSubscribe<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, object?>? resolve = null, // TODO: remove?
-        Func<IResolveFieldContext, IObservable<object?>>? subscribe = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(resolve)
-                : null,
-            StreamResolver = subscribe != null
-                ? new SourceStreamResolver<object>(subscribe)
-                : null
-        });
-    }
-
-    /// <summary>
-    /// Adds a subscription field with the specified properties to this graph type.
-    /// </summary>
-    /// <typeparam name="TGraphType">The .NET type of the graph type of this field.</typeparam>
-    /// <param name="name">The name of the field.</param>
-    /// <param name="description">The description of this field.</param>
-    /// <param name="arguments">A list of arguments for the field.</param>
-    /// <param name="resolve">A field resolver delegate. Data from an event stream is processed by this field resolver as the source before being passed to the field's children as the source. Typically this would be <c>context => context.Source</c>.</param>
-    /// <param name="subscribeAsync">A source stream resolver delegate.</param>
-    /// <param name="deprecationReason">The deprecation reason for the field.</param>
-    /// <returns>The newly added <see cref="FieldType"/> instance.</returns>
-    [Obsolete("Please use one of the Field() methods returning FieldBuilder and the methods defined on it or just use AddField() method directly. This method will be removed in v9.")]
-    public FieldType FieldSubscribeAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>(
-        string name,
-        string? description = null,
-        QueryArguments? arguments = null,
-        Func<IResolveFieldContext<TSourceType>, object?>? resolve = null, // TODO: remove?
-        Func<IResolveFieldContext, Task<IObservable<object?>>>? subscribeAsync = null,
-        string? deprecationReason = null)
-        where TGraphType : IGraphType
-    {
-        return AddField(new FieldType
-        {
-            Name = name,
-            Description = description,
-            DeprecationReason = deprecationReason,
-            Type = typeof(TGraphType),
-            Arguments = arguments,
-            Resolver = resolve != null
-                ? new FuncFieldResolver<TSourceType, object>(resolve)
-                : null,
-            StreamResolver = subscribeAsync != null
-                ? new SourceStreamResolver<object>(context => new ValueTask<IObservable<object?>>(subscribeAsync(context)))
-                : null
-        });
     }
 
     /// <summary>
@@ -481,18 +185,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         AddField(builder.FieldType);
         return builder;
     }
-
-    /// <inheritdoc cref="Field{TGraphType, TReturnType}(string)"/>
-    [Obsolete("Please call Field<TGraphType, TReturnType>(string name) instead. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TReturnType> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType, [NotAGraphType] TReturnType>()
-        where TGraphType : IGraphType
-        => Field<TGraphType, TReturnType>("default");
-
-    /// <inheritdoc cref="Field{TGraphType}(string)"/>
-    [Obsolete("Please call Field<TGraphType>(string name) instead. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, object> Field<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphType>()
-        where TGraphType : IGraphType
-        => Field<TGraphType, object>("default");
 
     /// <summary>
     /// Adds a new field to the complex graph type and returns a builder for this newly added field.
@@ -548,25 +240,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         AddField(builder.FieldType);
         return builder;
     }
-
-    /// <summary>
-    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
-    /// <br/><br/>
-    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
-    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
-    /// </summary>
-    /// <typeparam name="TProperty">The return type of the field.</typeparam>
-    /// <param name="name">The name of this field.</param>
-    /// <param name="expression">The property of the source object represented within an expression.</param>
-    /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
-    [Obsolete("Please use another overload that receives only one of the 'nullable' or 'type' arguments. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
-        string name,
-        Expression<Func<TSourceType, TProperty>> expression,
-        bool nullable,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
-        Field(name, expression, (bool?)nullable, type);
 
     /// <summary>
     /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
@@ -707,24 +380,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     /// <param name="expression">The property of the source object represented within an expression.</param>
     /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
     /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
-    [Obsolete("Please use another overload that receives only one of the 'nullable' or 'type' arguments. This method will be removed in v9.")]
-    public virtual FieldBuilder<TSourceType, TProperty> Field<TProperty>(
-        Expression<Func<TSourceType, TProperty>> expression,
-        bool nullable,
-        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type? type) =>
-        Field(expression, (bool?)nullable, type);
-
-    /// <summary>
-    /// Adds a new field to the complex graph type and returns a builder for this newly added field that is linked to a property of the source object.
-    /// The default name of this field is inferred by the property represented within the expression.
-    /// <br/><br/>
-    /// Note: this method uses dynamic compilation and therefore allocates a relatively large amount of
-    /// memory in managed heap, ~1KB. Do not use this method in cases with limited memory requirements.
-    /// </summary>
-    /// <typeparam name="TProperty">The return type of the field.</typeparam>
-    /// <param name="expression">The property of the source object represented within an expression.</param>
-    /// <param name="nullable">Indicates if this field should be nullable or not. Ignored when <paramref name="type"/> is specified.</param>
-    /// <param name="type">The graph type of the field; if <see langword="null"/> then will be inferred from the specified expression via registered schema mappings.</param>
     /// <remarks>
     /// When <paramref name="nullable"/> and <paramref name="type"/> are both <see langword="null"/>
     /// the field's nullability depends on <see cref="GlobalSwitches.InferFieldNullabilityFromNRTAnnotations"/> and <paramref name="expression"/> type.
@@ -804,31 +459,10 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         Field(expression, nullable: null, type);
 
     /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>()
-        where TNodeType : IGraphType
-    {
-        var builder = ConnectionBuilder.Create<TNodeType, TSourceType>();
-        AddField(builder.FieldType);
-        return builder;
-    }
-
-    /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType}(string)"/>
     public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
         where TNodeType : IGraphType
     {
         var builder = ConnectionBuilder.Create<TNodeType, TSourceType>(name);
-        AddField(builder.FieldType);
-        return builder;
-    }
-
-    /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public ConnectionBuilder<TSourceType> Connection<TNodeType, TEdgeType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-    {
-        var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>();
         AddField(builder.FieldType);
         return builder;
     }
@@ -839,18 +473,6 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
         where TEdgeType : EdgeType<TNodeType>
     {
         var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TSourceType>(name);
-        AddField(builder.FieldType);
-        return builder;
-    }
-
-    /// <inheritdoc cref="ConnectionBuilder{TSourceType}.Create{TNodeType, TEdgeType, TConnectionType}(string)"/>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public ConnectionBuilder<TSourceType> Connection<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-        where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-    {
-        var builder = ConnectionBuilder.Create<TNodeType, TEdgeType, TConnectionType, TSourceType>();
         AddField(builder.FieldType);
         return builder;
     }

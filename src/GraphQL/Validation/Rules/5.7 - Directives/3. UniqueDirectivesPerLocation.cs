@@ -10,12 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL document is only valid if all not repeatable directives
 /// at a given location are uniquely named.
 /// </summary>
-public class UniqueDirectivesPerLocation : ValidationRuleBase
+public sealed class UniqueDirectivesPerLocation : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
     public static readonly UniqueDirectivesPerLocation Instance = new();
+    private UniqueDirectivesPerLocation() { }
 
     /// <inheritdoc/>
     /// <exception cref="UniqueDirectivesPerLocationError"/>

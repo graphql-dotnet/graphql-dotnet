@@ -13,7 +13,7 @@ public static class ComplexityAnalayzerMetadataExtensions
     private const string COMPLEXITY_IMPACT_FUNC = "__COMPLEXITY_IMPACT_FUNC__";
 
     /// <summary>
-    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/> and <see cref="LegacyComplexityValidationRule"/>.
+    /// Specify field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.
     /// Changing this value does not affect the complexity impact of child fields.
     /// </summary>
     /// <typeparam name="TMetadataProvider">The type of metadata provider. Generics are used here to let compiler infer the returning type to allow methods chaining.</typeparam>
@@ -49,15 +49,6 @@ public static class ComplexityAnalayzerMetadataExtensions
     public static TMetadataProvider WithComplexityImpact<TMetadataProvider>(this TMetadataProvider provider, Func<FieldImpactContext, FieldComplexityResult> func)
         where TMetadataProvider : IFieldMetadataWriter
         => provider.WithMetadata(COMPLEXITY_IMPACT_FUNC, func);
-
-    /// <summary>
-    /// Get field's complexity impact which will be taken into account by <see cref="LegacyComplexityValidationRule"/>.
-    /// </summary>
-    /// <param name="provider">Metadata provider which must implement <see cref="IProvideMetadata"/> interface.</param>
-    /// <returns>Field's complexity impact.</returns>
-    [Obsolete("Please use GetComplexityImpactDelegate instead. This method will be removed in v9.")]
-    public static double? GetComplexityImpact(this IMetadataReader provider)
-        => provider.GetMetadata<double?>(COMPLEXITY_IMPACT);
 
     /// <summary>
     /// Get field's complexity impact which will be taken into account by <see cref="ComplexityValidationRule"/>.

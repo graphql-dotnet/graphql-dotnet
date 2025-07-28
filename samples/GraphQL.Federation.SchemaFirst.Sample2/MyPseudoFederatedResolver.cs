@@ -1,5 +1,7 @@
+using System.Globalization;
+using GraphQL.Federation.Resolvers;
 using GraphQL.Federation.SchemaFirst.Sample2.Schema;
-using GraphQL.Utilities.Federation;
+using GraphQL.Types;
 
 namespace GraphQL.Federation.SchemaFirst.Sample2;
 
@@ -7,17 +9,17 @@ namespace GraphQL.Federation.SchemaFirst.Sample2;
 /// Creates a new instance of <typeparamref name="T"/> for any object requested to be resolved.
 /// Used for <see cref="Category"/> since there is no data stored in this repository for categories.
 /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
-public class MyPseudoFederatedResolver<T> : IFederatedResolver
+public class MyPseudoFederatedResolver<T> : IFederationResolver
     where T : IHasId, new()
 {
-    public Task<object?> Resolve(FederatedResolveContext context)
+    public bool MatchKeys(IDictionary<string, object?> representation) => true;
+
+    public object ParseRepresentation(IComplexGraphType graphType, IDictionary<string, object?> representation)
+        => (int)Convert.ChangeType(representation["id"], typeof(int), CultureInfo.InvariantCulture)!;
+
+    public ValueTask<object?> ResolveAsync(IResolveFieldContext context, IComplexGraphType graphType, object parsedRepresentation)
     {
-        if (context.Arguments.TryGetValue("id", out object? idValue))
-        {
-            int id = (int)Convert.ChangeType(idValue, typeof(int))!;
-            return Task.FromResult<object?>(new T() { Id = id! });
-        }
-        return Task.FromResult<object?>(null);
+        int id = (int)parsedRepresentation;
+        return ValueTask.FromResult<object?>(new T() { Id = id });
     }
 }

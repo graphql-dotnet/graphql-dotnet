@@ -10,20 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// For each usage of a directive, the directive must be available on that server and
 /// must be used in a location that the server has declared support for.
 /// </summary>
-public class KnownDirectivesInAllowedLocations : ValidationRuleBase
+public sealed class KnownDirectivesInAllowedLocations : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly KnownDirectivesInAllowedLocations Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="KnownDirectivesInAllowedLocations"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public KnownDirectivesInAllowedLocations()
-    {
-    }
+    private KnownDirectivesInAllowedLocations() { }
 
     /// <inheritdoc/>
     /// <exception cref="KnownDirectivesError"/>

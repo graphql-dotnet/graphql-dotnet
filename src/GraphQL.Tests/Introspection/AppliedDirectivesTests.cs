@@ -44,7 +44,7 @@ public class AppliedDirectivesTests
         {
             Field<StringGraphType>("test")
                 .Argument<StringGraphType>("some", arg => arg.ApplyDirective("traits", "quality", "moderate"))
-                .Directive("traits", "quality", "low");
+                .ApplyDirective("traits", "quality", "low");
 
             this.ApplyDirective("traits"); // default arguments values used, therefore they will not be returned by introspection
         }

@@ -156,7 +156,7 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         // the schema can be initialized without this field because no object graph type returns the interface type Image.
         // here, since a field has been added that returns the interface type Image, the interface type must either
         //   provide a resolveType function, or each possible type must provide an IsTypeOf function.
-        schema.Query.Field("test", new GraphQLTypeReference("Image"));
+        ((ObjectGraphType)schema.Query).Field("test", new GraphQLTypeReference("Image"));
         Should.Throw<InvalidOperationException>(schema.Initialize)
             .Message.ShouldBe("Interface type 'Image' does not provide a 'resolveType' function and possible Type 'Picture' does not provide a 'isTypeOf' function.  There is no way to resolve this possible type during execution.");
     }

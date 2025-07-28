@@ -2,7 +2,7 @@ using System.Reflection;
 using GraphQL.Federation.SchemaFirst.Sample2.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
+using GraphQL.Utilities;
 
 namespace GraphQL.Federation.SchemaFirst.Sample2;
 
@@ -16,7 +16,8 @@ public class Program
         builder.Services.AddSingleton<Query>();
         builder.Services.AddGraphQL(b => b
             .AddSchema(BuildSchema)
-            .AddSystemTextJson());
+            .AddSystemTextJson()
+            .AddFederation("1.0")); // specify Federation v1 compatibility
 
         // Build the web application
         var app = builder.Build();
@@ -47,21 +48,22 @@ public class Program
         var reader = new StreamReader(stream);
         var schemaString = reader.ReadToEnd();
 
-        // note: this demonstrates GraphQL.NET v7 and prior configuration methods
-#pragma warning disable CS0618 // Type or member is obsolete
+        // note: this demonstrates GraphQL.NET v8 and newer configuration methods
         // define the known types and their resolvers
-        var schemaBuilder = new FederatedSchemaBuilder();
+        var schemaBuilder = new SchemaBuilder
+        {
+            ServiceProvider = serviceProvider,
+        };
         schemaBuilder.Types.Include<Query>();
         schemaBuilder.Types.Include<Category>();
         // categories do not actually exist in the data, so we use a pseudo-resolver
         // which always returns a Category instance for the given ID, so that the product
         // list can be resolved from it
-        schemaBuilder.Types.For(nameof(Category)).ResolveReferenceAsync(
+        schemaBuilder.Types.For(nameof(Category)).ResolveReference(
             new MyPseudoFederatedResolver<Category>());
         schemaBuilder.Types.Include<Product>();
-        schemaBuilder.Types.For(nameof(Product)).ResolveReferenceAsync(
+        schemaBuilder.Types.For(nameof(Product)).ResolveReference(
             new MyFederatedResolver<Product>((data, id) => data.GetProductById(id)));
-#pragma warning restore CS0618 // Type or member is obsolete
 
         // build the schema
         return schemaBuilder.Build(schemaString);

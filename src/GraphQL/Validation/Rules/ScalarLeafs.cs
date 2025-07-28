@@ -10,20 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL document is valid only if all leaf fields (fields without
 /// sub selections) are of scalar or enum types.
 /// </summary>
-public class ScalarLeafs : ValidationRuleBase
+public sealed class ScalarLeafs : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly ScalarLeafs Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="ScalarLeafs"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public ScalarLeafs()
-    {
-    }
+    private ScalarLeafs() { }
 
     /// <inheritdoc/>
     /// <exception cref="ScalarLeafsError"/>

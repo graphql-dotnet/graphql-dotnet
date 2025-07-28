@@ -131,8 +131,7 @@ public class OrderType : ObjectGraphType<Order>
     {
         ...
 
-        Field<UserType, User>()
-            .Name("User")
+        Field<UserType, User>("User")
             .ResolveAsync(context =>
             {
                 // Get or add a batch loader with the key "GetUsersById"
@@ -176,8 +175,7 @@ public class UserType : ObjectGraphType<User>
     {
         ...
 
-        Field<ListGraphType<OrderType>, IEnumerable<Order>>()
-            .Name("Orders")
+        Field<ListGraphType<OrderType>, IEnumerable<Order>>("Orders")
             .ResolveAsync(ctx =>
             {
                 // Get or add a collection batch loader with the key "GetOrdersByUserId"
@@ -217,8 +215,7 @@ public class QueryType : ObjectGraphType
     // Inject the IDataLoaderContextAccessor to access the current DataLoaderContext
     public QueryType(IDataLoaderContextAccessor accessor, IUsersStore users)
     {
-        Field<ListGraphType<UserType>, IEnumerable<User>>()
-            .Name("Users")
+        Field<ListGraphType<UserType>, IEnumerable<User>>("Users")
             .Description("Get all Users")
             .ResolveAsync(ctx =>
             {
@@ -251,8 +248,7 @@ public class UserType : ObjectGraphType<User>
     {
         ...
 
-        Field<ListGraphType<ItemType>, IEnumerable<Item>>()
-            .Name("OrderedItems")
+        Field<ListGraphType<ItemType>, IEnumerable<Item>>("OrderedItems")
             .ResolveAsync(async context =>
             {
                 // Asynchronously authenticate

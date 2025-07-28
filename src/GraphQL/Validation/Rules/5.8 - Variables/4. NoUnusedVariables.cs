@@ -10,20 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// are used in that operation or a fragment transitively included by that
 /// operation.
 /// </summary>
-public class NoUnusedVariables : ValidationRuleBase
+public sealed class NoUnusedVariables : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly NoUnusedVariables Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="NoUnusedVariables"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public NoUnusedVariables()
-    {
-    }
+    private NoUnusedVariables() { }
 
     /// <inheritdoc/>
     /// <exception cref="NoUnusedVariablesError"/>

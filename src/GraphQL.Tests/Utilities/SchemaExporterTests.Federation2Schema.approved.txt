@@ -1,12 +1,14 @@
 directive @extends on INTERFACE | OBJECT
 
-directive @external on FIELD_DEFINITION
+directive @external on FIELD_DEFINITION | OBJECT
 
-directive @key(fields: String!) on INTERFACE | OBJECT
+directive @key(fields: FieldSet!, resolvable: Boolean = true) repeatable on OBJECT
 
-directive @provides(fields: String!) on FIELD_DEFINITION
+directive @provides(fields: FieldSet!) on FIELD_DEFINITION
 
-directive @requires(fields: String!) on FIELD_DEFINITION
+directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+
+scalar FieldSet
 
 type Product @key(fields: "id") {
   category: Category!
@@ -16,7 +18,6 @@ type Product @key(fields: "id") {
 
 scalar _Any
 
-"A union of all types that use the @key directive"
 union _Entity = Category | Product
 
 type _Service {

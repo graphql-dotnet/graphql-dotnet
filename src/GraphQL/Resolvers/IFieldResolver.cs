@@ -14,7 +14,7 @@ namespace GraphQL.Resolvers;
 /// or <see cref="Builders.FieldBuilder{TSourceType, TReturnType}">FieldBuilder</see>.<see cref="Builders.FieldBuilder{TSourceType, TReturnType}.ResolveAsync(Func{IResolveFieldContext{TSourceType}, Task{TReturnType}})">ResolveAsync</see>.
 /// </para><para>
 /// When mapping fields to source object properties via
-/// <see cref="ComplexGraphType{TSourceType}.Field{TProperty}(System.Linq.Expressions.Expression{Func{TSourceType, TProperty}}, bool, Type)">Field(x => x.Name)</see>,
+/// <see cref="ComplexGraphType{TSourceType}.Field{TProperty}(System.Linq.Expressions.Expression{Func{TSourceType, TProperty}}, bool)">Field(x => x.Name)</see>,
 /// <see cref="ExpressionFieldResolver{TSourceType, TProperty}">ExpressionFieldResolver</see> is used.
 /// </para><para>
 /// When a field resolver is not defined, such as with <see cref="ComplexGraphType{TSourceType}.Field{TGraphType, TReturnType}(string)">Field("Name")</see>,

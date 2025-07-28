@@ -428,7 +428,7 @@ public class SchemaWithDirective : Schema
         public BookSummaryCreateArgInputType()
         {
             Name = "BookSummaryCreateArg";
-            Field(_ => _.Count).Directive("maxLength", x =>
+            Field(_ => _.Count).ApplyDirective("maxLength", x =>
                 x.AddArgument(new DirectiveArgument("min") { Name = "min", Value = 1 })
                 .AddArgument(new DirectiveArgument("max") { Name = "max", Value = 10 }));
         }

@@ -85,20 +85,6 @@ public static class GlobalSwitches
     public static ICollection<GraphQLAttribute> GlobalAttributes { get; } = new List<GraphQLAttribute>();
 
     /// <summary>
-    /// Enables the schema validation rule requiring schemas to have a Query type defined.
-    /// This is required by the GraphQL specification.
-    /// See <see href="https://spec.graphql.org/October2021/#sec-Root-Operation-Types">Root Operation Types</see>.
-    /// </summary>
-    [Obsolete("The query root operation type must be provided and must be an Object type. See https://spec.graphql.org/October2021/#sec-Root-Operation-Types. This property will be removed in v9.")]
-    public static bool RequireRootQueryType { get; set; } = true;
-
-    /// <summary>
-    /// Use the v7 naming strategy for graph type names.
-    /// </summary>
-    [Obsolete("This property will be removed in v9.")]
-    public static bool UseLegacyTypeNaming { get; set; } = false;
-
-    /// <summary>
     /// Enables caching of reflection metadata and resolvers from <see cref="Types.AutoRegisteringObjectGraphType{TSourceType}">AutoRegisteringObjectGraphType</see>;
     /// useful for scoped schemas.
     /// <br/><br/>

@@ -360,10 +360,8 @@ public class SchemaTypes : IEnumerable<IGraphType>
             }
         }
 
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (schema.Query == null && GlobalSwitches.RequireRootQueryType)
+        if (schema.Query == null)
             throw new InvalidOperationException("Query root type must be provided. See https://spec.graphql.org/October2021/#sec-Schema-Introspection");
-#pragma warning restore CS0618 // Type or member is obsolete
 
         if (schema.Query != null)
             yield return schema.Query;

@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQL.Utilities.Federation;
 using GraphQLParser.AST;
 using Microsoft.Extensions.DependencyInjection;
 using SchemaExporter = GraphQL.Utilities.SchemaExporter;
@@ -59,8 +58,12 @@ public class SchemaExporterTests
     [Fact]
     public void Federation1Schema()
     {
-        var schema = new FederatedSchemaBuilder()
-            .Build("Federated".ReadSDL());
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddGraphQL(b => b
+            .AddSchema(provider => Schema.For("Federated".ReadSDL(), c => c.ServiceProvider = provider))
+            .AddFederation("1.0"));
+        var services = serviceCollection.BuildServiceProvider();
+        var schema = services.GetRequiredService<ISchema>();
         schema.Print(new() { IncludeFederationTypes = false, StringComparison = StringComparison.OrdinalIgnoreCase })
             .ShouldMatchApproved(o => o.NoDiff());
     }
@@ -68,8 +71,12 @@ public class SchemaExporterTests
     [Fact]
     public void Federation2Schema()
     {
-        var schema = new FederatedSchemaBuilder()
-            .Build("Federated".ReadSDL());
+        var serviceCollection = new ServiceCollection();
+        serviceCollection.AddGraphQL(b => b
+            .AddSchema(provider => Schema.For("Federated".ReadSDL(), c => c.ServiceProvider = provider))
+            .AddFederation("1.0"));
+        var services = serviceCollection.BuildServiceProvider();
+        var schema = services.GetRequiredService<ISchema>();
         schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase }).ShouldMatchApproved(o => o.NoDiff());
     }
 

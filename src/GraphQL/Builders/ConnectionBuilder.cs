@@ -16,35 +16,10 @@ public static class ConnectionBuilder
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [NotAGraphType] TSourceType>()
-        where TNodeType : IGraphType
-        => ConnectionBuilder<TSourceType>.Create<TNodeType>();
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node type.
-    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
     /// <param name="name">The name of the connection.</param>
     public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [NotAGraphType] TSourceType>(string name)
         where TNodeType : IGraphType
         => ConnectionBuilder<TSourceType>.Create<TNodeType>(name);
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node and edge type.
-    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [NotAGraphType] TSourceType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>();
 
     /// <summary>
     /// Returns a builder for new connection field for the specified node and edge type.
@@ -58,20 +33,6 @@ public static class ConnectionBuilder
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType>(name);
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node, edge and connection type.
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-    /// <typeparam name="TSourceType">The type of <see cref="IResolveFieldContext.Source"/>.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType, [NotAGraphType] TSourceType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-        where TConnectionType : ConnectionType<TNodeType, TEdgeType>
-        => ConnectionBuilder<TSourceType>.Create<TNodeType, TEdgeType, TConnectionType>();
 
     /// <summary>
     /// Returns a builder for new connection field for the specified node, edge and connection type.
@@ -123,31 +84,9 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
     /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
     /// </summary>
     /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>()
-        where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>();
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node type.
-    /// The edge type is <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.
-    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;&gt;.
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
     /// <param name="name">The name of the connection.</param>
     public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType>(string name)
         where TNodeType : IGraphType => Create<TNodeType, EdgeType<TNodeType>>(name);
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node and edge type.
-    /// The connection type is <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-        => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>();
 
     /// <summary>
     /// Returns a builder for new connection field for the specified node and edge type.
@@ -160,19 +99,6 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
         where TNodeType : IGraphType
         where TEdgeType : EdgeType<TNodeType>
         => Create<TNodeType, TEdgeType, ConnectionType<TNodeType, TEdgeType>>(name);
-
-    /// <summary>
-    /// Returns a builder for new connection field for the specified node, edge and connection type.
-    /// </summary>
-    /// <typeparam name="TNodeType">The graph type of the connection's node.</typeparam>
-    /// <typeparam name="TEdgeType">The graph type of the connection's edge. Must derive from <see cref="EdgeType{TNodeType}">EdgeType</see>&lt;<typeparamref name="TNodeType"/>&gt;.</typeparam>
-    /// <typeparam name="TConnectionType">The graph type of the connection. Must derive from <see cref="ConnectionType{TNodeType, TEdgeType}">ConnectionType</see>&lt;<typeparamref name="TNodeType"/>, <typeparamref name="TEdgeType"/>&gt;.</typeparam>
-    [Obsolete("Please use the overload that accepts the mandatory name argument. This method will be removed in v9.")]
-    public static ConnectionBuilder<TSourceType> Create<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TNodeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TEdgeType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TConnectionType>()
-        where TNodeType : IGraphType
-        where TEdgeType : EdgeType<TNodeType>
-        where TConnectionType : ConnectionType<TNodeType, TEdgeType> =>
-        Create<TNodeType, TEdgeType, TConnectionType>("default");
 
     /// <summary>
     /// Returns a builder for new connection field for the specified node, edge and connection type.
@@ -220,14 +146,6 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
         Argument<IntGraphType, int?>("last",
             "Specifies the maximum number of edges to return, starting prior to the cursor specified by 'before', or the last number of edges if 'before' is not specified.");
 
-        return this;
-    }
-
-    /// <inheritdoc cref="FieldBuilder{TSourceType, TReturnType}.Name(string)"/>
-    [Obsolete("Please configure the connection name by providing the name as an argument to the 'Connection' method.")]
-    public virtual ConnectionBuilder<TSourceType> Name(string name)
-    {
-        FieldType.Name = name;
         return this;
     }
 

@@ -29,7 +29,8 @@ public abstract class GraphType : MetadataProvider, IGraphType
                 // GraphType must always have a valid name so set it to default name in constructor
                 // and skip validation only for well-known types including introspection.
                 // This name can be always changed later to any valid value.
-                SetName(GetDefaultName(), validate: GetType().Assembly != typeof(GraphType).Assembly);
+                var defaultName = GetType().GraphQLName();
+                SetName(defaultName, validate: GetType().Assembly != typeof(GraphType).Assembly);
             }
             return;
         }
@@ -46,34 +47,6 @@ public abstract class GraphType : MetadataProvider, IGraphType
     }
 
     private bool IsTypeModifier => this is ListGraphType || this is NonNullGraphType; // lgtm [cs/type-test-of-this]
-
-    private string GetDefaultName()
-    {
-        var type = GetType();
-
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (!GlobalSwitches.UseLegacyTypeNaming)
-#pragma warning restore CS0618 // Type or member is obsolete
-            return type.GraphQLName();
-
-        string name = type.Name;
-        if (GlobalSwitches.UseDeclaringTypeNames)
-        {
-            var parent = type.DeclaringType;
-            while (parent != null)
-            {
-                name = parent.Name + "_" + name;
-                parent = parent.DeclaringType;
-            }
-        }
-
-        name = name.Replace('`', '_')
-                   .Replace('@', '_'); // https://github.com/graphql-dotnet/graphql-dotnet/issues/3472
-        if (name.EndsWith(nameof(GraphType), StringComparison.InvariantCulture))
-            name = name.Substring(0, name.Length - nameof(GraphType).Length);
-
-        return name;
-    }
 
     internal void SetName(string name, bool validate)
     {
