@@ -74,6 +74,7 @@
             file: global-switches.md
       - title: Guides
         dir: guides
+   
         items:
           - title: Serialization
             file: serialization.md
@@ -86,9 +87,12 @@
           - title: Known Issues & FAQ
             file: known-issues.md
           - title: Links
+          
             file: links.md
           - title: Document Caching
             file: document-caching.md
+              
+            
       - title: Analyzers
         dir: analyzers
         items:
@@ -123,6 +127,7 @@
           - title: GQL014
             file: gql014.md
           - title: GQL015
+              
             file: gql015.md
           - title: GQL016
             file: gql016.md
@@ -137,11 +142,13 @@
       - title: Migration Guides
         dir: migrations
         items:
+          
           - title: Migration Guide [v7 -> v8]
             file: migration8.md
           - title: Migration Guide [v5 -> v7]
             file: migration7.md
-          - title: Migration Guide [v4 -> v5]
+          - 
+          title: Migration Guide [v4 -> v5]
             file: migration5.md
           - title: Migration Guide [v3 -> v4]
             file: migration4.md
@@ -153,3 +160,5 @@
             file: v0_11_0.md
           - title: Migration Guide [v0.8.0]
             file: v0_8_0.md
+- title: Value Converter
+  file: guides/valueconverter.md
