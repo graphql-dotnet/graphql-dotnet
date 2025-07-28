@@ -3697,7 +3697,6 @@ namespace GraphQL.Utilities.Visitors
     public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public static GraphQL.Utilities.Visitors.ParseLinkVisitor Instance { get; }
-        public void Run(GraphQL.Types.ISchema schema) { }
         public override void VisitSchema(GraphQL.Types.ISchema schema) { }
     }
     public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor

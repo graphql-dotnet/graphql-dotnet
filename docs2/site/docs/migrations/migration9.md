@@ -35,3 +35,7 @@ The `IAbstractGraphType` interface has been extended with new methods that were 
 - `Types` - Property to get or set the collection of possible types
 
 If you have custom implementations of `IAbstractGraphType`, you will need to implement these new methods and property. Most users who inherit from `InterfaceGraphType` or `UnionGraphType` will not be affected as these base classes already provide the implementations.
+
+### 3. `ParseLinkVisitor.Run` method removed
+
+The `ParseLinkVisitor.Run` method has been removed. However, no changes should be required in your code since an equivalent extension method `Run` already exists for all `ISchemaNodeVisitor` instances, including `ParseLinkVisitor`.
