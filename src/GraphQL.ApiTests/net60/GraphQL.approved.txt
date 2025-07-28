@@ -2556,7 +2556,11 @@ namespace GraphQL.Types
     {
         GraphQL.Types.PossibleTypes PossibleTypes { get; }
         System.Func<object, GraphQL.Types.IObjectGraphType?>? ResolveType { get; set; }
+        System.Collections.Generic.IEnumerable<System.Type> Types { get; set; }
         void AddPossibleType(GraphQL.Types.IObjectGraphType type);
+        void Type(System.Type type);
+        void Type<TType>()
+            where TType : GraphQL.Types.IObjectGraphType;
     }
     public interface IComplexGraphType : GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -3413,7 +3417,6 @@ namespace GraphQL.Utilities.Visitors
     public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public static GraphQL.Utilities.Visitors.ParseLinkVisitor Instance { get; }
-        public void Run(GraphQL.Types.ISchema schema) { }
         public override void VisitSchema(GraphQL.Types.ISchema schema) { }
     }
     public class PatternMatchingVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor

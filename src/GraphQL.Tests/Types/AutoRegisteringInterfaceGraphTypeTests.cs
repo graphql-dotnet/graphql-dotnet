@@ -197,6 +197,8 @@ public class AutoRegisteringInterfaceGraphTypeTests
     [InlineData(nameof(FieldTests.ListOfListOfIntsField), typeof(ListGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>))]
     [InlineData(nameof(FieldTests.TaskStringField), typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
     [InlineData("TaskIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
+    [InlineData("ValueTaskStringField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>))]
+    [InlineData("AsyncEnumerableIntField", typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>))]
     [InlineData(nameof(FieldTests.DataLoaderNullableStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.NullableDataLoaderStringField), typeof(GraphQLClrOutputTypeReference<string>))]
     [InlineData(nameof(FieldTests.TaskDataLoaderStringArrayField), typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>))]
@@ -211,7 +213,9 @@ public class AutoRegisteringInterfaceGraphTypeTests
     public void Field_RemovesAsyncSuffix()
     {
         var graphType = new AutoRegisteringInterfaceGraphType<FieldTests>();
-        var fieldType = graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
+        graphType.Fields.Find("TaskIntField").ShouldNotBeNull();
+        graphType.Fields.Find("ValueTaskStringField").ShouldNotBeNull();
+        graphType.Fields.Find("AsyncEnumerableIntField").ShouldNotBeNull();
     }
 
     [Fact]
@@ -691,6 +695,8 @@ public class AutoRegisteringInterfaceGraphTypeTests
         int?[]?[]? ListOfListOfIntsField { get; set; }
         Task<string> TaskStringField();
         Task<int> TaskIntFieldAsync();
+        ValueTask<string> ValueTaskStringFieldAsync();
+        IAsyncEnumerable<int> AsyncEnumerableIntFieldAsync();
         IDataLoaderResult<string?> DataLoaderNullableStringField();
         IDataLoaderResult<string>? NullableDataLoaderStringField();
         Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField();

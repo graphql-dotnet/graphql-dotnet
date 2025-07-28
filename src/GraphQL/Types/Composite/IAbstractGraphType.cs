@@ -20,4 +20,13 @@ public interface IAbstractGraphType : IGraphType
     /// Adds the specified graph type to a list of possible graph types for this abstract graph type.
     /// </summary>
     void AddPossibleType(IObjectGraphType type);
+
+    /// <inheritdoc cref="AddPossibleType"/>
+    void Type(Type type);
+
+    /// <inheritdoc cref="IAbstractGraphType.AddPossibleType"/>
+    void Type<TType>() where TType : IObjectGraphType;
+
+    /// <inheritdoc cref="PossibleTypes"/>
+    public IEnumerable<Type> Types { get; set; }
 }

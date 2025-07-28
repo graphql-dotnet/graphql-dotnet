@@ -36,8 +36,7 @@ public class PossibleTypeAttribute : GraphQLAttribute
     /// <inheritdoc/>
     public override void Modify(IGraphType graphType)
     {
-        // todo: support IInterfaceGraphType
-        if (graphType is not IInterfaceGraphType2 interfaceGraphType)
+        if (graphType is not IInterfaceGraphType interfaceGraphType)
             throw new InvalidOperationException($"The {nameof(PossibleTypeAttribute)} can only be applied to graph types that derive from {nameof(InterfaceGraphType)}.");
 
         interfaceGraphType.Type(ObjectGraphType);
