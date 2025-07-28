@@ -176,16 +176,26 @@ public static class AutoRegisteringHelper
             var memberType = memberInfo is PropertyInfo propertyInfo ? propertyInfo.PropertyType : ((FieldInfo)memberInfo).FieldType;
             fieldType.Parser = value => memberType.IsInstanceOfType(value) ? value : value.GetPropertyValue(memberType, fieldType.ResolvedType!)!;
         }
-        if (!isInputType &&
-            memberInfo is MethodInfo methodInfo &&
-            fieldType.Name.EndsWith("Async") &&
-            methodInfo.ReturnType.IsGenericType &&
-            methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+        if (fieldType.Name.EndsWith("Async") && ShouldRemoveAsyncSuffix(isInputType, memberInfo))
         {
             fieldType.Name = fieldType.Name.Substring(0, fieldType.Name.Length - 5);
         }
 
         return fieldType;
+    }
+
+    /// <summary>
+    /// Determines whether a field should have its "Async" suffix removed based on the method info and input type context.
+    /// Returns true for output methods ending with "Async" that return Task&lt;T&gt;, ValueTask&lt;T&gt;, or IAsyncEnumerable&lt;T&gt;.
+    /// </summary>
+    private static bool ShouldRemoveAsyncSuffix(bool isInputType, MemberInfo memberInfo)
+    {
+        return !isInputType &&
+            memberInfo is MethodInfo methodInfo &&
+            methodInfo.ReturnType.IsGenericType &&
+            (methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(Task<>) ||
+                methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(ValueTask<>) ||
+                methodInfo.ReturnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>));
     }
 
     /// <summary>
