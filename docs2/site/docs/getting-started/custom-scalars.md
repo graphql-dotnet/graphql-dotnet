@@ -30,7 +30,8 @@ Assume the following schema
 scalar Vector3
 
 schema {
-    query: {
+
+   query: {
         getVector: Vector3!
     }
     mutation: {
@@ -721,3 +722,7 @@ The scalar to be replaced is matched based on the name of the scalar.
 var schema = Schema.For(...);
 schema.ReplaceScalar(new MyBooleanGraphType());
 ```
+
+
+
+to use a value converter versus a custom scalar, please see the [Value Converter guide](/docs/guides/valueconverter).
