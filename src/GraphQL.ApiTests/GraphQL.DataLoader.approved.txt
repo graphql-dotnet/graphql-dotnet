@@ -20,10 +20,10 @@ namespace GraphQL.DataLoader
         protected readonly System.Collections.Generic.IEqualityComparer<TKey> EqualityComparer;
         protected readonly int MaxBatchSize;
         public DataLoaderBase() { }
-        public DataLoaderBase(bool caching) { }
         public DataLoaderBase(System.Collections.Generic.IEqualityComparer<TKey> equalityComparer) { }
-        public DataLoaderBase(bool caching, int maxBatchSize) { }
+        public DataLoaderBase(bool caching) { }
         public DataLoaderBase(System.Collections.Generic.IEqualityComparer<TKey>? equalityComparer, int maxBatchSize) { }
+        public DataLoaderBase(bool caching, int maxBatchSize) { }
         public DataLoaderBase(bool caching, System.Collections.Generic.IEqualityComparer<TKey>? equalityComparer, int maxBatchSize) { }
         public System.Threading.Tasks.Task DispatchAsync(System.Threading.CancellationToken cancellationToken = default) { }
         protected abstract System.Threading.Tasks.Task FetchAsync(System.Collections.Generic.IEnumerable<GraphQL.DataLoader.DataLoaderPair<TKey, T>> list, System.Threading.CancellationToken cancellationToken);
