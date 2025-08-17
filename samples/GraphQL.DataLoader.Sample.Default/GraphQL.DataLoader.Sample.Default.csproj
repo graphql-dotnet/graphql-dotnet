@@ -9,18 +9,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.1.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0"/>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.*" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\GraphQL.DataLoader\GraphQL.DataLoader.csproj"/>
-    <ProjectReference Include="..\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj"/>
+    <ProjectReference Include="..\..\src\GraphQL.DataLoader\GraphQL.DataLoader.csproj" />
+    <ProjectReference Include="..\GraphQL.Server.Polyfill\GraphQL.Server.Polyfill.csproj" />
   </ItemGroup>
 
 </Project>
