@@ -2,7 +2,7 @@
   <Import Project="../../Tests.props" />
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.*" />
+    <PackageReference Include="Bogus" Version="35.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.*" />
     <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>

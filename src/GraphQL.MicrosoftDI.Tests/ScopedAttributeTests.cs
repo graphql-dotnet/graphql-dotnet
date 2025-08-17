@@ -40,7 +40,7 @@ public class ScopedAttributeTests
     }
 
     [Fact]
-    public async void ScopedSubscriptionWorks()
+    public async Task ScopedSubscriptionWorks()
     {
         Class1.DisposedCount = 0;
         var serviceCollection = new ServiceCollection();
