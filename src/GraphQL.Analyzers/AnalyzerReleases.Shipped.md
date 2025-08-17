@@ -1,6 +1,18 @@
 ; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
 
+## Release 9.0.0
+
+### Removed Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|--------------------
+GQL001 | Usage | Warning | FieldNameAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql001)
+GQL002 | Usage | Warning | FieldNameAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql002)
+GQL003 | Usage | Warning | FieldNameAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql003)
+GQL004 | Usage | Warning | FieldBuilderAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql004)
+GQL008 | Usage | Warning | FieldArgumentAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/gql008)
+
 ## Release 8.1.0
 
 ### New Rules
