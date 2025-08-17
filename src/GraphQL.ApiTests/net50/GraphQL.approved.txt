@@ -4380,6 +4380,8 @@ namespace GraphQL.Validation.Rules
     public class UniqueDirectivesPerLocation : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueDirectivesPerLocation Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueDirectivesPerLocation() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }
