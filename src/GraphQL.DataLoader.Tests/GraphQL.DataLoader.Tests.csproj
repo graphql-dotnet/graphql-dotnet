@@ -6,7 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="34.*" />
+    <PackageReference Include="Bogus" Version="35.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.*" />
     <PackageReference Include="System.Reactive" Version="6.*" />
   </ItemGroup>
