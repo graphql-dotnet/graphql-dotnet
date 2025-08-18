@@ -276,8 +276,8 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
         if (!isExtensionType)
         {
             type.Description = typeConfig.Description ?? astType.Description?.Value.ToString() ?? astType.MergeComments();
-            type.IsTypeOf = typeConfig.IsTypeOfFunc;
         }
+        type.IsTypeOf = typeConfig.IsTypeOfFunc;
 
         typeConfig.CopyMetadataTo(type);
 
