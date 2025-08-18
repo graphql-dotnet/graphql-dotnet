@@ -11,6 +11,7 @@
     "format": "prettier --write 'src/**/*.js'"
   },
   "dependencies": {
+    "@theme-toggles/react": "^4.1.0",
     "classnames": "^2.3.2",
     "gatsby": "5.9.1",
     "gatsby-plugin-react-helmet": "^6.8.0",
@@ -29,15 +30,16 @@
     "react-helmet": "^6.1.0"
   },
   "devDependencies": {
+    "babel-eslint": "^10.1.0",
     "chokidar": "^3.5.3",
+    "copy-webpack-plugin": "^13.0.0",
+    "eslint": "^4.12.1",
     "gatsby-node-helpers": "^1.2.1",
     "gh-pages": "^5.0.0",
     "github-slugger": "^2.0.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "prettier": "^2.8.7",
-    "babel-eslint": "^10.1.0",
-    "typescript": "^5.0.4",
-    "eslint": "^4.12.1"
+    "typescript": "^5.0.4"
   }
 }
