@@ -10,20 +10,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL document is only valid if when it contains an anonymous operation
 /// (the query short-hand) that it contains only that one operation definition.
 /// </summary>
-public class LoneAnonymousOperation : ValidationRuleBase
+public sealed class LoneAnonymousOperation : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly LoneAnonymousOperation Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="LoneAnonymousOperation"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public LoneAnonymousOperation()
-    {
-    }
+    private LoneAnonymousOperation() { }
 
     /// <inheritdoc/>
     /// <exception cref="LoneAnonymousOperationError"/>

@@ -168,7 +168,7 @@ public class ComplexInput : InputObjectGraphType
         Name = "ComplexInput";
         Field<NonNullGraphType<BooleanGraphType>>("requiredField");
         Field<IntGraphType>("intField");
-        Field<StringGraphType>("stringField").Directive("length", "min", 3, "max", 7);
+        Field<StringGraphType>("stringField").ApplyDirective("length", "min", 3, "max", 7);
         Field<BooleanGraphType>("booleanField");
         Field<ListGraphType<StringGraphType>>("stringListField");
     }
@@ -181,7 +181,7 @@ public class ComplexInput2 : InputObjectGraphType
         Name = "ComplexInput2";
         Field<NonNullGraphType<BooleanGraphType>>("requiredField");
         Field<IntGraphType>("intField");
-        Field<NonNullGraphType<StringGraphType>>("stringField").Directive("length", "min", 3, "max", 7);
+        Field<NonNullGraphType<StringGraphType>>("stringField").ApplyDirective("length", "min", 3, "max", 7);
         Field<BooleanGraphType>("booleanField");
         Field<ListGraphType<StringGraphType>>("stringListField");
     }

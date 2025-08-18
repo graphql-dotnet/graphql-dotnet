@@ -10,17 +10,6 @@ namespace GraphQL.Analyzers;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 {
-    // Violation: Field<T>("name", "description", ...)
-    // Fixed:     Field<T>("name").Description("description")...
-    public static readonly DiagnosticDescriptor DoNotUseObsoleteFieldMethods = new(
-        id: DiagnosticIds.DO_NOT_USE_OBSOLETE_FIELD_METHODS,
-        title: "Don't use obsolete 'Field' methods",
-        messageFormat: "Don't use obsolete 'Field' methods",
-        category: DiagnosticCategories.USAGE,
-        defaultSeverity: DiagnosticSeverity.Warning,
-        isEnabledByDefault: true,
-        helpLinkUri: HelpLinks.DO_NOT_USE_OBSOLETE_FIELD_METHODS);
-
     public static readonly DiagnosticDescriptor CantInferFieldNameFromExpression = new(
         id: DiagnosticIds.CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION,
         title: "Can't infer a Field name from expression",
@@ -32,15 +21,11 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
 
     private static readonly HashSet<string> _supportedNames =
     [
-        Constants.MethodNames.Field,
-        Constants.MethodNames.FieldAsync,
-        Constants.MethodNames.FieldDelegate,
-        Constants.MethodNames.FieldSubscribe,
-        Constants.MethodNames.FieldSubscribeAsync
+        Constants.MethodNames.Field
     ];
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-        ImmutableArray.Create(DoNotUseObsoleteFieldMethods, CantInferFieldNameFromExpression);
+        ImmutableArray.Create(CantInferFieldNameFromExpression);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -91,29 +76,7 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeFieldBuilderReturningFiledType(context, genericNameSyntax, methodSymbol, name);
         AnalyzeExpressionBasedFieldBuilder(context, genericNameSyntax, methodSymbol, name);
-    }
-
-    private static void AnalyzeFieldBuilderReturningFiledType(
-        SyntaxNodeAnalysisContext context,
-        SimpleNameSyntax genericNameSyntax,
-        IMethodSymbol methodSymbol,
-        string name)
-    {
-        if (methodSymbol.ReturnType.Name != Constants.Types.FieldType)
-        {
-            return;
-        }
-
-        var fieldInvocation = genericNameSyntax.FindMethodInvocationExpression()!;
-
-        ReportFieldTypeDiagnostic(
-            context,
-            fieldInvocation.GetLocation(),
-            DoNotUseObsoleteFieldMethods,
-            isAsyncField: name.EndsWith("Async"),
-            isDelegate: name == Constants.MethodNames.FieldDelegate);
     }
 
     private static void AnalyzeExpressionBasedFieldBuilder(
@@ -147,36 +110,6 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
                     isExpression: true,
                     messageArgs: expressionArg.Expression.ToString());
             }
-        }
-
-        var typeArgument = GetArgument(Constants.ArgumentNames.Type);
-        if (typeArgument == null)
-        {
-            return;
-        }
-
-        if (typeArgument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
-        {
-            // We need to remove the 'type: null' argument regardless of the presence
-            // of the 'nullable' because 'type' is not nullable in the new API
-            ReportFieldTypeDiagnostic(
-                context,
-                fieldInvocation.GetLocation(),
-                DoNotUseObsoleteFieldMethods,
-                isExpression: true);
-
-            return;
-        }
-
-        var nullableArg = GetArgument(Constants.ArgumentNames.Nullable);
-        if (nullableArg != null)
-        {
-            // both 'type' and 'nullable' are defined
-            ReportFieldTypeDiagnostic(
-                context,
-                fieldInvocation.GetLocation(),
-                DoNotUseObsoleteFieldMethods,
-                isExpression: true);
         }
 
         ArgumentSyntax? GetArgument(string argName) =>

@@ -176,6 +176,7 @@ AOT compilation has not been tested with frameworks other than .NET 7+ on Window
 
 You can see the changes in public APIs using [fuget.org](https://www.fuget.org/packages/GraphQL/8.2.1/lib/netstandard2.1/diff/7.9.0/).
 
+* [8.x to 9.x](https://graphql-dotnet.github.io/docs/migrations/migration9)
 * [7.x to 8.x](https://graphql-dotnet.github.io/docs/migrations/migration8)
 * [5.x to 7.x](https://graphql-dotnet.github.io/docs/migrations/migration7)
 * [4.x to 5.x](https://graphql-dotnet.github.io/docs/migrations/migration5)

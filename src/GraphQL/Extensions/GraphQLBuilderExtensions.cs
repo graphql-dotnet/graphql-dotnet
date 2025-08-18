@@ -384,26 +384,6 @@ public static class GraphQLBuilderExtensions // TODO: split
 
     #region - AddComplexityAnalyzer -
     /// <summary>
-    /// Enables the legacy complexity analyzer and configures it with the specified configuration delegate.
-    /// </summary>
-    [Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
-    public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration>? action = null)
-    {
-        builder.AddValidationRule<LegacyComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddLegacyComplexityAnalyzer(IGraphQLBuilder, Action{LegacyComplexityConfiguration})"/>
-    [Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be removed in v9.")]
-    public static IGraphQLBuilder AddLegacyComplexityAnalyzer(this IGraphQLBuilder builder, Action<LegacyComplexityConfiguration, IServiceProvider>? action)
-    {
-        builder.AddValidationRule<LegacyComplexityValidationRule>();
-        builder.Services.Configure(action);
-        return builder;
-    }
-
-    /// <summary>
     /// Enables the default complexity analyzer and configures it with the specified configuration delegate.
     /// </summary>
     public static IGraphQLBuilder AddComplexityAnalyzer(this IGraphQLBuilder builder, Action<ComplexityOptions>? action = null)
@@ -1234,22 +1214,6 @@ public static class GraphQLBuilderExtensions // TODO: split
         var handler = (UnhandledExceptionContext context) =>
         {
             unhandledExceptionDelegate(context);
-            return Task.CompletedTask;
-        };
-        builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);
-        return builder;
-    }
-
-    /// <inheritdoc cref="AddUnhandledExceptionHandler(IGraphQLBuilder, Func{UnhandledExceptionContext, Task})"/>
-    [Obsolete("Reference the UnhandledExceptionContext.ExecutionOptions property instead of using this overload. This method will be removed in v9.")]
-    public static IGraphQLBuilder AddUnhandledExceptionHandler(this IGraphQLBuilder builder, Action<UnhandledExceptionContext, ExecutionOptions> unhandledExceptionDelegate)
-    {
-        if (unhandledExceptionDelegate == null)
-            throw new ArgumentNullException(nameof(unhandledExceptionDelegate));
-
-        var handler = (UnhandledExceptionContext context) =>
-        {
-            unhandledExceptionDelegate(context, context.ExecutionOptions);
             return Task.CompletedTask;
         };
         builder.ConfigureExecutionOptions(settings => settings.UnhandledExceptionDelegate = handler);

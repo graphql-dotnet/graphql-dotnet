@@ -9,20 +9,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL operation is only valid if all variables encountered, both directly
 /// and via fragment spreads, are defined by that operation.
 /// </summary>
-public class NoUndefinedVariables : ValidationRuleBase
+public sealed class NoUndefinedVariables : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly NoUndefinedVariables Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="NoUndefinedVariables"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public NoUndefinedVariables()
-    {
-    }
+    private NoUndefinedVariables() { }
 
     /// <inheritdoc/>
     /// <exception cref="NoUndefinedVariablesError"/>

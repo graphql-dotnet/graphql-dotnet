@@ -42,7 +42,7 @@ public partial class InputGraphTypeAnalyzerTests
               {
                   public MyGraphType()
                   {
-                      Field<AutoRegisteringInputObjectGraphType<{|#2:MySource|}>>();
+                      Field<AutoRegisteringInputObjectGraphType<{|#2:MySource|}>>("test");
                   }
               }
 

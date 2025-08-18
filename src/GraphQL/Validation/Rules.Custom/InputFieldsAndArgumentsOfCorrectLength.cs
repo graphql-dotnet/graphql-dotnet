@@ -18,20 +18,13 @@ namespace GraphQL.Validation.Rules;
 /// Please copy the newer <see cref="PatternMatchingDirective"/> and <see cref="PatternMatchingVisitor"/>
 /// when designing new custom directives that can be used to validate input fields and arguments.
 /// </remarks>
-public class InputFieldsAndArgumentsOfCorrectLength : ValidationRuleBase
+public sealed class InputFieldsAndArgumentsOfCorrectLength : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly InputFieldsAndArgumentsOfCorrectLength Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="InputFieldsAndArgumentsOfCorrectLength"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public InputFieldsAndArgumentsOfCorrectLength()
-    {
-    }
+    private InputFieldsAndArgumentsOfCorrectLength() { }
 
     /// <inheritdoc/>
     public override ValueTask<IVariableVisitor?> GetVariableVisitorAsync(ValidationContext context) => new(FieldVisitor.Instance);

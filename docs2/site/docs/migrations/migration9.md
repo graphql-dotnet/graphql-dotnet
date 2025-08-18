@@ -1,15 +1,106 @@
 # Migrating from v8.x to v9.x
 
+:warning: For the best upgrade experience, please upgrade to v8.x and resolve all obsolete code warnings
+before upgrading to v9.0. Many members that were marked as obsolete in v8.x have been removed in v9.0. :warning:
+
 See [issues](https://github.com/graphql-dotnet/graphql-dotnet/issues?q=milestone%3A9.0.0+is%3Aissue+is%3Aclosed) and
 [pull requests](https://github.com/graphql-dotnet/graphql-dotnet/pulls?q=is%3Apr+milestone%3A9.0.0+is%3Aclosed) done in v9.
 
 ## Overview
 
+GraphQL.NET v9 is a major release that focuses on removing obsolete APIs and improving performance. The primary changes include:
+
+- Removal of many members that were marked as obsolete in v8.x
+- Improved concurrency support
+
+For the smoothest migration experience, we strongly recommend:
+
+1. Upgrade to the latest v8.x version
+2. Resolve all compiler warnings about obsolete members
+3. Test your application thoroughly
+4. Then upgrade to v9.0
+
 ## New Features
 
 ## Breaking Changes
 
-### 1. `ConcurrentDictionary` in `ValidationContext`
+### 1. Removal of Obsolete Members
+
+Many members that were marked as obsolete in v8.x have been removed in v9.0. The following is a summary of the key members that have been removed:
+
+- `GlobalSwitches.UseLegacyTypeNaming`
+- `GlobalSwitches.RequireRootQueryType`
+- `FieldBuilder.Directive()` method - use `ApplyDirective()` instead
+- `SchemaPrinter` class - use `schema.Print()` extension method instead
+- `LegacyComplexityValidationRule` - use the newer complexity analyzer instead
+- `IFederatedResolver` interface - use `IFederationResolver` instead
+- `FederatedSchemaBuilder` - use `SchemaBuilder` with `.AddFederation()` instead
+- Related classes within `GraphQL.Utilities.Federation` including `InjectTypenameValidationRule`
+- Built-in validation rule constructors - use `.Instance` instead
+- Field registration methods which do not include the name explicitly or implicitly - use overload with field name instead
+- Field registration methods that include both the bool nullable and Type graphType parameters - use overload with field name and type instead
+- Field methods which include arguments and the resolver as parameters - use field builder methods instead
+- Field argument registration methods that include default values - use configuration overload instead
+
+> **Note:** The GraphQL.NET v8 analyzers can help automatically update obsolete API calls with code fixes, prior to upgrading to v9.
+
+#### FederationSchemaBuilder migration
+
+To create Federation 1.0 schemas in v9, you will need to dependency injection along with the `AddFederation` extension method as seen below:
+
+```csharp
+// v8 using FederationSchemaBuilder
+var schema = GenerateSchema();
+
+ISchema GenerateSchema()
+{
+    string sdl = /* load sdl */;
+    var builder = new FederatedSchemaBuilder();
+    // configuration here
+    return builder.Build(sdl);
+}
+
+
+// v9 using SchemaBuilder with AddFederation
+services.AddGraphQL(b => b
+    .AddSchema(GenerateSchema)
+    .AddFederation("1.0")
+);
+
+ISchema GenerateSchema(IServiceProvider serviceProvider)
+{
+    string sdl = /* load sdl */;
+    var builder = new SchemaBuilder
+    {
+        ServiceProvider = serviceProvider,
+    };
+    // configuration here
+    return builder.Build(sdl);
+}
+```
+
+#### SchemaPrinter migration
+
+The `SchemaPrinter` has been replaced by the new `SchemaExporter` class and the `Print` extension method on `ISchema`.
+The default print options have changed when comparing `SchemaPrinter` to its replacement, but even so, there may be differences in the output.
+Please review [this documentation](migration7/#13-add-code-classlanguage-textschemaexportercode-to-export-schema-to-sdl-with-new-code-classlanguage-textschematoastcode-and-code-classlanguage-textschemaprintcode-methods)
+for details on the new features available. A simple migration example is shown below:
+
+```csharp
+// v8
+var printer = new SchemaPrinter(schema);
+var sdl = printer.Print();
+
+// v9 configured to have similar behavior as previous defaults
+var sdl = schema.Print(new() {
+    IncludeDescriptions = false,
+    IncludeDeprecationReasons = false,
+    IncludeFederationTypes = false,
+    StringComparison = StringComparison.OrdinalIgnoreCase,
+});
+```
+
+### 2. `ConcurrentDictionary` in `ValidationContext`
 
 Previously, `ValidationContext` used `Dictionary`-typed members, which prevented the use of `ConcurrentDictionary` even when concurrent access would have been beneficial. This limitation became apparent in two key issues:
 

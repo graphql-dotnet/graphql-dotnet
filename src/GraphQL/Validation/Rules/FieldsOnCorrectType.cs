@@ -11,20 +11,13 @@ namespace GraphQL.Validation.Rules;
 /// A GraphQL document is only valid if all fields selected are defined by the
 /// parent type, or are an allowed meta field such as __typename.
 /// </summary>
-public class FieldsOnCorrectType : ValidationRuleBase
+public sealed class FieldsOnCorrectType : ValidationRuleBase
 {
     /// <summary>
     /// Returns a static instance of this validation rule.
     /// </summary>
-#pragma warning disable CS0618 // Type or member is obsolete
     public static readonly FieldsOnCorrectType Instance = new();
-#pragma warning restore CS0618 // Type or member is obsolete
-
-    /// <inheritdoc cref="FieldsOnCorrectType"/>
-    [Obsolete("Please use the Instance property to retrieve a static instance. This constructor will be removed in v9.")]
-    public FieldsOnCorrectType()
-    {
-    }
+    private FieldsOnCorrectType() { }
 
     /// <inheritdoc/>
     /// <exception cref="FieldsOnCorrectTypeError"/>

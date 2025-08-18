@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Tests.Execution;
 
@@ -197,8 +196,7 @@ public class RegisteredInstanceTests : BasicQueryTestBase
         {
             Query = rootType
         };
-        string schema = new SchemaPrinter(s).Print();
-        return schema;
+        return s.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
     }
 
     public class SomeObject

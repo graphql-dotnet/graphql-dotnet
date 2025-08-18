@@ -193,7 +193,7 @@ public class NotAGraphTypeAnalyzerTests
             {
                 public MyGraphType()
                 {
-                    ConnectionBuilder.Create<StringGraphType, {|#0:IntGraphType|}>();
+                    ConnectionBuilder.Create<StringGraphType, {|#0:IntGraphType|}>("test");
                 }
             }
             """;
@@ -261,7 +261,7 @@ public class NotAGraphTypeAnalyzerTests
 
             public class MyGraphType<TSource, TReturn>
             {
-                public void DoSomething() => FieldBuilder<TSource, TReturn>.Create();
+                public void DoSomething() => FieldBuilder<TSource, TReturn>.Create("test");
             }
             """;
 
@@ -285,7 +285,7 @@ public class NotAGraphTypeAnalyzerTests
               public class MyGraphType<TSource, TReturn>
                     where TSource : {{constraint}}
               {
-                  public void DoSomething() => FieldBuilder<{|#0:TSource|}, TReturn>.Create();
+                  public void DoSomething() => FieldBuilder<{|#0:TSource|}, TReturn>.Create("test");
               }
               """;
 

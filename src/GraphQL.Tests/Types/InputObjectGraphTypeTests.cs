@@ -133,14 +133,13 @@ public class InputObjectGraphTypeTests
         inputType.Field(x => x.Url, type: typeof(StringGraphType))
             .ParseValue(value => new Uri((string)value));
         var queryType = new ObjectGraphType();
-        queryType.Field<StringGraphType>(
-            "test",
-            arguments: new QueryArguments(
+        queryType.Field<StringGraphType>("test")
+            .Arguments(new QueryArguments(
                 new QueryArgument(inputType)
                 {
                     Name = "input"
-                }),
-            resolve: context =>
+                }))
+            .Resolve(context =>
             {
                 var input = context.GetArgument<Class1>("input");
                 return input.Url?.ToString();
@@ -186,14 +185,13 @@ public class InputObjectGraphTypeTests
                     throw new ArgumentException("String must be a length of 5 characters.");
             });
         var queryType = new ObjectGraphType();
-        queryType.Field<StringGraphType>(
-            "test",
-            arguments: new QueryArguments(
+        queryType.Field<StringGraphType>("test")
+            .Arguments(new QueryArguments(
                 new QueryArgument(inputType)
                 {
                     Name = "input"
-                }),
-            resolve: context =>
+                }))
+            .Resolve(context =>
             {
                 var input = context.GetArgument<Class2>("input");
                 return input.String;

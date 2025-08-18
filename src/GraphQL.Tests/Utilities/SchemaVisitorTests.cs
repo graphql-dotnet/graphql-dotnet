@@ -149,7 +149,7 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         objectType.HasAppliedDirectives().ShouldBeTrue();
         objectType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
-        var field = objectType.Field<StringGraphType>("test").Directive("field");
+        var field = objectType.Field<StringGraphType>("test").ApplyDirective("field");
         field.FieldType.HasAppliedDirectives().ShouldBeTrue();
         field.FieldType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
@@ -183,7 +183,7 @@ public class SchemaVisitorTests : SchemaBuilderTestBase
         inputType.HasAppliedDirectives().ShouldBeTrue();
         inputType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
-        var input = inputType.Field<StringGraphType>("test").Directive("inputField");
+        var input = inputType.Field<StringGraphType>("test").ApplyDirective("inputField");
         input.FieldType.HasAppliedDirectives().ShouldBeTrue();
         input.FieldType.GetAppliedDirectives().ShouldNotBeNull().Count.ShouldBe(1);
 
