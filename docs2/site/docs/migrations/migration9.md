@@ -44,6 +44,62 @@ Many members that were marked as obsolete in v8.x have been removed in v9.0. The
 
 > **Note:** The GraphQL.NET v8 analyzers can help automatically update obsolete API calls with code fixes, prior to upgrading to v9.
 
+#### FederationSchemaBuilder migration
+
+To create Federation 1.0 schemas in v9, you will need to dependency injection along with the `AddFederation` extension method as seen below:
+
+```csharp
+// v8 using FederationSchemaBuilder
+var schema = GenerateSchema();
+
+ISchema GenerateSchema()
+{
+    string sdl = /* load sdl */;
+    var builder = new FederatedSchemaBuilder();
+    // configuration here
+    return builder.Build(sdl);
+}
+
+
+// v9 using SchemaBuilder with AddFederation
+services.AddGraphQL(b => b
+    .AddSchema(GenerateSchema)
+    .AddFederation("1.0")
+);
+
+ISchema GenerateSchema(IServiceProvider serviceProvider)
+{
+    string sdl = /* load sdl */;
+    var builder = new SchemaBuilder
+    {
+        ServiceProvider = serviceProvider,
+    };
+    // configuration here
+    return builder.Build(sdl);
+}
+```
+
+#### SchemaPrinter migration
+
+The `SchemaPrinter` has been replaced by the new `SchemaExporter` class and the `Print` extension method on `ISchema`.
+The default print options have changed when comparing `SchemaPrinter` to its replacement, but even so, there may be differences in the output.
+Please review [this documentation](migration7/#13-add-code-classlanguage-textschemaexportercode-to-export-schema-to-sdl-with-new-code-classlanguage-textschematoastcode-and-code-classlanguage-textschemaprintcode-methods)
+for details on the new features available. A simple migration example is shown below:
+
+```csharp
+// v8
+var printer = new SchemaPrinter(schema);
+var sdl = printer.Print();
+
+// v9 configured to have similar behavior as previous defaults
+var sdl = schema.Print(new() {
+    IncludeDescriptions = false,
+    IncludeDeprecationReasons = false,
+    IncludeFederationTypes = false,
+    StringComparison = StringComparison.OrdinalIgnoreCase,
+});
+```
+
 ### 2. `ConcurrentDictionary` in `ValidationContext`
 
 Previously, `ValidationContext` used `Dictionary`-typed members, which prevented the use of `ConcurrentDictionary` even when concurrent access would have been beneficial. This limitation became apparent in two key issues:
