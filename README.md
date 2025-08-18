@@ -153,7 +153,6 @@ It supports the popular IDEs for managing GraphQL requests and exploring GraphQL
 - [Altair](https://github.com/imolorhe/altair)
 - [Firecamp](https://firecamp.io/graphql/)
 - [GraphiQL](https://github.com/graphql/graphiql)
-- [GraphQL Playground](https://github.com/prisma-labs/graphql-playground)
 - [Voyager](https://github.com/APIs-guru/graphql-voyager)
 
 ## Ahead-of-time compilation
