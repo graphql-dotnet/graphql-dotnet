@@ -119,7 +119,7 @@ namespace GraphQL
         public override void Modify(GraphQL.Utilities.FieldConfig field) { }
         public override void Modify(GraphQL.Utilities.TypeConfig type) { }
         public override void Modify(GraphQL.Types.FieldType fieldType, bool isInputType) { }
-    }.
+    }
     public static class DirectivesExtensions
     {
         public static TMetadataProvider ApplyDirective<TMetadataProvider>(this TMetadataProvider provider, string name)
