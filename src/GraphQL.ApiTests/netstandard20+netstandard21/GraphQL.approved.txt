@@ -976,7 +976,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
         [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
-            "\'Connection\' method.")]
+            "\'Connection\' method. This method will be removed in v9.")]
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object?> resolver) { }
