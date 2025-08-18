@@ -8,10 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="7.*" />
-    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="7.*" />
-    <PackageReference Include="GraphQL.Server.Ui.Playground" Version="7.*" />
-    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="7.*" />
+    <PackageReference Include="GraphQL.Server.Ui.Altair" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="8.*" />
+    <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="8.*" />
   </ItemGroup>
 
   <ItemGroup>
