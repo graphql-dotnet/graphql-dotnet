@@ -58,6 +58,7 @@ public class SchemaExporterTests
     [Fact]
     public void Federation1Schema()
     {
+        // this prints the schema without federation types, which is typical for federation v1 schemas
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddGraphQL(b => b
             .AddSchema(provider => Schema.For("Federated".ReadSDL(), c => c.ServiceProvider = provider))
@@ -69,8 +70,9 @@ public class SchemaExporterTests
     }
 
     [Fact]
-    public void Federation2Schema()
+    public void Federation1Schema_WithFederationTypes()
     {
+        // this prints the schema with federation v1 types defined, which is the default for greater compatibility
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddGraphQL(b => b
             .AddSchema(provider => Schema.For("Federated".ReadSDL(), c => c.ServiceProvider = provider))
