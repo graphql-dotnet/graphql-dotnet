@@ -41,7 +41,6 @@ public class Startup
             app.UseDeveloperExceptionPage();
 
         app.UseGraphQL();
-        app.UseGraphQLPlayground();
         app.UseGraphQLGraphiQL();
         app.UseGraphQLAltair();
         app.UseGraphQLVoyager();

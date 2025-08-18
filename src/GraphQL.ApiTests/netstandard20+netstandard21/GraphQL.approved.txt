@@ -976,7 +976,7 @@ namespace GraphQL.Builders
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, System.Action<GraphQL.Types.AppliedDirective> configure) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Directive(string name, string argumentName, object? argumentValue) { }
         [System.Obsolete("Please configure the connection name by providing the name as an argument to the " +
-            "\'Connection\' method.")]
+            "\'Connection\' method. This method will be removed in v9.")]
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Name(string name) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> PageSize(int pageSize) { }
         public virtual GraphQL.Builders.ConnectionBuilder<TSourceType> Resolve(System.Func<GraphQL.Builders.IResolveConnectionContext<TSourceType>, object?> resolver) { }
@@ -4300,6 +4300,8 @@ namespace GraphQL.Validation.Rules
     public class UniqueDirectivesPerLocation : GraphQL.Validation.ValidationRuleBase
     {
         public static readonly GraphQL.Validation.Rules.UniqueDirectivesPerLocation Instance;
+        [System.Obsolete("Please use the Instance property to retrieve a static instance. This constructor " +
+            "will be removed in v9.")]
         public UniqueDirectivesPerLocation() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
     }

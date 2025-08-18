@@ -24,7 +24,7 @@ public class Program
         app.MapPost("/graphql", GraphQLHttpMiddlewareAsync);
 
         // Add a UI package for testing
-        app.UseGraphQLPlayground("/");
+        app.UseGraphQLGraphiQL("/");
 
         // Optional: ensure that the schema builds and initializes
         {
