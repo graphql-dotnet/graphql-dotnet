@@ -41,16 +41,16 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
                     var fieldDef = context.TypeInfo.GetFieldDef();
                     var directiveDef = context.TypeInfo.GetDirective();
 
-                    if (fieldDef != null)
+                    if (directiveDef != null)
+                    {
+                        // This is a directive argument
+                        await OnDeprecatedDirectiveArgumentReferenced(context, node, argumentDef, directiveDef).ConfigureAwait(false);
+                    }
+                    else if (fieldDef != null) // note: when a directive is applied to a field, both fieldDef and directiveDef are non-null
                     {
                         // This is a field argument
                         var parentType = context.TypeInfo.GetParentType()!.GetNamedType();
                         await OnDeprecatedFieldArgumentReferenced(context, node, argumentDef, fieldDef, parentType).ConfigureAwait(false);
-                    }
-                    else if (directiveDef != null)
-                    {
-                        // This is a directive argument
-                        await OnDeprecatedDirectiveArgumentReferenced(context, node, argumentDef, directiveDef).ConfigureAwait(false);
                     }
                 }
             }),
