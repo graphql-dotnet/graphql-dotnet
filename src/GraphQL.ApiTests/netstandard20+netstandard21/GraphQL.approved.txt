@@ -3590,6 +3590,19 @@ namespace GraphQL.Utilities.Federation
         public static void ResolveReferenceAsync<T>(this GraphQL.Utilities.TypeConfig config, System.Func<GraphQL.Utilities.Federation.FederatedResolveContext, System.Threading.Tasks.Task<T?>> resolver) { }
     }
 }
+namespace GraphQL.Utilities.Visitors.Custom
+{
+    public class DeprecatedTypeReferenceVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        public DeprecatedTypeReferenceVisitor() { }
+        public override void PostVisitSchema(GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+    }
+}
 namespace GraphQL.Utilities.Visitors
 {
     public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
@@ -4363,6 +4376,15 @@ namespace GraphQL.Validation.Rules.Custom
         protected virtual System.Threading.Tasks.ValueTask<System.ValueTuple<double, int>> CalculateComplexityAsync(GraphQL.Validation.ValidationContext context) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         protected virtual System.Threading.Tasks.ValueTask ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
+    }
+    public abstract class DeprecatedElementsValidationRule : GraphQL.Validation.ValidationRuleBase
+    {
+        protected DeprecatedElementsValidationRule() { }
+        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedDirectiveArgumentReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.Directive directiveDefinition);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldArgumentReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLField fieldNode, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedTypeReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLNamedType typeConditionNode, GraphQL.Types.IGraphType typeDefinition);
     }
     [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
         "d in v9.")]
