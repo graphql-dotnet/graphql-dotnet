@@ -1421,28 +1421,28 @@ public class LoggingDeprecatedElementsRule : DeprecatedElementsValidationRule
         _logger = logger;
     }
 
-    protected override ValueTask OnDeprecatedFieldReferenced(ValidationContext context, GraphQLField fieldNode, FieldType fieldDefinition, IGraphType parentType)
+    protected override ValueTask OnDeprecatedFieldReferencedAsync(ValidationContext context, GraphQLField fieldNode, FieldType fieldDefinition, IGraphType parentType)
     {
         _logger.LogWarning("Deprecated field '{ParentType}.{FieldName}' was used: {DeprecationReason}",
             parentType.Name, fieldDefinition.Name, fieldDefinition.DeprecationReason);
         return default;
     }
 
-    protected override ValueTask OnDeprecatedFieldArgumentReferenced(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, FieldType fieldDefinition, IGraphType parentType)
+    protected override ValueTask OnDeprecatedFieldArgumentReferencedAsync(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, FieldType fieldDefinition, IGraphType parentType)
     {
         _logger.LogWarning("Deprecated argument '{ParentType}.{FieldName}.{ArgumentName}' was used: {DeprecationReason}",
             parentType.Name, fieldDefinition.Name, argumentDefinition.Name, argumentDefinition.DeprecationReason);
         return default;
     }
 
-    protected override ValueTask OnDeprecatedDirectiveArgumentReferenced(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, Directive directiveDefinition)
+    protected override ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, Directive directiveDefinition)
     {
         _logger.LogWarning("Deprecated directive argument '@{DirectiveName}.{ArgumentName}' was used: {DeprecationReason}",
             directiveDefinition.Name, argumentDefinition.Name, argumentDefinition.DeprecationReason);
         return default;
     }
 
-    protected override ValueTask OnDeprecatedTypeReferenced(ValidationContext context, GraphQLNamedType typeConditionNode, IGraphType typeDefinition)
+    protected override ValueTask OnDeprecatedTypeReferencedAsync(ValidationContext context, GraphQLNamedType typeConditionNode, IGraphType typeDefinition)
     {
         _logger.LogWarning("Deprecated type '{TypeName}' was used: {DeprecationReason}",
             typeDefinition.Name, typeDefinition.DeprecationReason);

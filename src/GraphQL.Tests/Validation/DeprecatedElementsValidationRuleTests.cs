@@ -377,7 +377,7 @@ public class DeprecatedElementsValidationRuleTests : ValidationTestBase<Deprecat
         public List<DeprecatedDirectiveArgumentCall> DeprecatedDirectiveArgumentCalls { get; } = new();
         public List<DeprecatedTypeCall> DeprecatedTypeCalls { get; } = new();
 
-        protected override ValueTask OnDeprecatedFieldReferenced(
+        protected override ValueTask OnDeprecatedFieldReferencedAsync(
             ValidationContext context,
             GraphQLField fieldNode,
             FieldType fieldDefinition,
@@ -387,7 +387,7 @@ public class DeprecatedElementsValidationRuleTests : ValidationTestBase<Deprecat
             return default;
         }
 
-        protected override ValueTask OnDeprecatedFieldArgumentReferenced(
+        protected override ValueTask OnDeprecatedFieldArgumentReferencedAsync(
             ValidationContext context,
             GraphQLArgument argumentNode,
             QueryArgument argumentDefinition,
@@ -398,7 +398,7 @@ public class DeprecatedElementsValidationRuleTests : ValidationTestBase<Deprecat
             return default;
         }
 
-        protected override ValueTask OnDeprecatedDirectiveArgumentReferenced(
+        protected override ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(
             ValidationContext context,
             GraphQLArgument argumentNode,
             QueryArgument argumentDefinition,
@@ -408,7 +408,7 @@ public class DeprecatedElementsValidationRuleTests : ValidationTestBase<Deprecat
             return default;
         }
 
-        protected override ValueTask OnDeprecatedTypeReferenced(
+        protected override ValueTask OnDeprecatedTypeReferencedAsync(
             ValidationContext context,
             GraphQLNamedType typeConditionNode,
             IGraphType typeDefinition)

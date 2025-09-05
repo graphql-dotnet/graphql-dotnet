@@ -4479,10 +4479,10 @@ namespace GraphQL.Validation.Rules.Custom
     {
         protected DeprecatedElementsValidationRule() { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
-        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedDirectiveArgumentReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.Directive directiveDefinition);
-        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldArgumentReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
-        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLField fieldNode, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
-        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedTypeReferenced(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLNamedType typeConditionNode, GraphQL.Types.IGraphType typeDefinition);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.Directive directiveDefinition);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldArgumentReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLField fieldNode, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedTypeReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLNamedType typeConditionNode, GraphQL.Types.IGraphType typeDefinition);
     }
     [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
         "d in v9.")]

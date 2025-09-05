@@ -28,7 +28,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
                     var parentType = context.TypeInfo.GetParentType()!.GetNamedType();
 
                     // Call the abstract method for handling deprecated field usage
-                    await OnDeprecatedFieldReferenced(context, node, fieldDef, parentType).ConfigureAwait(false);
+                    await OnDeprecatedFieldReferencedAsync(context, node, fieldDef, parentType).ConfigureAwait(false);
                 }
             }),
             new MatchingNodeVisitor<GraphQLArgument>(async (node, context) =>
@@ -44,13 +44,13 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
                     if (directiveDef != null)
                     {
                         // This is a directive argument
-                        await OnDeprecatedDirectiveArgumentReferenced(context, node, argumentDef, directiveDef).ConfigureAwait(false);
+                        await OnDeprecatedDirectiveArgumentReferencedAsync(context, node, argumentDef, directiveDef).ConfigureAwait(false);
                     }
                     else if (fieldDef != null) // note: when a directive is applied to a field, both fieldDef and directiveDef are non-null
                     {
                         // This is a field argument
                         var parentType = context.TypeInfo.GetParentType()!.GetNamedType();
-                        await OnDeprecatedFieldArgumentReferenced(context, node, argumentDef, fieldDef, parentType).ConfigureAwait(false);
+                        await OnDeprecatedFieldArgumentReferencedAsync(context, node, argumentDef, fieldDef, parentType).ConfigureAwait(false);
                     }
                 }
             }),
@@ -62,7 +62,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
                 if (type?.DeprecationReason != null)
                 {
                     // Call the abstract method for handling deprecated type usage
-                    await OnDeprecatedTypeReferenced(context, node.TypeCondition.Type, type).ConfigureAwait(false);
+                    await OnDeprecatedTypeReferencedAsync(context, node.TypeCondition.Type, type).ConfigureAwait(false);
                 }
             }),
             new MatchingNodeVisitor<GraphQLInlineFragment>(async (node, context) =>
@@ -75,7 +75,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
                     if (type?.DeprecationReason != null)
                     {
                         // Call the abstract method for handling deprecated type usage
-                        await OnDeprecatedTypeReferenced(context, node.TypeCondition.Type, type).ConfigureAwait(false);
+                        await OnDeprecatedTypeReferencedAsync(context, node.TypeCondition.Type, type).ConfigureAwait(false);
                     }
                 }
             })
@@ -93,7 +93,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
     /// <param name="fieldNode">The GraphQL field node that references the deprecated field.</param>
     /// <param name="fieldDefinition">The field definition that is deprecated.</param>
     /// <param name="parentType">The parent type containing the deprecated field.</param>
-    protected abstract ValueTask OnDeprecatedFieldReferenced(
+    protected abstract ValueTask OnDeprecatedFieldReferencedAsync(
         ValidationContext context,
         GraphQLField fieldNode,
         FieldType fieldDefinition,
@@ -108,7 +108,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
     /// <param name="argumentDefinition">The argument definition that is deprecated.</param>
     /// <param name="fieldDefinition">The field definition containing the deprecated argument.</param>
     /// <param name="parentType">The parent type containing the field with the deprecated argument.</param>
-    protected abstract ValueTask OnDeprecatedFieldArgumentReferenced(
+    protected abstract ValueTask OnDeprecatedFieldArgumentReferencedAsync(
         ValidationContext context,
         GraphQLArgument argumentNode,
         QueryArgument argumentDefinition,
@@ -123,7 +123,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
     /// <param name="argumentNode">The GraphQL argument node that references the deprecated argument.</param>
     /// <param name="argumentDefinition">The argument definition that is deprecated.</param>
     /// <param name="directiveDefinition">The directive definition containing the deprecated argument.</param>
-    protected abstract ValueTask OnDeprecatedDirectiveArgumentReferenced(
+    protected abstract ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(
         ValidationContext context,
         GraphQLArgument argumentNode,
         QueryArgument argumentDefinition,
@@ -136,7 +136,7 @@ public abstract class DeprecatedElementsValidationRule : ValidationRuleBase
     /// <param name="context">The validation context.</param>
     /// <param name="typeConditionNode">The GraphQL type condition node that references the deprecated type.</param>
     /// <param name="typeDefinition">The type definition that is deprecated.</param>
-    protected abstract ValueTask OnDeprecatedTypeReferenced(
+    protected abstract ValueTask OnDeprecatedTypeReferencedAsync(
         ValidationContext context,
         GraphQLNamedType typeConditionNode,
         IGraphType typeDefinition);
