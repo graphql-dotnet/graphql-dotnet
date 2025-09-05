@@ -3594,6 +3594,7 @@ namespace GraphQL.Utilities.Visitors.Custom
 {
     public class DeprecatedTypeReferenceVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
+        protected readonly System.Collections.Generic.List<string> Violations;
         public DeprecatedTypeReferenceVisitor() { }
         public override void PostVisitSchema(GraphQL.Types.ISchema schema) { }
         public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }

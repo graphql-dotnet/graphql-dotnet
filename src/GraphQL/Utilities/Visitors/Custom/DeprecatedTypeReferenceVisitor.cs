@@ -16,6 +16,10 @@ namespace GraphQL.Utilities.Visitors.Custom;
 /// schema.RegisterVisitor(new DeprecatedTypeReferenceVisitor());
 /// schema.Initialize(); // Will throw if violations are found
 /// </code>
+///
+/// To log violations instead of throwing exceptions, consider extending this class and overriding the
+/// <see cref="PostVisitSchema(ISchema)"/> method to implement custom logging behavior, examining the
+/// <see cref="Violations"/> list for details.
 /// </remarks>
 public class DeprecatedTypeReferenceVisitor : BaseSchemaNodeVisitor
 {
@@ -23,18 +27,18 @@ public class DeprecatedTypeReferenceVisitor : BaseSchemaNodeVisitor
     /// Internal list of violations found during schema traversal.
     /// Each violation represents a non-deprecated field that references a deprecated type.
     /// </summary>
-    private readonly List<string> _violations = new List<string>();
+    protected readonly List<string> Violations = new();
 
     /// <inheritdoc/>
     public override void PostVisitSchema(ISchema schema)
     {
-        if (_violations.Count == 1)
+        if (Violations.Count == 1)
         {
-            throw new InvalidOperationException(_violations[0]);
+            throw new InvalidOperationException(Violations[0]);
         }
-        else if (_violations.Count > 1)
+        else if (Violations.Count > 1)
         {
-            var exceptions = _violations.Select(violation => new InvalidOperationException(violation)).ToArray();
+            var exceptions = Violations.Select(violation => new InvalidOperationException(violation)).ToArray();
             throw new AggregateException("Schema validation failed. Found multiple non-deprecated fields referencing deprecated types.", exceptions);
         }
     }
@@ -79,7 +83,7 @@ public class DeprecatedTypeReferenceVisitor : BaseSchemaNodeVisitor
         if (fieldType != null && IsDeprecated(fieldType))
         {
             var violation = $"Non-deprecated field '{parentTypeName}.{field.Name}' references deprecated type '{fieldType.Name}'.";
-            _violations.Add(violation);
+            Violations.Add(violation);
         }
     }
 
@@ -97,7 +101,7 @@ public class DeprecatedTypeReferenceVisitor : BaseSchemaNodeVisitor
         if (argumentType != null && IsDeprecated(argumentType))
         {
             var violation = $"Non-deprecated argument '{parentTypeName}.{field.Name}.{argument.Name}' references deprecated type '{argumentType.Name}'.";
-            _violations.Add(violation);
+            Violations.Add(violation);
         }
     }
 
