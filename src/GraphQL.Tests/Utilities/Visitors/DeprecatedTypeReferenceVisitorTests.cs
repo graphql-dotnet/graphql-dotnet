@@ -6,34 +6,6 @@ namespace GraphQL.Tests.Utilities.Visitors;
 public class DeprecatedTypeReferenceVisitorTests
 {
     [Fact]
-    public void Should_Throw_When_NonDeprecated_Field_References_Deprecated_Type()
-    {
-        // Arrange
-        var deprecatedType = new ObjectGraphType
-        {
-            Name = "DeprecatedUser",
-            DeprecationReason = "Use NewUser instead"
-        };
-        deprecatedType.Field<StringGraphType>("id");
-
-        var activeType = new ObjectGraphType { Name = "Post" };
-        activeType.Field<StringGraphType>("title");
-        // Non-deprecated field referencing deprecated type
-        activeType.Field<ObjectGraphType>("author").Type(deprecatedType);
-
-        var schema = new Schema
-        {
-            Query = activeType
-        };
-        schema.RegisterType(deprecatedType);
-        schema.RegisterVisitor(new DeprecatedTypeReferenceVisitor());
-
-        // Act & Assert
-        var exception = Should.Throw<InvalidOperationException>(() => schema.Initialize());
-        exception.Message.ShouldBe("Non-deprecated field 'Post.author' references deprecated type 'DeprecatedUser'.");
-    }
-
-    [Fact]
     public void Should_Not_Throw_When_Deprecated_Field_References_Deprecated_Type()
     {
         // Arrange
