@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2
@@ -40,7 +40,7 @@ jobs:
           path: docs2/public/**
           if-no-files-found: error
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '8.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
