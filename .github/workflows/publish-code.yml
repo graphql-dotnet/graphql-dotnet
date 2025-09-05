@@ -29,7 +29,7 @@ jobs:
           echo version=$version
           echo "version=$version" >> $GITHUB_ENV
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2
