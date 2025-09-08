@@ -3085,6 +3085,7 @@ namespace GraphQL.Types
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public void Initialize() { }
+        protected virtual void OnBeforeInitializeType(GraphQL.Types.IGraphType graphType) { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type) { }
         public void RegisterTypeMapping(System.Type clrType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type graphType) { }
@@ -3113,6 +3114,7 @@ namespace GraphQL.Types
         protected SchemaTypes() { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
@@ -3126,6 +3128,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        protected virtual void OnBeforeInitialize(GraphQL.Types.IGraphType graphType) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
