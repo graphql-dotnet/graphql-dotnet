@@ -1458,6 +1458,31 @@ services.AddGraphQL(b => b
 );
 ```
 
+### 35. Schema type initialization hooks (v8.6+)
+
+A new protected method `OnBeforeInitializeType` has been added to the `Schema` class that is called before each graph type is initialized during schema creation. This allows for custom logic to be executed before type processing, such as logging, validation, or metadata collection.
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema(IServiceProvider serviceProvider) : base(serviceProvider)
+    {
+        Query = new MyQuery();
+    }
+
+    protected override void OnBeforeInitializeType(IGraphType graphType)
+    {
+        // Custom logic before each type is initialized
+        Console.WriteLine($"Initializing type: {graphType.Name}");
+        
+        // Example: Add metadata to track initialization order
+        graphType.WithMetadata("InitializationTimestamp", DateTime.UtcNow);
+    }
+}
+```
+
+This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
+
 ## Breaking Changes
 
 ### 1. Query type is required
