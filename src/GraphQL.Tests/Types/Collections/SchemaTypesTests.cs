@@ -243,4 +243,113 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
 
         public override object? Serialize(object? value) => base.Serialize(new Guid("00000001-0002-0003-0004-000000000005"));
     }
+
+    [Fact]
+    public void OnBeforeInitialize()
+    {
+        var receivedTypes = new List<IGraphType>();
+        var schema = new TestSchemaWithOnBeforeInitialize(receivedTypes);
+
+        // Setup schema with various scenarios:
+        // 1. Multiple references to same types
+        var sharedType = new ObjectGraphType { Name = "SharedType" };
+        sharedType.Field<StringGraphType>("field1");
+        sharedType.Field<StringGraphType>("field2");
+
+        // 2. Type referenced by name
+        var referencedType = new ObjectGraphType { Name = "ReferencedType" };
+        referencedType.Field<StringGraphType>("field");
+
+        // 3. Various graph type kinds
+        var query = new ObjectGraphType { Name = "Query" };
+        query.Field<StringGraphType>("stringField");
+        query.Field<IntGraphType>("intField");
+        query.Field<BooleanGraphType>("boolField");
+        query.Field<string>("clrField"); // CLR type mapping
+        query.Field<TestObjectType>("objectField1");
+        query.Field<TestObjectType>("objectField2"); // Same type referenced twice
+        query.Field("interfaceField", new TestInterfaceType());
+        query.Field("enumField", new TestEnumType());
+        query.Field<StringGraphType>("fieldWithInput").Argument<TestInputType>("input");
+        query.Field("shared1", sharedType);
+        query.Field("shared2", sharedType); // Same instance referenced twice
+        query.Field("referenced", new GraphQLTypeReference("ReferencedType")); // Referenced by name
+
+        schema.Query = query;
+        schema.RegisterType(referencedType);
+        schema.Initialize();
+
+        // Verify that OnBeforeInitialize was called for each type exactly once
+        receivedTypes.ShouldContain(t => t.Name == "Query" && t is ObjectGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "SharedType" && t is ObjectGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "ReferencedType" && t is ObjectGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "TestObject" && t is ObjectGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "TestInterface" && t is InterfaceGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "TestEnum" && t is EnumerationGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "TestInput" && t is InputObjectGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "String" && t is StringGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "Int" && t is IntGraphType);
+        receivedTypes.ShouldContain(t => t.Name == "Boolean" && t is BooleanGraphType);
+
+        // Verify no duplicates by reference - each type should be called exactly once
+        var duplicatesByReference = receivedTypes.GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        duplicatesByReference.ShouldBeEmpty("No type instance should be passed multiple times");
+
+        // Verify no duplicates by name - each type name should appear exactly once
+        var typeNames = receivedTypes.Select(t => t.Name).ToList();
+        var duplicateNames = typeNames.GroupBy(x => x).Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        duplicateNames.ShouldBeEmpty($"Type names called multiple times: {string.Join(", ", duplicateNames)}");
+    }
+
+    private class TestSchemaWithOnBeforeInitialize : Schema
+    {
+        private readonly List<IGraphType> _receivedTypes;
+
+        public TestSchemaWithOnBeforeInitialize(List<IGraphType> receivedTypes) : base(new DefaultServiceProvider())
+        {
+            _receivedTypes = receivedTypes;
+        }
+
+        protected override void OnBeforeInitializeType(IGraphType graphType)
+        {
+            _receivedTypes.Add(graphType);
+        }
+    }
+
+    private class TestObjectType : ObjectGraphType
+    {
+        public TestObjectType()
+        {
+            Name = "TestObject";
+            Field<StringGraphType>("field");
+        }
+    }
+
+    private class TestInterfaceType : InterfaceGraphType
+    {
+        public TestInterfaceType()
+        {
+            Name = "TestInterface";
+            Field<StringGraphType>("field");
+        }
+    }
+
+    private class TestEnumType : EnumerationGraphType
+    {
+        public TestEnumType()
+        {
+            Name = "TestEnum";
+            Add("VALUE1", 1);
+            Add("VALUE2", 2);
+        }
+    }
+
+    private class TestInputType : InputObjectGraphType
+    {
+        public TestInputType()
+        {
+            Name = "TestInput";
+            Field<StringGraphType>("field");
+        }
+    }
 }

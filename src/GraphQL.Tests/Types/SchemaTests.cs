@@ -230,6 +230,32 @@ public class SchemaTests
         schema.Initialize();
         schema.Query.Fields.Find("test")!.Arguments![0].ResolvedType.ShouldBeOfType<AutoRegisteringInputObjectGraphType<CustomData>>();
     }
+
+    [Fact]
+    public void OnBeforeInitializeType_cannot_access_AllTypes()
+    {
+        var schema = new SchemaWithOnBeforeInitializeTypeAccessingAllTypes();
+
+        // Attempting to initialize should throw an exception when OnBeforeInitializeType tries to access AllTypes
+        Should.Throw<InvalidOperationException>(() => schema.Initialize())
+            .Message.ShouldBe("Cannot access AllTypes while schema types are being created. AllTypes is not available during OnBeforeInitializeType execution.");
+    }
+}
+
+public class SchemaWithOnBeforeInitializeTypeAccessingAllTypes : Schema
+{
+    public SchemaWithOnBeforeInitializeTypeAccessingAllTypes()
+    {
+        var query = new ObjectGraphType { Name = "Query" };
+        query.Field<StringGraphType>("test");
+        Query = query;
+    }
+
+    protected override void OnBeforeInitializeType(IGraphType graphType)
+    {
+        // This should throw an exception because AllTypes is not available during initialization
+        _ = AllTypes.Count;
+    }
 }
 
 public class CustomData

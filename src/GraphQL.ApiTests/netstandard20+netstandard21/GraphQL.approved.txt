@@ -2833,6 +2833,7 @@ namespace GraphQL.Types
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public void Initialize() { }
+        protected virtual void OnBeforeInitializeType(GraphQL.Types.IGraphType graphType) { }
         public void RegisterType(GraphQL.Types.IGraphType type) { }
         public void RegisterType(System.Type type) { }
         public void RegisterTypeMapping(System.Type clrType, System.Type graphType) { }
@@ -2861,6 +2862,7 @@ namespace GraphQL.Types
         protected SchemaTypes() { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize) { }
         public int Count { get; }
         protected virtual System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
@@ -2874,6 +2876,7 @@ namespace GraphQL.Types
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
+        protected virtual void OnBeforeInitialize(GraphQL.Types.IGraphType graphType) { }
     }
     public class ShortGraphType : GraphQL.Types.ScalarGraphType
     {
@@ -3185,6 +3188,7 @@ namespace GraphQL.Utilities
         public PrintOptions() { }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
+        public bool IncludeFederationDefinitions { get; set; }
         public bool IncludeFederationTypes { get; set; }
         public bool IncludeImportedDefinitions { get; set; }
         public System.StringComparison? StringComparison { get; set; }
@@ -3314,6 +3318,20 @@ namespace GraphQL.Utilities
         public void Include<TType, TTypeOfType>(string name) { }
     }
 }
+namespace GraphQL.Utilities.Visitors.Custom
+{
+    public class DeprecatedTypeReferenceVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
+    {
+        protected readonly System.Collections.Generic.List<string> Violations;
+        public DeprecatedTypeReferenceVisitor() { }
+        public override void PostVisitSchema(GraphQL.Types.ISchema schema) { }
+        public override void VisitInputObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInputObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitInterfaceFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IInterfaceGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldArgumentDefinition(GraphQL.Types.QueryArgument argument, GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+        public override void VisitObjectFieldDefinition(GraphQL.Types.FieldType field, GraphQL.Types.IObjectGraphType type, GraphQL.Types.ISchema schema) { }
+    }
+}
 namespace GraphQL.Utilities.Visitors
 {
     public sealed class ParseLinkVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
@@ -3354,6 +3372,7 @@ namespace GraphQL.Utilities.Visitors
     {
         protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema, params string[] urlPrefixes) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {
             public System.Threading.CancellationToken CancellationToken { get; }
@@ -3988,6 +4007,15 @@ namespace GraphQL.Validation.Rules.Custom
         protected virtual System.Threading.Tasks.ValueTask<System.ValueTuple<double, int>> CalculateComplexityAsync(GraphQL.Validation.ValidationContext context) { }
         public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPostNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
         protected virtual System.Threading.Tasks.ValueTask ValidateComplexityAsync(GraphQL.Validation.ValidationContext context, double totalComplexity, int maxDepth) { }
+    }
+    public abstract class DeprecatedElementsValidationRule : GraphQL.Validation.ValidationRuleBase
+    {
+        protected DeprecatedElementsValidationRule() { }
+        public override System.Threading.Tasks.ValueTask<GraphQL.Validation.INodeVisitor?> GetPreNodeVisitorAsync(GraphQL.Validation.ValidationContext context) { }
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.Directive directiveDefinition);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldArgumentReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLArgument argumentNode, GraphQL.Types.QueryArgument argumentDefinition, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedFieldReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLField fieldNode, GraphQL.Types.FieldType fieldDefinition, GraphQL.Types.IGraphType parentType);
+        protected abstract System.Threading.Tasks.ValueTask OnDeprecatedTypeReferencedAsync(GraphQL.Validation.ValidationContext context, GraphQLParser.AST.GraphQLNamedType typeConditionNode, GraphQL.Types.IGraphType typeDefinition);
     }
     public sealed class NoIntrospectionValidationRule : GraphQL.Validation.ValidationRuleBase
     {

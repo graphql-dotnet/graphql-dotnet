@@ -1399,6 +1399,90 @@ public interface IMyInterface
 }
 ```
 
+### 34. Deprecated element detection and validation support (v8.6+)
+
+Two new classes have been added to help manage deprecated schema elements more effectively:
+[`DeprecatedTypeReferenceVisitor`](src/GraphQL/Utilities/Visitors/Custom/DeprecatedTypeReferenceVisitor.cs) and
+[`DeprecatedElementsValidationRule`](src/GraphQL/Validation/Rules.Custom/DeprecatedElementsValidationRule.cs).
+These classes work together to provide comprehensive deprecation management at both the schema and query validation levels.
+
+The [`DeprecatedTypeReferenceVisitor`](src/GraphQL/Utilities/Visitors/Custom/DeprecatedTypeReferenceVisitor.cs) is a schema visitor that identifies non-deprecated fields that directly reference deprecated types during schema initialization. This helps maintain schema consistency by flagging potential issues where deprecated types are still being referenced by active fields.
+
+The [`DeprecatedElementsValidationRule`](src/GraphQL/Validation/Rules.Custom/DeprecatedElementsValidationRule.cs) is an abstract validation rule that identifies deprecated fields, arguments, and types referenced in GraphQL documents during query validation. It provides abstract methods that can be overridden to implement custom handling of deprecated element usage, such as logging warnings or collecting metrics.
+
+```csharp
+// Create a custom validation rule to handle deprecated element usage during query validation
+public class LoggingDeprecatedElementsRule : DeprecatedElementsValidationRule
+{
+    private readonly ILogger<LoggingDeprecatedElementsRule> _logger;
+
+    public LoggingDeprecatedElementsRule(ILogger<LoggingDeprecatedElementsRule> logger)
+    {
+        _logger = logger;
+    }
+
+    protected override ValueTask OnDeprecatedFieldReferencedAsync(ValidationContext context, GraphQLField fieldNode, FieldType fieldDefinition, IGraphType parentType)
+    {
+        _logger.LogWarning("Deprecated field '{ParentType}.{FieldName}' was used: {DeprecationReason}",
+            parentType.Name, fieldDefinition.Name, fieldDefinition.DeprecationReason);
+        return default;
+    }
+
+    protected override ValueTask OnDeprecatedFieldArgumentReferencedAsync(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, FieldType fieldDefinition, IGraphType parentType)
+    {
+        _logger.LogWarning("Deprecated argument '{ParentType}.{FieldName}.{ArgumentName}' was used: {DeprecationReason}",
+            parentType.Name, fieldDefinition.Name, argumentDefinition.Name, argumentDefinition.DeprecationReason);
+        return default;
+    }
+
+    protected override ValueTask OnDeprecatedDirectiveArgumentReferencedAsync(ValidationContext context, GraphQLArgument argumentNode, QueryArgument argumentDefinition, Directive directiveDefinition)
+    {
+        _logger.LogWarning("Deprecated directive argument '@{DirectiveName}.{ArgumentName}' was used: {DeprecationReason}",
+            directiveDefinition.Name, argumentDefinition.Name, argumentDefinition.DeprecationReason);
+        return default;
+    }
+
+    protected override ValueTask OnDeprecatedTypeReferencedAsync(ValidationContext context, GraphQLNamedType typeConditionNode, IGraphType typeDefinition)
+    {
+        _logger.LogWarning("Deprecated type '{TypeName}' was used: {DeprecationReason}",
+            typeDefinition.Name, typeDefinition.DeprecationReason);
+        return default;
+    }
+}
+
+// Register the schema visitor and validation rule
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddSchemaVisitor<DeprecatedTypeReferenceVisitor>()
+    .AddValidationRule<LoggingDeprecatedElementsRule>()
+);
+```
+
+### 35. Schema type initialization hooks (v8.6+)
+
+A new protected method `OnBeforeInitializeType` has been added to the `Schema` class that is called before each graph type is initialized during schema creation. This allows for custom logic to be executed before type processing, such as logging, validation, or metadata collection.
+
+```csharp
+public class MySchema : Schema
+{
+    public MySchema(IServiceProvider serviceProvider) : base(serviceProvider)
+    {
+        Query = new MyQuery();
+    }
+
+    protected override void OnBeforeInitializeType(IGraphType graphType)
+    {
+        // Custom logic before each type is initialized
+        Console.WriteLine($"Initializing type: {graphType.Name}");
+        
+        // Example: Add metadata to track initialization order
+        graphType.WithMetadata("InitializationTimestamp", DateTime.UtcNow);
+    }
+}
+```
+
+This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
+
 ## Breaking Changes
 
 ### 1. Query type is required

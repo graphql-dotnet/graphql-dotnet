@@ -155,6 +155,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
 
     private TypeCollectionContext _context;
     private INameConverter _nameConverter;
+    private readonly Action<IGraphType>? _onBeforeInitialize;
 
     /// <summary>
     /// Initializes a new instance with no types registered.
@@ -182,10 +183,25 @@ public class SchemaTypes : IEnumerable<IGraphType>
     /// <param name="schema">A schema for which this instance is created.</param>
     /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
     /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings)
+        : this(schema, serviceProvider, graphTypeMappings, null)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance for the specified schema, with the specified type resolver,
+    /// with the specified set of <see cref="IGraphTypeMappingProvider"/> instances, and with
+    /// an optional delegate to call before initializing each graph type.
+    /// </summary>
+    /// <param name="schema">A schema for which this instance is created.</param>
+    /// <param name="serviceProvider">A service provider used to resolve graph types.</param>
+    /// <param name="graphTypeMappings">A list of <see cref="IGraphTypeMappingProvider"/> instances used to map CLR types to graph types.</param>
+    /// <param name="onBeforeInitialize">An optional delegate to call before initializing each graph type.</param>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public SchemaTypes(ISchema schema, IServiceProvider serviceProvider, IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings, Action<IGraphType>? onBeforeInitialize)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        _onBeforeInitialize = onBeforeInitialize;
         Initialize(schema, serviceProvider, graphTypeMappings);
     }
 
@@ -539,6 +555,8 @@ public class SchemaTypes : IEnumerable<IGraphType>
         {
             throw new ArgumentOutOfRangeException(nameof(type), "Only add root types.");
         }
+
+        OnBeforeInitialize(type);
 
         if (context.InitializationTrace != null)
             type.WithMetadata(INITIALIZATIION_TRACE_KEY, string.Join(Environment.NewLine, context.InitializationTrace));
@@ -1108,4 +1126,14 @@ Make sure that your ServiceProvider is configured correctly.");
     /// Returns the <see cref="FieldType"/> instance for the <c>__typename</c> meta-field.
     /// </summary>
     protected internal virtual FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
+
+    /// <summary>
+    /// Called before a graph type is initialized. By default, calls the delegate
+    /// specified in the constructor if supplied.
+    /// </summary>
+    /// <param name="graphType">The graph type that is about to be initialized.</param>
+    protected virtual void OnBeforeInitialize(IGraphType graphType)
+    {
+        _onBeforeInitialize?.Invoke(graphType);
+    }
 }

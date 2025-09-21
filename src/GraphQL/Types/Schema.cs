@@ -78,6 +78,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     private SchemaTypes? _allTypes;
     private ExceptionDispatchInfo? _initializationException;
     private readonly object _allTypesInitializationLock = new();
+    private bool _creatingSchemaTypes;
 
     private List<Type>? _additionalTypes;
     private List<IGraphType>? _additionalInstances;
@@ -447,7 +448,19 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             }
         }
 
-        _allTypes = CreateSchemaTypes();
+        // note: this code is only executed from Initialize, which is locked to a single thread
+        if (_creatingSchemaTypes)
+            throw new InvalidOperationException("Cannot access AllTypes while schema types are being created. AllTypes is not available during OnBeforeInitializeType execution.");
+
+        _creatingSchemaTypes = true;
+        try
+        {
+            _allTypes = CreateSchemaTypes();
+        }
+        finally
+        {
+            _creatingSchemaTypes = false;
+        }
 
         try
         {
@@ -476,7 +489,17 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// </remarks>
     protected virtual SchemaTypes CreateSchemaTypes()
     {
-        return new SchemaTypes(this, _services);
+        var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
+        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
+    }
+
+    /// <summary>
+    /// Called before a graph type is initialized during schema creation.
+    /// Override this method to perform custom logic before each type is processed.
+    /// </summary>
+    /// <param name="graphType">The graph type that is about to be initialized.</param>
+    protected virtual void OnBeforeInitializeType(IGraphType graphType)
+    {
     }
 
     /// <summary>
