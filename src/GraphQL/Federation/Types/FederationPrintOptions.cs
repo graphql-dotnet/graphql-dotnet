@@ -7,7 +7,7 @@ namespace GraphQL.Federation.Types;
 /// returned by '<c>services { sdl }</c>' in a GraphQL federation subgraph.
 /// </summary>
 /// <remarks>
-/// By default this does not include Federation directives imported by '@link'.
+/// By default this does not include Federation types or directives imported by '@link'.
 /// Please disable <see cref="PrintOptions.IncludeFederationTypes"/> for
 /// Federation v1 compatibility.
 /// </remarks>
