@@ -7,15 +7,17 @@ namespace GraphQL.Federation.Types;
 /// returned by '<c>services { sdl }</c>' in a GraphQL federation subgraph.
 /// </summary>
 /// <remarks>
-/// By default this does not include types or directives imported by '@link'.
+/// By default this does not include Federation types or directives imported by '@link'.
 /// Please disable <see cref="PrintOptions.IncludeFederationTypes"/> for
 /// Federation v1 compatibility.
 /// </remarks>
 public class FederationPrintOptions : PrintOptions
 {
-    /// <inheritdoc cref="FederationPrintOptions"/>
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FederationPrintOptions"/> class.
+    /// </summary>
     public FederationPrintOptions()
     {
-        IncludeImportedDefinitions = false;
+        IncludeFederationDefinitions = false;
     }
 }

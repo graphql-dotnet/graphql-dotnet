@@ -3454,6 +3454,7 @@ namespace GraphQL.Utilities
         public PrintOptions() { }
         public bool IncludeDeprecationReasons { get; set; }
         public bool IncludeDescriptions { get; set; }
+        public bool IncludeFederationDefinitions { get; set; }
         public bool IncludeFederationTypes { get; set; }
         public bool IncludeImportedDefinitions { get; set; }
         public System.StringComparison? StringComparison { get; set; }
@@ -3745,6 +3746,7 @@ namespace GraphQL.Utilities.Visitors
     {
         protected override System.Threading.Tasks.ValueTask VisitDocumentAsync(GraphQLParser.AST.GraphQLDocument document, GraphQL.Utilities.Visitors.RemoveImportedTypesVisitor.Context context) { }
         public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node, GraphQL.Types.ISchema schema, params string[] urlPrefixes) { }
         public struct Context : GraphQLParser.Visitors.IASTVisitorContext
         {
             public System.Threading.CancellationToken CancellationToken { get; }

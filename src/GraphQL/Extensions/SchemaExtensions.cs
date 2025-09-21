@@ -136,6 +136,10 @@ public static class SchemaExtensions
         {
             RemoveImportedTypesVisitor.Visit(sdl, schema);
         }
+        if (!options.IncludeFederationDefinitions)
+        {
+            RemoveImportedTypesVisitor.Visit(sdl, schema, "https://specs.apollo.dev/federation/", "https://specs.apollo.dev/link/");
+        }
         if (options.StringComparison != null)
         {
             SDLSorter.Sort(sdl, new(options.StringComparison.Value));

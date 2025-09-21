@@ -15,8 +15,22 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
     {
     }
 
-    /// <inheritdoc cref="RemoveFederationTypesVisitor"/>
+    /// <summary>
+    /// Remove all type and directive definitions that are imported from another schema via the @link directive.
+    /// </summary>
+    /// <param name="node">The AST node to process.</param>
+    /// <param name="schema">The schema containing the link directives.</param>
     public static void Visit(ASTNode node, ISchema schema)
+        => Visit(node, schema, (string[])null!);
+
+    /// <summary>
+    /// Remove all type and directive definitions that are imported from another schema via the @link directive,
+    /// filtering by URL prefixes. Only imports from URLs starting with the specified prefixes will be removed.
+    /// </summary>
+    /// <param name="node">The AST node to process.</param>
+    /// <param name="schema">The schema containing the link directives.</param>
+    /// <param name="urlPrefixes">Array of URL prefixes to filter by. Only links with URLs starting with these prefixes will have their imports removed.</param>
+    public static void Visit(ASTNode node, ISchema schema, params string[] urlPrefixes)
     {
         var appliedDirectives = schema.GetAppliedDirectives();
         if (appliedDirectives == null)
@@ -29,6 +43,23 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
             var link = LinkConfiguration.GetConfiguration(appliedDirective);
             if (link == null)
                 continue;
+
+            // Filter by URL prefixes if provided
+            if (urlPrefixes != null)
+            {
+                bool matchesPrefix = false;
+                foreach (var prefix in urlPrefixes)
+                {
+                    if (link.Url.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        matchesPrefix = true;
+                        break;
+                    }
+                }
+                if (!matchesPrefix)
+                    continue;
+            }
+
             if (link.Namespace != null)
             {
                 importedNamespaces ??= new();
