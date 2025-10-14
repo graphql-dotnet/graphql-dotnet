@@ -16,7 +16,7 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v5
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: yarn docs2
