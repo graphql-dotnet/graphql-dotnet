@@ -57,7 +57,7 @@ public static class ResolveFieldContextExtensions
 
     internal static bool TryGetArgument(this IResolveFieldContext context, Type argumentType, string name, out object? result)
     {
-        var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+        var isIntrospection = context.ParentType?.IsIntrospectionType() ?? context.FieldDefinition.IsIntrospectionField();
         var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
 
         return TryGetArgumentExact(context, argumentType, argumentName, out result);
@@ -99,7 +99,7 @@ public static class ResolveFieldContextExtensions
     /// <summary>Determines if the specified field argument has been provided in the GraphQL query request.</summary>
     public static bool HasArgument(this IResolveFieldContext context, string name)
     {
-        var isIntrospection = context.ParentType == null ? context.FieldDefinition.IsIntrospectionField() : context.ParentType.IsIntrospectionType();
+        var isIntrospection = context.ParentType?.IsIntrospectionType() ?? context.FieldDefinition.IsIntrospectionField();
         var argumentName = isIntrospection ? name : (context.Schema?.NameConverter.NameForArgument(name, context.ParentType!, context.FieldDefinition) ?? name);
         return context.Arguments != null && context.Arguments.TryGetValue(argumentName, out var value) && value.Source != ArgumentSource.FieldDefault;
     }

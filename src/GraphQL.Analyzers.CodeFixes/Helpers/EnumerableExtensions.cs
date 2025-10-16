@@ -17,7 +17,7 @@ public static class EnumerableExtensions
         SyntaxKind separator = SyntaxKind.CommaToken)
         where T : SyntaxNode
     {
-        var nodesList = nodes == null ? [] : nodes.ToList();
+        var nodesList = nodes?.ToList() ?? [];
         return SyntaxFactory.SeparatedList(
             nodesList,
             Enumerable.Repeat(SyntaxFactory.Token(separator), Math.Max(nodesList.Count - 1, 0)));

@@ -321,7 +321,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
 
         static void Add(ExecutionContext context, Dictionary<string, (GraphQLField Field, FieldType FieldType)> fields, GraphQLField field, FieldType fieldType)
         {
-            string name = field.Alias != null ? field.Alias.Name.StringValue : fieldType.Name; //ISSUE:allocation in case of alias
+            string name = field.Alias?.Name.StringValue ?? fieldType.Name; //ISSUE:allocation in case of alias
 
             if (fields.TryGetValue(name, out var original))
             {
@@ -510,7 +510,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         {
             var resolveContext = _readonlyResolveFieldContext;
             _readonlyResolveFieldContext = null;
-            resolveContext = resolveContext != null ? resolveContext.Reset(node, context) : new ReadonlyResolveFieldContext(node, context);
+            resolveContext = resolveContext?.Reset(node, context) ?? new ReadonlyResolveFieldContext(node, context);
 
             var resolver = SelectResolver(node, context);
             object? result = await resolver.ResolveAsync(resolveContext).ConfigureAwait(false);

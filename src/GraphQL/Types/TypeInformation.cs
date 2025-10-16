@@ -294,9 +294,7 @@ public class TypeInformation
             }
         }
 
-        var attributes = ParameterInfo != null
-            ? ParameterInfo.GetGraphQLAttributes()
-            : MemberInfo.GetGraphQLAttributes();
+        var attributes = ParameterInfo?.GetGraphQLAttributes() ?? MemberInfo.GetGraphQLAttributes();
         foreach (var attr in attributes)
         {
             attr.Modify(this);

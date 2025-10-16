@@ -124,7 +124,7 @@ public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
         return (context) =>
         {
             var adapter = Interlocked.Exchange(ref _sharedAdapter, null);
-            adapter = adapter == null ? new ResolveFieldContextAdapter<TSourceType>(context) : adapter.Set(context);
+            adapter = adapter?.Set(context) ?? new ResolveFieldContextAdapter<TSourceType>(context);
             var ret = resolver(adapter);
             adapter.Reset();
             Interlocked.CompareExchange(ref _sharedAdapter, adapter, null);

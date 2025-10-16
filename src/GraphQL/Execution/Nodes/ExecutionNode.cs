@@ -54,7 +54,7 @@ public abstract class ExecutionNode
     /// <summary>
     /// Returns the AST field alias, if specified, or AST field name otherwise.
     /// </summary>
-    public string? Name => Field?.Alias != null ? Field.Alias.Name.StringValue : FieldDefinition?.Name; //ISSUE:allocation in case of alias
+    public string? Name => Field?.Alias?.Name.StringValue ?? FieldDefinition?.Name; //ISSUE:allocation in case of alias
 
     /// <summary>
     /// Sets or returns the result of the execution node. May return a <see cref="IDataLoaderResult"/> if a node returns a data loader
