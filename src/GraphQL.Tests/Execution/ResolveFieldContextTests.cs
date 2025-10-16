@@ -13,20 +13,20 @@ public class ResolveFieldContextTests
     {
         var fieldDef = new FieldType()
         {
-            Arguments = new QueryArguments
-            {
+            Arguments =
+            [
                 new QueryArgument(new IntGraphType()) { Name = "int" },
                 new QueryArgument(new LongGraphType()) { Name = "long" },
                 new QueryArgument(new FloatGraphType()) { Name = "float" },
                 new QueryArgument(new StringGraphType()) { Name = "string" },
                 new QueryArgument(new ListGraphType(new StringGraphType())) { Name = "stringlist" },
-                new QueryArgument(new EnumerationGraphType<SomeEnum>()) { Name = "enum" },
-            },
+                new QueryArgument(new EnumerationGraphType<SomeEnum>()) { Name = "enum" }
+            ],
         };
         _context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
-            Errors = new ExecutionErrors(),
+            Errors = [],
             OutputExtensions = new Dictionary<string, object?>(),
             FieldDefinition = fieldDef,
         };

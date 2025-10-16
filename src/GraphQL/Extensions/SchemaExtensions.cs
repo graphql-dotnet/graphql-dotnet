@@ -512,7 +512,7 @@ public static class SchemaExtensions
     {
         var appliedDirectives = schema.GetAppliedDirectives();
         if (appliedDirectives == null)
-            return Array.Empty<LinkConfiguration>();
+            return [];
         return appliedDirectives.Select(d => LinkConfiguration.TryParseDirective(d, false, out var c) ? c : null).Where(x => x != null)!;
     }
 }

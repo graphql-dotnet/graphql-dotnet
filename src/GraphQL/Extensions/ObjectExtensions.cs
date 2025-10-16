@@ -59,7 +59,7 @@ public static partial class ObjectExtensions
     {
         // build the constructor arguments
         object?[] ctorArguments = reflectionInfo.CtorFields.Length == 0
-            ? Array.Empty<object>()
+            ? []
             : new object[reflectionInfo.CtorFields.Length];
 
         for (int i = 0; i < reflectionInfo.CtorFields.Length; ++i)
@@ -215,7 +215,7 @@ public static partial class ObjectExtensions
 #pragma warning disable IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
                 var constructor = AutoRegisteringHelper.GetConstructor(clrType);
 #pragma warning restore IL2067 // Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.
-                var parameters = constructor?.GetParameters() ?? Array.Empty<ParameterInfo>();
+                var parameters = constructor?.GetParameters() ?? [];
                 return (constructor, parameters);
             });
 

@@ -917,7 +917,7 @@ public static class GraphQLBuilderExtensions // TODO: split
             options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
             if (useForCachedDocuments)
             {
-                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? []).Append(rule);
             }
         });
         return builder;
@@ -943,7 +943,7 @@ public static class GraphQLBuilderExtensions // TODO: split
             options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(validationRule);
             if (useForCachedDocuments)
             {
-                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(validationRule);
+                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? []).Append(validationRule);
             }
         });
         return builder;
@@ -970,7 +970,7 @@ public static class GraphQLBuilderExtensions // TODO: split
             options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
             if (useForCachedDocuments)
             {
-                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? []).Append(rule);
             }
         });
         return builder;

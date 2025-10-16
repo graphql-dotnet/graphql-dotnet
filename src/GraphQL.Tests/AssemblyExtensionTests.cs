@@ -11,8 +11,7 @@ public class AssemblyExtensionTests
     public void GetClrTypeMappings()
     {
         GetClrTypeMappings_Test(
-            new Type[]
-            {
+            [
                 typeof(MyClass1),
                 typeof(MyClass1InputGraph),
                 typeof(MyClass1OutputGraph),
@@ -23,16 +22,15 @@ public class AssemblyExtensionTests
                 typeof(DerivedGraph),
                 typeof(MyObjectInputGraph),
                 typeof(MyObjectOutputGraph),
-                typeof(MyGenericGraph<string>),
-            },
-            new (Type ClrType, Type GraphType)[]
-            {
+                typeof(MyGenericGraph<string>)
+            ],
+            [
                 (typeof(MyClass1), typeof(MyClass1InputGraph)),
                 (typeof(MyClass1), typeof(MyClass1OutputGraph)),
                 (typeof(ConsoleColor), typeof(MyEnumGraph)),
                 (typeof(MyClass1), typeof(DerivedGraph)),
-                (typeof(int), typeof(MyGenericGraph<string>)), //ensure CLR type is pulled from derived class's parent ObjectGraphType<int>
-            });
+                (typeof(int), typeof(MyGenericGraph<string>)) //ensure CLR type is pulled from derived class's parent ObjectGraphType<int>
+            ]);
     }
 
     [Fact]
@@ -40,11 +38,10 @@ public class AssemblyExtensionTests
     {
         GetClrTypeMappings_Test(
             typeof(GraphQL.StarWars.StarWarsQuery).Assembly.GetTypes(),
-            new (Type ClrType, Type GraphType)[]
-            {
+            [
                 (typeof(GraphQL.StarWars.Types.Droid), typeof(GraphQL.StarWars.Types.DroidType)),
-                (typeof(GraphQL.StarWars.Types.Human), typeof(GraphQL.StarWars.Types.HumanType)),
-            });
+                (typeof(GraphQL.StarWars.Types.Human), typeof(GraphQL.StarWars.Types.HumanType))
+            ]);
     }
 
     private void GetClrTypeMappings_Test(Type[] typeList, IEnumerable<(Type ClrType, Type GraphType)> expected)

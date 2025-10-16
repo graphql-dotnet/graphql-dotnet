@@ -31,7 +31,7 @@ public class ExecutionBenchmark : IBenchmark
         _schema = _provider.GetRequiredService<ISchema>();
         _schema.Initialize();
         _executer = new DocumentExecuter();
-        _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new DefaultExecutionStrategySelector(), new[] { new MemoryDocumentCache() });
+        _cachedExecuter = new DocumentExecuter(new GraphQLDocumentBuilder(), new DocumentValidator(), new DefaultExecutionStrategySelector(), [new MemoryDocumentCache()]);
     }
 
     [Benchmark]

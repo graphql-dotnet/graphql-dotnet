@@ -119,7 +119,7 @@ public static class ResolveFieldContextExtensions
         return new ResolveFieldContextAdapter<TSourceType>(context);
     }
 
-    private static readonly char[] _separators = { '.' };
+    private static readonly char[] _separators = ['.'];
 
     /// <summary>
     /// Method to get value by path (key1.key2.keyN) from input extensions dictionary.

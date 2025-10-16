@@ -44,10 +44,10 @@ public class NameFieldResolverTests
                 FieldDefinition = new FieldType
                 {
                     Name = name!,
-                    Arguments = new QueryArguments
-                    {
-                        new QueryArgument(new StringGraphType()) { Name = "prefix" },
-                    },
+                    Arguments =
+                    [
+                        new QueryArgument(new StringGraphType()) { Name = "prefix" }
+                    ],
                 },
                 FieldAst = new GraphQLField(name == null ? default! : new GraphQLName(name)),
                 Arguments = new Dictionary<string, ArgumentValue>()

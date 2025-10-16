@@ -36,7 +36,7 @@ public class DocumentExecuter : IDocumentExecuter
     /// <see cref="IDocumentValidator"/>.
     /// </summary>
     public DocumentExecuter(IDocumentBuilder documentBuilder, IDocumentValidator documentValidator)
-        : this(documentBuilder, documentValidator, new DefaultExecutionStrategySelector(), Array.Empty<IConfigureExecution>())
+        : this(documentBuilder, documentValidator, new DefaultExecutionStrategySelector(), [])
     {
     }
 
@@ -295,7 +295,7 @@ public class DocumentExecuter : IDocumentExecuter
             Variables = validationResult.Variables ?? Variables.None,
             ArgumentValues = validationResult.ArgumentValues,
             DirectiveValues = validationResult.DirectiveValues,
-            Errors = new ExecutionErrors(),
+            Errors = [],
             InputExtensions = options.Extensions ?? Inputs.Empty,
             OutputExtensions = new Dictionary<string, object?>(),
             CancellationToken = options.CancellationToken,

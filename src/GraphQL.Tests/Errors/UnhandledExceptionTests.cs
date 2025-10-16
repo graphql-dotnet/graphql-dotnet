@@ -41,7 +41,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
 
         var expectedError = new ExecutionError("Test error message");
         expectedError.AddLocation(new Location(1, 3));
-        expectedError.Path = new[] { "hello2" };
+        expectedError.Path = ["hello2"];
 
         AssertQuery(options =>
         {
@@ -55,7 +55,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
@@ -72,7 +72,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
 
         var expectedError = new ExecutionError("Test error message", new ApplicationException());
         expectedError.AddLocation(new Location(1, 3));
-        expectedError.Path = new[] { "hello2" };
+        expectedError.Path = ["hello2"];
 
         AssertQuery(options =>
         {
@@ -86,7 +86,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
@@ -116,7 +116,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Executed = true });
     }
 
     public class DocListener : DocumentExecutionListenerBase

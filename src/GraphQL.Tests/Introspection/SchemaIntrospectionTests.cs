@@ -93,7 +93,7 @@ public class SchemaIntrospectionTests
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
         });
-        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        string[] scalarTypeNames = ["String", "Boolean", "Int"];
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
@@ -109,11 +109,11 @@ public class SchemaIntrospectionTests
 
         types.Count.ShouldBe(3);
         ShouldBe(GetName(types[0]), "Query");
-        types[0].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "field2", "field1" });
+        types[0].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["field2", "field1"]);
         ShouldBe(GetName(types[1]), "Things");
-        types[1].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "foo", "bar", "baz" });
+        types[1].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["foo", "bar", "baz"]);
         ShouldBe(GetName(types[2]), "Letters");
-        types[2].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "bravo", "charlie", "alfa", "delta" });
+        types[2].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["bravo", "charlie", "alfa", "delta"]);
     }
 
     [Theory]
@@ -130,7 +130,7 @@ public class SchemaIntrospectionTests
             };
             _.Query = "GetFieldNamesOfTypesQuery".ReadGraphQLRequest();
         });
-        string[] scalarTypeNames = new[] { "String", "Boolean", "Int" };
+        string[] scalarTypeNames = ["String", "Boolean", "Int"];
 
         static string GetName(JsonElement el) => el.GetProperty("name").GetString()!;
 
@@ -146,11 +146,11 @@ public class SchemaIntrospectionTests
 
         types.Count.ShouldBe(3);
         ShouldBe(GetName(types[0]), "Letters");
-        types[0].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "alfa", "bravo", "charlie", "delta" });
+        types[0].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["alfa", "bravo", "charlie", "delta"]);
         ShouldBe(GetName(types[1]), "Query");
-        types[1].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "field1", "field2" });
+        types[1].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["field1", "field2"]);
         ShouldBe(GetName(types[2]), "Things");
-        types[2].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(new[] { "bar", "baz", "foo" });
+        types[2].GetProperty("fields").EnumerateArray().Select(GetName).ShouldBe(["bar", "baz", "foo"]);
     }
 
     private static IObjectGraphType TestQueryType()

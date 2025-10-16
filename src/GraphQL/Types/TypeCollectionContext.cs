@@ -21,7 +21,7 @@ internal sealed class TypeCollectionContext
         ClrToGraphTypeMappings = typeMappings;
         Schema = schema;
         if (GlobalSwitches.TrackGraphTypeInitialization)
-            InitializationTrace = new();
+            InitializationTrace = [];
     }
 
     /// <summary>

@@ -93,7 +93,7 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
             if (innerType.IsValueType)
             {
                 var adapterType = typeof(ObservableAdapter<>).MakeGenericType(innerType);
-                var ctor = adapterType.GetConstructor(new Type[] { bodyExpression.Type })!;
+                var ctor = adapterType.GetConstructor([bodyExpression.Type])!;
                 bodyExpression = Expression.New(ctor, bodyExpression);
             }
             return Compile(Expression.New(_valueTaskObservableCtor, bodyExpression));
@@ -116,8 +116,8 @@ public class SourceStreamMethodResolver : MemberResolver, ISourceStreamResolver
         }
     }
 
-    private static readonly ConstructorInfo _valueTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor(new Type[] { typeof(IObservable<object?>) })!;
-    private static readonly ConstructorInfo _valueTaskTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor(new Type[] { typeof(Task<IObservable<object?>>) })!;
+    private static readonly ConstructorInfo _valueTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor([typeof(IObservable<object?>)])!;
+    private static readonly ConstructorInfo _valueTaskTaskObservableCtor = typeof(ValueTask<IObservable<object?>>).GetConstructor([typeof(Task<IObservable<object?>>)])!;
 
     private static readonly MethodInfo _convertFromAsyncEnumerableMethodInfo = typeof(SourceStreamMethodResolver).GetMethod(nameof(ConvertFromAsyncEnumerable), BindingFlags.Static | BindingFlags.NonPublic)!;
     private static Func<IResolveFieldContext, ValueTask<IObservable<object?>>> ConvertFromAsyncEnumerable<T>(Expression body, ParameterExpression resolveFieldContextParameter)

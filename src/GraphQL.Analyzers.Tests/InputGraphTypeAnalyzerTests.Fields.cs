@@ -56,11 +56,11 @@ public partial class InputGraphTypeAnalyzerTests
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
-            : new[]
-            {
+            :
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithLocation(0).WithArguments("Name", symbolType, "Name", "MySourceType", reason)
-            };
+            ];
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -102,13 +102,13 @@ public partial class InputGraphTypeAnalyzerTests
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
-            : new[]
-            {
+            :
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithLocation(0).WithArguments("Name", "field", "name", "MySourceType", "'readonly'"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithLocation(0).WithArguments("Name", "property", "Name", "MySourceType", "not 'public' and doesn't have a public setter")
-            };
+            ];
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -148,13 +148,13 @@ public partial class InputGraphTypeAnalyzerTests
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
-            : new[]
-            {
+            :
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
                     .WithLocation(1).WithArguments("MySourceType"),
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotMatchInputFieldToTheSourceField)
                     .WithLocation(0).WithArguments("FirstName", "MySourceType")
-            };
+            ];
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -905,11 +905,11 @@ public partial class InputGraphTypeAnalyzerTests
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
-            : new[]
-            {
+            :
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithLocation(0).WithArguments("Name", "property", "Name", "MySourceType", "doesn't have a public setter")
-            };
+            ];
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }
@@ -1026,11 +1026,11 @@ public partial class InputGraphTypeAnalyzerTests
 
         var expected = isAllowed
             ? DiagnosticResult.EmptyDiagnosticResults
-            : new[]
-            {
+            :
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotSetSourceField)
                     .WithLocation(0).WithArguments("FirstName", "property", "Name", "MySourceType", "doesn't have a public setter")
-            };
+            ];
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }

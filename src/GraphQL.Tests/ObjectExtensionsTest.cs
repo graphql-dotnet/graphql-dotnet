@@ -70,7 +70,7 @@ public class ObjectExtensionsTests
     public void convert_double_array_to_array()
     {
         // Arrange
-        double[] doubles = new[] { 1.00, 2.01, 3.14 };
+        double[] doubles = [1.00, 2.01, 3.14];
 
         // Act
         object? actual = doubles.GetPropertyValue(typeof(double[]), new ListGraphType(new NonNullGraphType(new FloatGraphType())));
@@ -109,7 +109,7 @@ public class ObjectExtensionsTests
     public void convert_ndouble_array_to_array()
     {
         // Arrange
-        double?[] doubles = new double?[] { 1.00, 2.01, 3.14 };
+        double?[] doubles = [1.00, 2.01, 3.14];
 
         // Act
         object? actual = doubles.GetPropertyValue(typeof(double?[]), new ListGraphType(new FloatGraphType()));
@@ -148,7 +148,7 @@ public class ObjectExtensionsTests
     public void convert_double_array_of_arrays_to_array_of_arrays()
     {
         // Arrange
-        double[][] doubles = new[] { new[] { 1.00, 2.01, 3.14 }, new[] { 3.25, 2.21, 1.10 } };
+        double[][] doubles = [[1.00, 2.01, 3.14], [3.25, 2.21, 1.10]];
 
         // Act
         object? actual = doubles.GetPropertyValue(typeof(double[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new FloatGraphType()))));
@@ -174,7 +174,7 @@ public class ObjectExtensionsTests
     public void convert_strings_array_to_array()
     {
         // Arrange
-        string[] strings = new[] { "foo", "bar", "new" };
+        string[] strings = ["foo", "bar", "new"];
 
         // Act
         object? actual = strings.GetPropertyValue(typeof(string[]), new ListGraphType(new NonNullGraphType(new StringGraphType())));
@@ -226,7 +226,7 @@ public class ObjectExtensionsTests
     public void convert_string_array_of_arrays_to_array_of_arrays()
     {
         // Arrange
-        string[][] strings = new[] { new[] { "foo", "bar", "boo" }, new[] { "new", "year", "eve" } };
+        string[][] strings = [["foo", "bar", "boo"], ["new", "year", "eve"]];
 
         // Act
         object? actual = strings.GetPropertyValue(typeof(string[][]), new ListGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))));
@@ -803,7 +803,7 @@ public class ObjectExtensionsTests
             Values.Add(value);
         }
 
-        public List<T> Values { get; } = new();
+        public List<T> Values { get; } = [];
         public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

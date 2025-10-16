@@ -66,7 +66,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
             _.Query = """
                   fragment fragA on Human { relatives { ...fragA } },
                 """;
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 1, 41);
+            _.Error(CycleErrorMessage("fragA", []), 1, 41);
         });
     }
 
@@ -78,7 +78,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
             _.Query = """
                   fragment fragA on Dog { ...fragA }
                 """;
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 1, 27);
+            _.Error(CycleErrorMessage("fragA", []), 1, 27);
         });
     }
 
@@ -94,7 +94,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                     }
                   }
                 """;
-            _.Error(CycleErrorMessage("fragA", Array.Empty<string>()), 3, 7);
+            _.Error(CycleErrorMessage("fragA", []), 3, 7);
         });
     }
 
@@ -109,7 +109,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
+                e.Message = CycleErrorMessage("fragA", ["fragB"]);
                 e.Loc(1, 27);
                 e.Loc(2, 27);
             });
@@ -127,7 +127,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragB", new[] { "fragA" });
+                e.Message = CycleErrorMessage("fragB", ["fragA"]);
                 e.Loc(1, 27);
                 e.Loc(2, 27);
             });
@@ -153,7 +153,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
+                e.Message = CycleErrorMessage("fragA", ["fragB"]);
                 e.Loc(3, 7);
                 e.Loc(8, 7);
             });
@@ -177,7 +177,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC", "fragO", "fragP" });
+                e.Message = CycleErrorMessage("fragA", ["fragB", "fragC", "fragO", "fragP"]);
                 e.Loc(1, 27);
                 e.Loc(2, 27);
                 e.Loc(3, 27);
@@ -186,7 +186,7 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
             });
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragO", new[] { "fragP", "fragX", "fragY", "fragZ" });
+                e.Message = CycleErrorMessage("fragO", ["fragP", "fragX", "fragY", "fragZ"]);
                 e.Loc(7, 27);
                 e.Loc(8, 37);
                 e.Loc(4, 27);
@@ -208,13 +208,13 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragB" });
+                e.Message = CycleErrorMessage("fragA", ["fragB"]);
                 e.Loc(1, 27);
                 e.Loc(2, 27);
             });
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
+                e.Message = CycleErrorMessage("fragA", ["fragC"]);
                 e.Loc(1, 37);
                 e.Loc(3, 27);
             });
@@ -233,13 +233,13 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragC" });
+                e.Message = CycleErrorMessage("fragA", ["fragC"]);
                 e.Loc(1, 27);
                 e.Loc(3, 27);
             });
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragC", new[] { "fragB" });
+                e.Message = CycleErrorMessage("fragC", ["fragB"]);
                 e.Loc(3, 37);
                 e.Loc(2, 27);
             });
@@ -258,19 +258,19 @@ public class NoFragmentCyclesTests : ValidationTestBase<NoFragmentCycles, Valida
                 """;
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragB", Array.Empty<string>());
+                e.Message = CycleErrorMessage("fragB", []);
                 e.Loc(2, 27);
             });
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragA", new[] { "fragB", "fragC" });
+                e.Message = CycleErrorMessage("fragA", ["fragB", "fragC"]);
                 e.Loc(1, 27);
                 e.Loc(2, 37);
                 e.Loc(3, 27);
             });
             _.Error(e =>
             {
-                e.Message = CycleErrorMessage("fragB", new[] { "fragC" });
+                e.Message = CycleErrorMessage("fragB", ["fragC"]);
                 e.Loc(2, 37);
                 e.Loc(3, 37);
             });

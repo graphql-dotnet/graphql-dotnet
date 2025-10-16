@@ -18,26 +18,28 @@ public class GraphQLExtensionsTests
 
         public IEnumerator<object?[]> GetEnumerator()
         {
-            yield return new object?[] { new BooleanGraphType(), true, true };
-            yield return new object?[] { new BooleanGraphType(), false, true };
-            yield return new object?[] { new BooleanGraphType(), null, true };
+            yield return [new BooleanGraphType(), true, true];
+            yield return [new BooleanGraphType(), false, true];
+            yield return [new BooleanGraphType(), null, true];
 
-            yield return new object?[] { new NonNullGraphType(new BooleanGraphType()), false, true };
-            yield return new object?[] { new NonNullGraphType(new BooleanGraphType()), null, false };
+            yield return [new NonNullGraphType(new BooleanGraphType()), false, true];
+            yield return [new NonNullGraphType(new BooleanGraphType()), null, false];
 
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), null, true };
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, true };
-            yield return new object?[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, false };
-            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, null }, false };
-            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, true };
+            yield return [new ListGraphType(new BooleanGraphType()), null, true];
+            yield return [new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, true];
+            yield return [new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, false];
+            yield return [new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, null }, false
+            ];
+            yield return [new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, true
+            ];
 
-            yield return new object?[] { new InputObjectGraphType<Person>(), null, true };
-            yield return new object?[] { new NonNullGraphType(new InputObjectGraphType<Person>()), null, false };
-            yield return new object?[] { new InputObjectGraphType<Person>(), new Person(), true };
-            yield return new object?[] { new InputObjectGraphType<Person>(), "aaa", false };
+            yield return [new InputObjectGraphType<Person>(), null, true];
+            yield return [new NonNullGraphType(new InputObjectGraphType<Person>()), null, false];
+            yield return [new InputObjectGraphType<Person>(), new Person(), true];
+            yield return [new InputObjectGraphType<Person>(), "aaa", false];
 
             // https://github.com/graphql-dotnet/graphql-dotnet/issues/2334
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), true, true };
+            yield return [new ListGraphType(new BooleanGraphType()), true, true];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -47,8 +49,8 @@ public class GraphQLExtensionsTests
     {
         public IEnumerator<object?[]> GetEnumerator()
         {
-            yield return new object?[] { null, 0, new ArgumentNullException("type") };
-            yield return new object?[] { new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'") };
+            yield return [null, 0, new ArgumentNullException("type")];
+            yield return [new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'")];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -75,34 +77,38 @@ public class GraphQLExtensionsTests
 
         public IEnumerator<object?[]> GetEnumerator()
         {
-            yield return new object?[] { new BooleanGraphType(), true, new GraphQLTrueBooleanValue() };
-            yield return new object?[] { new BooleanGraphType(), false, new GraphQLFalseBooleanValue() };
-            yield return new object?[] { new BooleanGraphType(), null, new GraphQLNullValue() };
+            yield return [new BooleanGraphType(), true, new GraphQLTrueBooleanValue()];
+            yield return [new BooleanGraphType(), false, new GraphQLFalseBooleanValue()];
+            yield return [new BooleanGraphType(), null, new GraphQLNullValue()];
 
-            yield return new object?[] { new NonNullGraphType(new BooleanGraphType()), false, new GraphQLFalseBooleanValue() };
+            yield return [new NonNullGraphType(new BooleanGraphType()), false, new GraphQLFalseBooleanValue()];
 
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), null, new GraphQLNullValue() };
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue() } } };
-            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue() } } };
+            yield return [new ListGraphType(new BooleanGraphType()), null, new GraphQLNullValue()];
+            yield return [new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, new GraphQLListValue { Values = [new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue()] }];
+            yield return [new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, new GraphQLListValue { Values = [new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue()] }];
 
-            yield return new object?[] { new InputObjectGraphType<Person>(), null, new GraphQLNullValue() };
-            yield return new object?[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new GraphQLObjectValue
-            {
-                Fields = new List<GraphQLObjectField>
+            yield return [new InputObjectGraphType<Person>(), null, new GraphQLNullValue()];
+            yield return
+            [
+                new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new GraphQLObjectValue
                 {
-                    new GraphQLObjectField(new GraphQLName("Name"), new GraphQLStringValue("Tom")),
-                    new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(42))
+                    Fields =
+                    [
+                        new GraphQLObjectField(new GraphQLName("Name"), new GraphQLStringValue("Tom")),
+                        new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(42))
+                    ]
                 }
-            } };
-            yield return new object?[] { new PersonInputType(), new Person { }, new GraphQLObjectValue
-            {
-                Fields = new List<GraphQLObjectField>
+            ];
+            yield return
+            [
+                new PersonInputType(), new Person { },
+                new GraphQLObjectValue
                 {
-                    new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(0))
+                    Fields = [new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(0))]
                 }
-            } };
+            ];
 
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue() };
+            yield return [new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue()];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -124,12 +130,12 @@ public class GraphQLExtensionsTests
 
         public IEnumerator<object?[]> GetEnumerator()
         {
-            yield return new object?[] { new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'") };
-            yield return new object?[] { new BadPersonInputType(), new Person(), new InvalidOperationException("Unable to get an AST representation of the input object type 'BadPersonInput' for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests+ToASTExceptionTestData+Person'.") };
-            yield return new object?[] { new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
-            yield return new object?[] { new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of null value for type '[Boolean]!'.") };
-            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, null }, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.") };
-            yield return new object?[] { new NonNullGraphType(new InputObjectGraphType<Person>()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'PersonInputObject!'.") };
+            yield return [new ObjectGraphType(), 0, new ArgumentOutOfRangeException("type", "Must provide Input Type, cannot use ObjectGraphType 'Object'")];
+            yield return [new BadPersonInputType(), new Person(), new InvalidOperationException("Unable to get an AST representation of the input object type 'BadPersonInput' for 'GraphQL.Tests.Extensions.GraphQLExtensionsTests+ToASTExceptionTestData+Person'.")];
+            yield return [new NonNullGraphType(new BooleanGraphType()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.")];
+            yield return [new NonNullGraphType(new ListGraphType(new BooleanGraphType())), null, new InvalidOperationException($"Unable to get an AST representation of null value for type '[Boolean]!'.")];
+            yield return [new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, null }, new InvalidOperationException($"Unable to get an AST representation of null value for type 'Boolean!'.")];
+            yield return [new NonNullGraphType(new InputObjectGraphType<Person>()), null, new InvalidOperationException($"Unable to get an AST representation of null value for type 'PersonInputObject!'.")];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

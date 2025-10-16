@@ -12,15 +12,15 @@ public class TimeSpanSecondsGraphTypeTests
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            yield return new object[] { (byte)1 };
-            yield return new object[] { (sbyte)2 };
-            yield return new object[] { (short)3 };
-            yield return new object[] { (ushort)4 };
-            yield return new object[] { (int)5 };
-            yield return new object[] { (uint)6 };
-            yield return new object[] { (long)7 };
-            yield return new object[] { (ulong)8 };
-            yield return new object[] { new BigInteger(9) };
+            yield return [(byte)1];
+            yield return [(sbyte)2];
+            yield return [(short)3];
+            yield return [(ushort)4];
+            yield return [(int)5];
+            yield return [(uint)6];
+            yield return [(long)7];
+            yield return [(ulong)8];
+            yield return [new BigInteger(9)];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

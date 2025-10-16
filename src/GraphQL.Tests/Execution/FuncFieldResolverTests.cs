@@ -20,7 +20,7 @@ public class FuncFieldResolverTests
         _context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
-            Errors = new ExecutionErrors(),
+            Errors = [],
             OutputExtensions = new Dictionary<string, object?>(),
         };
     }
@@ -200,12 +200,12 @@ public class FuncFieldResolverTests
         var ffr1 = new FuncFieldResolver<int?, IEnumerable<int>>(context =>
         {
             rfc1 = context;
-            return new[] { 1, 2 };
+            return [1, 2];
         });
         var ffr2 = new FuncFieldResolver<int?, IEnumerable<int>>(context =>
         {
             rfc2 = context;
-            return new[] { 1, 2 };
+            return [1, 2];
         });
         await ffr1.ResolveAsync(_context);
         await ffr2.ResolveAsync(_context);

@@ -68,7 +68,7 @@ public class ExecutionError : Exception
     /// </summary>
     public void AddLocation(Location location)
     {
-        (Locations ??= new()).Add(location);
+        (Locations ??= []).Add(location);
     }
 
     private void SetCode(Exception? exception)

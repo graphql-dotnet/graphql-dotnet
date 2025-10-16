@@ -81,7 +81,7 @@ Available benchmarks:
     private static void RunProfilerPayload(Type benchmarkType, int count)
     {
         var m = typeof(Program).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).Where(x => x.Name == nameof(RunProfilerPayload) && x.ContainsGenericParameters).Single();
-        m.MakeGenericMethod(benchmarkType).Invoke(null, new object[] { count });
+        m.MakeGenericMethod(benchmarkType).Invoke(null, [count]);
     }
 
     private static void RunProfilerPayload<TBenchmark>(int count)

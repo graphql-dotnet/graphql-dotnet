@@ -172,7 +172,7 @@ public class MemoryDocumentCache : IConfigureExecution, IDisposable
                 options.Document = document;
                 // None of the default validation rules are dependent on the inputs; thus,
                 // a successfully cached document should not need additional validation.
-                options.ValidationRules = options.CachedDocumentValidationRules ?? Array.Empty<IValidationRule>();
+                options.ValidationRules = options.CachedDocumentValidationRules ?? [];
             }
 
             var result = await next(options).ConfigureAwait(false);

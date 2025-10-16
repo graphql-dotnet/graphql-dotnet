@@ -588,7 +588,7 @@ public static class GraphQLExtensions
         };
     }
 
-    private static readonly char[] _escapes = new char[] { '\b', '\f', '\n', '\r', '\t', '\\', '"' };
+    private static readonly char[] _escapes = ['\b', '\f', '\n', '\r', '\t', '\\', '"'];
 
     /// <summary>
     /// Returns a string representation of the specified node.

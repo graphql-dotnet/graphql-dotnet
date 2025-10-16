@@ -348,7 +348,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? [VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync)]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -422,7 +422,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? [VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync)]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;
@@ -478,7 +478,7 @@ public class AwaitableResolverAnalyzerTests
               """;
 
         var expected = report
-            ? new[] { VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync) }
+            ? [VerifyCS.Diagnostic().WithLocation(0).WithArguments(Constants.MethodNames.ResolveAsync)]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         string expectedFix = report ? fix : source;

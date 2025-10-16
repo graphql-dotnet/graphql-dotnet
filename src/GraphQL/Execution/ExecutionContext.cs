@@ -120,7 +120,7 @@ public class ExecutionContext : IExecutionContext, IExecutionArrayPool, IDisposa
         return array;
     }
 
-    private readonly List<Array> _trackedArrays = new();
+    private readonly List<Array> _trackedArrays = [];
 
     /// <summary>
     /// Clears all state in this context.

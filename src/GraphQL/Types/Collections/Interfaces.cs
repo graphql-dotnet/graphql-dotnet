@@ -7,7 +7,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class Interfaces : IEnumerable<Type>
 {
-    internal List<Type> List { get; } = new List<Type>();
+    internal List<Type> List { get; } = [];
 
     /// <summary>
     /// Gets the count of supported GraphQL interface types.

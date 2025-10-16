@@ -112,7 +112,7 @@ public static class StringExtensions
         }
     }
 
-    private static readonly char[] _bangs = new char[] { '!', '[', ']' };
+    private static readonly char[] _bangs = ['!', '[', ']'];
 
     /// <summary>
     /// Removes brackets and exclamation points from a GraphQL type name -- for example,

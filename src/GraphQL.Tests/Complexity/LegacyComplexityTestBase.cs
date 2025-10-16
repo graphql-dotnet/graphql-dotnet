@@ -22,7 +22,7 @@ public class LegacyComplexityTestBase
             options.Schema = CreateSchema();
             options.Query = query;
             options.ValidationRules = onlyComplexityRule
-                ? new[] { new LegacyComplexityValidationRule(complexityConfig) }
+                ? [new LegacyComplexityValidationRule(complexityConfig)]
                 : GraphQL.Validation.DocumentValidator.CoreRules.Append(new LegacyComplexityValidationRule(complexityConfig));
         }).ConfigureAwait(false);
 

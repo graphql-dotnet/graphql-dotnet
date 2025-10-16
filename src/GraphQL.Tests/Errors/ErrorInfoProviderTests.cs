@@ -89,7 +89,7 @@ public class ErrorInfoProviderTests
         info.Extensions.Count.ShouldBe(2);
         info.Extensions.ShouldContainKeyAndValue("code", "test code");
         info.Extensions.ShouldContainKey("codes");
-        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(new[] { "test code" });
+        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(["test code"]);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldContainKeyAndValue("code", error.Code);
         info.Extensions.ShouldContainKey("codes");
         info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(
-            new[] { ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>() });
+            [ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>()]);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldContainKeyAndValue("code", error.Code);
         info.Extensions.ShouldContainKey("codes");
         info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<string>>().ShouldBe(
-            new[] { ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>() });
+            [ErrorInfoProvider.GetErrorCode<ArgumentNullException>(), ErrorInfoProvider.GetErrorCode<ArgumentOutOfRangeException>()]);
         info.Extensions.ShouldContainKey("data");
         info.Extensions["data"].ShouldBeAssignableTo<IDictionary>().ShouldBe(error.Data);
     }
@@ -231,7 +231,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe("");
         info.Extensions.ShouldContainKey("codes");
-        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new object[] { "" });
+        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe([""]);
     }
 
     [Fact]
@@ -245,7 +245,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldContainKey("code");
         info.Extensions["code"].ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
         info.Extensions.ShouldContainKey("codes");
-        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new[] { ErrorInfoProvider.GetErrorCode<Exception>() });
+        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe([ErrorInfoProvider.GetErrorCode<Exception>()]);
     }
 
     [Fact]
@@ -260,7 +260,7 @@ public class ErrorInfoProviderTests
         info.Extensions["code"].ShouldBe(ErrorInfoProvider.GetErrorCode<Exception>());
         info.Extensions.ShouldContainKey("codes");
         info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
-            new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
+            [ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>()]);
 
         error.Data.Add("test1", "object1");
 
@@ -271,7 +271,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldContainKey("data");
         info.Extensions.ShouldContainKey("codes");
         info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(
-            new[] { ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>() });
+            [ErrorInfoProvider.GetErrorCode<Exception>(), ErrorInfoProvider.GetErrorCode<ArgumentNullException>()]);
     }
 
     [Fact]
@@ -342,7 +342,7 @@ public class ErrorInfoProviderTests
         info.Extensions.ShouldNotBeNull();
         info.Extensions.ShouldNotContainKey("code");
         info.Extensions.ShouldContainKey("codes");
-        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(new[] { "code" });
+        info.Extensions["codes"].ShouldBeAssignableTo<IEnumerable<object>>().ShouldBe(["code"]);
     }
 
     [Fact]

@@ -37,7 +37,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
             {
-                Path = new[] { "nullableDataGraph", "nonNullable" }
+                Path = ["nullableDataGraph", "nonNullable"]
             }
         };
 
@@ -55,7 +55,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
             {
-                Path = new[] {"nullableDataGraph", "nullableNest", "nonNullable"}
+                Path = ["nullableDataGraph", "nullableNest", "nonNullable"]
             }
         };
 
@@ -73,7 +73,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
             {
-                Path = new[] {"nullableDataGraph", "nonNullableNest", "nonNullable"}
+                Path = ["nullableDataGraph", "nonNullableNest", "nonNullable"]
             }
         };
 
@@ -91,7 +91,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullable, Type: String!."))
             {
-                Path = new[] {"nonNullableDataGraph", "nonNullableNest", "nonNullable"}
+                Path = ["nonNullableDataGraph", "nonNullableNest", "nonNullable"]
             }
         };
 
@@ -103,19 +103,19 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
         const string EXPECTED = """{ "nonNullableDataGraph": { "listOfNonNullable": null } }""";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: listOfNonNullable, Type: String!."))
             {
-                Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 1}
+                Path = ["nonNullableDataGraph", "listOfNonNullable", 1]
             },
 
             new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: listOfNonNullable, Type: String!."))
             {
-                Path = new object[] {"nonNullableDataGraph", "listOfNonNullable", 2}
+                Path = ["nonNullableDataGraph", "listOfNonNullable", 2]
             }
         };
 
@@ -133,7 +133,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullableList, Type: [String]!."))
             {
-                Path = new[] {"nullableDataGraph", "nonNullableList"}
+                Path = ["nullableDataGraph", "nonNullableList"]
             }
         };
 
@@ -151,7 +151,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullableList'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullableList, Type: [String]!."))
             {
-                Path = new[] {"nonNullableDataGraph", "nonNullableList"}
+                Path = ["nonNullableDataGraph", "nonNullableList"]
             }
         };
 
@@ -163,19 +163,19 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
         const string EXPECTED = """{ "nullableDataGraph": null }""";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullableListOfNonNullable, Type: String!."))
             {
-                Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 1}
+                Path = ["nullableDataGraph", "nonNullableListOfNonNullable", 1]
             },
 
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullableListOfNonNullable, Type: String!."))
             {
-                Path = new object[] {"nullableDataGraph", "nonNullableListOfNonNullable", 2}
+                Path = ["nullableDataGraph", "nonNullableListOfNonNullable", 2]
             }
         };
 
@@ -193,7 +193,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
                 "Cannot return null for a non-null type. Field: nonNullableListOfNonNullable, Type: [String!]!."))
             {
-                Path = new[] {"nullableDataGraph", "nonNullableListOfNonNullable"}
+                Path = ["nullableDataGraph", "nonNullableListOfNonNullable"]
             }
         };
 
@@ -205,13 +205,13 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nonNullableListOfNonNullableDataGraph { nonNullableListOfNonNullableThrow } }";
         const string EXPECTED = "";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullableThrow'.", new Exception(
                 "test"))
             {
-                Path = new object[] { "nonNullableListOfNonNullableDataGraph", 0, "nonNullableListOfNonNullableThrow"}
+                Path = ["nonNullableListOfNonNullableDataGraph", 0, "nonNullableListOfNonNullableThrow"]
             }
         };
 

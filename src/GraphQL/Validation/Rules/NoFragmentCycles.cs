@@ -31,7 +31,7 @@ public class NoFragmentCycles : ValidationRuleBase
 
     private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
     {
-        var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new();
+        var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= [];
         var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new();
         var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new();
         if (!visitedFrags.Contains(node.FragmentName.Name))
@@ -84,7 +84,7 @@ public class NoFragmentCycles : ValidationRuleBase
             else
             {
                 var cyclePath = spreadPath.Reverse().Skip(cycleIndex).ToArray();
-                var nodes = cyclePath.OfType<ASTNode>().Concat(new[] { spreadNode }).ToArray();
+                var nodes = cyclePath.OfType<ASTNode>().Concat([spreadNode]).ToArray();
 
                 context.ReportError(new NoFragmentCyclesError(context, spreadName.StringValue, cyclePath.Select(x => x.FragmentName.Name.StringValue).ToArray(), nodes)); //ISSUE:allocation
             }

@@ -74,7 +74,7 @@ public class DataLoaderQueryTests : QueryTestBase
         var usersMock = Services.GetRequiredService<Mock<IUsersStore>>();
 
         ordersMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<IEnumerable<int>>()))
-            .ReturnsAsync(new[] { order });
+            .ReturnsAsync([order]);
 
         usersMock.Setup(x => x.GetUsersByIdAsync(It.IsAny<IEnumerable<int>>(), default))
             .ReturnsAsync(users.ToDictionary(x => x.UserId));

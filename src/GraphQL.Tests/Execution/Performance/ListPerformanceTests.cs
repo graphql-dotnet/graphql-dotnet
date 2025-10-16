@@ -12,7 +12,7 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
     {
         _output = output;
 
-        _people = new List<Person>();
+        _people = [];
 
         var garfield = new Cat
         {
@@ -29,8 +29,8 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
         var liz = new Person
         {
             Name = "Liz",
-            Pets = new List<IPet>(),
-            Friends = new List<INamed>()
+            Pets = [],
+            Friends = []
         };
 
         for (int x = 0; x < PerformanceIterations; x++)
@@ -38,16 +38,16 @@ public class ListPerformanceTests : QueryTestBase<ListPerformanceSchema>
             var person = new Person
             {
                 Name = $"Person {x}",
-                Pets = new List<IPet>
-                {
+                Pets =
+                [
                     garfield,
                     odie
-                },
-                Friends = new List<INamed>
-                {
+                ],
+                Friends =
+                [
                     liz,
                     odie
-                }
+                ]
             };
 
             _people.Add(person);

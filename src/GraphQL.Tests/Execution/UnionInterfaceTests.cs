@@ -26,23 +26,23 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
         var liz = new Person
         {
             Name = "Liz",
-            Pets = new List<IPet>(),
-            Friends = new List<INamed>()
+            Pets = [],
+            Friends = []
         };
 
         _john = new Person
         {
             Name = "John",
-            Pets = new List<IPet>
-            {
+            Pets =
+            [
                 garfield,
                 odie
-            },
-            Friends = new List<INamed>
-            {
+            ],
+            Friends =
+            [
                 liz,
                 odie
-            }
+            ]
         };
     }
 
@@ -143,7 +143,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
+        var result = AssertQueryWithErrors(query, expected, root: _john, rules: [], expectedErrorCount: 2);
         result.Errors![0].Message.ShouldBe("Error trying to resolve field 'pets'.");
         result.Errors[0].InnerException!.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Cat'.");
         result.Errors[1].Message.ShouldBe("Error trying to resolve field 'pets'.");
@@ -213,7 +213,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
             }
             """;
 
-        var result = AssertQueryWithErrors(query, expected, root: _john, rules: Enumerable.Empty<IValidationRule>(), expectedErrorCount: 2);
+        var result = AssertQueryWithErrors(query, expected, root: _john, rules: [], expectedErrorCount: 2);
         result.Errors![0].Message.ShouldBe("Error trying to resolve field 'friends'.");
         result.Errors[0].InnerException!.Message.ShouldBe("Schema is not configured correctly to fetch field 'barks' from type 'Person'.");
         result.Errors[1].Message.ShouldBe("Error trying to resolve field 'friends'.");

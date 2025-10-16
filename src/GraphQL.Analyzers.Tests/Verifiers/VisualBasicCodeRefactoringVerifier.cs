@@ -15,7 +15,7 @@ public static partial class VisualBasicCodeRefactoringVerifier<TCodeRefactoring>
     /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, DiagnosticResult, string)"/>
     public static async Task VerifyRefactoringAsync(string source, DiagnosticResult expected, string fixedSource)
     {
-        await VerifyRefactoringAsync(source, new[] { expected }, fixedSource).ConfigureAwait(false);
+        await VerifyRefactoringAsync(source, [expected], fixedSource).ConfigureAwait(false);
     }
 
     /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, DiagnosticResult[], string)"/>

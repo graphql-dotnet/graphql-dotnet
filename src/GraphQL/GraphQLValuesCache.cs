@@ -5,10 +5,10 @@ namespace GraphQL;
 
 internal static class GraphQLValuesCache
 {
-    private static readonly object[] _positiveInts = new object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    private static readonly object[] _negativeInts = new object[] { 0, -1, -2, -3, -4, -5, -6, -7, -8, -9 };
-    private static readonly object[] _positiveLongs = new object[] { 0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L };
-    private static readonly object[] _negativeLongs = new object[] { 0L, -1L, -2L, -3L, -4L, -5L, -6L, -7L, -8L, -9L };
+    private static readonly object[] _positiveInts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    private static readonly object[] _negativeInts = [0, -1, -2, -3, -4, -5, -6, -7, -8, -9];
+    private static readonly object[] _positiveLongs = [0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L];
+    private static readonly object[] _negativeLongs = [0L, -1L, -2L, -3L, -4L, -5L, -6L, -7L, -8L, -9L];
 
     public static object GetInt(ROM value)
     {

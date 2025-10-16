@@ -99,7 +99,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 }
                 """;
 
-            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
+            undefinedField(_, "meowVolume", "Dog", suggestedFields: ["barkVolume"], line: 2, column: 3);
         });
     }
 
@@ -150,7 +150,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 }
                 """;
 
-            undefinedField(_, "meowVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 3, column: 5);
+            undefinedField(_, "meowVolume", "Dog", suggestedFields: ["barkVolume"], line: 3, column: 5);
         });
     }
 
@@ -165,7 +165,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 }
                 """;
 
-            undefinedField(_, "mooVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
+            undefinedField(_, "mooVolume", "Dog", suggestedFields: ["barkVolume"], line: 2, column: 3);
         });
     }
 
@@ -180,7 +180,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 }
                 """;
 
-            undefinedField(_, "kawVolume", "Dog", suggestedFields: new[] { "barkVolume" }, line: 2, column: 3);
+            undefinedField(_, "kawVolume", "Dog", suggestedFields: ["barkVolume"], line: 2, column: 3);
         });
     }
 
@@ -210,7 +210,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 }
                 """;
 
-            undefinedField(_, "nickname", "Pet", suggestedTypes: new[] { "Dog", "Cat" }, line: 2, column: 3);
+            undefinedField(_, "nickname", "Pet", suggestedTypes: ["Dog", "Cat"], line: 2, column: 3);
         });
     }
 
@@ -251,7 +251,7 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
                 """;
 
             undefinedField(_, "name", "CatOrDog",
-                suggestedTypes: new[] { "Canine", "Being", "Pet", "Cat", "Dog" },
+                suggestedTypes: ["Canine", "Being", "Pet", "Cat", "Dog"],
                 line: 2, column: 3);
         });
     }
@@ -280,8 +280,8 @@ public class FieldsOnCorrectTypeTests : ValidationTestBase<FieldsOnCorrectType, 
         int line = 0,
         int column = 0)
     {
-        suggestedTypes ??= Enumerable.Empty<string>();
-        suggestedFields ??= Enumerable.Empty<string>();
+        suggestedTypes ??= [];
+        suggestedFields ??= [];
 
         _.Error(FieldsOnCorrectTypeError.UndefinedFieldMessage(field, type, suggestedTypes, suggestedFields), line, column);
     }

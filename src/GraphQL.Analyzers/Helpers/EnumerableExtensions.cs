@@ -8,7 +8,7 @@ public static class EnumerableExtensions
     /// <typeparam name="T">The type of elements in the source.</typeparam>
     /// <param name="source">The source <see cref="IEnumerable{T}"/>.</param>
     /// <returns>A <see cref="HashSet{T}"/> containing the elements from the source.</returns>
-    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new(source);
+    public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => [..source];
 
     /// <summary>
     /// Creates a <see cref="HashSet{T}"/> from an <see cref="IEnumerable{T}"/> using the specified <see cref="IEqualityComparer{T}"/>.

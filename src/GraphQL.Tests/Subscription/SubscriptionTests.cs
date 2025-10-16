@@ -305,7 +305,7 @@ public class SubscriptionTests
         var stream = result.Streams.ShouldNotBeNull().Values.First();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
         error.InnerException!.Message.ShouldBe("test");
-        error.Path.ShouldBe(new[] { "messageAdded" });
+        error.Path.ShouldBe(["messageAdded"]);
     }
 
     private class NoopMiddleware : IFieldMiddleware

@@ -38,7 +38,7 @@ public class ApiApprovalTests
         {
             IncludeAssemblyAttributes = false,
             //AllowNamespacePrefixes = new[] { "Microsoft.Extensions.DependencyInjection" },
-            ExcludeAttributes = new[] { "System.Diagnostics.DebuggerDisplayAttribute", "System.Diagnostics.CodeAnalysis.AllowNullAttribute" }
+            ExcludeAttributes = ["System.Diagnostics.DebuggerDisplayAttribute", "System.Diagnostics.CodeAnalysis.AllowNullAttribute"]
         }) + Environment.NewLine)).ToArray();
 
         if (publicApi.DistinctBy(item => item.content).Count() == 1)

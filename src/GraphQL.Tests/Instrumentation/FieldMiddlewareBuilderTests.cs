@@ -17,7 +17,7 @@ public class FieldMiddlewareBuilderTests
             FieldDefinition = new FieldType { Name = "Name" },
             FieldAst = new GraphQLField(new GraphQLName("Name")),
             Source = new Person { Name = "Quinn" },
-            Errors = new ExecutionErrors(),
+            Errors = [],
             Schema = new Schema(),
             Metrics = new Metrics().Start(null)
         };
@@ -143,8 +143,8 @@ public class FieldMiddlewareBuilderTests
     {
         var additionalData = new Dictionary<string, string[]>
         {
-            ["errorCodes"] = new[] { "one", "two" },
-            ["otherErrorCodes"] = new[] { "one", "four" }
+            ["errorCodes"] = ["one", "two"],
+            ["otherErrorCodes"] = ["one", "four"]
         };
         _builder.Use(_ =>
         {

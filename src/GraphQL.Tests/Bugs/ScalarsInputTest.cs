@@ -305,13 +305,13 @@ public class ScalarsInputWithDefaults : InputObjectGraphType<ScalarsModel>
         Field("dec", o => o.dec, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(39614081257132168796771975168m);
         Field("decZero", o => o.decZero, type: typeof(NonNullGraphType<DecimalGraphType>)).DefaultValue(12.10m);
 
-        Field(o => o.byteArray, nullable: false).DefaultValue(new byte[] { 1, 2, 3 });
-        Field(o => o.sbyteArray, nullable: false).DefaultValue(new sbyte[] { -1, 2, -3 });
-        Field(o => o.ulongArray, nullable: false).DefaultValue(new ulong[] { 1234567890123456789 });
-        Field(o => o.uintArray, nullable: false).DefaultValue(new uint[] { 3147483640 });
-        Field(o => o.shortArray, nullable: false).DefaultValue(new short[] { 20000 });
-        Field(o => o.ushortArray, nullable: false).DefaultValue(new ushort[] { 65000 });
-        Field(o => o.decArray, nullable: false).DefaultValue(new decimal[] { 1, 39614081257132168796771975168m, 3 });
+        Field(o => o.byteArray, nullable: false).DefaultValue([1, 2, 3]);
+        Field(o => o.sbyteArray, nullable: false).DefaultValue([-1, 2, -3]);
+        Field(o => o.ulongArray, nullable: false).DefaultValue([1234567890123456789]);
+        Field(o => o.uintArray, nullable: false).DefaultValue([3147483640]);
+        Field(o => o.shortArray, nullable: false).DefaultValue([20000]);
+        Field(o => o.ushortArray, nullable: false).DefaultValue([65000]);
+        Field(o => o.decArray, nullable: false).DefaultValue([1, 39614081257132168796771975168m, 3]);
     }
 }
 

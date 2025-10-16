@@ -67,8 +67,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
                     Total = 2
                 };
 
-                dataResult.Data.AddRange(new[]
-                {
+                dataResult.Data.AddRange([
                     new MyObject
                     {
                         Id = Guid.Parse("96b8c7b5-d542-4d70-a0cf-b0bbc0db119f"),
@@ -78,8 +77,8 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
                     {
                         Id = Guid.Parse("b405cb58-b966-4926-a989-90a76217af66"),
                         Name = "test2"
-                    },
-                });
+                    }
+                ]);
 
                 return dataResult;
             });
@@ -149,7 +148,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
     {
         public DataResult()
         {
-            Data = new List<TResult>();
+            Data = [];
         }
 
         public long Total { get; set; }

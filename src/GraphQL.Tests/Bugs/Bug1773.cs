@@ -14,7 +14,7 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
         error.Path = path;
         if (code != null)
             error.Code = code;
-        var expected = CreateQueryResult(result, new ExecutionErrors { error });
+        var expected = CreateQueryResult(result, [error]);
         var actualResult = AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
         if (exception != null)
         {
@@ -36,7 +36,7 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     [Fact]
     public void list_throws_when_not_ienumerable()
     {
-        AssertQueryWithError("{testListInvalid}", "{\"testListInvalid\": null}", "Error trying to resolve field 'testListInvalid'.", 1, 2, new[] { "testListInvalid" },
+        AssertQueryWithError("{testListInvalid}", "{\"testListInvalid\": null}", "Error trying to resolve field 'testListInvalid'.", 1, 2, ["testListInvalid"],
             new InvalidOperationException("Expected an IEnumerable list though did not find one. Found: Int32"));
     }
 
@@ -49,21 +49,21 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     [Fact]
     public void nonnull_list_throws_when_null()
     {
-        AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, new object[] { "testListNullInvalid", 0 },
+        AssertQueryWithError("{testListNullInvalid}", "{\"testListNullInvalid\": null}", "Error trying to resolve field 'testListNullInvalid'.", 1, 2, ["testListNullInvalid", 0],
             new InvalidOperationException("Cannot return null for a non-null type. Field: testListNullInvalid, Type: Int!."));
     }
 
     [Fact]
     public void list_throws_for_invalid_type()
     {
-        AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, new object[] { "testListInvalidType", 0 },
+        AssertQueryWithError("{testListInvalidType}", "{\"testListInvalidType\": [ null ]}", "Error trying to resolve field 'testListInvalidType'.", 1, 2, ["testListInvalidType", 0],
             new InvalidOperationException("Unable to convert 'test' value of type 'String' to the scalar type 'Int'"));
     }
 
     [Fact]
     public void list_throws_for_invalid_type_when_conversion_returns_null()
     {
-        AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [ null ]}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, new object[] { "testListInvalidType2", 0 },
+        AssertQueryWithError("{testListInvalidType2}", "{\"testListInvalidType2\": [ null ]}", "Error trying to resolve field 'testListInvalidType2'.", 1, 2, ["testListInvalidType2", 0],
             new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 
@@ -71,7 +71,7 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     public void throws_for_invalid_type()
     {
         // in this case, the conversion threw a FormatException
-        AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, new[] { "testInvalidType" },
+        AssertQueryWithError("{testInvalidType}", "{\"testInvalidType\": null}", "Error trying to resolve field 'testInvalidType'.", 1, 2, ["testInvalidType"],
             new InvalidOperationException("Unable to convert 'test' value of type 'String' to the scalar type 'Int'"));
     }
 
@@ -79,14 +79,14 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
     public void throws_for_invalid_type_when_conversion_returns_null()
     {
         // in this case, the conversion returned null, and GraphQL threw an InvalidOperationException
-        AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, new[] { "testInvalidType2" },
+        AssertQueryWithError("{testInvalidType2}", "{\"testInvalidType2\": null}", "Error trying to resolve field 'testInvalidType2'.", 1, 2, ["testInvalidType2"],
             new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 
     [Fact]
     public void list_with_null_element_for_invalid_type_when_conversion_returns_null()
     {
-        AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": [null, \"HELLO\"]}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, new object[] { "testListInvalidType3", 0 },
+        AssertQueryWithError("{testListInvalidType3}", "{\"testListInvalidType3\": [null, \"HELLO\"]}", "Error trying to resolve field 'testListInvalidType3'.", 1, 2, ["testListInvalidType3", 0],
             new InvalidOperationException("Unable to serialize 'test' value of type 'String' to the enumeration type 'Bug1773Enum'. Enumeration does not contain such value. Available values: 'Hello' of type 'Bug1773Enum'."));
     }
 }

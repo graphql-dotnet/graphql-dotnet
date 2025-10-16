@@ -249,13 +249,13 @@ public class DetailedBenchmark : IBenchmark
 
                 Operation = Operation,
                 Variables = Variables,
-                Errors = new ExecutionErrors(),
+                Errors = [],
                 InputExtensions = Inputs.Empty,
                 OutputExtensions = new Dictionary<string, object>(),
                 CancellationToken = default,
 
                 Metrics = Instrumentation.Metrics.None,
-                Listeners = new List<IDocumentExecutionListener>(),
+                Listeners = [],
                 ThrowOnUnhandledException = true,
                 UnhandledExceptionDelegate = _ => Task.CompletedTask,
                 MaxParallelExecutionCount = int.MaxValue,

@@ -29,7 +29,7 @@ public static class StringUtils
     {
         if (options == null)
         {
-            return Array.Empty<string>();
+            return [];
         }
 
         var optionsByDistance = new Dictionary<string, int>();

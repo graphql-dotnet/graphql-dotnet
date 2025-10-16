@@ -57,7 +57,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
 
         result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
-        error.Path.ShouldBe(new[] { "testSub", "two" });
+        error.Path.ShouldBe(["testSub", "two"]);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
 
         result.Errors!.Count.ShouldBe(1);
         var error = result.Errors.First();
-        error.Path.ShouldBe(new object[] { "testSubList", 0, "two" });
+        error.Path.ShouldBe(["testSubList", 0, "two"]);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public class ErrorLocationTests : QueryTestBase<ErrorLocationTests.TestSchema>
     {
         var error = new UnhandledError("Error trying to resolve field 'testasync'.", new Exception());
         error.AddLocation(new Location(1, 3));
-        error.Path = new[] { "testasync" };
+        error.Path = ["testasync"];
 
         var errors = new ExecutionErrors { error };
 

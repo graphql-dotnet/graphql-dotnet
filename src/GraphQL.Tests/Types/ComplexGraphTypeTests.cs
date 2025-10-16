@@ -556,7 +556,7 @@ public class ComplexGraphTypeTests
         type.Fields.Find("field12").ShouldNotBeNull().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<string>));
 
         // notice here that since the NRT attribute of 'string' cannot be read, it is assumed to be nullable
-        type.Field<IEnumerable<string>>("field13").Resolve(_ => Array.Empty<string>());
+        type.Field<IEnumerable<string>>("field13").Resolve(_ => []);
         type.Fields.Find("field13").ShouldNotBeNull().Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
     }
 

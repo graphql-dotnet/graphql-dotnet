@@ -169,11 +169,11 @@ public partial class InputGraphTypeAnalyzerTests
               """;
 
         var expected = report
-            ? new[]
-            {
+            ?
+            [
                 VerifyCS.Diagnostic(InputGraphTypeAnalyzer.CanNotResolveInputSourceTypeConstructor)
                     .WithLocation(0).WithArguments("MySource")
-            }
+            ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);

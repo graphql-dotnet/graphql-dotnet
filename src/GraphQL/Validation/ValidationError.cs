@@ -10,7 +10,7 @@ namespace GraphQL.Validation;
 [Serializable]
 public class ValidationError : DocumentError
 {
-    private readonly List<ASTNode> _nodes = new();
+    private readonly List<ASTNode> _nodes = [];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValidationError"/> class with a specified error message.

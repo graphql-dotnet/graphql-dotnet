@@ -30,14 +30,14 @@ public class Issue1874 : QueryTestBase<Issue1874Schema>
             }
             """;
 
-        string str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+        string str1234 = System.Convert.ToBase64String([1, 2, 3, 4]);
         AssertQuerySuccess(query, $$"""{ "bytes64": { "bytes": "{{str1234}}" } }""", $$"""{ "bytesHolder": { "bytes": "{{str1234}}" } }""".ToInputs());
     }
 
     [Fact]
     public void string_literal_should_work()
     {
-        string str1234 = System.Convert.ToBase64String(new byte[] { 1, 2, 3, 4 });
+        string str1234 = System.Convert.ToBase64String([1, 2, 3, 4]);
 
         string query = $$"""
             query BytesRequest {
@@ -77,7 +77,7 @@ public class Issue1874Query : ObjectGraphType
             .Resolve(context =>
             {
                 var bytesObject = context.GetArgument<Issue1874BytesHolder>("bytesObject");
-                bytesObject.Bytes.ShouldBe(new byte[] { 1, 2, 3, 4 });
+                bytesObject.Bytes.ShouldBe([1, 2, 3, 4]);
                 return bytesObject;
             }
         );

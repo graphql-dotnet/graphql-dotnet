@@ -19,9 +19,9 @@ public class BomTests
 
         byte[] buffer = new byte[3];
         int counter = 0;
-        List<string> files = new();
+        List<string> files = [];
 
-        string[] extensions = { ".cs", ".csproj", ".sln" };
+        string[] extensions = [".cs", ".csproj", ".sln"];
         foreach (string file in Directory.EnumerateFiles(gitRoot.FullName, "*.*", SearchOption.AllDirectories))
         {
             ++counter;

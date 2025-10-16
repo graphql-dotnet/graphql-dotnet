@@ -17,7 +17,7 @@ public class ExecutionErrors : IEnumerable<ExecutionError>
 
     internal ExecutionErrors(ExecutionError error)
     {
-        List = new(1) { error };
+        List = [error];
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public class ExecutionErrors : IEnumerable<ExecutionError>
     public virtual void Add(ExecutionError error)
     {
         lock (_lock)
-            (List ??= new()).Add(error ?? throw new ArgumentNullException(nameof(error)));
+            (List ??= []).Add(error ?? throw new ArgumentNullException(nameof(error)));
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ internal sealed class EmptyExecutionErrors : ExecutionErrors
 {
     private EmptyExecutionErrors() { }
 
-    public static readonly EmptyExecutionErrors Instance = new();
+    public static readonly EmptyExecutionErrors Instance = [];
 
     public override void Add(ExecutionError error) => throw new NotSupportedException();
 

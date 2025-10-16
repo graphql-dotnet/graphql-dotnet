@@ -170,7 +170,7 @@ public abstract class ExecutionNode
         }
 
         if (count == 0)
-            return Array.Empty<object>();
+            return [];
 
         var pathList = new object[count];
         var index = count;

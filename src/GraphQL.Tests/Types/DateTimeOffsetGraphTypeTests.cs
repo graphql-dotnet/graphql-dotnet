@@ -64,9 +64,9 @@ public class DateTimeOffsetGraphTypeTests
 
         return new object[][]
         {
-            new object[] { dateTimeNow, new DateTimeOffset(dateTimeNow) },
-            new object[] { dateTimeUtcNow, new DateTimeOffset(dateTimeUtcNow) },
-            new object[] { dateTimeUnspecified, new DateTimeOffset(dateTimeUnspecified, TimeSpan.Zero) }
+            [dateTimeNow, new DateTimeOffset(dateTimeNow)],
+            [dateTimeUtcNow, new DateTimeOffset(dateTimeUtcNow)],
+            [dateTimeUnspecified, new DateTimeOffset(dateTimeUnspecified, TimeSpan.Zero)]
         };
     }
 

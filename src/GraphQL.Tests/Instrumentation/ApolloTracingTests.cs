@@ -44,13 +44,13 @@ public class ApolloTracingTests : StarWarsTestBase
 
         var expectedPaths = new List<(List<object> Path, string ParentType, string FieldName, string ReturnType)>
         {
-            (new List<object> { "hero" }, "Query", "hero", "Character"),
-            (new List<object> { "hero", "name" }, "Droid", "name", "String"),
-            (new List<object> { "hero", "friends" }, "Droid", "friends", "[Character]"),
-            (new List<object> { "hero", "friends", 0, "name" }, "Human", "name", "String"),
-            (new List<object> { "hero", "friends", 0, "aliasedName" }, "Human", "name", "String"),
-            (new List<object> { "hero", "friends", 1, "name" }, "Droid", "name", "String"),
-            (new List<object> { "hero", "friends", 1, "aliasedName" }, "Droid" , "name" , "String"),
+            (["hero"], "Query", "hero", "Character"),
+            (["hero", "name"], "Droid", "name", "String"),
+            (["hero", "friends"], "Droid", "friends", "[Character]"),
+            (["hero", "friends", 0, "name"], "Human", "name", "String"),
+            (["hero", "friends", 0, "aliasedName"], "Human", "name", "String"),
+            (["hero", "friends", 1, "name"], "Droid", "name", "String"),
+            (["hero", "friends", 1, "aliasedName"], "Droid" , "name" , "String"),
         };
 
         trace.Execution.Resolvers.Count.ShouldBe(expectedPaths.Count);

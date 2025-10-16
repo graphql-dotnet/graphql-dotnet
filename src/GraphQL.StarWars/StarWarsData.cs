@@ -4,7 +4,7 @@ namespace GraphQL.StarWars;
 
 public class StarWarsData
 {
-    private readonly List<StarWarsCharacter> _characters = new();
+    private readonly List<StarWarsCharacter> _characters = [];
 
     public StarWarsData()
     {
@@ -12,8 +12,8 @@ public class StarWarsData
         {
             Id = "1",
             Name = "Luke",
-            Friends = new List<string> { "3", "4" },
-            AppearsIn = new[] { 4, 5, 6 },
+            Friends = ["3", "4"],
+            AppearsIn = [4, 5, 6],
             HomePlanet = "Tatooine",
             Cursor = "MQ=="
         });
@@ -21,7 +21,7 @@ public class StarWarsData
         {
             Id = "2",
             Name = "Vader",
-            AppearsIn = new[] { 4, 5, 6 },
+            AppearsIn = [4, 5, 6],
             HomePlanet = "Tatooine",
             Cursor = "Mg=="
         });
@@ -30,8 +30,8 @@ public class StarWarsData
         {
             Id = "3",
             Name = "R2-D2",
-            Friends = new List<string> { "1", "4" },
-            AppearsIn = new[] { 4, 5, 6 },
+            Friends = ["1", "4"],
+            AppearsIn = [4, 5, 6],
             PrimaryFunction = "Astromech",
             Cursor = "Mw=="
         });
@@ -39,7 +39,7 @@ public class StarWarsData
         {
             Id = "4",
             Name = "C-3PO",
-            AppearsIn = new[] { 4, 5, 6 },
+            AppearsIn = [4, 5, 6],
             PrimaryFunction = "Protocol",
             Cursor = "NA=="
         });

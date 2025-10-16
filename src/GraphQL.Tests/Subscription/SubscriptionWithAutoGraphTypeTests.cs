@@ -244,6 +244,6 @@ public class SubscriptionWithAutoGraphTypeTests
         var stream = result.Streams!.Values.First();
         var error = await Should.ThrowAsync<ExecutionError>(async () => await stream.FirstOrDefaultAsync());
         error.InnerException!.Message.ShouldBe("test");
-        error.Path.ShouldBe(new[] { "messageAdded" });
+        error.Path.ShouldBe(["messageAdded"]);
     }
 }

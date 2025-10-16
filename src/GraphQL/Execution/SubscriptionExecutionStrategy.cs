@@ -157,7 +157,7 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// </summary>
     protected virtual ExecutionContext CloneExecutionContext(ExecutionContext context, CancellationToken token) => new(context)
     {
-        Errors = new ExecutionErrors(),
+        Errors = [],
         OutputExtensions = new Dictionary<string, object?>(),
         Metrics = Instrumentation.Metrics.None,
         CancellationToken = token,
@@ -221,10 +221,10 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
                 {
                     result.Data = new RootExecutionNode(null!, null)
                     {
-                        SubFields = new ExecutionNode[]
-                        {
-                            node,
-                        }
+                        SubFields =
+                        [
+                            node
+                        ]
                     };
                 }
             }

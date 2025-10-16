@@ -730,7 +730,7 @@ public class FieldBuilderAnalyzerTests
 
         var expected1 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(0);
         var expected2 = VerifyCS.Diagnostic(FieldBuilderAnalyzer.DoNotUseObsoleteFieldMethods).WithLocation(1);
-        await VerifyCS.VerifyCodeFixAsync(source, new[] { expected1, expected2 }, fix);
+        await VerifyCS.VerifyCodeFixAsync(source, [expected1, expected2], fix);
     }
 
     [Fact]

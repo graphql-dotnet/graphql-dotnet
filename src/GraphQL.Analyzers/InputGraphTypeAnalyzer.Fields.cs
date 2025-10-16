@@ -263,12 +263,12 @@ public partial class InputGraphTypeAnalyzer
 
             if (symbol.DeclaredAccessibility != Accessibility.Public)
             {
-                (reasons ??= new List<string>()).Add("not 'public'");
+                (reasons ??= []).Add("not 'public'");
             }
 
             if (symbol.IsStatic)
             {
-                (reasons ??= new List<string>()).Add("'static'");
+                (reasons ??= []).Add("'static'");
             }
 
             switch (symbol)
@@ -280,7 +280,7 @@ public partial class InputGraphTypeAnalyzer
                     symbolType = "property";
                     if (property.SetMethod is not { DeclaredAccessibility: Accessibility.Public })
                     {
-                        (reasons ??= new List<string>()).Add("doesn't have a public setter");
+                        (reasons ??= []).Add("doesn't have a public setter");
                     }
                     break;
                 }
@@ -294,7 +294,7 @@ public partial class InputGraphTypeAnalyzer
                     }
                     else if (field.IsReadOnly)
                     {
-                        (reasons ??= new List<string>()).Add("'readonly'");
+                        (reasons ??= []).Add("'readonly'");
                     }
                     break;
                 }

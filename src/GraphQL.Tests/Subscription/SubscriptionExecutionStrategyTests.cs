@@ -506,7 +506,7 @@ public class SubscriptionExecutionStrategyTests : IDisposable
     [Fact]
     public async Task MultipleSubscriptions_NoValidation()
     {
-        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = new GraphQL.Validation.IValidationRule[] { }, false);
+        var result = await ExecuteAsync("subscription { test testWithInitialExtensions }", o => o.ValidationRules = [], false);
         result.Streams.ShouldNotBeNull().Count.ShouldBe(2);
         result.Data.ShouldBeNull();
         result.Errors.ShouldBeNull();

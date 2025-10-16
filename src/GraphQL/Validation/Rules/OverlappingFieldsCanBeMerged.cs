@@ -153,7 +153,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
                         if (conflict != null)
                         {
-                            (conflicts ??= new()).Add(conflict);
+                            (conflicts ??= []).Add(conflict);
                         }
                     }
                 }
@@ -214,8 +214,8 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                             Msg = $"{name1} and {name2} are different fields"
                         }
                     },
-                    FieldsLeft = new List<ISelectionNode> { node1 },
-                    FieldsRight = new List<ISelectionNode> { node2 }
+                    FieldsLeft = [node1],
+                    FieldsRight = [node2]
                 };
             }
 
@@ -232,8 +232,8 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                             Msg = "they have differing arguments"
                         }
                     },
-                    FieldsLeft = new List<ISelectionNode> { node1 },
-                    FieldsRight = new List<ISelectionNode> { node2 }
+                    FieldsLeft = [node1],
+                    FieldsRight = [node2]
                 };
             }
         }
@@ -250,8 +250,8 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
                         Msg = $"they return conflicting types {type1} and {type2}"
                     }
                 },
-                FieldsLeft = new List<ISelectionNode> { node1 },
-                FieldsRight = new List<ISelectionNode> { node2 }
+                FieldsLeft = [node1],
+                FieldsRight = [node2]
             };
         }
 
@@ -569,7 +569,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
                         if (conflict != null)
                         {
-                            (conflicts ??= new()).Add(conflict);
+                            (conflicts ??= []).Add(conflict);
                         }
                     }
                 }
@@ -715,7 +715,7 @@ public class OverlappingFieldsCanBeMerged : ValidationRuleBase
 
                 if (!nodeAndDefs.ContainsKey(responseName))
                 {
-                    nodeAndDefs[responseName] = new List<FieldDefPair>();
+                    nodeAndDefs[responseName] = [];
                 }
 
                 nodeAndDefs[responseName].Add(new FieldDefPair

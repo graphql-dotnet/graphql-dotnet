@@ -44,7 +44,7 @@ public class Issue1189 : SchemaBuilderTestBase
         {
             Executed = true,
             Data = new { hero = new { id = "1", name = "R2-D2", friend = default(Issue1189_Character) } },
-            Errors = new ExecutionErrors { error }
+            Errors = [error]
         };
 
         AssertQuery(

@@ -47,7 +47,7 @@ public class FieldsOnCorrectType : ValidationRuleBase
 
                 // If there are no suggested types, then perhaps this was a typo?
                 var suggestedFieldNames = suggestedTypeNames.Count > 0
-                    ? Array.Empty<string>()
+                    ? []
                     : GetSuggestedFieldNames(type, fieldName.StringValue); //ISSUE:allocation
 
                 // Report an error, including helpful suggestions.
@@ -91,7 +91,7 @@ public class FieldsOnCorrectType : ValidationRuleBase
             return suggestedInterfaceTypes.Concat(suggestedObjectTypes);
         }
 
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     /// <summary>
@@ -105,6 +105,6 @@ public class FieldsOnCorrectType : ValidationRuleBase
             return StringUtils.SuggestionList(fieldName, complexType.Fields.Select(x => x.Name));
         }
 
-        return Enumerable.Empty<string>();
+        return [];
     }
 }

@@ -376,9 +376,9 @@ public class SchemaBuilderTests
         type.ShouldNotBeNull();
         type.Description.ShouldBe("Example description");
 
-        type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
-        type.Values.Select(x => x.Value!.ToString()).ShouldBe(new[] { "CAT", "DOG" });
-        type.Values.Select(x => x.Description).ShouldBe(new[] { "Cat description", null });
+        type.Values.Select(x => x.Name).ShouldBe(["CAT", "DOG"]);
+        type.Values.Select(x => x.Value!.ToString()).ShouldBe(["CAT", "DOG"]);
+        type.Values.Select(x => x.Description).ShouldBe(["Cat description", null]);
     }
 
     private enum PetKind
@@ -418,8 +418,8 @@ public class SchemaBuilderTests
         var type = schema.AllTypes["PetKind"] as EnumerationGraphType;
         type.ShouldNotBeNull();
 
-        type.Values.Select(x => x.Name).ShouldBe(new[] { "CAT", "DOG" });
-        type.Values.Select(x => (PetKind)x.Value!).ShouldBe(new[] { PetKind.Cat, PetKind.Dog });
+        type.Values.Select(x => x.Name).ShouldBe(["CAT", "DOG"]);
+        type.Values.Select(x => (PetKind)x.Value!).ShouldBe([PetKind.Cat, PetKind.Dog]);
     }
 
     [Fact]
@@ -587,7 +587,7 @@ public class SchemaBuilderTests
 
         var searchResult = schema.AllTypes["SearchResult"] as UnionGraphType;
         searchResult!.Description.ShouldBe("Example description");
-        searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(new[] { "Human", "Droid" });
+        searchResult.PossibleTypes.Select(x => x.Name).ShouldBe(["Human", "Droid"]);
     }
 
     [Fact]

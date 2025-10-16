@@ -140,7 +140,7 @@ public partial class ValidationContext
             {
                 var items = GetRecursivelyReferencedFragments(operation);
                 if (items != null)
-                    (fragments ??= new()).AddRange(items);
+                    (fragments ??= []).AddRange(items);
             }
             return fragments;
         }

@@ -65,7 +65,7 @@ public static partial class ObjectExtensions
         // return obj;
         expressions.Add(objParam);
 
-        var block = Expression.Block(new[] { objParam }, expressions);
+        var block = Expression.Block([objParam], expressions);
 
         // build the lambda
         var lambda = Expression.Lambda<Func<IDictionary<string, object?>, object>>(
@@ -115,7 +115,7 @@ public static partial class ObjectExtensions
             var param = Expression.Variable(typeof(ValueTuple<object?, bool>), "value");
             var ret = Expression.Variable(type, "ret");
             return Expression.Block(
-                new[] { param, ret },
+                [param, ret],
                 Expression.Assign(
                     param,
                     Expression.Call(_getOrDefaultMethod, _dictionaryParam, Expression.Constant(key, typeof(string)))),

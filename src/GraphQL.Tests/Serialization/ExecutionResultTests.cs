@@ -19,11 +19,11 @@ public class ExecutionResultTests
         {
             Executed = true,
             Data = """{ "someType": { "someProperty": "someValue" } }""".ToDictionary().ToExecutionTree(),
-            Errors = new ExecutionErrors
-            {
+            Errors =
+            [
                 new ExecutionError("some error 1"),
-                new ExecutionError("some error 2"),
-            },
+                new ExecutionError("some error 2")
+            ],
             Extensions = new Dictionary<string, object?>
             {
                 { "someExtension", new { someProperty = "someValue", someOtherProperty = 1 } }
@@ -81,11 +81,11 @@ public class ExecutionResultTests
 
         var executionResult = new ExecutionResult
         {
-            Errors = new ExecutionErrors
-            {
+            Errors =
+            [
                 new ExecutionError("some error 1"),
-                new ExecutionError("some error 2"),
-            }
+                new ExecutionError("some error 2")
+            ]
         };
 
         const string expected = """
@@ -106,7 +106,7 @@ public class ExecutionResultTests
         var executionResult = new ExecutionResult
         {
             Data = new Dictionary<string, object?>().ToExecutionTree(),
-            Errors = new ExecutionErrors(),
+            Errors = [],
             Extensions = new Dictionary<string, object?>(),
             Executed = true
         };
@@ -125,7 +125,7 @@ public class ExecutionResultTests
         var executionResult = new ExecutionResult
         {
             Data = new Dictionary<string, object?>().ToExecutionTree(),
-            Errors = new ExecutionErrors(),
+            Errors = [],
             Extensions = new Dictionary<string, object?>(),
             Executed = false
         };
@@ -144,7 +144,7 @@ public class ExecutionResultTests
         var executionResult = new ExecutionResult
         {
             Data = null,
-            Errors = new ExecutionErrors(),
+            Errors = [],
             Extensions = new Dictionary<string, object?>(),
             Executed = true
         };

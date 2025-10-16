@@ -17,7 +17,7 @@ public class ErrorExtensionsTests : QueryTestBase<ErrorExtensionsTests.TestSchem
             Code = code
         };
         error.AddLocation(new Location(1, 3));
-        error.Path = new[] { "firstSync" };
+        error.Path = ["firstSync"];
         errors.Add(error);
 
         const string expectedResult = """{ "firstSync": null}""";

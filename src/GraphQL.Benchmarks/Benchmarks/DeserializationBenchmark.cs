@@ -28,7 +28,7 @@ public class DeserializationBenchmark : IBenchmark
         var loadedFromFile = IntrospectionResult.Data;
     }
 
-    public IEnumerable<string> Codes => new[] { "Empty", "Short", "Introspection" };
+    public IEnumerable<string> Codes => ["Empty", "Short", "Introspection"];
 
     [ParamsSource(nameof(Codes))]
     public string Code { get; set; }

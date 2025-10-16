@@ -28,5 +28,5 @@ public class ToCamelCaseBenchmark
     [ParamsSource(nameof(Names))]
     public string Name { get; set; }
 
-    public IEnumerable<string> Names => new[] { "", "short", "Short", "looooooooooooooooooooooooooooooooooooooooooooong", "Looooooooooooooooooooooooooooooooooooooooooooong" };
+    public IEnumerable<string> Names => ["", "short", "Short", "looooooooooooooooooooooooooooooooooooooooooooong", "Looooooooooooooooooooooooooooooooooooooooooooong"];
 }

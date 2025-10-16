@@ -9,7 +9,7 @@ namespace GraphQL.Tests.Bugs;
 public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
 {
     private void AssertQueryWithError(string query, string result, string message, int line, int column, string path, Exception? exception = null, string? code = null, string? inputs = null, string? number = null)
-        => AssertQueryWithError(query, result, message, line, column, new object[] { path }, exception, code, inputs, number);
+        => AssertQueryWithError(query, result, message, line, column, [path], exception, code, inputs, number);
 
     private void AssertQueryWithError(string query, string? result, string message, int line, int column, object[]? path, Exception? exception = null, string? code = null, string? inputs = null, string? number = null, bool executed = true)
     {
@@ -23,7 +23,7 @@ public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
         error.Path = path;
         if (code != null)
             error.Code = code;
-        var expected = CreateQueryResult(result, new ExecutionErrors { error }, executed: executed);
+        var expected = CreateQueryResult(result, [error], executed: executed);
         AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
     }
 
@@ -47,10 +47,10 @@ public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
 
     // TODO: does not yet fully meet spec (does not return members of the enum that are able to be serialized, with nulls and individual errors for unserializable values)
     [Fact]
-    public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", """{ "invalidEnumWithinList": [ "HAPPY", "SLEEPY", null ] }""", "Error trying to resolve field 'invalidEnumWithinList'.", 1, 3, new object[] { "invalidEnumWithinList", 2 }, exception: new InvalidOperationException());
+    public void Invalid_Enum_Within_List() => AssertQueryWithError("{ invalidEnumWithinList }", """{ "invalidEnumWithinList": [ "HAPPY", "SLEEPY", null ] }""", "Error trying to resolve field 'invalidEnumWithinList'.", 1, 3, ["invalidEnumWithinList", 2], exception: new InvalidOperationException());
 
     [Fact]
-    public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", """{ "invalidEnumWithinNonNullList": null }""", "Error trying to resolve field 'invalidEnumWithinNonNullList'.", 1, 3, new object[] { "invalidEnumWithinNonNullList", 2 }, exception: new InvalidOperationException());
+    public void Invalid_Enum_Within_NonNullList() => AssertQueryWithError("{ invalidEnumWithinNonNullList }", """{ "invalidEnumWithinNonNullList": null }""", "Error trying to resolve field 'invalidEnumWithinNonNullList'.", 1, 3, ["invalidEnumWithinNonNullList", 2], exception: new InvalidOperationException());
 
     [Fact]
     public void Input_EnumList() => AssertQuerySuccess("{ inputList(arg: [SLEEPY]) }", """{ "inputList": "Sleepy" }""");

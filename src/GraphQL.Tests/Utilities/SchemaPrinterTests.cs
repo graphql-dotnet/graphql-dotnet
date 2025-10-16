@@ -436,10 +436,9 @@ public class SchemaPrinterTests
     public void prints_string_field_with_int_arg()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne" }
-            });
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne" }
+        ]);
 
         const string expected = """
             type Query {
@@ -453,10 +452,9 @@ public class SchemaPrinterTests
     public void prints_string_field_with_int_arg_with_default()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
-            });
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 2 }
+        ]);
 
         const string expected = """
             type Query {
@@ -470,10 +468,9 @@ public class SchemaPrinterTests
     public void prints_string_field_with_non_null_int_arg()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new[]
-            {
-                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
-            });
+        [
+            new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "argOne" }
+        ]);
 
         const string expected = """
             type Query {
@@ -487,10 +484,9 @@ public class SchemaPrinterTests
     public void prints_string_field_with_list_guid_arg_with_default()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new QueryArgument[]
-            {
-                new QueryArgument<ListGraphType<GuidGraphType>> { Name = "arg", DefaultValue = new List<Guid>() },
-            });
+        [
+            new QueryArgument<ListGraphType<GuidGraphType>> { Name = "arg", DefaultValue = new List<Guid>() }
+        ]);
 
         const string expected = """
             scalar Guid
@@ -506,11 +502,10 @@ public class SchemaPrinterTests
     public void prints_string_field_with_multiple_args()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new QueryArgument[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne" },
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne" },
                 new QueryArgument<StringGraphType> { Name = "argTwo" }
-            });
+        ]);
 
         const string expected = """
             type Query {
@@ -524,12 +519,11 @@ public class SchemaPrinterTests
     public void prints_string_field_with_multiple_args_first_has_default()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new QueryArgument[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne", DefaultValue = 1 },
                 new QueryArgument<StringGraphType> { Name = "argTwo" },
                 new QueryArgument<BooleanGraphType> { Name = "argThree" }
-            });
+        ]);
 
         const string expected = """
             type Query {
@@ -543,12 +537,11 @@ public class SchemaPrinterTests
     public void prints_string_field_with_multiple_args_second_has_default()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new QueryArgument[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne" },
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne" },
                 new QueryArgument<StringGraphType> { Name = "argTwo", DefaultValue = "foo" },
                 new QueryArgument<BooleanGraphType> { Name = "argThree" }
-            });
+        ]);
 
         const string expected = """
             type Query {
@@ -562,12 +555,11 @@ public class SchemaPrinterTests
     public void prints_string_field_with_multiple_args_third_has_default()
     {
         string result = printSingleFieldSchema<StringGraphType>(
-            new QueryArgument[]
-            {
-                new QueryArgument<IntGraphType> { Name = "argOne" },
+        [
+            new QueryArgument<IntGraphType> { Name = "argOne" },
                 new QueryArgument<StringGraphType> { Name = "argTwo" },
                 new QueryArgument<BooleanGraphType> { Name = "argThree", DefaultValue = false }
-            });
+        ]);
 
         const string expected = """
             type Query {

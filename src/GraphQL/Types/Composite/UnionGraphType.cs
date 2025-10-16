@@ -8,7 +8,7 @@ public class UnionGraphType : GraphType, IAbstractGraphType
     private List<Type>? _types;
 
     /// <inheritdoc/>
-    public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
+    public PossibleTypes PossibleTypes { get; } = [];
 
     /// <inheritdoc/>
     public Func<object, IObjectGraphType?>? ResolveType { get; set; }
@@ -63,5 +63,5 @@ public class UnionGraphType : GraphType, IAbstractGraphType
             _types.Add(type);
     }
 
-    private void EnsureTypes() => _types ??= new();
+    private void EnsureTypes() => _types ??= [];
 }

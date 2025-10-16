@@ -14,7 +14,7 @@ public class TrimGraphQLTypesBenchmark
     [Benchmark]
     public string New() => Name.TrimGraphQLTypes();
 
-    private static readonly char[] _chars = new[] { '[', ']', '!' };
+    private static readonly char[] _chars = ['[', ']', '!'];
 
     [Benchmark]
     public string Alt() => Name.Trim().Trim(_chars);
@@ -22,5 +22,5 @@ public class TrimGraphQLTypesBenchmark
     [ParamsSource(nameof(Names))]
     public string Name { get; set; }
 
-    public IEnumerable<string> Names => new[] { "", "Human", "Human!", "[Human]", "[Human]!", "[[Human!]!]!", "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]!!!!!!!!!!!!!!!!!!!!!!!!!!!" };
+    public IEnumerable<string> Names => ["", "Human", "Human!", "[Human]", "[Human]!", "[[Human!]!]!", "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]]]]]]]]]]!!!!!!!!!!!!!!!!!!!!!!!!!!!"];
 }

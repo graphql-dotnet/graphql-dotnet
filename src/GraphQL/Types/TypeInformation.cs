@@ -331,7 +331,8 @@ public class TypeInformation
         return type;
     }
 
-    internal static readonly Type[] EnumerableListTypes = new Type[] {
+    internal static readonly Type[] EnumerableListTypes =
+    [
         typeof(IEnumerable<>),
         typeof(IList<>),
         typeof(List<>),
@@ -339,8 +340,8 @@ public class TypeInformation
         typeof(IReadOnlyCollection<>),
         typeof(IReadOnlyList<>),
         typeof(HashSet<>),
-        typeof(ISet<>),
-    };
+        typeof(ISet<>)
+    ];
 
     /// <summary>
     /// Determines if the specified type is one of a certain set of recognized generic list types.

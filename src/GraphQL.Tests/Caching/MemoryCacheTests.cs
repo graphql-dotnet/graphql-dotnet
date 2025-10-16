@@ -20,7 +20,7 @@ public class MemoryCacheTests
     [Fact]
     public async Task Validate_Entry_Is_Cached()
     {
-        var doc = new GraphQLDocument(new());
+        var doc = new GraphQLDocument([]);
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
@@ -33,7 +33,7 @@ public class MemoryCacheTests
     [Fact]
     public async Task Validate_Cache_Cannot_Be_Removed_Or_Set_To_Null()
     {
-        var doc = new GraphQLDocument(new());
+        var doc = new GraphQLDocument([]);
         var options = new ExecutionOptions { Query = "test" };
         var memoryCache = new MyMemoryDocumentCache();
 
@@ -77,7 +77,7 @@ public class MemoryCacheTests
         bool expectCached)
     {
         // Arrange
-        var document = new GraphQLDocument(new());
+        var document = new GraphQLDocument([]);
         var cacheOptions = new ExecutionOptions
         {
             Query = cacheQuery,
@@ -142,7 +142,7 @@ public class MemoryCacheTests
     [InlineData(true, true, false, false, false, false, false, false)]
     public async Task ExecuteAsync(bool querySet, bool documentIdSet, bool docSet, bool getCalled, bool getReturned, bool executed, bool exectuedSetDocument, bool setCalled)
     {
-        var mockDocument = new GraphQLDocument(new());
+        var mockDocument = new GraphQLDocument([]);
         var options = new ExecutionOptions
         {
             Query = querySet ? "Some Query" : null,
@@ -229,7 +229,7 @@ public class MemoryCacheTests
             { "starwars2", new StarWarsSchema(serviceProvider) }
         };
 
-        var document = new GraphQLDocument(new());
+        var document = new GraphQLDocument([]);
         var cacheOptions = new ExecutionOptions
         {
             Schema = schemas[cacheSchema],

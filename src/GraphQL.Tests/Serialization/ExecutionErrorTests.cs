@@ -73,12 +73,12 @@ public class ExecutionErrorTests
         var executionResult = new ExecutionResult
         {
             Data = null,
-            Errors = new ExecutionErrors(),
+            Errors = [],
             Extensions = null,
         };
         var executionError = new ExecutionError("Error testing index")
         {
-            Path = new object[] { "parent", 23, "child" }
+            Path = ["parent", 23, "child"]
         };
         executionResult.Errors.Add(executionError);
 

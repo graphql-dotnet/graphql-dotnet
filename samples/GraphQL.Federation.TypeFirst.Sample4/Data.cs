@@ -4,11 +4,12 @@ namespace GraphQL.Federation.TypeFirst.Sample4;
 
 public class Data
 {
-    private readonly List<User> _users = new() {
+    private readonly List<User> _users =
+    [
         new User { Id = 1, Username = "Username 1" },
         new User { Id = 2, Username = "Username 2" },
-        new User { Id = 3, Username = "Username 3" },
-    };
+        new User { Id = 3, Username = "Username 3" }
+    ];
 
     public Task<IEnumerable<User>> GetUsersAsync()
     {

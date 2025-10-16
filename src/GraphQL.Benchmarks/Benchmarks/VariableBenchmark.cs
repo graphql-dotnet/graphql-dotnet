@@ -52,7 +52,7 @@ public class VariableBenchmark : IBenchmark
         EnableValidation = val;
     }
 
-    public IEnumerable<bool> TrueFalse => new[] { true, false };
+    public IEnumerable<bool> TrueFalse => [true, false];
 
     [ParamsSource(nameof(TrueFalse))]
     public bool EnableValidation { get; set; }

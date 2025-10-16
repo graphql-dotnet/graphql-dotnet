@@ -5,8 +5,8 @@ namespace GraphQL.Tests.Validation;
 
 public class ValidationTestConfig
 {
-    private readonly List<IValidationRule> _rules = new();
-    private readonly List<ValidationErrorAssertion> _assertions = new();
+    private readonly List<IValidationRule> _rules = [];
+    private readonly List<ValidationErrorAssertion> _assertions = [];
 
     public ISchema Schema { get; set; }
 

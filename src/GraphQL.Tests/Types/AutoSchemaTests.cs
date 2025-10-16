@@ -33,7 +33,7 @@ public class AutoSchemaTests
     private class Query
     {
         public static string Hero => "Luke Skywalker";
-        public static IEnumerable<Droid> Droids => new Droid[] { new Droid("R2D2"), new Droid("C3PO") };
+        public static IEnumerable<Droid> Droids => [new Droid("R2D2"), new Droid("C3PO")];
     }
 
     private class Mutation

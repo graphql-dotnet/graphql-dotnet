@@ -9,8 +9,8 @@ public class Bug2958DecimalPrecisionTests : QueryTestBase<DecimalSchema>
     {
         public IEnumerator<object[]> GetEnumerator()
         {
-            yield return new object[] { new SystemTextJson.GraphQLSerializer() };
-            yield return new object[] { new NewtonsoftJson.GraphQLSerializer(settings => settings.FloatParseHandling = Newtonsoft.Json.FloatParseHandling.Decimal) };
+            yield return [new SystemTextJson.GraphQLSerializer()];
+            yield return [new NewtonsoftJson.GraphQLSerializer(settings => settings.FloatParseHandling = Newtonsoft.Json.FloatParseHandling.Decimal)];
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

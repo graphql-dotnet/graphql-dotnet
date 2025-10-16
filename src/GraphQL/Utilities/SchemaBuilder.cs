@@ -671,11 +671,11 @@ Schema contains a redefinition of these types: {string.Join(", ", duplicates.Sel
     //TODO: add support for directive arguments
     private QueryArguments ToQueryArguments(List<GraphQLInputValueDefinition>? arguments)
     {
-        return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name), a))); //TODO:alloc
+        return arguments == null ? [] : new QueryArguments(arguments.Select(a => ToArgument(new ArgumentConfig((string)a.Name), a))); //TODO:alloc
     }
 
     private QueryArguments ToQueryArguments(FieldConfig fieldConfig, List<GraphQLInputValueDefinition>? arguments)
     {
-        return arguments == null ? new QueryArguments() : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:alloc
+        return arguments == null ? [] : new QueryArguments(arguments.Select(a => ToArgument(fieldConfig.ArgumentFor((string)a.Name), a))); //TODO:alloc
     }
 }

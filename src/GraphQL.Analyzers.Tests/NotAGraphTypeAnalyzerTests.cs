@@ -240,11 +240,11 @@ public class NotAGraphTypeAnalyzerTests
               """;
 
         var expected = report
-            ? new[]
-            {
+            ?
+            [
                 VerifyCS.Diagnostic().WithLocation(0)
                     .WithArguments("TSource", "TSourceType", "ObjectGraphType<TSourceType>")
-            }
+            ]
             : DiagnosticResult.EmptyDiagnosticResults;
 
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
@@ -290,11 +290,11 @@ public class NotAGraphTypeAnalyzerTests
               """;
 
         var expected = report
-            ? new[]
-            {
+            ?
+            [
                 VerifyCS.Diagnostic().WithLocation(0)
                     .WithArguments("TSource", "TSourceType", "FieldBuilder<TSourceType, TReturnType>")
-            }
+            ]
             : DiagnosticResult.EmptyDiagnosticResults;
         await VerifyCS.VerifyAnalyzerAsync(source, expected);
     }

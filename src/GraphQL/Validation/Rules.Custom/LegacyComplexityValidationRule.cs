@@ -112,8 +112,8 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
         // https://github.com/graphql-dotnet/graphql-dotnet/issues/3030
         // Sort fragment definitions so that independent fragments go in front.
         var dependencies = BuildDependencies(doc);
-        List<GraphQLFragmentDefinition> orderedFragments = new();
-        List<GraphQLFragmentDefinition> fragsToNull = new();
+        List<GraphQLFragmentDefinition> orderedFragments = [];
+        List<GraphQLFragmentDefinition> fragsToNull = [];
 
         while (dependencies.Count > 0)
         {
@@ -188,7 +188,7 @@ public class LegacyComplexityValidationRule : ValidationRuleBase, INodeVisitor
                         var frag = document.FindFragmentDefinition(spread.FragmentName.Name.Value);
                         if (frag != null)
                         {
-                            (dependencies ??= new()).Add(frag);
+                            (dependencies ??= []).Add(frag);
                             _selectionSetsToVisit.Push(frag.SelectionSet);
                         }
                     }

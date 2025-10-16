@@ -8,21 +8,21 @@ namespace GraphQL.Utilities.Federation;
 [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
 public class FederatedSchemaPrinter : SchemaPrinter //TODO:should be completely rewritten
 {
-    private readonly List<string> _federatedDirectives = new()
-    {
+    private readonly List<string> _federatedDirectives =
+    [
         "external",
         "provides",
         "requires",
         "key",
         "extends"
-    };
+    ];
 
-    private readonly List<string> _federatedTypes = new()
-    {
+    private readonly List<string> _federatedTypes =
+    [
         "_Service",
         "_Entity",
         "_Any"
-    };
+    ];
 
     public FederatedSchemaPrinter(ISchema schema, SchemaPrinterOptions? options = null)
         : base(schema, options)

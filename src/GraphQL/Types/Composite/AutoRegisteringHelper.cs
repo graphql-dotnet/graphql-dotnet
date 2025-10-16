@@ -57,7 +57,7 @@ public static class AutoRegisteringHelper
 
     private static IList<LambdaExpression> BuildFieldResolver_BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
     {
-        List<LambdaExpression> expressions = new();
+        List<LambdaExpression> expressions = [];
         foreach (var parameterInfo in methodInfo.GetParameters())
         {
             var typeInformation = new TypeInformation(parameterInfo);
@@ -93,7 +93,7 @@ public static class AutoRegisteringHelper
         // exception cannot occur here, so don't worry catching TargetInvokeException
         return (LambdaExpression)_buildSourceExpressionForSchemaBuilderInternalMethodInfo
             .MakeGenericMethod(sourceType)
-            .Invoke(null, new object[] { serviceProvider })!;
+            .Invoke(null, [serviceProvider])!;
     }
 
     private static readonly MethodInfo _buildSourceExpressionForSchemaBuilderInternalMethodInfo = typeof(AutoRegisteringHelper).GetMethod(nameof(BuildSourceExpressionForSchemaBuilderInternal), BindingFlags.Static | BindingFlags.NonPublic)!;

@@ -5,7 +5,7 @@ namespace GraphQL.StarWars.TypeFirst;
 
 public class StarWarsData
 {
-    private readonly List<IStarWarsCharacter> _characters = new();
+    private readonly List<IStarWarsCharacter> _characters = [];
 
     public StarWarsData()
     {
@@ -13,8 +13,8 @@ public class StarWarsData
         {
             Id = "1",
             Name = "Luke",
-            Friends = new List<string> { "3", "4" },
-            AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
+            Friends = ["3", "4"],
+            AppearsIn = [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
             HomePlanet = "Tatooine",
             Cursor = "MQ=="
         });
@@ -22,7 +22,7 @@ public class StarWarsData
         {
             Id = "2",
             Name = "Vader",
-            AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
+            AppearsIn = [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
             HomePlanet = "Tatooine",
             Cursor = "Mg=="
         });
@@ -31,8 +31,8 @@ public class StarWarsData
         {
             Id = "3",
             Name = "R2-D2",
-            Friends = new List<string> { "1", "4" },
-            AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
+            Friends = ["1", "4"],
+            AppearsIn = [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
             PrimaryFunction = "Astromech",
             Cursor = "Mw=="
         });
@@ -40,7 +40,7 @@ public class StarWarsData
         {
             Id = "4",
             Name = "C-3PO",
-            AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
+            AppearsIn = [Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI],
             PrimaryFunction = "Protocol",
             Cursor = "NA=="
         });

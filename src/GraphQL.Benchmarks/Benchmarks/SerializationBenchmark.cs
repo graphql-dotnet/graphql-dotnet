@@ -81,7 +81,7 @@ public class SerializationBenchmark : IBenchmark
         _stream = Stream.Null;
     }
 
-    public IEnumerable<string> Codes => new[] { "Small", "Middle", "Introspection" };
+    public IEnumerable<string> Codes => ["Small", "Middle", "Introspection"];
 
     [ParamsSource(nameof(Codes))]
     public string Code { get; set; }

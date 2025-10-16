@@ -16,16 +16,15 @@ public class DocumentExecuterTests
         var queryStrategy = new TestQueryExecutionStrategy();
         var mutationStrategy = new TestMutationExecutionStrategy();
         var selector = new DefaultExecutionStrategySelector(
-            new[]
-            {
-                new ExecutionStrategyRegistration(queryStrategy, GraphQLParser.AST.OperationType.Query),
-                new ExecutionStrategyRegistration(mutationStrategy, GraphQLParser.AST.OperationType.Mutation),
-            });
+        [
+            new ExecutionStrategyRegistration(queryStrategy, GraphQLParser.AST.OperationType.Query),
+            new ExecutionStrategyRegistration(mutationStrategy, GraphQLParser.AST.OperationType.Mutation)
+        ]);
         var executer = new DocumentExecuter(
             new GraphQLDocumentBuilder(),
             new DocumentValidator(),
             selector,
-            Array.Empty<IConfigureExecution>());
+            []);
         var schema = new Schema();
         var graphType1 = new AutoRegisteringObjectGraphType<SampleGraph>();
         var graphType2 = new AutoRegisteringObjectGraphType<SampleGraph>();

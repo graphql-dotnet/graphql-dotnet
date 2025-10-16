@@ -27,7 +27,7 @@ public class AppliedDirectives : IEnumerable<AppliedDirective>
         if (List != null && List.Contains(directive))
             throw new InvalidOperationException("Already exists");
 
-        (List ??= new()).Add(directive);
+        (List ??= []).Add(directive);
     }
 
     /// <summary>

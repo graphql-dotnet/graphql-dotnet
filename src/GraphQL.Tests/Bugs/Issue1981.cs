@@ -42,7 +42,7 @@ public class Issue1981 : QueryTestBase<Issue1981Schema>
         }
         """;
         // empty validation rules to bypass validation error from KnownDirectivesInAllowedLocations
-        AssertQuerySuccess(query, expected, rules: Array.Empty<IValidationRule>());
+        AssertQuerySuccess(query, expected, rules: []);
     }
 }
 

@@ -460,7 +460,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
-            .ShouldBe(new[] { "AnimalType", "Boolean", "Cat", "Dog", "IAnimal", "ID", "Int", "String", "TestQuery" });
+            .ShouldBe(["AnimalType", "Boolean", "Cat", "Dog", "IAnimal", "ID", "Int", "String", "TestQuery"]);
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var result = await executer.ExecuteAsync(new()
         {
@@ -484,7 +484,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
-            .ShouldBe(new[] { "AnimalType", "Boolean", "IAnimal", "ID", "String", "TestQuery2" });
+            .ShouldBe(["AnimalType", "Boolean", "IAnimal", "ID", "String", "TestQuery2"]);
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var ex = await Should.ThrowAsync<InvalidOperationException>(() => executer.ExecuteAsync(new()
         {
@@ -511,7 +511,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
         using var provider = services.BuildServiceProvider();
         var schema = provider.GetRequiredService<ISchema>();
         schema.AllTypes.Select(x => x.Name).OrderBy(x => x).Where(x => !x.StartsWith("__"))
-            .ShouldBe(new[] { "AnimalType", "Boolean", "Dog", "IAnimal", "ID", "String", "TestQuery3" });
+            .ShouldBe(["AnimalType", "Boolean", "Dog", "IAnimal", "ID", "String", "TestQuery3"]);
         var executer = provider.GetRequiredService<IDocumentExecuter>();
         var ex = await Should.ThrowAsync<InvalidOperationException>(() => executer.ExecuteAsync(new()
         {

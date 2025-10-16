@@ -25,7 +25,7 @@ public class Bug1767InvalidByte : QueryTestBase<Bug1767Schema>
         error.Path = path;
         if (code != null)
             error.Code = code;
-        var expected = CreateQueryResult(result, new ExecutionErrors { error }, executed);
+        var expected = CreateQueryResult(result, [error], executed);
         AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
     }
 

@@ -6,13 +6,13 @@ public class DeserializationTestBase
 {
     protected readonly TestData ExampleData = new()
     {
-        array = new object?[]
-        {
+        array =
+        [
             null,
             "test",
             123,
             1.2
-        },
+        ],
         obj = new TestChildData
         {
             itemNull = null,

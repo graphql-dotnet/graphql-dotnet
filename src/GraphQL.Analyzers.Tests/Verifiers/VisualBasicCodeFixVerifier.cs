@@ -40,7 +40,7 @@ public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
 
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult, string)"/>
     public static async Task VerifyCodeFixAsync(string source, DiagnosticResult expected, string fixedSource)
-        => await VerifyCodeFixAsync(source, new[] { expected }, fixedSource).ConfigureAwait(false);
+        => await VerifyCodeFixAsync(source, [expected], fixedSource).ConfigureAwait(false);
 
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
     public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)

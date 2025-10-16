@@ -41,7 +41,7 @@ public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSo
         {
             if (typeof(TSourceType) != typeof(object))
                 IsTypeOf = instance => instance is TSourceType;
-            Interfaces = new Interfaces();
+            Interfaces = [];
             return;
         }
         IsTypeOf = cloneFrom.IsTypeOf;
@@ -64,7 +64,7 @@ public class ObjectGraphType<[NotAGraphType] TSourceType> : ComplexGraphType<TSo
     public Interfaces Interfaces { get; }
 
     /// <inheritdoc/>
-    public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
+    public ResolvedInterfaces ResolvedInterfaces { get; } = [];
 
     /// <summary>
     /// Adds a GraphQL interface graph type to the list of GraphQL interfaces implemented by this graph type.

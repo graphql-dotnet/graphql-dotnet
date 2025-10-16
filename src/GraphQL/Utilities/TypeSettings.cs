@@ -14,7 +14,7 @@ public class TypeSettings
     public TypeSettings()
     {
         _typeConfigurations = new LightweightCache<string, TypeConfig>(name => new TypeConfig(name));
-        _forAllTypesConfigurationDelegates = new List<Action<TypeConfig>>();
+        _forAllTypesConfigurationDelegates = [];
     }
 
     /// <summary>

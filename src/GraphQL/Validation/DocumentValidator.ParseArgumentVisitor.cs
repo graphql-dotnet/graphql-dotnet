@@ -95,7 +95,7 @@ public partial class DocumentValidator
             // visit the fragment that this fragment spread references,
             // unless we already visited this fragment spread
             var fragmentName = fragmentSpread.FragmentName.Name.Value;
-            if ((context.VisitedFragments ??= new()).Add(fragmentName))
+            if ((context.VisitedFragments ??= []).Add(fragmentName))
             {
                 var definition = context.ValidationContext.Document.FindFragmentDefinition(fragmentName);
                 if (definition != null)

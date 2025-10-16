@@ -373,7 +373,7 @@ public class FieldNameAnalyzerTests
 
         string methodName = GetMethodName(builder);
 
-        string[] fixes = { fix0, fix1 };
+        string[] fixes = [fix0, fix1];
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -448,7 +448,7 @@ public class FieldNameAnalyzerTests
 
         string methodName = GetMethodName(builder);
 
-        string[] fixes = { fix0, fix1 };
+        string[] fixes = [fix0, fix1];
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -521,7 +521,7 @@ public class FieldNameAnalyzerTests
 
         string methodName = GetMethodName(builder);
 
-        string[] fixes = { fix0, fix1 };
+        string[] fixes = [fix0, fix1];
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -593,7 +593,7 @@ public class FieldNameAnalyzerTests
 
         string methodName = GetMethodName(builder);
 
-        string[] fixes = { fix0, fix1 };
+        string[] fixes = [fix0, fix1];
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);
         var test = new VerifyCS.Test
@@ -656,7 +656,7 @@ public class FieldNameAnalyzerTests
             }
             """;
 
-        string[] fixes = { fix0, fix1 };
+        string[] fixes = [fix0, fix1];
         const string methodName = Constants.MethodNames.Field;
 
         var expected = VerifyCS.Diagnostic(FieldNameAnalyzer.DifferentNamesDefinedByFieldAndNameMethods).WithLocation(0).WithArguments(methodName);

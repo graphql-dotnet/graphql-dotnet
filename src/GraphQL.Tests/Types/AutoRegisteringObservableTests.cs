@@ -46,7 +46,7 @@ public class AutoRegisteringObservableTests
     {
         var streamResolver = GetResolver(fieldName);
         var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
-        observable.ToEnumerable().ShouldBe(new object[] { 1, 2, 3 });
+        observable.ToEnumerable().ShouldBe([1, 2, 3]);
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class AutoRegisteringObservableTests
     {
         var streamResolver = GetResolver(fieldName);
         var observable = await streamResolver.ResolveAsync(new ResolveFieldContext());
-        observable.ToEnumerable().ShouldBe(new object[] { 4, 5, 6 });
+        observable.ToEnumerable().ShouldBe([4, 5, 6]);
     }
 
     [Theory]
@@ -392,8 +392,8 @@ public class AutoRegisteringObservableTests
             context.Operation.Operation.ShouldBe(GraphQLParser.AST.OperationType.Subscription);
             context.Parent.ShouldBeNull();
             context.ParentType.Name.ShouldBe("TestClass");
-            context.Path.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
-            context.ResponsePath.ShouldBe(new object[] { "resolveFieldContextPassThrough" });
+            context.Path.ShouldBe(["resolveFieldContextPassThrough"]);
+            context.ResponsePath.ShouldBe(["resolveFieldContextPassThrough"]);
             context.RootValue.ShouldBe("root");
             context.Schema.Subscription!.Name.ShouldBe("TestClass");
             context.Source.ShouldBe("root");

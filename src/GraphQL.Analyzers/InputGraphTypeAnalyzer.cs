@@ -96,7 +96,7 @@ public partial class InputGraphTypeAnalyzer : DiagnosticAnalyzer
 
         string? forceTypesAnalysisOption = context.Options.GetStringOption(ForceTypesAnalysisOption, context.Node.SyntaxTree);
         var forceTypesAnalysis = forceTypesAnalysisOption
-            ?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            ?.Split([','], StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
 

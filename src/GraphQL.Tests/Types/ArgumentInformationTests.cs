@@ -22,7 +22,7 @@ public class ArgumentInformationTests
         {
             Expression = (IResolveFieldContext context) => 23
         };
-        info.Expression.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
+        info.Expression.Compile().DynamicInvoke([null]).ShouldBeOfType<int>().ShouldBe(23);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public class ArgumentInformationTests
         {
             Expression = (IResolveFieldContext context) => 23
         };
-        info.Expression.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
+        info.Expression.Compile().DynamicInvoke([null]).ShouldBeOfType<int>().ShouldBe(23);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public class ArgumentInformationTests
     {
         var info = new ArgumentInformation(_testParameterInfo, typeof(object), new FieldType(), new TypeInformation(_testParameterInfo));
         info.SetDelegate(context => 23);
-        info.Expression!.Compile().DynamicInvoke(new object?[] { null }).ShouldBeOfType<int>().ShouldBe(23);
+        info.Expression!.Compile().DynamicInvoke([null]).ShouldBeOfType<int>().ShouldBe(23);
     }
 
     [Fact]

@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Instrumentation;
 [Collection("StaticTests")]
 public sealed class OpenTelemetryTests : IDisposable
 {
-    private readonly List<Activity> _exportedActivities = new();
+    private readonly List<Activity> _exportedActivities = [];
     private IHostBuilder __hostBuilder;
     private IHostBuilder _hostBuilder
     {
@@ -83,7 +83,7 @@ public sealed class OpenTelemetryTests : IDisposable
             var optionsInstance = Activator.CreateInstance(optionsType)!;
             var recordDocumentOption = optionsType.GetProperty("RecordDocument").ShouldNotBeNull();
             recordDocumentOption.SetValue(optionsInstance, true);
-            method.Invoke(null, new object[] { optionsInstance });
+            method.Invoke(null, [optionsInstance]);
 
             // verify that the initializer was called
             OpenTelemetry.AutoInstrumentation.Initializer.Enabled.ShouldBeTrue();
@@ -194,13 +194,12 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.TagObjects.ShouldBe(new KeyValuePair<string, object?>[]
-        {
+        activity.TagObjects.ShouldBe([
             new("graphql.document", "{ hello }"),
             new("mytag", registrationMethod),
-            new("graphql.operation.type", "query"),
+            new("graphql.operation.type", "query")
             // no operation name
-        });
+        ]);
         activity.DisplayName.ShouldBe("query");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -220,12 +219,11 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.document", "query helloQuery { hello }"),
             new("graphql.operation.type", "query"),
-            new("graphql.operation.name", "helloQuery"), // operation name pulled from document
-        });
+            new("graphql.operation.name", "helloQuery") // operation name pulled from document
+        ]);
         activity.DisplayName.ShouldBe("query helloQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -247,12 +245,11 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.document", "{ testing }"),
-            new("graphql.operation.type", "query"),
+            new("graphql.operation.type", "query")
             // no operation name
-        });
+        ]);
         activity.DisplayName.ShouldBe("query");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -294,15 +291,14 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.document", "query helloQuery { hello }"),
             new("testoptions", "test1"),
             new("graphql.operation.type", "query"),
             new("graphql.operation.name", "helloQuery"), // operation name pulled from document
             new("testdocument", "test2"),
-            new("testresult", "test3"),
-        });
+            new("testresult", "test3")
+        ]);
         activity.DisplayName.ShouldBe("query helloQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -453,12 +449,11 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.document", "query helloQuery { hello { dummy } }"),
             new("graphql.operation.type", "query"),
-            new("graphql.operation.name", "helloQuery"),
-        });
+            new("graphql.operation.name", "helloQuery")
+        ]);
         activity.DisplayName.ShouldBe("query helloQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -478,10 +473,9 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
-            new("graphql.document", "{"),
-        });
+        activity.Tags.ShouldBe([
+            new("graphql.document", "{")
+        ]);
         activity.DisplayName.ShouldBe("graphql");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -569,11 +563,10 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
-            new("graphql.document", "query helloQuery { hello }"),
+        activity.Tags.ShouldBe([
+            new("graphql.document", "query helloQuery { hello }")
             // no operation name within ExecutionOptions, and request was canceled before parsing
-        });
+        ]);
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -592,11 +585,10 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.operation.name", "helloQuery"), // operation name pulled from ExecutionOptions
-            new("graphql.document", "query helloQuery { hello }"),
-        });
+            new("graphql.document", "query helloQuery { hello }")
+        ]);
         activity.DisplayName.ShouldBe("graphql"); // unknown operation type since request was canceled before parsing
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
     }
@@ -616,12 +608,11 @@ public sealed class OpenTelemetryTests : IDisposable
 
         // verify activity telemetry
         var activity = _exportedActivities.ShouldHaveSingleItem();
-        activity.Tags.ShouldBe(new KeyValuePair<string, string?>[]
-        {
+        activity.Tags.ShouldBe([
             new("graphql.document", "query cancelQuery { cancel }"),
             new("graphql.operation.type", "query"),
-            new("graphql.operation.name", "cancelQuery"),
-        });
+            new("graphql.operation.name", "cancelQuery")
+        ]);
         activity.DisplayName.ShouldBe("query cancelQuery");
         activity.Status().ShouldBe(ActivityStatusCode.Unset);
         activity.Events.ShouldBeEmpty();

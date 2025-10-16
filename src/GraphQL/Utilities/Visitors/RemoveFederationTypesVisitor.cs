@@ -11,23 +11,23 @@ namespace GraphQL.Utilities.Visitors;
 /// </summary>
 public sealed class RemoveFederationTypesVisitor : ASTVisitor<RemoveFederationTypesVisitor.Context>
 {
-    private static readonly HashSet<string> _federatedDirectives = new()
-    {
+    private static readonly HashSet<string> _federatedDirectives =
+    [
         EXTERNAL_DIRECTIVE,
         PROVIDES_DIRECTIVE,
         REQUIRES_DIRECTIVE,
         KEY_DIRECTIVE,
         "tag",
-        "extends",
-    };
+        "extends"
+    ];
 
-    private static readonly HashSet<string> _federatedTypes = new()
-    {
+    private static readonly HashSet<string> _federatedTypes =
+    [
         "_Entity",
         "_Any",
         "FieldSet",
-        "_Service",
-    };
+        "_Service"
+    ];
 
     private static readonly RemoveFederationTypesVisitor _instance = new();
 

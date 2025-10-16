@@ -10,7 +10,7 @@ public class UnionGraphTypeTests
         var unionType = new UnionGraphType
         {
             Name = "UnionType",
-            Types = new[] { typeof(Type1), typeof(Type2) }
+            Types = [typeof(Type1), typeof(Type2)]
         };
         var queryType = new ObjectGraphType { Name = "Query" };
         queryType.Field("union", unionType);
@@ -58,7 +58,7 @@ public class UnionGraphTypeTests
         var unionType = new UnionGraphType
         {
             Name = "UnionType",
-            Types = new[] { typeof(GraphQLClrOutputTypeReference<Model1>) }
+            Types = [typeof(GraphQLClrOutputTypeReference<Model1>)]
         };
         unionType.AddPossibleType(new GraphQLTypeReference("Type2"));
         queryType.Field("union1", unionType, resolve: _ => new Model1());
@@ -80,7 +80,7 @@ public class UnionGraphTypeTests
         var unionType = new UnionGraphType
         {
             Name = "UnionType",
-            Types = new[] { typeof(GraphQLClrOutputTypeReference<Model1>) }
+            Types = [typeof(GraphQLClrOutputTypeReference<Model1>)]
         };
         queryType.Field("union1", unionType, resolve: _ => new Model1());
 

@@ -246,11 +246,10 @@ public class FieldBuilderCodeFixProvider : CodeFixProvider
         var newArgumentList = typeArgumentExpression == null
             ? SingletonSeparatedList(
                 Argument(nameArgumentExpression))
-            : SeparatedList(new[]
-            {
+            : SeparatedList([
                 Argument(nameArgumentExpression),
                 Argument(typeArgumentExpression)
-            });
+            ]);
 
         return originalFieldInvocationExpression
             .WithExpression(newExpression)

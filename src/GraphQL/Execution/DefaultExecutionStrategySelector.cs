@@ -13,7 +13,7 @@ public class DefaultExecutionStrategySelector : IExecutionStrategySelector
     /// <see cref="SerialExecutionStrategy"/> for <see cref="OperationType.Mutation"/>.
     /// </summary>
     public DefaultExecutionStrategySelector()
-        : this(Array.Empty<ExecutionStrategyRegistration>())
+        : this([])
     {
     }
 

@@ -8,12 +8,12 @@ internal static class AssemblyExtensions
     /// <summary>
     /// Contains a list of types that are scanned for, from which a clr type mapping will be matched
     /// </summary>
-    private static readonly Type[] _typesToRegister = new Type[]
-    {
+    private static readonly Type[] _typesToRegister =
+    [
         typeof(ObjectGraphType<>),
         typeof(InputObjectGraphType<>),
-        typeof(EnumerationGraphType<>),
-    };
+        typeof(EnumerationGraphType<>)
+    ];
 
     /// <summary>
     /// Scans the specified assembly for classes that inherit from <see cref="ObjectGraphType{TSourceType}"/>,

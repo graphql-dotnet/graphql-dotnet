@@ -4,12 +4,12 @@ namespace GraphQL.Federation.CodeFirst.Sample3;
 
 public class Data
 {
-    private readonly List<Review> _reviews = new()
-    {
+    private readonly List<Review> _reviews =
+    [
         new Review { Id = 1, ProductId = 1, UserId = 1, Content = "Review 1" },
         new Review { Id = 2, ProductId = 1, UserId = 2, Content = "Review 2" },
-        new Review { Id = 3, ProductId = 2, UserId = 1, Content = "Review 3" },
-    };
+        new Review { Id = 3, ProductId = 2, UserId = 1, Content = "Review 3" }
+    ];
 
     public Task<IEnumerable<Review>> GetReviewsAsync() => Task.FromResult<IEnumerable<Review>>(_reviews);
 

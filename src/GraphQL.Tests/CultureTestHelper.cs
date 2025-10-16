@@ -4,15 +4,15 @@ namespace GraphQL.Tests;
 
 public static class CultureTestHelper
 {
-    private static IEnumerable<CultureInfo> Cultures => new[]
-    {
+    private static IEnumerable<CultureInfo> Cultures =>
+    [
         new CultureInfo("ru-RU"),
         new CultureInfo("fi-FI"),
         new CultureInfo("en-US"),
         CultureInfo.InvariantCulture,
         new CultureInfo(CultureInfo.CurrentUICulture.Name),
         new CultureInfo(CultureInfo.CurrentCulture.Name)
-    };
+    ];
 
     /// <summary>
     /// Executes the specified delegate with a variety of cultures.
