@@ -1,7 +1,6 @@
 using GraphQL.DI;
 using GraphQL.PersistedDocuments;
 using GraphQL.Types;
-using GraphQL.Validation;
 using GraphQLParser.AST;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;

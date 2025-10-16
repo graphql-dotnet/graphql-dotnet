@@ -1,7 +1,6 @@
 using GraphQL.Builders;
 using GraphQL.Execution;
 using GraphQL.Types;
-using GraphQL.Validation;
 using GraphQLParser.AST;
 using Moq;
 

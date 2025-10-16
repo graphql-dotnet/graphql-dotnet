@@ -1,7 +1,6 @@
 using GraphQL.DI;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQL.Validation;
 
 namespace GraphQL.Tests.Execution;
 

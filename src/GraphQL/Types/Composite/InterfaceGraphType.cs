@@ -53,7 +53,7 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
     public IEnumerable<Type> Types
     {
         get => _types;
-        set => _types = [..value];
+        set => _types = [.. value];
     }
 
     /// <inheritdoc/>

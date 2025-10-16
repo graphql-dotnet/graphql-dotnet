@@ -1,5 +1,4 @@
 using GraphQL.Types;
-using GraphQL.Validation;
 
 namespace GraphQL.Tests.Bugs;
 
