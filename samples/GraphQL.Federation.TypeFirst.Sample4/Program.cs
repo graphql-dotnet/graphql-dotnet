@@ -1,7 +1,6 @@
 using GraphQL.Federation.TypeFirst.Sample4.Schema;
 using GraphQL.Transport;
 using GraphQL.Types;
-using GraphQL.Utilities;
 
 namespace GraphQL.Federation.TypeFirst.Sample4;
 

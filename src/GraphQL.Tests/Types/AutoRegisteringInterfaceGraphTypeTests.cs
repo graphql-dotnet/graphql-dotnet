@@ -5,7 +5,6 @@ using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.Types;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 
 namespace GraphQL.Tests.Types;
 
