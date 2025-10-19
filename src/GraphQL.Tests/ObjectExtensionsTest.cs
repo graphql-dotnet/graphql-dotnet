@@ -803,7 +803,7 @@ public class ObjectExtensionsTests
             Values.Add(value);
         }
 
-        public List<T> Values { get; } = new();
+        public List<T> Values { get; } = [];
         public IEnumerator<T> GetEnumerator() => Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

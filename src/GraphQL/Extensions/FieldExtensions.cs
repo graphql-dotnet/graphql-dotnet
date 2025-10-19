@@ -32,7 +32,7 @@ public static class FieldExtensions
         var keys = fieldType.GetMetadata<List<Type>>(FromServicesAttribute.REQUIRED_SERVICES_METADATA);
         if (keys == null)
         {
-            keys = new List<Type>();
+            keys = [];
             fieldType.Metadata[FromServicesAttribute.REQUIRED_SERVICES_METADATA] = keys;
         }
         keys.Add(serviceType);

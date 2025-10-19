@@ -8,7 +8,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class SchemaDirectives : IEnumerable<Directive>
 {
-    internal List<Directive> List { get; } = new List<Directive>();
+    internal List<Directive> List { get; } = [];
 
     /// <summary>
     /// Returns an instance of the predefined 'include' directive.

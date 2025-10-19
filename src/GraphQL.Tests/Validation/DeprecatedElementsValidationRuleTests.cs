@@ -372,10 +372,10 @@ public class DeprecatedElementsValidationRuleTests : ValidationTestBase<Deprecat
 
     public class TestDeprecatedElementsValidationRule : DeprecatedElementsValidationRule
     {
-        public List<DeprecatedFieldCall> DeprecatedFieldCalls { get; } = new();
-        public List<DeprecatedFieldArgumentCall> DeprecatedFieldArgumentCalls { get; } = new();
-        public List<DeprecatedDirectiveArgumentCall> DeprecatedDirectiveArgumentCalls { get; } = new();
-        public List<DeprecatedTypeCall> DeprecatedTypeCalls { get; } = new();
+        public List<DeprecatedFieldCall> DeprecatedFieldCalls { get; } = [];
+        public List<DeprecatedFieldArgumentCall> DeprecatedFieldArgumentCalls { get; } = [];
+        public List<DeprecatedDirectiveArgumentCall> DeprecatedDirectiveArgumentCalls { get; } = [];
+        public List<DeprecatedTypeCall> DeprecatedTypeCalls { get; } = [];
 
         protected override ValueTask OnDeprecatedFieldReferencedAsync(
             ValidationContext context,

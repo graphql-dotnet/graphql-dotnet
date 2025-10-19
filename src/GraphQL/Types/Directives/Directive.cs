@@ -87,7 +87,7 @@ public class Directive : MetadataProvider, INamedType, IProvideDescription
     /// <summary>
     /// Returns a list of locations where the directive can be applied.
     /// </summary>
-    public List<DirectiveLocation> Locations { get; } = new List<DirectiveLocation>();
+    public List<DirectiveLocation> Locations { get; } = [];
 
     /// <summary>
     /// Validates given <paramref name="applied"/> directive against this directive graph type.

@@ -283,7 +283,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         CheckDisposed();
         CheckInitialized();
 
-        (_visitors ??= new()).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
+        (_visitors ??= []).Add(visitor ?? throw new ArgumentNullException(nameof(visitor)));
     }
 
     /// <inheritdoc/>
@@ -300,7 +300,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             throw new ArgumentOutOfRangeException(nameof(type), $"Type must be of {nameof(ISchemaNodeVisitor)}.");
         }
 
-        if (!(_visitorTypes ??= new()).Contains(type))
+        if (!(_visitorTypes ??= []).Contains(type))
             _visitorTypes.Add(type);
     }
 
@@ -310,7 +310,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         CheckDisposed();
         CheckInitialized();
 
-        (_additionalInstances ??= new()).Add(type ?? throw new ArgumentNullException(nameof(type)));
+        (_additionalInstances ??= []).Add(type ?? throw new ArgumentNullException(nameof(type)));
     }
 
     /// <inheritdoc/>
@@ -327,7 +327,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             throw new ArgumentOutOfRangeException(nameof(type), "Type must be of IGraphType.");
         }
 
-        _additionalTypes ??= new();
+        _additionalTypes ??= [];
 
         if (!_additionalTypes.Contains(type))
             _additionalTypes.Add(type);
@@ -358,7 +358,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)]
         Type graphType)
     {
-        (_clrToGraphTypeMappings ??= new()).Add((
+        (_clrToGraphTypeMappings ??= []).Add((
             CheckClrType(clrType ?? throw new ArgumentNullException(nameof(clrType))),
             CheckGraphType(graphType ?? throw new ArgumentNullException(nameof(graphType)))
         ));

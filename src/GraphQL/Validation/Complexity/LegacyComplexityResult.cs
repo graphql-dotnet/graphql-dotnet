@@ -11,7 +11,7 @@ public class LegacyComplexityResult
     /// <summary>
     /// Returns a dictionary of nodes and their complexity factors.
     /// </summary>
-    public Dictionary<ASTNode, double> ComplexityMap { get; } = new();
+    public Dictionary<ASTNode, double> ComplexityMap { get; } = [];
 
     /// <summary>
     /// Returns the total calculated document complexity factor over all executed nodes.

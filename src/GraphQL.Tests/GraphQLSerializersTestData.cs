@@ -48,11 +48,11 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
         }
     }
 
-    public static readonly List<IGraphQLTextSerializer> AllWriters = new()
-    {
+    public static readonly List<IGraphQLTextSerializer> AllWriters =
+    [
         new Wrapper(CreateNSJ()),
         new Wrapper(CreateSTJ())
-    };
+    ];
 
     private static IGraphQLTextSerializer CreateNSJ() => new NewtonsoftJson.GraphQLSerializer(settings =>
     {

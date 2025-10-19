@@ -39,7 +39,7 @@ public static class ExecutionHelper
             if (dirDefinition == null)
                 continue;
 
-            (directives ??= new())[dirDefinition.Name] = new DirectiveInfo(
+            (directives ??= [])[dirDefinition.Name] = new DirectiveInfo(
                 dirDefinition,
                 GetArguments(dirDefinition.Arguments, dir.Arguments, variables, document, (ASTNode)node, dir) ?? _emptyDirectiveArguments);
         }

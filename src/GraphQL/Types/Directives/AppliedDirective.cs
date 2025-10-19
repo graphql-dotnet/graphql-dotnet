@@ -58,7 +58,7 @@ public class AppliedDirective : MetadataProvider, IEnumerable<DirectiveArgument>
         if (argument == null)
             throw new ArgumentNullException(nameof(argument));
 
-        (List ??= new()).Add(argument);
+        (List ??= []).Add(argument);
 
         return this;
     }

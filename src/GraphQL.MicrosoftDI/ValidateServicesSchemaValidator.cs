@@ -31,7 +31,7 @@ internal sealed class ValidateServicesSchemaValidator : BaseSchemaNodeVisitor
             {
                 if (!_isValidService(serviceType))
                 {
-                    _errors ??= new();
+                    _errors ??= [];
                     _errors.Add($"The service '{serviceType.FullName}' required by '{type.Name}.{field.Name}' is not registered.");
                 }
             }

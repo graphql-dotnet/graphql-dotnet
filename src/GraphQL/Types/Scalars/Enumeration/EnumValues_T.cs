@@ -8,8 +8,8 @@ namespace GraphQL.Types;
 /// </summary>
 public class EnumValues<TEnum> : EnumValuesBase where TEnum : Enum
 {
-    private Dictionary<ROM, EnumValueDefinition> DictionaryByName { get; } = new();
-    private Dictionary<TEnum, EnumValueDefinition> DictionaryByValue { get; } = new();
+    private Dictionary<ROM, EnumValueDefinition> DictionaryByName { get; } = [];
+    private Dictionary<TEnum, EnumValueDefinition> DictionaryByValue { get; } = [];
 
     /// <inheritdoc/>
     public override int Count => DictionaryByName.Count;

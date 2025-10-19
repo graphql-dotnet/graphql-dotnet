@@ -26,21 +26,21 @@ internal static class SchemaPrinterExtensions
 [Obsolete("Please use the schema.Print() extension method instead. This class will be removed in v9.")]
 public class SchemaPrinter //TODO: rewrite string concatenations to use buffer ?
 {
-    private static readonly List<string> _builtInScalars = new()
-    {
+    private static readonly List<string> _builtInScalars =
+    [
         "String",
         "Boolean",
         "Int",
         "Float",
         "ID"
-    };
+    ];
 
-    private static readonly List<string> _builtInDirectives = new()
-    {
+    private static readonly List<string> _builtInDirectives =
+    [
         "skip",
         "include",
         "deprecated"
-    };
+    ];
 
     /// <summary>
     /// Creates printer with the specified options.

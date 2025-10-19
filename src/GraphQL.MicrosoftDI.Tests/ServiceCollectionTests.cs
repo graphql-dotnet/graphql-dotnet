@@ -7,7 +7,7 @@ namespace GraphQL.MicrosoftDI.Tests;
 public class ServiceCollectionTests
 {
     private bool _disposed;
-    private readonly ServiceCollection _serviceCollection = new();
+    private readonly ServiceCollection _serviceCollection = [];
     private readonly ITest _testObject;
 
     public ServiceCollectionTests()

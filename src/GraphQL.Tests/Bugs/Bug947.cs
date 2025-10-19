@@ -30,13 +30,13 @@ public class Bug947
             },
             FieldDefinition = new FieldType
             {
-                Arguments = new QueryArguments
-                {
+                Arguments =
+                [
                     new QueryArgument(new IntGraphType()) { Name = "int" },
                     new QueryArgument(new StringGraphType()) { Name = "string" },
                     new QueryArgument(new AnyScalarGraphType()) { Name = "vector" },
                     new QueryArgument(inputObjectGraphType) { Name = "object" },
-                },
+                ],
             },
         };
 

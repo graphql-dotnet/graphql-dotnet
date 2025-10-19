@@ -23,7 +23,7 @@ public class Bug1699InvalidEnum : QueryTestBase<Bug1699InvalidEnumSchema>
         error.Path = path;
         if (code != null)
             error.Code = code;
-        var expected = CreateQueryResult(result, new ExecutionErrors { error }, executed: executed);
+        var expected = CreateQueryResult(result, [error], executed: executed);
         AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
     }
 

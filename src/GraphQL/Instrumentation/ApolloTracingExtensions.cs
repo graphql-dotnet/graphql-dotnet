@@ -18,7 +18,7 @@ public static class ApolloTracingExtensions
     {
         var perf = result?.Perf;
         if (perf != null)
-            (result!.Extensions ??= new())["tracing"] = CreateTrace(perf, start);
+            (result!.Extensions ??= [])["tracing"] = CreateTrace(perf, start);
     }
 
     /// <summary>

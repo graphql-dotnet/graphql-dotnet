@@ -7,8 +7,8 @@ namespace GraphQL.Validation;
 
 public partial class ValidationContext
 {
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragments = new();
-    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragments = new();
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _fragments = [];
+    private Dictionary<GraphQLOperationDefinition, List<GraphQLFragmentDefinition>?>? _usedFragments = [];
     private bool? _noFragments;
 
     /// <summary>
@@ -52,7 +52,7 @@ public partial class ValidationContext
         var context = new GetRecursivelyReferencedFragmentsVisitorContext(this, onlyUsed);
         GetRecursivelyReferencedFragmentsVisitor.Instance.VisitAsync(operation.SelectionSet, context).GetAwaiter().GetResult();
         var fragments = context.GetFragments(reset: true);
-        (onlyUsed ? _usedFragments ??= new() : _fragments ??= new())[operation] = fragments;
+        (onlyUsed ? _usedFragments ??= [] : _fragments ??= [])[operation] = fragments;
         return fragments;
     }
 
@@ -140,7 +140,7 @@ public partial class ValidationContext
             {
                 var items = GetRecursivelyReferencedFragments(operation);
                 if (items != null)
-                    (fragments ??= new()).AddRange(items);
+                    (fragments ??= []).AddRange(items);
             }
             return fragments;
         }

@@ -246,7 +246,7 @@ internal static class FederationHelper
                 return;
             var directive = new Directive(link.NameForDirective(directiveName))
             {
-                Arguments = arguments != null ? new QueryArguments(arguments) : null,
+                Arguments = arguments != null ? [.. arguments] : null,
                 Repeatable = repeatable,
             };
             foreach (var location in locations)

@@ -7,7 +7,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class EnumValues : EnumValuesBase
 {
-    private List<EnumValueDefinition> List { get; } = new List<EnumValueDefinition>();
+    private List<EnumValueDefinition> List { get; } = [];
 
     /// <inheritdoc/>
     public override int Count => List.Count;

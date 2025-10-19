@@ -22,7 +22,7 @@ internal sealed class LegacyAnalysisContext : IASTVisitorContext
 
     public bool FragmentMapAlreadyBuilt { get; set; }
 
-    public Dictionary<string, LegacyFragmentComplexity> FragmentMap { get; } = new Dictionary<string, LegacyFragmentComplexity>();
+    public Dictionary<string, LegacyFragmentComplexity> FragmentMap { get; } = [];
 
     public CancellationToken CancellationToken => default;
 

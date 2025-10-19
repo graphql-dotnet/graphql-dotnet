@@ -9,9 +9,9 @@ public class SampleObserver : IObserver<ExecutionResult>
     public void OnError(Exception error)
     {
         if (error is ExecutionError executionError)
-            Events.Enqueue(new ExecutionResult { Errors = new ExecutionErrors { executionError } });
+            Events.Enqueue(new ExecutionResult { Errors = [executionError] });
         else
-            Events.Enqueue(new ExecutionResult { Errors = new ExecutionErrors { new ExecutionError($"Unhandled error of type {error.GetType().Name}") } });
+            Events.Enqueue(new ExecutionResult { Errors = [new ExecutionError($"Unhandled error of type {error.GetType().Name}")] });
     }
     public void OnNext(ExecutionResult value) => Events.Enqueue(value);
 }

@@ -26,23 +26,23 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
         var liz = new Person
         {
             Name = "Liz",
-            Pets = new List<IPet>(),
-            Friends = new List<INamed>()
+            Pets = [],
+            Friends = []
         };
 
         _john = new Person
         {
             Name = "John",
-            Pets = new List<IPet>
-            {
+            Pets =
+            [
                 garfield,
                 odie
-            },
-            Friends = new List<INamed>
-            {
+            ],
+            Friends =
+            [
                 liz,
                 odie
-            }
+            ]
         };
     }
 

@@ -8,7 +8,7 @@ namespace GraphQL.Utilities;
 /// </summary>
 public sealed class AppliedDirectivesValidationVisitor : ISchemaNodeVisitor
 {
-    private readonly List<Exception> _exceptions = new();
+    private readonly List<Exception> _exceptions = [];
 
     private AppliedDirectivesValidationVisitor()
     {

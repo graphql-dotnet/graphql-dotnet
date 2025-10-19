@@ -27,7 +27,7 @@ public class DeprecatedTypeReferenceVisitor : BaseSchemaNodeVisitor
     /// Internal list of violations found during schema traversal.
     /// Each violation represents a non-deprecated field that references a deprecated type.
     /// </summary>
-    protected readonly List<string> Violations = new();
+    protected readonly List<string> Violations = [];
 
     /// <inheritdoc/>
     public override void PostVisitSchema(ISchema schema)

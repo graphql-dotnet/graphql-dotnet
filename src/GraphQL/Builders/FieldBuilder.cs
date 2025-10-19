@@ -340,7 +340,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
             Name = name,
         };
         configure?.Invoke(arg);
-        FieldType.Arguments ??= new();
+        FieldType.Arguments ??= [];
         FieldType.Arguments.Add(arg);
         return this;
     }
@@ -359,7 +359,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
             Name = name,
         };
         configure?.Invoke(arg);
-        FieldType.Arguments ??= new();
+        FieldType.Arguments ??= [];
         FieldType.Arguments.Add(arg);
         return this;
     }
@@ -375,7 +375,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         {
             foreach (var arg in arguments)
             {
-                FieldType.Arguments ??= new();
+                FieldType.Arguments ??= [];
                 FieldType.Arguments.Add(arg);
             }
         }

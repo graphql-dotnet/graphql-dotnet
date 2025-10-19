@@ -394,8 +394,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "x",
@@ -404,7 +404,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "a and b are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(2, 5));
@@ -440,8 +440,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "x",
@@ -458,7 +458,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "c and d are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(2, 5));
@@ -498,15 +498,15 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "deepField",
                                 Message = new OverlappingFieldsCanBeMerged.Message
                                 {
-                                    Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                                    {
+                                    Msgs =
+                                    [
                                         new OverlappingFieldsCanBeMerged.ConflictReason
                                         {
                                             Name = "x",
@@ -515,10 +515,10 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                                 Msg = "a and b are different fields"
                                             }
                                         }
-                                    }
+                                    ]
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(2, 5));
@@ -561,8 +561,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "x",
@@ -571,7 +571,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "a and b are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(3, 9));
@@ -620,8 +620,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "x",
@@ -630,7 +630,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "a and b are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(11, 9));
@@ -678,8 +678,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "x",
@@ -696,7 +696,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "c and d are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(2, 5));
@@ -960,8 +960,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "scalar",
@@ -970,7 +970,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "scalar and unrelatedField are different fields"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(30, 5));
@@ -1168,8 +1168,8 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                 {
                     Message = new OverlappingFieldsCanBeMerged.Message
                     {
-                        Msgs = new List<OverlappingFieldsCanBeMerged.ConflictReason>
-                        {
+                        Msgs =
+                        [
                             new OverlappingFieldsCanBeMerged.ConflictReason
                             {
                                 Name = "scalar",
@@ -1178,7 +1178,7 @@ public class OverlappingFieldsCanBeMergedTest : ValidationTestBase<OverlappingFi
                                     Msg = "they return conflicting types String and Int"
                                 }
                             }
-                        }
+                        ]
                     }
                 });
                 e.Locations.Add(new Location(4, 13));

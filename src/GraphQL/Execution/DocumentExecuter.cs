@@ -295,9 +295,9 @@ public class DocumentExecuter : IDocumentExecuter
             Variables = validationResult.Variables ?? Variables.None,
             ArgumentValues = validationResult.ArgumentValues,
             DirectiveValues = validationResult.DirectiveValues,
-            Errors = new ExecutionErrors(),
+            Errors = [],
             InputExtensions = options.Extensions ?? Inputs.Empty,
-            OutputExtensions = new Dictionary<string, object?>(),
+            OutputExtensions = [],
             CancellationToken = options.CancellationToken,
 
             Metrics = metrics,

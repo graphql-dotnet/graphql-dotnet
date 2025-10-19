@@ -82,24 +82,24 @@ public class GraphQLExtensionsTests
             yield return new object?[] { new NonNullGraphType(new BooleanGraphType()), false, new GraphQLFalseBooleanValue() };
 
             yield return new object?[] { new ListGraphType(new BooleanGraphType()), null, new GraphQLNullValue() };
-            yield return new object?[] { new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue() } } };
-            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, new GraphQLListValue { Values = new List<GraphQLValue> { new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue() } } };
+            yield return new object?[] { new ListGraphType(new BooleanGraphType()), new object?[] { true, false, null }, new GraphQLListValue { Values = [new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLNullValue()] } };
+            yield return new object?[] { new ListGraphType(new NonNullGraphType(new BooleanGraphType())), new object?[] { true, false, true }, new GraphQLListValue { Values = [new GraphQLTrueBooleanValue(), new GraphQLFalseBooleanValue(), new GraphQLTrueBooleanValue()] } };
 
             yield return new object?[] { new InputObjectGraphType<Person>(), null, new GraphQLNullValue() };
             yield return new object?[] { new PersonInputType(), new Person { Name = "Tom", Age = 42 }, new GraphQLObjectValue
             {
-                Fields = new List<GraphQLObjectField>
-                {
+                Fields =
+                [
                     new GraphQLObjectField(new GraphQLName("Name"), new GraphQLStringValue("Tom")),
                     new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(42))
-                }
+                ]
             } };
             yield return new object?[] { new PersonInputType(), new Person { }, new GraphQLObjectValue
             {
-                Fields = new List<GraphQLObjectField>
-                {
+                Fields =
+                [
                     new GraphQLObjectField(new GraphQLName("Age"), new GraphQLIntValue(0))
-                }
+                ]
             } };
 
             yield return new object?[] { new ListGraphType(new BooleanGraphType()), true, new GraphQLTrueBooleanValue() };

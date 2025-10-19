@@ -32,7 +32,7 @@ public sealed class RemovePrivateTypesAndFieldsVisitor : BaseSchemaNodeVisitor
         foreach (var pair in schema.AllTypes.Dictionary)
         {
             if (pair.Value.IsPrivate)
-                (typesToRemove ??= new()).Add(pair.Key);
+                (typesToRemove ??= []).Add(pair.Key);
         }
         if (typesToRemove != null)
         {
