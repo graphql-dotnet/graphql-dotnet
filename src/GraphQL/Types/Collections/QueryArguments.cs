@@ -69,7 +69,7 @@ public class QueryArguments : IEnumerable<QueryArgument>
 
         NameValidator.ValidateName(argument.Name, NamedElement.Argument);
 
-        (List ??= new()).Add(argument);
+        (List ??= []).Add(argument);
     }
 
     /// <summary>

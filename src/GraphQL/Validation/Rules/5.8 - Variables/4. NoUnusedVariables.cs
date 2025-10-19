@@ -32,7 +32,7 @@ public class NoUnusedVariables : ValidationRuleBase
     private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
         new MatchingNodeVisitor<GraphQLVariableDefinition>((def, context) =>
         {
-            var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= new();
+            var varDefs = context.TypeInfo.NoUnusedVariables_VariableDefs ??= [];
             varDefs.Add(def);
         }),
 

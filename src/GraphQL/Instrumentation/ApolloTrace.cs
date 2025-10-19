@@ -83,7 +83,7 @@ public class ApolloTrace
         /// <summary>
         /// Returns a list of resolvers executed during the execution of a GraphQL document.
         /// </summary>
-        public List<ResolverTrace> Resolvers { get; } = new List<ResolverTrace>();
+        public List<ResolverTrace> Resolvers { get; } = [];
     }
 
     /// <summary>

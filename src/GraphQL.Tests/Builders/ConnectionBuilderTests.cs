@@ -140,8 +140,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                         StartCursor = "01",
                         EndCursor = "01",
                     },
-                    Edges = new List<Edge<Child>>
-                    {
+                    Edges =
+                    [
                         new Edge<Child>
                         {
                             Cursor = "01",
@@ -150,7 +150,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                                 Field1 = "abcd",
                             },
                         },
-                    },
+                    ],
                 });
 
         var field = type.Fields.Single();
@@ -189,8 +189,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 StartCursor = "01",
                 EndCursor = "01",
             },
-            Edges = new List<Edge<Child>>
-            {
+            Edges =
+            [
                 new Edge<Child>
                 {
                     Cursor = "01",
@@ -199,7 +199,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                         Field1 = "abcd",
                     },
                 },
-            },
+            ],
         };
         type.Connection<ObjectGraphType>("testConnection")
             .ResolveAsync(_ => Task.FromResult<object?>(connection));
@@ -241,8 +241,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 StartCursor = "01",
                 EndCursor = "01",
             },
-            Edges = new List<ParentChildrenEdge>
-            {
+            Edges =
+            [
                 new ParentChildrenEdge
                 {
                     Cursor = "01",
@@ -252,7 +252,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                     },
                     FriendedAt = FriendedAt
                 },
-            },
+            ],
         };
         type.Connection<ChildType, ParentChildrenEdgeType>("testConnection")
             .ResolveAsync(_ => Task.FromResult<object?>(connection));
@@ -295,8 +295,8 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                 StartCursor = "01",
                 EndCursor = "01",
             },
-            Edges = new List<ParentChildrenEdge>
-            {
+            Edges =
+            [
                 new ParentChildrenEdge
                 {
                     Cursor = "01",
@@ -327,7 +327,7 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                     },
                     FriendedAt = FriendedAt
                 },
-            },
+            ],
             ConnectionField1 = ConnectionField1Value
         };
         type.Connection<ChildType, ParentChildrenEdgeType, ParentChildrenConnectionType>("testConnection")
@@ -489,12 +489,12 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                     StartCursor = "1",
                     EndCursor = "3",
                 },
-                Edges = new List<Edge<Child>>
-                {
+                Edges =
+                [
                     new Edge<Child> { Cursor = "1", Node = new Child { Field1 = "one", Field2 = 1 } },
                     new Edge<Child> { Cursor = "2", Node = new Child { Field1 = "two", Field2 = 2 } },
                     new Edge<Child> { Cursor = "3", Node = new Child { Field1 = "three", Field2 = 3 } },
-                }
+                ]
             };
             Connection2 = new Connection<Child>
             {
@@ -506,10 +506,10 @@ public class ConnectionBuilderTests : QueryTestBase<ConnectionBuilderTests.TestS
                     StartCursor = "2",
                     EndCursor = "2",
                 },
-                Edges = new List<Edge<Child>>
-                {
+                Edges =
+                [
                     new Edge<Child> { Cursor = "2", Node = new Child { Field1 = "TWO", Field2 = 22 } },
-                }
+                ]
             };
         }
 

@@ -157,8 +157,8 @@ public class SubscriptionExecutionStrategy : ExecutionStrategy
     /// </summary>
     protected virtual ExecutionContext CloneExecutionContext(ExecutionContext context, CancellationToken token) => new(context)
     {
-        Errors = new ExecutionErrors(),
-        OutputExtensions = new Dictionary<string, object?>(),
+        Errors = [],
+        OutputExtensions = [],
         Metrics = Instrumentation.Metrics.None,
         CancellationToken = token,
     };

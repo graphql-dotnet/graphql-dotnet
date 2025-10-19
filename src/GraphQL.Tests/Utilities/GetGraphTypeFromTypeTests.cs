@@ -342,10 +342,10 @@ public class GetGraphTypeFromTypeTests
         };
         var directive = new Directive("MyDirective")
         {
-            Arguments = new QueryArguments
-            {
+            Arguments =
+            [
                 new QueryArgument(referenceType) { Name = "arg" }
-            }
+            ]
         };
         directive.Locations.Add(DirectiveLocation.Field);
         schema.Directives.Register(directive);

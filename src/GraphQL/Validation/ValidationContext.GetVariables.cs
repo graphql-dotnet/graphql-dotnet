@@ -7,7 +7,7 @@ namespace GraphQL.Validation;
 public partial class ValidationContext
 {
     private static readonly GetVariablesVisitor _getVariablesVisitor = new();
-    private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>?> _variables = new();
+    private readonly Dictionary<GraphQLOperationDefinition, List<VariableUsage>?> _variables = [];
 
     /// <summary>
     /// For a node with a selection set, returns a list of variable references along with what input type each were referenced for.

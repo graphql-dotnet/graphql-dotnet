@@ -46,14 +46,14 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
     }
 
     /// <inheritdoc/>
-    public PossibleTypes PossibleTypes { get; } = new PossibleTypes();
+    public PossibleTypes PossibleTypes { get; } = [];
 
-    private List<Type> _types = new();
+    private List<Type> _types = [];
     /// <inheritdoc cref="PossibleTypes"/>
     public IEnumerable<Type> Types
     {
         get => _types;
-        set => _types = new(value);
+        set => _types = [.. value];
     }
 
     /// <inheritdoc/>
@@ -70,10 +70,10 @@ public class InterfaceGraphType<[NotAGraphType] TSource> : ComplexGraphType<TSou
     }
 
     /// <inheritdoc/>
-    public Interfaces Interfaces { get; } = new Interfaces();
+    public Interfaces Interfaces { get; } = [];
 
     /// <inheritdoc/>
-    public ResolvedInterfaces ResolvedInterfaces { get; } = new ResolvedInterfaces();
+    public ResolvedInterfaces ResolvedInterfaces { get; } = [];
 
     /// <inheritdoc/>
     public void AddPossibleType(IObjectGraphType type)

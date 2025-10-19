@@ -68,7 +68,7 @@ public class ExecutionError : Exception
     /// </summary>
     public void AddLocation(Location location)
     {
-        (Locations ??= new()).Add(location);
+        (Locations ??= []).Add(location);
     }
 
     private void SetCode(Exception? exception)
@@ -119,7 +119,7 @@ public static class ExecutionErrorExtensions
     public static TError AddExtension<TError>(this TError error, string key, object? value)
          where TError : ExecutionError
     {
-        (error.Extensions ??= new())[key] = value;
+        (error.Extensions ??= [])[key] = value;
         return error;
     }
 }

@@ -164,7 +164,7 @@ public class PersistedDocumentTests
         {
             Query = query,
             DocumentId = documentId,
-            Document = new(new()),
+            Document = new([]),
         };
         var expected = new ExecutionResult();
         var actual = await handler.ExecuteAsync(options, _ => Task.FromResult(expected));

@@ -112,7 +112,7 @@ public class ProgramStepConfig
 {
     public int SequenceOrder { get; set; }
     public int ProgramStepId { get; set; }
-    public System.Collections.Generic.List<ProgramPropertyValue> PropertyValues { get; set; } = new System.Collections.Generic.List<ProgramPropertyValue>();
+    public System.Collections.Generic.List<ProgramPropertyValue> PropertyValues { get; set; } = [];
     public int ProgramStepDefinitionId { get; set; }
 }
 

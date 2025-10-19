@@ -4,7 +4,7 @@ namespace GraphQL.Tests.Validation;
 
 public class ValidationErrorAssertion
 {
-    private readonly List<Location> _locations = new();
+    private readonly List<Location> _locations = [];
 
     public string Message { get; set; }
     public IList<Location> Locations => _locations;

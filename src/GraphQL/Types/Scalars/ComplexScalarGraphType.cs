@@ -138,7 +138,7 @@ public class ComplexScalarGraphType : ScalarGraphType
                 values = new(collection.Count);
             foreach (var item in list)
             {
-                (values ??= new()).Add(ToAST(item));
+                (values ??= []).Add(ToAST(item));
             }
             return new GraphQLListValue { Values = values };
         }

@@ -13,7 +13,7 @@ public class MetadataProvider : IMetadataReader, IMetadataWriter
     private Dictionary<string, object?>? _metadata;
 
     /// <inheritdoc />
-    public Dictionary<string, object?> Metadata => _metadata ??= new();
+    public Dictionary<string, object?> Metadata => _metadata ??= [];
 
     IMetadataReader IMetadataWriter.MetadataReader => this;
 

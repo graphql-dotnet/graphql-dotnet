@@ -620,7 +620,7 @@ public class ArgumentDefaultValuesTests : QueryTestBase<VariablesSchema>
 
         var expected = new ExecutionResult
         {
-            Errors = new ExecutionErrors { error },
+            Errors = [error],
         };
 
         AssertQueryIgnoreErrors(query, expected, renderErrors: true, expectedErrorCount: 1);

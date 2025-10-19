@@ -57,7 +57,7 @@ public static class AutoRegisteringHelper
 
     private static IList<LambdaExpression> BuildFieldResolver_BuildMethodArguments(MethodInfo methodInfo, Type? sourceType, FieldType? fieldType)
     {
-        List<LambdaExpression> expressions = new();
+        List<LambdaExpression> expressions = [];
         foreach (var parameterInfo in methodInfo.GetParameters())
         {
             var typeInformation = new TypeInformation(parameterInfo);

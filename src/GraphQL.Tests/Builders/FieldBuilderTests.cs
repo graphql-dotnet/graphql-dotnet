@@ -368,7 +368,7 @@ public class FieldBuilderTests
             .Argument<NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>>("episodes", c => c.ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(new StringGraphType()))))
             .Resolve(context =>
             {
-                context.GetArgument<Collection<string>>("episodes").ShouldBe(new Collection<string> { "JEDI", "EMPIRE" });
+                context.GetArgument<Collection<string>>("episodes").ShouldBe(["JEDI", "EMPIRE"]);
                 return null;
             });
 

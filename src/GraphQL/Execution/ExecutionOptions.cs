@@ -53,7 +53,7 @@ public class ExecutionOptions : IProvideUserContext
     public IDictionary<string, object?> UserContext { get; set; } = new Dictionary<string, object?>();
 
     /// <summary>A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query</summary>
-    public List<IDocumentExecutionListener> Listeners { get; } = new List<IDocumentExecutionListener>();
+    public List<IDocumentExecutionListener> Listeners { get; } = [];
 
     /// <summary>This setting essentially allows Apollo Tracing. Disabling will increase performance.</summary>
     public bool EnableMetrics { get; set; }

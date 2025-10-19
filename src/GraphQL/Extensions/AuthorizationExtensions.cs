@@ -114,7 +114,7 @@ public static class AuthorizationExtensions
         if (policy == null)
             throw new ArgumentNullException(nameof(policy));
 
-        var list = provider.MetadataReader.GetPolicies() ?? new List<string>();
+        var list = provider.MetadataReader.GetPolicies() ?? [];
 
         if (!list.Contains(policy))
             list.Add(policy);
@@ -144,7 +144,7 @@ public static class AuthorizationExtensions
         if (roles == null)
             throw new ArgumentNullException(nameof(roles));
 
-        var list = provider.MetadataReader.GetRoles() ?? new List<string>();
+        var list = provider.MetadataReader.GetRoles() ?? [];
 
         foreach (var role in roles.Split(','))
         {
@@ -177,7 +177,7 @@ public static class AuthorizationExtensions
         if (roles == null)
             throw new ArgumentNullException(nameof(roles));
 
-        var list = provider.MetadataReader.GetRoles() ?? new List<string>();
+        var list = provider.MetadataReader.GetRoles() ?? [];
 
         foreach (var role in roles)
         {

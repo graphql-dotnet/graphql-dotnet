@@ -108,7 +108,7 @@ public static class DirectivesExtensions
         var directive = new AppliedDirective(name);
         configure(directive);
 
-        var directives = provider.MetadataReader.GetAppliedDirectives() ?? new AppliedDirectives();
+        var directives = provider.MetadataReader.GetAppliedDirectives() ?? [];
         directives.Add(directive);
 
         provider.Metadata[DIRECTIVES_KEY] = directives;

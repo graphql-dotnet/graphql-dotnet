@@ -20,7 +20,7 @@ public class FuncFieldResolverTests
         _context = new ResolveFieldContext
         {
             Arguments = new Dictionary<string, ArgumentValue>(),
-            Errors = new ExecutionErrors(),
+            Errors = [],
             OutputExtensions = new Dictionary<string, object?>(),
         };
     }

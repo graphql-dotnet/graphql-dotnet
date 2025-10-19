@@ -10,7 +10,7 @@ namespace GraphQL.Utilities;
 /// </summary>
 public sealed class SchemaValidationVisitor : BaseSchemaNodeVisitor
 {
-    private readonly List<Exception> _exceptions = new();
+    private readonly List<Exception> _exceptions = [];
     private bool _hasFieldArgumentValidation;
 
     private SchemaValidationVisitor()

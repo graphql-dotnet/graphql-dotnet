@@ -55,7 +55,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
@@ -86,7 +86,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Data = new { hello2 = (object?)null }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Data = new { hello2 = (object?)null }, Executed = true });
 
     }
 
@@ -116,7 +116,7 @@ public class UnhandledExceptionTests : SchemaBuilderTestBase
                 }
                 return Task.CompletedTask;
             };
-        }, new ExecutionResult { Errors = new ExecutionErrors { expectedError }, Executed = true });
+        }, new ExecutionResult { Errors = [expectedError], Executed = true });
     }
 
     public class DocListener : DocumentExecutionListenerBase

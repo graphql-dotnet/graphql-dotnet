@@ -28,7 +28,7 @@ public sealed class RenameImportedDirectivesVisitor : BaseSchemaNodeVisitor
             var link = LinkConfiguration.GetConfiguration(appliedDirective);
             if (link == null)
                 continue;
-            links ??= new();
+            links ??= [];
             links.Add(link);
         }
 

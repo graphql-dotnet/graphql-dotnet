@@ -30,7 +30,7 @@ public partial class DocumentValidator
                         var directives = ExecutionHelper.GetDirectives(hasDirectivesNode, context.Variables, context.Schema, context.ValidationContext.Document);
                         if (directives != null)
                         {
-                            (context.DirectiveValues ??= new()).Add(node, directives);
+                            (context.DirectiveValues ??= []).Add(node, directives);
                         }
                     }
                     catch (ValidationError ex)
@@ -95,7 +95,7 @@ public partial class DocumentValidator
             // visit the fragment that this fragment spread references,
             // unless we already visited this fragment spread
             var fragmentName = fragmentSpread.FragmentName.Name.Value;
-            if ((context.VisitedFragments ??= new()).Add(fragmentName))
+            if ((context.VisitedFragments ??= []).Add(fragmentName))
             {
                 var definition = context.ValidationContext.Document.FindFragmentDefinition(fragmentName);
                 if (definition != null)
@@ -140,7 +140,7 @@ public partial class DocumentValidator
                     var arguments = ExecutionHelper.GetArguments(fieldDefinition.Arguments, field.Arguments, context.Variables, context.ValidationContext.Document, field, null);
                     if (arguments != null)
                     {
-                        (context.ArgumentValues ??= new()).Add(field, arguments);
+                        (context.ArgumentValues ??= []).Add(field, arguments);
                     }
                 }
                 catch (ValidationError ex)

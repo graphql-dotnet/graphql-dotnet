@@ -76,7 +76,7 @@ public abstract class ComplexGraphType<[NotAGraphType] TSourceType> : GraphType,
     }
 
     /// <inheritdoc/>
-    public TypeFields Fields { get; } = new();
+    public TypeFields Fields { get; } = [];
 
     /// <inheritdoc/>
     public bool HasField(string name)

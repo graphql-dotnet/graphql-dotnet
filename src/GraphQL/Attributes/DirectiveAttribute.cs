@@ -61,7 +61,7 @@ public class DirectiveAttribute : GraphQLAttribute
     /// <summary>
     /// The arguments to the directive.
     /// </summary>
-    public Dictionary<string, object?> Arguments = new();
+    public Dictionary<string, object?> Arguments = [];
 
     /// <inheritdoc/>
     public override void Modify(TypeConfig type) => type.ApplyDirective(Name, ApplyDirectives);

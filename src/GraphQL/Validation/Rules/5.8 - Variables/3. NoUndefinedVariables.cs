@@ -31,7 +31,7 @@ public class NoUndefinedVariables : ValidationRuleBase
     private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
         new MatchingNodeVisitor<GraphQLVariableDefinition>((varDef, context) =>
         {
-            var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= new();
+            var varNameDef = context.TypeInfo.NoUndefinedVariables_VariableNameDefined ??= [];
             varNameDef.Add(varDef.Variable.Name);
         }),
 

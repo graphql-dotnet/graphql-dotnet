@@ -103,7 +103,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nonNullableDataGraph { listOfNonNullable } }";
         const string EXPECTED = """{ "nonNullableDataGraph": { "listOfNonNullable": null } }""";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'listOfNonNullable'.", new InvalidOperationException(
@@ -163,7 +163,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nullableDataGraph { nonNullableListOfNonNullable } }";
         const string EXPECTED = """{ "nullableDataGraph": null }""";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullable'.", new InvalidOperationException(
@@ -205,7 +205,7 @@ public class BubbleUpTheNullToNextNullable : QueryTestBase<BubbleNullSchema>
     {
         const string QUERY = "{ nonNullableListOfNonNullableDataGraph { nonNullableListOfNonNullableThrow } }";
         const string EXPECTED = "";
-        var data = new Data { ListOfStrings = new List<string?> { "text", null, null } };
+        var data = new Data { ListOfStrings = ["text", null, null] };
         var errors = new[]
         {
             new ExecutionError("Error trying to resolve field 'nonNullableListOfNonNullableThrow'.", new Exception(

@@ -27,8 +27,8 @@ public class ParallelExecutionStrategy : ExecutionStrategy
         pendingNodes.Enqueue(rootNode);
         var pendingDataLoaders = Interlocked.Exchange(ref _reusablePendingDataLoaders, null) ?? new Queue<ExecutionNode>();
 
-        var currentTasks = Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? new List<Task>();
-        var currentNodes = Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? new List<ExecutionNode>();
+        var currentTasks = Interlocked.Exchange(ref _reusableCurrentTasks, null) ?? [];
+        var currentNodes = Interlocked.Exchange(ref _reusableCurrentNodes, null) ?? [];
 
         try
         {

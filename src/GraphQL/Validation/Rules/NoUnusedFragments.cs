@@ -32,7 +32,7 @@ public class NoUnusedFragments : ValidationRuleBase
 
     private static readonly INodeVisitor _nodeVisitor = new NodeVisitors(
         new MatchingNodeVisitor<GraphQLOperationDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_OperationDefs ??= new(1)).Add(node)),
-        new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= new()).Add(node)),
+        new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) => (context.TypeInfo.NoUnusedFragments_FragmentDefs ??= []).Add(node)),
         new MatchingNodeVisitor<GraphQLDocument>(leave: (document, context) =>
         {
             var fragmentDefs = context.TypeInfo.NoUnusedFragments_FragmentDefs;

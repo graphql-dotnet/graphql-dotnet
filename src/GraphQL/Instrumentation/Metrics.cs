@@ -24,7 +24,7 @@ public class Metrics
     {
         Enabled = enabled;
         if (enabled)
-            _records = new List<PerfRecord>();
+            _records = [];
     }
 
     /// <summary>

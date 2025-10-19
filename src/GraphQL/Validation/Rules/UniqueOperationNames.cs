@@ -36,7 +36,7 @@ public class UniqueOperationNames : ValidationRuleBase
             return;
         }
 
-        var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= new();
+        var frequency = context.TypeInfo.UniqueOperationNames_Frequency ??= [];
 
         if (!frequency.Add(op.Name))
         {

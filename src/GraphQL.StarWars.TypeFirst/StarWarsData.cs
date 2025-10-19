@@ -5,7 +5,7 @@ namespace GraphQL.StarWars.TypeFirst;
 
 public class StarWarsData
 {
-    private readonly List<IStarWarsCharacter> _characters = new();
+    private readonly List<IStarWarsCharacter> _characters = [];
 
     public StarWarsData()
     {
@@ -13,7 +13,7 @@ public class StarWarsData
         {
             Id = "1",
             Name = "Luke",
-            Friends = new List<string> { "3", "4" },
+            Friends = ["3", "4"],
             AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
             HomePlanet = "Tatooine",
             Cursor = "MQ=="
@@ -31,7 +31,7 @@ public class StarWarsData
         {
             Id = "3",
             Name = "R2-D2",
-            Friends = new List<string> { "1", "4" },
+            Friends = ["1", "4"],
             AppearsIn = new[] { Episodes.NEWHOPE, Episodes.EMPIRE, Episodes.JEDI },
             PrimaryFunction = "Astromech",
             Cursor = "Mw=="

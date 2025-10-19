@@ -13,21 +13,21 @@ public class SchemaExporter
     /// </summary>
     protected ISchema Schema { get; }
 
-    private static readonly HashSet<string> _builtInScalars = new()
-    {
+    private static readonly HashSet<string> _builtInScalars =
+    [
         "String",
         "Boolean",
         "Int",
         "Float",
         "ID",
-    };
+    ];
 
-    private static readonly HashSet<string> _builtInDirectives = new()
-    {
+    private static readonly HashSet<string> _builtInDirectives =
+    [
         "skip",
         "include",
         "deprecated",
-    };
+    ];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SchemaExporter"/> class for the specified <see cref="ISchema"/>.

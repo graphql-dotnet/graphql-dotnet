@@ -30,7 +30,7 @@ public class VariablesInAllowedPosition : ValidationRuleBase
         new MatchingNodeVisitor<GraphQLVariableDefinition>(
             (varDefAst, context) =>
             {
-                var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= new();
+                var varDefMap = context.TypeInfo.VariablesInAllowedPosition_VarDefMap ??= [];
                 varDefMap[varDefAst.Variable.Name] = varDefAst;
             }
         ),

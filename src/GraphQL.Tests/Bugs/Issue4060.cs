@@ -119,7 +119,7 @@ public class Issue4060
 
         private class MyVisitor : INodeVisitor
         {
-            private readonly Dictionary<GraphQLField, FieldType> _fields = new();
+            private readonly Dictionary<GraphQLField, FieldType> _fields = [];
 
             public ValueTask EnterAsync(ASTNode node, ValidationContext context)
             {
