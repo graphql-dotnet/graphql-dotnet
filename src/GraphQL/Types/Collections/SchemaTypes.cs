@@ -514,7 +514,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
                     if (middleware != null)
                     {
                         // Wrap the resolver with field-specific middleware
-                        var fieldMiddlewareWrapped = (FieldMiddlewareDelegate)(ctx => middleware.ResolveAsync(ctx, inner.ResolveAsync));
+                        FieldMiddlewareDelegate fieldMiddlewareWrapped = ctx => middleware.ResolveAsync(ctx, inner.ResolveAsync);
 
                         // Then apply schema-wide middleware if present
                         fieldMiddlewareDelegate = transform != null ? transform(fieldMiddlewareWrapped) : fieldMiddlewareWrapped;
