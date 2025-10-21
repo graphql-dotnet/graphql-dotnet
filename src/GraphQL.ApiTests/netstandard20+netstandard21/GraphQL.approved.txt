@@ -1531,10 +1531,10 @@ namespace GraphQL.Execution
         public RequestError(string message) { }
         public RequestError(string message, System.Exception? innerException) { }
     }
-    public class ResolveFieldContextAccessor : GraphQL.Execution.IResolveFieldContextAccessor
+    public sealed class ResolveFieldContextAccessor : GraphQL.Execution.IResolveFieldContextAccessor
     {
-        public ResolveFieldContextAccessor() { }
         public GraphQL.IResolveFieldContext Context { get; set; }
+        public static GraphQL.Execution.ResolveFieldContextAccessor Instance { get; }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
