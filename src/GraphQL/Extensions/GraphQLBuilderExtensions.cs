@@ -662,7 +662,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddResolveFieldContextAccessor(this IGraphQLBuilder builder)
     {
         // Register the accessor as a singleton
-        builder.Services.TryRegister<IResolveFieldContextAccessor, ResolveFieldContextAccessor>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IResolveFieldContextAccessor>(ResolveFieldContextAccessor.Instance);
 
         // Configure the schema to use the accessor
         builder.ConfigureSchema<ConfigureResolveFieldContextAccessor>();

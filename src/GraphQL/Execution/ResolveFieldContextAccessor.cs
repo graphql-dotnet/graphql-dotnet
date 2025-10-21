@@ -6,9 +6,15 @@ namespace GraphQL.Execution;
 /// Default implementation of <see cref="IResolveFieldContextAccessor"/> that uses <see cref="AsyncLocal{T}"/>
 /// to store the current <see cref="IResolveFieldContext"/>.
 /// </summary>
-public class ResolveFieldContextAccessor : IResolveFieldContextAccessor
+public sealed class ResolveFieldContextAccessor : IResolveFieldContextAccessor
 {
     private static readonly AsyncLocal<IResolveFieldContext?> _context = new();
+    private ResolveFieldContextAccessor() { }
+
+    /// <summary>
+    /// Singleton instance of the <see cref="ResolveFieldContextAccessor"/>.
+    /// </summary>
+    public static ResolveFieldContextAccessor Instance { get; } = new();
 
     /// <inheritdoc/>
     [AllowNull]

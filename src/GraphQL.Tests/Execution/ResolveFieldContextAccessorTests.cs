@@ -136,7 +136,7 @@ public class ResolveFieldContextAccessorTests
     public void ContextAccessor_OutsideExecution_ReturnsNull()
     {
         // Arrange
-        var accessor = new ResolveFieldContextAccessor();
+        var accessor = ResolveFieldContextAccessor.Instance;
 
         // Act & Assert
         Should.Throw<InvalidOperationException>(() =>

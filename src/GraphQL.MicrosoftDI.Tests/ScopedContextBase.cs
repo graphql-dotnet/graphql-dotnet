@@ -1,4 +1,5 @@
 using GraphQL.Builders;
+using GraphQL.Execution;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -17,6 +18,7 @@ public class ScopedContextBase
     public ScopedContextBase()
     {
         _scopedServiceProviderMock = new Mock<IServiceProvider>(MockBehavior.Strict);
+        _scopedServiceProviderMock.Setup(x => x.GetService(It.Is<Type>(t => t == typeof(IResolveFieldContextAccessor)))).Returns<Type>(null!);
         _scopedServiceProvider = _scopedServiceProviderMock.Object;
         _scopedServiceScopeMock = new Mock<IServiceScope>(MockBehavior.Strict);
         _scopedServiceScopeMock.Setup(x => x.ServiceProvider).Returns(_scopedServiceProvider).Verifiable();
