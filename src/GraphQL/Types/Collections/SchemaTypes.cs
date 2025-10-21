@@ -488,11 +488,8 @@ public class SchemaTypes : IEnumerable<IGraphType>
     {
         var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
 
-        // allocation free optimization if no middlewares are defined
-        if (transform != null)
-        {
-            ApplyMiddleware(transform);
-        }
+        // Always call ApplyMiddleware to handle field-specific middleware even when no schema middleware is defined
+        ApplyMiddleware(transform);
     }
 
     /// <summary>
@@ -501,11 +498,8 @@ public class SchemaTypes : IEnumerable<IGraphType>
     /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
     /// Therefore, as a rule, this method should be called only once - during schema initialization.
     /// </summary>
-    public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
+    public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? transform)
     {
-        if (transform == null)
-            throw new ArgumentNullException(nameof(transform));
-
         foreach (var item in Dictionary)
         {
             if (item.Value is IObjectGraphType obj)
@@ -514,7 +508,27 @@ public class SchemaTypes : IEnumerable<IGraphType>
                 {
                     var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
 
-                    var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
+                    // Apply field-specific middleware first, then schema-wide middleware
+                    FieldMiddlewareDelegate fieldMiddlewareDelegate;
+                    var middleware = field.Middleware;
+                    if (middleware != null)
+                    {
+                        // Wrap the resolver with field-specific middleware
+                        var fieldMiddlewareWrapped = (FieldMiddlewareDelegate)(ctx => middleware.ResolveAsync(ctx, inner.ResolveAsync));
+
+                        // Then apply schema-wide middleware if present
+                        fieldMiddlewareDelegate = transform != null ? transform(fieldMiddlewareWrapped) : fieldMiddlewareWrapped;
+                    }
+                    else if (transform != null)
+                    {
+                        // Only schema-wide middleware
+                        fieldMiddlewareDelegate = transform(inner.ResolveAsync);
+                    }
+                    else
+                    {
+                        // No middleware at all, skip this field
+                        continue;
+                    }
 
                     field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
                 }

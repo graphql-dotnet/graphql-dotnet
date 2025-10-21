@@ -15,14 +15,13 @@ public class ScopedAttribute : GraphQLAttribute
         if (isInputType)
             return;
 
-        if (fieldType.Resolver != null)
-        {
-            fieldType.Resolver = new DynamicScopedFieldResolver(fieldType.Resolver);
-        }
+        // Apply scoped middleware to the field
+        fieldType.Middleware = fieldType.Middleware == null && fieldType.Middleware is not ScopedFieldMiddleware
+            ? ScopedFieldMiddleware.Instance
+            : new ScopedFieldMiddleware(fieldType.Middleware);
 
-        if (fieldType.StreamResolver != null)
-        {
+        // Wrap the stream resolver, if any, to create a scope for subscriptions
+        if (fieldType.StreamResolver != null && fieldType.StreamResolver is not DynamicScopedSourceStreamResolver)
             fieldType.StreamResolver = new DynamicScopedSourceStreamResolver(fieldType.StreamResolver);
-        }
     }
 }

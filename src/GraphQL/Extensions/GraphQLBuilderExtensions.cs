@@ -652,6 +652,33 @@ public static class GraphQLBuilderExtensions // TODO: split
     }
     #endregion
 
+    #region - AddResolveFieldContextAccessor -
+    /// <summary>
+    /// Enables the <see cref="IResolveFieldContextAccessor"/> feature, which allows user code to retrieve
+    /// the current <see cref="IResolveFieldContext"/> during field resolution. This is similar to
+    /// <c>IHttpContextAccessor</c> in ASP.NET Core. Registers <see cref="IResolveFieldContextAccessor"/>
+    /// as a singleton and configures the schema to populate the accessor during field execution.
+    /// </summary>
+    public static IGraphQLBuilder AddResolveFieldContextAccessor(this IGraphQLBuilder builder)
+    {
+        // Register the accessor as a singleton
+        builder.Services.TryRegister<IResolveFieldContextAccessor, ResolveFieldContextAccessor>(ServiceLifetime.Singleton);
+
+        // Configure the schema to use the accessor
+        builder.ConfigureSchema<ConfigureResolveFieldContextAccessor>();
+
+        return builder;
+    }
+
+    private sealed class ConfigureResolveFieldContextAccessor : IConfigureSchema
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider)
+        {
+            ((Schema)schema).ResolveFieldContextAccessor = serviceProvider.GetRequiredService<IResolveFieldContextAccessor>();
+        }
+    }
+    #endregion
+
     #region - UseMiddleware -
     /// <summary>
     /// Registers <typeparamref name="TMiddleware"/> with the dependency injection framework as both <typeparamref name="TMiddleware"/> and

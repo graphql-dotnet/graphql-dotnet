@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -488,4 +489,47 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
+
+    /// <summary>
+    /// Applies middleware to the field. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="middleware">The middleware to apply.</param>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
+    {
+        if (middleware == null)
+            throw new ArgumentNullException(nameof(middleware));
+
+        if (FieldType.Middleware == null)
+        {
+            FieldType.Middleware = middleware;
+        }
+        else
+        {
+            // Chain the middleware
+            FieldType.Middleware = new ChainedFieldMiddleware(FieldType.Middleware, middleware);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Internal middleware implementation that chains two middleware instances together.
+    /// </summary>
+    private class ChainedFieldMiddleware : IFieldMiddleware
+    {
+        private readonly IFieldMiddleware _first;
+        private readonly IFieldMiddleware _second;
+
+        public ChainedFieldMiddleware(IFieldMiddleware first, IFieldMiddleware second)
+        {
+            _first = first;
+            _second = second;
+        }
+
+        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+        {
+            return _first.ResolveAsync(context, ctx => _second.ResolveAsync(ctx, next));
+        }
+    }
 }

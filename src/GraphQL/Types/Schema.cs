@@ -2,8 +2,10 @@ using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
+using GraphQL.Resolvers;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
 using GraphQLParser.AST;
@@ -168,6 +170,13 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
+
+    /// <summary>
+    /// Gets or sets the <see cref="IResolveFieldContextAccessor"/> instance to be used for populating
+    /// the current field context during execution. When set, middleware will be automatically applied
+    /// to all fields to populate the accessor.
+    /// </summary>
+    public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
 
     /// <inheritdoc/>
     public bool Initialized { get; private set; }
@@ -466,6 +475,34 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         {
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
+
+            // Wrap resolvers with context accessor if configured
+            if (ResolveFieldContextAccessor != null)
+            {
+                foreach (var type in _allTypes.Dictionary) // allocation-free enumeration
+                {
+                    // only apply to object graph types, as only they have fields with resolvers
+                    if (type.Value is IObjectGraphType objectGraphType)
+                    {
+                        // iterate all fields of the object graph type
+                        foreach (var field in objectGraphType.Fields.List) // allocation-free enumeration
+                        {
+                            // only wrap fields that have a custom resolver, as default resolvers do not need the context accessor
+                            if (field.Resolver != null && field.Resolver != NameFieldResolver.Instance && field.Resolver != SourceFieldResolver.Instance)
+                            {
+                                field.Resolver = new ResolveFieldContextAccessorResolver(ResolveFieldContextAccessor, field.Resolver);
+                            }
+
+                            // also wrap stream resolvers if present
+                            if (field.StreamResolver != null)
+                            {
+                                field.StreamResolver = new ResolveFieldContextAccessorStreamResolver(ResolveFieldContextAccessor, field.StreamResolver);
+                            }
+                        }
+                    }
+                }
+            }
+
             _allTypes.ApplyMiddleware(FieldMiddleware);
 
             foreach (var visitor in GetVisitors())

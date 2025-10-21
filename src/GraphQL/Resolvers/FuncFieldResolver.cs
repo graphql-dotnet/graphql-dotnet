@@ -107,7 +107,7 @@ public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
                 {
                     adapter.Set(context);
                 }
-                var ret = resolver(adapter);
+                object? ret = resolver(adapter);
                 // only re-use contexts that do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
                 if (CanReuseContextForValue(ret))
                 {

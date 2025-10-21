@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Utilities;
 using GraphQL.Validation;
@@ -92,6 +93,11 @@ public class FieldType : MetadataProvider, IFieldType
     /// Gets or sets a subscription resolver for the field. Only applicable to the root fields of subscription.
     /// </summary>
     public ISourceStreamResolver? StreamResolver { get; set; }
+
+    /// <summary>
+    /// Gets or sets field middleware for the field. Only applicable to fields of output graph types.
+    /// </summary>
+    public IFieldMiddleware? Middleware { get; set; }
 
     /// <summary>
     /// Parses the value received from the client when the value is not <see langword="null"/>.

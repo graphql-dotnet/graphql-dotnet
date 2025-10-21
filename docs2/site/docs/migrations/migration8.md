@@ -1483,6 +1483,79 @@ public class MySchema : Schema
 
 This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
 
+### 36. Field-specific middleware support (v8.7.0+)
+
+GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property. This allows middleware to be applied to individual fields rather than only globally across all fields in the schema. Field middleware is collapsed into the field's resolver during schema initialization for optimal performance.
+
+You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
+
+```csharp
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("myField")
+            .Resolve(context => "Hello World")
+            .ApplyMiddleware(async (context, next) =>
+            {
+                // Code before resolver execution
+                var result = await next(context);
+                // Code after resolver execution
+                return result;
+            });
+    }
+}
+```
+
+Multiple middleware can be chained together on a single field, and they will be executed in the order they were applied:
+
+```csharp
+Field<StringGraphType>("myField")
+    .Resolve(context => "Hello World")
+    .ApplyMiddleware(loggingMiddleware)
+    .ApplyMiddleware(authorizationMiddleware)
+    .ApplyMiddleware(cachingMiddleware);
+```
+
+The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping the resolver directly. This provides better composability and allows scoped services to work seamlessly with other middleware.
+
+### 37. `IResolveFieldContextAccessor` for accessing current field context (v8.7.0+)
+
+An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext` from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when you need to access the current field resolution context from services or other code that doesn't have direct access to the context parameter.
+
+To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddResolveFieldContextAccessor()
+);
+```
+
+Then inject `IResolveFieldContextAccessor` into your services:
+
+```csharp
+public class MyService
+{
+    private readonly IResolveFieldContextAccessor _contextAccessor;
+
+    public MyService(IResolveFieldContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
+    public string GetCurrentFieldName()
+    {
+        var context = _contextAccessor.ResolveFieldContext;
+        return context.FieldDefinition.Name;
+    }
+}
+```
+
+The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and proper context isolation across concurrent requests. The context is automatically populated during field resolution and cleared after the resolver completes.
+
+**Note:** The context accessor adds a small performance overhead as middleware must be applied to every field in the schema. Only enable it if you need to access the context from services or other code that doesn't have direct access to the resolver's context parameter.
+
 ## Breaking Changes
 
 ### 1. Query type is required

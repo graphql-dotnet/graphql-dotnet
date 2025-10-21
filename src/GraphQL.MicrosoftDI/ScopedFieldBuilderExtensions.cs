@@ -10,17 +10,36 @@ namespace GraphQL.MicrosoftDI;
 public static class ScopedFieldBuilderExtensions
 {
     /// <summary>
+    /// Applies scoped middleware to the field. A dependency injection scope is created for the duration of the field resolver's execution
+    /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
+    /// </summary>
+    [AllowedOn<IObjectGraphType>]
+    internal static FieldBuilder<TSourceType, TReturnType> Scoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
+    {
+        // Apply scoped middleware to the field
+        builder.FieldType.Middleware = builder.FieldType.Middleware == null && builder.FieldType.Middleware is not ScopedFieldMiddleware
+            ? ScopedFieldMiddleware.Instance
+            : new ScopedFieldMiddleware(builder.FieldType.Middleware);
+
+        // Wrap the stream resolver, if any, to create a scope for subscriptions
+        if (builder.FieldType.StreamResolver != null && builder.FieldType.StreamResolver is not DynamicScopedSourceStreamResolver)
+            builder.FieldType.StreamResolver = new DynamicScopedSourceStreamResolver(builder.FieldType.StreamResolver);
+
+        return builder;
+    }
+
+    /// <summary>
     /// Sets the resolver for the field. A dependency injection scope is created for the duration of the resolver's execution
     /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
     /// </summary>
     [AllowedOn<IObjectGraphType>]
     public static FieldBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
-        => builder.Resolve(new ScopedFieldResolver<TSourceType, TReturnType>(resolver));
+        => builder.Resolve(resolver).Scoped();
 
     /// <inheritdoc cref="ResolveScoped{TSourceType, TReturnType}(FieldBuilder{TSourceType, TReturnType}, Func{IResolveFieldContext{TSourceType}, TReturnType})"/>
     [AllowedOn<IObjectGraphType>]
     public static FieldBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder, Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolver)
-        => builder.Resolve(new ScopedFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolver(context))));
+        => builder.ResolveAsync(resolver).Scoped();
 
     /// <summary>
     /// Creates a resolve builder for the field.
