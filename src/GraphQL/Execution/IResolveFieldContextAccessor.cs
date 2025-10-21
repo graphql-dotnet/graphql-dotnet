@@ -11,6 +11,5 @@ public interface IResolveFieldContextAccessor
     /// Returns <see langword="null"/> if no field is currently being resolved or if
     /// <see cref="Types.Schema.ResolveFieldContextAccessor"/> is not enabled.
     /// </summary>
-    [AllowNull]
-    public IResolveFieldContext Context { get; set; }
+    public IResolveFieldContext? Context { get; set; }
 }

@@ -1521,7 +1521,7 @@ namespace GraphQL.Execution
     }
     public interface IResolveFieldContextAccessor
     {
-        GraphQL.IResolveFieldContext Context { get; set; }
+        GraphQL.IResolveFieldContext? Context { get; set; }
     }
     [System.Serializable]
     public class InvalidOperationError : GraphQL.Execution.DocumentError
@@ -1575,7 +1575,7 @@ namespace GraphQL.Execution
     }
     public sealed class ResolveFieldContextAccessor : GraphQL.Execution.IResolveFieldContextAccessor
     {
-        public GraphQL.IResolveFieldContext Context { get; set; }
+        public GraphQL.IResolveFieldContext? Context { get; set; }
         public static GraphQL.Execution.ResolveFieldContextAccessor Instance { get; }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode

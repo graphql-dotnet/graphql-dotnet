@@ -37,10 +37,7 @@ public class ResolveFieldContextAccessorTests
             """);
 
         // Context should be null after execution completes
-        Should.Throw<InvalidOperationException>(() =>
-        {
-            var _ = accessor.Context;
-        });
+        accessor.Context.ShouldBeNull();
     }
 
     [Fact]
@@ -139,10 +136,7 @@ public class ResolveFieldContextAccessorTests
         var accessor = ResolveFieldContextAccessor.Instance;
 
         // Act & Assert
-        Should.Throw<InvalidOperationException>(() =>
-        {
-            var _ = accessor.Context;
-        });
+        accessor.Context.ShouldBeNull();
     }
 
     [Fact]

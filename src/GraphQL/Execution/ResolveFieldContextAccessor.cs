@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace GraphQL.Execution;
 
 /// <summary>
@@ -17,17 +15,9 @@ public sealed class ResolveFieldContextAccessor : IResolveFieldContextAccessor
     public static ResolveFieldContextAccessor Instance { get; } = new();
 
     /// <inheritdoc/>
-    [AllowNull]
-    public IResolveFieldContext Context
+    public IResolveFieldContext? Context
     {
-        get => _context.Value ?? ThrowNoContext();
+        get => _context.Value;
         set => _context.Value = value;
-    }
-
-    [DoesNotReturn]
-    [StackTraceHidden]
-    private static IResolveFieldContext ThrowNoContext()
-    {
-        throw new InvalidOperationException("No IResolveFieldContext is currently set. Ensure that Schema.ResolveFieldContextAccessor is set and that this code is being called during field resolution.");
     }
 }
