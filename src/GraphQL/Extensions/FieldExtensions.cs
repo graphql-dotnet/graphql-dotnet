@@ -53,20 +53,13 @@ public static class FieldExtensions
             throw new ArgumentNullException(nameof(middleware));
 
         var existingTransform = fieldType.Middleware;
-        if (existingTransform == null)
+        fieldType.Middleware = (serviceProvider, next) =>
         {
-            fieldType.Middleware = (serviceProvider, next) =>
-                ctx => middleware.ResolveAsync(ctx, next);
-        }
-        else
-        {
-            // Chain the middleware
-            fieldType.Middleware = (serviceProvider, next) =>
-            {
-                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
+            FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
+            return existingTransform == null
+                ? newNext
+                : existingTransform(serviceProvider, newNext);
+        };
     }
 
     /// <summary>
@@ -81,6 +74,7 @@ public static class FieldExtensions
         var existingTransform = fieldType.Middleware;
         if (existingTransform == null)
         {
+            // Use static lambda if possible
             fieldType.Middleware = static (serviceProvider, next) =>
             {
                 var middleware = serviceProvider.GetRequiredService<TMiddleware>();
@@ -111,18 +105,12 @@ public static class FieldExtensions
             throw new ArgumentNullException(nameof(middleware));
 
         var existingTransform = fieldType.Middleware;
-        if (existingTransform == null)
+        fieldType.Middleware = (serviceProvider, next) =>
         {
-            fieldType.Middleware = (_, next) => middleware(next);
-        }
-        else
-        {
-            // Chain the middleware
-            fieldType.Middleware = (serviceProvider, next) =>
-            {
-                FieldMiddlewareDelegate newNext = middleware(next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
+            FieldMiddlewareDelegate newNext = middleware(next);
+            return existingTransform == null
+                ? newNext
+                : existingTransform(serviceProvider, newNext);
+        };
     }
 }
