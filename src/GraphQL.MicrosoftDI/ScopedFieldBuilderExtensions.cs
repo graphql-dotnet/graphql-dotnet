@@ -1,6 +1,5 @@
 using GraphQL.Builders;
 using GraphQL.DataLoader;
-using GraphQL.Instrumentation;
 using GraphQL.Types;
 
 namespace GraphQL.MicrosoftDI;
@@ -10,10 +9,6 @@ namespace GraphQL.MicrosoftDI;
 /// </summary>
 public static class ScopedFieldBuilderExtensions
 {
-    // Cached transform delegate to avoid allocations
-    private static readonly Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _scopedTransform =
-        static (_, next) => ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
-
     /// <summary>
     /// Applies scoped middleware to the field. A dependency injection scope is created for the duration of the field resolver's execution
     /// and the scoped service provider is passed within <see cref="IResolveFieldContext.RequestServices"/>.
@@ -21,21 +16,8 @@ public static class ScopedFieldBuilderExtensions
     [AllowedOn<IObjectGraphType>]
     internal static FieldBuilder<TSourceType, TReturnType> Scoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
     {
-        // Apply scoped middleware to the field using transform function
-        var existingTransform = builder.FieldType.MiddlewareFactory;
-        if (existingTransform == null)
-        {
-            builder.FieldType.MiddlewareFactory = _scopedTransform;
-        }
-        else
-        {
-            // Chain the middleware
-            builder.FieldType.MiddlewareFactory = (serviceProvider, next) =>
-            {
-                FieldMiddlewareDelegate newNext = ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
+        // Apply scoped middleware to the field resolver
+        builder.FieldType.ApplyMiddleware(ScopedFieldMiddleware.Instance);
 
         // Wrap the stream resolver, if any, to create a scope for subscriptions
         if (builder.FieldType.StreamResolver != null && builder.FieldType.StreamResolver is not DynamicScopedSourceStreamResolver)

@@ -3,7 +3,6 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Rules.Custom;
 
@@ -505,25 +504,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
     {
-        if (middleware == null)
-            throw new ArgumentNullException(nameof(middleware));
-
-        var existingTransform = FieldType.MiddlewareFactory;
-        if (existingTransform == null)
-        {
-            FieldType.MiddlewareFactory = (serviceProvider, next) =>
-                ctx => middleware.ResolveAsync(ctx, next);
-        }
-        else
-        {
-            // Chain the middleware
-            FieldType.MiddlewareFactory = (serviceProvider, next) =>
-            {
-                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
-
+        FieldType.ApplyMiddleware(middleware);
         return this;
     }
 
@@ -535,26 +516,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
         where TMiddleware : IFieldMiddleware
     {
-        var existingTransform = FieldType.MiddlewareFactory;
-        if (existingTransform == null)
-        {
-            FieldType.MiddlewareFactory = static (serviceProvider, next) =>
-            {
-                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
-                return ctx => middleware.ResolveAsync(ctx, next);
-            };
-        }
-        else
-        {
-            // Chain the middleware
-            FieldType.MiddlewareFactory = (serviceProvider, next) =>
-            {
-                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
-                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
-
+        FieldType.ApplyMiddleware<TMiddleware>();
         return this;
     }
 
@@ -565,24 +527,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
     {
-        if (middleware == null)
-            throw new ArgumentNullException(nameof(middleware));
-
-        var existingTransform = FieldType.MiddlewareFactory;
-        if (existingTransform == null)
-        {
-            FieldType.MiddlewareFactory = (_, next) => middleware(next);
-        }
-        else
-        {
-            // Chain the middleware
-            FieldType.MiddlewareFactory = (serviceProvider, next) =>
-            {
-                FieldMiddlewareDelegate newNext = middleware(next);
-                return existingTransform(serviceProvider, newNext);
-            };
-        }
-
+        FieldType.ApplyMiddleware(middleware);
         return this;
     }
 }
