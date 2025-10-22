@@ -610,7 +610,7 @@ asserts that exactly one of the fields must be set and non-null, all others
 being omitted. This is useful for representing situations where an input may be
 one of many different options.
 
-See: https://github.com/graphql/graphql-spec/pull/825
+See: https://spec.graphql.org/draft/#sec-OneOf-Input-Objects
 
 To use this feature:
 - **Code-First**: Set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
