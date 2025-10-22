@@ -8,7 +8,7 @@ namespace GraphQL.Resolvers;
 /// Returns the specified field or property, or for methods, calls the specified method (with the specified arguments)
 /// and returns the value of the method.
 /// </summary>
-public class MemberResolver : IFieldResolver
+public class MemberResolver : IFieldResolver, IRequiresResolveFieldContextAccessor
 {
     private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
@@ -110,6 +110,9 @@ public class MemberResolver : IFieldResolver
                 expressionBodies);
 
         _resolver = BuildFieldResolver(resolveFieldContextParameter, methodCallExpr);
+
+        // for methods, enable the context accessor
+        RequiresResolveFieldContextAccessor = true;
     }
 
     /// <summary>
@@ -185,6 +188,9 @@ public class MemberResolver : IFieldResolver
 
     private static readonly MethodInfo _marshalValueTaskAsyncMethod = typeof(MemberResolver).GetMethod(nameof(MarshalValueTaskAsync), BindingFlags.Static | BindingFlags.NonPublic)!;
     private static async ValueTask<object?> MarshalValueTaskAsync<T>(ValueTask<T> task) => await task.ConfigureAwait(false);
+
+    /// <inheritdoc/>
+    public bool RequiresResolveFieldContextAccessor { get; }
 
     /// <inheritdoc/>
     public virtual ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
