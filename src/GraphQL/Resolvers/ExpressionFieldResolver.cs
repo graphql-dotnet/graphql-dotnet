@@ -27,9 +27,8 @@ public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver, I
         var body = property.Body.Replace(property.Parameters[0], cast);
         _resolver = MemberResolver.BuildFieldResolverInternal(param, body);
 
-        // for direct accesses to properties or fields, do not require the context accessor
-        RequiresResolveFieldContextAccessor = property.Body is not MemberExpression memberExpr ||
-            (memberExpr.Member is not PropertyInfo && memberExpr.Member is not FieldInfo);
+        // require the context accessor unless the expression is a simple member access to a property or field
+        RequiresResolveFieldContextAccessor = !(property.Body is MemberExpression { Member: PropertyInfo or FieldInfo });
     }
 
     private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
