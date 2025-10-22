@@ -511,15 +511,16 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         var existingTransform = FieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            FieldType.MiddlewareFactory = _ => middleware;
+            FieldType.MiddlewareFactory = (serviceProvider, next) =>
+                ctx => middleware.ResolveAsync(ctx, next);
         }
         else
         {
             // Chain the middleware
-            FieldType.MiddlewareFactory = serviceProvider =>
+            FieldType.MiddlewareFactory = (serviceProvider, next) =>
             {
-                var existing = existingTransform(serviceProvider);
-                return existing == null ? middleware : new ChainedFieldMiddleware(existing, middleware);
+                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
+                return existingTransform(serviceProvider, newNext);
             };
         }
 
@@ -537,17 +538,20 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         var existingTransform = FieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            FieldType.MiddlewareFactory = serviceProvider =>
-                serviceProvider.GetRequiredService<TMiddleware>();
+            FieldType.MiddlewareFactory = static (serviceProvider, next) =>
+            {
+                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
+                return ctx => middleware.ResolveAsync(ctx, next);
+            };
         }
         else
         {
             // Chain the middleware
-            FieldType.MiddlewareFactory = serviceProvider =>
+            FieldType.MiddlewareFactory = (serviceProvider, next) =>
             {
-                var existing = existingTransform(serviceProvider);
                 var middleware = serviceProvider.GetRequiredService<TMiddleware>();
-                return existing == null ? middleware : new ChainedFieldMiddleware(existing, middleware);
+                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
+                return existingTransform(serviceProvider, newNext);
             };
         }
 
@@ -559,31 +563,26 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <param name="middleware">The middleware delegate to apply.</param>
     [AllowedOn<IObjectGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<IResolveFieldContext, FieldMiddlewareDelegate, ValueTask<object?>> middleware)
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
     {
         if (middleware == null)
             throw new ArgumentNullException(nameof(middleware));
 
-        return ApplyMiddleware(new FuncFieldMiddleware(middleware));
-    }
-
-    /// <summary>
-    /// Internal middleware implementation that chains two middleware instances together.
-    /// </summary>
-    private class ChainedFieldMiddleware : IFieldMiddleware
-    {
-        private readonly IFieldMiddleware _first;
-        private readonly IFieldMiddleware _second;
-
-        public ChainedFieldMiddleware(IFieldMiddleware first, IFieldMiddleware second)
+        var existingTransform = FieldType.MiddlewareFactory;
+        if (existingTransform == null)
         {
-            _first = first;
-            _second = second;
+            FieldType.MiddlewareFactory = (_, next) => middleware(next);
+        }
+        else
+        {
+            // Chain the middleware
+            FieldType.MiddlewareFactory = (serviceProvider, next) =>
+            {
+                FieldMiddlewareDelegate newNext = middleware(next);
+                return existingTransform(serviceProvider, newNext);
+            };
         }
 
-        public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
-        {
-            return _first.ResolveAsync(context, ctx => _second.ResolveAsync(ctx, next));
-        }
+        return this;
     }
 }

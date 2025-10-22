@@ -11,7 +11,8 @@ namespace GraphQL.MicrosoftDI;
 public static class ScopedFieldBuilderExtensions
 {
     // Cached transform delegate to avoid allocations
-    private static readonly Func<IServiceProvider, IFieldMiddleware> _scopedTransform = static _ => ScopedFieldMiddleware.Instance;
+    private static readonly Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _scopedTransform =
+        static (_, next) => ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
 
     /// <summary>
     /// Applies scoped middleware to the field. A dependency injection scope is created for the duration of the field resolver's execution
@@ -29,10 +30,10 @@ public static class ScopedFieldBuilderExtensions
         else
         {
             // Chain the middleware
-            builder.FieldType.MiddlewareFactory = serviceProvider =>
+            builder.FieldType.MiddlewareFactory = (serviceProvider, next) =>
             {
-                var existing = existingTransform(serviceProvider);
-                return new ScopedFieldMiddleware(existing);
+                FieldMiddlewareDelegate newNext = ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
+                return existingTransform(serviceProvider, newNext);
             };
         }
 

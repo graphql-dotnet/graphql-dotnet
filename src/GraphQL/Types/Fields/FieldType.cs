@@ -96,10 +96,11 @@ public class FieldType : MetadataProvider, IFieldType
 
     /// <summary>
     /// Gets or sets a transform function for field middleware. This function takes an IServiceProvider
-    /// and returns an IFieldMiddleware instance, allowing middleware to be resolved from the service provider.
+    /// and a FieldMiddlewareDelegate (the next delegate in the chain), and returns a new FieldMiddlewareDelegate
+    /// that wraps the next delegate with middleware logic.
     /// Only applicable to fields of output graph types.
     /// </summary>
-    public Func<IServiceProvider, IFieldMiddleware>? MiddlewareFactory { get; set; }
+    public Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate>? MiddlewareFactory { get; set; }
 
     /// <summary>
     /// Parses the value received from the client when the value is not <see langword="null"/>.

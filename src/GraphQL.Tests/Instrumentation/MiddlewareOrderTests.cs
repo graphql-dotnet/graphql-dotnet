@@ -459,14 +459,14 @@ public class MiddlewareOrderTests
 
             Field<StringGraphType>("test")
                 .Resolve(_ => "result")
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field1-Before");
                     var result = next(context);
                     executionOrder.Add("Field1-After");
                     return result;
                 })
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field2-Before");
                     var result = next(context);
@@ -508,17 +508,17 @@ public class MiddlewareOrderTests
 
             Field<StringGraphType>("test")
                 .Resolve(_ => "result")
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field1");
                     return next(context);
                 })
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field2");
                     return next(context);
                 })
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field3");
                     return next(context);
@@ -582,12 +582,12 @@ public class MiddlewareOrderTests
         {
             Field<StringGraphType>("test")
                 .Resolve(_ => "R")
-                .ApplyMiddleware(async (context, next) =>
+                .ApplyMiddleware(next => async context =>
                 {
                     var result = await next(context);
                     return result + "-F1";
                 })
-                .ApplyMiddleware(async (context, next) =>
+                .ApplyMiddleware(next => async context =>
                 {
                     var result = await next(context);
                     return result + "-F2";
@@ -611,7 +611,7 @@ public class MiddlewareOrderTests
 
             Field<StringGraphType>("field1")
                 .Resolve(_ => "result1")
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field1-Middleware");
                     return next(context);
@@ -619,7 +619,7 @@ public class MiddlewareOrderTests
 
             Field<StringGraphType>("field2")
                 .Resolve(_ => "result2")
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("Field2-Middleware");
                     return next(context);
@@ -643,7 +643,7 @@ public class MiddlewareOrderTests
 
             Field<StringGraphType>("test")
                 .Resolve(_ => "result")
-                .ApplyMiddleware((context, next) =>
+                .ApplyMiddleware(next => context =>
                 {
                     executionOrder.Add("FieldLambda");
                     return next(context);

@@ -28,18 +28,14 @@ internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
         var middlewareTransform = field.MiddlewareFactory;
         if (middlewareTransform != null)
         {
-            var middleware = middlewareTransform(_serviceProvider);
-            if (middleware != null)
-            {
-                var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
+            var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
 
-                // Wrap the resolver with field-specific middleware
-                FieldMiddlewareDelegate fieldMiddlewareWrapped = ctx => middleware.ResolveAsync(ctx, inner.ResolveAsync);
-                field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareWrapped.Invoke);
+            // Apply the middleware transform to wrap the resolver
+            FieldMiddlewareDelegate wrappedDelegate = middlewareTransform(_serviceProvider, inner.ResolveAsync);
+            field.Resolver = new FuncFieldResolver<object>(wrappedDelegate.Invoke);
 
-                // Clear the middleware transform as it has been applied
-                field.MiddlewareFactory = null;
-            }
+            // Clear the middleware transform as it has been applied
+            field.MiddlewareFactory = null;
         }
     }
 }

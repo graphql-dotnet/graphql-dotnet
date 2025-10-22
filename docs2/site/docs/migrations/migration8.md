@@ -1496,7 +1496,7 @@ public class MyGraphType : ObjectGraphType
     {
         Field<StringGraphType>("myField")
             .Resolve(context => "Hello World")
-            .ApplyMiddleware(async (context, next) =>    // using a lambda
+            .ApplyMiddleware(next => async (context) =>    // using a lambda
             {
                 // Code before resolver execution
                 var result = await next(context);

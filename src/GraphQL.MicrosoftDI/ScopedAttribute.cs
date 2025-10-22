@@ -11,7 +11,8 @@ namespace GraphQL;
 public class ScopedAttribute : GraphQLAttribute
 {
     // Cached transform delegate to avoid allocations
-    private static readonly Func<IServiceProvider, IFieldMiddleware> _scopedTransform = static _ => ScopedFieldMiddleware.Instance;
+    private static readonly Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate> _scopedTransform =
+        static (_, next) => ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
@@ -28,10 +29,10 @@ public class ScopedAttribute : GraphQLAttribute
         else
         {
             // Chain the middleware
-            fieldType.MiddlewareFactory = serviceProvider =>
+            fieldType.MiddlewareFactory = (serviceProvider, next) =>
             {
-                var existing = existingTransform(serviceProvider);
-                return new ScopedFieldMiddleware(existing);
+                FieldMiddlewareDelegate newNext = ctx => ScopedFieldMiddleware.Instance.ResolveAsync(ctx, next);
+                return existingTransform(serviceProvider, newNext);
             };
         }
 

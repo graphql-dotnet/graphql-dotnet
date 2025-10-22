@@ -1089,7 +1089,7 @@ namespace GraphQL.Builders
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddleware middleware) { }
-        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(System.Func<GraphQL.IResolveFieldContext, GraphQL.Instrumentation.FieldMiddlewareDelegate, System.Threading.Tasks.ValueTask<object?>> middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
             where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
@@ -2672,7 +2672,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public bool IsPrivate { get; set; }
-        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.IFieldMiddleware>? MiddlewareFactory { get; set; }
+        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? MiddlewareFactory { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
