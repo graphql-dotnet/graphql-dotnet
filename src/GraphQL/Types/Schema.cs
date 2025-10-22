@@ -5,7 +5,6 @@ using GraphQL.DI;
 using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
-using GraphQL.Resolvers;
 using GraphQL.Utilities;
 using GraphQL.Utilities.Visitors;
 using GraphQLParser.AST;
@@ -479,32 +478,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
             // Wrap resolvers with context accessor if configured
             if (ResolveFieldContextAccessor != null)
             {
-                foreach (var type in _allTypes.Dictionary) // allocation-free enumeration
-                {
-                    // only apply to object graph types, as only they have fields with resolvers
-                    if (type.Value is IObjectGraphType objectGraphType)
-                    {
-                        // iterate all fields of the object graph type
-                        foreach (var field in objectGraphType.Fields.List) // allocation-free enumeration
-                        {
-                            // only wrap fields that have a custom resolver, as default resolvers do not need the context accessor
-                            // also, do not wrap fields that explicitly indicate they do not need the context accessor
-                            if (field.Resolver != null &&
-                                field.Resolver != NameFieldResolver.Instance &&
-                                field.Resolver != SourceFieldResolver.Instance &&
-                                (field.Resolver is not IRequiresResolveFieldContextAccessor requiresAccessor || requiresAccessor.RequiresResolveFieldContextAccessor))
-                            {
-                                field.Resolver = new ResolveFieldContextAccessorResolver(ResolveFieldContextAccessor, field.Resolver);
-                            }
-
-                            // also wrap stream resolvers if present
-                            if (field.StreamResolver != null)
-                            {
-                                field.StreamResolver = new ResolveFieldContextAccessorStreamResolver(ResolveFieldContextAccessor, field.StreamResolver);
-                            }
-                        }
-                    }
-                }
+                new ResolveFieldContextAccessorVisitor(ResolveFieldContextAccessor).Run(this);
             }
 
             _allTypes.ApplyMiddleware(FieldMiddleware);
