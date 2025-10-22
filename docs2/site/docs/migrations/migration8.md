@@ -1551,9 +1551,16 @@ public class MyService
 }
 ```
 
-The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and proper context isolation across concurrent requests. The context is automatically populated during field resolution and cleared after the resolver completes.
+The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and
+proper context isolation across concurrent requests. The context is automatically populated during
+field resolution and cleared after the resolver completes. The context will not be available within
+data loader batch functions, as they execute outside the original field resolver.
 
-**Note:** The context accessor adds a small performance overhead as middleware must be applied to every field in the schema. Only enable it if you need to access the context from services or other code that doesn't have direct access to the resolver's context parameter.
+**Note:** The context accessor adds a small performance overhead as middleware must be applied to
+every field in the schema. Only enable it if you need to access the context from services or other
+code that doesn't have direct access to the resolver's context parameter. To mitigate this overhead,
+the context accessor middleware is not applied to fields that directly access a property or field of
+the source object. Use a resolver function if a property getter needs to access the context.
 
 ## Breaking Changes
 
