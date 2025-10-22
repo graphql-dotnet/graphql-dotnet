@@ -257,6 +257,10 @@ namespace GraphQL
     }
     public static class FieldExtensions
     {
+        public static void ApplyMiddleware(this GraphQL.Types.FieldType fieldType, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public static void ApplyMiddleware(this GraphQL.Types.FieldType fieldType, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public static void ApplyMiddleware<TMiddleware>(this GraphQL.Types.FieldType fieldType)
+            where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public static TMetadataWriter DependsOn<TMetadataWriter>(this TMetadataWriter fieldType, System.Type serviceType)
             where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
         public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter fieldType)
@@ -387,6 +391,7 @@ namespace GraphQL
         [System.Obsolete("Please use the new complexity analyzer. The v7 complexity analyzer will be remove" +
             "d in v9.")]
         public static GraphQL.DI.IGraphQLBuilder AddLegacyComplexityAnalyzer(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.Validation.Complexity.LegacyComplexityConfiguration, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddResolveFieldContextAccessor(this GraphQL.DI.IGraphQLBuilder builder) { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TSchema>(this GraphQL.DI.IGraphQLBuilder builder, GraphQL.DI.ServiceLifetime serviceLifetime = 0)
             where TSchema :  class, GraphQL.Types.ISchema { }
         public static GraphQL.DI.IGraphQLBuilder AddSchema<TSchema>(this GraphQL.DI.IGraphQLBuilder builder, TSchema schema)
@@ -1087,6 +1092,10 @@ namespace GraphQL.Builders
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+            where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name)
@@ -1517,6 +1526,10 @@ namespace GraphQL.Execution
     {
         System.Collections.Generic.IDictionary<string, object?> UserContext { get; }
     }
+    public interface IResolveFieldContextAccessor
+    {
+        GraphQL.IResolveFieldContext? Context { get; set; }
+    }
     [System.Serializable]
     public class InvalidOperationError : GraphQL.Execution.DocumentError
     {
@@ -1566,6 +1579,11 @@ namespace GraphQL.Execution
     {
         public RequestError(string message) { }
         public RequestError(string message, System.Exception? innerException) { }
+    }
+    public sealed class ResolveFieldContextAccessor : GraphQL.Execution.IResolveFieldContextAccessor
+    {
+        public GraphQL.IResolveFieldContext? Context { get; set; }
+        public static GraphQL.Execution.ResolveFieldContextAccessor Instance { get; }
     }
     public class RootExecutionNode : GraphQL.Execution.ObjectExecutionNode
     {
@@ -2645,6 +2663,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public bool IsPrivate { get; set; }
+        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? Middleware { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
@@ -3072,6 +3091,7 @@ namespace GraphQL.Types
         public GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         public GraphQL.Conversion.INameConverter NameConverter { get; set; }
         public GraphQL.Types.IObjectGraphType Query { get; set; }
+        public GraphQL.Execution.IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
         public GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         public GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {

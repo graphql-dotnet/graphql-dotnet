@@ -150,11 +150,21 @@ namespace GraphQL.MicrosoftDI
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveScoped<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, TReturnType?> resolver) { }
         public static GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ResolveScopedAsync<TSourceType, TReturnType>(this GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> builder, System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.Task<TReturnType?>> resolver) { }
     }
+    public class ScopedFieldMiddleware : GraphQL.Instrumentation.IFieldMiddleware
+    {
+        public static readonly GraphQL.MicrosoftDI.ScopedFieldMiddleware Instance;
+        public ScopedFieldMiddleware(GraphQL.Instrumentation.IFieldMiddleware? innerMiddleware) { }
+        public System.Threading.Tasks.ValueTask<object?> ResolveAsync(GraphQL.IResolveFieldContext context, GraphQL.Instrumentation.FieldMiddlewareDelegate next) { }
+    }
+    [System.Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future " +
+        "release.")]
     public class ScopedFieldResolver<TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
     {
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext, System.Threading.Tasks.ValueTask<TReturnType?>> resolver) { }
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext, TReturnType?> resolver) { }
     }
+    [System.Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future " +
+        "release.")]
     public class ScopedFieldResolver<TSourceType, TReturnType> : GraphQL.Resolvers.FuncFieldResolver<TReturnType>
     {
         public ScopedFieldResolver(System.Func<GraphQL.IResolveFieldContext<TSourceType>, System.Threading.Tasks.ValueTask<TReturnType?>> resolver) { }
