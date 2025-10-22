@@ -488,7 +488,11 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                         foreach (var field in objectGraphType.Fields.List) // allocation-free enumeration
                         {
                             // only wrap fields that have a custom resolver, as default resolvers do not need the context accessor
-                            if (field.Resolver != null && field.Resolver != NameFieldResolver.Instance && field.Resolver != SourceFieldResolver.Instance)
+                            // also, do not wrap fields that explicitly indicate they do not need the context accessor
+                            if (field.Resolver != null &&
+                                field.Resolver != NameFieldResolver.Instance &&
+                                field.Resolver != SourceFieldResolver.Instance &&
+                                (field.Resolver is not IRequiresResolveFieldContextAccessor requiresAccessor || requiresAccessor.RequiresResolveFieldContextAccessor))
                             {
                                 field.Resolver = new ResolveFieldContextAccessorResolver(ResolveFieldContextAccessor, field.Resolver);
                             }

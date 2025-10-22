@@ -24,11 +24,11 @@ public class __DirectiveArgument : ObjectGraphType<DirectiveArgument>
 
         Field<NonNullGraphType<StringGraphType>>("name")
             .Description("Argument name")
-            .Resolve(context => context.Source!.Name);
+            .ResolveNoAccessor(context => context.Source!.Name);
 
         Field<NonNullGraphType<StringGraphType>>("value")
             .Description("A GraphQL-formatted string representing the value for argument.")
-            .Resolve(context =>
+            .ResolveNoAccessor(context =>
             {
                 var argument = context.Source!;
                 if (argument.Value == null)

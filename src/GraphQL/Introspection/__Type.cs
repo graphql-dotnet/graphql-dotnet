@@ -49,9 +49,9 @@ public class __Type : ObjectGraphType<IGraphType>
                 : throw new InvalidOperationException($"Unknown kind of type: {context.Source}");
         });
 
-        Field<StringGraphType>("name").Resolve(context => context.Source!.Name);
+        Field<StringGraphType>("name").ResolveNoAccessor(context => context.Source!.Name);
 
-        Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
+        Field<StringGraphType>("description").ResolveNoAccessor(context => context.Source!.Description);
 
         Field<ListGraphType<NonNullGraphType<__Field>>>("fields")
             .Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False)
@@ -180,7 +180,7 @@ public class __Type : ObjectGraphType<IGraphType>
         if (deprecationOfInputValues)
             inputFieldsField.Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False);
 
-        Field<__Type>("ofType").Resolve(context =>
+        Field<__Type>("ofType").ResolveNoAccessor(context =>
         {
             return context.Source switch
             {
@@ -193,7 +193,7 @@ public class __Type : ObjectGraphType<IGraphType>
         if (allowAppliedDirectives)
             this.AddAppliedDirectivesField("type");
 
-        Field<BooleanGraphType>("isOneOf").Resolve(context => context.Source is IInputObjectGraphType inputType ? BoolBox.Boxed(inputType.IsOneOf) : null);
+        Field<BooleanGraphType>("isOneOf").ResolveNoAccessor(context => context.Source is IInputObjectGraphType inputType ? BoolBox.Boxed(inputType.IsOneOf) : null);
     }
 
     private static object KindForInstance(IGraphType type) => type switch
