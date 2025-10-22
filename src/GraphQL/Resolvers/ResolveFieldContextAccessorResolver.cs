@@ -20,15 +20,13 @@ internal class ResolveFieldContextAccessorResolver : IFieldResolver
     public async ValueTask<object?> ResolveAsync(IResolveFieldContext context)
     {
         _accessor.Context = context;
-        object? ret = null;
         try
         {
-            ret = await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
+            return await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
         }
         finally
         {
             _accessor.Context = null;
         }
-        return ret;
     }
 }
