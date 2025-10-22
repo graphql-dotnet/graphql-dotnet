@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
