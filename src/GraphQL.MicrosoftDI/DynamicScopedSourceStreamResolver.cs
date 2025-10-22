@@ -40,7 +40,7 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
             finally
             {
                 if (accessor != null)
-                    accessor.Context = null;
+                    accessor.Context = context;
             }
             // keep the service scope alive until the subscription has been disposed
             return new ObservableMapper(observable, scope);
