@@ -503,6 +503,9 @@ public class SchemaTypes : IEnumerable<IGraphType>
     /// </summary>
     public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
     {
+        if (transform == null)
+            throw new ArgumentNullException(nameof(transform));
+
         foreach (var item in Dictionary)
         {
             if (item.Value is IObjectGraphType obj)
