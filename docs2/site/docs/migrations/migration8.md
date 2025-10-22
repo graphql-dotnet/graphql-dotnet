@@ -1524,6 +1524,53 @@ The `[Scoped]` attribute and related methods now use field middleware internally
 the resolver directly. This provides better composability and allows scoped services to work seamlessly
 with other middleware.
 
+### 37. `IResolveFieldContextAccessor` for accessing current field context (v8.7.0+)
+
+An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext`
+from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when
+you need to access the current field resolution context from services or other code that doesn't have
+direct access to the context parameter.
+
+To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddResolveFieldContextAccessor()
+);
+```
+
+Then inject `IResolveFieldContextAccessor` into your services:
+
+```csharp
+public class MyService
+{
+    private readonly IResolveFieldContextAccessor _contextAccessor;
+
+    public MyService(IResolveFieldContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
+    public string GetCurrentFieldName()
+    {
+        var context = _contextAccessor.ResolveFieldContext;
+        return context.FieldDefinition.Name;
+    }
+}
+```
+
+The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and
+proper context isolation across concurrent requests. The context is automatically populated during
+field resolution and cleared after the resolver completes. The context will not be available within
+data loader batch functions, as they execute outside the original field resolver.
+
+**Note:** The context accessor adds a small performance overhead as middleware must be applied to
+every field in the schema. Only enable it if you need to access the context from services or other
+code that doesn't have direct access to the resolver's context parameter. To mitigate this overhead,
+the context accessor middleware is not applied to fields that directly access a property or field of
+the source object. Use a resolver function if a property getter needs to access the context.
+
 ## Breaking Changes
 
 ### 1. Query type is required
