@@ -1521,10 +1521,6 @@ Field<StringGraphType>("myField")
     .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
 ```
 
-The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping
-the resolver directly. This provides better composability and allows scoped services to work seamlessly
-with other middleware.
-
 ## Breaking Changes
 
 ### 1. Query type is required
