@@ -2596,7 +2596,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public bool IsPrivate { get; set; }
-        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? MiddlewareFactory { get; set; }
+        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? Middleware { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
