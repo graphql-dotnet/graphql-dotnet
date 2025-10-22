@@ -254,6 +254,10 @@ namespace GraphQL
     }
     public static class FieldExtensions
     {
+        public static void ApplyMiddleware(this GraphQL.Types.FieldType fieldType, GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public static void ApplyMiddleware(this GraphQL.Types.FieldType fieldType, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public static void ApplyMiddleware<TMiddleware>(this GraphQL.Types.FieldType fieldType)
+            where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public static TMetadataWriter DependsOn<TMetadataWriter>(this TMetadataWriter fieldType, System.Type serviceType)
             where TMetadataWriter : GraphQL.Types.IFieldMetadataWriter { }
         public static TMetadataWriter NoClrMapping<TMetadataWriter>(this TMetadataWriter fieldType)
@@ -1046,6 +1050,10 @@ namespace GraphQL.Builders
     {
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+            where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<TArgumentGraphType>(string name)
@@ -2572,6 +2580,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public bool IsPrivate { get; set; }
+        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? Middleware { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
