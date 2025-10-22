@@ -6,7 +6,7 @@ namespace GraphQL.Execution;
 /// </summary>
 public sealed class ResolveFieldContextAccessor : IResolveFieldContextAccessor
 {
-    private static readonly AsyncLocal<IResolveFieldContext?> _context = new();
+    private static readonly AsyncLocal<ContextHolder?> _context = new();
     private ResolveFieldContextAccessor() { }
 
     /// <summary>
@@ -17,7 +17,21 @@ public sealed class ResolveFieldContextAccessor : IResolveFieldContextAccessor
     /// <inheritdoc/>
     public IResolveFieldContext? Context
     {
-        get => _context.Value;
-        set => _context.Value = value;
+        get => _context.Value?.Context;
+        set
+        {
+            if (_context.Value != null)
+                _context.Value.Context = null;
+
+            if (value != null)
+            {
+                _context.Value = new ContextHolder { Context = value };
+            }
+        }
+    }
+
+    private sealed class ContextHolder
+    {
+        public IResolveFieldContext? Context;
     }
 }
