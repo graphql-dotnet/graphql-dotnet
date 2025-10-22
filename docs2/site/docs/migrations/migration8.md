@@ -1485,7 +1485,10 @@ This method is called exactly once for each graph type during schema initializat
 
 ### 36. Field-specific middleware support (v8.7.0+)
 
-GraphQL.NET now supports field-specific middleware through the `FieldType.MiddlewareFactory` property. This allows middleware to be applied to individual fields rather than only globally across all fields in the schema. Field middleware is collapsed into the field's resolver during schema initialization for optimal performance.
+GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property.
+This allows middleware to be applied to individual fields rather than only globally across all fields
+in the schema. Field middleware is collapsed into the field's resolver during schema initialization
+for optimal performance.
 
 You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
 
@@ -1507,7 +1510,8 @@ public class MyGraphType : ObjectGraphType
 }
 ```
 
-Multiple middleware can be chained together on a single field, and they will be executed in the order they were applied:
+Multiple middleware can be chained together on a single field, and they will be executed in the order
+they were applied:
 
 ```csharp
 Field<StringGraphType>("myField")
@@ -1516,11 +1520,16 @@ Field<StringGraphType>("myField")
     .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
 ```
 
-The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping the resolver directly. This provides better composability and allows scoped services to work seamlessly with other middleware.
+The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping
+the resolver directly. This provides better composability and allows scoped services to work seamlessly
+with other middleware.
 
 ### 37. `IResolveFieldContextAccessor` for accessing current field context (v8.7.0+)
 
-An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext` from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when you need to access the current field resolution context from services or other code that doesn't have direct access to the context parameter.
+An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext`
+from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when
+you need to access the current field resolution context from services or other code that doesn't have
+direct access to the context parameter.
 
 To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
 

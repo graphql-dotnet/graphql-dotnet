@@ -52,16 +52,16 @@ public static class FieldExtensions
         if (middleware == null)
             throw new ArgumentNullException(nameof(middleware));
 
-        var existingTransform = fieldType.MiddlewareFactory;
+        var existingTransform = fieldType.Middleware;
         if (existingTransform == null)
         {
-            fieldType.MiddlewareFactory = (serviceProvider, next) =>
+            fieldType.Middleware = (serviceProvider, next) =>
                 ctx => middleware.ResolveAsync(ctx, next);
         }
         else
         {
             // Chain the middleware
-            fieldType.MiddlewareFactory = (serviceProvider, next) =>
+            fieldType.Middleware = (serviceProvider, next) =>
             {
                 FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
                 return existingTransform(serviceProvider, newNext);
@@ -78,10 +78,10 @@ public static class FieldExtensions
     public static void ApplyMiddleware<TMiddleware>(this FieldType fieldType)
         where TMiddleware : IFieldMiddleware
     {
-        var existingTransform = fieldType.MiddlewareFactory;
+        var existingTransform = fieldType.Middleware;
         if (existingTransform == null)
         {
-            fieldType.MiddlewareFactory = static (serviceProvider, next) =>
+            fieldType.Middleware = static (serviceProvider, next) =>
             {
                 var middleware = serviceProvider.GetRequiredService<TMiddleware>();
                 return ctx => middleware.ResolveAsync(ctx, next);
@@ -90,7 +90,7 @@ public static class FieldExtensions
         else
         {
             // Chain the middleware
-            fieldType.MiddlewareFactory = (serviceProvider, next) =>
+            fieldType.Middleware = (serviceProvider, next) =>
             {
                 var middleware = serviceProvider.GetRequiredService<TMiddleware>();
                 FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
@@ -110,15 +110,15 @@ public static class FieldExtensions
         if (middleware == null)
             throw new ArgumentNullException(nameof(middleware));
 
-        var existingTransform = fieldType.MiddlewareFactory;
+        var existingTransform = fieldType.Middleware;
         if (existingTransform == null)
         {
-            fieldType.MiddlewareFactory = (_, next) => middleware(next);
+            fieldType.Middleware = (_, next) => middleware(next);
         }
         else
         {
             // Chain the middleware
-            fieldType.MiddlewareFactory = (serviceProvider, next) =>
+            fieldType.Middleware = (serviceProvider, next) =>
             {
                 FieldMiddlewareDelegate newNext = middleware(next);
                 return existingTransform(serviceProvider, newNext);

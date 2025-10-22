@@ -100,7 +100,7 @@ public class FieldType : MetadataProvider, IFieldType
     /// that wraps the next delegate with middleware logic.
     /// Only applicable to fields of output graph types.
     /// </summary>
-    public Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate>? MiddlewareFactory { get; set; }
+    public Func<IServiceProvider, FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Middleware { get; set; }
 
     /// <summary>
     /// Parses the value received from the client when the value is not <see langword="null"/>.
