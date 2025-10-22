@@ -488,4 +488,38 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
+
+    /// <summary>
+    /// Applies middleware to the field. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="middleware">The middleware to apply.</param>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
+
+    /// <summary>
+    /// Applies middleware to the field by resolving it from the service provider. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <typeparam name="TMiddleware">The type of middleware to resolve from the service provider.</typeparam>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+        where TMiddleware : IFieldMiddleware
+    {
+        FieldType.ApplyMiddleware<TMiddleware>();
+        return this;
+    }
+
+    /// <summary>
+    /// Applies middleware to the field using a delegate. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="middleware">The middleware delegate to apply.</param>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
 }

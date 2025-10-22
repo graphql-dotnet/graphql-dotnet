@@ -1483,6 +1483,47 @@ public class MySchema : Schema
 
 This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
 
+### 36. Field-specific middleware support (v8.7.0+)
+
+GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property.
+This allows middleware to be applied to individual fields rather than only globally across all fields
+in the schema. Field middleware is collapsed into the field's resolver during schema initialization
+for optimal performance.
+
+You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
+
+```csharp
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("myField")
+            .Resolve(context => "Hello World")
+            .ApplyMiddleware(next => async (context) =>    // using a lambda
+            {
+                // Code before resolver execution
+                var result = await next(context);
+                // Code after resolver execution
+                return result;
+            });
+    }
+}
+```
+
+Multiple middleware can be chained together on a single field, and they will be executed in the order
+they were applied:
+
+```csharp
+Field<StringGraphType>("myField")
+    .Resolve(context => "Hello World")
+    .ApplyMiddleware(loggingMiddleware)            // using an instance
+    .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
+```
+
+The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping
+the resolver directly. This provides better composability and allows scoped services to work seamlessly
+with other middleware.
+
 ## Breaking Changes
 
 ### 1. Query type is required
