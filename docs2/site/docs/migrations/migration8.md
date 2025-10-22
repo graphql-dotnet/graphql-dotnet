@@ -27,6 +27,8 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Better error handling of GraphQL.NET pipeline; add timeout support
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
+- Field-specific middleware support (v8.7.0+)
+- `IResolveFieldContextAccessor` opt-in support for accessing current field context (v8.7.0+)
 
 Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
