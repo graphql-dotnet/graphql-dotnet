@@ -9,6 +9,7 @@ namespace GraphQL.MicrosoftDI;
 /// to create a dependency injection scope. Then it calls a predefined <see cref="Func{T, TResult}"/>, passing the scoped service provider
 /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
 /// </summary>
+[Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future release.")]
 public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
 {
     /// <summary>
@@ -39,6 +40,7 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
 }
 
 /// <inheritdoc cref="ScopedFieldResolver{TReturnType}"/>
+[Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future release.")]
 public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<TReturnType>
 {
     /// <inheritdoc cref="ScopedFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
