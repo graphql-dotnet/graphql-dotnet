@@ -1089,6 +1089,8 @@ namespace GraphQL.Builders
         protected FieldBuilder(GraphQL.Types.FieldType fieldType) { }
         public GraphQL.Types.FieldType FieldType { get; }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddleware middleware) { }
+        public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+            where TMiddleware : GraphQL.Instrumentation.IFieldMiddleware { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument(GraphQL.Types.IGraphType type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)] System.Type type, string name, System.Action<GraphQL.Types.QueryArgument>? configure = null) { }
         public virtual GraphQL.Builders.FieldBuilder<TSourceType, TReturnType> Argument<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  TArgumentGraphType>(string name)
@@ -2669,7 +2671,7 @@ namespace GraphQL.Types
         public string? DeprecationReason { get; set; }
         public string? Description { get; set; }
         public bool IsPrivate { get; set; }
-        public GraphQL.Instrumentation.IFieldMiddleware? Middleware { get; set; }
+        public System.Func<System.IServiceProvider, GraphQL.Instrumentation.IFieldMiddleware>? Middleware { get; set; }
         public string Name { get; set; }
         public System.Func<object, object>? Parser { get; set; }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
@@ -3149,7 +3151,7 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
-        public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate>? transform) { }
+        public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }

@@ -95,9 +95,11 @@ public class FieldType : MetadataProvider, IFieldType
     public ISourceStreamResolver? StreamResolver { get; set; }
 
     /// <summary>
-    /// Gets or sets field middleware for the field. Only applicable to fields of output graph types.
+    /// Gets or sets a transform function for field middleware. This function takes an IServiceProvider
+    /// and returns an IFieldMiddleware instance, allowing middleware to be resolved from the service provider.
+    /// Only applicable to fields of output graph types.
     /// </summary>
-    public IFieldMiddleware? Middleware { get; set; }
+    public Func<IServiceProvider, IFieldMiddleware>? Middleware { get; set; }
 
     /// <summary>
     /// Parses the value received from the client when the value is not <see langword="null"/>.

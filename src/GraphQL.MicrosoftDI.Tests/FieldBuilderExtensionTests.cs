@@ -34,7 +34,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .Resolve(context => "hello")
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello");
         VerifyScoped();
     }
 
@@ -48,7 +49,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<string>()
             .Resolve((context, value) => value)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello");
         VerifyScoped();
     }
 
@@ -63,7 +65,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<int>()
             .Resolve((context, value, v2) => value + v2)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2");
         VerifyScoped();
     }
 
@@ -79,7 +82,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<short>()
             .Resolve((context, value, v2, v3) => value + v2 + v3)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello23");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello23");
         VerifyScoped();
     }
 
@@ -96,7 +100,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<byte>()
             .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello234");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello234");
         VerifyScoped();
     }
 
@@ -114,7 +119,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithService<long>()
             .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2345");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
@@ -128,7 +134,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int>()
             .Resolve((context, value, v2) => value + v2)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2");
         VerifyScoped();
     }
 
@@ -142,7 +149,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short>()
             .Resolve((context, value, v2, v3) => value + v2 + v3)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello23");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello23");
         VerifyScoped();
     }
 
@@ -156,7 +164,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short, byte>()
             .Resolve((context, value, v2, v3, v4) => value + v2 + v3 + v4)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello234");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello234");
         VerifyScoped();
     }
 
@@ -170,7 +179,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithServices<string, int, short, byte, long>()
             .Resolve((context, value, v2, v3, v4, v5) => value + v2 + v3 + v4 + v5)
             .FieldType;
-        (await field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2345");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        (await middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync)).ShouldBe("hello2345");
         VerifyScoped();
     }
 
@@ -276,7 +286,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync(context => Task.FromResult<object?>("hello"))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -290,7 +301,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync((context, value) => Task.FromResult<object?>(value))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello");
         VerifyScoped();
     }
 
@@ -305,7 +317,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync((context, value, v2) => Task.FromResult<object?>(value + v2))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello2");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello2");
         VerifyScoped();
     }
 
@@ -321,7 +334,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync((context, value, v2, v3) => Task.FromResult<object?>(value + v2 + v3))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello23");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello23");
         VerifyScoped();
     }
 
@@ -338,7 +352,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync((context, value, v2, v3, v4) => Task.FromResult<object?>(value + v2 + v3 + v4))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello234");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello234");
         VerifyScoped();
     }
 
@@ -356,7 +371,8 @@ public class FieldBuilderExtensionTests : ScopedContextBase
             .WithScope()
             .ResolveAsync((context, value, v2, v3, v4, v5) => Task.FromResult<object?>(value + v2 + v3 + v4 + v5))
             .FieldType;
-        field.Middleware!.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello2345");
+        var middleware = field.Middleware!(_scopedServiceProvider);
+        middleware.ResolveAsync(_scopedContext, field.Resolver!.ResolveAsync).ShouldBeTask("hello2345");
         VerifyScoped();
     }
 

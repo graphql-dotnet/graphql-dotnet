@@ -3,6 +3,7 @@ using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using GraphQL.Validation;
 using GraphQL.Validation.Rules.Custom;
 
@@ -507,14 +508,47 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         if (middleware == null)
             throw new ArgumentNullException(nameof(middleware));
 
-        if (FieldType.Middleware == null)
+        var existingTransform = FieldType.Middleware;
+        if (existingTransform == null)
         {
-            FieldType.Middleware = middleware;
+            FieldType.Middleware = _ => middleware;
         }
         else
         {
             // Chain the middleware
-            FieldType.Middleware = new ChainedFieldMiddleware(FieldType.Middleware, middleware);
+            FieldType.Middleware = serviceProvider =>
+            {
+                var existing = existingTransform(serviceProvider);
+                return existing == null ? middleware : new ChainedFieldMiddleware(existing, middleware);
+            };
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Applies middleware to the field by resolving it from the service provider. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <typeparam name="TMiddleware">The type of middleware to resolve from the service provider.</typeparam>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+        where TMiddleware : IFieldMiddleware
+    {
+        var existingTransform = FieldType.Middleware;
+        if (existingTransform == null)
+        {
+            FieldType.Middleware = serviceProvider =>
+                serviceProvider.GetRequiredService<TMiddleware>();
+        }
+        else
+        {
+            // Chain the middleware
+            FieldType.Middleware = serviceProvider =>
+            {
+                var existing = existingTransform(serviceProvider);
+                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
+                return existing == null ? middleware : new ChainedFieldMiddleware(existing, middleware);
+            };
         }
 
         return this;

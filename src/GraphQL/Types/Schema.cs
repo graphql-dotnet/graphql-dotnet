@@ -481,6 +481,10 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
                 new ResolveFieldContextAccessorVisitor(ResolveFieldContextAccessor).Run(this);
             }
 
+            // Apply field-specific middleware before schema-wide middleware (so it runs after schema-wide middleware)
+            new FieldMiddlewareVisitor(_services).Run(this);
+
+            // Apply schema-wide middleware
             _allTypes.ApplyMiddleware(FieldMiddleware);
 
             foreach (var visitor in GetVisitors())
