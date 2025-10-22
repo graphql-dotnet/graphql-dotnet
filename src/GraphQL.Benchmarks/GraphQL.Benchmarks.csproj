@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.15.2" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.10" />
   </ItemGroup>
 
   <ItemGroup>
