@@ -20,15 +20,15 @@ public class ScopedAttribute : GraphQLAttribute
             return;
 
         // Apply scoped middleware to the field using transform function
-        var existingTransform = fieldType.Middleware;
+        var existingTransform = fieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            fieldType.Middleware = _scopedTransform;
+            fieldType.MiddlewareFactory = _scopedTransform;
         }
         else
         {
             // Chain the middleware
-            fieldType.Middleware = serviceProvider =>
+            fieldType.MiddlewareFactory = serviceProvider =>
             {
                 var existing = existingTransform(serviceProvider);
                 return new ScopedFieldMiddleware(existing);

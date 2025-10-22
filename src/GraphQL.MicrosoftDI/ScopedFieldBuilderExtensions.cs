@@ -21,15 +21,15 @@ public static class ScopedFieldBuilderExtensions
     internal static FieldBuilder<TSourceType, TReturnType> Scoped<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> builder)
     {
         // Apply scoped middleware to the field using transform function
-        var existingTransform = builder.FieldType.Middleware;
+        var existingTransform = builder.FieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            builder.FieldType.Middleware = _scopedTransform;
+            builder.FieldType.MiddlewareFactory = _scopedTransform;
         }
         else
         {
             // Chain the middleware
-            builder.FieldType.Middleware = serviceProvider =>
+            builder.FieldType.MiddlewareFactory = serviceProvider =>
             {
                 var existing = existingTransform(serviceProvider);
                 return new ScopedFieldMiddleware(existing);

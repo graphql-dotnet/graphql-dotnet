@@ -99,7 +99,7 @@ public class FieldType : MetadataProvider, IFieldType
     /// and returns an IFieldMiddleware instance, allowing middleware to be resolved from the service provider.
     /// Only applicable to fields of output graph types.
     /// </summary>
-    public Func<IServiceProvider, IFieldMiddleware>? Middleware { get; set; }
+    public Func<IServiceProvider, IFieldMiddleware>? MiddlewareFactory { get; set; }
 
     /// <summary>
     /// Parses the value received from the client when the value is not <see langword="null"/>.

@@ -1485,7 +1485,7 @@ This method is called exactly once for each graph type during schema initializat
 
 ### 36. Field-specific middleware support (v8.7.0+)
 
-GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property. This allows middleware to be applied to individual fields rather than only globally across all fields in the schema. Field middleware is collapsed into the field's resolver during schema initialization for optimal performance.
+GraphQL.NET now supports field-specific middleware through the `FieldType.MiddlewareFactory` property. This allows middleware to be applied to individual fields rather than only globally across all fields in the schema. Field middleware is collapsed into the field's resolver during schema initialization for optimal performance.
 
 You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
 
@@ -1496,7 +1496,7 @@ public class MyGraphType : ObjectGraphType
     {
         Field<StringGraphType>("myField")
             .Resolve(context => "Hello World")
-            .ApplyMiddleware(async (context, next) =>
+            .ApplyMiddleware(async (context, next) =>    // using a lambda
             {
                 // Code before resolver execution
                 var result = await next(context);
@@ -1512,9 +1512,8 @@ Multiple middleware can be chained together on a single field, and they will be 
 ```csharp
 Field<StringGraphType>("myField")
     .Resolve(context => "Hello World")
-    .ApplyMiddleware(loggingMiddleware)
-    .ApplyMiddleware(authorizationMiddleware)
-    .ApplyMiddleware(cachingMiddleware);
+    .ApplyMiddleware(loggingMiddleware)            // using an instance
+    .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
 ```
 
 The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping the resolver directly. This provides better composability and allows scoped services to work seamlessly with other middleware.

@@ -7,7 +7,7 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Applies field-specific middleware to field resolvers before schema-wide middleware is applied.
 /// This visitor wraps field resolvers with any middleware configured on individual fields via
-/// <see cref="FieldType.Middleware"/>.
+/// <see cref="FieldType.MiddlewareFactory"/>.
 /// </summary>
 internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
 {
@@ -25,7 +25,7 @@ internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
     /// <inheritdoc/>
     public override void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema)
     {
-        var middlewareTransform = field.Middleware;
+        var middlewareTransform = field.MiddlewareFactory;
         if (middlewareTransform != null)
         {
             var middleware = middlewareTransform(_serviceProvider);
@@ -38,7 +38,7 @@ internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
                 field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareWrapped.Invoke);
 
                 // Clear the middleware transform as it has been applied
-                field.Middleware = null;
+                field.MiddlewareFactory = null;
             }
         }
     }

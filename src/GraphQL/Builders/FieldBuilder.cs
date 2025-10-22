@@ -508,15 +508,15 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         if (middleware == null)
             throw new ArgumentNullException(nameof(middleware));
 
-        var existingTransform = FieldType.Middleware;
+        var existingTransform = FieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            FieldType.Middleware = _ => middleware;
+            FieldType.MiddlewareFactory = _ => middleware;
         }
         else
         {
             // Chain the middleware
-            FieldType.Middleware = serviceProvider =>
+            FieldType.MiddlewareFactory = serviceProvider =>
             {
                 var existing = existingTransform(serviceProvider);
                 return existing == null ? middleware : new ChainedFieldMiddleware(existing, middleware);
@@ -534,16 +534,16 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
         where TMiddleware : IFieldMiddleware
     {
-        var existingTransform = FieldType.Middleware;
+        var existingTransform = FieldType.MiddlewareFactory;
         if (existingTransform == null)
         {
-            FieldType.Middleware = serviceProvider =>
+            FieldType.MiddlewareFactory = serviceProvider =>
                 serviceProvider.GetRequiredService<TMiddleware>();
         }
         else
         {
             // Chain the middleware
-            FieldType.Middleware = serviceProvider =>
+            FieldType.MiddlewareFactory = serviceProvider =>
             {
                 var existing = existingTransform(serviceProvider);
                 var middleware = serviceProvider.GetRequiredService<TMiddleware>();
@@ -552,6 +552,19 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         }
 
         return this;
+    }
+
+    /// <summary>
+    /// Applies middleware to the field using a delegate. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="middleware">The middleware delegate to apply.</param>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<IResolveFieldContext, FieldMiddlewareDelegate, ValueTask<object?>> middleware)
+    {
+        if (middleware == null)
+            throw new ArgumentNullException(nameof(middleware));
+
+        return ApplyMiddleware(new FuncFieldMiddleware(middleware));
     }
 
     /// <summary>
