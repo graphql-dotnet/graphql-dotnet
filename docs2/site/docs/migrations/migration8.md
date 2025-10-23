@@ -21,7 +21,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - `ComplexScalarGraphType` added, allowing flexible input/output types
 - `IMetadataWriter` and similar interfaces added to allow better intellisense
 - List converter enhancements and AOT support
-- OneOf Input Object support (based on draft spec)
+- OneOf Input Object support
 - Infer nullability by default for `Field` methods
 - Add Persisted Document support (based on draft spec)
 - Better error handling of GraphQL.NET pipeline; add timeout support
@@ -612,16 +612,12 @@ asserts that exactly one of the fields must be set and non-null, all others
 being omitted. This is useful for representing situations where an input may be
 one of many different options.
 
-See: https://github.com/graphql/graphql-spec/pull/825
+See: https://spec.graphql.org/draft/#sec-OneOf-Input-Objects
 
 To use this feature:
 - **Code-First**: Set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
 - **Schema-First**: Use the `@oneOf` directive on the input type in your schema definition.
 - **Type-First**: Use the `[OneOf]` directive on the CLR class.
-
-Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
-It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
-It is not expected to change from the current draft.
 
 ### 17. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
 
