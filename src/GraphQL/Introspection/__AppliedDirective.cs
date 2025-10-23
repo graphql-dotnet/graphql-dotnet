@@ -20,10 +20,10 @@ public class __AppliedDirective : ObjectGraphType<AppliedDirective>
 
         Field<NonNullGraphType<StringGraphType>>("name")
             .Description("Directive name")
-            .Resolve(context => context.Source!.Name);
+            .ResolveNoAccessor(context => context.Source!.Name);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveArgument>>>>("args")
             .Description("Values of explicitly specified directive arguments")
-            .Resolve(context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
+            .ResolveNoAccessor(context => context.Source!.List ?? Enumerable.Empty<DirectiveArgument>());
     }
 }

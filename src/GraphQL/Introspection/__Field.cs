@@ -32,9 +32,9 @@ public class __Field : ObjectGraphType<IFieldType>
             "Object and Interface types are described by a list of Fields, each of " +
             "which has a name, potentially a list of arguments, and a return type.";
 
-        Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source.Name);
+        Field<NonNullGraphType<StringGraphType>>("name").ResolveNoAccessor(context => context.Source.Name);
 
-        Field<StringGraphType>("description").Resolve(context => context.Source.Description);
+        Field<StringGraphType>("description").ResolveNoAccessor(context => context.Source.Description);
 
         var argsField = Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
             .ResolveAsync(async context =>
@@ -65,11 +65,11 @@ public class __Field : ObjectGraphType<IFieldType>
         if (deprecationOfInputValues)
             argsField.Argument<BooleanGraphType>("includeDeprecated", arg => arg.DefaultValue = BoolBox.False);
 
-        Field<NonNullGraphType<__Type>>("type").Resolve(context => context.Source.ResolvedType);
+        Field<NonNullGraphType<__Type>>("type").ResolveNoAccessor(context => context.Source.ResolvedType);
 
-        Field<NonNullGraphType<BooleanGraphType>>("isDeprecated").Resolve(context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
+        Field<NonNullGraphType<BooleanGraphType>>("isDeprecated").ResolveNoAccessor(context => (!string.IsNullOrWhiteSpace(context.Source.DeprecationReason)).Boxed());
 
-        Field<StringGraphType>("deprecationReason").Resolve(context => context.Source.DeprecationReason);
+        Field<StringGraphType>("deprecationReason").ResolveNoAccessor(context => context.Source.DeprecationReason);
 
         if (allowAppliedDirectives)
             this.AddAppliedDirectivesField("field");

@@ -1529,6 +1529,13 @@ from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`.
 you need to access the current field resolution context from services or other code that doesn't have
 direct access to the context parameter.
 
+Additionally, the `IRequiresResolveFieldContextAccessor` interface has been added to allow resolvers
+to indicate whether they require the context accessor. Resolvers that implement this interface and
+return `false` for the `RequiresResolveFieldContextAccessor` property will not have the context accessor
+middleware applied, even when `AddResolveFieldContextAccessor()` is called globally. This provides an
+optimization to avoid the overhead of the context accessor for resolvers that don't need it, such as
+simple property accessors.
+
 To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
 
 ```csharp

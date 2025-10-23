@@ -28,7 +28,8 @@ internal sealed class ResolveFieldContextAccessorVisitor : BaseSchemaNodeVisitor
         // also, do not wrap fields that explicitly indicate they do not need the context accessor
         if (field.Resolver != null &&
             field.Resolver != NameFieldResolver.Instance &&
-            field.Resolver != SourceFieldResolver.Instance)
+            field.Resolver != SourceFieldResolver.Instance &&
+            (field.Resolver is not IRequiresResolveFieldContextAccessor requiresAccessor || requiresAccessor.RequiresResolveFieldContextAccessor))
         {
             field.Resolver = new ResolveFieldContextAccessorResolver(_accessor, field.Resolver);
         }

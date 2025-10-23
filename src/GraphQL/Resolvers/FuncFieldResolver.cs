@@ -107,7 +107,7 @@ public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
                 {
                     adapter.Set(context);
                 }
-                var ret = resolver(adapter);
+                object? ret = resolver(adapter);
                 // only re-use contexts that do not return an IDataLoaderResult or an IEnumerable (that may be based on the context source)
                 if (CanReuseContextForValue(ret))
                 {
@@ -143,4 +143,14 @@ public class FuncFieldResolver<TSourceType, TReturnType> : IFieldResolver
 
     /// <inheritdoc/>
     public ValueTask<object?> ResolveAsync(IResolveFieldContext context) => _resolver(context);
+}
+
+internal class FuncFieldResolverNoAccessor<TSourceType, TReturnType> : FuncFieldResolver<TSourceType, TReturnType>, IRequiresResolveFieldContextAccessor
+{
+    public FuncFieldResolverNoAccessor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolver)
+        : base(resolver)
+    {
+    }
+
+    public bool RequiresResolveFieldContextAccessor => false;
 }

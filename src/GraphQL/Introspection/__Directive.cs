@@ -28,33 +28,33 @@ public class __Directive : ObjectGraphType<Directive>
             "conditionally including or skipping a field. Directives provide this by " +
             "describing additional information to the executor.";
 
-        Field<NonNullGraphType<StringGraphType>>("name").Resolve(context => context.Source!.Name);
+        Field<NonNullGraphType<StringGraphType>>("name").ResolveNoAccessor(context => context.Source!.Name);
 
-        Field<StringGraphType>("description").Resolve(context => context.Source!.Description);
+        Field<StringGraphType>("description").ResolveNoAccessor(context => context.Source!.Description);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__DirectiveLocation>>>>("locations")
-            .Resolve(context => context.Source!.Locations);
+            .ResolveNoAccessor(context => context.Source!.Locations);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
-            .Resolve(context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>());
+            .ResolveNoAccessor(context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>());
 
         if (allowRepeatable)
-            Field<NonNullGraphType<BooleanGraphType>>("isRepeatable").Resolve(context => context.Source!.Repeatable);
+            Field<NonNullGraphType<BooleanGraphType>>("isRepeatable").ResolveNoAccessor(context => context.Source!.Repeatable);
 
         Field<NonNullGraphType<BooleanGraphType>>("onOperation").DeprecationReason("Use 'locations'.")
-            .Resolve(context => context.Source!.Locations.Any(l =>
+            .ResolveNoAccessor(context => context.Source!.Locations.Any(l =>
                     l == DirectiveLocation.Query ||
                     l == DirectiveLocation.Mutation ||
                     l == DirectiveLocation.Subscription));
 
         Field<NonNullGraphType<BooleanGraphType>>("onFragment").DeprecationReason("Use 'locations'.")
-            .Resolve(context => context.Source!.Locations.Any(l =>
+            .ResolveNoAccessor(context => context.Source!.Locations.Any(l =>
                     l == DirectiveLocation.FragmentSpread ||
                     l == DirectiveLocation.InlineFragment ||
                     l == DirectiveLocation.FragmentDefinition));
 
         Field<NonNullGraphType<BooleanGraphType>>("onField").DeprecationReason("Use 'locations'.")
-            .Resolve(context => context.Source!.Locations.Any(l => l == DirectiveLocation.Field));
+            .ResolveNoAccessor(context => context.Source!.Locations.Any(l => l == DirectiveLocation.Field));
 
         if (allowAppliedDirectives)
             this.AddAppliedDirectivesField("directive");

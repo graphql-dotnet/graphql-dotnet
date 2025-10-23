@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
@@ -197,6 +198,12 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> Resolve(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
         => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
+
+    /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+    /// <remarks>Indicates that the <see cref="IResolveFieldContextAccessor"/> is not required for this resolver.</remarks>
+    [AllowedOn<IObjectGraphType>]
+    internal virtual FieldBuilder<TSourceType, TReturnType> ResolveNoAccessor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
+        => Resolve(new FuncFieldResolverNoAccessor<TSourceType, TReturnType>(resolve));
 
     /// <inheritdoc cref="Resolve(IFieldResolver)"/>
     [AllowedOn<IObjectGraphType>]

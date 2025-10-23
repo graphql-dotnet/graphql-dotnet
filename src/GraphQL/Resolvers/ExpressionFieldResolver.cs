@@ -11,7 +11,7 @@ namespace GraphQL.Resolvers;
 /// Note: this class uses dynamic compilation and therefore allocates a relatively large amount of
 /// memory in managed heap, ~1KB. Do not use this class in cases with limited memory requirements.
 /// </summary>
-public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver
+public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver, IRequiresResolveFieldContextAccessor
 {
     private readonly Func<IResolveFieldContext, ValueTask<object?>> _resolver;
 
@@ -26,9 +26,15 @@ public class ExpressionFieldResolver<TSourceType, TProperty> : IFieldResolver
         var cast = Expression.Convert(source, typeof(TSourceType));
         var body = property.Body.Replace(property.Parameters[0], cast);
         _resolver = MemberResolver.BuildFieldResolverInternal(param, body);
+
+        // require the context accessor unless the expression is a simple member access to a property or field
+        RequiresResolveFieldContextAccessor = !(property.Body is MemberExpression { Member: PropertyInfo or FieldInfo });
     }
 
     private static readonly PropertyInfo _sourcePropertyInfo = typeof(IResolveFieldContext).GetProperty(nameof(IResolveFieldContext.Source))!;
+
+    /// <inheritdoc/>
+    public bool RequiresResolveFieldContextAccessor { get; }
 
     /// <inheritdoc/>
     ValueTask<object?> IFieldResolver.ResolveAsync(IResolveFieldContext context)

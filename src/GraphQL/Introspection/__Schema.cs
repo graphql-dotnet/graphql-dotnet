@@ -21,7 +21,7 @@ public class __Schema : ObjectGraphType<ISchema>
             "the entry points for query, mutation, and subscription operations.";
 
         Field<StringGraphType>("description")
-            .Resolve(context => context.Schema.Description);
+            .ResolveNoAccessor(context => context.Schema.Description);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__Type>>>>("types")
             .Description("A list of all types supported by this server.")
@@ -50,7 +50,7 @@ public class __Schema : ObjectGraphType<ISchema>
 
         Field<NonNullGraphType<__Type>>("queryType")
             .Description("The type that query operations will be rooted at.")
-            .Resolve(context => context.Schema.Query);
+            .ResolveNoAccessor(context => context.Schema.Query);
 
         Field<__Type>("mutationType")
             .Description("If this server supports mutation, the type that mutation operations will be rooted at.")
