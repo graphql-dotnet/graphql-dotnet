@@ -490,10 +490,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
 
-    /// <summary>
-    /// Applies middleware to the field. If middleware is already set, the new middleware will be chained after the existing middleware.
-    /// </summary>
-    /// <param name="middleware">The middleware to apply.</param>
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, IFieldMiddleware)"/>
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
     {
@@ -501,10 +498,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         return this;
     }
 
-    /// <summary>
-    /// Applies middleware to the field by resolving it from the service provider. If middleware is already set, the new middleware will be chained after the existing middleware.
-    /// </summary>
-    /// <typeparam name="TMiddleware">The type of middleware to resolve from the service provider.</typeparam>
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware{TMiddleware}(FieldType)"/>
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
         where TMiddleware : IFieldMiddleware
@@ -513,10 +507,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         return this;
     }
 
-    /// <summary>
-    /// Applies middleware to the field using a delegate. If middleware is already set, the new middleware will be chained after the existing middleware.
-    /// </summary>
-    /// <param name="middleware">The middleware delegate to apply.</param>
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, Func{FieldMiddlewareDelegate, FieldMiddlewareDelegate})"/>/>
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
     {
