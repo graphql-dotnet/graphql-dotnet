@@ -654,7 +654,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     {
         public void Configure(ISchema schema, IServiceProvider serviceProvider)
         {
-            ((Schema)schema).ResolveFieldContextAccessor = serviceProvider.GetRequiredService<IResolveFieldContextAccessor>();
+            schema.ResolveFieldContextAccessor = serviceProvider.GetRequiredService<IResolveFieldContextAccessor>();
         }
     }
     #endregion
