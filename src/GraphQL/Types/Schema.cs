@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using GraphQL.Conversion;
 using GraphQL.DI;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
@@ -168,6 +169,13 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
+
+    /// <summary>
+    /// Gets or sets the <see cref="IResolveFieldContextAccessor"/> instance to be used for populating
+    /// the current field context during execution. When set, middleware will be automatically applied
+    /// to all fields to populate the accessor.
+    /// </summary>
+    public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
 
     /// <inheritdoc/>
     public bool Initialized { get; private set; }
@@ -466,6 +474,12 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         {
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
+
+            // Wrap resolvers with context accessor if configured
+            if (ResolveFieldContextAccessor != null)
+            {
+                new ResolveFieldContextAccessorVisitor(ResolveFieldContextAccessor).Run(this);
+            }
 
             // Apply field-specific middleware before schema-wide middleware (so it runs after schema-wide middleware)
             new FieldMiddlewareVisitor(_services).Run(this);

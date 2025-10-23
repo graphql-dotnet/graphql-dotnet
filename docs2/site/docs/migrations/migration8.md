@@ -28,6 +28,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
 - Field-specific middleware support (v8.7.0+)
+- `IResolveFieldContextAccessor` opt-in support for accessing current field context (v8.7.0+)
 
 Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
@@ -1520,6 +1521,53 @@ Field<StringGraphType>("myField")
 The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping
 the resolver directly. This provides better composability and allows scoped services to work seamlessly
 with other middleware.
+
+### 37. `IResolveFieldContextAccessor` for accessing current field context (v8.7.0+)
+
+An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext`
+from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when
+you need to access the current field resolution context from services or other code that doesn't have
+direct access to the context parameter.
+
+To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddResolveFieldContextAccessor()
+);
+```
+
+Then inject `IResolveFieldContextAccessor` into your services:
+
+```csharp
+public class MyService
+{
+    private readonly IResolveFieldContextAccessor _contextAccessor;
+
+    public MyService(IResolveFieldContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
+    public string GetCurrentFieldName()
+    {
+        var context = _contextAccessor.ResolveFieldContext;
+        return context.FieldDefinition.Name;
+    }
+}
+```
+
+The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and
+proper context isolation across concurrent requests. The context is automatically populated during
+field resolution and cleared after the resolver completes. The context will not be available within
+data loader batch functions, as they execute outside the original field resolver.
+
+**Note:** The context accessor adds a small performance overhead as middleware must be applied to
+every field in the schema. Only enable it if you need to access the context from services or other
+code that doesn't have direct access to the resolver's context parameter. To mitigate this overhead,
+the context accessor middleware is not applied to fields that directly access a property or field of
+the source object. Use a resolver function if a property getter needs to access the context.
 
 ## Breaking Changes
 
