@@ -1,190 +1,249 @@
 # Field Middleware
 
-Field Middleware is a component connected to the schema, which is embedded into the process of
-calculating the field value. You can write middleware for fields to provide additional behaviors
-during field resolution. After connecting the middleware to the schema, it is applied to all
-fields of all schema types. You can connect several middlewares to the schema. In this case,
-they will be called sequentially along the chain where the previous middleware decides to call
-the next one. This process is very similar to how middlewares work in the ASP.NET Core HTTP request
-pipeline.
+Field Middleware provides additional behaviors during field resolution. GraphQL.NET supports two types:
 
-The following example is how Metrics are captured. You write a class that implements `IFieldMiddleware`:
+1. **Global Middleware** - Applied to all fields across the entire schema
+2. **Field-Specific Middleware** - Applied to individual fields (v8.7.0+)
+
+Both types work similarly to ASP.NET Core HTTP middleware, executing in a chain where each middleware can perform actions before and after the next middleware or resolver.
+
+## Creating Middleware
+
+Middleware is created by implementing the `IFieldMiddleware` interface:
 
 ```csharp
-public class InstrumentFieldsMiddleware : IFieldMiddleware
+public class LoggingMiddleware : IFieldMiddleware
 {
-    public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+    private readonly ILogger<LoggingMiddleware> _logger;
+
+    public LoggingMiddleware(ILogger<LoggingMiddleware> logger)
     {
-        return context.Metrics.Enabled
-            ? ResolveWhenMetricsEnabledAsync(context, next)
-            : next(context);
+        _logger = logger;
     }
 
-    private async ValueTask<object?> ResolveWhenMetricsEnabledAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
     {
-        var name = context.FieldAst.Name.StringValue;
-
-        var metadata = new Dictionary<string, object?>
-        {
-            { "typeName", context.ParentType.Name },
-            { "fieldName", name },
-            { "returnTypeName", context.FieldDefinition.ResolvedType!.ToString() },
-            { "path", context.Path },
-        };
-
-        using (context.Metrics.Subject("field", name, metadata))
-            return await next(context).ConfigureAwait(false);
+        _logger.LogInformation("Resolving {Field}", context.FieldName);
+        var result = await next(context);
+        _logger.LogInformation("Resolved {Field}", context.FieldName);
+        return result;
     }
 }
 ```
 
-Then register your Field Middleware on the schema.
+The same middleware class can be used as either global or field-specific middleware depending on how you register it.
+
+## Global Middleware
+
+Global middleware applies to all fields in your schema. This is useful for cross-cutting concerns like logging, metrics, or authorization.
+
+### Using UseMiddleware
+
+The recommended approach is using `UseMiddleware<T>()` on the GraphQL builder:
 
 ```csharp
-var schema = new Schema();
-schema.Query = new MyQuery();
-schema.FieldMiddleware.Use(new InstrumentFieldsMiddleware());
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .UseMiddleware<InstrumentFieldsMiddleware>()
+    .UseMiddleware<LoggingMiddleware>());
 ```
 
-Or, you can register a middleware delegate directly:
+This automatically registers the middleware in DI as a singleton and applies it to the schema.
+
+### Manual Registration
+
+You can also register middleware directly on the schema:
 
 ```csharp
-schema.FieldMiddleware.Use(next =>
+public class MySchema : Schema
 {
-  return context =>
-  {
-    // your code here
-    var result = next(context);
-    // your code here
+    public MySchema(IServiceProvider services, MyQuery query, LoggingMiddleware middleware)
+        : base(services)
+    {
+        Query = query;
+        FieldMiddleware.Use(middleware);
+    }
+}
+```
+
+Or use a lambda:
+
+```csharp
+schema.FieldMiddleware.Use(next => async context =>
+{
+    // Code before resolver
+    var result = await next(context);
+    // Code after resolver
     return result;
-  };
 });
 ```
 
-The middleware interface is defined as:
+## Field-Specific Middleware
+
+Field-specific middleware applies only to designated fields, offering better performance and clearer intent than global middleware for field-level concerns. There are three ways to apply middleware to a field:
+
+```csharp
+// Register middleware in DI first if applicable
+services.AddSingleton<LoggingMiddleware>();
+
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("field1")
+            .Resolve(context => "Data")
+            // 1. Using a lambda
+            .ApplyMiddleware(next => async context =>
+            {
+                // Custom logic here
+                var result = await next(context);
+                return result;
+            });
+
+        Field<StringGraphType>("field2")
+            .Resolve(context => "Data")
+            // 2. Using a middleware instance
+            .ApplyMiddleware(new LoggingMiddleware(logger));
+
+        Field<StringGraphType>("field3")
+            .Resolve(context => "Data")
+            // 3. Using a type resolved from DI (recommended)
+            .ApplyMiddleware<LoggingMiddleware>();
+    }
+}
+```
+
+## Execution Order
+
+When both global and field-specific middleware are present:
+
+1. Global middleware (in registration order)
+2. Field-specific middleware (in application order)
+3. Field resolver
+
+Example:
+
+```csharp
+// Global middleware
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .UseMiddleware<GlobalMiddleware1>()
+    .UseMiddleware<GlobalMiddleware2>());
+
+// Field-specific middleware
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("myField")
+            .Resolve(context => "Result")
+            .ApplyMiddleware<FieldMiddleware1>()
+            .ApplyMiddleware<FieldMiddleware2>();
+    }
+}
+
+// Execution order:
+// 1. GlobalMiddleware1 (before)
+// 2. GlobalMiddleware2 (before)
+// 3. FieldMiddleware1 (before)
+// 4. FieldMiddleware2 (before)
+// 5. Field Resolver executes
+// 6. FieldMiddleware2 (after)
+// 7. FieldMiddleware1 (after)
+// 8. GlobalMiddleware2 (after)
+// 9. GlobalMiddleware1 (after)
+```
+
+## Dependency Injection
+
+### Using DI with Global Middleware
+
+When using `UseMiddleware<T>()`, the middleware is automatically registered as a singleton. For manual registration:
+
+```csharp
+services.AddSingleton<LoggingMiddleware>();
+
+public class MySchema : Schema
+{
+    public MySchema(IServiceProvider services, MyQuery query, LoggingMiddleware middleware)
+        : base(services)
+    {
+        Query = query;
+        FieldMiddleware.Use(middleware);
+    }
+}
+```
+
+### Using DI with Field-Specific Middleware
+
+When using `ApplyMiddleware<T>()`, the middleware must be registered in the DI container:
+
+```csharp
+// Register middleware in DI
+services.AddSingleton<AuthorizationMiddleware>();
+
+// Apply to field - middleware is resolved from DI during schema initialization
+Field<StringGraphType>("protectedField")
+    .Resolve(context => "Protected data")
+    .ApplyMiddleware<AuthorizationMiddleware>();
+```
+
+**Note**: The middleware is resolved from DI during schema initialization, not during each field resolution.
+
+### Scoped Dependencies
+
+For scoped dependencies, use a singleton middleware and resolve dependencies in `ResolveAsync`:
+
+```csharp
+public class MyMiddleware : IFieldMiddleware
+{
+    public async ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
+    {
+        var scopedService = context.RequestServices!
+            .GetRequiredService<IMyScopedService>();
+        
+        // Use scoped service
+        return await next(context);
+    }
+}
+```
+
+## Lifetime Considerations
+
+Recommended lifetimes for optimal performance:
+
+| Schema    | Graph Type | Middleware | Recommendation |
+|-----------|------------|------------|----------------|
+| singleton | singleton  | singleton  | ✅ Recommended |
+| scoped    | scoped     | singleton  | ⚠️ Less performant |
+| scoped    | scoped     | scoped     | ⚠️ Least performant |
+| scoped    | singleton  | scoped     | ❌ Avoid - causes duplicate middleware application |
+| singleton | singleton  | scoped     | ❌ Avoid - throws InvalidOperationException |
+
+**Important**: Middleware is applied during schema initialization. Using incompatible lifetimes can cause middleware to be applied multiple times or fail to resolve.
+
+## Field Middleware vs Directives
+
+**Use Field Middleware when:**
+
+- You need programmatic control over field behavior
+- The behavior is implementation-specific (not part of the schema contract)
+- You want to apply logic to specific fields without schema changes
+
+**Use Directives when:**
+
+- The behavior should be visible in schema introspection
+- You want schema-first configuration
+- The behavior applies to multiple schema elements (types, fields, arguments)
+
+For more information, see [Directives](../directives).
+
+## Interface Reference
 
 ```csharp
 public interface IFieldMiddleware
 {
-  ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next);
+    ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next);
 }
-```
 
-The middleware delegate is defined as:
-
-```csharp
 public delegate ValueTask<object?> FieldMiddlewareDelegate(IResolveFieldContext context);
-```
-
-## Field Middleware and Dependency Injection
-
-First, you are advised to read the article about [Dependency Injection](../dependency-injection).
-
-Typically you will want to set the middleware within the schema constructor.
-
-```csharp
-public MySchema : Schema
-{
-  public MySchema(
-    IServiceProvider services,
-    MyQuery query,
-    InstrumentFieldsMiddleware middleware)
-    : base(services)
-  {
-    Query = query;
-    FieldMiddleware.Use(middleware);
-  }
-}
-```
-
-Then your middleware creation will be delegated to DI-container. Thus, you can pass any dependencies to
-the Field Middleware constructor, provided that you have registered them correctly in DI.
-
-Also, the middleware itself should be registered in DI:
-
-```csharp
-services.AddSingleton<InstrumentFieldsMiddleware>();
-```
-
-Alternatively, you can use an enumerable in your constructor to add all DI-registered middlewares:
-
-```csharp
-public MySchema : Schema
-{
-  public MySchema(
-    IServiceProvider services,
-    MyQuery query,
-    IEnumerable<IFieldMiddleware> middlewares)
-    : base(services)
-  {
-    Query = query;
-    foreach (var middleware in middlewares)
-      FieldMiddleware.Use(middleware);
-  }
-}
-
-// within Startup.cs
-services.AddSingleton<ISchema, MySchema>();
-services.AddSingleton<IFieldMiddleware, InstrumentFieldsMiddleware>();
-services.AddSingleton<IFieldMiddleware, MyMiddleware>();
-...
-```
-
-## Known issues
-
-Perhaps the most important thing with Field Middlewares that you should be aware of is that the
-default `DocumentExecuter` applies middlewares to the schema only once while the schema is being
-initialized. After this, calling any `IFieldMiddlewareBuilder.Use` methods has no effect.
-
-Field Middleware, when applying to the schema, **modifies** the resolver of each field. Therefore,
-you should be careful when using different lifetimes (singleton, scoped, transient) for your
-GraphTypes, Schema and Field Middleware. You **can** use any of lifetime, but for example in
-case of using singleton lifetime for some GraphType and scoped lifetime for Field Middleware
-and Schema this will cause the middleware to be applied to the same fields multiple times.
-In the case of ASP.NET Core app the resolvers of these fields will be wrapped again on each
-HTTP request to the server.
-
-General recommendations for lifetimes are:
-
-| Schema    | Graph Type | Middleware | Rating | 
-|-----------|------------|------------|--------|
-| singleton | singleton  | singleton  | the safest and the most performant option recommended by default |
-| scoped    | scoped     | singleton  | much less performant option |
-| scoped    | scoped     | scoped     | the least performant option |
-| scoped    | singleton  | scoped     | DO NOT DO THAT! Explanation above. |
-| singleton | singleton  | scoped     | DO NOT DO THAT! InvalidOperationException: Cannot resolve scoped service from root provider |
-
-If your Field Middleware has scoped dependencies but your Schema and Graph Types are singletons
-(which is recommended for them) you can make Field Middleware singleton too and obtain the necessary
-dependencies right in the `Resolve` method. Here is an example of such an approach:
-
-```csharp
-public class MyFieldMiddleware : IFieldMiddleware
-{
-  private readonly IHttpContextAccessor _accessor;
-  private readonly IMySingletonService _service;
-
-  public MyFieldMiddleware(IHttpContextAccessor accessor, IMySingletonService service)
-  {
-    _accessor = accessor;
-    _service = service;
-  }
-
-  public ValueTask<object?> ResolveAsync(IResolveFieldContext context, FieldMiddlewareDelegate next)
-  {
-    var scopedDependency1 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService1>();
-    var scopedDependency2 = accessor.HttpContext.RequestServices.GetRequiredService<IMyService2>();
-    ...
-    return next(context);
-  }
-}
-```
-
-Options are also possible using transient lifetime, but are not given here (not recommended).
-
-## Field Middleware vs Directive
-
-You can think of a Field Middleware as something global that controls how all fields of all types
-in the schema are resolved. A directive, at the same time, would only affect specific schema elements
-and only those elements. Moreover, a directive is not limited to field resolvers like middleware is.
-For more information about directives see [Directives](../directives).
