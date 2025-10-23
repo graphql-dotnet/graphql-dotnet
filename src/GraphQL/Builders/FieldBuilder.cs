@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -488,4 +489,29 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, IFieldMiddleware)"/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware{TMiddleware}(FieldType)"/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+        where TMiddleware : IFieldMiddleware
+    {
+        FieldType.ApplyMiddleware<TMiddleware>();
+        return this;
+    }
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, Func{FieldMiddlewareDelegate, FieldMiddlewareDelegate})"/>/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
 }

@@ -466,6 +466,11 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         {
             // At this point, Initialized will return false, and Initialize will still lock while waiting for initialization to complete.
             // However, AllTypes and similar properties will return a reference to SchemaTypes without waiting for a lock.
+
+            // Apply field-specific middleware before schema-wide middleware (so it runs after schema-wide middleware)
+            new FieldMiddlewareVisitor(_services).Run(this);
+
+            // Apply schema-wide middleware
             _allTypes.ApplyMiddleware(FieldMiddleware);
 
             foreach (var visitor in GetVisitors())

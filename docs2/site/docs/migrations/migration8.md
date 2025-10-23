@@ -27,6 +27,7 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - Better error handling of GraphQL.NET pipeline; add timeout support
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
+- Field-specific middleware support (v8.7.0+)
 
 Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
@@ -1482,6 +1483,43 @@ public class MySchema : Schema
 ```
 
 This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
+
+### 36. Field-specific middleware support (v8.7.0+)
+
+GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property.
+This allows middleware to be applied to individual fields rather than only globally across all fields
+in the schema. Field middleware is collapsed into the field's resolver during schema initialization
+for optimal performance.
+
+You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
+
+```csharp
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("myField")
+            .Resolve(context => "Hello World")
+            .ApplyMiddleware(next => async (context) =>    // using a lambda
+            {
+                // Code before resolver execution
+                var result = await next(context);
+                // Code after resolver execution
+                return result;
+            });
+    }
+}
+```
+
+Multiple middleware can be chained together on a single field, and they will be executed in the order
+they were applied:
+
+```csharp
+Field<StringGraphType>("myField")
+    .Resolve(context => "Hello World")
+    .ApplyMiddleware(loggingMiddleware)            // using an instance
+    .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
+```
 
 ## Breaking Changes
 
