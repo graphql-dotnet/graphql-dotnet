@@ -33,9 +33,6 @@ internal sealed class FieldMiddlewareVisitor : BaseSchemaNodeVisitor
             // Apply the middleware transform to wrap the resolver
             FieldMiddlewareDelegate wrappedDelegate = middlewareTransform(_serviceProvider, inner.ResolveAsync);
             field.Resolver = new FuncFieldResolver<object>(wrappedDelegate.Invoke);
-
-            // Clear the middleware transform as it has been applied
-            field.Middleware = null;
         }
     }
 }
