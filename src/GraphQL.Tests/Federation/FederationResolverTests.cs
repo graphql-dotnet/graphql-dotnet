@@ -467,7 +467,7 @@ public class FederationResolverTests
 
     private class MySchemaTypes : SchemaTypes
     {
-        private readonly Dictionary<ROM, IGraphType> _types = new();
+        private readonly Dictionary<ROM, IGraphType> _types = [];
 
         public MySchemaTypes(IEnumerable<IGraphType> types)
         {

@@ -117,7 +117,7 @@ public partial class ValidationContext : IProvideUserContext
     {
         if (error == null)
             throw new ArgumentNullException(nameof(error), "Must provide a validation error.");
-        (_errors ??= new()).Add(error);
+        (_errors ??= []).Add(error);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public partial class ValidationContext : IProvideUserContext
 
                 if (graphType == null)
                 {
-                    (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
+                    (errors ??= []).Add(new InvalidVariableError(this, variableDef, variableDefName, $"Variable has unknown type '{variableDef.Type.Name()}'"));
                     continue;
                 }
 
@@ -218,7 +218,7 @@ public partial class ValidationContext : IProvideUserContext
                     }
                     catch (ValidationError error)
                     {
-                        (errors ??= new()).Add(error);
+                        (errors ??= []).Add(error);
                         continue;
                     }
                 }
@@ -237,14 +237,14 @@ public partial class ValidationContext : IProvideUserContext
                     }
                     catch (ValidationError ex)
                     {
-                        (errors ??= new()).Add(ex);
+                        (errors ??= []).Add(ex);
                         continue;
                     }
                     variable.IsDefault = true;
                 }
                 else if (graphType is NonNullGraphType)
                 {
-                    (errors ??= new()).Add(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
+                    (errors ??= []).Add(new InvalidVariableError(this, variableDef, variable.Name, "No value provided for a non-null variable."));
                     continue;
                 }
 
@@ -541,7 +541,7 @@ public partial class ValidationContext : IProvideUserContext
                     {
                         string? error = IsValidLiteralValue(ofType, listValue.Values[index]);
                         if (error != null)
-                            (errors ??= new()).Add($"In element #{index + 1}: [{error}]");
+                            (errors ??= []).Add($"In element #{index + 1}: [{error}]");
                     }
                 }
 
@@ -573,7 +573,7 @@ public partial class ValidationContext : IProvideUserContext
                     var found = fields.Find(x => x.Name == providedFieldAst.Name);
                     if (found == null)
                     {
-                        (errors ??= new()).Add($"In field '{providedFieldAst.Name}': Unknown field.");
+                        (errors ??= []).Add($"In field '{providedFieldAst.Name}': Unknown field.");
                     }
                 }
             }
@@ -587,11 +587,11 @@ public partial class ValidationContext : IProvideUserContext
                 {
                     string? error = IsValidLiteralValue(field.ResolvedType!, fieldAst.Value);
                     if (error != null)
-                        (errors ??= new()).Add($"In field '{field.Name}': [{error}]");
+                        (errors ??= []).Add($"In field '{field.Name}': [{error}]");
                 }
                 else if (field.ResolvedType is NonNullGraphType nonNull2 && field.DefaultValue == null)
                 {
-                    (errors ??= new()).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
+                    (errors ??= []).Add($"Missing required field '{field.Name}' of type '{nonNull2.ResolvedType}'.");
                 }
             }
 
@@ -623,8 +623,8 @@ internal static class ValidationContextExtensions
         }
         else
         {
-            items = new List<T> { item };
-            (context.NonUserContext ??= new()).Add(listKey, items);
+            items = [item];
+            (context.NonUserContext ??= []).Add(listKey, items);
         }
     }
 

@@ -8,7 +8,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class TypeFields : IEnumerable<FieldType>
 {
-    internal List<FieldType> List { get; } = new List<FieldType>();
+    internal List<FieldType> List { get; } = [];
 
     /// <summary>
     /// Gets the count of fields.

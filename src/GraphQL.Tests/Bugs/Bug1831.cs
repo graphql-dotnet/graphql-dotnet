@@ -31,7 +31,7 @@ public class Bug1831 : QueryTestBase<Bug1831Schema>
             Code = "KNOWN_TYPE_NAMES"
         };
         error2.AddLocation(new Location(1, 13));
-        var expected = CreateQueryResult(null, new ExecutionErrors { error1, error2 }, executed: false);
+        var expected = CreateQueryResult(null, [error1, error2], executed: false);
         AssertQueryIgnoreErrors("query($arg: abcdefg) { test1 (arg: $arg) }", expected, variables: $"{{ \"arg\": {param} }}".ToInputs(), expectedErrorCount: 2, renderErrors: true);
     }
 }

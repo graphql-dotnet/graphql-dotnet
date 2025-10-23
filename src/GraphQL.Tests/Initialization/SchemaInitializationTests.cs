@@ -351,7 +351,7 @@ public class SchemaWithInvalidDefault2 : Schema
     {
         var root = new ObjectGraphType();
         root.Field<NonNullGraphType<StringGraphType>>("field")
-            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = new List<string?> { "a", null, "b" } });
+            .Argument<NonNullGraphType<SchemaWithInvalidDefault1.SomeInputType>>("argOne", arg => arg.DefaultValue = new SchemaWithInvalidDefault1.SomeInput { Names = ["a", null, "b"] });
         Query = root;
     }
 }

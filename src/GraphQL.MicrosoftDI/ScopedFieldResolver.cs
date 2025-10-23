@@ -1,3 +1,4 @@
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +10,7 @@ namespace GraphQL.MicrosoftDI;
 /// to create a dependency injection scope. Then it calls a predefined <see cref="Func{T, TResult}"/>, passing the scoped service provider
 /// within <see cref="IResolveFieldContext.RequestServices"/>, and returns the result.
 /// </summary>
+[Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future release.")]
 public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
 {
     /// <summary>
@@ -21,7 +23,19 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
         return context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
-            return resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider));
+            var newContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
+            var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
+            if (accessor != null)
+                accessor.Context = newContext;
+            try
+            {
+                return resolver(newContext);
+            }
+            finally
+            {
+                if (accessor != null)
+                    accessor.Context = context;
+            }
         };
     }
 
@@ -33,12 +47,25 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
         return async context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
-            return await resolver(new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider)).ConfigureAwait(false);
+            var newContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
+            var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
+            if (accessor != null)
+                accessor.Context = newContext;
+            try
+            {
+                return await resolver(newContext).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (accessor != null)
+                    accessor.Context = context;
+            }
         };
     }
 }
 
 /// <inheritdoc cref="ScopedFieldResolver{TReturnType}"/>
+[Obsolete("Please use ScopedFieldMiddleware instead. This class will be removed in a future release.")]
 public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<TReturnType>
 {
     /// <inheritdoc cref="ScopedFieldResolver{TReturnType}(Func{IResolveFieldContext, TReturnType})"/>
@@ -49,7 +76,19 @@ public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<T
         return context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
-            return resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider));
+            var newContext = new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider);
+            var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
+            if (accessor != null)
+                accessor.Context = newContext;
+            try
+            {
+                return resolver(newContext);
+            }
+            finally
+            {
+                if (accessor != null)
+                    accessor.Context = context;
+            }
         };
     }
 
@@ -61,7 +100,19 @@ public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<T
         return async context =>
         {
             using var scope = context.RequestServicesOrThrow().CreateScope();
-            return await resolver(new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider)).ConfigureAwait(false);
+            var newContext = new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider);
+            var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
+            if (accessor != null)
+                accessor.Context = newContext;
+            try
+            {
+                return await resolver(newContext).ConfigureAwait(false);
+            }
+            finally
+            {
+                if (accessor != null)
+                    accessor.Context = context;
+            }
         };
     }
 }

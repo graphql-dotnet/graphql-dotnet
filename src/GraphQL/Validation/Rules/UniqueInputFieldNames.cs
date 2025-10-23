@@ -51,7 +51,7 @@ public sealed class UniqueInputFieldNames : ValidationRuleBase
             new MatchingNodeVisitor<GraphQLObjectField>(
                 leave: (objField, context) =>
                 {
-                    var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= new();
+                    var knownNames = context.TypeInfo.UniqueInputFieldNames_KnownNames ??= [];
 
                     if (knownNames.TryGetValue(objField.Name, out var value))
                     {

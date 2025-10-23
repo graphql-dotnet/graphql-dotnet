@@ -70,7 +70,7 @@ public sealed class LinkConfiguration
     /// link.Imports.Add("@shareable", "@fed_shareable"); // imports @shareable as @fed_shareable
     /// </code>
     /// </remarks>
-    public Dictionary<string, string> Imports { get; } = new();
+    public Dictionary<string, string> Imports { get; } = [];
 
     /// <summary>
     /// Returns the aliased name for the requested type.

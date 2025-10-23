@@ -24,7 +24,7 @@ public sealed class UniqueFragmentNames : ValidationRuleBase
 
     private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((fragmentDefinition, context) =>
         {
-            var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= new();
+            var knownFragments = context.TypeInfo.UniqueFragmentNames_KnownFragments ??= [];
 
             var fragmentName = fragmentDefinition.FragmentName.Name;
             if (knownFragments.TryGetValue(fragmentName, out var frag)) // .NET 2.2+ has TryAdd

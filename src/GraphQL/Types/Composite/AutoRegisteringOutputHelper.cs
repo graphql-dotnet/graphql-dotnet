@@ -46,8 +46,8 @@ internal static class AutoRegisteringOutputHelper
         }
         else if (memberInfo is MethodInfo methodInfo)
         {
-            List<LambdaExpression> expressions = new();
-            QueryArguments queryArguments = new();
+            List<LambdaExpression> expressions = [];
+            QueryArguments queryArguments = [];
             foreach (var parameterInfo in methodInfo.GetParameters())
             {
                 var getArgumentInfoMethod = getTypedArgumentInfoMethod(parameterInfo.ParameterType);

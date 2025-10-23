@@ -24,9 +24,9 @@ public sealed class NoFragmentCycles : ValidationRuleBase
 
     private static readonly INodeVisitor _nodeVisitor = new MatchingNodeVisitor<GraphQLFragmentDefinition>((node, context) =>
     {
-        var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= new();
+        var visitedFrags = context.TypeInfo.NoFragmentCycles_VisitedFrags ??= [];
         var spreadPath = context.TypeInfo.NoFragmentCycles_SpreadPath ??= new();
-        var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= new();
+        var spreadPathIndexByName = context.TypeInfo.NoFragmentCycles_SpreadPathIndexByName ??= [];
         if (!visitedFrags.Contains(node.FragmentName.Name))
         {
             DetectCycleRecursive(node, spreadPath, visitedFrags, spreadPathIndexByName, context);

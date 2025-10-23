@@ -36,7 +36,7 @@ public struct FieldArgumentsValidationContext
         }
         set
         {
-            ValidationContext.ArgumentValues ??= new();
+            ValidationContext.ArgumentValues ??= [];
             if (value != null)
                 ValidationContext.ArgumentValues.TryAdd(FieldAst, value);
             else

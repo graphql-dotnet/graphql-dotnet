@@ -33,7 +33,7 @@ public class ThreadPerformanceTests : QueryTestBase<ThreadPerformanceTests.Threa
 
     public class PerfMutation : ObjectGraphType<object>
     {
-        public static readonly List<string> Calls = new();
+        public static readonly List<string> Calls = [];
 
         public PerfMutation()
         {

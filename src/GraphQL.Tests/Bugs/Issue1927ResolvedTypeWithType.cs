@@ -33,7 +33,7 @@ public class Issue1927ResolvedTypeWithType
             Name = "hello",
             ResolvedType = new StringGraphType(),
             Type = typeof(StringGraphType),
-            Arguments = new QueryArguments { new QueryArgument(inputObj) { Name = "input" } }
+            Arguments = [new QueryArgument(inputObj) { Name = "input" }]
         };
         obj.AddField(field);
         var schema = new Schema

@@ -220,10 +220,10 @@ public class SchemaTests
         {
             Name = "test",
             Type = typeof(IntGraphType),
-            Arguments = new QueryArguments
-            {
+            Arguments =
+            [
                 new QueryArgument(typeof(GraphQLClrInputTypeReference<CustomData>)) { Name = "arg" }
-            }
+            ]
         };
         query.AddField(field);
         schema.Query = query;

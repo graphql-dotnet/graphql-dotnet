@@ -177,7 +177,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
             writtenResult.ShouldBeCrossPlat(expectedResult);
 
-            var errors = runResult.Errors ?? new ExecutionErrors();
+            var errors = runResult.Errors ?? [];
 
             errors.Count.ShouldBe(expectedErrorCount);
         }

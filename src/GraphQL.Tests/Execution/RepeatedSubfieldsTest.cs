@@ -10,9 +10,9 @@ public class RepeatedSubfieldsTests
     public RepeatedSubfieldsTests()
     {
         FirstInnerField = new GraphQLField(new GraphQLName("first"));
-        FirstFieldSelection = new GraphQLSelectionSet(new List<ASTNode> { FirstInnerField });
+        FirstFieldSelection = new GraphQLSelectionSet([FirstInnerField]);
         SecondInnerField = new GraphQLField(new GraphQLName("second"));
-        SecondFieldSelection = new GraphQLSelectionSet(new List<ASTNode> { SecondInnerField });
+        SecondFieldSelection = new GraphQLSelectionSet([SecondInnerField]);
         FirstTestField = new GraphQLField(new GraphQLName("test"));
         SecondTestField = new GraphQLField(new GraphQLName("test"));
         AliasedTestField = new GraphQLField(new GraphQLName("test")) { Alias = new GraphQLAlias(new GraphQLName("alias")) };
@@ -45,11 +45,10 @@ public class RepeatedSubfieldsTests
     public void BeMergedCorrectlyInCaseOfFields()
     {
         var outerSelection = new GraphQLSelectionSet(
-            new List<ASTNode>
-            {
+            [
                 FirstTestField,
                 SecondTestField
-            }
+            ]
         );
 
         var query = new ObjectGraphType { Name = "Query" };
@@ -74,11 +73,10 @@ public class RepeatedSubfieldsTests
     public void NotMergeAliasedFields()
     {
         var outerSelection = new GraphQLSelectionSet(
-            new List<ASTNode>
-            {
+            [
                 FirstTestField,
                 AliasedTestField
-            }
+            ]
         );
 
         var query = new ObjectGraphType { Name = "Query" };
@@ -105,10 +103,9 @@ public class RepeatedSubfieldsTests
     public void MergeFieldAndFragment()
     {
         var fragmentSelection = new GraphQLSelectionSet(
-            new List<ASTNode>
-            {
+            [
                 FirstTestField
-            }
+            ]
         );
         var fragment = new GraphQLFragmentDefinition(
             new GraphQLFragmentName(new GraphQLName("fragment")),
@@ -116,10 +113,9 @@ public class RepeatedSubfieldsTests
             fragmentSelection);
 
         var document = new GraphQLDocument(
-            new List<ASTNode>
-            {
+            [
                 fragment
-            }
+            ]
         );
 
         var query = new ObjectGraphType { Name = "Query" };
@@ -138,11 +134,10 @@ public class RepeatedSubfieldsTests
 
         var fragSpread = new GraphQLFragmentSpread(new GraphQLFragmentName(new GraphQLName("fragment")));
         var outerSelection = new GraphQLSelectionSet(
-            new List<ASTNode>
-            {
+            [
                 fragSpread,
                 SecondTestField
-            }
+            ]
         );
 
         var fields = CollectFrom(context, query, outerSelection);

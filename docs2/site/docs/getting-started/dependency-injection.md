@@ -96,6 +96,7 @@ A list of the available extension methods is below:
 | `AddGraphTypeMappingProvider` | Registers a graph type mapping provider for unmapped CLR types | |
 | `AddLegacyComplexityAnalyzer` | Enables the v7 complexity analyzer and configures its options | |
 | `AddNewtonsoftJson`     | Registers the serializer that uses Newtonsoft.Json as its underlying JSON serialization engine | GraphQL.NewtonsoftJson |
+| `AddResolveFieldContextAccessor` | Registers `IResolveFieldContextAccessor` to access the current field context from services | |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSchemaVisitor<>`    | Registers the specified schema visitor and configures it to be used at schema initialization | |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |

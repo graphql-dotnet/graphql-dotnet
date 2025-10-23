@@ -7,7 +7,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class PossibleTypes : IEnumerable<IObjectGraphType>
 {
-    internal List<IObjectGraphType> List { get; } = new List<IObjectGraphType>();
+    internal List<IObjectGraphType> List { get; } = [];
 
     /// <summary>
     /// Gets the count of possible types.

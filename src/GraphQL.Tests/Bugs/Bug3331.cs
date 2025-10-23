@@ -149,7 +149,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
     {
         public DataResult()
         {
-            Data = new List<TResult>();
+            Data = [];
         }
 
         public long Total { get; set; }

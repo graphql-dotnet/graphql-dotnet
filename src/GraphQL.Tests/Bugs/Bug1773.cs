@@ -14,7 +14,7 @@ public class Bug1773 : QueryTestBase<Bug1773Schema>
         error.Path = path;
         if (code != null)
             error.Code = code;
-        var expected = CreateQueryResult(result, new ExecutionErrors { error });
+        var expected = CreateQueryResult(result, [error]);
         var actualResult = AssertQueryIgnoreErrors(query, expected, inputs?.ToInputs(), renderErrors: true, expectedErrorCount: 1);
         if (exception != null)
         {

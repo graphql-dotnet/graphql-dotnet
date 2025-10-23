@@ -83,6 +83,6 @@ public class ExecuteConfig
     public string ExpectedResult { get; set; }
     public object Root { get; set; }
     public bool ThrowOnUnhandledException { get; set; }
-    public List<IDocumentExecutionListener> Listeners { get; set; } = new List<IDocumentExecutionListener>();
+    public List<IDocumentExecutionListener> Listeners { get; set; } = [];
     public Action<ISchema> ConfigureBuildedSchema { get; set; }
 }

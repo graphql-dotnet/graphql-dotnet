@@ -33,7 +33,7 @@ public class ValidationResult : IValidationResult
     private ExecutionErrors? _errors;
 
     /// <inheritdoc/>
-    public ExecutionErrors Errors => _errors ??= new ExecutionErrors();
+    public ExecutionErrors Errors => _errors ??= [];
 
     /// <inheritdoc/>
     public Variables? Variables { get; set; }

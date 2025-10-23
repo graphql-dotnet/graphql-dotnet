@@ -26,7 +26,7 @@ public sealed class UniqueArgumentNames : ValidationRuleBase
         new MatchingNodeVisitor<GraphQLDirective>((__, context) => context.TypeInfo.UniqueArgumentNames_KnownArgs?.Clear()),
         new MatchingNodeVisitor<GraphQLArgument>((argument, context) =>
         {
-            var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= new();
+            var knownArgs = context.TypeInfo.UniqueArgumentNames_KnownArgs ??= [];
             var argName = argument.Name;
             if (knownArgs.TryGetValue(argName, out var arg))
             {

@@ -1,4 +1,6 @@
 using System.Linq.Expressions;
+using GraphQL.Execution;
+using GraphQL.Instrumentation;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using GraphQL.Validation;
@@ -159,6 +161,12 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(resolve));
 
     /// <inheritdoc cref="Resolve(IFieldResolver)"/>
+    /// <remarks>Indicates that the <see cref="IResolveFieldContextAccessor"/> is not required for this resolver.</remarks>
+    [AllowedOn<IObjectGraphType>]
+    internal virtual FieldBuilder<TSourceType, TReturnType> ResolveNoAccessor(Func<IResolveFieldContext<TSourceType>, TReturnType?> resolve)
+        => Resolve(new FuncFieldResolverNoAccessor<TSourceType, TReturnType>(resolve));
+
+    /// <inheritdoc cref="Resolve(IFieldResolver)"/>
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> ResolveAsync(Func<IResolveFieldContext<TSourceType>, Task<TReturnType?>> resolve)
         => Resolve(new FuncFieldResolver<TSourceType, TReturnType>(context => new ValueTask<TReturnType?>(resolve(context))));
@@ -281,7 +289,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
             Name = name,
         };
         configure?.Invoke(arg);
-        FieldType.Arguments ??= new();
+        FieldType.Arguments ??= [];
         FieldType.Arguments.Add(arg);
         return this;
     }
@@ -300,7 +308,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
             Name = name,
         };
         configure?.Invoke(arg);
-        FieldType.Arguments ??= new();
+        FieldType.Arguments ??= [];
         FieldType.Arguments.Add(arg);
         return this;
     }
@@ -316,7 +324,7 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
         {
             foreach (var arg in arguments)
             {
-                FieldType.Arguments ??= new();
+                FieldType.Arguments ??= [];
                 FieldType.Arguments.Add(arg);
             }
         }
@@ -379,4 +387,29 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     [AllowedOn<IObjectGraphType>]
     public virtual FieldBuilder<TSourceType, TReturnType> DependsOn<TService>()
         => this.DependsOn(typeof(TService));
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, IFieldMiddleware)"/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(IFieldMiddleware middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware{TMiddleware}(FieldType)"/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware<TMiddleware>()
+        where TMiddleware : IFieldMiddleware
+    {
+        FieldType.ApplyMiddleware<TMiddleware>();
+        return this;
+    }
+
+    /// <inheritdoc cref="FieldExtensions.ApplyMiddleware(FieldType, Func{FieldMiddlewareDelegate, FieldMiddlewareDelegate})"/>/>
+    [AllowedOn<IObjectGraphType>]
+    public virtual FieldBuilder<TSourceType, TReturnType> ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+    {
+        FieldType.ApplyMiddleware(middleware);
+        return this;
+    }
 }

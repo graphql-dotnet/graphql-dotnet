@@ -24,7 +24,7 @@ public sealed class UniqueVariableNames : ValidationRuleBase
         new MatchingNodeVisitor<GraphQLOperationDefinition>((__, context) => context.TypeInfo.UniqueVariableNames_KnownVariables?.Clear()),
         new MatchingNodeVisitor<GraphQLVariableDefinition>((variableDefinition, context) =>
         {
-            var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= new();
+            var knownVariables = context.TypeInfo.UniqueVariableNames_KnownVariables ??= [];
 
             var variableName = variableDefinition.Variable.Name;
 

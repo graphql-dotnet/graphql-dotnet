@@ -20,7 +20,7 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         var expected = new ExecutionResult
         {
             Executed = true,
-            Errors = new ExecutionErrors { error },
+            Errors = [error],
             Data = new { @int = (object?)null }
         };
 
@@ -33,13 +33,13 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         const string query = "{ int_with_arg(in:636474637870330463) }";
         var expected = new ExecutionResult
         {
-            Errors = new ExecutionErrors
-            {
+            Errors =
+            [
                 new ValidationError(default, ArgumentsOfCorrectTypeError.NUMBER, "Argument 'in' has invalid value. Expected type 'Int', found 636474637870330463.")
                 {
                     Code = "ARGUMENTS_OF_CORRECT_TYPE"
                 }
-            }
+            ]
         };
         expected.Errors[0].AddLocation(new Location(1, 16));
 
@@ -80,7 +80,7 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         var expected = new ExecutionResult
         {
             Executed = true,
-            Errors = new ExecutionErrors { error },
+            Errors = [error],
             Data = new { long_return_bigint = (object?)null }
         };
 
@@ -93,13 +93,13 @@ public class Bug1205VeryLongInt : QueryTestBase<Bug1205VeryLongIntSchema>
         const string query = "{ long_with_arg(in:636474637870330463636474637870330463636474637870330463) }";
         var expected = new ExecutionResult
         {
-            Errors = new ExecutionErrors
-            {
+            Errors =
+            [
                 new ValidationError(default, ArgumentsOfCorrectTypeError.NUMBER, "Argument 'in' has invalid value. Expected type 'Long', found 636474637870330463636474637870330463636474637870330463.")
                 {
                     Code = "ARGUMENTS_OF_CORRECT_TYPE"
                 }
-            }
+            ]
         };
         expected.Errors[0].AddLocation(new Location(1, 17));
 

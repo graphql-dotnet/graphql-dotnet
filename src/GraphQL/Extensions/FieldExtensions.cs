@@ -1,4 +1,6 @@
+using GraphQL.Instrumentation;
 using GraphQL.Types;
+using GraphQL.Utilities;
 
 namespace GraphQL;
 
@@ -32,10 +34,95 @@ public static class FieldExtensions
         var keys = fieldType.GetMetadata<List<Type>>(FromServicesAttribute.REQUIRED_SERVICES_METADATA);
         if (keys == null)
         {
-            keys = new List<Type>();
+            keys = [];
             fieldType.Metadata[FromServicesAttribute.REQUIRED_SERVICES_METADATA] = keys;
         }
         keys.Add(serviceType);
         return fieldType;
+    }
+
+    /// <summary>
+    /// Applies middleware to the field. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="fieldType">The field type to apply middleware to.</param>
+    /// <param name="middleware">The middleware to apply.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
+    [AllowedOn<IObjectGraphType>]
+    public static void ApplyMiddleware(this FieldType fieldType, IFieldMiddleware middleware)
+    {
+        if (middleware == null)
+            throw new ArgumentNullException(nameof(middleware));
+
+        var existingTransform = fieldType.Middleware;
+        fieldType.Middleware = (serviceProvider, next) =>
+        {
+            FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
+            return existingTransform == null
+                ? newNext
+                : existingTransform(serviceProvider, newNext);
+        };
+    }
+
+    /// <summary>
+    /// Applies middleware to the field by resolving it from the service provider. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <typeparam name="TMiddleware">The type of middleware to resolve from the service provider.</typeparam>
+    /// <param name="fieldType">The field type to apply middleware to.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
+    [AllowedOn<IObjectGraphType>]
+    public static void ApplyMiddleware<TMiddleware>(this FieldType fieldType)
+        where TMiddleware : IFieldMiddleware
+    {
+        var existingTransform = fieldType.Middleware;
+        if (existingTransform == null)
+        {
+            // Use static lambda if possible
+            fieldType.Middleware = static (serviceProvider, next) =>
+            {
+                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
+                return ctx => middleware.ResolveAsync(ctx, next);
+            };
+        }
+        else
+        {
+            // Chain the middleware
+            fieldType.Middleware = (serviceProvider, next) =>
+            {
+                var middleware = serviceProvider.GetRequiredService<TMiddleware>();
+                FieldMiddlewareDelegate newNext = ctx => middleware.ResolveAsync(ctx, next);
+                return existingTransform(serviceProvider, newNext);
+            };
+        }
+    }
+
+    /// <summary>
+    /// Applies middleware to the field using a delegate. If middleware is already set, the new middleware will be chained after the existing middleware.
+    /// </summary>
+    /// <param name="fieldType">The field type to apply middleware to.</param>
+    /// <param name="middleware">The middleware delegate to apply.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
+    [AllowedOn<IObjectGraphType>]
+    public static void ApplyMiddleware(this FieldType fieldType, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
+    {
+        if (middleware == null)
+            throw new ArgumentNullException(nameof(middleware));
+
+        var existingTransform = fieldType.Middleware;
+        fieldType.Middleware = (serviceProvider, next) =>
+        {
+            FieldMiddlewareDelegate newNext = middleware(next);
+            return existingTransform == null
+                ? newNext
+                : existingTransform(serviceProvider, newNext);
+        };
     }
 }

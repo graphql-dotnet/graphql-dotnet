@@ -27,11 +27,11 @@ internal sealed class Table
         return table;
     }
 
-    public List<Column> Columns { get; set; } = new List<Column>();
+    public List<Column> Columns { get; set; } = [];
 
     public int ColumnCount => Columns.Count;
 
-    public List<List<string>> Rows { get; set; } = new List<List<string>>();
+    public List<List<string>> Rows { get; set; } = [];
 
     public int RowCount => Rows.Count;
 

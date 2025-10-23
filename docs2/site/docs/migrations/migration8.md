@@ -21,12 +21,14 @@ GraphQL.NET v8 is a major release that includes many new features, including:
 - `ComplexScalarGraphType` added, allowing flexible input/output types
 - `IMetadataWriter` and similar interfaces added to allow better intellisense
 - List converter enhancements and AOT support
-- OneOf Input Object support (based on draft spec)
+- OneOf Input Object support
 - Infer nullability by default for `Field` methods
 - Add Persisted Document support (based on draft spec)
 - Better error handling of GraphQL.NET pipeline; add timeout support
 - Optimize scalar lists (e.g. `ListGraphType<IntGraphType>`)
 - Allow GraphQL interfaces to implement other GraphQL interfaces (based on spec)
+- Field-specific middleware support (v8.7.0+)
+- `IResolveFieldContextAccessor` opt-in support for accessing current field context (v8.7.0+)
 
 Some of these features require changes to the infrastructure, which can cause breaking changes during upgrades.
 Most notably, if your server uses any of the following features, you are likely to encounter migration issues:
@@ -610,16 +612,12 @@ asserts that exactly one of the fields must be set and non-null, all others
 being omitted. This is useful for representing situations where an input may be
 one of many different options.
 
-See: https://github.com/graphql/graphql-spec/pull/825
+See: https://spec.graphql.org/draft/#sec-OneOf-Input-Objects
 
 To use this feature:
 - **Code-First**: Set the `IsOneOf` property on your `InputObjectGraphType` to `true`.
 - **Schema-First**: Use the `@oneOf` directive on the input type in your schema definition.
 - **Type-First**: Use the `[OneOf]` directive on the CLR class.
-
-Note: the feature is still a draft and has not made it into the official GraphQL spec yet.
-It is expected to be added once it has been implemented in multiple libraries and proven to be useful.
-It is not expected to change from the current draft.
 
 ### 17. Federation entity resolver configuration methods and attributes added for code-first and type-first schemas
 
@@ -1482,6 +1480,101 @@ public class MySchema : Schema
 ```
 
 This method is called exactly once for each graph type during schema initialization, ensuring that duplicate calls are avoided even when types are referenced multiple times or built automatically.
+
+### 36. Field-specific middleware support (v8.7.0+)
+
+GraphQL.NET now supports field-specific middleware through the `FieldType.Middleware` property.
+This allows middleware to be applied to individual fields rather than only globally across all fields
+in the schema. Field middleware is collapsed into the field's resolver during schema initialization
+for optimal performance.
+
+You can apply middleware to individual fields using the `ApplyMiddleware()` field builder extension method:
+
+```csharp
+public class MyGraphType : ObjectGraphType
+{
+    public MyGraphType()
+    {
+        Field<StringGraphType>("myField")
+            .Resolve(context => "Hello World")
+            .ApplyMiddleware(next => async (context) =>    // using a lambda
+            {
+                // Code before resolver execution
+                var result = await next(context);
+                // Code after resolver execution
+                return result;
+            });
+    }
+}
+```
+
+Multiple middleware can be chained together on a single field, and they will be executed in the order
+they were applied:
+
+```csharp
+Field<StringGraphType>("myField")
+    .Resolve(context => "Hello World")
+    .ApplyMiddleware(loggingMiddleware)            // using an instance
+    .ApplyMiddleware<AuthorizationMiddleware>();   // pulled from dependency injection
+```
+
+The `[Scoped]` attribute and related methods now use field middleware internally instead of wrapping
+the resolver directly. This provides better composability and allows scoped services to work seamlessly
+with other middleware.
+
+### 37. `IResolveFieldContextAccessor` for accessing current field context (v8.7.0+)
+
+An opt-in `IResolveFieldContextAccessor` has been added to retrieve the current `IResolveFieldContext`
+from user code, similar to `HttpContextAccessor` or `DataLoaderContextAccessor`. This is useful when
+you need to access the current field resolution context from services or other code that doesn't have
+direct access to the context parameter.
+
+Additionally, the `IRequiresResolveFieldContextAccessor` interface has been added to allow resolvers
+to indicate whether they require the context accessor. Resolvers that implement this interface and
+return `false` for the `RequiresResolveFieldContextAccessor` property will not have the context accessor
+middleware applied, even when `AddResolveFieldContextAccessor()` is called globally. This provides an
+optimization to avoid the overhead of the context accessor for resolvers that don't need it, such as
+simple property accessors.
+
+To enable the context accessor, call `AddResolveFieldContextAccessor()` on your GraphQL builder:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSchema<MySchema>()
+    .AddResolveFieldContextAccessor()
+);
+```
+
+Then inject `IResolveFieldContextAccessor` into your services:
+
+```csharp
+public class MyService
+{
+    private readonly IResolveFieldContextAccessor _contextAccessor;
+
+    public MyService(IResolveFieldContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
+    public string GetCurrentFieldName()
+    {
+        var context = _contextAccessor.ResolveFieldContext;
+        return context.FieldDefinition.Name;
+    }
+}
+```
+
+The accessor uses `AsyncLocal<T>` to store the context per async flow, ensuring thread-safety and
+proper context isolation across concurrent requests. The context is automatically populated during
+field resolution and cleared after the resolver completes. The context will not be available within
+data loader batch functions, as they execute outside the original field resolver.
+
+**Note:** The context accessor adds a small performance overhead as middleware must be applied to
+every field in the schema. Only enable it if you need to access the context from services or other
+code that doesn't have direct access to the resolver's context parameter. To mitigate this overhead,
+the context accessor middleware is not applied to fields that directly access a property or field of
+the source object. Use a resolver function if a property getter needs to access the context.
 
 ## Breaking Changes
 

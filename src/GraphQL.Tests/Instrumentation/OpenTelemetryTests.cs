@@ -14,7 +14,7 @@ namespace GraphQL.Tests.Instrumentation;
 [Collection("StaticTests")]
 public sealed class OpenTelemetryTests : IDisposable
 {
-    private readonly List<Activity> _exportedActivities = new();
+    private readonly List<Activity> _exportedActivities = [];
     private IHostBuilder __hostBuilder;
     private IHostBuilder _hostBuilder
     {

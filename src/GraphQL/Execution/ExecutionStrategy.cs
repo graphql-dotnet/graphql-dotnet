@@ -164,7 +164,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         Debug.Assert(parent.Result != null || parent is RootExecutionNode);
 
         var parentType = parent.GetObjectGraphType(context.Schema) ?? parent.GraphType;
-        var fields = _reusableFields ??= new();
+        var fields = _reusableFields ??= [];
         try
         {
             fields = CollectFieldsFrom(context, parentType, parent.SelectionSet!, fields);
@@ -242,7 +242,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
     {
         //Debug.Assert(specificType is not IAbstractGraphType); //TODO: think about it
 
-        fields ??= new();
+        fields ??= [];
 
         // TODO: DESIGN REVIEW NEEDED
         // https://github.com/graphql-dotnet/graphql-dotnet/pull/3416
@@ -450,7 +450,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
         int index = 0;
         var arrayItems = (data is ICollection collection)
             ? new List<ExecutionNode>(collection.Count)
-            : new List<ExecutionNode>();
+            : [];
 
         if (data is IList list)
         {

@@ -115,7 +115,7 @@ public class ExecutionResult
     /// <returns>Reference to this.</returns>
     public ExecutionResult AddError(ExecutionError error)
     {
-        (Errors ??= new()).Add(error);
+        (Errors ??= []).Add(error);
         return this;
     }
 

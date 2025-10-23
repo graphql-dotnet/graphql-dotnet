@@ -231,7 +231,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
         }
         var directives = schema.Directives ?? throw new ArgumentNullException(nameof(schema) + "." + nameof(ISchema.Directives));
 
-        _typeDictionary = new Dictionary<Type, IGraphType>();
+        _typeDictionary = [];
         if (schema.Features.DeprecationOfInputValues)
         {
             // TODO: remove this code block when the next version of the spec will be released
@@ -424,7 +424,7 @@ public class SchemaTypes : IEnumerable<IGraphType>
     /// <summary>
     /// Returns a dictionary that relates type names to graph types.
     /// </summary>
-    protected internal virtual Dictionary<ROM, IGraphType> Dictionary { get; } = new Dictionary<ROM, IGraphType>();
+    protected internal virtual Dictionary<ROM, IGraphType> Dictionary { get; } = [];
     private Dictionary<Type, IGraphType> _typeDictionary;
 
     /// <inheritdoc cref="IEnumerable.GetEnumerator"/>

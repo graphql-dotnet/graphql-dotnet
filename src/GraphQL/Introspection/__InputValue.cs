@@ -34,16 +34,16 @@ public class __InputValue : ObjectGraphType<IMetadataReader> // context.Source e
             "and optionally a default value.";
 
         Field<NonNullGraphType<StringGraphType>>("name")
-            .Resolve(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name); // avoid implicit use of FieldNameResolver here to make the code compatible with AOT compilation
+            .ResolveNoAccessor(context => context.Source is QueryArgument arg ? arg.Name : ((FieldType)context.Source).Name); // avoid implicit use of FieldNameResolver here to make the code compatible with AOT compilation
 
         Field<StringGraphType>("description")
-            .Resolve(context => context.Source is QueryArgument arg ? arg.Description : ((FieldType)context.Source).Description);
+            .ResolveNoAccessor(context => context.Source is QueryArgument arg ? arg.Description : ((FieldType)context.Source).Description);
 
-        Field<NonNullGraphType<__Type>>("type").Resolve(context => ((IProvideResolvedType)context.Source!).ResolvedType);
+        Field<NonNullGraphType<__Type>>("type").ResolveNoAccessor(context => ((IProvideResolvedType)context.Source!).ResolvedType);
 
         Field<StringGraphType>("defaultValue")
             .Description("A GraphQL-formatted string representing the default value for this input value.")
-            .Resolve(context =>
+            .ResolveNoAccessor(context =>
             {
                 return context.Source is IHaveDefaultValue hasDefault && hasDefault.DefaultValue != null
                     ? hasDefault.ResolvedType!.Print(hasDefault.DefaultValue)

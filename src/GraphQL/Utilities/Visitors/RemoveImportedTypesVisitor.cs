@@ -62,12 +62,12 @@ public sealed class RemoveImportedTypesVisitor : ASTVisitor<RemoveImportedTypesV
 
             if (link.Namespace != null)
             {
-                importedNamespaces ??= new();
+                importedNamespaces ??= [];
                 importedNamespaces.Add(link.Namespace + "__");
             }
             if (link.Imports?.Count > 0)
             {
-                importedTypes ??= new();
+                importedTypes ??= [];
                 foreach (var import in link.Imports)
                 {
                     importedTypes.Add(import.Value);

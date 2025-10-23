@@ -116,7 +116,7 @@ public class ConnectionBuilder<[NotAGraphType] TSourceType> : IFieldMetadataWrit
         {
             Name = name,
             Type = typeof(TConnectionType),
-            Arguments = new QueryArguments(),
+            Arguments = [],
         };
         fieldType.Arguments.Add(new QueryArgument(typeof(StringGraphType))
         {

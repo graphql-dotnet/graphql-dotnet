@@ -95,7 +95,7 @@ public partial class DocumentValidator : IDocumentValidator
 
                     var variableVisitor = await rule.GetVariableVisitorAsync(context).ConfigureAwait(false);
                     if (variableVisitor != null)
-                        (variableVisitors ??= new()).Add(variableVisitor);
+                        (variableVisitors ??= []).Add(variableVisitor);
                 }
 
                 await new BasicVisitor(visitors).VisitAsync(context.Document, new BasicVisitor.State(context)).ConfigureAwait(false);

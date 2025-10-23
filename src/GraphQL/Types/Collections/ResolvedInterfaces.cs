@@ -7,7 +7,7 @@ namespace GraphQL.Types;
 /// </summary>
 public class ResolvedInterfaces : IEnumerable<IInterfaceGraphType>
 {
-    internal List<IInterfaceGraphType> List { get; } = new List<IInterfaceGraphType>();
+    internal List<IInterfaceGraphType> List { get; } = [];
 
     /// <summary>
     /// Gets the count of supported GraphQL interface types.

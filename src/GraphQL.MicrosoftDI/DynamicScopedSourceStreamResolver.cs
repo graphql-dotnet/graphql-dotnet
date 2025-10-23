@@ -1,3 +1,4 @@
+using GraphQL.Execution;
 using GraphQL.Resolvers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,11 +21,14 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
     {
         _resolverFunc = async context =>
         {
+            var accessor = context.RequestServices?.GetService<IResolveFieldContextAccessor>();
             var scope = context.RequestServicesOrThrow().CreateScope();
             IObservable<object?> observable;
             try
             {
                 var scopedContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
+                if (accessor != null)
+                    accessor.Context = scopedContext;
                 observable = await resolver.ResolveAsync(scopedContext).ConfigureAwait(false)
                     ?? throw new InvalidOperationException("The source stream resolver returned null.");
             }
@@ -32,6 +36,11 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
             {
                 scope.Dispose();
                 throw;
+            }
+            finally
+            {
+                if (accessor != null)
+                    accessor.Context = context;
             }
             // keep the service scope alive until the subscription has been disposed
             return new ObservableMapper(observable, scope);

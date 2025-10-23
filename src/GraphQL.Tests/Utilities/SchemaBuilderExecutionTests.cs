@@ -826,10 +826,10 @@ public class PeopleQueryType
 
 public static class PostData
 {
-    public static readonly List<Post> Posts = new()
-    {
+    public static readonly List<Post> Posts =
+    [
         new Post {Id = "1", Title = "Post One"}
-    };
+    ];
 }
 
 public class Post
