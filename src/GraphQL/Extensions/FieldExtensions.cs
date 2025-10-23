@@ -46,6 +46,10 @@ public static class FieldExtensions
     /// </summary>
     /// <param name="fieldType">The field type to apply middleware to.</param>
     /// <param name="middleware">The middleware to apply.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
     [AllowedOn<IObjectGraphType>]
     public static void ApplyMiddleware(this FieldType fieldType, IFieldMiddleware middleware)
     {
@@ -67,6 +71,10 @@ public static class FieldExtensions
     /// </summary>
     /// <typeparam name="TMiddleware">The type of middleware to resolve from the service provider.</typeparam>
     /// <param name="fieldType">The field type to apply middleware to.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
     [AllowedOn<IObjectGraphType>]
     public static void ApplyMiddleware<TMiddleware>(this FieldType fieldType)
         where TMiddleware : IFieldMiddleware
@@ -98,6 +106,10 @@ public static class FieldExtensions
     /// </summary>
     /// <param name="fieldType">The field type to apply middleware to.</param>
     /// <param name="middleware">The middleware delegate to apply.</param>
+    /// <remarks>
+    /// Note: Schema-level field middleware (configured via <see cref="ISchema.FieldMiddleware"/>) executes before
+    /// field-specific middleware in the middleware pipeline.
+    /// </remarks>
     [AllowedOn<IObjectGraphType>]
     public static void ApplyMiddleware(this FieldType fieldType, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware)
     {
