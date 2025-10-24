@@ -34,7 +34,7 @@ jobs:
         working-directory: docs2
         run: yarn gatsby build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Documentation
           path: docs2/public/**
@@ -56,7 +56,7 @@ jobs:
         working-directory: .
         run: dotnet pack --no-restore --no-build -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -o src/out
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: Nuget packages
           path: |
