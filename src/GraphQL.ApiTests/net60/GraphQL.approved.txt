@@ -2684,6 +2684,7 @@ namespace GraphQL.Types
         GraphQL.Types.IObjectGraphType? Mutation { get; set; }
         GraphQL.Conversion.INameConverter NameConverter { get; }
         GraphQL.Types.IObjectGraphType Query { get; set; }
+        GraphQL.Execution.IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
         GraphQL.Types.FieldType SchemaMetaFieldType { get; }
         GraphQL.Types.IObjectGraphType? Subscription { get; set; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
