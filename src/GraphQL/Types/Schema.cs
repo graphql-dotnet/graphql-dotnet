@@ -170,11 +170,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <inheritdoc/>
     public IFieldMiddlewareBuilder FieldMiddleware { get; internal set; } = new FieldMiddlewareBuilder();
 
-    /// <summary>
-    /// Gets or sets the <see cref="IResolveFieldContextAccessor"/> instance to be used for populating
-    /// the current field context during execution. When set, middleware will be automatically applied
-    /// to all fields to populate the accessor.
-    /// </summary>
+    /// <inheritdoc/>
     public IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
 
     /// <inheritdoc/>

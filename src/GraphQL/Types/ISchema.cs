@@ -1,4 +1,5 @@
 using GraphQL.Conversion;
+using GraphQL.Execution;
 using GraphQL.Instrumentation;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
@@ -163,4 +164,11 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
     /// </summary>
     FieldType TypeNameMetaFieldType { get; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="IResolveFieldContextAccessor"/> instance to be used for populating
+    /// the current field context during execution. When set, middleware will be automatically applied
+    /// to all fields to populate the accessor.
+    /// </summary>
+    IResolveFieldContextAccessor? ResolveFieldContextAccessor { get; set; }
 }
