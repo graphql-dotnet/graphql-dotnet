@@ -38,7 +38,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static fn => new SimpleDataLoader<T>(fn), fetchFunc);
+        return context.GetOrAdd(loaderKey, fetchFunc, static fn => new SimpleDataLoader<T>(fn));
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static fn => new SimpleDataLoader<T>(WrapNonCancellableFunc(fn)), fetchFunc);
+        return context.GetOrAdd(loaderKey, fetchFunc, static fn => new SimpleDataLoader<T>(WrapNonCancellableFunc(fn)));
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.defaultValue, x.maxBatchSize), (fetchFunc, keyComparer, defaultValue, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -107,7 +107,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.defaultValue, x.maxBatchSize), (fetchFunc, keyComparer, defaultValue, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -136,7 +136,7 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize), (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize), (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, defaultValue, maxBatchSize), static x => new BatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.defaultValue, x.maxBatchSize));
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.maxBatchSize), (fetchFunc, keyComparer, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -213,7 +213,7 @@ public static class DataLoaderContextExtensions
         if (fetchFunc == null)
             throw new ArgumentNullException(nameof(fetchFunc));
 
-        return context.GetOrAdd(loaderKey, static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.maxBatchSize), (fetchFunc, keyComparer, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -241,7 +241,7 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.maxBatchSize), (fetchFunc, keySelector, keyComparer, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(x.fetchFunc, x.keySelector, x.keyComparer, x.maxBatchSize));
     }
 
     /// <summary>
@@ -269,6 +269,6 @@ public static class DataLoaderContextExtensions
         if (keySelector == null)
             throw new ArgumentNullException(nameof(keySelector));
 
-        return context.GetOrAdd(loaderKey, static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.maxBatchSize), (fetchFunc, keySelector, keyComparer, maxBatchSize));
+        return context.GetOrAdd(loaderKey, (fetchFunc, keySelector, keyComparer, maxBatchSize), static x => new CollectionBatchDataLoader<TKey, T>(WrapNonCancellableFunc(x.fetchFunc), x.keySelector, x.keyComparer, x.maxBatchSize));
     }
 }

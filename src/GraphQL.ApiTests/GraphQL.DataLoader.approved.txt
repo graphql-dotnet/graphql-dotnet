@@ -34,7 +34,7 @@ namespace GraphQL.DataLoader
         public DataLoaderContext() { }
         public TDataLoader GetOrAdd<TDataLoader>(string loaderKey, System.Func<TDataLoader> dataLoaderFactory)
             where TDataLoader : GraphQL.DataLoader.IDataLoader { }
-        public TDataLoader GetOrAdd<TDataLoader, TValue>(string loaderKey, System.Func<TValue, TDataLoader> dataLoaderFactory, TValue factoryArgument)
+        public TDataLoader GetOrAdd<TDataLoader, TValue>(string loaderKey, TValue factoryArgument, System.Func<TValue, TDataLoader> dataLoaderFactory)
             where TDataLoader : GraphQL.DataLoader.IDataLoader { }
     }
     public class DataLoaderContextAccessor : GraphQL.DataLoader.IDataLoaderContextAccessor
