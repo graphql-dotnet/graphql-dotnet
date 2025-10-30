@@ -10,7 +10,7 @@ public class DataLoaderContext
     private ConcurrentDictionary<string, IDataLoader>? _loaders;
 
     private ConcurrentDictionary<string, IDataLoader> GetLoaders()
-        => LazyInitializer.EnsureInitialized(ref _loaders!, static () => new ConcurrentDictionary<string, IDataLoader>());
+        => LazyInitializer.EnsureInitialized(ref _loaders)!;
 
     /// <summary>
     /// Add a new data loader if one does not already exist with the provided key
