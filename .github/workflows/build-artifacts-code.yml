@@ -27,12 +27,12 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - name: yarn docs2
+      - name: npm install docs2
         working-directory: docs2
-        run: yarn
-      - name: yarn gatsby build
+        run: npm install
+      - name: npm run build
         working-directory: docs2
-        run: yarn gatsby build
+        run: npm run build
       - name: Publish docs artifacts
         uses: actions/upload-artifact@v5
         with:
