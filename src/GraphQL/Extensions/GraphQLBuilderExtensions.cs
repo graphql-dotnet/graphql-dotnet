@@ -718,7 +718,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.TryRegister<IFieldMiddleware, TMiddleware>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         builder.Services.Register<TMiddleware>(serviceLifetime);
         if (install)
-            builder.Services.TryRegister<IConfigureSchema, UseMiddlewareConfiguration<TMiddleware>>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            builder.Services.TryRegister<IConfigureSchema, UseMiddlewareConfiguration<TMiddleware>>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 
@@ -1315,6 +1315,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddSchemaVisitor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSchemaVisitor>(this IGraphQLBuilder builder)
         where TSchemaVisitor : class, ISchemaNodeVisitor
     {
+        builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
         builder.ConfigureSchema<VisitorConfiguration<TSchemaVisitor>>();
         return builder;
     }
