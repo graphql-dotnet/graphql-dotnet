@@ -392,10 +392,10 @@ public class GraphQLBuilderExtensionTests
     {
         var ruleInstance = new LegacyComplexityValidationRule(new LegacyComplexityConfiguration());
         MockSetupRegister<LegacyComplexityValidationRule, LegacyComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, LegacyComplexityValidationRule>();
+        MockSetupTryRegister<IValidationRule, LegacyComplexityValidationRule>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(LegacyComplexityValidationRule))).Returns(ruleInstance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (withAction)
         {
             var action = MockSetupConfigure1<LegacyComplexityConfiguration>();
@@ -424,10 +424,10 @@ public class GraphQLBuilderExtensionTests
     {
         var ruleInstance = new ComplexityValidationRule(new ComplexityOptions());
         MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
+        MockSetupTryRegister<IValidationRule, ComplexityValidationRule>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (withAction)
         {
             var action = MockSetupConfigure1<ComplexityOptions>();
@@ -1103,10 +1103,10 @@ public class GraphQLBuilderExtensionTests
     {
         var instance = new MyValidationRule();
         MockSetupRegister<MyValidationRule, MyValidationRule>(serviceLifetime);
-        MockSetupRegister<IValidationRule, MyValidationRule>(serviceLifetime);
+        MockSetupTryRegister<IValidationRule, MyValidationRule>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (useForCachedDocuments)
         {
             //verify default argument value

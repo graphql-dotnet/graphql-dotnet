@@ -960,17 +960,38 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddValidationRule<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(serviceLifetime);
-        builder.ConfigureExecutionOptions(options =>
+        builder.Services.TryRegister<IValidationRule, TValidationRule>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TValidationRule, TValidationRule>(serviceLifetime);
+        if (useForCachedDocuments)
+            builder.ConfigureExecution<ValidationRuleCachedConfiguration<TValidationRule>>();
+        else
+            builder.ConfigureExecution<ValidationRuleUncachedConfiguration<TValidationRule>>();
+        return builder;
+    }
+
+    private sealed class ValidationRuleUncachedConfiguration<TValidationRule> : IConfigureExecution
+        where TValidationRule : class, IValidationRule
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
             options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
-            if (useForCachedDocuments)
-            {
-                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
-            }
-        });
-        return builder;
+            return next(options);
+        }
+    }
+
+    private sealed class ValidationRuleCachedConfiguration<TValidationRule> : IConfigureExecution
+        where TValidationRule : class, IValidationRule
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+        {
+            var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
+            options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
+            options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+            return next(options);
+        }
     }
 
     /// <summary>
