@@ -612,7 +612,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     {
         builder.Services.TryRegister<IDocumentExecutionListener, TDocumentListener>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         builder.Services.Register<TDocumentListener>(serviceLifetime);
-        builder.Services.TryRegister<IConfigureExecution, AddDocumentListenerConfiguration<TDocumentListener>>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.ConfigureExecution<AddDocumentListenerConfiguration<TDocumentListener>>();
         return builder;
     }
 
@@ -718,7 +718,7 @@ public static class GraphQLBuilderExtensions // TODO: split
         builder.Services.TryRegister<IFieldMiddleware, TMiddleware>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         builder.Services.Register<TMiddleware>(serviceLifetime);
         if (install)
-            builder.Services.TryRegister<IConfigureSchema, UseMiddlewareConfiguration<TMiddleware>>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
+            builder.ConfigureSchema<UseMiddlewareConfiguration<TMiddleware>>();
         return builder;
     }
 
