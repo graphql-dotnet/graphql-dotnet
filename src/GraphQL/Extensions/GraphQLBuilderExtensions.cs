@@ -610,9 +610,22 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddDocumentListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TDocumentListener : class, IDocumentExecutionListener
     {
-        builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-        builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
+        builder.Services.TryRegister<IDocumentExecutionListener, TDocumentListener>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TDocumentListener>(serviceLifetime);
+        builder.Services.TryRegister<IConfigureExecution, AddDocumentListenerConfiguration<TDocumentListener>>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
+    }
+
+    private sealed class AddDocumentListenerConfiguration<TDocumentListener> : IConfigureExecution
+        where TDocumentListener : class, IDocumentExecutionListener
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+        {
+            options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>());
+            return next(options);
+        }
     }
 
     /// <summary>
@@ -702,10 +715,20 @@ public static class GraphQLBuilderExtensions // TODO: split
         }
 
         // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-        builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
+        builder.Services.TryRegister<IFieldMiddleware, TMiddleware>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TMiddleware>(serviceLifetime);
         if (install)
-            builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            builder.Services.TryRegister<IConfigureSchema, UseMiddlewareConfiguration<TMiddleware>>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
+    }
+
+    private sealed class UseMiddlewareConfiguration<TMiddleware> : IConfigureSchema
+        where TMiddleware : class, IFieldMiddleware
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider)
+        {
+            schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>());
+        }
     }
 
     /// <summary>
@@ -1292,9 +1315,17 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddSchemaVisitor<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TSchemaVisitor>(this IGraphQLBuilder builder)
         where TSchemaVisitor : class, ISchemaNodeVisitor
     {
-        builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
-        builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
+        builder.ConfigureSchema<VisitorConfiguration<TSchemaVisitor>>();
         return builder;
+    }
+
+    private sealed class VisitorConfiguration<TSchemaVisitor> : IConfigureSchema
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider)
+        {
+            schema.RegisterVisitor<TSchemaVisitor>();
+        }
     }
 
     /// <summary>
