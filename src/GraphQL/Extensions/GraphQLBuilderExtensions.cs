@@ -257,7 +257,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddGraphTypeMappingProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphTypeMappingProvider>(this IGraphQLBuilder builder)
         where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
     {
-        builder.Services.Register<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 
