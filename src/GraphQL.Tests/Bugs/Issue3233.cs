@@ -24,7 +24,8 @@ public class Issue3233
             "The type 'System.Object' is not a supported Dictionary key type. Path: $.",
             "The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.ObjectConverter'. Path: $.",
             "The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.DefaultObjectConverter'. Path: $.",
-            "The collection type 'System.Collections.ListDictionaryInternal' is not supported."
+            "The collection type 'System.Collections.ListDictionaryInternal' is not supported.",
+            "The type 'System.Object' is not a supported dictionary key using converter of type 'System.Text.Json.Serialization.Converters.DefaultObjectConverter'. Custom converters can add support for dictionary key serialization by overriding the 'ReadAsPropertyName' and 'WriteAsPropertyName' methods."
         };
         if (!messages.Contains(ex.Message))
             throw ex;

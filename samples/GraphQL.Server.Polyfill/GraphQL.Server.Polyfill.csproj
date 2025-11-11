@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- Since GraphQL.NET Server resides in another repository, this project serves to serve as a replacement for sample projects within this repository -->
   <!-- When creating projects based on one of the included samples, replace references to this project with the GraphQL.Server.Transports.AspNetCore NuGet package -->
