@@ -8,7 +8,7 @@
     <IsPackable>false</IsPackable>
     <Nullable>enable</Nullable>
     <NoWarn>$(NoWarn);CS8618</NoWarn>
-    <SingleFramework>net8.0</SingleFramework>
+    <SingleFramework>net10.0</SingleFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' == 'true'">
@@ -16,11 +16,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' == 'Windows_NT'">
-    <TargetFrameworks>net8.0;net7.0;net6.0;netcoreapp3.1;net48</TargetFrameworks>
+    <TargetFrameworks>net10.0;net8.0;net6.0;netcoreapp3.1;net48</TargetFrameworks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(SingleTestPlatform)' != 'true' and '$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>net8.0;net7.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;net8.0;net6.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
