@@ -4,7 +4,7 @@
   <!-- When creating projects based on one of the included samples, replace references to this project with the GraphQL.Server.Transports.AspNetCore NuGet package -->
   
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net7.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net10.0;net8.0;net6.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
