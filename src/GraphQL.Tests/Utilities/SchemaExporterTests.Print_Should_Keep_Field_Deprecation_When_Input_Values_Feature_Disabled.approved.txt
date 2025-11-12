@@ -1,0 +1,4 @@
+type Query {
+  oldField: String @deprecated(reason: "Use newField instead")
+  newField: String
+}

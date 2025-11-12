@@ -1,0 +1,8 @@
+type Query {
+  test(oldArg: String, input: TestInput): String
+}
+
+input TestInput {
+  oldField: String
+  newField: String
+}

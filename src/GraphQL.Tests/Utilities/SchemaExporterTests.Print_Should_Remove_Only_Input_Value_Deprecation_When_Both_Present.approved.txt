@@ -1,0 +1,3 @@
+type Query {
+  oldOutputField(oldArg: String): String @deprecated(reason: "Use newField instead")
+}
