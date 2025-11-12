@@ -6,15 +6,15 @@ namespace GraphQL.Utilities.Visitors;
 /// <summary>
 /// Removes the <c>@deprecated</c> directive from input values (arguments and input fields) within an AST.
 /// </summary>
-public sealed class RemoveInputValueDeprecationReasonsVisitor : ASTVisitor<NullVisitorContext>
+public sealed class RemoveInputValueDeprecationDirectivesVisitor : ASTVisitor<NullVisitorContext>
 {
-    private static readonly RemoveInputValueDeprecationReasonsVisitor _instance = new();
+    private static readonly RemoveInputValueDeprecationDirectivesVisitor _instance = new();
 
-    private RemoveInputValueDeprecationReasonsVisitor()
+    private RemoveInputValueDeprecationDirectivesVisitor()
     {
     }
 
-    /// <inheritdoc cref="RemoveInputValueDeprecationReasonsVisitor"/>
+    /// <inheritdoc cref="RemoveInputValueDeprecationDirectivesVisitor"/>
     public static void Visit(ASTNode node)
     {
         _instance.VisitAsync(node, default).GetAwaiter().GetResult();

@@ -122,7 +122,7 @@ public static class SchemaExtensions
         options ??= _defaultPrintOptions;
         if (!schema.Features.DeprecationOfInputValues)
         {
-            RemoveInputValueDeprecationReasonsVisitor.Visit(sdl);
+            RemoveInputValueDeprecationDirectivesVisitor.Visit(sdl);
         }
         if (!options.IncludeDeprecationReasons)
         {
