@@ -1,0 +1,8 @@
+type Query {
+  test(oldArg: String @deprecated(reason: "Use newArg instead"), input: TestInput): String
+}
+
+input TestInput {
+  oldField: String @deprecated(reason: "Use newField instead")
+  newField: String
+}
