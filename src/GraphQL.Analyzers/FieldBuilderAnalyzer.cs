@@ -103,46 +103,15 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
             var nameArg = GetArgument(Constants.ArgumentNames.Name);
             if (nameArg == null)
             {
-                ReportFieldTypeDiagnostic(
-                    context,
-                    expressionArg.GetLocation(),
-                    CantInferFieldNameFromExpression,
-                    isExpression: true,
-                    messageArgs: expressionArg.Expression.ToString());
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        CantInferFieldNameFromExpression,
+                        expressionArg.GetLocation(),
+                        expressionArg.Expression.ToString()));
             }
         }
 
         ArgumentSyntax? GetArgument(string argName) =>
             fieldInvocation.GetMethodArgument(argName, context.SemanticModel);
-    }
-
-    private static void ReportFieldTypeDiagnostic(
-        SyntaxNodeAnalysisContext context,
-        Location location,
-        DiagnosticDescriptor diagnosticDescriptor,
-        bool isAsyncField = false,
-        bool isDelegate = false,
-        bool isExpression = false,
-        params object?[]? messageArgs)
-    {
-        var props = ImmutableDictionary<string, string?>.Empty;
-
-        if (isAsyncField)
-        {
-            props = props.Add(Constants.AnalyzerProperties.IsAsync, "true");
-        }
-
-        if (isDelegate)
-        {
-            props = props.Add(Constants.AnalyzerProperties.IsDelegate, "true");
-        }
-
-        if (isExpression)
-        {
-            props = props.Add(Constants.AnalyzerProperties.IsExpression, "true");
-        }
-
-        var diagnostic = Diagnostic.Create(diagnosticDescriptor, location, props, messageArgs);
-        context.ReportDiagnostic(diagnostic);
     }
 }
