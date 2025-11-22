@@ -116,6 +116,32 @@ public class GraphQLBuilderExtensionTests
         };
     }
 
+    private Func<ExecutionOptions> MockSetupTryConfigureExecution(IServiceProvider? serviceProvider = null)
+    {
+        Action<ExecutionOptions> actions = _ => { };
+        _builderMock.Setup(b => b.TryRegister(typeof(IConfigureExecution), It.IsAny<Type>(), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType))
+            .Returns<Type, Type, ServiceLifetime, RegistrationCompareMode>((_, type, _, _) =>
+            {
+                var actions2 = actions;
+                actions = opts =>
+                {
+                    actions2(opts);
+                    var instance = (IConfigureExecution?)Activator.CreateInstance(type)!;
+                    instance.ExecuteAsync(opts, _ => Task.FromResult<ExecutionResult>(null!)).Wait();
+                };
+                return _builder;
+            }).Verifiable();
+        return () =>
+        {
+            var opts = new ExecutionOptions()
+            {
+                RequestServices = serviceProvider,
+            };
+            actions(opts);
+            return opts;
+        };
+    }
+
     private Action MockSetupConfigureSchema(ISchema schema, IServiceProvider? serviceProvider = null)
     {
         Action<ISchema, IServiceProvider> actions = (_, _) => { };
@@ -127,6 +153,23 @@ public class GraphQLBuilderExtensionTests
                 {
                     actions2(opts, services);
                     action.Configure(opts, services);
+                };
+                return _builder;
+            }).Verifiable();
+        return () => actions(schema, serviceProvider!);
+    }
+
+    private Action MockSetupTryConfigureSchema(ISchema schema, IServiceProvider? serviceProvider = null)
+    {
+        Action<ISchema, IServiceProvider> actions = (_, _) => { };
+        _builderMock.Setup(b => b.TryRegister(typeof(IConfigureSchema), It.IsAny<Type>(), ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType))
+            .Returns<Type, Type, ServiceLifetime, RegistrationCompareMode>((_, implType, _, _) =>
+            {
+                var actions2 = actions;
+                actions = (opts, services) =>
+                {
+                    actions2(opts, services);
+                    ((IConfigureSchema?)Activator.CreateInstance(implType))!.Configure(opts, services);
                 };
                 return _builder;
             }).Verifiable();
@@ -349,10 +392,10 @@ public class GraphQLBuilderExtensionTests
     {
         var ruleInstance = new ComplexityValidationRule(new ComplexityOptions());
         MockSetupRegister<ComplexityValidationRule, ComplexityValidationRule>();
-        MockSetupRegister<IValidationRule, ComplexityValidationRule>();
+        MockSetupTryRegister<IValidationRule, ComplexityValidationRule>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(ComplexityValidationRule))).Returns(ruleInstance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (withAction)
         {
             var action = MockSetupConfigure1<ComplexityOptions>();
@@ -567,10 +610,10 @@ public class GraphQLBuilderExtensionTests
     public void AddDocumentListener(ServiceLifetime serviceLifetime)
     {
         MockSetupRegister<MyDocumentListener, MyDocumentListener>(serviceLifetime);
-        MockSetupRegister<IDocumentExecutionListener, MyDocumentListener>(serviceLifetime);
+        MockSetupTryRegister<IDocumentExecutionListener, MyDocumentListener>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(sp => sp.GetService(typeof(MyDocumentListener))).Returns(new MyDocumentListener()).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (serviceLifetime == ServiceLifetime.Singleton)
         {
             //verify default service lifetime
@@ -642,12 +685,19 @@ public class GraphQLBuilderExtensionTests
     public async Task AddMiddleware(bool install, bool usePredicate, ServiceLifetime serviceLifetime)
     {
         var instance = new MyMiddleware();
-        MockSetupRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime);
+        if (usePredicate)
+            MockSetupRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime);
+        else
+            MockSetupTryRegister<IFieldMiddleware, MyMiddleware>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         MockSetupRegister<MyMiddleware, MyMiddleware>(serviceLifetime);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         var schema = new TestSchema();
         Action? runSchemaConfigs = null;
-        if (install || usePredicate)
+        if (install && !usePredicate)
+        {
+            runSchemaConfigs = MockSetupTryConfigureSchema(schema, mockServiceProvider.Object);
+        }
+        else if (usePredicate)
         {
             runSchemaConfigs = MockSetupConfigureSchema(schema, mockServiceProvider.Object);
         }
@@ -947,7 +997,7 @@ public class GraphQLBuilderExtensionTests
         var schemaMock = new Mock<ISchema>(MockBehavior.Strict);
         schemaMock.Setup(s => s.RegisterVisitor(typeof(TestSchemaVisitor))).Verifiable();
         var schema = schemaMock.Object;
-        var execute = MockSetupConfigureSchema(schema);
+        var execute = MockSetupTryConfigureSchema(schema);
         _builder.AddSchemaVisitor<TestSchemaVisitor>();
         execute();
         schemaMock.Verify();
@@ -1002,10 +1052,10 @@ public class GraphQLBuilderExtensionTests
     {
         var instance = new MyValidationRule();
         MockSetupRegister<MyValidationRule, MyValidationRule>(serviceLifetime);
-        MockSetupRegister<IValidationRule, MyValidationRule>(serviceLifetime);
+        MockSetupTryRegister<IValidationRule, MyValidationRule>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
         var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Strict);
         mockServiceProvider.Setup(s => s.GetService(typeof(MyValidationRule))).Returns(instance).Verifiable();
-        var getOpts = MockSetupConfigureExecution(mockServiceProvider.Object);
+        var getOpts = MockSetupTryConfigureExecution(mockServiceProvider.Object);
         if (useForCachedDocuments)
         {
             //verify default argument value

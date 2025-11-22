@@ -257,7 +257,7 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddGraphTypeMappingProvider<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TGraphTypeMappingProvider>(this IGraphQLBuilder builder)
         where TGraphTypeMappingProvider : class, IGraphTypeMappingProvider
     {
-        builder.Services.Register<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton);
+        builder.Services.TryRegister<IGraphTypeMappingProvider, TGraphTypeMappingProvider>(ServiceLifetime.Singleton, RegistrationCompareMode.ServiceTypeAndImplementationType);
         return builder;
     }
 
@@ -590,9 +590,22 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddDocumentListener<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TDocumentListener>(this IGraphQLBuilder builder, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TDocumentListener : class, IDocumentExecutionListener
     {
-        builder.Services.RegisterAsBoth<IDocumentExecutionListener, TDocumentListener>(serviceLifetime);
-        builder.ConfigureExecutionOptions(options => options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>()));
+        builder.Services.TryRegister<IDocumentExecutionListener, TDocumentListener>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TDocumentListener>(serviceLifetime);
+        builder.ConfigureExecution<AddDocumentListenerConfiguration<TDocumentListener>>();
         return builder;
+    }
+
+    private sealed class AddDocumentListenerConfiguration<TDocumentListener> : IConfigureExecution
+        where TDocumentListener : class, IDocumentExecutionListener
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+        {
+            options.Listeners.Add(options.RequestServicesOrThrow().GetRequiredService<TDocumentListener>());
+            return next(options);
+        }
     }
 
     /// <summary>
@@ -682,10 +695,20 @@ public static class GraphQLBuilderExtensions // TODO: split
         }
 
         // service lifetime defaults to transient so that the lifetime will match that of the schema, be it scoped or singleton
-        builder.Services.RegisterAsBoth<IFieldMiddleware, TMiddleware>(serviceLifetime);
+        builder.Services.TryRegister<IFieldMiddleware, TMiddleware>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TMiddleware>(serviceLifetime);
         if (install)
-            builder.ConfigureSchema((schema, serviceProvider) => schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>()));
+            builder.ConfigureSchema<UseMiddlewareConfiguration<TMiddleware>>();
         return builder;
+    }
+
+    private sealed class UseMiddlewareConfiguration<TMiddleware> : IConfigureSchema
+        where TMiddleware : class, IFieldMiddleware
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider)
+        {
+            schema.FieldMiddleware.Use(serviceProvider.GetRequiredService<TMiddleware>());
+        }
     }
 
     /// <summary>
@@ -917,17 +940,38 @@ public static class GraphQLBuilderExtensions // TODO: split
     public static IGraphQLBuilder AddValidationRule<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] TValidationRule>(this IGraphQLBuilder builder, bool useForCachedDocuments = false, ServiceLifetime serviceLifetime = ServiceLifetime.Singleton)
         where TValidationRule : class, IValidationRule
     {
-        builder.Services.RegisterAsBoth<IValidationRule, TValidationRule>(serviceLifetime);
-        builder.ConfigureExecutionOptions(options =>
+        builder.Services.TryRegister<IValidationRule, TValidationRule>(serviceLifetime, RegistrationCompareMode.ServiceTypeAndImplementationType);
+        builder.Services.Register<TValidationRule, TValidationRule>(serviceLifetime);
+        if (useForCachedDocuments)
+            builder.ConfigureExecution<ValidationRuleCachedConfiguration<TValidationRule>>();
+        else
+            builder.ConfigureExecution<ValidationRuleUncachedConfiguration<TValidationRule>>();
+        return builder;
+    }
+
+    private sealed class ValidationRuleUncachedConfiguration<TValidationRule> : IConfigureExecution
+        where TValidationRule : class, IValidationRule
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
         {
             var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
             options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
-            if (useForCachedDocuments)
-            {
-                options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
-            }
-        });
-        return builder;
+            return next(options);
+        }
+    }
+
+    private sealed class ValidationRuleCachedConfiguration<TValidationRule> : IConfigureExecution
+        where TValidationRule : class, IValidationRule
+    {
+        public float SortOrder => SORT_ORDER_OPTIONS;
+        public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)
+        {
+            var rule = options.RequestServicesOrThrow().GetRequiredService<TValidationRule>();
+            options.ValidationRules = (options.ValidationRules ?? DocumentValidator.CoreRules).Append(rule);
+            options.CachedDocumentValidationRules = (options.CachedDocumentValidationRules ?? Enumerable.Empty<IValidationRule>()).Append(rule);
+            return next(options);
+        }
     }
 
     /// <summary>
@@ -1257,8 +1301,17 @@ public static class GraphQLBuilderExtensions // TODO: split
         where TSchemaVisitor : class, ISchemaNodeVisitor
     {
         builder.Services.Register<TSchemaVisitor>(ServiceLifetime.Singleton);
-        builder.ConfigureSchema(schema => schema.RegisterVisitor<TSchemaVisitor>());
+        builder.ConfigureSchema<VisitorConfiguration<TSchemaVisitor>>();
         return builder;
+    }
+
+    private sealed class VisitorConfiguration<TSchemaVisitor> : IConfigureSchema
+        where TSchemaVisitor : class, ISchemaNodeVisitor
+    {
+        public void Configure(ISchema schema, IServiceProvider serviceProvider)
+        {
+            schema.RegisterVisitor<TSchemaVisitor>();
+        }
     }
 
     /// <summary>

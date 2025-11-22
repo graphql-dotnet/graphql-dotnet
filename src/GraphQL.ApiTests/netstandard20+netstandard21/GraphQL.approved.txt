@@ -3407,6 +3407,11 @@ namespace GraphQL.Utilities.Visitors
             public System.Collections.Generic.HashSet<string>? ImportedTypes { get; set; }
         }
     }
+    public sealed class RemoveInputValueDeprecationDirectivesVisitor : GraphQLParser.Visitors.ASTVisitor<GraphQLParser.Visitors.NullVisitorContext>
+    {
+        protected override System.Threading.Tasks.ValueTask VisitInputValueDefinitionAsync(GraphQLParser.AST.GraphQLInputValueDefinition inputValue, GraphQLParser.Visitors.NullVisitorContext context) { }
+        public static void Visit(GraphQLParser.AST.ASTNode node) { }
+    }
     public sealed class RenameImportedDirectivesVisitor : GraphQL.Utilities.BaseSchemaNodeVisitor
     {
         public RenameImportedDirectivesVisitor(System.Collections.Generic.List<GraphQL.Utilities.LinkConfiguration> linkConfigurations) { }

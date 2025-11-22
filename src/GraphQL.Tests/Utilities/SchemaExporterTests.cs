@@ -214,4 +214,125 @@ public class SchemaExporterTests
         var exported = schema.Print(new() { StringComparison = StringComparison.OrdinalIgnoreCase });
         exported.ShouldEndWith(Environment.NewLine);
     }
+
+    [Fact]
+    public void Print_Should_Remove_Input_Value_Deprecation_When_Feature_Disabled()
+    {
+        var schema = new TestSchema();
+        schema.Features.DeprecationOfInputValues = false;
+        schema.Initialize();
+
+        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void Print_Should_Keep_Input_Value_Deprecation_When_Feature_Enabled()
+    {
+        var schema = new TestSchema();
+        schema.Features.DeprecationOfInputValues = true;
+        schema.Initialize();
+
+        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    private class TestSchema : Schema
+    {
+        public TestSchema()
+        {
+            Query = new QueryType();
+        }
+
+        private class QueryType : ObjectGraphType
+        {
+            public QueryType()
+            {
+                Name = "Query";
+                Field<StringGraphType>("test")
+                    .Argument<StringGraphType>("oldArg", arg => arg.DeprecationReason = "Use newArg instead")
+                    .Argument<TestInputType>("input")
+                    .Resolve(_ => "test");
+            }
+        }
+
+        private class TestInputType : InputObjectGraphType
+        {
+            public TestInputType()
+            {
+                Name = "TestInput";
+                Field<StringGraphType>("oldField").DeprecationReason("Use newField instead");
+                Field<StringGraphType>("newField");
+            }
+        }
+    }
+
+    [Fact]
+    public void Print_Should_Keep_Field_Deprecation_When_Input_Values_Feature_Disabled()
+    {
+        var schema = new TestSchemaWithFieldDeprecation();
+        schema.Features.DeprecationOfInputValues = false;
+        schema.Initialize();
+
+        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    private class TestSchemaWithFieldDeprecation : Schema
+    {
+        public TestSchemaWithFieldDeprecation()
+        {
+            Query = new QueryType();
+        }
+
+        private class QueryType : ObjectGraphType
+        {
+            public QueryType()
+            {
+                Name = "Query";
+                Field<StringGraphType>("oldField")
+                    .DeprecationReason("Use newField instead")
+                    .Resolve(_ => "test");
+                Field<StringGraphType>("newField").Resolve(_ => "test");
+            }
+        }
+    }
+
+    [Fact]
+    public void Print_Should_Remove_Only_Input_Value_Deprecation_When_Both_Present()
+    {
+        var schema = new TestSchemaWithMixedDeprecation();
+        schema.Features.DeprecationOfInputValues = false;
+        schema.Initialize();
+
+        schema.Print().ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    [Fact]
+    public void Print_Should_Remove_All_DeprecationReasons_When_DeprecationOfInputValues_True_And_IncludeDeprecationReasons_False()
+    {
+        var schema = new TestSchemaWithMixedDeprecation();
+        schema.Features.DeprecationOfInputValues = true;
+        schema.Initialize();
+
+        var options = new GraphQL.Utilities.PrintOptions { IncludeDeprecationReasons = false };
+        schema.Print(options).ShouldMatchApproved(o => o.NoDiff());
+    }
+
+    private class TestSchemaWithMixedDeprecation : Schema
+    {
+        public TestSchemaWithMixedDeprecation()
+        {
+            Query = new QueryType();
+        }
+
+        private class QueryType : ObjectGraphType
+        {
+            public QueryType()
+            {
+                Name = "Query";
+                Field<StringGraphType>("oldOutputField")
+                    .DeprecationReason("Use newField instead")
+                    .Argument<StringGraphType>("oldArg", arg => arg.DeprecationReason = "Use newArg instead")
+                    .Resolve(_ => "test");
+            }
+        }
+    }
 }

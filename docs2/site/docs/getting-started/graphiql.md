@@ -26,7 +26,7 @@ To change the default path from `/ui/graphiql`, pass a custom path to the `UseGr
 
 Example:
 ```csharp
-app.UseGraphQLGraphiQL("/my/own/path/to/graphiql");`  
+app.UseGraphQLGraphiQL("/my/own/path/to/graphiql");
 ```
 
 ### Changing the GraphQL endpoint
@@ -35,7 +35,7 @@ To change the default GraphQL endpoint from `/graphql`, set a custom endpoint us
 Example:
 ```csharp
 var graphiQLOptions = new GraphiQLOptions { GraphQLEndPoint = "/my/own/graphql/endpoint" }
-app.UseGraphQLGraphiQL(options: graphiQLOptions);`  
+app.UseGraphQLGraphiQL(options: graphiQLOptions);
 ```
 
 ### Adding HTTP headers
@@ -51,7 +51,7 @@ var graphiQLOptions = new GraphiQLOptions
     }
 };
 
-app.UseGraphQLGraphiQL(options: graphiQLOptions);`  
+app.UseGraphQLGraphiQL(options: graphiQLOptions);
 ```
 
 ## Additional Resources
