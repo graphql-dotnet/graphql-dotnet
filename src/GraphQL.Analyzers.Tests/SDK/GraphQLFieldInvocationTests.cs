@@ -154,7 +154,7 @@ public class GraphQLFieldInvocationTests
     }
 
     [Fact]
-    public async Task Name_ExpressionBased_ReturnsInferredName()
+    public async Task Name_ExpressionBased_ReturnsNull()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -181,15 +181,112 @@ public class GraphQLFieldInvocationTests
         var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
 
         field.ShouldNotBeNull();
-        field.Name.ShouldNotBeNull();
-        field.Name.Value.ShouldBe("FirstName");
-
-        // Verify location points to the property name in the lambda
-        await VerifyLocationAsync(context, field.Name.Location, "FirstName");
+        field.Name.ShouldBeNull(); // Name property should be null for expression-based fields
     }
 
     [Fact]
-    public async Task Name_ExpressionBasedWithExplicitOverride_ReturnsExplicitName()
+    public async Task FieldExpression_ExpressionBased_ReturnsFieldExpression()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string FirstName { get; set; }
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field(x => x.FirstName);
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.Name.ShouldNotBeNull();
+        field.FieldExpression.Name.Value.ShouldBe("FirstName");
+
+        // Verify location points to the property name in the lambda
+        await VerifyLocationAsync(context, field.FieldExpression.Name.Location, "FirstName");
+    }
+
+    [Fact]
+    public async Task GetName_ExplicitName_ReturnsExplicitName()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("firstName");
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        var name = field.GetName();
+        name.ShouldNotBeNull();
+        name.Value.ShouldBe("firstName");
+        await VerifyLocationAsync(context, name.Location, "\"firstName\"");
+    }
+
+    [Fact]
+    public async Task GetName_ExpressionBased_ReturnsInferredName()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string FirstName { get; set; }
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field(x => x.FirstName);
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        var name = field.GetName();
+        name.ShouldNotBeNull();
+        name.Value.ShouldBe("FirstName");
+
+        // Verify location points to the property name in the lambda
+        await VerifyLocationAsync(context, name.Location, "FirstName");
+    }
+
+    [Fact]
+    public async Task GetName_ExplicitNameWithExpression_PrefersExplicitName()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -216,10 +313,21 @@ public class GraphQLFieldInvocationTests
         var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
 
         field.ShouldNotBeNull();
+
+        // Name property should return the explicit name
         field.Name.ShouldNotBeNull();
         field.Name.Value.ShouldBe("customName");
 
-        await VerifyLocationAsync(context, field.Name.Location, "\"customName\"");
+        // FieldExpression should also be populated
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.Name.ShouldNotBeNull();
+        field.FieldExpression.Name.Value.ShouldBe("FirstName");
+
+        // GetName should prefer the explicit name
+        var name = field.GetName();
+        name.ShouldNotBeNull();
+        name.Value.ShouldBe("customName");
+        await VerifyLocationAsync(context, name.Location, "\"customName\"");
     }
 
     [Fact]
