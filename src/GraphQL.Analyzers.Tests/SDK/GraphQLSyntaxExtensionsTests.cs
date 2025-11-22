@@ -160,7 +160,7 @@ public class GraphQLSyntaxExtensionsTests
         var argument = invocation.AsGraphQLFieldArgument(model);
 
         argument.ShouldNotBeNull();
-        argument.Name?.Value.ShouldBe("limit");
+        argument.GetName()?.Value.ShouldBe("limit");
     }
 
     [Fact]

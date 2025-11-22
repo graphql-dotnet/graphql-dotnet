@@ -1,7 +1,6 @@
 using GraphQL.Analyzers.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 using Microsoft.CodeAnalysis.Text;
 
 namespace GraphQL.Analyzers.SDK;
@@ -12,10 +11,11 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldArgument
 {
-    private readonly Lazy<GraphQLFieldProperty<string>?> _name;
-    private readonly Lazy<GraphQLFieldProperty<ITypeSymbol>?> _graphType;
-    private readonly Lazy<GraphQLFieldProperty<string>?> _description;
-    private readonly Lazy<GraphQLFieldProperty<object>?> _defaultValue;
+    private readonly Lazy<GraphQLFieldProperty<string>?> _nameArgument;
+    private readonly Lazy<GraphQLFieldProperty<ITypeSymbol>?> _graphTypeGeneric;
+    private readonly Lazy<GraphQLFieldProperty<bool>?> _nullable;
+    private readonly Lazy<GraphQLFieldProperty<string>?> _descriptionArgument;
+    private readonly Lazy<GraphQLFieldArgumentConfigureAction?> _configureAction;
     private readonly Lazy<Location> _location;
     private readonly Lazy<GraphQLFieldInvocation?> _parentField;
 
@@ -24,33 +24,39 @@ public sealed class GraphQLFieldArgument
         Syntax = invocation;
         SemanticModel = semanticModel;
 
-        _name = new Lazy<GraphQLFieldProperty<string>?>(GetArgumentName);
-        _graphType = new Lazy<GraphQLFieldProperty<ITypeSymbol>?>(GetGraphType);
-        _description = new Lazy<GraphQLFieldProperty<string>?>(GetDescription);
-        _defaultValue = new Lazy<GraphQLFieldProperty<object>?>(GetDefaultValue);
+        _nameArgument = new Lazy<GraphQLFieldProperty<string>?>(GetNameArgument);
+        _graphTypeGeneric = new Lazy<GraphQLFieldProperty<ITypeSymbol>?>(GetGraphTypeFromGeneric);
+        _nullable = new Lazy<GraphQLFieldProperty<bool>?>(GetNullable);
+        _descriptionArgument = new Lazy<GraphQLFieldProperty<string>?>(GetDescriptionArgument);
+        _configureAction = new Lazy<GraphQLFieldArgumentConfigureAction?>(GetConfigureAction);
         _location = new Lazy<Location>(() => GetLocation(invocation, semanticModel));
         _parentField = new Lazy<GraphQLFieldInvocation?>(() => parentField ?? FindParentField());
     }
 
     /// <summary>
-    /// Gets the name of the argument.
+    /// Gets the 'name' argument from the Argument() method call.
     /// </summary>
-    public GraphQLFieldProperty<string>? Name => _name.Value;
+    public GraphQLFieldProperty<string>? Name => _nameArgument.Value;
 
     /// <summary>
-    /// Gets the graph type of the argument.
+    /// Gets the graph type from the generic type argument.
     /// </summary>
-    public GraphQLFieldProperty<ITypeSymbol>? GraphType => _graphType.Value;
+    public GraphQLFieldProperty<ITypeSymbol>? GraphTypeGeneric => _graphTypeGeneric.Value;
 
     /// <summary>
-    /// Gets the description of the argument.
+    /// Gets the 'nullable' argument from the Argument() method call.
     /// </summary>
-    public GraphQLFieldProperty<string>? Description => _description.Value;
+    public GraphQLFieldProperty<bool>? Nullable => _nullable.Value;
 
     /// <summary>
-    /// Gets the default value of the argument, if specified.
+    /// Gets the 'description' argument from the Argument() method call.
     /// </summary>
-    public GraphQLFieldProperty<object>? DefaultValue => _defaultValue.Value;
+    public GraphQLFieldProperty<string>? Description => _descriptionArgument.Value;
+
+    /// <summary>
+    /// Gets the 'configure' argument from the Argument() method call.
+    /// </summary>
+    public GraphQLFieldArgumentConfigureAction? ConfigureAction => _configureAction.Value;
 
     /// <summary>
     /// Gets the location of the entire argument definition in source code.
@@ -71,6 +77,46 @@ public sealed class GraphQLFieldArgument
     /// Gets the semantic model used for analysis.
     /// </summary>
     public SemanticModel SemanticModel { get; }
+
+    /// <summary>
+    /// Gets the name of the argument, checking the 'configure' action first, then the 'name' argument.
+    /// </summary>
+    public GraphQLFieldProperty<string>? GetName()
+    {
+        return ConfigureAction?.Name ?? Name;
+    }
+
+    /// <summary>
+    /// Gets the graph type of the argument, checking the 'configure' action first, then the generic type.
+    /// </summary>
+    public GraphQLFieldProperty<ITypeSymbol>? GetGraphType()
+    {
+        return ConfigureAction?.GraphType ?? GraphTypeGeneric;
+    }
+
+    /// <summary>
+    /// Gets the description of the argument, checking the 'configure' action first, then the 'description' argument.
+    /// </summary>
+    public GraphQLFieldProperty<string>? GetDescription()
+    {
+        return ConfigureAction?.Description ?? Description;
+    }
+
+    /// <summary>
+    /// Gets the default value of the argument from the configure action.
+    /// </summary>
+    public GraphQLFieldProperty<object>? GetDefaultValue()
+    {
+        return ConfigureAction?.DefaultValue;
+    }
+
+    /// <summary>
+    /// Gets the deprecation reason of the argument from the configure action.
+    /// </summary>
+    public GraphQLFieldProperty<string>? GetDeprecationReason()
+    {
+        return ConfigureAction?.DeprecationReason;
+    }
 
     /// <summary>
     /// Creates a GraphQLFieldArgument from an invocation expression, if it represents an Argument() method call.
@@ -117,9 +163,9 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLFieldProperty<string>? GetArgumentName()
+    private GraphQLFieldProperty<string>? GetNameArgument()
     {
-        // Try to get from explicit 'name' argument: .Argument<IntGraphType>("argName")
+        // Try to get from explicit 'name' argument: .Argument<IntGraphType>("argName") or .Argument<int>("argName", nullable: true)
         var nameArg = GetArgument("name");
         if (nameArg != null)
         {
@@ -147,19 +193,8 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLFieldProperty<ITypeSymbol>? GetGraphType()
+    private GraphQLFieldProperty<ITypeSymbol>? GetGraphTypeFromGeneric()
     {
-        // Try to get from 'type' argument
-        var typeArg = GetArgument("type");
-        if (typeArg != null)
-        {
-            var typeInfo = SemanticModel.GetTypeInfo(typeArg.Expression);
-            if (typeInfo.Type != null)
-            {
-                return new GraphQLFieldProperty<ITypeSymbol>(typeInfo.Type, typeArg.Expression.GetLocation());
-            }
-        }
-
         // Try to get from generic type argument
         if (Syntax.Expression is MemberAccessExpressionSyntax { Name: GenericNameSyntax genericName })
         {
@@ -177,9 +212,24 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLFieldProperty<string>? GetDescription()
+    private GraphQLFieldProperty<bool>? GetNullable()
     {
-        // Try to get from explicit 'description' argument: .Argument<IntGraphType>("limit", "Description")
+        // Try to get from explicit 'nullable' argument: .Argument<int>("argName", nullable: true)
+        var nullableArg = GetArgument("nullable");
+        if (nullableArg?.Expression is LiteralExpressionSyntax literal)
+        {
+            if (literal.Token.Value is bool boolValue)
+            {
+                return new GraphQLFieldProperty<bool>(boolValue, literal.GetLocation());
+            }
+        }
+
+        return null;
+    }
+
+    private GraphQLFieldProperty<string>? GetDescriptionArgument()
+    {
+        // Try to get from explicit 'description' argument: .Argument<IntGraphType>("limit", "Description") or .Argument<int>("limit", nullable: true, description: "desc")
         var descArg = GetArgument("description");
         if (descArg?.Expression is LiteralExpressionSyntax literal)
         {
@@ -188,57 +238,16 @@ public sealed class GraphQLFieldArgument
                 descArg.Expression.GetLocation());
         }
 
-        // Try to get from configure action: .Argument<IntGraphType>("limit", arg => arg.Description = "Description")
-        var configureArg = GetArgument("configure");
-        if (configureArg?.Expression is SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax)
-        {
-            var descriptionAssignment = FindPropertyAssignment<string>(configureArg.Expression, "Description");
-            if (descriptionAssignment != null)
-            {
-                return descriptionAssignment;
-            }
-        }
-
         return null;
     }
 
-    private GraphQLFieldProperty<object>? GetDefaultValue()
+    private GraphQLFieldArgumentConfigureAction? GetConfigureAction()
     {
-        // Try to get from configure action: .Argument<IntGraphType>("limit", arg => arg.DefaultValue = 50)
+        // Try to get from configure action: .Argument<IntGraphType>("limit", arg => arg.Description = "Description")
         var configureArg = GetArgument("configure");
-        if (configureArg?.Expression is SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax)
+        if (configureArg?.Expression != null)
         {
-            var defaultValueAssignment = FindPropertyAssignment<object>(configureArg.Expression, "DefaultValue");
-            if (defaultValueAssignment == null)
-            {
-                return null;
-            }
-
-            // Try to get the constant value of the assignment
-            var operation = SemanticModel.GetOperation(configureArg.Expression);
-            if (operation is not IAnonymousFunctionOperation lambdaOp)
-            {
-                return null;
-            }
-
-            foreach (var assignment in lambdaOp.Body.Descendants().OfType<ISimpleAssignmentOperation>())
-            {
-                if (assignment.Target is IPropertyReferenceOperation { Property.Name: "DefaultValue" })
-                {
-                    var valueOperation = assignment.Value;
-                    if (valueOperation is IConversionOperation conversion)
-                    {
-                        valueOperation = conversion.Operand;
-                    }
-                    var constantValue = valueOperation.ConstantValue;
-                    if (constantValue.HasValue)
-                    {
-                        return new GraphQLFieldProperty<object>(
-                            constantValue.Value!,
-                            assignment.Value.Syntax.GetLocation());
-                    }
-                }
-            }
+            return GraphQLFieldArgumentConfigureAction.TryCreate(configureArg.Expression, SemanticModel);
         }
 
         return null;
@@ -280,52 +289,6 @@ public sealed class GraphQLFieldArgument
             if (arg.NameColon == null)
             {
                 return arg;
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Finds a property assignment in a lambda expression (e.g., arg => arg.PropertyName = "value").
-    /// </summary>
-    private GraphQLFieldProperty<TType>? FindPropertyAssignment<TType>(ExpressionSyntax lambdaExpression, string propertyName)
-    {
-        // Use semantic model operations for more reliable analysis
-        var operation = SemanticModel.GetOperation(lambdaExpression);
-        if (operation is not IAnonymousFunctionOperation lambdaOp)
-        {
-            return null;
-        }
-
-        foreach (var assignment in lambdaOp.Body.Descendants().OfType<ISimpleAssignmentOperation>())
-        {
-            if (assignment.Target is not IPropertyReferenceOperation propRef ||
-                propRef.Property.Name != propertyName)
-            {
-                continue;
-            }
-
-            var valueOperation = assignment.Value;
-            if (valueOperation is IConversionOperation conversion)
-            {
-                valueOperation = conversion.Operand;
-            }
-
-            var constantValue = valueOperation.ConstantValue;
-            if (constantValue is { HasValue: true })
-            {
-                switch (constantValue.Value)
-                {
-                    case null:
-                        return new GraphQLFieldProperty<TType>(
-                            default,
-                            assignment.Value.Syntax.GetLocation());
-                    case TType value:
-                        return new GraphQLFieldProperty<TType>(
-                            value,
-                            assignment.Value.Syntax.GetLocation());
-                }
             }
         }
 

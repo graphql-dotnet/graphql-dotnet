@@ -362,8 +362,8 @@ public class GraphQLFieldInvocationTests
 
         field.ShouldNotBeNull();
         field.Arguments.Count.ShouldBe(2);
-        field.Arguments[0].Name?.Value.ShouldBe("limit");
-        field.Arguments[1].Name?.Value.ShouldBe("includeArchived");
+        field.Arguments[0].GetName()?.Value.ShouldBe("limit");
+        field.Arguments[1].GetName()?.Value.ShouldBe("includeArchived");
     }
 
     [Fact]
