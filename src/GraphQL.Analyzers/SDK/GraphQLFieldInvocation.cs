@@ -15,6 +15,7 @@ public sealed class GraphQLFieldInvocation
     private readonly Lazy<GraphQLObjectProperty<string>?> _description;
     private readonly Lazy<GraphQLObjectProperty<string>?> _deprecationReason;
     private readonly Lazy<GraphQLObjectProperty<ExpressionSyntax>?> _resolverExpression;
+    private readonly Lazy<GraphQLFieldExpression?> _fieldExpression;
     private readonly Lazy<IReadOnlyList<GraphQLFieldArgument>> _arguments;
     private readonly Lazy<GraphQLGraphType?> _declaringGraphType;
     private readonly Lazy<Location> _location;
@@ -29,13 +30,14 @@ public sealed class GraphQLFieldInvocation
         _description = new Lazy<GraphQLObjectProperty<string>?>(GetDescription);
         _deprecationReason = new Lazy<GraphQLObjectProperty<string>?>(GetDeprecationReason);
         _resolverExpression = new Lazy<GraphQLObjectProperty<ExpressionSyntax>?>(GetResolverExpression);
+        _fieldExpression = new Lazy<GraphQLFieldExpression?>(GetFieldExpression);
         _arguments = new Lazy<IReadOnlyList<GraphQLFieldArgument>>(GetArguments);
         _declaringGraphType = new Lazy<GraphQLGraphType?>(FindDeclaringGraphType);
         _location = new Lazy<Location>(invocation.GetLocation);
     }
 
     /// <summary>
-    /// Gets the name of the field with its location, if it can be determined.
+    /// Gets the name of the field from explicit 'name' argument, if specified.
     /// </summary>
     public GraphQLObjectProperty<string>? Name => _name.Value;
 
@@ -58,6 +60,12 @@ public sealed class GraphQLFieldInvocation
     /// Gets the resolver expression (lambda or delegate) with its location, if specified.
     /// </summary>
     public GraphQLObjectProperty<ExpressionSyntax>? ResolverExpression => _resolverExpression.Value;
+
+    /// <summary>
+    /// Gets the field expression data inferred from an expression-based field definition.
+    /// For example: Field(x => x.PropertyName) or Field("name", x => x.PropertyName)
+    /// </summary>
+    public GraphQLFieldExpression? FieldExpression => _fieldExpression.Value;
 
     /// <summary>
     /// Gets the arguments defined for this field.
@@ -97,6 +105,14 @@ public sealed class GraphQLFieldInvocation
         return new GraphQLFieldInvocation(invocation, semanticModel);
     }
 
+    /// <summary>
+    /// Gets the name of the field, checking the explicit 'name' argument first, then the field expression.
+    /// </summary>
+    public GraphQLObjectProperty<string>? GetName()
+    {
+        return Name ?? FieldExpression?.Name;
+    }
+
     private GraphQLObjectProperty<string>? GetFieldName()
     {
         // Try to get from explicit 'name' argument: Field<StringGraphType>("fieldName")
@@ -118,14 +134,6 @@ public sealed class GraphQLFieldInvocation
                     break;
                 }
             }
-        }
-
-        // Try to infer from 'expression' argument: Field(x => x.PropertyName)
-        var expressionArg = GetArgument("expression");
-        if (expressionArg?.Expression is SimpleLambdaExpressionSyntax { Body: MemberAccessExpressionSyntax memberAccess })
-        {
-            var propertyName = memberAccess.Name.Identifier.Text;
-            return new GraphQLObjectProperty<string>(propertyName, memberAccess.Name.GetLocation());
         }
 
         return null;
@@ -199,6 +207,18 @@ public sealed class GraphQLFieldInvocation
             return new GraphQLObjectProperty<ExpressionSyntax>(
                 arg.Expression,
                 arg.Expression.GetLocation());
+        }
+
+        return null;
+    }
+
+    private GraphQLFieldExpression? GetFieldExpression()
+    {
+        // Try to get from 'expression' argument: Field(x => x.PropertyName) or Field("name", x => x.PropertyName)
+        var expressionArg = GetArgument("expression");
+        if (expressionArg?.Expression != null)
+        {
+            return GraphQLFieldExpression.TryCreate(expressionArg.Expression, SemanticModel);
         }
 
         return null;
