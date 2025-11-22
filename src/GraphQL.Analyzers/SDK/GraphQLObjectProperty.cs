@@ -7,7 +7,7 @@ namespace GraphQL.Analyzers.SDK;
 /// Used for properties that may need location-specific diagnostics.
 /// </summary>
 /// <typeparam name="T">The type of the property value.</typeparam>
-public sealed class GraphQLFieldProperty<T>
+public sealed class GraphQLObjectProperty<T>
 {
     /// <summary>
     /// Gets the value of the property.
@@ -19,7 +19,7 @@ public sealed class GraphQLFieldProperty<T>
     /// </summary>
     public Location Location { get; }
 
-    internal GraphQLFieldProperty(T? value, Location location)
+    internal GraphQLObjectProperty(T? value, Location location)
     {
         Value = value;
         Location = location;
@@ -28,7 +28,7 @@ public sealed class GraphQLFieldProperty<T>
     /// <summary>
     /// Implicitly converts the property to its underlying value.
     /// </summary>
-    public static implicit operator T?(GraphQLFieldProperty<T> property) => property.Value;
+    public static implicit operator T?(GraphQLObjectProperty<T> property) => property.Value;
 
     public override string? ToString() => Value?.ToString();
 }
