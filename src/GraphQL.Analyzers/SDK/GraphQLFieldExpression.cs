@@ -26,22 +26,31 @@ public sealed class GraphQLFieldExpression
     }
 
     /// <summary>
+    /// Gets a value indicating whether the expression is a valid member access expression.
+    /// </summary>
+    public bool IsValid => GetMemberAccess() != null;
+
+    /// <summary>
     /// Gets the name inferred from the expression (e.g., property name from x => x.PropertyName).
+    /// Returns null when the expression is not valid.
     /// </summary>
     public GraphQLObjectProperty<string>? Name => _name.Value;
 
     /// <summary>
     /// Gets the description from attributes on the member referenced by the expression.
+    /// Returns null when the expression is not valid.
     /// </summary>
     public GraphQLObjectProperty<string>? Description => _description.Value;
 
     /// <summary>
     /// Gets the deprecation reason from attributes on the member referenced by the expression.
+    /// Returns null when the expression is not valid.
     /// </summary>
     public GraphQLObjectProperty<string>? DeprecationReason => _deprecationReason.Value;
 
     /// <summary>
     /// Gets the default value from attributes on the member referenced by the expression.
+    /// Returns null when the expression is not valid.
     /// </summary>
     public GraphQLObjectProperty<object>? DefaultValue => _defaultValue.Value;
 
@@ -56,7 +65,8 @@ public sealed class GraphQLFieldExpression
     public SemanticModel SemanticModel { get; }
 
     /// <summary>
-    /// Creates a GraphQLFieldExpression from a lambda expression, if it represents a member access.
+    /// Creates a GraphQLFieldExpression from a lambda expression.
+    /// Returns null if the expression is not a lambda expression.
     /// </summary>
     public static GraphQLFieldExpression? TryCreate(ExpressionSyntax? expression, SemanticModel semanticModel)
     {
@@ -65,21 +75,8 @@ public sealed class GraphQLFieldExpression
             return null;
         }
 
-        // Check if it's a lambda expression with a member access body
+        // Check if it's a lambda expression
         if (expression is not (SimpleLambdaExpressionSyntax or ParenthesizedLambdaExpressionSyntax))
-        {
-            return null;
-        }
-
-        var body = expression switch
-        {
-            SimpleLambdaExpressionSyntax simple => simple.Body,
-            ParenthesizedLambdaExpressionSyntax parenthesized => parenthesized.Body,
-            _ => null
-        };
-
-        // We're only interested in member access expressions (e.g., x => x.PropertyName)
-        if (body is not MemberAccessExpressionSyntax)
         {
             return null;
         }

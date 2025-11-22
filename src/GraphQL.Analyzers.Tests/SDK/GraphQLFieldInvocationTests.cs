@@ -221,6 +221,153 @@ public class GraphQLFieldInvocationTests
     }
 
     [Fact]
+    public async Task FieldExpression_IsValid_ValidPropertyAccess_ReturnsTrue()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string FirstName { get; set; }
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field(x => x.FirstName);
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.IsValid.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async Task FieldExpression_IsValid_ValidPropertyAccess_PropertiesReturnValues()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+            using System.ComponentModel;
+
+            namespace Sample;
+
+            public class Person
+            {
+                [Description("First name of the person")]
+                [System.Obsolete("Use FullName")]
+                public string FirstName { get; set; }
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field(x => x.FirstName);
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.IsValid.ShouldBeTrue();
+
+        // When IsValid is true, properties should return values
+        field.FieldExpression.Name.ShouldNotBeNull();
+        field.FieldExpression.Name.Value.ShouldBe("FirstName");
+
+        field.FieldExpression.Description.ShouldNotBeNull();
+        field.FieldExpression.Description.Value.ShouldBe("First name of the person");
+
+        field.FieldExpression.DeprecationReason.ShouldNotBeNull();
+        field.FieldExpression.DeprecationReason.Value.ShouldBe("Use FullName");
+    }
+
+    [Fact]
+    public async Task FieldExpression_IsValid_ComplexExpression_FieldExpressionIsNotNull()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string FirstName { get; set; }
+                public string LastName { get; set; }
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field("fullName", x => x.FirstName + " " + x.LastName);
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        // For complex expressions (not simple member access), FieldExpression should exist but IsValid should be false
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.IsValid.ShouldBeFalse();
+        field.FieldExpression.Name.ShouldBeNull();
+        field.FieldExpression.Description.ShouldBeNull();
+        field.FieldExpression.DeprecationReason.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task FieldExpression_IsValid_MethodCallExpression_FieldExpressionIsNotNull()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string FirstName { get; set; }
+                public string GetFullName() => FirstName;
+            }
+
+            public class MyType : ObjectGraphType<Person>
+            {
+                public MyType()
+                {
+                    Field("fullName", x => x.GetFullName());
+                }
+            }
+            """);
+
+        var invocation = FindFieldInvocation(context.Root);
+        var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+
+        field.ShouldNotBeNull();
+        // For method call expressions, FieldExpression should exist but IsValid should be false
+        field.FieldExpression.ShouldNotBeNull();
+        field.FieldExpression.IsValid.ShouldBeFalse();
+        field.FieldExpression.Name.ShouldBeNull();
+        field.FieldExpression.Description.ShouldBeNull();
+        field.FieldExpression.DeprecationReason.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task GetName_ExplicitName_ReturnsExplicitName()
     {
         var context = await TestContext.CreateAsync(
