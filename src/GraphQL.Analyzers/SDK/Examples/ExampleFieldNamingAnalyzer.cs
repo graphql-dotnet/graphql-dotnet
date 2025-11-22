@@ -97,7 +97,7 @@ public class ExampleFieldNamingAnalyzer : DiagnosticAnalyzer
             {
                 // Could check argument naming conventions here
                 // Now we can report diagnostics on the argument name itself
-                if (argument.Name is { } argName && argName.Value!.StartsWith("_", StringComparison.Ordinal))
+                if (argument.GetName() is { } argName && argName.Value!.StartsWith("_", StringComparison.Ordinal))
                 {
                     // Report at the exact location of the argument name
                     context.ReportDiagnostic(Diagnostic.Create(

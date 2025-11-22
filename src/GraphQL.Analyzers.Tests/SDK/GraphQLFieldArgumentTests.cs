@@ -103,7 +103,7 @@ public class GraphQLFieldArgumentTests
     [Theory]
     [InlineData(".Argument<IntGraphType>(\"limit\")", "limit")]
     [InlineData(".Argument<IntGraphType>(name: \"limit\")", "limit")]
-    public async Task Name_ExplicitStringLiteral_ReturnsNameWithLocation(string argumentCall, string expectedName)
+    public async Task NameArgument_ExplicitStringLiteral_ReturnsNameWithLocation(string argumentCall, string expectedName)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -132,7 +132,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task Name_ConstFieldReference_ReturnsNameWithLocation()
+    public async Task NameArgument_ConstFieldReference_ReturnsNameWithLocation()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -162,7 +162,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task GraphType_GenericTypeArgument_ReturnsTypeWithLocation()
+    public async Task GraphTypeGeneric_GenericTypeArgument_ReturnsTypeWithLocation()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -184,14 +184,14 @@ public class GraphQLFieldArgumentTests
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
-        argument.GraphType.ShouldNotBeNull();
-        argument.GraphType.Value?.Name.ShouldBe("IntGraphType");
-        argument.GraphType.Location.ShouldNotBeNull();
-        await VerifyLocationAsync(context, argument.GraphType.Location, "IntGraphType");
+        argument.GraphTypeGeneric.ShouldNotBeNull();
+        argument.GraphTypeGeneric.Value?.Name.ShouldBe("IntGraphType");
+        argument.GraphTypeGeneric.Location.ShouldNotBeNull();
+        await VerifyLocationAsync(context, argument.GraphTypeGeneric.Location, "IntGraphType");
     }
 
     [Fact]
-    public async Task Description_ArgumentWithDescription_ReturnsDescriptionWithLocation()
+    public async Task DescriptionArgument_ExplicitArgument_ReturnsDescriptionWithLocation()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -219,7 +219,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task Description_ConfigureAction_ReturnsDescriptionWithLocation()
+    public async Task ConfigureAction_Description_ReturnsDescriptionWithLocation()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -241,9 +241,10 @@ public class GraphQLFieldArgumentTests
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
-        argument.Description.ShouldNotBeNull();
-        argument.Description.Value.ShouldBe("Maximum number of items");
-        await VerifyLocationAsync(context, argument.Description.Location, "\"Maximum number of items\"");
+        argument.ConfigureAction.ShouldNotBeNull();
+        argument.ConfigureAction.Description.ShouldNotBeNull();
+        argument.ConfigureAction.Description.Value.ShouldBe("Maximum number of items");
+        await VerifyLocationAsync(context, argument.ConfigureAction.Description.Location, "\"Maximum number of items\"");
     }
 
     [Theory]
@@ -252,7 +253,7 @@ public class GraphQLFieldArgumentTests
     [InlineData("\"default\"", "default")]
     [InlineData("null", null)]
     [InlineData("DefaultLimitConst", 100)]
-    public async Task DefaultValue_ConfigureAction_ReturnsValueWithLocation(string defaultValueExpr, object? expectedDefaultValue)
+    public async Task ConfigureAction_DefaultValue_ReturnsValueWithLocation(string defaultValueExpr, object? expectedDefaultValue)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -278,13 +279,14 @@ public class GraphQLFieldArgumentTests
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
-        argument.DefaultValue.ShouldNotBeNull();
-        argument.DefaultValue.Value.ShouldBe(expectedDefaultValue);
-        await VerifyLocationAsync(context, argument.DefaultValue.Location, defaultValueExpr);
+        argument.ConfigureAction.ShouldNotBeNull();
+        argument.ConfigureAction.DefaultValue.ShouldNotBeNull();
+        argument.ConfigureAction.DefaultValue.Value.ShouldBe(expectedDefaultValue);
+        await VerifyLocationAsync(context, argument.ConfigureAction.DefaultValue.Location, defaultValueExpr);
     }
 
     [Fact]
-    public async Task DefaultValue_ConfigureAction_FromMethod_ReturnNull()
+    public async Task ConfigureAction_DefaultValue_FromMethod_ReturnsNull()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -308,7 +310,8 @@ public class GraphQLFieldArgumentTests
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
-        argument.DefaultValue.ShouldBeNull(); // handling method invocation is not currently supported
+        argument.ConfigureAction.ShouldNotBeNull();
+        argument.ConfigureAction.DefaultValue.ShouldBeNull(); // handling method invocation is not currently supported
     }
 
     [Fact]
@@ -331,18 +334,17 @@ public class GraphQLFieldArgumentTests
             """);
 
         var invocation = FindArgumentInvocation(context.Root);
-
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
         argument.Name.ShouldNotBeNull();
         argument.Name.Value.ShouldBe("limit");
-        argument.GraphType.ShouldNotBeNull(); // TODO: improve test for GraphType
+        argument.GraphTypeGeneric.ShouldBeNull(); // No generic type argument in this case
         await VerifyLocationAsync(context, argument.Location, "Argument(typeof(IntGraphType), \"limit\")");
     }
 
     [Fact]
-    public async Task Argument_WithCLRType_ReturnsName()
+    public async Task Argument_WithCLRTypeAndNullable_ReturnsNameAndNullable()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -355,18 +357,19 @@ public class GraphQLFieldArgumentTests
                 public MyType()
                 {
                     Field<StringGraphType>("name")
-                        .Argument<int>("limit");
+                        .Argument<int>("limit", nullable: true);
                 }
             }
             """);
 
         var invocation = FindArgumentInvocation(context.Root);
-
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
         argument.Name.ShouldNotBeNull();
         argument.Name.Value.ShouldBe("limit");
+        argument.Nullable.ShouldNotBeNull();
+        argument.Nullable.Value.ShouldBe(true);
     }
 
     [Fact]
@@ -393,16 +396,100 @@ public class GraphQLFieldArgumentTests
             """);
 
         var invocation = FindArgumentInvocation(context.Root);
-
         var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
 
         argument.ShouldNotBeNull();
         argument.Name.ShouldNotBeNull();
         argument.Name.Value.ShouldBe("limit");
-        argument.Description.ShouldNotBeNull();
-        argument.Description.Value.ShouldBe("Maximum items");
-        argument.DefaultValue.ShouldNotBeNull();
-        argument.DefaultValue.Value.ShouldBe(50);
+        argument.ConfigureAction.ShouldNotBeNull();
+        argument.ConfigureAction.Description.ShouldNotBeNull();
+        argument.ConfigureAction.Description.Value.ShouldBe("Maximum items");
+        argument.ConfigureAction.DefaultValue.ShouldNotBeNull();
+        argument.ConfigureAction.DefaultValue.Value.ShouldBe(50);
+    }
+
+    [Fact]
+    public async Task GetName_ReturnsNameArgument()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name")
+                        .Argument<IntGraphType>("limit");
+                }
+            }
+            """);
+
+        var invocation = FindArgumentInvocation(context.Root);
+        var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
+
+        argument.ShouldNotBeNull();
+        var name = argument.GetName();
+        name.ShouldNotBeNull();
+        name.Value.ShouldBe("limit");
+    }
+
+    [Fact]
+    public async Task GetDescription_PrefersConfigureActionOverDescriptionArgument()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name")
+                        .Argument<int>("limit", nullable: true, description: "From argument", arg => arg.Description = "From configure");
+                }
+            }
+            """);
+
+        var invocation = FindArgumentInvocation(context.Root);
+        var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
+
+        argument.ShouldNotBeNull();
+        var description = argument.GetDescription();
+        description.ShouldNotBeNull();
+        description.Value.ShouldBe("From configure");
+    }
+
+    [Fact]
+    public async Task GetDefaultValue_ReturnsValueFromConfigureAction()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name")
+                        .Argument<IntGraphType>("limit", arg => arg.DefaultValue = 100);
+                }
+            }
+            """);
+
+        var invocation = FindArgumentInvocation(context.Root);
+        var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
+
+        argument.ShouldNotBeNull();
+        var defaultValue = argument.GetDefaultValue();
+        defaultValue.ShouldNotBeNull();
+        defaultValue.Value.ShouldBe(100);
     }
 
     [Fact]
@@ -540,5 +627,62 @@ public class GraphQLFieldArgumentTests
         var sourceText = await context.SyntaxTree.GetTextAsync();
         var locationText = sourceText.ToString(location.SourceSpan);
         locationText.ShouldBe(expectedLocationText);
+    }
+
+    [Fact]
+    public async Task ConfigureAction_DeprecationReason_ReturnsReasonWithLocation()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name")
+                        .Argument<IntGraphType>("limit", arg => arg.DeprecationReason = "Use pageSize instead");
+                }
+            }
+            """);
+
+        var invocation = FindArgumentInvocation(context.Root);
+        var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
+
+        argument.ShouldNotBeNull();
+        argument.ConfigureAction.ShouldNotBeNull();
+        argument.ConfigureAction.DeprecationReason.ShouldNotBeNull();
+        argument.ConfigureAction.DeprecationReason.Value.ShouldBe("Use pageSize instead");
+        await VerifyLocationAsync(context, argument.ConfigureAction.DeprecationReason.Location, "\"Use pageSize instead\"");
+    }
+
+    [Fact]
+    public async Task GetDeprecationReason_ReturnsValueFromConfigureAction()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class MyType : ObjectGraphType
+            {
+                public MyType()
+                {
+                    Field<StringGraphType>("name")
+                        .Argument<IntGraphType>("limit", arg => arg.DeprecationReason = "Deprecated");
+                }
+            }
+            """);
+
+        var invocation = FindArgumentInvocation(context.Root);
+        var argument = GraphQLFieldArgument.TryCreate(invocation, context.SemanticModel);
+
+        argument.ShouldNotBeNull();
+        var deprecationReason = argument.GetDeprecationReason();
+        deprecationReason.ShouldNotBeNull();
+        deprecationReason.Value.ShouldBe("Deprecated");
     }
 }
