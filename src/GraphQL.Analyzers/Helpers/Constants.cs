@@ -45,8 +45,6 @@ public static class Constants
         public const string Field = "Field";
         public const string FieldAsync = "FieldAsync";
         public const string FieldDelegate = "FieldDelegate";
-        public const string FieldSubscribe = "FieldSubscribe";
-        public const string FieldSubscribeAsync = "FieldSubscribeAsync";
         public const string Name = "Name";
         public const string NoClrMapping = "NoClrMapping";
         public const string ParseDictionary = "ParseDictionary";
@@ -56,21 +54,12 @@ public static class Constants
         public const string ResolveScoped = "ResolveScoped";
         public const string ResolveScopedAsync = "ResolveScopedAsync";
         public const string ResolveStream = "ResolveStream";
-        public const string ResolveStreamAsync = "ResolveStreamAsync";
         public const string Returns = "Returns";
     }
 
     public static class ObjectProperties
     {
         public const string DefaultValue = "DefaultValue";
-    }
-
-    public static class AnalyzerProperties
-    {
-        public const string BuilderMethodName = "BuilderMethodName";
-        public const string IsAsync = "IsAsync";
-        public const string IsDelegate = "IsDelegate";
-        public const string IsExpression = "IsExpression";
     }
 
     public static class Types
