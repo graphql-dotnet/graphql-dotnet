@@ -10,7 +10,7 @@ namespace GraphQL.Analyzers.SDK;
 public sealed class GraphQLGraphType
 {
     private readonly Lazy<INamedTypeSymbol?> _typeSymbol;
-    private readonly Lazy<ITypeSymbol?> _sourceType;
+    private readonly Lazy<GraphQLSourceType?> _sourceType;
     private readonly Lazy<IReadOnlyList<GraphQLFieldInvocation>> _fields;
     private readonly Lazy<bool> _isInputType;
     private readonly Lazy<bool> _isOutputType;
@@ -23,7 +23,7 @@ public sealed class GraphQLGraphType
 
         _typeSymbol = new Lazy<INamedTypeSymbol?>(() =>
             semanticModel.GetDeclaredSymbol(classDeclaration) as INamedTypeSymbol);
-        _sourceType = new Lazy<ITypeSymbol?>(GetSourceType);
+        _sourceType = new Lazy<GraphQLSourceType?>(GetSourceType);
         _fields = new Lazy<IReadOnlyList<GraphQLFieldInvocation>>(GetFields);
         _isInputType = new Lazy<bool>(CheckIsInputType);
         _isOutputType = new Lazy<bool>(CheckIsOutputType);
@@ -38,7 +38,7 @@ public sealed class GraphQLGraphType
     /// <summary>
     /// Gets the source type (TSourceType generic parameter) if available.
     /// </summary>
-    public ITypeSymbol? SourceType => _sourceType.Value;
+    public GraphQLSourceType? SourceType => _sourceType.Value;
 
     /// <summary>
     /// Gets all fields declared in this graph type.
@@ -115,7 +115,7 @@ public sealed class GraphQLGraphType
         return false;
     }
 
-    private ITypeSymbol? GetSourceType()
+    private GraphQLSourceType? GetSourceType()
     {
         var typeSymbol = _typeSymbol.Value;
         if (typeSymbol == null)
@@ -132,7 +132,7 @@ public sealed class GraphQLGraphType
                 case "ComplexGraphType" when baseType is { TypeArguments.Length: > 0 }:
                 case "ObjectGraphType" when baseType is { TypeArguments.Length: > 0 }:
                 case "InputObjectGraphType" when baseType is { TypeArguments.Length: > 0 }:
-                    return baseType.TypeArguments[0];
+                    return new GraphQLSourceType(baseType.TypeArguments[0]);
                 default:
                     baseType = baseType.BaseType;
                     break;
