@@ -123,7 +123,17 @@ public sealed class GraphQLGraphType
             return null;
         }
 
-        // Look for ComplexGraphType<TSourceType> base type
+        // Look for ComplexGraphType<TSourceType> base type in syntax
+        var baseTypeSyntax = Syntax.BaseList?.Types.FirstOrDefault();
+        Location? sourceTypeLocation = null;
+
+        if (baseTypeSyntax?.Type is GenericNameSyntax genericName && genericName.TypeArgumentList.Arguments.Count > 0)
+        {
+            // Get the location of the first type argument (the source type)
+            sourceTypeLocation = genericName.TypeArgumentList.Arguments[0].GetLocation();
+        }
+
+        // Look for the type symbol in the base type hierarchy
         var baseType = typeSymbol.BaseType;
         while (baseType != null)
         {
@@ -132,7 +142,7 @@ public sealed class GraphQLGraphType
                 case "ComplexGraphType" when baseType is { TypeArguments.Length: > 0 }:
                 case "ObjectGraphType" when baseType is { TypeArguments.Length: > 0 }:
                 case "InputObjectGraphType" when baseType is { TypeArguments.Length: > 0 }:
-                    return new GraphQLSourceType(baseType.TypeArguments[0]);
+                    return new GraphQLSourceType(baseType.TypeArguments[0], sourceTypeLocation);
                 default:
                     baseType = baseType.BaseType;
                     break;

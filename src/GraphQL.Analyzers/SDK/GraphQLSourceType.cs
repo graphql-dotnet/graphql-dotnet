@@ -8,11 +8,13 @@ namespace GraphQL.Analyzers.SDK;
 public sealed class GraphQLSourceType
 {
     private readonly Lazy<IReadOnlyList<GraphQLSourceTypeMember>> _members;
+    private readonly Lazy<Location> _location;
 
-    internal GraphQLSourceType(ITypeSymbol typeSymbol)
+    internal GraphQLSourceType(ITypeSymbol typeSymbol, Location? declarationLocation = null)
     {
         TypeSymbol = typeSymbol;
         _members = new Lazy<IReadOnlyList<GraphQLSourceTypeMember>>(GetMembers);
+        _location = new Lazy<Location>(() => GetLocation(declarationLocation));
     }
 
     /// <summary>
@@ -29,6 +31,25 @@ public sealed class GraphQLSourceType
     /// Gets the name of the source type.
     /// </summary>
     public string Name => TypeSymbol.Name;
+
+    /// <summary>
+    /// Gets the location of the source type declaration in source code.
+    /// If the source type was referenced in a graph type declaration (e.g., ObjectGraphType&lt;Person&gt;),
+    /// this returns the location of that type argument. Otherwise, returns the type's primary location.
+    /// </summary>
+    public Location Location => _location.Value;
+
+    private Location GetLocation(Location? declarationLocation)
+    {
+        // If we have a declaration location from the graph type syntax, use it
+        if (declarationLocation != null)
+        {
+            return declarationLocation;
+        }
+
+        // Otherwise fall back to the type symbol's first location
+        return TypeSymbol.Locations.FirstOrDefault() ?? Location.None;
+    }
 
     private List<GraphQLSourceTypeMember> GetMembers()
     {

@@ -611,6 +611,46 @@ public class GraphQLGraphTypeTests
         graphType.SourceType.Name.ShouldBe("Object");
     }
 
+    [Fact]
+    public async Task SourceType_Location_PointsToTypeArgumentInDeclaration()
+    {
+        var context = await TestContext.CreateAsync(
+            """
+            using GraphQL.Types;
+
+            namespace Sample;
+
+            public class Person
+            {
+                public string Name { get; set; }
+            }
+
+            public class PersonGraphType : ObjectGraphType<Person>
+            {
+                public PersonGraphType()
+                {
+                    Field(x => x.Name);
+                }
+            }
+            """);
+
+        var classDeclaration = context.Root.DescendantNodes()
+            .OfType<ClassDeclarationSyntax>()
+            .First(c => c.Identifier.Text == "PersonGraphType");
+
+        var graphType = GraphQLGraphType.TryCreate(classDeclaration, context.SemanticModel);
+
+        graphType.ShouldNotBeNull();
+        graphType.SourceType.ShouldNotBeNull();
+        graphType.SourceType.Location.ShouldNotBeNull();
+        graphType.SourceType.Location.ShouldNotBe(Microsoft.CodeAnalysis.Location.None);
+
+        // Verify location points to the Person type argument in ObjectGraphType<Person>
+        var sourceText = await context.SyntaxTree.GetTextAsync();
+        var locationText = sourceText.ToString(graphType.SourceType.Location.SourceSpan);
+        locationText.ShouldBe("Person");
+    }
+
     [Theory]
     [InlineData("public string TestMember { get; set; }", true, true, true, true)]
     [InlineData("public string TestMember;", true, false, true, true)]
