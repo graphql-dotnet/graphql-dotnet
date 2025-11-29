@@ -11,7 +11,7 @@ namespace GraphQL.Analyzers.SDK;
 public sealed class GraphQLFieldInvocation
 {
     private readonly Lazy<GraphQLObjectProperty<string>?> _name;
-    private readonly Lazy<GraphQLObjectProperty<ITypeSymbol>?> _graphType;
+    private readonly Lazy<GraphQLFieldGraphType?> _graphType;
     private readonly Lazy<GraphQLObjectProperty<string>?> _description;
     private readonly Lazy<GraphQLObjectProperty<string>?> _deprecationReason;
     private readonly Lazy<GraphQLObjectProperty<ExpressionSyntax>?> _resolverExpression;
@@ -26,7 +26,7 @@ public sealed class GraphQLFieldInvocation
         SemanticModel = semanticModel;
 
         _name = new Lazy<GraphQLObjectProperty<string>?>(GetFieldName);
-        _graphType = new Lazy<GraphQLObjectProperty<ITypeSymbol>?>(GetGraphType);
+        _graphType = new Lazy<GraphQLFieldGraphType?>(GetGraphType);
         _description = new Lazy<GraphQLObjectProperty<string>?>(GetDescription);
         _deprecationReason = new Lazy<GraphQLObjectProperty<string>?>(GetDeprecationReason);
         _resolverExpression = new Lazy<GraphQLObjectProperty<ExpressionSyntax>?>(GetResolverExpression);
@@ -42,9 +42,9 @@ public sealed class GraphQLFieldInvocation
     public GraphQLObjectProperty<string>? Name => _name.Value;
 
     /// <summary>
-    /// Gets the graph type of the field with its location, if it can be determined.
+    /// Gets the graph type of the field with its location and type information, if it can be determined.
     /// </summary>
-    public GraphQLObjectProperty<ITypeSymbol>? GraphType => _graphType.Value;
+    public GraphQLFieldGraphType? GraphType => _graphType.Value;
 
     /// <summary>
     /// Gets the description of the field with its location, if specified.
@@ -139,7 +139,7 @@ public sealed class GraphQLFieldInvocation
         return null;
     }
 
-    private GraphQLObjectProperty<ITypeSymbol>? GetGraphType()
+    private GraphQLFieldGraphType? GetGraphType()
     {
         // Try to get from 'type' argument
         var typeArg = GetArgument("type");
@@ -148,7 +148,7 @@ public sealed class GraphQLFieldInvocation
             var typeInfo = SemanticModel.GetTypeInfo(typeArg.Expression);
             if (typeInfo.Type != null)
             {
-                return new GraphQLObjectProperty<ITypeSymbol>(typeInfo.Type, typeArg.Expression.GetLocation());
+                return new GraphQLFieldGraphType(typeInfo.Type, typeArg.Expression.GetLocation(), SemanticModel);
             }
         }
 
@@ -159,7 +159,7 @@ public sealed class GraphQLFieldInvocation
             var typeInfo = SemanticModel.GetTypeInfo(genericTypeArg);
             if (typeInfo.Type != null)
             {
-                return new GraphQLObjectProperty<ITypeSymbol>(typeInfo.Type, genericTypeArg.GetLocation());
+                return new GraphQLFieldGraphType(typeInfo.Type, genericTypeArg.GetLocation(), SemanticModel);
             }
         }
 

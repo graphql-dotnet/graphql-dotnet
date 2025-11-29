@@ -496,12 +496,11 @@ public class GraphQLFieldInvocationTests
             """);
 
         var invocation = FindFieldInvocation(context.Root);
-
         var field = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
 
         field.ShouldNotBeNull();
         field.GraphType.ShouldNotBeNull();
-        field.GraphType.Value?.Name.ShouldBe("StringGraphType");
+        field.GraphType.TypeSymbol.Name.ShouldBe("StringGraphType");
         field.GraphType.Location.ShouldNotBeNull();
     }
 
