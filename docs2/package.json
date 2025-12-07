@@ -38,6 +38,6 @@
     "prettier": "^2.8.7",
     "babel-eslint": "^10.1.0",
     "typescript": "^5.0.4",
-    "eslint": "^4.12.1"
+    "eslint": "^9.39.1"
   }
 }
