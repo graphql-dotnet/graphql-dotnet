@@ -19,16 +19,23 @@ internal class ResolveFieldContextAccessorStreamResolver : ISourceStreamResolver
 
     public async ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
     {
-        _accessor.Context = context;
-        IObservable<object?> source;
-        try
+        // The following code ensures that the context is set in the correct ExecutionContext without clearing _accessor.Context
+        //   in case asynchronous operations execute in the background that needs access to it.
+
+        ValueTask<IObservable<object?>> task = default;
+        using var capturedContext = System.Threading.ExecutionContext.Capture();
+        if (capturedContext != null)
+            System.Threading.ExecutionContext.Run(capturedContext, Inner, null);
+        else
+            Inner(null);
+
+        void Inner(object? state)
         {
-            source = await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
+            _accessor.Context = context;
+            task = _innerResolver.ResolveAsync(context);
         }
-        finally
-        {
-            _accessor.Context = null;
-        }
+
+        var source = await task.ConfigureAwait(false);
 
         // Wrap the observable to set context during call to subscribe
         return new ContextAccessorObservable(_accessor, context, source);
@@ -49,15 +56,23 @@ internal class ResolveFieldContextAccessorStreamResolver : ISourceStreamResolver
 
         public IDisposable Subscribe(IObserver<object?> observer)
         {
-            _accessor.Context = _context;
-            try
+            // The following code ensures that the context is set in the correct ExecutionContext without clearing _accessor.Context
+            //   in case asynchronous operations execute in the background that needs access to it.
+
+            IDisposable ret = null!;
+            using var capturedContext = System.Threading.ExecutionContext.Capture();
+            if (capturedContext != null)
+                System.Threading.ExecutionContext.Run(capturedContext, Inner, null);
+            else
+                Inner(null);
+
+            void Inner(object? state)
             {
-                return _source.Subscribe(observer);
+                _accessor.Context = _context;
+                ret = _source.Subscribe(observer);
             }
-            finally
-            {
-                _accessor.Context = null;
-            }
+
+            return ret;
         }
     }
 }
