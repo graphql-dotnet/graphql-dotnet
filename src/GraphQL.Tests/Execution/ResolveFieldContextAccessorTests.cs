@@ -1,3 +1,5 @@
+using System.Reactive.Linq;
+using System.Runtime.CompilerServices;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.Types;
@@ -170,6 +172,48 @@ public class ResolveFieldContextAccessorTests
             """);
     }
 
+    [Fact]
+    public async Task ContextAccessor_StreamResolver_ReturnsCorrectContext()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<TestStreamSchema>()
+            .AddResolveFieldContextAccessor()
+            .AddSystemTextJson());
+
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var accessor = provider.GetRequiredService<IResolveFieldContextAccessor>();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+
+        // Act
+        var result = await executer.ExecuteAsync(_ =>
+        {
+            _.Schema = schema;
+            _.Query = "subscription { streamField }";
+            _.RequestServices = provider;
+        });
+
+        // Assert
+        result.Streams.ShouldNotBeNull();
+        result.Streams.Count.ShouldBe(1);
+
+        var stream = result.Streams.Single().Value;
+        var streamList = await stream.ToList();
+        // Verify the stream emitted the correct value
+        streamList.Count.ShouldBe(2);
+        var row = serializer.Serialize(streamList[0]);
+        row.ShouldBeCrossPlatJson("""{"data":{"streamField":"found"}}""");
+        row = serializer.Serialize(streamList[1]);
+        row.ShouldBeCrossPlatJson("""{"data":{"streamField":"found"}}""");
+
+        // Context should be null after execution completes
+        accessor.Context.ShouldBeNull();
+    }
+
     private class TestSchema : Schema
     {
         public TestSchema(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -300,5 +344,34 @@ public class ResolveFieldContextAccessorTests
 
     private class Parent
     {
+    }
+
+    private class TestStreamSchema : Schema
+    {
+        public TestStreamSchema(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            Query = new TestStreamQuery();
+            Subscription = new AutoRegisteringObjectGraphType<TestStreamSubscription>();
+        }
+    }
+
+    private class TestStreamQuery : ObjectGraphType
+    {
+        public TestStreamQuery()
+        {
+            Field<StringGraphType>("dummy").Resolve(_ => "dummy");
+        }
+    }
+
+    private class TestStreamSubscription
+    {
+        public static async IAsyncEnumerable<string> StreamField([FromServices] IResolveFieldContextAccessor accessor, [EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return accessor.Context != null ? "found" : "not found";
+            await Task.Yield(); // Simulate async work
+            cancellationToken.ThrowIfCancellationRequested();
+            yield return accessor.Context != null ? "found" : "not found";
+        }
     }
 }
