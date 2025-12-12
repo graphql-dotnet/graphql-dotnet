@@ -19,16 +19,60 @@ internal class ResolveFieldContextAccessorStreamResolver : ISourceStreamResolver
 
     public async ValueTask<IObservable<object?>> ResolveAsync(IResolveFieldContext context)
     {
-        _accessor.Context = context;
-        IObservable<object?> ret;
-        try
+        // The following code ensures that the context is set in the correct ExecutionContext without clearing _accessor.Context
+        //   in case asynchronous operations execute in the background that needs access to it.
+
+        ValueTask<IObservable<object?>> task = default;
+        using var capturedContext = System.Threading.ExecutionContext.Capture();
+        if (capturedContext != null)
+            System.Threading.ExecutionContext.Run(capturedContext, Inner, null);
+        else
+            Inner(null);
+
+        void Inner(object? state)
         {
-            ret = await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
+            _accessor.Context = context;
+            task = _innerResolver.ResolveAsync(context);
         }
-        finally
+
+        var source = await task.ConfigureAwait(false);
+
+        // Wrap the observable to set context during call to subscribe
+        return new ContextAccessorObservable(_accessor, context, source);
+    }
+
+    private sealed class ContextAccessorObservable : IObservable<object?>
+    {
+        private readonly IResolveFieldContextAccessor _accessor;
+        private readonly IResolveFieldContext _context;
+        private readonly IObservable<object?> _source;
+
+        public ContextAccessorObservable(IResolveFieldContextAccessor accessor, IResolveFieldContext context, IObservable<object?> source)
         {
-            _accessor.Context = null;
+            _accessor = accessor;
+            _context = context;
+            _source = source;
         }
-        return ret;
+
+        public IDisposable Subscribe(IObserver<object?> observer)
+        {
+            // The following code ensures that the context is set in the correct ExecutionContext without clearing _accessor.Context
+            //   in case asynchronous operations execute in the background that needs access to it.
+
+            IDisposable ret = null!;
+            using var capturedContext = System.Threading.ExecutionContext.Capture();
+            if (capturedContext != null)
+                System.Threading.ExecutionContext.Run(capturedContext, Inner, null);
+            else
+                Inner(null);
+
+            void Inner(object? state)
+            {
+                _accessor.Context = _context;
+                ret = _source.Subscribe(observer);
+            }
+
+            return ret;
+        }
     }
 }
