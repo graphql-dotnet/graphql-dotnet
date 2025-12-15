@@ -36,7 +36,7 @@ jobs:
         working-directory: main/docs2
         run: npm run build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Documentation
           path: main/docs2/public/**
