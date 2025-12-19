@@ -64,7 +64,16 @@ internal class ResolveFieldContextAccessorResolver : IFieldResolver
             _accessor.Context = _context;
             try
             {
-                return await _innerResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
+                var result = await _innerResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
+
+                // If the result is a data loader, wrap it to maintain context during execution
+                if (result is IDataLoaderResult dataLoaderResult)
+                {
+                    // Note that the context will not be discarded/reused by DocumentExecuter due to an IDataLoaderResult being returned
+                    return new ContextPreservingDataLoaderResult(_accessor, _context, dataLoaderResult);
+                }
+
+                return result;
             }
             finally
             {
