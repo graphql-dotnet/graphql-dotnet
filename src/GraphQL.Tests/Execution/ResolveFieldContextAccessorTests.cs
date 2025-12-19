@@ -132,44 +132,11 @@ public class ResolveFieldContextAccessorTests
             """);
     }
 
-    [Fact]
-    public async Task ContextAccessor_DataLoaderField_ReturnsCorrectContext()
-    {
-        // Arrange
-        var services = new ServiceCollection();
-        services.AddGraphQL(b => b
-            .AddSchema<TestDataLoaderSchema>()
-            .AddResolveFieldContextAccessor()
-            .AddDataLoader()
-            .AddSystemTextJson());
-
-        var provider = services.BuildServiceProvider();
-        var schema = provider.GetRequiredService<ISchema>();
-        var executer = provider.GetRequiredService<IDocumentExecuter>();
-        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
-
-        // Act
-        var result = await executer.ExecuteAsync(_ =>
-        {
-            _.Query = "{ dataLoaderField }";
-            _.RequestServices = provider;
-        });
-        var jsonResult = serializer.Serialize(result);
-
-        // Assert
-        jsonResult.ShouldBeCrossPlatJson("""
-            {
-              "data": {
-                "dataLoaderField": "match"
-              }
-            }
-            """);
-    }
-
     [Theory]
+    [InlineData("dataLoaderField")]
     [InlineData("nestedDataLoaderField1")]
     [InlineData("nestedDataLoaderField2")]
-    public async Task ContextAccessor_NestedDataLoaderField_ReturnsCorrectContext(string fieldName)
+    public async Task ContextAccessor_DataLoaderFields_ReturnCorrectContext(string fieldName)
     {
         // Arrange
         var services = new ServiceCollection();
