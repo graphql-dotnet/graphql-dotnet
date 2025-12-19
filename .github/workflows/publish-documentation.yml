@@ -16,11 +16,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           path: main
       - name: Checkout publish target
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           repository: graphql-dotnet/graphql-dotnet.github.io
           token: ${{ secrets.ORG_PAT_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
         working-directory: main/docs2
         run: npm run build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Documentation
           path: main/docs2/public/**

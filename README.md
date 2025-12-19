@@ -147,6 +147,7 @@ For more information see [Dependency Injection](https://graphql-dotnet.github.io
 | [GraphQL.Net Server](https://github.com/graphql-dotnet/server/tree/master/samples)                   | Sample projects highlighting features of the server package, including utilities for integrating a GraphQL server with .NET Web APIs. |
 | [Examples](https://github.com/graphql-dotnet/examples/tree/master/src)                               | Community-provided examples. These may not represent officially supported patterns but show how others use the library.               |
 | [GraphQL.Net Client](https://github.com/graphql-dotnet/graphql-client/tree/master/examples)          | Example implementations for the GraphQL client library.                                                                               |
+| [Full Stack App Template](https://github.com/Shane32/AppTemplate)                                    | Production-ready template for building full-stack applications with .NET, React, TypeScript, and GraphQL.NET. Features Microsoft OAuth, Entity Framework Core, automated CI/CD, type-safe development from database to UI, and monorepo architecture with single deployment. |
 
 You can also try an example of GraphQL demo server inside this repo - [GraphQL.Harness](samples/GraphQL.Harness/GraphQL.Harness.csproj).
 It supports the popular IDEs for managing GraphQL requests and exploring GraphQL schema:
