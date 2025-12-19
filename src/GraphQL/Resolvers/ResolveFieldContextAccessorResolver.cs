@@ -28,6 +28,7 @@ internal class ResolveFieldContextAccessorResolver : IFieldResolver
             // If the result is a data loader, wrap it to maintain context during execution
             if (result is IDataLoaderResult dataLoaderResult)
             {
+                // Note that the context will not be discarded/reused by DocumentExecuter due to an IDataLoaderResult being returned
                 return new ContextPreservingDataLoaderResult(_accessor, context, dataLoaderResult);
             }
 
