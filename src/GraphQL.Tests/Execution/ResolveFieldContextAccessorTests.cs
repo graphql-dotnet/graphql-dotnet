@@ -317,7 +317,7 @@ public class ResolveFieldContextAccessorTests
 
                         // Verify context is available in outer loader
                         if (currentContext != context)
-                            return new SimpleDataLoader<string>(async (_) => "outer no match");
+                            return new SimpleDataLoader<string>((_) => Task.FromResult("outer no match"));
 
                         // Return inner data loader
                         var innerLoader = new SimpleDataLoader<string>(async (_) =>
