@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.Types;
@@ -132,6 +133,40 @@ public class ResolveFieldContextAccessorTests
     }
 
     [Fact]
+    public async Task ContextAccessor_DataLoaderField_ReturnsCorrectContext()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<TestDataLoaderSchema>()
+            .AddResolveFieldContextAccessor()
+            .AddDataLoader()
+            .AddSystemTextJson());
+
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+
+        // Act
+        var result = await executer.ExecuteAsync(_ =>
+        {
+            _.Query = "{ dataLoaderField }";
+            _.RequestServices = provider;
+        });
+        var jsonResult = serializer.Serialize(result);
+
+        // Assert
+        jsonResult.ShouldBeCrossPlatJson("""
+            {
+              "data": {
+                "dataLoaderField": "match"
+              }
+            }
+            """);
+    }
+
+    [Fact]
     public void ContextAccessor_OutsideExecution_ReturnsNull()
     {
         // Arrange
@@ -233,6 +268,35 @@ public class ResolveFieldContextAccessorTests
                 {
                     var accessor = serviceProvider.GetService<IResolveFieldContextAccessor>();
                     return accessor?.Context == context ? "match" : "no match";
+                });
+        }
+    }
+
+    private class TestDataLoaderSchema : Schema
+    {
+        public TestDataLoaderSchema(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            Query = new TestDataLoaderQuery();
+        }
+    }
+
+    private class TestDataLoaderQuery : ObjectGraphType
+    {
+        public TestDataLoaderQuery()
+        {
+            Field<StringGraphType>("dataLoaderField")
+                .ResolveAsync(async context =>
+                {
+                    await Task.Yield();
+                    var dataLoaderContext = context.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>().Context!;
+                    var loader = new SimpleDataLoader<string>(async (_) =>
+                    {
+                        await Task.Yield();
+                        var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                        var currentContext = service.Context;
+                        return currentContext == context ? "match" : "no match";
+                    });
+                    return loader.LoadAsync();
                 });
         }
     }
