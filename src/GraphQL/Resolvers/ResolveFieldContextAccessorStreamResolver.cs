@@ -6,7 +6,7 @@ namespace GraphQL.Resolvers;
 /// Resolver wrapper that populates the <see cref="IResolveFieldContextAccessor"/> with the current context
 /// before delegating to the wrapped resolver.
 /// </summary>
-internal class ResolveFieldContextAccessorStreamResolver : ISourceStreamResolver
+internal sealed class ResolveFieldContextAccessorStreamResolver : ISourceStreamResolver
 {
     private readonly IResolveFieldContextAccessor _accessor;
     private readonly ISourceStreamResolver _innerResolver;
