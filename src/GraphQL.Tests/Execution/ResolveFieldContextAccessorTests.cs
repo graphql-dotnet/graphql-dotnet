@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
+using GraphQL.DataLoader;
 using GraphQL.Execution;
 using GraphQL.MicrosoftDI;
 using GraphQL.Types;
@@ -131,6 +132,43 @@ public class ResolveFieldContextAccessorTests
             """);
     }
 
+    [Theory]
+    [InlineData("dataLoaderField")]
+    [InlineData("nestedDataLoaderField1")]
+    [InlineData("nestedDataLoaderField2")]
+    public async Task ContextAccessor_DataLoaderFields_ReturnCorrectContext(string fieldName)
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<TestDataLoaderSchema>()
+            .AddResolveFieldContextAccessor()
+            .AddDataLoader()
+            .AddSystemTextJson());
+
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        var executer = provider.GetRequiredService<IDocumentExecuter>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+
+        // Act
+        var result = await executer.ExecuteAsync(_ =>
+        {
+            _.Query = $"{{ {fieldName} }}";
+            _.RequestServices = provider;
+        });
+        var jsonResult = serializer.Serialize(result);
+
+        // Assert
+        jsonResult.ShouldBeCrossPlatJson($$"""
+            {
+              "data": {
+                "{{fieldName}}": "match"
+              }
+            }
+            """);
+    }
+
     [Fact]
     public void ContextAccessor_OutsideExecution_ReturnsNull()
     {
@@ -233,6 +271,99 @@ public class ResolveFieldContextAccessorTests
                 {
                     var accessor = serviceProvider.GetService<IResolveFieldContextAccessor>();
                     return accessor?.Context == context ? "match" : "no match";
+                });
+        }
+    }
+
+    private class TestDataLoaderSchema : Schema
+    {
+        public TestDataLoaderSchema(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+            Query = new TestDataLoaderQuery();
+        }
+    }
+
+    private class TestDataLoaderQuery : ObjectGraphType
+    {
+        public TestDataLoaderQuery()
+        {
+            Field<StringGraphType>("dataLoaderField")
+                .ResolveAsync(async context =>
+                {
+                    await Task.Yield();
+                    var dataLoaderContext = context.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>().Context!;
+                    var loader = new SimpleDataLoader<string>(async (_) =>
+                    {
+                        await Task.Yield();
+                        var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                        var currentContext = service.Context;
+                        return currentContext == context ? "match" : "no match";
+                    });
+                    return loader.LoadAsync();
+                });
+
+            Field<StringGraphType>("nestedDataLoaderField1")
+                .ResolveAsync(async context =>
+                {
+                    await Task.Yield();
+                    var dataLoaderContext = context.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>().Context!;
+
+                    // First data loader that returns another data loader
+                    var outerLoader = new SimpleDataLoader<IDataLoaderResult>(async (_) =>
+                    {
+                        await Task.Yield();
+                        var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                        var currentContext = service.Context;
+
+                        // Verify context is available in outer loader
+                        if (currentContext != context)
+                            return new SimpleDataLoader<string>((_) => Task.FromResult("outer no match"));
+
+                        // Return inner data loader
+                        var innerLoader = new SimpleDataLoader<string>(async (_) =>
+                        {
+                            await Task.Yield();
+                            var innerService = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                            var innerCurrentContext = innerService.Context;
+                            return innerCurrentContext == context ? "match" : "inner no match";
+                        });
+
+                        return innerLoader.LoadAsync();
+                    });
+
+                    return outerLoader.LoadAsync();
+                });
+
+            Field<StringGraphType>("nestedDataLoaderField2")
+                .ResolveAsync(async context =>
+                {
+                    await Task.Yield();
+                    var dataLoaderContext = context.RequestServices!.GetRequiredService<IDataLoaderContextAccessor>().Context!;
+
+                    // First data loader that returns another data loader
+                    var loader = new SimpleDataLoader<string>(async (_) =>
+                    {
+                        await Task.Yield();
+                        var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                        var currentContext = service.Context;
+
+                        // Verify context is available in outer loader
+                        return currentContext == context ? "match" : "no match";
+                    });
+
+                    var loader2 = loader.Then(async result1 =>
+                    {
+                        if (result1 != "match")
+                            return "first no match";
+
+                        await Task.Yield();
+                        var service = context.RequestServices!.GetRequiredService<IResolveFieldContextAccessor>();
+                        var currentContext = service.Context;
+
+                        return currentContext == context ? "match" : "second no match";
+                    });
+
+                    return loader2;
                 });
         }
     }

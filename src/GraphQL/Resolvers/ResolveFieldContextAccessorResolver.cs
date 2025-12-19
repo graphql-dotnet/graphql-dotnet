@@ -1,3 +1,4 @@
+using GraphQL.DataLoader;
 using GraphQL.Execution;
 
 namespace GraphQL.Resolvers;
@@ -22,11 +23,62 @@ internal class ResolveFieldContextAccessorResolver : IFieldResolver
         _accessor.Context = context;
         try
         {
-            return await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
+            var result = await _innerResolver.ResolveAsync(context).ConfigureAwait(false);
+
+            // If the result is a data loader, wrap it to maintain context during execution
+            if (result is IDataLoaderResult dataLoaderResult)
+            {
+                // Note that the context will not be discarded/reused by DocumentExecuter due to an IDataLoaderResult being returned
+                return new ContextPreservingDataLoaderResult(_accessor, context, dataLoaderResult);
+            }
+
+            return result;
         }
         finally
         {
             _accessor.Context = null;
+        }
+    }
+
+    /// <summary>
+    /// Wraps an IDataLoaderResult to ensure the context is set before calling GetResultAsync
+    /// </summary>
+    private sealed class ContextPreservingDataLoaderResult : IDataLoaderResult
+    {
+        private readonly IResolveFieldContextAccessor _accessor;
+        private readonly IResolveFieldContext _context;
+        private readonly IDataLoaderResult _innerResult;
+
+        public ContextPreservingDataLoaderResult(
+            IResolveFieldContextAccessor accessor,
+            IResolveFieldContext context,
+            IDataLoaderResult innerResult)
+        {
+            _accessor = accessor;
+            _context = context;
+            _innerResult = innerResult;
+        }
+
+        public async Task<object?> GetResultAsync(CancellationToken cancellationToken = default)
+        {
+            _accessor.Context = _context;
+            try
+            {
+                var result = await _innerResult.GetResultAsync(cancellationToken).ConfigureAwait(false);
+
+                // If the result is a data loader, wrap it to maintain context during execution
+                if (result is IDataLoaderResult dataLoaderResult)
+                {
+                    // Note that the context will not be discarded/reused by DocumentExecuter due to an IDataLoaderResult being returned
+                    return new ContextPreservingDataLoaderResult(_accessor, _context, dataLoaderResult);
+                }
+
+                return result;
+            }
+            finally
+            {
+                _accessor.Context = null;
+            }
         }
     }
 }
