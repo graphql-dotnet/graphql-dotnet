@@ -1,6 +1,9 @@
+using GraphQL.Execution;
 using GraphQL.StarWars.Types;
+using GraphQL.Tests.Bugs;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types;
 
@@ -239,6 +242,96 @@ public class SchemaTests
         // Attempting to initialize should throw an exception when OnBeforeInitializeType tries to access AllTypes
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
             .Message.ShouldBe("Cannot access AllTypes while schema types are being created. AllTypes is not available during OnBeforeInitializeType execution.");
+    }
+
+    [Fact]
+    public async Task does_not_double_initialize_types()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<AutoMapSchema>()
+            .AddAutoClrMappings(false, false)
+            .AddSystemTextJson()
+            .AddResolveFieldContextAccessor());
+        services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(MyAuto<>));
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var parent = schema.AllTypes["Parent"].ShouldNotBeNull().ShouldBeAssignableTo<IObjectGraphType>().ShouldNotBeNull();
+        var field1 = parent.Fields.Find("field1").ShouldNotBeNull();
+        var field2 = parent.Fields.Find("field2").ShouldNotBeNull();
+        var objType = schema.AllTypes["Obj"];
+        field1.ResolvedType
+            .ShouldBeAssignableTo<NonNullGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeAssignableTo<ListGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeAssignableTo<NonNullGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeSameAs(objType);
+        field2.ResolvedType
+            .ShouldBeAssignableTo<NonNullGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeAssignableTo<ListGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeAssignableTo<NonNullGraphType>().ShouldNotBeNull().ResolvedType
+            .ShouldBeSameAs(objType);
+
+        var executer = provider.GetRequiredService<IDocumentExecuter<ISchema>>();
+        var serializer = provider.GetRequiredService<IGraphQLTextSerializer>();
+
+        var result = await executer.ExecuteAsync(new ExecutionOptions
+        {
+            Query = "{ parent { field1 { hello } field2 { hello } } }",
+            RequestServices = provider,
+        });
+
+        var json = serializer.Serialize(result);
+
+        json.ShouldBeCrossPlatJson(
+            """
+            {
+                "data": {
+                    "parent": {
+                        "field1": [
+                            {
+                                "hello": "found"
+                            }
+                        ],
+                        "field2": [
+                            {
+                                "hello": "found"
+                            }
+                        ]
+                    }
+                }
+            }
+            """);
+    }
+
+    private class MyAuto<T> : AutoRegisteringObjectGraphType<T>;
+    private class AutoMapSchema : Schema
+    {
+        public AutoMapSchema(IServiceProvider provider) : base(provider)
+        {
+            var query = new ObjectGraphType
+            {
+                Name = "Query",
+            };
+            query.Field<Parent>("parent").Resolve(_ => new Parent());
+            Query = query;
+        }
+
+        [Name("Parent")]
+        [MapAutoClrType]
+        public class Parent
+        {
+            public static IEnumerable<ObjType> Field1 => new ObjType[] { new ObjType() };
+            public static IEnumerable<ObjType> Field2 => new ObjType[] { new ObjType() };
+        }
+
+        [MapAutoClrType]
+        [Name("Obj")]
+        public class ObjType
+        {
+            public static string Hello([FromServices] IResolveFieldContextAccessor accessor) => accessor.Context != null ? "found" : "not found";
+            //public static IEnumerable<ObjType>? Field3 => null;
+        }
     }
 }
 

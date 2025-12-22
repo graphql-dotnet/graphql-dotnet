@@ -454,7 +454,16 @@ public class SchemaTypes : IEnumerable<IGraphType>
     {
         var local = resolve;
         local ??= t => (IGraphType)Activator.CreateInstance(t)!;
-        resolve = t => FindGraphType(t) ?? local(t);
+        resolve = t =>
+        {
+            var ret = FindGraphType(t);
+            if (ret == null)
+            {
+                ret = local(t);
+                _typeDictionary[t] = ret;
+            }
+            return ret;
+        };
 
         if (type.IsGenericType)
         {
