@@ -142,3 +142,13 @@ If you have type-first schemas with `ValueTask<T>` or `IAsyncEnumerable<T>` meth
 ### 5. `ISchema.ResolveFieldContextAccessor` property added
 
 The `ResolveFieldContextAccessor` property has been added to the `ISchema` interface. This property was previously only available on the `Schema` class. If you have custom implementations of `ISchema`, you will need to implement this property. Most users who inherit from `Schema` will not be affected as the base class already provides the implementation.
+
+### 6. `ApplyMiddleware` methods moved from `SchemaTypes` to extension methods
+
+The `ApplyMiddleware` methods have been moved from the `SchemaTypes` class to extension methods in the `SchemaTypesExtensions` class. This change improves code organization and follows .NET best practices for extending types. These methods are typically only called by `Schema` and as such should not require any changes to your code.
+
+### 7. `SchemaTypes` is now an abstract base class
+
+The `SchemaTypes` class has been refactored into an abstract base class with a new `LegacySchemaTypes` derived class that contains the concrete implementation. This change enables future extensibility while maintaining backward compatibility.
+
+Typically no changes are required unless you override `Schema.CreateSchemaTypes()` and/or use your own `SchemaTypes` implementation. In those cases, you should update your code to use or derive from `LegacySchemaTypes` instead of `SchemaTypes`.

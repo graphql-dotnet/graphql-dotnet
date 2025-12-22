@@ -505,7 +505,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     protected virtual SchemaTypes CreateSchemaTypes()
     {
         var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
-        return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
+        return new LegacySchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
     }
 
     /// <summary>

@@ -269,7 +269,7 @@ public class CustomTypesSchema : Schema
         => new CustomSchemaTypes(this, this);
 }
 
-public class CustomSchemaTypes : SchemaTypes
+public class CustomSchemaTypes : LegacySchemaTypes
 {
     public CustomSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         : base(schema, serviceProvider)
