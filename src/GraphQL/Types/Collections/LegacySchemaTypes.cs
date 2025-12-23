@@ -118,7 +118,7 @@ public class LegacySchemaTypes : SchemaTypes
                t => _introspectionTypes.TryGetValue(t, out var graphType)
                ? graphType
                : (IGraphType?)serviceProvider.GetService(t)
-               ?? (BuiltInScalars.TryGetValue(t, out var scalarType)
+               ?? (BuiltInCustomScalars.TryGetValue(t, out var scalarType)
                ? scalarType
                : throw new Exception($"Invalid introspection type '{t.GetFriendlyName()}'"))),
            (name, type, ctx) =>
@@ -157,7 +157,7 @@ public class LegacySchemaTypes : SchemaTypes
                 // if the service provider does not provide an instance, and if
                 // the type is a GraphQL.NET built-in type, create an instance of it
                 return (IGraphType?)serviceProvider.GetService(serviceType)
-                    ?? (BuiltInScalars.TryGetValue(serviceType, out var scalarType)
+                    ?? (BuiltInCustomScalars.TryGetValue(serviceType, out var scalarType)
                         ? scalarType
                         : throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered."));
             },
@@ -614,8 +614,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
     private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
-        namedType ??= context.ResolveType(namedType2!);
+        var namedType = type.GetNamedType();
 
         using var _ = context.Trace("AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type '{0}'", namedType.Name);
 
@@ -836,7 +835,7 @@ Make sure that your ServiceProvider is configured correctly.");
             var type2 = this[reference.TypeName];
             if (type2 == null)
             {
-                type2 = BuiltInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
+                type2 = BuiltInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                 if (type2 != null)
                     SetGraphType(type2.Name, type2);
             }

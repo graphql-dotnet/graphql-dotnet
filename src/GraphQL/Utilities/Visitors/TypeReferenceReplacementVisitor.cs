@@ -10,16 +10,19 @@ namespace GraphQL.Utilities.Visitors;
 internal struct TypeReferenceReplacementVisitor
 {
     private readonly Dictionary<ROM, IGraphType> _typeDictionary;
+    private readonly Dictionary<string, ScalarGraphType> _builtInTypes;
     private readonly ISchema _schema;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TypeReferenceReplacementVisitor"/> struct.
     /// </summary>
     /// <param name="typeDictionary">The dictionary containing all registered types in the schema.</param>
+    /// <param name="builtInTypes">The dictionary containing all built-in scalar types.</param>
     /// <param name="schema">The schema being processed.</param>
-    public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, ISchema schema)
+    public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, Dictionary<string, ScalarGraphType> builtInTypes, ISchema schema)
     {
         _typeDictionary = typeDictionary ?? throw new ArgumentNullException(nameof(typeDictionary));
+        _builtInTypes = builtInTypes ?? throw new ArgumentNullException(nameof(builtInTypes));
         _schema = schema ?? throw new ArgumentNullException(nameof(schema));
     }
 
@@ -41,7 +44,7 @@ internal struct TypeReferenceReplacementVisitor
         }
 
         // Process all types in the dictionary
-        foreach (var type in _typeDictionary.Values)
+        foreach (var type in _typeDictionary.Values.ToList()) // copy list in case resovling GraphQLTypeReference adds a built-in scalar
         {
             switch (type)
             {
@@ -140,9 +143,16 @@ internal struct TypeReferenceReplacementVisitor
 
         if (type is GraphQLTypeReference reference)
         {
-            return _typeDictionary.TryGetValue(reference.TypeName, out var found)
-                ? found
-                : throw new InvalidOperationException(
+            if (_typeDictionary.TryGetValue(reference.TypeName, out var found))
+                return found;
+
+            if (_builtInTypes.TryGetValue(reference.TypeName, out var builtIn))
+            {
+                _typeDictionary[reference.TypeName] = builtIn;
+                return builtIn;
+            }
+
+            throw new InvalidOperationException(
                     $"Unable to resolve reference to type '{reference.TypeName}' on '{parentType.Name}'");
         }
 
