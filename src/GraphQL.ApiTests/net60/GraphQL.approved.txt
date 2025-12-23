@@ -490,10 +490,11 @@ namespace GraphQL
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static bool DoTypesOverlap(GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
-        public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
+        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("type")]
+        public static GraphQL.Types.IGraphType? GetNamedType(this GraphQL.Types.IGraphType? type) { }
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
-        public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
+        public static bool IsInputObjectType(this GraphQL.Types.IGraphType? type) { }
         public static bool IsInputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this System.Type type) { }
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
@@ -2793,17 +2794,10 @@ namespace GraphQL.Types
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
         public override string ToString() { }
     }
     public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) ins" +
-            "tead.")]
-        public ListGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
         public LongGraphType() { }
@@ -2821,17 +2815,10 @@ namespace GraphQL.Types
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) " +
-            "instead.")]
-        public NonNullGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
@@ -2998,6 +2985,7 @@ namespace GraphQL.Types
     }
     public abstract class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
+        protected static readonly System.Collections.Generic.Dictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInCustomScalars;
         protected static readonly System.Collections.Generic.Dictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
         protected SchemaTypes() { }
         public int Count { get; }

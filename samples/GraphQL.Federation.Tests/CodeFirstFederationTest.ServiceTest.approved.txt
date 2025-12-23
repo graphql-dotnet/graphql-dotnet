@@ -2,12 +2,27 @@ schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link
   query: TestQuery
 }
 
-scalar _Any
-
 type TestQuery {
   directivesTest: DirectivesTestDto!
   _service: _Service!
   _entities(representations: [_Any!]!): [_Entity]!
+}
+
+type _Service {
+  sdl: String
+}
+
+scalar _Any
+
+union _Entity = FederatedTestDto | DirectivesTestDto | ExternalResolvableTestDto
+
+type FederatedTestDto @key(fields: "id") {
+  id: Int!
+  name: String! @deprecated(reason: "Test deprecation reason 01.")
+  externalTestId: Int!
+  externalResolvableTestId: Int!
+  externalTest: ExternalTestDto! @deprecated(reason: "Test deprecation reason 02.")
+  externalResolvableTest: ExternalResolvableTestDto! @provides(fields: "external")
 }
 
 type DirectivesTestDto @key(fields: "id") @shareable @inaccessible {
@@ -18,21 +33,6 @@ type DirectivesTestDto @key(fields: "id") @shareable @inaccessible {
   external: String! @external
   provides: String! @provides(fields: "foo bar")
   requires: String! @requires(fields: "foo bar")
-}
-
-type _Service {
-  sdl: String
-}
-
-union _Entity = DirectivesTestDto | FederatedTestDto | ExternalResolvableTestDto
-
-type FederatedTestDto @key(fields: "id") {
-  id: Int!
-  name: String! @deprecated(reason: "Test deprecation reason 01.")
-  externalTestId: Int!
-  externalResolvableTestId: Int!
-  externalTest: ExternalTestDto! @deprecated(reason: "Test deprecation reason 02.")
-  externalResolvableTest: ExternalResolvableTestDto! @provides(fields: "external")
 }
 
 type ExternalTestDto @key(fields: "id", resolvable: false) {

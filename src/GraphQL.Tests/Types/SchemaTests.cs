@@ -126,10 +126,10 @@ public class SchemaTests
     }
 
     [Fact]
-    public void handles_stackoverflow_exception_for_cycle_field_type()
+    public void handles_cycle_field_type_2()
     {
         var schema = new ACyclingDerivingSchema(new FuncServiceProvider(t => t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null));
-        Should.Throw<InvalidOperationException>(() => schema.AllTypes["abcd"]);
+        schema.Initialize();
     }
 
     private void ContainsTypeNames(ISchema schema, params string[] typeNames)

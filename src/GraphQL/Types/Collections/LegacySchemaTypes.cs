@@ -314,16 +314,16 @@ public class LegacySchemaTypes : SchemaTypes
         {
             if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
             {
-                var nonNull = (NonNullGraphType)Activator.CreateInstance(type)!;
-                nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
-                return nonNull;
+                var innerType = type.GenericTypeArguments[0];
+                var resolvedInner = BuildGraphQLType(innerType, resolve);
+                return new NonNullGraphType(resolvedInner);
             }
 
             if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
             {
-                var list = (ListGraphType)Activator.CreateInstance(type)!;
-                list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
-                return list;
+                var innerType = type.GenericTypeArguments[0];
+                var resolvedInner = BuildGraphQLType(innerType, resolve);
+                return new ListGraphType(resolvedInner);
             }
         }
 

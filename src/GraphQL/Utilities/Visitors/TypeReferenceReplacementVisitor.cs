@@ -7,7 +7,7 @@ namespace GraphQL.Utilities.Visitors;
 /// A visitor that replaces all <see cref="GraphQLTypeReference"/> instances
 /// with actual types from the schema's type dictionary.
 /// </summary>
-internal struct TypeReferenceReplacementVisitor
+internal readonly ref struct TypeReferenceReplacementVisitor
 {
     private readonly Dictionary<ROM, IGraphType> _typeDictionary;
     private readonly Dictionary<string, ScalarGraphType> _builtInTypes;

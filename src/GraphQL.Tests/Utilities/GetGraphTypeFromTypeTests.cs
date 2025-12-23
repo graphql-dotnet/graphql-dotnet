@@ -283,7 +283,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassObjectType));
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.Initialize();
-        schema.Query.Fields.Find("test")!.Type.ShouldBe(mappedType);
+        CompareResolvedType(schema.Query.Fields.Find("test")!.ResolvedType, mappedType);
     }
 
     [Theory]
@@ -314,7 +314,29 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
+        CompareResolvedType(schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.ResolvedType, mappedType);
+    }
+
+    private void CompareResolvedType(IGraphType? actual, Type expected)
+    {
+        actual.ShouldNotBeNull();
+        if (expected.IsGenericType)
+        {
+            var genericExpectedType = expected.GetGenericTypeDefinition();
+            if (genericExpectedType == typeof(NonNullGraphType<>))
+            {
+                var innerGraphType = actual.ShouldBeOfType<NonNullGraphType>().ResolvedType;
+                CompareResolvedType(innerGraphType, expected.GetGenericArguments()[0]);
+                return;
+            }
+            else if (genericExpectedType == typeof(ListGraphType<>))
+            {
+                var innerGraphType = actual.ShouldBeOfType<ListGraphType>().ResolvedType;
+                CompareResolvedType(innerGraphType, expected.GetGenericArguments()[0]);
+                return;
+            }
+        }
+        actual.ShouldBeAssignableTo(expected);
     }
 
     [Theory]
@@ -353,7 +375,7 @@ public class GetGraphTypeFromTypeTests
         schema.RegisterTypeMapping(typeof(MyClass), typeof(MyClassInputType));
         schema.RegisterTypeMapping(typeof(MappedEnum), typeof(MappedEnumGraphType));
         schema.Initialize();
-        schema.Directives.Find("MyDirective")!.Arguments!.Find("arg")!.Type.ShouldBe(mappedType);
+        CompareResolvedType(schema.Directives.Find("MyDirective")!.Arguments!.Find("arg")!.ResolvedType, mappedType);
     }
 
     [Theory]
@@ -388,7 +410,7 @@ public class GetGraphTypeFromTypeTests
         schema.Initialize();
         var inputTypeActual = schema.Query.Fields.Find("test")!.Arguments!.Find("arg")!.ResolvedType.ShouldBeOfType<InputObjectGraphType>();
         inputTypeActual.ShouldBe(inputType);
-        inputTypeActual.Fields.Find("field")!.Type.ShouldBe(mappedType);
+        CompareResolvedType(inputTypeActual.Fields.Find("field")!.ResolvedType, mappedType);
     }
 
     [Fact]

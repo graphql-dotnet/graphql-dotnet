@@ -2,16 +2,16 @@ schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link
   query: MyQuery
 }
 
+type MyQuery {
+  favoriteProduct: Product!
+  _service: _Service!
+}
+
 type _Service {
   sdl: String
 }
 
 scalar _Any
-
-type MyQuery {
-  favoriteProduct: Product!
-  _service: _Service!
-}
 
 type Product @key(fields: "id", resolvable: false) {
   id: ID!
