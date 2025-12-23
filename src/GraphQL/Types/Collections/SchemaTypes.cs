@@ -45,6 +45,42 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
         [typeof(Uri)] = typeof(UriGraphType),
     });
 
+    /// <summary>
+    /// Built-in scalar instances (preinitialized and shared across all schema instances).
+    /// </summary>
+    protected static readonly Dictionary<Type, ScalarGraphType> BuiltInScalars = new ScalarGraphType[]
+    {
+        new StringGraphType(),
+        new BooleanGraphType(),
+        new FloatGraphType(),
+        new IntGraphType(),
+        new IdGraphType(),
+        new DateGraphType(),
+#if NET5_0_OR_GREATER
+        new HalfGraphType(),
+#endif
+#if NET6_0_OR_GREATER
+        new DateOnlyGraphType(),
+        new TimeOnlyGraphType(),
+#endif
+        new DateTimeGraphType(),
+        new DateTimeOffsetGraphType(),
+        new TimeSpanSecondsGraphType(),
+        new TimeSpanMillisecondsGraphType(),
+        new DecimalGraphType(),
+        new UriGraphType(),
+        new GuidGraphType(),
+        new ShortGraphType(),
+        new UShortGraphType(),
+        new UIntGraphType(),
+        new LongGraphType(),
+        new BigIntGraphType(),
+        new ULongGraphType(),
+        new ByteGraphType(),
+        new SByteGraphType(),
+    }
+    .ToDictionary(t => t.GetType());
+
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]

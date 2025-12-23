@@ -2805,6 +2805,11 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
+    public class NewSchemaTypes : GraphQL.Types.SchemaTypes
+    {
+        public NewSchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings = null, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize = null) { }
+        protected override System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
+    }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
@@ -2986,6 +2991,7 @@ namespace GraphQL.Types
     }
     public abstract class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
+        protected static readonly System.Collections.Generic.Dictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
         protected SchemaTypes() { }
         public int Count { get; }
         protected abstract System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }

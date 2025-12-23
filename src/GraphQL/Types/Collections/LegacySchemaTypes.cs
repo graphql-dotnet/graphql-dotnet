@@ -20,46 +20,6 @@ public class LegacySchemaTypes : SchemaTypes
     // Introspection types https://spec.graphql.org/October2021/#sec-Schema-Introspection
     private Dictionary<Type, IGraphType> _introspectionTypes;
 
-    // Standard scalars https://spec.graphql.org/October2021/#sec-Scalars
-    private static readonly Dictionary<Type, IGraphType> _builtInScalars = new IGraphType[]
-    {
-        new StringGraphType(),
-        new BooleanGraphType(),
-        new FloatGraphType(),
-        new IntGraphType(),
-        new IdGraphType(),
-    }
-    .ToDictionary(t => t.GetType());
-
-    // .NET custom scalars
-    private static readonly Dictionary<Type, IGraphType> _builtInCustomScalars = new IGraphType[]
-    {
-        new DateGraphType(),
-#if NET5_0_OR_GREATER
-        new HalfGraphType(),
-#endif
-#if NET6_0_OR_GREATER
-        new DateOnlyGraphType(),
-        new TimeOnlyGraphType(),
-#endif
-        new DateTimeGraphType(),
-        new DateTimeOffsetGraphType(),
-        new TimeSpanSecondsGraphType(),
-        new TimeSpanMillisecondsGraphType(),
-        new DecimalGraphType(),
-        new UriGraphType(),
-        new GuidGraphType(),
-        new ShortGraphType(),
-        new UShortGraphType(),
-        new UIntGraphType(),
-        new LongGraphType(),
-        new BigIntGraphType(),
-        new ULongGraphType(),
-        new ByteGraphType(),
-        new SByteGraphType(),
-    }
-    .ToDictionary(t => t.GetType());
-
     private TypeCollectionContext _context;
     private INameConverter _nameConverter;
     private readonly Action<IGraphType>? _onBeforeInitialize;
@@ -158,8 +118,8 @@ public class LegacySchemaTypes : SchemaTypes
                t => _introspectionTypes.TryGetValue(t, out var graphType)
                ? graphType
                : (IGraphType?)serviceProvider.GetService(t)
-               ?? (_builtInScalars.TryGetValue(t, out graphType)
-               ? graphType
+               ?? (BuiltInScalars.TryGetValue(t, out var scalarType)
+               ? scalarType
                : throw new Exception($"Invalid introspection type '{t.GetFriendlyName()}'"))),
            (name, type, ctx) =>
            {
@@ -197,10 +157,8 @@ public class LegacySchemaTypes : SchemaTypes
                 // if the service provider does not provide an instance, and if
                 // the type is a GraphQL.NET built-in type, create an instance of it
                 return (IGraphType?)serviceProvider.GetService(serviceType)
-                    ?? (_builtInScalars.TryGetValue(serviceType, out var graphType)
-                        ? graphType
-                        : _builtInCustomScalars.TryGetValue(serviceType, out graphType)
-                        ? graphType
+                    ?? (BuiltInScalars.TryGetValue(serviceType, out var scalarType)
+                        ? scalarType
                         : throw new InvalidOperationException($"No service for type '{serviceType.GetFriendlyName()}' has been registered."));
             },
             (name, graphType, context) =>
@@ -878,7 +836,7 @@ Make sure that your ServiceProvider is configured correctly.");
             var type2 = this[reference.TypeName];
             if (type2 == null)
             {
-                type2 = _builtInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName) ?? _builtInCustomScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
+                type2 = BuiltInScalars.Values.FirstOrDefault(t => t.Name == reference.TypeName);
                 if (type2 != null)
                     SetGraphType(type2.Name, type2);
             }
