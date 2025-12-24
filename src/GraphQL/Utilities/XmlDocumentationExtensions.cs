@@ -172,10 +172,10 @@ internal static class XmlDocumentationExtensions
         /// <returns>The contents of the returns/param tag for the parameter.</returns>
         private static string? GetXmlDocumentation(ParameterInfo parameter, XDocument? xml) =>
             parameter.IsRetval || string.IsNullOrEmpty(parameter.Name)
-                ? xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString()!.Trim().NullIfEmpty()
-                : xml?.XPathEvaluate(
-                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString()!.Trim().NullIfEmpty();
+                ? NullIfEmpty(xml?.XPathEvaluate(
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/returns)").ToString()!.Trim())
+                : NullIfEmpty(xml?.XPathEvaluate(
+                    $"string(/doc/members/member[@name='{GetMemberElementName(parameter.Member)}']/param[@name='{parameter.Name}'])").ToString()!.Trim());
     }
 
     /// <summary>
