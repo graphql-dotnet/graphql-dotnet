@@ -2812,7 +2812,6 @@ namespace GraphQL.Types
     public class NewSchemaTypes : GraphQL.Types.SchemaTypes
     {
         public NewSchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings = null, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize = null) { }
-        protected override System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
     }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
