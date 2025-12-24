@@ -149,7 +149,7 @@ The `ApplyMiddleware` methods have been moved from the `SchemaTypes` class to ex
 
 ### 7. Schema initialization logic rewritten
 
-The schema initialization logic has been completely rewritten to improve type reference handling. The `SchemaTypes` class is now abstract, with the new `NewSchemaTypes` implementation providing stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
+The schema initialization logic has been completely rewritten to improve type reference handling. The update `SchemaTypes` class provides stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
 
 Most users require no changes. Note that the order in which types are added to the schema has changed, which may affect introspection query results if you rely on a specific type ordering. Additionally, `GlobalSwitches.TrackGraphTypeInitialization` has been removed, but exception messages have been improved to provide better diagnostics.
 
