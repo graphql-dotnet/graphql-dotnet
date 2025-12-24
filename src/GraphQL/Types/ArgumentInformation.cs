@@ -67,7 +67,6 @@ public class ArgumentInformation
     /// </summary>
     public TypeInformation TypeInformation { get; }
 
-    private LambdaExpression? _expression;
     /// <summary>
     /// Gets or sets a delegate in the form of a <see cref="LambdaExpression"/> to be used to populate
     /// this method argument while building the field resolver.
@@ -81,7 +80,7 @@ public class ArgumentInformation
     /// </summary>
     public LambdaExpression? Expression
     {
-        get => _expression;
+        get;
         set
         {
             if (value != null)
@@ -110,7 +109,7 @@ public class ArgumentInformation
                     throw new ArgumentException($"Value must be a lambda expression delegate of type Func<IResolveFieldContext, {ParameterInfo.ParameterType.Name}>.");
                 }
             }
-            _expression = value;
+            field = value;
         }
     }
 

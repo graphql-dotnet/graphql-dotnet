@@ -40,7 +40,18 @@ public static class GlobalSwitches
     /// <br/>
     /// By default disabled.
     /// </summary>
-    public static bool EnableReadDescriptionFromXmlDocumentation { get; set; } = false;
+    public static bool EnableReadDescriptionFromXmlDocumentation
+    {
+        get;
+        set
+        {
+            // When no code calls the setter, the setter is trimmed during AOT compilation,
+            // causing the entire XML documentation feature to be trimmed out.
+            field = value;
+            if (value)
+                XmlDocumentationExtensions.Enable();
+        }
+    } = false;
 
     /// <summary>
     /// Gets or sets current validation delegate. By default this delegate validates all names according

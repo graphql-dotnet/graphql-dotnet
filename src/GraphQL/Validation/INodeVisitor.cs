@@ -10,10 +10,10 @@ public interface INodeVisitor
     /// <summary>
     /// Called when the node walker is entering a node.
     /// </summary>
-    ValueTask EnterAsync(ASTNode node, ValidationContext context);
+    public ValueTask EnterAsync(ASTNode node, ValidationContext context);
 
     /// <summary>
     /// Called when the node walker is leaving a node.
     /// </summary>
-    ValueTask LeaveAsync(ASTNode node, ValidationContext context);
+    public ValueTask LeaveAsync(ASTNode node, ValidationContext context);
 }

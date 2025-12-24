@@ -9,5 +9,5 @@ public interface IMetadataWriter : IProvideMetadata
     /// <summary>
     /// Provides access to read metadata.
     /// </summary>
-    IMetadataReader MetadataReader { get; }
+    public IMetadataReader MetadataReader { get; }
 }

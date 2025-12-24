@@ -12,33 +12,33 @@ public interface IResolveConnectionContext : IResolveFieldContext
     /// <summary>
     /// Indicates if this connection only allows forward pagination requests.
     /// </summary>
-    bool IsUnidirectional { get; }
+    public bool IsUnidirectional { get; }
 
     /// <summary>
     /// For a forward pagination request, returns the maximum number of edges to be returned.
     /// </summary>
-    int? First { get; }
+    public int? First { get; }
 
     /// <summary>
     /// For a backwards pagination request, returns the maximum number of edges to be returned.
     /// </summary>
-    int? Last { get; }
+    public int? Last { get; }
 
     /// <summary>
     /// For a forward pagination request, returned edges should start immediately after the edge identified by this cursor.
     /// </summary>
-    string? After { get; }
+    public string? After { get; }
 
     /// <summary>
     /// For a backwards pagination request, returned edges should end immediately prior to the edge identified by this cursor.
     /// </summary>
-    string? Before { get; }
+    public string? Before { get; }
 
     /// <summary>
     /// The maximum number of edges to be returned, or the specified default page size if <see cref="First"/> and
     /// <see cref="Last"/> are not specified.
     /// </summary>
-    int? PageSize { get; }
+    public int? PageSize { get; }
 }
 
 /// <inheritdoc cref="IResolveConnectionContext"/>

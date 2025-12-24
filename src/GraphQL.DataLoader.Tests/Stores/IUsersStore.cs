@@ -4,7 +4,7 @@ namespace GraphQL.DataLoader.Tests.Stores;
 
 public interface IUsersStore
 {
-    Task<IEnumerable<User>> GetAllUsersAsync(CancellationToken cancellationToken);
+    public Task<IEnumerable<User>> GetAllUsersAsync(CancellationToken cancellationToken);
 
-    Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+    public Task<IDictionary<int, User>> GetUsersByIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
 }

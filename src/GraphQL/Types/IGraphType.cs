@@ -10,7 +10,7 @@ public interface INamedType
     /// consist of alphanumeric characters and underscores only. Type names cannot start with
     /// a digit. For List and NonNull type modifiers returns <see langword="null"/>.
     /// </summary>
-    string Name { get; set; }
+    public string Name { get; set; }
 }
 
 /// <summary>
@@ -21,7 +21,7 @@ public interface IProvideDescription
     /// <summary>
     /// Gets or sets the element description.
     /// </summary>
-    string? Description { get; set; }
+    public string? Description { get; set; }
 }
 
 /// <summary>
@@ -34,7 +34,7 @@ public interface IProvideDeprecationReason
     /// Gets or sets the reason this element has been deprecated;
     /// <see langword="null"/> if this element has not been deprecated.
     /// </summary>
-    string? DeprecationReason { get; set; }
+    public string? DeprecationReason { get; set; }
 }
 
 /// <summary>
@@ -45,10 +45,10 @@ public interface IGraphType : IMetadataReader, IMetadataWriter, IProvideDescript
     /// <summary>
     /// Initializes the graph type.
     /// </summary>
-    void Initialize(ISchema schema);
+    public void Initialize(ISchema schema);
 
     /// <summary>
     /// Indicates that the graph type is not exposed through introspection and cannot be used as type conditions within queries.
     /// </summary>
-    bool IsPrivate { get; set; }
+    public bool IsPrivate { get; set; }
 }

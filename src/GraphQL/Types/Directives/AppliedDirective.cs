@@ -8,8 +8,6 @@ namespace GraphQL.Types;
 /// </summary>
 public class AppliedDirective : MetadataProvider, IEnumerable<DirectiveArgument>
 {
-    private string _name = null!;
-
     internal List<DirectiveArgument>? List { get; private set; }
 
     /// <summary>
@@ -26,13 +24,13 @@ public class AppliedDirective : MetadataProvider, IEnumerable<DirectiveArgument>
     /// </summary>
     public string Name
     {
-        get => _name;
+        get;
         set
         {
             NameValidator.ValidateName(value, NamedElement.Directive);
-            _name = value;
+            field = value;
         }
-    }
+    } = null!;
 
     /// <summary>
     /// Indicates the schema url that this directive was imported from via the @link directive.

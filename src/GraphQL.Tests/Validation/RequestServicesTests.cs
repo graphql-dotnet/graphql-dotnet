@@ -64,8 +64,6 @@ public class RequestServicesTests
 
     private class Class1
     {
-        private int _num;
-
-        public int GetNum => Interlocked.Increment(ref _num);
+        public int GetNum { get => Interlocked.Increment(ref field); private set; }
     }
 }

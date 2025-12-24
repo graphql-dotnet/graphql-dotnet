@@ -20,8 +20,6 @@ public sealed class DataLoaderPair<TKey, T> : IDataLoaderResult<T>
         Key = key;
     }
 
-    private T _result = default!;
-
     /// <summary>
     /// Returns the key that is passed to the data loader's fetch delegate
     /// </summary>
@@ -42,12 +40,13 @@ public sealed class DataLoaderPair<TKey, T> : IDataLoaderResult<T>
             if (IsResultSet)
             {
                 Interlocked.MemoryBarrier(); // ensure that _loader is read before _result is read
-                return _result;
+                return field;
             }
             else
                 throw new InvalidOperationException("Result has not been set");
         }
-    }
+        private set;
+    } = default!;
 
     /// <summary>
     /// Returns a boolean that indicates if the result has been set
@@ -62,7 +61,7 @@ public sealed class DataLoaderPair<TKey, T> : IDataLoaderResult<T>
     {
         if (IsResultSet)
             throw new InvalidOperationException("Result has already been set");
-        _result = value;
+        Result = value;
         Interlocked.MemoryBarrier(); // ensure that _result is written before _loader is written
         _loader = null;
     }

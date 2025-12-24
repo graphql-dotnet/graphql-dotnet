@@ -8,5 +8,5 @@ public interface IHaveDefaultValue : IProvideResolvedType
     /// <summary>
     /// Returns the default value of this argument or field.
     /// </summary>
-    object? DefaultValue { get; }
+    public object? DefaultValue { get; }
 }

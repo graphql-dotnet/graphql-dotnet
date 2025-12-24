@@ -19,20 +19,18 @@ public class ListGraphType : GraphType, IProvideResolvedType
     /// </summary>
     public virtual Type? Type => null;
 
-    private IGraphType? _resolvedType;
-
     /// <summary>
     /// Gets or sets the instance of the inner (wrapped) graph type.
     /// </summary>
     public IGraphType? ResolvedType
     {
-        get => _resolvedType;
+        get;
         set
         {
             if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
                 throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
 
-            _resolvedType = value;
+            field = value;
             _cachedString = null;
         }
     }
