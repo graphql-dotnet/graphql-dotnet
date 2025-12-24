@@ -541,22 +541,19 @@ public class NewSchemaTypes : SchemaTypes
             return (existing, type);
 
         // Try to get from service provider
-        var instance = _serviceProvider.GetService(type) as IGraphType;
-
-        if (instance == null)
+        if (_serviceProvider.GetService(type) is not IGraphType instance)
         {
-            // Check if it's a built-in scalar
+            // Unable to resolve from DI; check if it's a built-in scalar
             if (BuiltInScalars.TryGetValue(type, out var scalar))
             {
                 instance = scalar;
             }
-        }
-
-        // Throw if we couldn't resolve to a concrete type
-        if (instance == null)
-        {
-            throw new InvalidOperationException(
-                $"Cannot resolve type '{type.GetFriendlyName()}' to a concrete GraphQL type. Ensure the type is registered in the service provider or is a built-in scalar type.");
+            else
+            {
+                // Throw if we couldn't resolve to a concrete type
+                throw new InvalidOperationException(
+                    $"Cannot resolve type '{type.GetFriendlyName()}' to a concrete GraphQL type. Ensure the type is registered in the service provider or is a built-in scalar type.");
+            }
         }
 
         return (instance, type);
