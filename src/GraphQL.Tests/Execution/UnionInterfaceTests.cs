@@ -274,7 +274,7 @@ public class UnionInterfaceTests : QueryTestBase<UnionSchema>
 
 public interface INamed
 {
-    string Name { get; set; }
+    public string Name { get; set; }
 }
 
 public interface IPet : INamed

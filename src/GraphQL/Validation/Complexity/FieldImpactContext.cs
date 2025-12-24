@@ -29,9 +29,12 @@ public struct FieldImpactContext
     internal ComplexityVisitorContext VisitorContext;
     private int _parentDepth;
 
-    private IDictionary<string, ArgumentValue>? _arguments;
     /// <inheritdoc cref="IResolveFieldContext.Arguments"/>
-    public IDictionary<string, ArgumentValue>? Arguments => _arguments ??= (VisitorContext.Arguments?.TryGetValue(FieldAst, out var args) == true ? args : null);
+    public IDictionary<string, ArgumentValue>? Arguments
+    {
+        get => field ??= (VisitorContext.Arguments?.TryGetValue(FieldAst, out var args) == true ? args : null);
+        private set;
+    }
 
     /// <inheritdoc cref="ResolveFieldContextExtensions.GetArgument{TType}(IResolveFieldContext, string, TType)"/>
     /// <remarks>Does not coerce the argument name via <see cref="ISchema.NameConverter"/>.</remarks>

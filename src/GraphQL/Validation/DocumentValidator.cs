@@ -9,7 +9,7 @@ namespace GraphQL.Validation;
 public interface IDocumentValidator
 {
     /// <inheritdoc cref="IDocumentValidator"/>
-    Task<IValidationResult> ValidateAsync(in ValidationOptions options);
+    public Task<IValidationResult> ValidateAsync(in ValidationOptions options);
 }
 
 /// <inheritdoc/>

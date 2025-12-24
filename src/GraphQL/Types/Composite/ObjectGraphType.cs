@@ -8,12 +8,12 @@ public interface IObjectGraphType : IComplexGraphType, IImplementInterfaces
     /// <summary>
     /// Gets or sets a delegate that determines if the specified object is valid for this graph type.
     /// </summary>
-    Func<object, bool>? IsTypeOf { get; set; }
+    public Func<object, bool>? IsTypeOf { get; set; }
 
     /// <summary>
     /// Instructs GraphQL.NET to skip type checking when a resolver of a field that returns this graph type returns an object.
     /// </summary>
-    bool SkipTypeCheck { get; set; }
+    public bool SkipTypeCheck { get; set; }
 }
 
 /// <summary>

@@ -13,13 +13,13 @@ public interface IExecutionStrategy
     /// Executes a GraphQL request and returns the result
     /// </summary>
     /// <param name="context">The execution parameters</param>
-    Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
+    public Task<ExecutionResult> ExecuteAsync(ExecutionContext context);
 
     /// <summary>
     /// Executes an execution node and all of its child nodes. This is typically only executed upon
     /// the root execution node.
     /// </summary>
-    Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
+    public Task ExecuteNodeTreeAsync(ExecutionContext context, ExecutionNode rootNode);
 
     /// <summary>
     /// Returns the children fields for a specified node. Note that this set will be completely defined only for
@@ -28,5 +28,5 @@ public interface IExecutionStrategy
     /// union field this method returns empty set since we don't know the concrete union member if <see cref="ExecutionNode.Result"/>
     /// was not set yet.
     /// </summary>
-    Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
+    public Dictionary<string, (GraphQLField field, FieldType fieldType)>? GetSubFields(ExecutionContext executionContext, ExecutionNode executionNode);
 }

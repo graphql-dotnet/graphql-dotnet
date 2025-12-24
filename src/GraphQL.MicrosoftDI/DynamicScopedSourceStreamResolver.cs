@@ -27,8 +27,7 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
             try
             {
                 var scopedContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
-                if (accessor != null)
-                    accessor.Context = scopedContext;
+                accessor?.Context = scopedContext;
                 observable = await resolver.ResolveAsync(scopedContext).ConfigureAwait(false)
                     ?? throw new InvalidOperationException("The source stream resolver returned null.");
             }
@@ -39,8 +38,7 @@ internal class DynamicScopedSourceStreamResolver : ISourceStreamResolver
             }
             finally
             {
-                if (accessor != null)
-                    accessor.Context = context;
+                accessor?.Context = context;
             }
             // keep the service scope alive until the subscription has been disposed
             return new ObservableMapper(observable, scope);

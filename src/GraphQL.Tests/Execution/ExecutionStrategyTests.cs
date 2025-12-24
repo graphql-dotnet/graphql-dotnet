@@ -23,7 +23,8 @@ public class ExecutionStrategyTests
             else
             {
                 schema.Query = new DummyType();
-            };
+            }
+
             schema.Initialize();
             var executer = new DocumentExecuter();
             var result = await executer.ExecuteAsync(new ExecutionOptions

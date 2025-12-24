@@ -15,14 +15,12 @@ public struct FieldArgumentsValidationContext
     /// <inheritdoc cref="IResolveFieldContext.FieldDefinition"/>
     public FieldType FieldDefinition { get; set; }
 
-    private IGraphType? _parentType;
     /// <inheritdoc cref="IResolveFieldContext.ParentType"/>
-    public IGraphType? ParentType => _parentType ??= ValidationContext.TypeInfo.GetLastType();
+    public IGraphType? ParentType => field ??= ValidationContext.TypeInfo.GetLastType();
 
     /// <inheritdoc cref="Validation.ValidationContext"/>
     public ValidationContext ValidationContext { get; set; }
 
-    private IDictionary<string, ArgumentValue>? _arguments;
     private bool _argumentsSet;
     /// <inheritdoc cref="IResolveFieldContext.Arguments"/>
     public IDictionary<string, ArgumentValue>? Arguments
@@ -30,9 +28,9 @@ public struct FieldArgumentsValidationContext
         get
         {
             if (_argumentsSet)
-                return _arguments;
+                return field;
             _argumentsSet = true;
-            return _arguments = ValidationContext.ArgumentValues?.TryGetValue(FieldAst, out var args) == true ? args : null;
+            return field = ValidationContext.ArgumentValues?.TryGetValue(FieldAst, out var args) == true ? args : null;
         }
         set
         {
@@ -41,7 +39,7 @@ public struct FieldArgumentsValidationContext
                 ValidationContext.ArgumentValues[FieldAst] = value;
             else
                 ValidationContext.ArgumentValues.Remove(FieldAst);
-            _arguments = value;
+            field = value;
             _argumentsSet = true;
         }
     }

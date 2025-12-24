@@ -5,5 +5,5 @@ namespace GraphQL.Utilities.Federation;
 [Obsolete("Please use IFederationResolver instead. This interface will be removed in v9.")]
 public interface IFederatedResolver
 {
-    Task<object?> Resolve(FederatedResolveContext context);
+    public Task<object?> Resolve(FederatedResolveContext context);
 }

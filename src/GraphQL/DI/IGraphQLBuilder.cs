@@ -8,5 +8,5 @@ public interface IGraphQLBuilder
     /// <summary>
     /// Provides an interface for registering services with the dependency injection provider.
     /// </summary>
-    IServiceRegister Services { get; }
+    public IServiceRegister Services { get; }
 }

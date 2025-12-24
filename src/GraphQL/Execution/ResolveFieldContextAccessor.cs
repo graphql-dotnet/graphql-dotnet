@@ -20,8 +20,7 @@ public sealed class ResolveFieldContextAccessor : IResolveFieldContextAccessor
         get => _context.Value?.Context;
         set
         {
-            if (_context.Value != null)
-                _context.Value.Context = null;
+            _context.Value?.Context = null;
 
             if (value != null)
             {

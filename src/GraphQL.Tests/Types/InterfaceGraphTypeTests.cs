@@ -456,21 +456,21 @@ public class InterfaceGraphTypeTests : QueryTestBase<InterfaceGraphTypeTests.MyS
         [Name("Image")]
         public interface IImage : IResource
         {
-            string? Thumbnail { get; }
+            public string? Thumbnail { get; }
         }
 
         [Implements(typeof(INode))]
         [Name("Resource")]
         public interface IResource : INode
         {
-            string? Url { get; }
+            public string? Url { get; }
         }
 
         [Name("Node")]
         public interface INode
         {
             [Id]
-            string Id { get; }
+            public string Id { get; }
         }
     }
 

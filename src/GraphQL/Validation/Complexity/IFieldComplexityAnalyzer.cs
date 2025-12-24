@@ -11,5 +11,5 @@ public interface IFieldComplexityAnalyzer
     /// <summary>
     /// Analyzes the complexity of a field.
     /// </summary>
-    FieldComplexityResult Analyze(FieldImpactContext context);
+    public FieldComplexityResult Analyze(FieldImpactContext context);
 }

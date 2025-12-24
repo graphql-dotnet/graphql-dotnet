@@ -16,7 +16,7 @@ public interface IConfigureSchema
     /// Specifically, typically executes during the <see cref="Schema"/> constructor,
     /// which executes prior to any descendant classes' constructors.
     /// </summary>
-    void Configure(ISchema schema, IServiceProvider serviceProvider);
+    public void Configure(ISchema schema, IServiceProvider serviceProvider);
 }
 
 internal sealed class ConfigureSchema : IConfigureSchema
