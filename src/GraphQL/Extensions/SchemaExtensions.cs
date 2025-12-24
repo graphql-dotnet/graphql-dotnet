@@ -120,6 +120,10 @@ public static class SchemaExtensions
     {
         var sdl = schema.ToAST();
         options ??= _defaultPrintOptions;
+        if (!schema.Features.DeprecationOfInputValues)
+        {
+            RemoveInputValueDeprecationDirectivesVisitor.Visit(sdl);
+        }
         if (!options.IncludeDeprecationReasons)
         {
             RemoveDeprecationReasonsVisitor.Visit(sdl);
