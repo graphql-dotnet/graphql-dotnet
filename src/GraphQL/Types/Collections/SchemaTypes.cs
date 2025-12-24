@@ -55,14 +55,6 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
         new FloatGraphType(),
         new IntGraphType(),
         new IdGraphType(),
-    }
-    .ToDictionary(t => t.GetType());
-
-    /// <summary>
-    /// Built-in scalar instances (preinitialized and shared across all schema instances).
-    /// </summary>
-    protected static readonly Dictionary<Type, ScalarGraphType> BuiltInCustomScalars = new ScalarGraphType[]
-    {
         new DateGraphType(),
 #if NET5_0_OR_GREATER
         new HalfGraphType(),
@@ -87,7 +79,6 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
         new ByteGraphType(),
         new SByteGraphType(),
     }
-    .Concat(BuiltInScalars.Values)
     .ToDictionary(t => t.GetType());
 
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]

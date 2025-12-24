@@ -40,7 +40,14 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void SchemaWithDuplicateInterfaceFields_Should_Throw()
     {
-        ShouldThrow<SchemaWithDuplicateInterfaceFields, InvalidOperationException>("The field 'field' must have a unique name within Interface type 'Dup'; no two fields may share the same name.");
+        var exceptions = Should.Throw<AggregateException>(() =>
+        {
+            var schema = new SchemaWithDuplicateInterfaceFields();
+            schema.Initialize();
+        }).InnerExceptions;
+        exceptions.Count.ShouldBe(2);
+        exceptions[0].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'field' must have a unique name within Interface type 'Dup'; no two fields may share the same name.");
+        exceptions[1].ShouldBeOfType<ArgumentException>().Message.ShouldBe("Type ObjectGraphType with name 'Query' does not implement interface InterfaceGraphType with name 'Dup'. Field 'field' must be of type 'String' or covariant from it, but in fact it is of type 'String'.");
     }
 
     [Fact]

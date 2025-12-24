@@ -90,7 +90,7 @@ internal readonly ref struct TypeReferenceReplacementVisitor
                 // Add possible type relationship for object types
                 if (type is IObjectGraphType objectType)
                 {
-                    interfaceType.AddPossibleType(objectType);
+                    interfaceType.PossibleTypes.Add(objectType);
                 }
 
                 list[i] = interfaceType;

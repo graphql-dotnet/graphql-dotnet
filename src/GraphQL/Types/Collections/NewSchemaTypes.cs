@@ -203,7 +203,7 @@ public class NewSchemaTypes : SchemaTypes
                 return;
 
             // Allow known scalars (built-in scalars provided with GraphQL.NET) to use duplicated instances
-            if (existing.GetType() == type.GetType() && type is ScalarGraphType && BuiltInCustomScalars.ContainsKey(existing.GetType()))
+            if (existing.GetType() == type.GetType() && type is ScalarGraphType && BuiltInScalars.ContainsKey(existing.GetType()))
                 return;
 
             // Check if types are different classes with same name
@@ -254,7 +254,7 @@ public class NewSchemaTypes : SchemaTypes
             var baseType = type.GetType().BaseType;
             while (baseType != null && baseType != typeof(ScalarGraphType) && baseType != typeof(object))
             {
-                if (BuiltInCustomScalars.ContainsKey(baseType))
+                if (BuiltInScalars.ContainsKey(baseType))
                 {
                     // Check if the name matches the built-in scalar's name
                     var builtInInstance = GetBuiltInScalar(baseType);
@@ -490,7 +490,7 @@ public class NewSchemaTypes : SchemaTypes
     private void FinalizeTypes()
     {
         // Replace GraphQLTypeReference instances with actual types from the dictionary
-        new TypeReferenceReplacementVisitor(Dictionary, BuiltInCustomScalars.Values.ToDictionary(x => x.Name), _schema).Run();
+        new TypeReferenceReplacementVisitor(Dictionary, BuiltInScalars.Values.ToDictionary(x => x.Name), _schema).Run();
 
         // Inherit interface field descriptions to implementing types
         InheritInterfaceDescriptions();
@@ -565,7 +565,7 @@ public class NewSchemaTypes : SchemaTypes
         if (instance == null)
         {
             // Check if it's a built-in scalar
-            if (BuiltInCustomScalars.TryGetValue(type, out var scalar))
+            if (BuiltInScalars.TryGetValue(type, out var scalar))
             {
                 instance = scalar;
             }
@@ -697,7 +697,7 @@ public class NewSchemaTypes : SchemaTypes
     /// </summary>
     private ScalarGraphType GetBuiltInScalar(Type type)
     {
-        return BuiltInCustomScalars[type];
+        return BuiltInScalars[type];
     }
 
     /// <summary>
