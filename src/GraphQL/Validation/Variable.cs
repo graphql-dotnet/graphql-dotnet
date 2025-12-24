@@ -19,16 +19,15 @@ public class Variable
     /// </summary>
     public string Name { get; }
 
-    private object? _value;
     /// <summary>
     /// Gets or sets the value of the variable.
     /// </summary>
     public object? Value
     {
-        get => _value;
+        get;
         set
         {
-            _value = value;
+            field = value;
             ValueSpecified = true;
         }
     }

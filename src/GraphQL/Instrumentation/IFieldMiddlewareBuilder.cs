@@ -14,11 +14,11 @@ public interface IFieldMiddlewareBuilder
     /// </summary>
     /// <param name="middleware">Middleware delegate.</param>
     /// <returns>Reference to the same <see cref="IFieldMiddlewareBuilder"/>.</returns>
-    IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
+    public IFieldMiddlewareBuilder Use(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> middleware);
 
     /// <summary>
     /// Returns a transform for field resolvers, or <see langword="null"/> if no middleware is defined.
     /// The transform is a cumulation of all middlewares configured within this builder.
     /// </summary>
-    Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build();
+    public Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate>? Build();
 }

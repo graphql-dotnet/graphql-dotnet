@@ -15,5 +15,5 @@ public interface IPersistedDocumentLoader
     /// A task that represents the asynchronous operation. The task result contains the query string
     /// if found; otherwise, <see langword="null"/>.
     /// </returns>
-    ValueTask<string?> GetQueryAsync(string? documentIdPrefix, string documentIdPayload, CancellationToken cancellationToken);
+    public ValueTask<string?> GetQueryAsync(string? documentIdPrefix, string documentIdPayload, CancellationToken cancellationToken);
 }

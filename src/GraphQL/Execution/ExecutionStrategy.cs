@@ -300,8 +300,7 @@ public abstract class ExecutionStrategy : IExecutionStrategy
                     {
                         if ((visitedFragmentNames == null || !Contains(visitedFragmentNames, spread.FragmentName.Name, foundFragments)) && ShouldIncludeNode(context, spread))
                         {
-                            if (visitedFragmentNames != null)
-                                visitedFragmentNames[foundFragments++] = spread.FragmentName.Name;
+                            visitedFragmentNames?[foundFragments++] = spread.FragmentName.Name;
 
                             var fragment = context.Document.FindFragmentDefinition(spread.FragmentName.Name);
                             if (fragment != null && ShouldIncludeNode(context, fragment) && DoesFragmentConditionMatch(context, fragment.TypeCondition.Type.Name, specificType))

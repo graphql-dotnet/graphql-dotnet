@@ -8,7 +8,7 @@ public interface IParentExecutionNode
     /// <summary>
     /// Returns a list of child execution nodes.
     /// </summary>
-    IEnumerable<ExecutionNode> GetChildNodes();
+    public IEnumerable<ExecutionNode> GetChildNodes();
 
     /// <summary>
     /// Applies the specified delegate to child execution nodes.
@@ -17,5 +17,5 @@ public interface IParentExecutionNode
     /// <param name="action">Delegate to execute on every child node of this node.</param>
     /// <param name="state">An arbitrary state passed by the caller.</param>
     /// <param name="reverse">Specifies the direct or reverse direction of child nodes traversal.</param>
-    void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false);
+    public void ApplyToChildren<TState>(Action<ExecutionNode, TState> action, TState state, bool reverse = false);
 }

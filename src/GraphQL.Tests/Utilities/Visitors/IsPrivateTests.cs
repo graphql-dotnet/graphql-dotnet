@@ -99,15 +99,15 @@ public class IsPrivateTests
 
     private interface IProduct
     {
-        string Name { get; }
+        public string Name { get; }
 
         [Private]
-        string Test { get; }
+        public string Test { get; }
     }
 
     [Private]
     private interface IProduct2
     {
-        string Name { get; }
+        public string Name { get; }
     }
 }

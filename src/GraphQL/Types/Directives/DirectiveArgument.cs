@@ -16,20 +16,18 @@ public class DirectiveArgument
         Name = name;
     }
 
-    private string _name = null!;
-
     /// <summary>
     /// Argument name.
     /// </summary>
     public string Name
     {
-        get => _name;
+        get;
         set
         {
             NameValidator.ValidateName(value, NamedElement.Argument);
-            _name = value;
+            field = value;
         }
-    }
+    } = null!;
 
     /// <summary>
     /// Argument value.

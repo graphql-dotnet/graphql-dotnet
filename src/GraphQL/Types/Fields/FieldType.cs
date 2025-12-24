@@ -49,20 +49,19 @@ public class FieldType : MetadataProvider, IFieldType
     /// </summary>
     public object? DefaultValue { get; set; }
 
-    private Type? _type;
     /// <summary>
     /// Gets or sets the graph type of this field.
     /// </summary>
     public Type? Type
     {
-        get => _type;
+        get;
         set
         {
             if (value != null && !value.IsGraphType())
                 throw new ArgumentOutOfRangeException(nameof(value), $"Type '{value}' is not a graph type.");
             if (value != null && value.IsGenericTypeDefinition)
                 throw new ArgumentOutOfRangeException(nameof(value), $"Type '{value}' should not be an open generic type definition.");
-            _type = value;
+            field = value;
         }
     }
 

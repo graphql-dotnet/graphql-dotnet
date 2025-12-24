@@ -82,21 +82,20 @@ public class ExecutionOptions : IProvideUserContext
     /// </summary>
     public ClaimsPrincipal? User { get; set; }
 
-    private TimeSpan _timeout = System.Threading.Timeout.InfiniteTimeSpan;
     /// <summary>
     /// Gets or sets the maximum time allowed for the execution of the GraphQL request before timing out.
     /// The default value is <see cref="Timeout.InfiniteTimeSpan"/> which indicates no timeout.
     /// </summary>
     public TimeSpan Timeout
     {
-        get => _timeout;
+        get;
         set
         {
             if (value <= TimeSpan.Zero && value != System.Threading.Timeout.InfiniteTimeSpan)
                 throw new ArgumentOutOfRangeException(nameof(value));
-            _timeout = value;
+            field = value;
         }
-    }
+    } = System.Threading.Timeout.InfiniteTimeSpan;
 
     /// <summary>
     /// Gets or sets the action to take when a timeout is reached during GraphQL request execution.

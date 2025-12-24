@@ -9,5 +9,5 @@ public interface IDataLoaderContextAccessor
     /// The current <seealso cref="DataLoaderContext"/>
     /// </summary>
     [AllowNull]
-    DataLoaderContext Context { get; set; }
+    public DataLoaderContext Context { get; set; }
 }
