@@ -304,12 +304,12 @@ public class SchemaWithNotFullSpecifiedResolvedType : Schema
         stringFilterInputType.AddField(new FieldType
         {
             Name = "in",
-            ResolvedType = new ListGraphType<StringGraphType>()
+            ResolvedType = new ListGraphType(new StringGraphType())
         });
         stringFilterInputType.AddField(new FieldType
         {
             Name = "not",
-            ResolvedType = new NonNullGraphType<StringGraphType>()
+            ResolvedType = new NonNullGraphType(new StringGraphType())
         });
 
         var query = new ObjectGraphType();
