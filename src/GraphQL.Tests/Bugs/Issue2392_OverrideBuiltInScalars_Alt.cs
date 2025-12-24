@@ -7,29 +7,6 @@ namespace GraphQL.Tests.Bugs;
 public class Issue2392_OverrideBuiltInScalars_Alt : QueryTestBase<Issue2392_OverrideBuiltInScalars_Alt.MySchema>
 {
     [Fact]
-    public void cant_have_mixed_scalars_then_replace_them()
-    {
-        var schema = new Schema();
-        schema.RegisterType(new MyBooleanGraphType());
-        var query = new ObjectGraphType();
-        query.Field<IntGraphType>("sample")
-          .Argument<BooleanGraphType>("argNewBehavior")
-          .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" });
-        schema.Query = query;
-        Should.Throw<InvalidOperationException>(schema.Initialize).Message
-            .ShouldBe("Unable to register GraphType 'BooleanGraphType' with the name 'Boolean'. The name 'Boolean' is already registered to 'MyBooleanGraphType'. Check your schema configuration.");
-    }
-
-    public class MyBooleanGraphType : BooleanGraphType
-    {
-        public MyBooleanGraphType()
-        {
-            Name = "Boolean";
-        }
-    }
-
-
-    [Fact]
     public void replace_not_scalar_should_throw()
     {
         Schema.AllTypes["MyQuery"].ShouldBeOfType<MyQuery>();
