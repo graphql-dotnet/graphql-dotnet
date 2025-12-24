@@ -45,6 +45,47 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
         [typeof(Uri)] = typeof(UriGraphType),
     });
 
+    /// <summary>
+    /// Built-in scalar instances (preinitialized and shared across all schema instances).
+    /// </summary>
+    protected static readonly ReadOnlyDictionary<Type, ScalarGraphType> BuiltInScalars = new(new ScalarGraphType[]
+    {
+        new StringGraphType(),
+        new BooleanGraphType(),
+        new FloatGraphType(),
+        new IntGraphType(),
+        new IdGraphType(),
+        new DateGraphType(),
+#if NET5_0_OR_GREATER
+        new HalfGraphType(),
+#endif
+#if NET6_0_OR_GREATER
+        new DateOnlyGraphType(),
+        new TimeOnlyGraphType(),
+#endif
+        new DateTimeGraphType(),
+        new DateTimeOffsetGraphType(),
+        new TimeSpanSecondsGraphType(),
+        new TimeSpanMillisecondsGraphType(),
+        new DecimalGraphType(),
+        new UriGraphType(),
+        new GuidGraphType(),
+        new ShortGraphType(),
+        new UShortGraphType(),
+        new UIntGraphType(),
+        new LongGraphType(),
+        new BigIntGraphType(),
+        new ULongGraphType(),
+        new ByteGraphType(),
+        new SByteGraphType(),
+    }
+    .ToDictionary(t => t.GetType()));
+
+    /// <summary>
+    /// Built-in scalar instances by name (preinitialized and shared across all schema instances).
+    /// </summary>
+    protected static readonly ReadOnlyDictionary<string, ScalarGraphType> BuiltInScalarsByName = new(BuiltInScalars.Values.ToDictionary(t => t.Name));
+
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]
@@ -101,16 +142,25 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
     }
 
     /// <summary>
-    /// Initializes a new instance with a protected constructor.
+    /// Initializes a new instance with an empty dictionary.
     /// </summary>
-    protected SchemaTypes()
+    protected SchemaTypes() : this([])
     {
+    }
+
+    /// <summary>
+    /// Initializes a new instance with the specified dictionary.
+    /// </summary>
+    /// <param name="dictionary">The dictionary that relates type names to graph types.</param>
+    protected SchemaTypes(Dictionary<ROM, IGraphType> dictionary)
+    {
+        Dictionary = dictionary;
     }
 
     /// <summary>
     /// Returns a dictionary that relates type names to graph types.
     /// </summary>
-    protected internal abstract Dictionary<ROM, IGraphType> Dictionary { get; }
+    protected internal Dictionary<ROM, IGraphType> Dictionary { get; protected set; }
 
     /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
     public IEnumerator<IGraphType> GetEnumerator() => Dictionary.Values.GetEnumerator();
@@ -138,15 +188,15 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__schema</c> meta-field.
     /// </summary>
-    protected internal virtual FieldType SchemaMetaFieldType { get; } = new SchemaMetaFieldType();
+    protected internal FieldType SchemaMetaFieldType { get; protected set; } = new SchemaMetaFieldType();
 
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__type</c> meta-field.
     /// </summary>
-    protected internal virtual FieldType TypeMetaFieldType { get; } = new TypeMetaFieldType();
+    protected internal FieldType TypeMetaFieldType { get; protected set; } = new TypeMetaFieldType();
 
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__typename</c> meta-field.
     /// </summary>
-    protected internal virtual FieldType TypeNameMetaFieldType { get; } = new TypeNameMetaFieldType();
+    protected internal FieldType TypeNameMetaFieldType { get; protected set; } = new TypeNameMetaFieldType();
 }
