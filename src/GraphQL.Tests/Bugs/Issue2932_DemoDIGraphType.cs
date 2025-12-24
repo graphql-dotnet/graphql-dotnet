@@ -88,8 +88,6 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
 
     public class Service1
     {
-        private int _counter;
-
         public Task<IEnumerable<string>> GetChildrenAsync(int sourceId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -100,7 +98,7 @@ public class Issue2932_DemoDIGraphType : QueryTestBase<Issue2932_DemoDIGraphType
             });
         }
 
-        public int Count => _counter++;
+        public int Count { get => field++; private set; }
     }
 
     public class Service2

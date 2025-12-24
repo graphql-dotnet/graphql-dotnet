@@ -45,7 +45,7 @@ query {
 
     public interface IInterface
     {
-        string Id { get; }
+        public string Id { get; }
     }
 
     public class InterfaceGraphType : InterfaceGraphType<IInterface>

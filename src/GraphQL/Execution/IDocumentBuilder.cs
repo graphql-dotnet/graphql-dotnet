@@ -10,5 +10,5 @@ public interface IDocumentBuilder
     /// <summary>
     /// Parse a GraphQL request and return a <see cref="GraphQLDocument">Document</see> representing the GraphQL request AST
     /// </summary>
-    GraphQLDocument Build(string body);
+    public GraphQLDocument Build(string body);
 }

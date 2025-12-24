@@ -53,7 +53,7 @@ public class SchemaExporter
         if (schemaDefinition is GraphQLSchemaDefinition schemaDef && !IsDefaultSchemaConfiguration(schemaDef))
         {
             definitions.Add(schemaDef);
-        };
+        }
 
         // export directives
         foreach (var directive in Schema.Directives)

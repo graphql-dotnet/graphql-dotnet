@@ -46,18 +46,17 @@ public class TypeInformation
     /// </summary>
     public bool ListIsNullable { get; set; }
 
-    private Type? _graphType;
     /// <summary>
     /// The graph type of the underlying CLR type or <see langword="null"/> to detect the graph type automatically.
     /// </summary>
     public Type? GraphType
     {
-        get => _graphType;
+        get;
         set
         {
             if (value == null)
             {
-                _graphType = null;
+                field = null;
                 return;
             }
             if (IsInputType)
@@ -75,7 +74,7 @@ public class TypeInformation
             {
                 throw new ArgumentOutOfRangeException(nameof(value), "Value must be a named graph type.");
             }
-            _graphType = value;
+            field = value;
         }
     }
 

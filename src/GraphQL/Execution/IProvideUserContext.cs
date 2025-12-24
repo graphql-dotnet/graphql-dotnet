@@ -11,5 +11,5 @@ public interface IProvideUserContext
     /// A custom implementation of <see cref="IDictionary{TKey, TValue}">IDictionary</see> may be
     /// used in place of the default <see cref="Dictionary{TKey, TValue}">Dictionary</see>.
     /// </summary>
-    IDictionary<string, object?> UserContext { get; }
+    public IDictionary<string, object?> UserContext { get; }
 }

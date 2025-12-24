@@ -4,9 +4,9 @@ namespace GraphQL.DataLoader.Tests.Stores;
 
 public interface IOrdersStore
 {
-    Task<IEnumerable<Order>> GetAllOrdersAsync();
-    Task<IEnumerable<Order>> GetOrderByIdAsync(IEnumerable<int> orderIds);
-    Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
-    Task<ILookup<int, OrderItem>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds);
-    IObservable<Order> GetOrderObservable();
+    public Task<IEnumerable<Order>> GetAllOrdersAsync();
+    public Task<IEnumerable<Order>> GetOrderByIdAsync(IEnumerable<int> orderIds);
+    public Task<ILookup<int, Order>> GetOrdersByUserIdAsync(IEnumerable<int> userIds, CancellationToken cancellationToken);
+    public Task<ILookup<int, OrderItem>> GetItemsByOrderIdAsync(IEnumerable<int> orderIds);
+    public IObservable<Order> GetOrderObservable();
 }

@@ -10,8 +10,6 @@ public class TypeConfig : MetadataProvider
     private readonly LightweightCache<string, FieldConfig> _fields =
         new(f => new FieldConfig(f));
 
-    private Type? _type;
-
     /// <summary>
     /// Creates an instance of <see cref="TypeConfig"/> with the specified name.
     /// </summary>
@@ -26,10 +24,10 @@ public class TypeConfig : MetadataProvider
     /// </summary>
     public Type? Type
     {
-        get => _type;
+        get;
         set
         {
-            _type = value;
+            field = value;
             if (value != null)
                 IsTypeOfFunc ??= value.IsInstanceOfType;
             ApplyMetadata(value);

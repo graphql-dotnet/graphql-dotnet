@@ -57,8 +57,11 @@ public class GraphQLTelemetryProvider : IConfigureExecution
 
     // make sure no accidental use of the default constructor by DI by making it private,
     // accessible only through AutoTelemetryProvider, a shared static instance
-    private static GraphQLTelemetryProvider? _autoTelemetryProvider;
-    internal static GraphQLTelemetryProvider AutoTelemetryProvider => _autoTelemetryProvider ??= new GraphQLTelemetryProvider();
+    internal static GraphQLTelemetryProvider AutoTelemetryProvider
+    {
+        get => field ??= new GraphQLTelemetryProvider();
+        private set;
+    }
 
     /// <inheritdoc/>
     public virtual float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_CONFIGURATION;
