@@ -315,7 +315,7 @@ public static class GraphQLExtensions
         //superType = locationType
 
         // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
-        if (maybeSubType == superType)
+        if (ReferenceEquals(maybeSubType, superType))
         {
             return true;
         }
