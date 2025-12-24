@@ -106,15 +106,14 @@ public partial class NewSchemaTypes
                 {
                     var unionType = ConvertTypeReference(type, list[i]) as IObjectGraphType;
 
-                    if (type is UnionGraphType) // check for interfaces is in schema validation
+                    // Validate that either resolveType or isTypeOf is provided
+                    // Note: check for interfaces exists within schema validation
+                    if (type is UnionGraphType && type.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
                     {
-                        if (type.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
-                        {
-                            throw new InvalidOperationException(
-                                $"{(type is UnionGraphType ? "Union" : "Interface")} type '{type.Name}' does not provide a 'resolveType' function " +
-                                $"and possible Type '{unionType.Name}' does not provide a 'isTypeOf' function.  " +
-                                "There is no way to resolve this possible type during execution.");
-                        }
+                        throw new InvalidOperationException(
+                            $"{(type is UnionGraphType ? "Union" : "Interface")} type '{type.Name}' does not provide a 'resolveType' function " +
+                            $"and possible Type '{unionType.Name}' does not provide a 'isTypeOf' function.  " +
+                            "There is no way to resolve this possible type during execution.");
                     }
 
                     list[i] = unionType!;
