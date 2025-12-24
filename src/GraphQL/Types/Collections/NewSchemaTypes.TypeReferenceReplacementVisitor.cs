@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using GraphQLParser;
 
 namespace GraphQL.Types;
@@ -11,7 +12,7 @@ public partial class NewSchemaTypes
     private readonly ref struct TypeReferenceReplacementVisitor
     {
         private readonly Dictionary<ROM, IGraphType> _typeDictionary;
-        private readonly Dictionary<string, ScalarGraphType> _builtInTypes;
+        private readonly ReadOnlyDictionary<string, ScalarGraphType> _builtInTypes;
         private readonly ISchema _schema;
 
         /// <summary>
@@ -20,7 +21,7 @@ public partial class NewSchemaTypes
         /// <param name="typeDictionary">The dictionary containing all registered types in the schema.</param>
         /// <param name="builtInTypes">The dictionary containing all built-in scalar types.</param>
         /// <param name="schema">The schema being processed.</param>
-        public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, Dictionary<string, ScalarGraphType> builtInTypes, ISchema schema)
+        public TypeReferenceReplacementVisitor(Dictionary<ROM, IGraphType> typeDictionary, ReadOnlyDictionary<string, ScalarGraphType> builtInTypes, ISchema schema)
         {
             _typeDictionary = typeDictionary ?? throw new ArgumentNullException(nameof(typeDictionary));
             _builtInTypes = builtInTypes ?? throw new ArgumentNullException(nameof(builtInTypes));

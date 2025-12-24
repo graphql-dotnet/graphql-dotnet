@@ -1,7 +1,6 @@
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
-using GraphQLParser;
 
 namespace GraphQL.Types;
 
@@ -245,9 +244,6 @@ public partial class NewSchemaTypes : SchemaTypes
         _schema = null!;
         _serviceProvider = null!;
     }
-
-    /// <inheritdoc/>
-    protected internal override Dictionary<ROM, IGraphType> Dictionary { get; } = new();
 
     /// <summary>
     /// Phase 1: Discovers all types from multiple sources without processing them.
@@ -648,6 +644,7 @@ public partial class NewSchemaTypes : SchemaTypes
     private void FinalizeTypes()
     {
         // Replace GraphQLTypeReference instances with actual types from the dictionary
+        // Any built-in scalars referenced by name will be added automatically if not already present
         new TypeReferenceReplacementVisitor(Dictionary, BuiltInScalarsByName, _schema).Run();
 
         // Inherit interface field descriptions to implementing types
