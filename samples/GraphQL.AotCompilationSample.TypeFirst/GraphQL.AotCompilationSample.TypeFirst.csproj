@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 
     <!-- GraphQL.NET currently requires this option for serialization to work properly -->
     <!-- Serialization and deserialization takes place primarily within dedicated JsonConverters and so little reflection is used in practice -->
