@@ -2721,10 +2721,6 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
-    public class NewSchemaTypes : GraphQL.Types.SchemaTypes
-    {
-        public NewSchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings = null, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize = null) { }
-    }
     public class NonNullGraphType : GraphQL.Types.GraphType, GraphQL.Types.IProvideResolvedType
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
@@ -2895,12 +2891,13 @@ namespace GraphQL.Types
         public void Register(GraphQL.Types.Directive directive) { }
         public void Register(params GraphQL.Types.Directive[] directives) { }
     }
-    public abstract class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
+    public class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<string, GraphQL.Types.ScalarGraphType> BuiltInScalarsByName;
         protected SchemaTypes() { }
         protected SchemaTypes(System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> dictionary) { }
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings = null, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize = null) { }
         public int Count { get; }
         protected System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; set; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
