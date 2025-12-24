@@ -5,6 +5,186 @@ using GraphQLParser;
 
 namespace GraphQL.Types;
 
+/*
+ * ================================================================================================
+ * NewSchemaTypes - GraphQL Schema Type Collection and Initialization
+ * ================================================================================================
+ *
+ * This class manages the complete lifecycle of type discovery, registration, and initialization
+ * for a GraphQL schema. It implements a three-phase approach to ensure all types are properly
+ * discovered, processed, and finalized before the schema becomes operational.
+ *
+ * ================================================================================================
+ * THREE-PHASE INITIALIZATION PROCESS
+ * ================================================================================================
+ *
+ * PHASE 1: DISCOVERY
+ * ------------------
+ * The discovery phase collects known/root types from various sources WITHOUT processing them.
+ * This includes introspection types, manually-added types, root operation types, and additional
+ * type references. These types are registered but not processed, deferring all recursive
+ * field/argument processing until Phase 2.
+ *
+ * Types are discovered in the following order (which establishes registration priority):
+ *
+ *   1. Introspection Types (__Schema, __Type, __Field, __InputValue, __EnumValue, __Directive,
+ *      __DirectiveLocation, __TypeKind, and optionally __AppliedDirective, __DirectiveArgument)
+ *      - These are registered first to ensure they're available for schema introspection
+ *      - They use specific feature flags to determine which types to include
+ *
+ *   2. Manually-Added Type Instances (Schema.AdditionalTypeInstances)
+ *      - Pre-instantiated types added via Schema.RegisterType(instance)
+ *      - These take precedence over types resolved from the DI container
+ *      - Specifically useful for overriding built-in scalars
+ *
+ *   3. Root Operation Types (Query, Mutation, Subscription)
+ *      - The Query type is required; Mutation and Subscription are optional
+ *      - These define the entry points for GraphQL operations
+ *
+ *   4. Additional Type References (Schema.AdditionalTypes)
+ *      - Types added via Schema.RegisterType<T>()
+ *      - These are CLR types that will be resolved to GraphType instances
+ *      - Useful for ensuring types are included even if not directly referenced
+ *
+ * During discovery, types are added to the Dictionary (keyed by GraphQL type name) and to the
+ * _typeDictionary (keyed by CLR type). The skipProcessing flag is set to true, deferring all
+ * recursive field/argument processing until Phase 2.
+ *
+ * PHASE 2: PROCESSING
+ * -------------------
+ * The processing phase walks through all discovered types and resolves their dependencies,
+ * discovering additional types as needed. Before processing each type, the _onBeforeInitialize
+ * hook is called (if provided), allowing for last-minute modifications to the type before it's
+ * locked in. This phase then handles:
+ *
+ *   - Field Type Resolution: Converts Type references to ResolvedType instances
+ *   - Argument Type Resolution: Resolves types for field and directive arguments
+ *   - Interface Implementation: Resolves interface types and updates PossibleTypes
+ *   - Union/Interface Possible Types: Resolves object types that implement interfaces or unions
+ *   - Name Conversion: Applies INameConverter to field and argument names
+ *   - Name Validation: Ensures all names comply with GraphQL naming rules
+ *
+ * As new types are discovered during processing (e.g., field types, argument types, interface
+ * types), they are immediately added to the Dictionary and processed recursively. This continues
+ * until all type dependencies are fully resolved.
+ *
+ * The processing phase also handles:
+ *   - Meta fields (__schema, __type, __typename) on the Query type
+ *   - Directive arguments and validation
+ *   - Enum value name validation
+ *
+ * PHASE 3: FINALIZATION
+ * ---------------------
+ * The finalization phase completes the type initialization process:
+ *
+ *   1. Type Reference Replacement: All GraphQLTypeReference instances are replaced with actual
+ *      type instances from the Dictionary. This allows types to reference each other by name
+ *      before they're fully initialized. During this process, if a referenced type is not found
+ *      in the Dictionary, built-in scalars may be referenced by name and automatically added
+ *      (e.g., a GraphQLTypeReference("String") will be replaced with the built-in StringGraphType
+ *      if "String" was not explicitly registered during discovery or processing).
+ *
+ *   2. Interface Description Inheritance: Field descriptions are inherited from interfaces to
+ *      implementing types when the implementing type doesn't provide its own description.
+ *
+ *   3. Type Initialization: Each type's Initialize() method is called, allowing types to perform
+ *      any final setup now that all dependencies are resolved.
+ *
+ * ================================================================================================
+ * TYPE REGISTRATION PRIORITY AND DICTIONARY BEHAVIOR
+ * ================================================================================================
+ *
+ * When a type instance is registered (via AddType), it is stored in TWO dictionaries:
+ *
+ * 1. Dictionary (keyed by GraphQL type name - e.g., "String", "User", "Query")
+ *    - This is the primary type lookup used during schema operations
+ *    - Only one type can exist per name (duplicates throw an exception)
+ *    - Used for type reference resolution and schema introspection
+ *
+ * 2. _typeDictionary (keyed by CLR Type - e.g., typeof(StringGraphType), typeof(UserType))
+ *    - This is used during type resolution to avoid creating duplicate instances
+ *    - Maps CLR types to their corresponding GraphType instances
+ *    - Used when resolving field types, argument types, and interface implementations
+ *
+ * The _typeDictionary stores multiple keys for a single GraphType instance:
+ *
+ *   a) The CLR type passed to AddType (if provided)
+ *      - This is typically the type used to resolve the instance from DI
+ *
+ *   b) The GraphType's own CLR type (if not a base type like ObjectGraphType)
+ *      - Base types (ObjectGraphType, InterfaceGraphType, etc.) are excluded because they're
+ *        commonly used as base classes for custom types, and we don't want to map the base
+ *        type to a specific instance
+ *
+ *   c) Base scalar types (when a derived scalar has the same name as a built-in scalar)
+ *      - If a scalar derives from StringGraphType and is named "String", both the derived type
+ *        and typeof(StringGraphType) will map to the same instance
+ *      - This allows the derived scalar to be used anywhere the built-in scalar would be used
+ *
+ * ================================================================================================
+ * TYPE RESOLUTION AND MAPPING
+ * ================================================================================================
+ *
+ * For CLR-to-GraphType mappings (e.g., GraphQLClrOutputTypeReference<string> -> StringGraphType),
+ * the system uses:
+ *
+ *   1. Schema.TypeMappings (explicit mappings via RegisterTypeMapping)
+ *      - Highest priority; allows per-schema customization
+ *
+ *   2. IGraphTypeMappingProvider instances (custom mapping providers)
+ *      - Allows extensible mapping logic (e.g., for custom conventions)
+ *
+ *   3. BuiltInScalarMappings (default CLR-to-scalar mappings)
+ *      - Maps string -> StringGraphType, int -> IntGraphType, etc.
+ *
+ *   4. Auto-generated EnumerationGraphType<T> for enum types
+ *      - Automatically creates GraphQL enum types from C# enums
+ *
+ * When resolving a CLR graph type to a GraphType instance, the system follows this priority order:
+ *
+ *   1. Check _typeDictionary for an already-registered instance
+ *      - This ensures we reuse existing instances and respect overrides
+ *
+ *   2. Try to resolve from the DI container (IServiceProvider)
+ *      - This allows types to be registered with dependency injection
+ *
+ *   3. Check BuiltInScalars dictionary
+ *      - Falls back to built-in scalar instances if not found in DI
+ *
+ *   4. Throw an exception if the type cannot be resolved (includes EnumerationGraphType<T>)
+ *
+ * When explicit GraphType instances are encountered (e.g., field.ResolvedType is already set,
+ * or types in Schema.AdditionalTypeInstances, or root operation types):
+ *
+ *   - The instance is used directly without any CLR type resolution
+ *   - If the type's name has already been registered, then duplicate registration rules apply:
+ *
+ *     a) ALLOWED - Same instance registered multiple times (reference equality check):
+ *        - The operation is idempotent; subsequent registrations are ignored
+ *        - Example: The same UserType instance referenced in multiple places
+ *
+ *     b) ALLOWED - Built-in scalar types with duplicate instances of the same CLR type:
+ *        - Multiple instances of StringGraphType, IntGraphType, etc. are permitted
+ *        - Only applies to types in the BuiltInScalars dictionary
+ *
+ *     c) NOT ALLOWED - Different instances or types with the same name:
+ *        - Example: Two different instances of UserType both named "User"
+ *        - Example: UserObjectType and UserInputType both named "User"
+ *
+ * ================================================================================================
+ * IMPORTANT NOTES AND EDGE CASES
+ * ================================================================================================
+ *
+ * - When an object type implements an interface, it's automatically added to the interface's
+ *   PossibleTypes collection. This bidirectional relationship is established during processing.
+ *
+ * - Only minimal schema validation is performed during initialization (e.g., name validation,
+ *   type resolution). For comprehensive schema validation, use Schema.Validate() after the
+ *   schema is fully initialized.
+ *
+ * ================================================================================================
+ */
+
 /// <summary>
 /// A new implementation of <see cref="SchemaTypes"/> that represents a collection of all graph types
 /// utilized by a schema. This implementation follows the comprehensive specifications for type discovery,
@@ -247,9 +427,6 @@ public partial class NewSchemaTypes : SchemaTypes
             }
         }
 
-        // Call the pre-initialization hook, allowing changes to the type before initialization
-        _onBeforeInitialize?.Invoke(type);
-
         // Process the type immediately after adding it (unless skipProcessing is true)
         if (!skipProcessing)
             ProcessType(type);
@@ -260,6 +437,9 @@ public partial class NewSchemaTypes : SchemaTypes
     /// </summary>
     private void ProcessType(IGraphType type)
     {
+        // Call the pre-initialization hook, allowing changes to the type before processing
+        _onBeforeInitialize?.Invoke(type);
+
         if (type is IComplexGraphType complexType)
             ProcessComplexType(complexType);
 
