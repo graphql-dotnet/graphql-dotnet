@@ -295,6 +295,8 @@ namespace GraphQL
         public static bool EnableReflectionCaching { get; set; }
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
         public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
+        [System.Obsolete("This switch is only applicable to LegacySchemaTypes, which is not used by default" +
+            ".")]
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
@@ -2684,6 +2686,8 @@ namespace GraphQL.Types
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
     }
+    [System.Obsolete("LegacySchemaTypes is obsolete and will be removed in a future version. Please use" +
+        " NewSchemaTypes instead.")]
     public class LegacySchemaTypes : GraphQL.Types.SchemaTypes
     {
         protected LegacySchemaTypes() { }

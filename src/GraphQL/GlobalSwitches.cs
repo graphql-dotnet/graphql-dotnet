@@ -70,6 +70,7 @@ public static class GlobalSwitches
     /// <br/>
     /// By default disabled.
     /// </summary>
+    [Obsolete("This switch is only applicable to LegacySchemaTypes, which is not used by default.")]
     public static bool TrackGraphTypeInitialization { get; set; } = false;
 
     /// <summary>

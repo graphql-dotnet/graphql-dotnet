@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
@@ -218,9 +217,7 @@ public class NewSchemaTypes : SchemaTypes
             throw new InvalidOperationException(
                 $"A different instance of the GraphType '{type.GetType().GetFriendlyName()}' with the name '{typeName}' " +
                 $"has already been registered within the schema. Please use the same instance for all references within the schema, " +
-                $"or use {nameof(GraphQLTypeReference)} to reference a type instantiated elsewhere." + @"
-" +
-                $"To view additional trace enable {nameof(GlobalSwitches)}.{nameof(GlobalSwitches.TrackGraphTypeInitialization)} switch.");
+                $"or use {nameof(GraphQLTypeReference)} to reference a type instantiated elsewhere.");
         }
 
         Dictionary[typeName] = type;
@@ -239,10 +236,9 @@ public class NewSchemaTypes : SchemaTypes
             var baseType = type.GetType().BaseType;
             while (baseType != null && baseType != typeof(ScalarGraphType) && baseType != typeof(object))
             {
-                if (BuiltInScalars.ContainsKey(baseType))
+                if (BuiltInScalars.TryGetValue(baseType, out var builtInInstance))
                 {
                     // Check if the name matches the built-in scalar's name
-                    var builtInInstance = BuiltInScalars[baseType];
                     if (builtInInstance.Name == type.Name)
                     {
                         _typeDictionary[baseType] = type;
