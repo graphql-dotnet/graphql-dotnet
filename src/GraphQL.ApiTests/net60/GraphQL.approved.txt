@@ -2782,7 +2782,6 @@ namespace GraphQL.Types
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize) { }
-        protected override System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }
         protected void Initialize(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings) { }
@@ -2989,14 +2988,16 @@ namespace GraphQL.Types
     }
     public abstract class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
-        protected static readonly System.Collections.Generic.Dictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
+        protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
+        protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<string, GraphQL.Types.ScalarGraphType> BuiltInScalarsByName;
         protected SchemaTypes() { }
+        protected SchemaTypes(System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> dictionary) { }
         public int Count { get; }
-        protected abstract System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; }
+        protected System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; set; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
-        protected virtual GraphQL.Types.FieldType SchemaMetaFieldType { get; }
-        protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
-        protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
+        protected GraphQL.Types.FieldType SchemaMetaFieldType { get; set; }
+        protected GraphQL.Types.FieldType TypeMetaFieldType { get; set; }
+        protected GraphQL.Types.FieldType TypeNameMetaFieldType { get; set; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
     }
