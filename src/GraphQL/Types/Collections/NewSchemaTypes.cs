@@ -1,7 +1,6 @@
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
-using GraphQL.Utilities.Visitors;
 using GraphQLParser;
 
 namespace GraphQL.Types;
@@ -11,7 +10,7 @@ namespace GraphQL.Types;
 /// utilized by a schema. This implementation follows the comprehensive specifications for type discovery,
 /// registration, validation, and initialization.
 /// </summary>
-public class NewSchemaTypes : SchemaTypes
+public partial class NewSchemaTypes : SchemaTypes
 {
     private readonly ISchema _schema;
     private readonly IServiceProvider _serviceProvider;
