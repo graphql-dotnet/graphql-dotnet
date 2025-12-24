@@ -25,9 +25,6 @@ public class QueryArgument<TType> : QueryArgument
 [DebuggerDisplay("{Name,nq}: {ResolvedType,nq}")]
 public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescription, IProvideDeprecationReason
 {
-    private Type? _type;
-    private IGraphType? _resolvedType;
-
     /// <summary>
     /// Initializes a new instance of the argument.
     /// </summary>
@@ -51,19 +48,18 @@ public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescri
         Type = type;
     }
 
-    private string? _name;
     /// <summary>
     /// Gets or sets the name of the argument.
     /// </summary>
     public string Name
     {
-        get => _name!;
+        get => field!;
         set
         {
-            if (_name != value)
+            if (field != value)
             {
                 NameValidator.ValidateName(value, NamedElement.Argument);
-                _name = value;
+                field = value;
             }
         }
     }
@@ -90,15 +86,15 @@ public class QueryArgument : MetadataProvider, IHaveDefaultValue, IProvideDescri
     /// </summary>
     public IGraphType? ResolvedType
     {
-        get => _resolvedType;
-        set => _resolvedType = CheckResolvedType(value);
+        get;
+        set => field = CheckResolvedType(value);
     }
 
     /// <inheritdoc/>
     public Type? Type
     {
-        get => _type;
-        internal set => _type = CheckType(value);
+        get;
+        internal set => field = CheckType(value);
     }
 
     private Type? CheckType(Type? type)

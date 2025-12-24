@@ -18,7 +18,7 @@ public interface IDocumentExecuter
     /// Executes a GraphQL request and returns the result
     /// </summary>
     /// <param name="options">The options of the execution</param>
-    Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
+    public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options);
 }
 
 /// <summary>

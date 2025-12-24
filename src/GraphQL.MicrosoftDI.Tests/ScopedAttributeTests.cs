@@ -135,12 +135,11 @@ public class ScopedAttributeTests
         public static int DisposedCount;
 
         private bool _disposed;
-        private int _value;
 
         public int Value
         {
-            get => _disposed ? throw new ObjectDisposedException(null) : _value;
-            set => _value = _disposed ? throw new ObjectDisposedException(null) : value;
+            get => _disposed ? throw new ObjectDisposedException(null) : field;
+            set => field = _disposed ? throw new ObjectDisposedException(null) : value;
         }
 
         public void Dispose()

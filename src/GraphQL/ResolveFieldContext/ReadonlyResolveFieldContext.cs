@@ -16,8 +16,6 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
     // WARNING: if you add a new field here, then don't forget to clear it in Reset method!
     private ExecutionNode _executionNode;
     private ExecutionContext _executionContext;
-    private Dictionary<string, (GraphQLField Field, FieldType FieldType)>? _subFields;
-    private IResolveFieldContext? _parent;
 
     /// <summary>
     /// Initializes an instance with the specified <see cref="ExecutionNode"/> and <see cref="ExecutionContext"/>.
@@ -32,8 +30,8 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
     {
         _executionNode = node!;
         _executionContext = context!;
-        _subFields = null;
-        _parent = null;
+        SubFields = null;
+        Parent = null;
 
         return this;
     }
@@ -55,18 +53,20 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
     {
         get
         {
-            if (_parent == null)
+            if (field == null)
             {
                 var parent = _executionNode.Parent;
                 while (parent is ArrayExecutionNode)
                     parent = parent.Parent;
 
                 if (parent != null && parent is not RootExecutionNode)
-                    _parent = new ReadonlyResolveFieldContext(parent, _executionContext);
+                    field = new ReadonlyResolveFieldContext(parent, _executionContext);
             }
 
-            return _parent;
+            return field;
         }
+
+        private set;
     }
 
     /// <inheritdoc/>
@@ -107,7 +107,10 @@ public class ReadonlyResolveFieldContext : IResolveFieldContext<object?>
 
     /// <inheritdoc/>
     public Dictionary<string, (GraphQLField Field, FieldType FieldType)>? SubFields
-        => _subFields ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+    {
+        get => field ??= _executionContext.ExecutionStrategy.GetSubFields(_executionContext, _executionNode);
+        private set;
+    }
 
     /// <inheritdoc/>
     public IDictionary<string, object?> UserContext => _executionContext.UserContext;

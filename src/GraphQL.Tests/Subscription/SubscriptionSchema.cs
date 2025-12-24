@@ -160,16 +160,16 @@ public class ReceivedMessage
 
 public interface IChat
 {
-    ConcurrentStack<Message> AllMessages { get; }
+    public ConcurrentStack<Message> AllMessages { get; }
 
-    Message AddMessage(Message message);
+    public Message AddMessage(Message message);
 
-    IObservable<Message> Messages();
-    IObservable<List<Message>> MessagesGetAll();
+    public IObservable<Message> Messages();
+    public IObservable<List<Message>> MessagesGetAll();
 
-    Message AddMessage(ReceivedMessage message);
+    public Message AddMessage(ReceivedMessage message);
 
-    Task<IObservable<Message>> MessagesAsync();
+    public Task<IObservable<Message>> MessagesAsync();
 }
 
 public class Chat : IChat

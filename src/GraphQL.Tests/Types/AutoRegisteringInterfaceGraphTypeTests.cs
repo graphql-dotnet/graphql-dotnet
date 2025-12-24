@@ -393,7 +393,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     public interface Interface3
     {
-        string GetName([Id] int id);
+        public string GetName([Id] int id);
     }
 
     [Fact]
@@ -577,13 +577,13 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     public interface IObject
     {
-        [Id] int Id { get; }
+        [Id] public int Id { get; }
     }
 
     public interface IAnimal : IObject
     {
-        AnimalType Type { get; }
-        string Name { get; }
+        public AnimalType Type { get; }
+        public string Name { get; }
     }
 
     public enum AnimalType
@@ -623,76 +623,76 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private interface NoDefaultConstructorTestInterface
     {
-        bool Example1 { get; set; }
-        string Example2();
+        public bool Example1 { get; set; }
+        public string Example2();
     }
 
     private interface FieldTests
     {
         [Name("Test1")]
-        string? Field1 { get; set; }
+        public string? Field1 { get; set; }
         [Description("Test description")]
-        string? Field2 { get; set; }
+        public string? Field2 { get; set; }
         [Obsolete("Test deprecation reason")]
-        string? Field3 { get; set; }
+        public string? Field3 { get; set; }
         [CustomDescription]
-        string? Field4 { get; set; }
+        public string? Field4 { get; set; }
         [Description("Test description")]
         [Metadata("key1", "value1")]
         [Metadata("key2", "value2")]
-        string? Field5 { get; set; }
+        public string? Field5 { get; set; }
 #if NET48
         [InputType(typeof(IdGraphType))]
 #else
         [InputType<IdGraphType>()]
 #endif
-        int? Field6 { get; set; }
+        public int? Field6 { get; set; }
 #if NET48
         [OutputType(typeof(IdGraphType))]
 #else
         [OutputType<IdGraphType>()]
 #endif
-        int? Field7 { get; set; }
+        public int? Field7 { get; set; }
         [DefaultValue("hello")]
-        string? Field8 { get; set; }
+        public string? Field8 { get; set; }
         [InputName("InputField9")]
-        string? Field9 { get; set; }
+        public string? Field9 { get; set; }
         [OutputName("OutputField10")]
-        string? Field10 { get; set; }
+        public string? Field10 { get; set; }
         [Ignore]
-        string? Field11 { get; set; }
-        int NotNullIntField { get; set; }
-        int? NullableIntField { get; set; }
-        string NotNullStringField { get; set; }
-        string? NullableStringField { get; set; }
-        string NotNullStringGetOnlyField { get; }
-        string? NullableStringGetOnlyField { get; }
-        List<string?> NotNullListNullableStringField { get; set; }
-        List<string> NotNullListNotNullStringField { get; set; }
-        List<string?>? NullableListNullableStringField { get; set; }
-        List<string>? NullableListNotNullStringField { get; set; }
-        IEnumerable<int?> NotNullEnumerableNullableIntField { get; set; }
-        IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; }
-        IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
-        IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
-        Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; }
-        Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; }
-        Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
-        Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
+        public string? Field11 { get; set; }
+        public int NotNullIntField { get; set; }
+        public int? NullableIntField { get; set; }
+        public string NotNullStringField { get; set; }
+        public string? NullableStringField { get; set; }
+        public string NotNullStringGetOnlyField { get; }
+        public string? NullableStringGetOnlyField { get; }
+        public List<string?> NotNullListNullableStringField { get; set; }
+        public List<string> NotNullListNotNullStringField { get; set; }
+        public List<string?>? NullableListNullableStringField { get; set; }
+        public List<string>? NullableListNotNullStringField { get; set; }
+        public IEnumerable<int?> NotNullEnumerableNullableIntField { get; set; }
+        public IEnumerable<int> NotNullEnumerableNotNullIntField { get; set; }
+        public IEnumerable<int?>? NullableEnumerableNullableIntField { get; set; }
+        public IEnumerable<int>? NullableEnumerableNotNullIntField { get; set; }
+        public Tuple<int, string>?[] NotNullArrayNullableTupleField { get; set; }
+        public Tuple<int, string>[] NotNullArrayNotNullTupleField { get; set; }
+        public Tuple<int, string>?[]? NullableArrayNullableTupleField { get; set; }
+        public Tuple<int, string>[]? NullableArrayNotNullTupleField { get; set; }
         [Id]
-        int IdField { get; set; }
+        public int IdField { get; set; }
         [Id]
-        int? NullableIdField { get; set; }
-        IEnumerable EnumerableField { get; set; }
-        ICollection CollectionField { get; set; }
-        IEnumerable? NullableEnumerableField { get; set; }
-        ICollection? NullableCollectionField { get; set; }
-        int?[]?[]? ListOfListOfIntsField { get; set; }
-        Task<string> TaskStringField();
-        Task<int> TaskIntFieldAsync();
-        IDataLoaderResult<string?> DataLoaderNullableStringField();
-        IDataLoaderResult<string>? NullableDataLoaderStringField();
-        Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField();
+        public int? NullableIdField { get; set; }
+        public IEnumerable EnumerableField { get; set; }
+        public ICollection CollectionField { get; set; }
+        public IEnumerable? NullableEnumerableField { get; set; }
+        public ICollection? NullableCollectionField { get; set; }
+        public int?[]?[]? ListOfListOfIntsField { get; set; }
+        public Task<string> TaskStringField();
+        public Task<int> TaskIntFieldAsync();
+        public IDataLoaderResult<string?> DataLoaderNullableStringField();
+        public IDataLoaderResult<string>? NullableDataLoaderStringField();
+        public Task<IDataLoaderResult<string?[]>> TaskDataLoaderStringArrayField();
     }
 
     private class ArgumentTestsClass : ArgumentTestsInterface
@@ -719,24 +719,24 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private interface ArgumentTestsInterface
     {
-        string? WithNonNullString(string arg1);
-        string? WithNullableString(string? arg1);
-        string? WithDefaultString(string arg1 = "test");
-        string? WithNullableDefaultString(string? arg1 = "test");
-        bool WithCancellationToken(CancellationToken cancellationToken);
-        string? WithResolveFieldContext(IResolveFieldContext context);
-        string WithFromServices([FromServices] string arg1);
-        string NamedArg([Name("arg1rename")] string arg1);
-        string IdArg([Id] string arg1);
-        int IdIntArg([Id] int arg1);
-        int TypedArg(
+        public string? WithNonNullString(string arg1);
+        public string? WithNullableString(string? arg1);
+        public string? WithDefaultString(string arg1 = "test");
+        public string? WithNullableDefaultString(string? arg1 = "test");
+        public bool WithCancellationToken(CancellationToken cancellationToken);
+        public string? WithResolveFieldContext(IResolveFieldContext context);
+        public string WithFromServices([FromServices] string arg1);
+        public string NamedArg([Name("arg1rename")] string arg1);
+        public string IdArg([Id] string arg1);
+        public int IdIntArg([Id] int arg1);
+        public int TypedArg(
 #if NET48
         [InputType(typeof(StringGraphType))]
 #else
         [InputType<StringGraphType>()]
 #endif
         int arg1);
-        string MultipleArgs(string arg1, int arg2);
+        public string MultipleArgs(string arg1, int arg2);
     }
 
     private class TestChangingFieldList<T> : AutoRegisteringInterfaceGraphType<T>
@@ -759,13 +759,13 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private interface TestInterface
     {
-        int Field1 { get; set; }
-        int Field2 { get; }
-        int Field3 { set; }
-        int Field4();
+        public int Field1 { get; set; }
+        public int Field2 { get; }
+        public int Field3 { set; }
+        public int Field4();
         [Name("Field6AltName")]
-        int Field6 { get; }
-        Task<int> Field7 { get; }
+        public int Field6 { get; }
+        public Task<int> Field7 { get; }
     }
 
     [Name("TestWithCustomName")]
@@ -817,7 +817,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
     private interface ParentInterface
     {
         [Name("Field1CustomName")]
-        string? Field1 { get; set; }
+        public string? Field1 { get; set; }
     }
     private interface DerivedInterface : ParentInterface
     {
@@ -825,7 +825,7 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private interface TestExceptionBubblingInterface
     {
-        string Test([TestExceptionBubbling] string arg);
+        public string Test([TestExceptionBubbling] string arg);
     }
 
     private class TestExceptionBubblingAttribute : GraphQLAttribute
@@ -838,24 +838,24 @@ public class AutoRegisteringInterfaceGraphTypeTests
 
     private interface TestBasicInterface
     {
-        int Id { get; set; }
-        string Name { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     public interface InheritanceTestsGrandparent
     {
-        int Field1 { get; }
-        int Field2();
+        public int Field1 { get; }
+        public int Field2();
     }
 
     public interface InheritanceTestsParent : InheritanceTestsGrandparent
     {
-        int Field3();
+        public int Field3();
     }
 
     public interface InheritanceTests : InheritanceTestsParent
     {
-        int Field4 { get; }
-        int Field5();
+        public int Field4 { get; }
+        public int Field5();
     }
 }

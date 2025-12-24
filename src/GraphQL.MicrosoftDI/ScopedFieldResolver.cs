@@ -25,16 +25,14 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
             using var scope = context.RequestServicesOrThrow().CreateScope();
             var newContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
             var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
-            if (accessor != null)
-                accessor.Context = newContext;
+            accessor?.Context = newContext;
             try
             {
                 return resolver(newContext);
             }
             finally
             {
-                if (accessor != null)
-                    accessor.Context = context;
+                accessor?.Context = context;
             }
         };
     }
@@ -49,16 +47,14 @@ public class ScopedFieldResolver<TReturnType> : FuncFieldResolver<TReturnType>
             using var scope = context.RequestServicesOrThrow().CreateScope();
             var newContext = new ScopedResolveFieldContextAdapter<object>(context, scope.ServiceProvider);
             var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
-            if (accessor != null)
-                accessor.Context = newContext;
+            accessor?.Context = newContext;
             try
             {
                 return await resolver(newContext).ConfigureAwait(false);
             }
             finally
             {
-                if (accessor != null)
-                    accessor.Context = context;
+                accessor?.Context = context;
             }
         };
     }
@@ -78,16 +74,14 @@ public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<T
             using var scope = context.RequestServicesOrThrow().CreateScope();
             var newContext = new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider);
             var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
-            if (accessor != null)
-                accessor.Context = newContext;
+            accessor?.Context = newContext;
             try
             {
                 return resolver(newContext);
             }
             finally
             {
-                if (accessor != null)
-                    accessor.Context = context;
+                accessor?.Context = context;
             }
         };
     }
@@ -102,16 +96,14 @@ public class ScopedFieldResolver<TSourceType, TReturnType> : FuncFieldResolver<T
             using var scope = context.RequestServicesOrThrow().CreateScope();
             var newContext = new ScopedResolveFieldContextAdapter<TSourceType>(context, scope.ServiceProvider);
             var accessor = scope.ServiceProvider.GetService<IResolveFieldContextAccessor>();
-            if (accessor != null)
-                accessor.Context = newContext;
+            accessor?.Context = newContext;
             try
             {
                 return await resolver(newContext).ConfigureAwait(false);
             }
             finally
             {
-                if (accessor != null)
-                    accessor.Context = context;
+                accessor?.Context = context;
             }
         };
     }

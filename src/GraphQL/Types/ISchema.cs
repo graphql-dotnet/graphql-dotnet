@@ -15,12 +15,12 @@ namespace GraphQL.Types;
 public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
 {
     /// <inheritdoc cref="ExperimentalFeatures"/>
-    ExperimentalFeatures Features { get; set; }
+    public ExperimentalFeatures Features { get; set; }
 
     /// <summary>
     /// Returns <see langword="true"/> once the schema has been initialized.
     /// </summary>
-    bool Initialized { get; }
+    public bool Initialized { get; }
 
     /// <summary>
     /// Initializes the schema. Called by <see cref="IDocumentExecuter"/> before validating or executing the request.
@@ -29,12 +29,12 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// <br/><br/>
     /// This method should be safe to be called from multiple threads simultaneously.
     /// </summary>
-    void Initialize();
+    public void Initialize();
 
     /// <summary>
     /// Field and argument names are sanitized by the provided <see cref="INameConverter"/>; defaults to <see cref="CamelCaseNameConverter"/>
     /// </summary>
-    INameConverter NameConverter { get; }
+    public INameConverter NameConverter { get; }
 
     /// <summary>
     /// Note that field middlewares from this property apply only to an uninitialized schema. If the schema is initialized
@@ -42,22 +42,22 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// at the beginning of the first call to <see cref="DocumentExecuter"/>.<see cref="DocumentExecuter.ExecuteAsync(ExecutionOptions)">ExecuteAsync</see>.
     /// However, you can also apply middlewares at any time in runtime using SchemaTypes.ApplyMiddleware method.
     /// </summary>
-    IFieldMiddlewareBuilder FieldMiddleware { get; }
+    public IFieldMiddlewareBuilder FieldMiddleware { get; }
 
     /// <summary>
     /// The 'query' base graph type; required.
     /// </summary>
-    IObjectGraphType Query { get; set; }
+    public IObjectGraphType Query { get; set; }
 
     /// <summary>
     /// The 'mutation' base graph type; optional.
     /// </summary>
-    IObjectGraphType? Mutation { get; set; }
+    public IObjectGraphType? Mutation { get; set; }
 
     /// <summary>
     /// The 'subscription' base graph type; optional.
     /// </summary>
-    IObjectGraphType? Subscription { get; set; }
+    public IObjectGraphType? Subscription { get; set; }
 
     /// <summary>
     /// Returns a list of directives supported by the schema.
@@ -67,35 +67,35 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// <br/><br/>
     /// <see cref="Schema"/> initializes the list to include <see cref="SchemaDirectives.Include"/>, <see cref="SchemaDirectives.Skip"/> and <see cref="SchemaDirectives.Deprecated"/> by default.
     /// </summary>
-    SchemaDirectives Directives { get; }
+    public SchemaDirectives Directives { get; }
 
     /// <summary>
     /// Returns a list of all the graph types utilized by this schema.
     /// </summary>
-    SchemaTypes AllTypes { get; }
+    public SchemaTypes AllTypes { get; }
 
     /// <summary>
     /// A list of additional graph types manually added to the schema by a <see cref="RegisterType(Type)"/> call.
     /// </summary>
-    IEnumerable<Type> AdditionalTypes { get; }
+    public IEnumerable<Type> AdditionalTypes { get; }
 
     /// <summary>
     /// A list of additional graph type instances manually added to the schema by a <see cref="RegisterType(IGraphType)"/> call.
     /// </summary>
-    IEnumerable<IGraphType> AdditionalTypeInstances { get; }
+    public IEnumerable<IGraphType> AdditionalTypeInstances { get; }
 
     /// <summary>
     /// Adds the specified instance of an <see cref="ISchemaNodeVisitor"/> to the schema.
     /// When initializing a schema, all registered visitors will be executed on each
     /// schema element when it is traversed.
     /// </summary>
-    void RegisterVisitor(ISchemaNodeVisitor visitor);
+    public void RegisterVisitor(ISchemaNodeVisitor visitor);
 
     /// <summary>
     /// Adds the specified visitor type to the schema. When initializing a schema, all
     /// registered visitors will be executed on each schema element when it is traversed.
     /// </summary>
-    void RegisterVisitor(Type type);
+    public void RegisterVisitor(Type type);
 
     /// <summary>
     /// Adds the specified specific instance of an <see cref="IGraphType"/> to the schema.
@@ -103,7 +103,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
     /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
     /// </summary>
-    void RegisterType(IGraphType type);
+    public void RegisterType(IGraphType type);
 
     /// <summary>
     /// Adds the specified graph type to the schema. Type must implement <see cref="IGraphType"/>.
@@ -111,7 +111,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// Not typically required as schema initialization will scan the <see cref="Query"/>, <see cref="Mutation"/> and <see cref="Subscription"/> graphs,
     /// creating instances of <see cref="IGraphType"/>s referenced therein as necessary.
     /// </summary>
-    void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type);
+    public void RegisterType([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type type);
 
     /// <summary>
     /// Registers type mapping from CLR type to GraphType.
@@ -124,43 +124,43 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// </summary>
     /// <param name="clrType">The CLR property type from which to infer the GraphType.</param>
     /// <param name="graphType">Inferred GraphType.</param>
-    void RegisterTypeMapping(Type clrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType);
+    public void RegisterTypeMapping(Type clrType, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type graphType);
 
     /// <summary>
     /// Returns all registered by <see cref="RegisterTypeMapping"/> type mappings.
     /// </summary>
-    IEnumerable<(Type clrType, Type graphType)> TypeMappings { get; }
+    public IEnumerable<(Type clrType, Type graphType)> TypeMappings { get; }
 
     /// <summary>
     /// Returns all built-in type mappings for scalars.
     /// </summary>
-    IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings { get; }
+    public IEnumerable<(Type clrType, Type graphType)> BuiltInTypeMappings { get; }
 
     /// <summary>
     /// Provides the ability to filter the schema upon introspection to hide types, fields, arguments, enum values, directives.
     /// By default nothing is hidden. Note that this filter in fact does not prohibit the execution of queries that contain
     /// hidden types/fields. To limit access to the particular fields, you should use some authorization logic.
     /// </summary>
-    ISchemaFilter Filter { get; set; }
+    public ISchemaFilter Filter { get; set; }
 
     /// <summary>
     /// Provides the ability to order the schema elements upon introspection.
     /// By default all elements are returned as is, no sorting is applied.
     /// </summary>
-    ISchemaComparer Comparer { get; set; }
+    public ISchemaComparer Comparer { get; set; }
 
     /// <summary>
     /// Returns a reference to the __schema introspection field available on the query graph type.
     /// </summary>
-    FieldType SchemaMetaFieldType { get; }
+    public FieldType SchemaMetaFieldType { get; }
 
     /// <summary>
     /// Returns a reference to the __type introspection field available on the query graph type.
     /// </summary>
-    FieldType TypeMetaFieldType { get; }
+    public FieldType TypeMetaFieldType { get; }
 
     /// <summary>
     /// Returns a reference to the __typename introspection field available on any object, interface, or union graph type.
     /// </summary>
-    FieldType TypeNameMetaFieldType { get; }
+    public FieldType TypeNameMetaFieldType { get; }
 }

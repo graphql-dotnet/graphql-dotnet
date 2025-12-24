@@ -2,7 +2,7 @@ namespace GraphQL.Benchmarks;
 
 internal interface IBenchmark
 {
-    void GlobalSetup();
+    public void GlobalSetup();
 
-    void RunProfiler();
+    public void RunProfiler();
 }

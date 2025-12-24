@@ -14,27 +14,27 @@ public interface IInputObjectGraphType : IComplexGraphType
     /// much like a field resolver does for output objects. For example, you can set some 'computed'
     /// properties for your input object which were not passed in the GraphQL request.
     /// </summary>
-    object ParseDictionary(IDictionary<string, object?> value);
+    public object ParseDictionary(IDictionary<string, object?> value);
 
     /// <summary>
     /// Returns a boolean indicating if the provided value is valid as a default value for a
     /// field or argument of this type.
     /// </summary>
-    bool IsValidDefault(object value);
+    public bool IsValidDefault(object value);
 
     /// <summary>
     /// Converts a value to an AST representation. This is necessary for introspection queries
     /// to return the default value for fields of this scalar type. This method may throw an exception
     /// or return <see langword="null"/> for a failed conversion.
     /// </summary>
-    GraphQLValue ToAST(object value);
+    public GraphQLValue ToAST(object value);
 
     /// <summary>
     /// Indicates that this type is a OneOf Input Object. This means that during parsing, the input object
     /// must have exactly one of the fields set, which must be non-null. All fields defined on the type must
     /// be nullable.
     /// </summary>
-    bool IsOneOf { get; set; }
+    public bool IsOneOf { get; set; }
 }
 
 /// <inheritdoc/>

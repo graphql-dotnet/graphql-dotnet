@@ -8,13 +8,13 @@ namespace GraphQL.Execution;
 public interface IDocumentExecutionListener
 {
     /// <summary>Executes after document validation is complete. Can be used to log validation failures.</summary>
-    Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult);
+    public Task AfterValidationAsync(IExecutionContext context, IValidationResult validationResult);
 
     /// <summary>Executes after document validation passes, before calling <see cref="IExecutionStrategy.ExecuteAsync(ExecutionContext)"/>.</summary>
-    Task BeforeExecutionAsync(IExecutionContext context);
+    public Task BeforeExecutionAsync(IExecutionContext context);
 
     /// <summary>Executes after the <see cref="IExecutionStrategy"/> has completed executing the request</summary>
-    Task AfterExecutionAsync(IExecutionContext context);
+    public Task AfterExecutionAsync(IExecutionContext context);
 }
 
 /// <inheritdoc cref="IDocumentExecutionListener"/>

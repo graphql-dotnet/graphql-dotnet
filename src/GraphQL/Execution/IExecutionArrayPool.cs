@@ -16,5 +16,5 @@ public interface IExecutionArrayPool
     /// <typeparam name="TElement">Array element type.</typeparam>
     /// <param name="minimumLength">The minimum length of the array.</param>
     /// <returns>Array from pool.</returns>
-    TElement[] Rent<TElement>(int minimumLength);
+    public TElement[] Rent<TElement>(int minimumLength);
 }

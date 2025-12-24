@@ -6,5 +6,5 @@ namespace GraphQL.Execution;
 public interface IExecutionStrategySelector
 {
     /// <inheritdoc cref="IExecutionStrategySelector"/>
-    IExecutionStrategy Select(ExecutionContext context);
+    public IExecutionStrategy Select(ExecutionContext context);
 }

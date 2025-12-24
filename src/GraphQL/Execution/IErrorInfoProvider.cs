@@ -8,5 +8,5 @@ public interface IErrorInfoProvider
     /// <summary>
     /// Parses an <see cref="ExecutionError"/> into a <see cref="ErrorInfo"/> struct
     /// </summary>
-    ErrorInfo GetInfo(ExecutionError executionError);
+    public ErrorInfo GetInfo(ExecutionError executionError);
 }
