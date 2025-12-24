@@ -11,7 +11,6 @@ public static class Program
 #if NET10_0_OR_GREATER
     public static IHost BuildWebHost(string[] args)
     {
-
         var builder = WebApplication.CreateBuilder(args);
 
         var startup = new Startup(builder.Configuration);
