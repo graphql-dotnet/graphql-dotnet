@@ -492,23 +492,21 @@ public class NewSchemaTypes : SchemaTypes
     {
         foreach (var type in Dictionary.Values)
         {
-            if (type is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0)
+            if (type is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0
+                && type is IComplexGraphType complexType)
             {
-                if (type is IComplexGraphType complexType)
+                foreach (var field in complexType.Fields.List)
                 {
-                    foreach (var field in complexType.Fields.List)
+                    if (string.IsNullOrWhiteSpace(field.Description))
                     {
-                        if (string.IsNullOrWhiteSpace(field.Description))
+                        // Search for description in implemented interfaces
+                        foreach (var iface in implementation.ResolvedInterfaces.List)
                         {
-                            // Search for description in implemented interfaces
-                            foreach (var iface in implementation.ResolvedInterfaces.List)
+                            var interfaceField = iface.GetField(field.Name);
+                            if (interfaceField?.Description != null)
                             {
-                                var interfaceField = iface.GetField(field.Name);
-                                if (interfaceField?.Description != null)
-                                {
-                                    field.Description = interfaceField.Description;
-                                    break;
-                                }
+                                field.Description = interfaceField.Description;
+                                break;
                             }
                         }
                     }
