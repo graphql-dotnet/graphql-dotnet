@@ -46,16 +46,11 @@ internal readonly ref struct TypeReferenceReplacementVisitor
         // Process all types in the dictionary
         foreach (var type in _typeDictionary.Values.ToList()) // copy list in case resovling GraphQLTypeReference adds a built-in scalar
         {
-            switch (type)
-            {
-                case IComplexGraphType complexType:
-                    VisitComplexType(complexType);
-                    break;
+            if (type is IComplexGraphType complexGraphType)
+                VisitComplexType(complexGraphType);
 
-                case UnionGraphType union:
-                    VisitUnion(union);
-                    break;
-            }
+            if (type is IAbstractGraphType abstractType)
+                VisitAbstractType(abstractType);
         }
     }
 
@@ -99,9 +94,9 @@ internal readonly ref struct TypeReferenceReplacementVisitor
     }
 
     /// <summary>
-    /// Visits a union type and replaces type references in its possible types.
+    /// Visits a union or interface type and replaces type references in its possible types.
     /// </summary>
-    private void VisitUnion(UnionGraphType type)
+    private void VisitAbstractType(IAbstractGraphType type)
     {
         if (type.PossibleTypes != null)
         {
@@ -110,12 +105,15 @@ internal readonly ref struct TypeReferenceReplacementVisitor
             {
                 var unionType = ConvertTypeReference(type, list[i]) as IObjectGraphType;
 
-                if (type.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
+                if (type is UnionGraphType) // check for interfaces is in schema validation
                 {
-                    throw new InvalidOperationException(
-                       $"Union type '{type.Name}' does not provide a 'resolveType' function " +
-                       $"and possible Type '{unionType.Name}' does not provide a 'isTypeOf' function. " +
-                        "There is no way to resolve this possible type during execution.");
+                    if (type.ResolveType == null && unionType != null && unionType.IsTypeOf == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"{(type is UnionGraphType ? "Union" : "Interface")} type '{type.Name}' does not provide a 'resolveType' function " +
+                            $"and possible Type '{unionType.Name}' does not provide a 'isTypeOf' function.  " +
+                            "There is no way to resolve this possible type during execution.");
+                    }
                 }
 
                 list[i] = unionType!;

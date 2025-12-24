@@ -81,6 +81,11 @@ public abstract class SchemaTypes : IEnumerable<IGraphType>
     }
     .ToDictionary(t => t.GetType());
 
+    /// <summary>
+    /// Built-in scalar instances by name (preinitialized and shared across all schema instances).
+    /// </summary>
+    internal static readonly Dictionary<string, ScalarGraphType> BuiltInScalarsByName = BuiltInScalars.Values.ToDictionary(t => t.Name);
+
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrInputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]

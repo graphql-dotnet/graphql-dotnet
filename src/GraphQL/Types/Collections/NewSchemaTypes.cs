@@ -117,9 +117,8 @@ public class NewSchemaTypes : SchemaTypes
     /// </summary>
     private void ProcessTypes()
     {
-        // Process all types that have been discovered
-        var typesToProcess = Dictionary.Values.ToList(); // snapshot to avoid modification during iteration
-        foreach (var type in typesToProcess)
+        // Process all types that have been discovered so far
+        foreach (var type in Dictionary.Values.ToList()) // make a copy to avoid modification during iteration
         {
             ProcessType(type);
         }
@@ -192,7 +191,7 @@ public class NewSchemaTypes : SchemaTypes
         var typeName = type.Name;
 
         // Validate the name
-        if (!IsIntrospectionType(type))
+        if (!type.IsIntrospectionType())
             NameValidator.ValidateNameOnSchemaInitialize(typeName, NamedElement.Type);
 
         // Check for duplicate registration
@@ -230,22 +229,8 @@ public class NewSchemaTypes : SchemaTypes
         if (clrType != null || !_baseTypes.Contains(type.GetType()))
         {
             var typeKey = clrType ?? type.GetType();
-            Debug.WriteLine($"Storing mapping from CLR type '{typeKey.GetFriendlyName()}' to GraphType '{typeName}' of type '{type.GetType().GetFriendlyName()}'");
             _typeDictionary[typeKey] = type;
         }
-        else
-        {
-            Debug.WriteLine($"Not storing mapping for GraphType '{typeName}' of type '{type.GetType().GetFriendlyName()}' as it is a built-in GraphQL type");
-        }
-        //if (clrType != null)
-        //{
-        //    Debug.WriteLine($"Storing mapping from CLR type '{clrType.GetFriendlyName()}' to GraphType '{typeName}' of type '{type.GetType().GetFriendlyName()}'");
-        //    _typeDictionary[clrType] = type;
-        //}
-        //else
-        //{
-        //    Debug.WriteLine($"Not storing mapping for GraphType '{typeName}' of type '{type.GetType().GetFriendlyName()}' as no CLR type was provided");
-        //}
 
         // For scalar types that derive from built-in scalars, also register the base type
         // if the Name matches (indicating it's an override, not a new type)
@@ -257,7 +242,7 @@ public class NewSchemaTypes : SchemaTypes
                 if (BuiltInScalars.ContainsKey(baseType))
                 {
                     // Check if the name matches the built-in scalar's name
-                    var builtInInstance = GetBuiltInScalar(baseType);
+                    var builtInInstance = BuiltInScalars[baseType];
                     if (builtInInstance.Name == type.Name)
                     {
                         _typeDictionary[baseType] = type;
@@ -272,9 +257,7 @@ public class NewSchemaTypes : SchemaTypes
 
         // Process the type immediately after adding it (unless skipProcessing is true)
         if (!skipProcessing)
-        {
             ProcessType(type);
-        }
     }
 
     /// <summary>
@@ -490,7 +473,7 @@ public class NewSchemaTypes : SchemaTypes
     private void FinalizeTypes()
     {
         // Replace GraphQLTypeReference instances with actual types from the dictionary
-        new TypeReferenceReplacementVisitor(Dictionary, BuiltInScalars.Values.ToDictionary(x => x.Name), _schema).Run();
+        new TypeReferenceReplacementVisitor(Dictionary, BuiltInScalarsByName, _schema).Run();
 
         // Inherit interface field descriptions to implementing types
         InheritInterfaceDescriptions();
@@ -620,7 +603,11 @@ public class NewSchemaTypes : SchemaTypes
         // Rebuild the generic type if any arguments were resolved
         if (needsRebuild)
         {
+            // Note: GraphQLClrInputTypeReference and GraphQLClrOutputTypeReference are both classes, and
+            //   and so will the graph type be, therefore we can safely use MakeGenericType here.
+#pragma warning disable IL2055 // Call to 'System.Type.MakeGenericType' cannot be statically analyzed by the trimmer
             return genericDef.MakeGenericType(newGenericArgs);
+#pragma warning restore IL2055 // Call to 'System.Type.MakeGenericType' cannot be statically analyzed by the trimmer
         }
 
         return type;
@@ -693,28 +680,12 @@ public class NewSchemaTypes : SchemaTypes
     }
 
     /// <summary>
-    /// Gets a built-in scalar instance.
-    /// </summary>
-    private ScalarGraphType GetBuiltInScalar(Type type)
-    {
-        return BuiltInScalars[type];
-    }
-
-    /// <summary>
     /// Gets the name converter for a type.
     /// </summary>
     private INameConverter GetNameConverter(IGraphType type)
     {
-        return IsIntrospectionType(type)
+        return type.IsIntrospectionType()
             ? CamelCaseNameConverter.Instance
             : _schema.NameConverter;
-    }
-
-    /// <summary>
-    /// Checks if a type is an introspection type.
-    /// </summary>
-    private bool IsIntrospectionType(IGraphType type)
-    {
-        return type.Name?.StartsWith("__") == true;
     }
 }
