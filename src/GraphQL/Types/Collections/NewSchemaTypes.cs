@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Reflection;
 using GraphQL.Conversion;
 using GraphQL.Introspection;
 using GraphQL.Utilities;
@@ -511,19 +509,19 @@ public class NewSchemaTypes : SchemaTypes
     {
         foreach (var type in Dictionary.Values)
         {
-            if (type is IObjectGraphType objectType && objectType.Interfaces != null)
+            if (type is IImplementInterfaces implementation && implementation.ResolvedInterfaces.Count > 0)
             {
-                foreach (var field in objectType.Fields.List)
+                if (type is IComplexGraphType complexType)
                 {
-                    if (string.IsNullOrWhiteSpace(field.Description))
+                    foreach (var field in complexType.Fields.List)
                     {
-                        // Search for description in implemented interfaces
-                        foreach (var iface in objectType.Interfaces.List)
+                        if (string.IsNullOrWhiteSpace(field.Description))
                         {
-                            if (iface is IInterfaceGraphType interfaceType)
+                            // Search for description in implemented interfaces
+                            foreach (var iface in implementation.ResolvedInterfaces.List)
                             {
-                                var interfaceField = interfaceType.Fields.FirstOrDefault(f => f.Name == field.Name);
-                                if (interfaceField != null && !string.IsNullOrWhiteSpace(interfaceField.Description))
+                                var interfaceField = iface.GetField(field.Name);
+                                if (interfaceField?.Description != null)
                                 {
                                     field.Description = interfaceField.Description;
                                     break;
