@@ -2536,6 +2536,7 @@ namespace GraphQL.Types
         public string TypeName { get; }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
+        public override string ToString() { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
