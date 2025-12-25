@@ -576,7 +576,7 @@ public class AutoRegisteringObjectGraphTypeTests
         // verify that during input coercion, the value is converted to an integer
         var fieldType = queryType.Fields.First();
         var argument = fieldType.Arguments.ShouldNotBeNull().First();
-        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<IdGraphType>>();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IdGraphType>();
         argument.Parser.ShouldNotBeNull().Invoke("123").ShouldBe(123);
         // verify that during input coercion, parsing errors throw an exception
         Should.Throw<FormatException>(() => argument.Parser("abc"));
@@ -609,7 +609,7 @@ public class AutoRegisteringObjectGraphTypeTests
         // verify that during input coercion, the value is validated
         var fieldType = queryType.Fields.First();
         var argument = fieldType.Arguments.ShouldNotBeNull().First();
-        argument.ResolvedType.ShouldBeOfType<NonNullGraphType<StringGraphType>>();
+        argument.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
         argument.Validator.ShouldNotBeNull().Invoke("abc");
         // verify that during input coercion, parsing errors throw an exception
         Should.Throw<ArgumentException>(() => argument.Validator("abcdef"));
