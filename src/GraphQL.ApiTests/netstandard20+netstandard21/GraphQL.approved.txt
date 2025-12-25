@@ -2900,9 +2900,9 @@ namespace GraphQL.Types
         public int Count { get; }
         protected System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; set; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
-        protected GraphQL.Types.FieldType SchemaMetaFieldType { get; set; }
-        protected GraphQL.Types.FieldType TypeMetaFieldType { get; set; }
-        protected GraphQL.Types.FieldType TypeNameMetaFieldType { get; set; }
+        public GraphQL.Types.FieldType SchemaMetaFieldType { get; protected set; }
+        public GraphQL.Types.FieldType TypeMetaFieldType { get; protected set; }
+        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; protected set; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
     }
