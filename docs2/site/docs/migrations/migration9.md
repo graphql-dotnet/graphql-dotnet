@@ -135,7 +135,7 @@ To address both concerns:
   - `IValidationResult.ArgumentValues` and `IValidationResult.DirectiveValues`
   - `ValidationResult.ArgumentValues` and `ValidationResult.DirectiveValues`
 
-### 2. New methods added to `IAbstractGraphType`
+### 3. New methods added to `IAbstractGraphType`
 
 The `IAbstractGraphType` interface has been extended with new methods that were previously only available on `InterfaceGraphType` and `UnionGraphType`. Since both interface and union graph types require the same methods for the same purpose, these methods have been moved to the common interface:
 
@@ -145,11 +145,11 @@ The `IAbstractGraphType` interface has been extended with new methods that were 
 
 If you have custom implementations of `IAbstractGraphType`, you will need to implement these new methods and property. Most users who inherit from `InterfaceGraphType` or `UnionGraphType` will not be affected as these base classes already provide the implementations.
 
-### 3. `ParseLinkVisitor.Run` method removed
+### 4. `ParseLinkVisitor.Run` method removed
 
 The `ParseLinkVisitor.Run` method has been removed. However, no changes should be required in your code since an equivalent extension method `Run` already exists for all `ISchemaNodeVisitor` instances, including `ParseLinkVisitor`.
 
-### 4. Async suffix removal for type-first field names
+### 5. Async suffix removal for type-first field names
 
 In type-first GraphQL schemas, field names ending with "Async" are now automatically removed for methods returning `ValueTask<T>` and `IAsyncEnumerable<T>`, consistent with the existing behavior for `Task<T>`.
 
@@ -157,15 +157,15 @@ For example, previously only `Task<string> GetDataAsync()` would become field `"
 
 If you have type-first schemas with `ValueTask<T>` or `IAsyncEnumerable<T>` methods ending in "Async", update your GraphQL queries to use the new field names without the "Async" suffix, or use the `[Name]` attribute to explicitly specify the desired field name.
 
-### 5. `ISchema.ResolveFieldContextAccessor` property added
+### 6. `ISchema.ResolveFieldContextAccessor` property added
 
 The `ResolveFieldContextAccessor` property has been added to the `ISchema` interface. This property was previously only available on the `Schema` class. If you have custom implementations of `ISchema`, you will need to implement this property. Most users who inherit from `Schema` will not be affected as the base class already provides the implementation.
 
-### 6. `ApplyMiddleware` methods moved from `SchemaTypes` to extension methods
+### 7. `SchemaTypes.ApplyMiddleware` moved to `SchemaTypesExtensions`
 
-The `ApplyMiddleware` methods have been moved from the `SchemaTypes` class to extension methods in the `SchemaTypesExtensions` class. This change improves code organization and follows .NET best practices for extending types. These methods are typically only called by `Schema` and as such should not require any changes to your code.
+The `ApplyMiddleware` method has been moved from the `SchemaTypes` class to the `SchemaTypesExtensions` static class.
 
-### 7. `SchemaTypes` is now an abstract base class
+### 8. `SchemaTypes` is now an abstract base class
 
 The `SchemaTypes` class has been refactored into an abstract base class with a new `LegacySchemaTypes` derived class that contains the concrete implementation. This change enables future extensibility while maintaining backward compatibility.
 
