@@ -840,6 +840,11 @@ namespace GraphQL
         public static void Run(this GraphQL.Utilities.ISchemaNodeVisitor visitor, GraphQL.Types.ISchema schema) { }
         public static GraphQLParser.AST.GraphQLDocument ToAST(this GraphQL.Types.ISchema schema) { }
     }
+    public static class SchemaTypesExtensions
+    {
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypes schemaTypes, GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypes schemaTypes, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+    }
     public static class StringExtensions
     {
         public static string ToCamelCase(this string s) { }
@@ -2888,8 +2893,6 @@ namespace GraphQL.Types
         protected virtual GraphQL.Types.FieldType TypeMetaFieldType { get; }
         protected virtual GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
-        public void ApplyMiddleware(GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
-        public void ApplyMiddleware(System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
         protected virtual GraphQL.Types.IGraphType BuildGraphQLType(System.Type type, System.Func<System.Type, GraphQL.Types.IGraphType> resolve) { }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
         protected virtual System.Type? GetGraphTypeFromClrType(System.Type clrType, bool isInputType, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? typeMappings) { }

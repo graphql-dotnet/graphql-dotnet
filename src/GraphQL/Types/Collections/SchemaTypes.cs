@@ -3,9 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
 using GraphQL.Conversion;
-using GraphQL.Instrumentation;
 using GraphQL.Introspection;
-using GraphQL.Resolvers;
 using GraphQL.Types.Collections;
 using GraphQL.Utilities;
 using GraphQLParser;
@@ -473,50 +471,6 @@ public class SchemaTypes : IEnumerable<IGraphType>
         return resolve(type) ??
                throw new InvalidOperationException(
                    $"Expected non-null value, but {nameof(resolve)} delegate return null for '{type.Name}'");
-    }
-
-    /// <summary>
-    /// Applies all delegates specified by the middleware builder to the schema.
-    /// <br/><br/>
-    /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
-    /// Therefore, as a rule, this method should be called only once - during schema initialization.
-    /// </summary>
-    public void ApplyMiddleware(IFieldMiddlewareBuilder fieldMiddlewareBuilder)
-    {
-        var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
-
-        // allocation free optimization if no middlewares are defined
-        if (transform != null)
-        {
-            ApplyMiddleware(transform);
-        }
-    }
-
-    /// <summary>
-    /// Applies the specified middleware transform delegate to the schema.
-    /// <br/><br/>
-    /// When applying to the schema, modifies the resolver of each field of each graph type adding required behavior.
-    /// Therefore, as a rule, this method should be called only once - during schema initialization.
-    /// </summary>
-    public void ApplyMiddleware(Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
-    {
-        if (transform == null)
-            throw new ArgumentNullException(nameof(transform));
-
-        foreach (var item in Dictionary)
-        {
-            if (item.Value is IObjectGraphType obj)
-            {
-                foreach (var field in obj.Fields.List)
-                {
-                    var inner = field.Resolver ?? (field.StreamResolver == null ? NameFieldResolver.Instance : SourceFieldResolver.Instance);
-
-                    var fieldMiddlewareDelegate = transform(inner.ResolveAsync);
-
-                    field.Resolver = new FuncFieldResolver<object>(fieldMiddlewareDelegate.Invoke);
-                }
-            }
-        }
     }
 
     /// <summary>
