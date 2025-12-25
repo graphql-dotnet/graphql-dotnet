@@ -105,7 +105,7 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
         _ = new SchemaTypes_Test_Cannot_Initialize_More_Than_Once();
     }
 
-    private class SchemaTypes_Test_Cannot_Initialize_More_Than_Once : SchemaTypes
+    private class SchemaTypes_Test_Cannot_Initialize_More_Than_Once : LegacySchemaTypes
     {
         public SchemaTypes_Test_Cannot_Initialize_More_Than_Once()
         {

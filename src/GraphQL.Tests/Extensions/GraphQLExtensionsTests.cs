@@ -162,7 +162,7 @@ public class GraphQLExtensionsTests
         Should.Throw(() => type.ToAST(value), expected.GetType()).Message.ShouldBe(expected.Message);
     }
 
-    private class TestSchemaTypes : SchemaTypes
+    private class TestSchemaTypes : LegacySchemaTypes
     {
     }
 
