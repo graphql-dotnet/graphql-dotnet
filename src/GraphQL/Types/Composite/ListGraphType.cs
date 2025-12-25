@@ -31,13 +31,27 @@ public class ListGraphType : GraphType, IProvideResolvedType
 
     /// <inheritdoc/>
     public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (ListGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => ToString().GetHashCode();
 }
 
 /// <inheritdoc cref="ListGraphType"/>
 public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : ListGraphType
     where T : IGraphType
 {
-    private ListGraphType() : base(null!)
-    {
-    }
+    private ListGraphType() : base(null!) { }
 }

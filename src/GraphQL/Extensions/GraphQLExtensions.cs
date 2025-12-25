@@ -114,25 +114,21 @@ public static class GraphQLExtensions
     /// <summary>
     /// Indicates if the graph type is an input object graph type.
     /// </summary>
-    public static bool IsInputObjectType(this IGraphType? type)
+    public static bool IsInputObjectType(this IGraphType type)
     {
         return type.GetNamedType() is IInputObjectGraphType;
     }
 
     internal static bool IsGraphQLTypeReference(this IGraphType? type)
     {
-        return type.GetNamedType() is GraphQLTypeReference;
+        return type?.GetNamedType() is GraphQLTypeReference;
     }
 
     /// <summary>
     /// Unwraps any list/non-null graph type wrappers from a graph type and returns the base graph type.
     /// </summary>
-    [return: NotNullIfNotNull("type")]
-    public static IGraphType? GetNamedType(this IGraphType? type)
+    public static IGraphType GetNamedType(this IGraphType type)
     {
-        if (type == null)
-            return null;
-
         if (type is IProvideResolvedType provideResolvedType)
         {
             var resolvedType = provideResolvedType.ResolvedType
@@ -315,7 +311,7 @@ public static class GraphQLExtensions
         //superType = locationType
 
         // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
-        if (ReferenceEquals(maybeSubType, superType))
+        if (Equals(maybeSubType.ToString(), superType.ToString())) // use Equals to match on name; rely on SchemaTypes to ensure that names are unique within the schema
         {
             return true;
         }

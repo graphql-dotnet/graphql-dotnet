@@ -287,6 +287,37 @@ public class SchemaWithArgumentsOnInputField : Schema
     }
 }
 
+// https://github.com/graphql-dotnet/graphql-dotnet/issues/2675
+public class SchemaWithNotFullSpecifiedResolvedType : Schema
+{
+    public SchemaWithNotFullSpecifiedResolvedType()
+    {
+        var stringFilterInputType = new InputObjectGraphType { Name = "InputString" };
+
+        stringFilterInputType.AddField(new FieldType
+        {
+            Name = "eq",
+            ResolvedType = new StringGraphType()
+        });
+        stringFilterInputType.AddField(new FieldType
+        {
+            Name = "in",
+            ResolvedType = new ListGraphType(new StringGraphType())
+        });
+        stringFilterInputType.AddField(new FieldType
+        {
+            Name = "not",
+            ResolvedType = new NonNullGraphType(new StringGraphType())
+        });
+
+        var query = new ObjectGraphType();
+        query.Field("test", new StringGraphType())
+            .Arguments(new QueryArgument(stringFilterInputType) { Name = "a" })
+            .Resolve(_ => "ok");
+        Query = query;
+    }
+}
+
 public class SchemaWithInvalidDefault1 : Schema
 {
     public SchemaWithInvalidDefault1()

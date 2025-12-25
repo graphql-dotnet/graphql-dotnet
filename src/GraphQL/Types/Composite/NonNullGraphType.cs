@@ -37,13 +37,27 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
 
     /// <inheritdoc/>
     public override string ToString() => _cachedString ??= $"{ResolvedType}!";
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (NonNullGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => ToString().GetHashCode();
 }
 
 /// <inheritdoc cref="NonNullGraphType"/>
 public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : NonNullGraphType
     where T : IGraphType
 {
-    private NonNullGraphType() : base(null!)
-    {
-    }
+    private NonNullGraphType() : base(null!) { }
 }
