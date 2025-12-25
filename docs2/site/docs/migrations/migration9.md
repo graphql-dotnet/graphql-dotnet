@@ -22,6 +22,24 @@ For the smoothest migration experience, we strongly recommend:
 
 ## New Features
 
+### 1. GraphQL Specification September 2025 Features Enabled by Default
+
+Two features from the GraphQL specification dated September 2025 are now enabled by default:
+
+- **Repeatable Directives**: The `isRepeatable` field is now exposed for directives via introspection by default. This allows clients to determine whether a directive can be applied multiple times to the same location.
+- **Deprecation of Input Values**: Input values (arguments on fields and input fields on input types) can now be deprecated by default, similar to how output fields and enum values can be deprecated.
+
+These features were previously opt-in via `Schema.Features` but are now part of the official GraphQL specification and enabled by default.
+
+If you need to disable these features for backward compatibility, you can set them to `false`:
+
+```csharp
+schema.Features.RepeatableDirectives = false;
+schema.Features.DeprecationOfInputValues = false;
+```
+
+Note that these properties must be set before schema initialization.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
