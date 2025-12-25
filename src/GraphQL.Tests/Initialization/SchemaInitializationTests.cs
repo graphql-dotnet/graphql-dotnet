@@ -40,11 +40,7 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
     [Fact]
     public void SchemaWithDuplicateInterfaceFields_Should_Throw()
     {
-        Should.Throw<InvalidOperationException>(() =>
-        {
-            var schema = new SchemaWithDuplicateInterfaceFields();
-            schema.Initialize();
-        }).Message.ShouldBe("The field 'field' must have a unique name within Interface type 'Dup'; no two fields may share the same name.");
+        ShouldThrow<SchemaWithDuplicateInterfaceFields, InvalidOperationException>("The field 'field' must have a unique name within Interface type 'Dup'; no two fields may share the same name.");
     }
 
     [Fact]
