@@ -56,7 +56,7 @@ public class Issue1837ArrayInputType : InputObjectGraphType
         {
             AddField(new FieldType
             {
-                ResolvedType = new ListGraphType<OutputIntGraphType>(),
+                ResolvedType = new ListGraphType(new OutputIntGraphType()),
                 Name = "abc"
             });
         });
@@ -64,7 +64,7 @@ public class Issue1837ArrayInputType : InputObjectGraphType
 
         AddField(new FieldType
         {
-            ResolvedType = new ListGraphType<IntGraphType> { ResolvedType = new IntGraphType() },
+            ResolvedType = new ListGraphType(new IntGraphType()),
             Name = "abc"
         });
     }

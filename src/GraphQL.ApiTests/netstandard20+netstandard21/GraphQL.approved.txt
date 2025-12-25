@@ -2463,6 +2463,7 @@ namespace GraphQL.Types
         public string TypeName { get; }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
+        public override string ToString() { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2688,17 +2689,12 @@ namespace GraphQL.Types
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class ListGraphType<T> : GraphQL.Types.ListGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) ins" +
-            "tead.")]
-        public ListGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
         public LongGraphType() { }
@@ -2711,17 +2707,12 @@ namespace GraphQL.Types
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<T> : GraphQL.Types.NonNullGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) " +
-            "instead.")]
-        public NonNullGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
