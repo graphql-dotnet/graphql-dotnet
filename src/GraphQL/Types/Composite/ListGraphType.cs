@@ -31,6 +31,12 @@ public class ListGraphType : GraphType, IProvideResolvedType
 
     /// <inheritdoc/>
     public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj) => obj is ListGraphType listGraphType && Equals(ResolvedType, listGraphType.ResolvedType);
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => ToString().GetHashCode();
 }
 
 /// <inheritdoc cref="ListGraphType"/>
