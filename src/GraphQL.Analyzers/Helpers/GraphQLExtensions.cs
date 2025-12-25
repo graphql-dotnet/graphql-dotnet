@@ -8,7 +8,36 @@ public static class GraphQLExtensions
     private static readonly byte[] _publicKey = typeof(GraphQLExtensions).Assembly.GetName().GetPublicKey();
 
     /// <summary>
-    /// Checks if the given <see cref="ExpressionSyntax"/> represents a symbol defined by the GraphQL library.
+    /// Checks if the given invocation expression represents a method call defined by the GraphQL library
+    /// with the specified method name.
+    /// </summary>
+    /// <param name="semanticModel">The <see cref="SemanticModel"/> for semantic analysis.</param>
+    /// <param name="invocation">The <see cref="InvocationExpressionSyntax"/> to check.</param>
+    /// <param name="methodName">The expected method name to match.</param>
+    /// <returns>
+    /// <see langword="true"/> if the invocation represents a call to a method with the specified name
+    /// that is defined by the GraphQL library; otherwise, <see langword="false"/>.
+    /// </returns>
+    public static bool IsGraphQLMethodInvocation(
+        this SemanticModel semanticModel,
+        InvocationExpressionSyntax invocation,
+        string methodName)
+    {
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
+        {
+            return false;
+        }
+
+        if (methodSymbol.Name != methodName)
+        {
+            return false;
+        }
+
+        return methodSymbol.IsGraphQLSymbol();
+    }
+
+    /// <summary>
+    /// Checks if the given <see cref="SyntaxNode"/> represents a symbol defined by the GraphQL library.
     /// </summary>
     /// <param name="syntaxNode">The <see cref="SyntaxNode"/> to check.</param>
     /// <param name="semanticModel">The <see cref="SemanticModel"/> for semantic analysis.</param>
