@@ -492,11 +492,10 @@ namespace GraphQL
         public static string? DeprecationReasonOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static string? DescriptionOf<TSourceType, TProperty>(this System.Linq.Expressions.Expression<System.Func<TSourceType, TProperty>> expression) { }
         public static bool DoTypesOverlap(GraphQL.Types.IGraphType typeA, GraphQL.Types.IGraphType typeB) { }
-        [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("type")]
-        public static GraphQL.Types.IGraphType? GetNamedType(this GraphQL.Types.IGraphType? type) { }
+        public static GraphQL.Types.IGraphType GetNamedType(this GraphQL.Types.IGraphType type) { }
         public static System.Type GetNamedType(this System.Type type) { }
         public static bool IsCompositeType(this GraphQL.Types.IGraphType type) { }
-        public static bool IsInputObjectType(this GraphQL.Types.IGraphType? type) { }
+        public static bool IsInputObjectType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this GraphQL.Types.IGraphType type) { }
         public static bool IsInputType(this System.Type type) { }
         public static bool IsLeafType(this GraphQL.Types.IGraphType type) { }
@@ -2544,6 +2543,7 @@ namespace GraphQL.Types
         public string TypeName { get; }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }
+        public override string ToString() { }
     }
     public abstract class GraphType : GraphQL.Utilities.MetadataProvider, GraphQL.Types.IGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
@@ -2790,6 +2790,8 @@ namespace GraphQL.Types
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
@@ -2806,6 +2808,8 @@ namespace GraphQL.Types
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
