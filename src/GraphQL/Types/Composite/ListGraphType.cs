@@ -33,7 +33,17 @@ public class ListGraphType : GraphType, IProvideResolvedType
     public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is ListGraphType listGraphType && Equals(ResolvedType, listGraphType.ResolvedType);
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (ListGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode() => ToString().GetHashCode();

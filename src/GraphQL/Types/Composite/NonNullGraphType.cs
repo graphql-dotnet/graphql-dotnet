@@ -39,7 +39,17 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
     public override string ToString() => _cachedString ??= $"{ResolvedType}!";
 
     /// <inheritdoc/>
-    public override bool Equals(object? obj) => obj is NonNullGraphType nonNullGraphType && Equals(ResolvedType, nonNullGraphType.ResolvedType);
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (NonNullGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode() => ToString().GetHashCode();
