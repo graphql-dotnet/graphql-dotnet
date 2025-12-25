@@ -308,16 +308,16 @@ public class LegacySchemaTypes : SchemaTypes
         {
             if (type.GetGenericTypeDefinition() == typeof(NonNullGraphType<>))
             {
-                var nonNull = (NonNullGraphType)Activator.CreateInstance(type)!;
-                nonNull.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
-                return nonNull;
+                var innerType = type.GenericTypeArguments[0];
+                var resolvedInner = BuildGraphQLType(innerType, resolve);
+                return new NonNullGraphType(resolvedInner);
             }
 
             if (type.GetGenericTypeDefinition() == typeof(ListGraphType<>))
             {
-                var list = (ListGraphType)Activator.CreateInstance(type)!;
-                list.ResolvedType = BuildGraphQLType(type.GenericTypeArguments[0], resolve);
-                return list;
+                var innerType = type.GenericTypeArguments[0];
+                var resolvedInner = BuildGraphQLType(innerType, resolve);
+                return new ListGraphType(resolvedInner);
             }
         }
 
@@ -608,8 +608,7 @@ Make sure that your ServiceProvider is configured correctly.");
 
     private void AddTypeIfNotRegistered(IGraphType type, TypeCollectionContext context)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
-        namedType ??= context.ResolveType(namedType2!);
+        var namedType = type.GetNamedType();
 
         using var _ = context.Trace("AddTypeIfNotRegistered(IGraphType, TypeCollectionContext) for type '{0}'", namedType.Name);
 

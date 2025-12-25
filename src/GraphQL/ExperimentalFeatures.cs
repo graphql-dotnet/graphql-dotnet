@@ -18,17 +18,17 @@ public class ExperimentalFeatures
     /// Enables ability to expose 'isRepeatable' field for directives via introspection.
     /// This property must be set before schema initialization.
     /// <br/><br/>
-    /// This feature is from a working draft of the specification (not experimental, just not released yet).
+    /// This feature is part of the GraphQL specification dated September 2025.
     /// </summary>
-    public bool RepeatableDirectives { get; set; } = false;
+    public bool RepeatableDirectives { get; set; } = true;
 
     /// <summary>
     /// Enables deprecation of input values - arguments on a field or input fields on an input type.
     /// This property must be set before schema initialization.
     /// <br/><br/>
-    /// This feature is from a working draft of the specification (not experimental, just not released yet).
+    /// This feature is part of the GraphQL specification dated September 2025.
     /// </summary>
-    public bool DeprecationOfInputValues { get; set; } = false;
+    public bool DeprecationOfInputValues { get; set; } = true;
 
     /// <summary>
     /// Specifies whether scalar or object variable types can be used where list types are defined.

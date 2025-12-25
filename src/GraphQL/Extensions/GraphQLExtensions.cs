@@ -33,9 +33,8 @@ public static class GraphQLExtensions
     /// </summary>
     public static bool IsLeafType(this IGraphType type)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
-        return namedType is ScalarGraphType ||
-               typeof(ScalarGraphType).IsAssignableFrom(namedType2);
+        var namedType = type.GetNamedType();
+        return namedType is ScalarGraphType;
     }
 
     // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
@@ -68,11 +67,9 @@ public static class GraphQLExtensions
     /// </summary>
     public static bool IsInputType(this IGraphType type)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
+        var namedType = type.GetNamedType();
         return namedType is ScalarGraphType ||
-               namedType is IInputObjectGraphType ||
-               typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
-               typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
+               namedType is IInputObjectGraphType;
     }
 
     // https://spec.graphql.org/October2021/#sec-Input-and-Output-Types
@@ -107,15 +104,11 @@ public static class GraphQLExtensions
     /// </summary>
     public static bool IsOutputType(this IGraphType type)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
+        var namedType = type.GetNamedType();
         return namedType is ScalarGraphType ||
                namedType is IObjectGraphType ||
                namedType is IInterfaceGraphType ||
-               namedType is UnionGraphType ||
-               typeof(ScalarGraphType).IsAssignableFrom(namedType2) ||
-               typeof(IObjectGraphType).IsAssignableFrom(namedType2) ||
-               typeof(IInterfaceGraphType).IsAssignableFrom(namedType2) ||
-               typeof(UnionGraphType).IsAssignableFrom(namedType2);
+               namedType is UnionGraphType;
     }
 
     /// <summary>
@@ -123,25 +116,12 @@ public static class GraphQLExtensions
     /// </summary>
     public static bool IsInputObjectType(this IGraphType type)
     {
-        var (namedType, namedType2) = type.GetNamedTypes();
-        return namedType is IInputObjectGraphType ||
-               typeof(IInputObjectGraphType).IsAssignableFrom(namedType2);
+        return type.GetNamedType() is IInputObjectGraphType;
     }
 
     internal static bool IsGraphQLTypeReference(this IGraphType? type)
     {
-        var (namedType, _) = type.GetNamedTypes();
-        return namedType is GraphQLTypeReference;
-    }
-
-    internal static (IGraphType? resolvedType, Type? type) GetNamedTypes(this IGraphType? type)
-    {
-        return type switch
-        {
-            NonNullGraphType nonNull => nonNull.ResolvedType != null ? GetNamedTypes(nonNull.ResolvedType) : (null, GetNamedType(nonNull.Type!)),
-            ListGraphType list => list.ResolvedType != null ? GetNamedTypes(list.ResolvedType) : (null, GetNamedType(list.Type!)),
-            _ => (type, null)
-        };
+        return type?.GetNamedType() is GraphQLTypeReference;
     }
 
     /// <summary>
@@ -149,11 +129,15 @@ public static class GraphQLExtensions
     /// </summary>
     public static IGraphType GetNamedType(this IGraphType type)
     {
-        if (type == null)
-            return null!;
+        if (type is IProvideResolvedType provideResolvedType)
+        {
+            var resolvedType = provideResolvedType.ResolvedType
+                ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
 
-        var (namedType, _) = type.GetNamedTypes();
-        return namedType ?? throw new NotSupportedException("Please set ResolvedType property before calling this method or call GetNamedType(this Type type) instead");
+            return resolvedType.GetNamedType();
+        }
+
+        return type;
     }
 
     /// <summary>
@@ -327,7 +311,7 @@ public static class GraphQLExtensions
         //superType = locationType
 
         // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
-        if (maybeSubType.Equals(superType)) // use Equals to match on name; rely on SchemaTypes to ensure that names are unique within the schema
+        if (Equals(maybeSubType.ToString(), superType.ToString())) // use Equals to match on name; rely on SchemaTypes to ensure that names are unique within the schema
         {
             return true;
         }
