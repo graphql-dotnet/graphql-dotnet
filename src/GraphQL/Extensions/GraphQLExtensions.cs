@@ -327,7 +327,7 @@ public static class GraphQLExtensions
         //superType = locationType
 
         // >> - Return {true} if {variableType} and {locationType} are identical, otherwise {false}.
-        if (maybeSubType.Equals(superType))
+        if (maybeSubType.Equals(superType)) // use Equals to match on name; rely on SchemaTypes to ensure that names are unique within the schema
         {
             return true;
         }

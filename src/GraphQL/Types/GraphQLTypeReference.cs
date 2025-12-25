@@ -48,6 +48,9 @@ public sealed class GraphQLTypeReference : InterfaceGraphType, IObjectGraphType
     }
 
     /// <inheritdoc/>
+    public override string ToString() => TypeName;
+
+    /// <inheritdoc/>
     public override int GetHashCode() => TypeName?.GetHashCode() ?? 0;
 }
 
