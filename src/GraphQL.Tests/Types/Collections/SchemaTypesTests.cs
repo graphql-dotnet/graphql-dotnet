@@ -95,8 +95,7 @@ public class SchemaTypesTests
 
         // Test
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
-            .Message.ShouldBe(@"A different instance of the GraphType 'ObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.
-To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization switch.");
+            .Message.ShouldBe(@"A different instance of the GraphType 'ObjectGraphType' with the name 'MyObject' has already been registered within the schema. Please use the same instance for all references within the schema, or use GraphQLTypeReference to reference a type instantiated elsewhere.");
     }
 
     [Fact]
@@ -220,6 +219,40 @@ To view additional trace enable GlobalSwitches.TrackGraphTypeInitialization swit
                 }
             }
             """);
+    }
+
+    [Fact]
+    public void can_override_scalars_manually()
+    {
+        var schema = new Schema();
+        schema.RegisterType(new MyBooleanGraphType());
+        var query = new ObjectGraphType();
+        query.Field<IntGraphType>("sample")
+          .Argument<BooleanGraphType>("argNewBehavior");
+        schema.Query = query;
+        schema.Initialize();
+    }
+
+    [Fact]
+    public void cant_have_mixed_scalars_then_replace_them()
+    {
+        var schema = new Schema();
+        schema.RegisterType(new MyBooleanGraphType());
+        var query = new ObjectGraphType();
+        query.Field<IntGraphType>("sample")
+          .Argument<BooleanGraphType>("argNewBehavior")
+          .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" });
+        schema.Query = query;
+        Should.Throw<InvalidOperationException>(schema.Initialize).Message
+            .ShouldBe("Unable to register GraphType 'BooleanGraphType' with the name 'Boolean'. The name 'Boolean' is already registered to 'MyBooleanGraphType'. Check your schema configuration.");
+    }
+
+    public class MyBooleanGraphType : BooleanGraphType
+    {
+        public MyBooleanGraphType()
+        {
+            Name = "Boolean";
+        }
     }
 
     private class MyStringGraphType : StringGraphType

@@ -91,19 +91,30 @@ public class ComplexGraphTypeTests
             type.DeprecationReason.ShouldBe("Obsolete for test");
             type.Fields.Count.ShouldBe(18);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
-            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(IntGraphType));
-            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<string>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from XML comment");
-            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<Direction>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<EnumerationGraphType<Direction>>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<Direction>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).ResolvedType.ShouldBeOfType<EnumerationGraphType<Direction>>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<GraphQLClrOutputTypeReference<int>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<int>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
@@ -134,20 +145,31 @@ public class ComplexGraphTypeTests
             type.DeprecationReason.ShouldBe("Obsolete for test");
             type.Fields.Count.ShouldBe(18);
             type.Fields.First(f => f.Name == nameof(TestObject.someString)).Description.ShouldBe("Super secret");
-            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(StringGraphType));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(IntGraphType));
-            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).Type.ShouldBe(typeof(GraphQLClrInputTypeReference<string>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someString)).ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<string>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredString)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).Type.ShouldBe(typeof(GraphQLClrInputTypeReference<int>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someInt)).ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<int>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNotNullInt)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
             type.Fields.First(f => f.Name == nameof(TestObject.someBoolean)).DeprecationReason.ShouldBe("Use someInt");
             type.Fields.First(f => f.Name == nameof(TestObject.someDate)).DefaultValue.ShouldBe(new DateTime(2019, 3, 14));
             type.Fields.First(f => f.Name == nameof(TestObject.someShort)).Description.ShouldBe("Description from XML comment");
-            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<StringGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<EnumerationGraphType<Direction>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(EnumerationGraphType<Direction>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<IntGraphType>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<IntGraphType>>>));
-            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<IntGraphType>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).Type.ShouldBe(typeof(ListGraphType<GraphQLClrInputTypeReference<string>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnumerableOfString)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrInputTypeReference<Direction>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someEnum)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<EnumerationGraphType<Direction>>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).Type.ShouldBe(typeof(GraphQLClrInputTypeReference<Direction>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someNullableEnum)).ResolvedType.ShouldBeOfType<EnumerationGraphType<Direction>>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someList)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).Type.ShouldBe(typeof(ListGraphType<GraphQLClrInputTypeReference<int>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someListWithNullable)).ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrInputTypeReference<int>>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredList)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrInputTypeReference<int>>>));
+            type.Fields.First(f => f.Name == nameof(TestObject.someRequiredListWithNullable)).ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
             type.Fields.First(f => f.Name == nameof(TestObject.someMoney)).Type.ShouldBe(typeof(AutoRegisteringInputObjectGraphType<Money>));
 
             var enumType = new EnumerationGraphType<Direction>();
@@ -174,7 +196,8 @@ public class ComplexGraphTypeTests
             schema.Initialize();
 
             type.Fields.Last().Name.ShouldBe("name");
-            type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+            type.Fields.Last().Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            type.Fields.Last().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
         }
         finally
         {
@@ -200,7 +223,7 @@ public class ComplexGraphTypeTests
         schema.Query = type;
         schema.Initialize();
 
-        type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
+        type.Fields.Last().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
     }
 
     [Fact]
@@ -212,7 +235,8 @@ public class ComplexGraphTypeTests
         schema.Query = type;
         schema.Initialize();
 
-        type.Fields.Last().Type.ShouldBe(typeof(IntGraphType));
+        type.Fields.Last().Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
+        type.Fields.Last().ResolvedType.ShouldBeOfType<IntGraphType>();
     }
 
     [Fact]
@@ -224,7 +248,8 @@ public class ComplexGraphTypeTests
         schema.Query = type;
         schema.Initialize();
 
-        type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<IntGraphType>>));
+        type.Fields.Last().Type.ShouldBe(typeof(ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<int>>>));
+        type.Fields.Last().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
     }
 
     [Fact]
@@ -594,37 +619,58 @@ public class ComplexGraphTypeTests
             schema.Initialize();
 
             var field = type.Fields.FirstOrDefault(f => f.Name == "str1").ShouldNotBeNull();
-            field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "str2").ShouldNotBeNull();
-            field.Type.ShouldBe(infer ? typeof(StringGraphType) : typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(infer ? typeof(GraphQLClrOutputTypeReference<string>) : typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            if (infer)
+                field.ResolvedType.ShouldBeOfType<StringGraphType>();
+            else
+                field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "str3").ShouldNotBeNull();
-            field.Type.ShouldBe(infer ? typeof(StringGraphType) : typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(infer ? typeof(GraphQLClrOutputTypeReference<string>) : typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            if (infer)
+                field.ResolvedType.ShouldBeOfType<StringGraphType>();
+            else
+                field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list1").ShouldNotBeNull();
             field.Type.ShouldBe(infer
-                ? typeof(NonNullGraphType<ListGraphType<NonNullGraphType<StringGraphType>>>)
-                : typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+                ? typeof(NonNullGraphType<ListGraphType<NonNullGraphType<GraphQLClrOutputTypeReference<string>>>>)
+                : typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
+            if (infer)
+                field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            else
+                field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list2").ShouldNotBeNull();
-            field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
+            field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "list3").ShouldNotBeNull();
             field.Type.ShouldBe(infer
-                ? typeof(ListGraphType<StringGraphType>)
-                : typeof(NonNullGraphType<ListGraphType<StringGraphType>>));
+                ? typeof(ListGraphType<GraphQLClrOutputTypeReference<string>>)
+                : typeof(NonNullGraphType<ListGraphType<GraphQLClrOutputTypeReference<string>>>));
+            if (infer)
+                field.ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
+            else
+                field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<ListGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "concatStr").ShouldNotBeNull();
-            field.Type.ShouldBe(typeof(NonNullGraphType<StringGraphType>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<string>>));
+            field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<StringGraphType>();
 
             field = type.Fields.FirstOrDefault(f => f.Name == "int1").ShouldNotBeNull();
-            field.Type.ShouldBe(typeof(NonNullGraphType<IntGraphType>));
+            field.Type.ShouldBe(typeof(NonNullGraphType<GraphQLClrOutputTypeReference<int>>));
+            field.ResolvedType.ShouldBeOfType<NonNullGraphType>().ResolvedType.ShouldBeOfType<IntGraphType>();
 
             if (infer)
             {
                 field = type.Fields.FirstOrDefault(f => f.Name == "int2").ShouldNotBeNull();
-                field.Type.ShouldBe(typeof(IntGraphType));
+                field.Type.ShouldBe(typeof(GraphQLClrOutputTypeReference<int>));
+                field.ResolvedType.ShouldBeOfType<IntGraphType>();
             }
         }
         finally

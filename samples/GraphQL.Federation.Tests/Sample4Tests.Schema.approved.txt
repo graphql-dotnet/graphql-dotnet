@@ -2,21 +2,21 @@ schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link
   query: Query
 }
 
-scalar _Any
-
 type Query {
   users: [User!]!
   _service: _Service!
   _entities(representations: [_Any!]!): [_Entity]!
 }
 
-type User @key(fields: "id") {
-  id: ID!
-  username: String!
-}
-
 type _Service {
   sdl: String
 }
 
+scalar _Any
+
 union _Entity = User
+
+type User @key(fields: "id") {
+  id: ID!
+  username: String!
+}

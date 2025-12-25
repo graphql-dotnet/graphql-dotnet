@@ -209,124 +209,124 @@ public class StarWarsIntrospectionTests : StarWarsTestBase
             """;
         const string expected = """
             {
-                "__schema": {
-                    "types": [
-                    {
-                        "name": "__Schema",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "String",
-                        "kind": "SCALAR"
-                    },
-                    {
-                        "name": "__Type",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "__TypeKind",
-                        "kind": "ENUM"
-                    },
-                    {
-                        "name": "__Field",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "__InputValue",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Boolean",
-                        "kind": "SCALAR"
-                    },
-                    {
-                        "name": "__EnumValue",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "__Directive",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "__DirectiveLocation",
-                        "kind": "ENUM"
-                    },
-                    {
-                        "name": "Query",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Character",
-                        "kind": "INTERFACE"
-                    },
-                    {
-                        "name": "CharacterInterfaceConnection",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Int",
-                        "kind": "SCALAR"
-                    },
-                    {
-                        "name": "PageInfo",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "CharacterInterfaceEdge",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Episode",
-                        "kind": "ENUM"
-                    },
-                    {
-                        "name": "Human",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Droid",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "Mutation",
-                        "kind": "OBJECT"
-                    },
-                    {
-                        "name": "HumanInput",
-                        "kind": "INPUT_OBJECT"
-                    }
-                    ],
-                    "queryType": {
-                      "name": "Query",
-                      "kind": "OBJECT"
-                    },
-                    "mutationType": {
-                      "name": "Mutation"
-                    },
-                    "directives": [
-                    {
-                        "name": "include",
-                        "description": "Directs the executor to include this field or fragment only when the 'if' argument is true.",
-                        "onOperation": false,
-                        "onFragment": true,
-                        "onField": true
-                    },
-                    {
-                        "name": "skip",
-                        "description": "Directs the executor to skip this field or fragment when the 'if' argument is true.",
-                        "onOperation": false,
-                        "onFragment": true,
-                        "onField": true
-                    },
-                    {
-                        "name": "deprecated",
-                        "description": "Marks an element of a GraphQL schema as no longer supported.",
-                        "onOperation": false,
-                        "onFragment": false,
-                        "onField": false
-                    }
-                    ]
-                }
+              "__schema": {
+                "types": [
+                  {
+                    "name": "__DirectiveLocation",
+                    "kind": "ENUM"
+                  },
+                  {
+                    "name": "__TypeKind",
+                    "kind": "ENUM"
+                  },
+                  {
+                    "name": "__EnumValue",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "__Directive",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "__Field",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "__InputValue",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "__Type",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "__Schema",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "Query",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "Mutation",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "String",
+                    "kind": "SCALAR"
+                  },
+                  {
+                    "name": "Boolean",
+                    "kind": "SCALAR"
+                  },
+                  {
+                    "name": "Character",
+                    "kind": "INTERFACE"
+                  },
+                  {
+                    "name": "CharacterInterfaceConnection",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "Int",
+                    "kind": "SCALAR"
+                  },
+                  {
+                    "name": "PageInfo",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "CharacterInterfaceEdge",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "Episode",
+                    "kind": "ENUM"
+                  },
+                  {
+                    "name": "Human",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "Droid",
+                    "kind": "OBJECT"
+                  },
+                  {
+                    "name": "HumanInput",
+                    "kind": "INPUT_OBJECT"
+                  }
+                ],
+                "queryType": {
+                  "name": "Query",
+                  "kind": "OBJECT"
+                },
+                "mutationType": {
+                  "name": "Mutation"
+                },
+                "directives": [
+                  {
+                    "name": "include",
+                    "description": "Directs the executor to include this field or fragment only when the 'if' argument is true.",
+                    "onOperation": false,
+                    "onFragment": true,
+                    "onField": true
+                  },
+                  {
+                    "name": "skip",
+                    "description": "Directs the executor to skip this field or fragment when the 'if' argument is true.",
+                    "onOperation": false,
+                    "onFragment": true,
+                    "onField": true
+                  },
+                  {
+                    "name": "deprecated",
+                    "description": "Marks an element of a GraphQL schema as no longer supported.",
+                    "onOperation": false,
+                    "onFragment": false,
+                    "onField": false
+                  }
+                ]
+              }
             }
             """;
 

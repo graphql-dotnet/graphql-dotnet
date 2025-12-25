@@ -2,8 +2,6 @@ schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link
   query: Query
 }
 
-scalar _Any
-
 type Query {
   _service: _Service!
   _entities(representations: [_Any!]!): [_Entity]!
@@ -12,6 +10,8 @@ type Query {
 type _Service {
   sdl: String
 }
+
+scalar _Any
 
 union _Entity = Review | Product | User
 

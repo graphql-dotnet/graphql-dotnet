@@ -22,7 +22,7 @@ public class Bug1156 : QueryTestBase<Bug1156Schema>
 """;
         var result = AssertQueryWithErrors(query, null, expectedErrorCount: 1, executed: false);
         result.Errors.ShouldHaveSingleItem().Message.ShouldBe("Error executing document.");
-        result.Errors.ShouldHaveSingleItem().InnerException.ShouldNotBeNull().Message.ShouldBe("Unable to register GraphType 'Type2' with the name 'MyType'. The name 'MyType' is already registered to 'Type1'. Check your schema configuration.");
+        result.Errors.ShouldHaveSingleItem().InnerException.ShouldNotBeNull().Message.ShouldBe("The GraphQL type for field 'Query.type2' could not be derived implicitly. Unable to register GraphType 'Type2' with the name 'MyType'. The name 'MyType' is already registered to 'Type1'. Check your schema configuration.");
     }
 }
 
