@@ -23,18 +23,20 @@ public class MyGraphType : ObjectGraphType
 ## Validation Rule
 
 ```csharp
-public class RequiresAuthValidationRule : IValidationRule
+using GraphQL.Validation;
+using GraphQLParser.AST;
+
+public class RequiresAuthValidationRule : ValidationRuleBase
 {
-  public Task<INodeVisitor> ValidateAsync(ValidationContext context)
+  public override ValueTask<INodeVisitor?> GetPreNodeVisitorAsync(ValidationContext context)
   {
     var userContext = context.UserContext as GraphQLUserContext;
-    var authenticated = userContext.User?.IsAuthenticated() ?? false;
+    var authenticated = userContext?.User?.IsAuthenticated() ?? false;
 
-    return Task.FromResult(new EnterLeaveListener(_ =>
-    {
-      _.Match<Operation>(op =>
+    return new(new NodeVisitors(
+      new MatchingNodeVisitor<GraphQLOperationDefinition>((op, context) =>
       {
-        if (op.OperationType == OperationType.Mutation && !authenticated)
+        if (op.Operation == OperationType.Mutation && !authenticated)
         {
           context.ReportError(new ValidationError(
               context.Document.Source,
@@ -42,17 +44,17 @@ public class RequiresAuthValidationRule : IValidationRule
               $"Authorization is required to access {op.Name}.",
               op) { Code = "auth-required" });
         }
-      });
+      }),
 
       // this could leak info about hidden fields in error messages
       // it would be better to implement a filter on the schema so it
       // acts as if they just don't exist vs. an auth denied error
       // - filtering the schema is not currently supported
-      _.Match<Field>(fieldAst =>
+      new MatchingNodeVisitor<GraphQLField>((fieldAst, context) =>
       {
         var fieldDef = context.TypeInfo.GetFieldDef();
-        if (fieldDef.RequiresPermissions() &&
-            (!authenticated || !fieldDef.CanAccess(userContext.User.Claims)))
+        if (fieldDef != null && fieldDef.RequiresPermissions() &&
+            (!authenticated || !fieldDef.CanAccess(userContext?.User?.Claims)))
         {
           context.ReportError(new ValidationError(
               context.Document.Source,
@@ -60,11 +62,15 @@ public class RequiresAuthValidationRule : IValidationRule
               $"You are not authorized to run this query.",
               fieldAst) { Code = "auth-required" });
         }
-      });
-    }));
+      })
+    ));
   }
 }
 ```
+
+> **Note:** In versions prior to v4, `EnterLeaveListener` was used instead of `NodeVisitors` with
+> `MatchingNodeVisitor<T>`. If you're migrating from an older version, see the
+> [Migration from v3.x to v4.x](/docs/migrations/migration4) guide for details on this change.
 
 ## Permission Extension Methods
 
