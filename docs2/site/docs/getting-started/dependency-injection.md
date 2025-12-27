@@ -99,6 +99,7 @@ A list of the available extension methods is below:
 | `AddResolveFieldContextAccessor` | Registers `IResolveFieldContextAccessor` to access the current field context from services | |
 | `AddSchema<>`           | Registers the specified schema | |
 | `AddSchemaVisitor<>`    | Registers the specified schema visitor and configures it to be used at schema initialization | |
+| `AddScopedSubscriptionExecutionStrategy` | Registers an execution strategy for subscriptions that creates a new service scope for each subscription event; see [Scoped services in subscriptions](#scoped-services-in-subscriptions) | GraphQL.MicrosoftDI |
 | `AddSelfActivatingSchema<>` | Registers the specified schema which will create instances of unregistered graph types during initialization | |
 | `AddSerializer<>`       | Registers the specified serializer | |
 | `AddSystemTextJson`     | Registers the serializer that uses System.Text.Json as its underlying JSON serialization engine | GraphQL.SystemTextJson |
@@ -373,6 +374,127 @@ public class MyGraphType : ObjectGraphType<Category>
 ```
 
 Another approach to resolve scoped services is to use the SteroidsDI project, as described below.
+
+# Scoped services in subscriptions
+
+Subscriptions present unique challenges for scoped service lifetimes. Unlike queries and mutations where
+the request completes after the initial execution, subscriptions maintain long-lived connections that emit
+multiple values over time. This creates a problem: the service scope from `RequestServices` is disposed
+after the initial subscription resolver executes, causing `ObjectDisposedException` errors when attempting
+to access scoped services during subsequent data emissions.
+
+## The problem
+
+Consider a subscription that needs to access a scoped database context:
+
+```csharp
+public class ChatSubscriptions : ObjectGraphType
+{
+    public ChatSubscriptions(IChat chat)
+    {
+        Field<MessageType>("messageAdded")
+            .ResolveStream(context => chat.Messages())
+            .Resolve(context =>
+            {
+                // This will throw ObjectDisposedException!
+                // The scope has been disposed after the initial stream subscription.
+                var dbContext = context.RequestServices.GetRequiredService<MyDbContext>();
+                return dbContext.Messages.Find(context.Source.Id);
+            });
+    }
+}
+```
+
+After the `ResolveStream` method completes and returns the `IObservable<T>`, the request scope is disposed.
+When subsequent messages arrive and the `Resolve` method executes, any attempt to access scoped services
+via `RequestServices` will fail because the underlying `IServiceProvider` has been disposed.
+
+## Solution: AddScopedSubscriptionExecutionStrategy
+
+The `GraphQL.MicrosoftDI` package provides `AddScopedSubscriptionExecutionStrategy` to solve this problem.
+This method registers an execution strategy that ensures each subscription data event executes within its
+own service scope.
+
+### Configuration
+
+Add the scoped subscription execution strategy during service configuration:
+
+```csharp
+services.AddGraphQL(builder => builder
+    .AddSystemTextJson()
+    .AddSchema<MySchema>()
+    .AddScopedSubscriptionExecutionStrategy()); // Uses serial execution by default
+```
+
+The method accepts an optional boolean parameter to control execution mode:
+
+```csharp
+// Serial execution (default) - safer for non-thread-safe scoped services
+.AddScopedSubscriptionExecutionStrategy()
+// or explicitly:
+.AddScopedSubscriptionExecutionStrategy(true)
+
+// Parallel execution - better performance but requires thread-safe services
+.AddScopedSubscriptionExecutionStrategy(false)
+```
+
+### Serial vs parallel execution
+
+**Serial execution (default)** processes subscription events one at a time. This is the safer choice
+because most scoped services (like Entity Framework's `DbContext`) are not thread-safe. With serial
+execution, you can safely access scoped services directly:
+
+```csharp
+Field<MessageType>("messageAdded")
+    .ResolveStream(context => chat.Messages())
+    .Resolve(context =>
+    {
+        // Safe with serial execution - each event gets its own scope
+        var dbContext = context.RequestServices.GetRequiredService<MyDbContext>();
+        return dbContext.Messages.Find(context.Source.Id);
+    });
+```
+
+**Parallel execution** allows multiple subscription events to process concurrently, providing better
+performance for high-throughput scenarios. However, you must ensure thread safety by creating explicit
+scopes within your resolvers:
+
+```csharp
+Field<MessageType>("messageAdded")
+    .ResolveStream(context => chat.Messages())
+    .Resolve(context =>
+    {
+        // Required for parallel execution - create your own scope
+        using var scope = context.RequestServices.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<MyDbContext>();
+        return dbContext.Messages.Find(context.Source.Id);
+    });
+```
+
+### When to use each mode
+
+| Scenario | Recommended Mode |
+|----------|------------------|
+| Using Entity Framework or other non-thread-safe services | Serial |
+| Low-volume subscriptions | Serial |
+| High-throughput with thread-safe services only | Parallel |
+| Using connection-pooled or singleton services | Either |
+
+### Important considerations
+
+1. **Singleton services** are always safe to use from `RequestServices` regardless of execution mode,
+   as they are not disposed with the scope.
+
+2. **DataLoader usage**: When using DataLoader with parallel subscription execution, ensure your data
+   loaders create their own scopes, as the batch loading may occur outside the resolver's scope.
+
+3. **Memory management**: Each subscription event creates a new scope. For long-running subscriptions
+   with high event rates, ensure scopes are properly disposed to prevent memory leaks.
+
+4. **Error handling**: If a scoped service throws an exception, the scope is still properly disposed,
+   preventing resource leaks.
+
+For more information on subscriptions, see the [Subscriptions documentation](subscriptions).
 
 ## Using SteroidsDI
 
