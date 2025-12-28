@@ -165,8 +165,14 @@ The `ResolveFieldContextAccessor` property has been added to the `ISchema` inter
 
 The `ApplyMiddleware` method has been moved from the `SchemaTypes` class to the `SchemaTypesExtensions` static class.
 
-### 8. `SchemaTypes` is now an abstract base class
+### 8. `SchemaTypes` is now `SchemaTypesBase`, an abstract base class
 
-The `SchemaTypes` class has been refactored into an abstract base class with a new `LegacySchemaTypes` derived class that contains the concrete implementation. This change enables future extensibility while maintaining backward compatibility.
+The `SchemaTypes` class has been refactored into an abstract base class `SchemaTypesBase` with a new `LegacySchemaTypes` derived class that contains the concrete implementation. This change enables future extensibility while maintaining backward compatibility.
 
 Typically no changes are required unless you override `Schema.CreateSchemaTypes()` and/or use your own `SchemaTypes` implementation. In those cases, you should update your code to use or derive from `LegacySchemaTypes` instead of `SchemaTypes`.
+
+### 9. `ISchema.AllTypes` and `Schema.AllTypes` return type changed
+
+The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesBase` instead of `SchemaTypes`. `SchemaTypesBase` is now the base class, and a new `SchemaTypes` class now inherits from `SchemaTypesBase`.
+
+This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as `SchemaTypes` did before, so most code should continue to work without changes.
