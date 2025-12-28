@@ -5,7 +5,6 @@ using GraphQL.Federation;
 using GraphQL.Federation.Resolvers;
 using GraphQL.Types;
 using GraphQL.Utilities;
-using GraphQLParser;
 using GraphQLParser.AST;
 using Moq;
 
@@ -467,33 +466,13 @@ public class FederationResolverTests
 
     private class MySchemaTypes : SchemaTypes
     {
-        private readonly Dictionary<ROM, IGraphType> _types = [];
-
         public MySchemaTypes(IEnumerable<IGraphType> types)
         {
             foreach (var type in types)
             {
-                _types.Add(type.Name, type);
+                Dictionary.Add(type.Name, type);
             }
         }
-
-        protected internal override Dictionary<ROM, IGraphType> Dictionary => _types;
-    }
-
-    private IFederationResolver GetResolver(IGraphType objectGraphType)
-    {
-        return GetResolvers(objectGraphType).ShouldHaveSingleItem();
-    }
-
-    private IEnumerable<IFederationResolver> GetResolvers(IGraphType objectGraphType)
-    {
-        var ret = objectGraphType.GetMetadata<object>(FederationHelper.RESOLVER_METADATA);
-        if (ret is IFederationResolver resolver)
-            return [resolver];
-        else if (ret is IEnumerable<IFederationResolver> resolvers)
-            return resolvers;
-        else
-            throw new InvalidOperationException("Could not find resolver");
     }
 
     private class Class2
