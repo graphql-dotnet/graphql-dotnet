@@ -188,15 +188,15 @@ public abstract class SchemaTypesBase : IEnumerable<IGraphType>
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__schema</c> meta-field.
     /// </summary>
-    protected internal FieldType SchemaMetaFieldType { get; protected set; } = new SchemaMetaFieldType();
+    public FieldType SchemaMetaFieldType { get; protected set; } = new SchemaMetaFieldType();
 
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__type</c> meta-field.
     /// </summary>
-    protected internal FieldType TypeMetaFieldType { get; protected set; } = new TypeMetaFieldType();
+    public FieldType TypeMetaFieldType { get; protected set; } = new TypeMetaFieldType();
 
     /// <summary>
     /// Returns the <see cref="FieldType"/> instance for the <c>__typename</c> meta-field.
     /// </summary>
-    protected internal FieldType TypeNameMetaFieldType { get; protected set; } = new TypeNameMetaFieldType();
+    public FieldType TypeNameMetaFieldType { get; protected set; } = new TypeNameMetaFieldType();
 }

@@ -2793,17 +2793,12 @@ namespace GraphQL.Types
     {
         public ListGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class ListGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.ListGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) ins" +
-            "tead.")]
-        public ListGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class LongGraphType : GraphQL.Types.ScalarGraphType
     {
         public LongGraphType() { }
@@ -2816,17 +2811,12 @@ namespace GraphQL.Types
     {
         public NonNullGraphType(GraphQL.Types.IGraphType type) { }
         public GraphQL.Types.IGraphType? ResolvedType { get; set; }
-        public virtual System.Type? Type { get; }
+        public override bool Equals(object? obj) { }
+        public override int GetHashCode() { }
         public override string ToString() { }
     }
     public sealed class NonNullGraphType<[System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]  T> : GraphQL.Types.NonNullGraphType
-        where T : GraphQL.Types.IGraphType
-    {
-        [System.Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) " +
-            "instead.")]
-        public NonNullGraphType() { }
-        public override System.Type Type { get; }
-    }
+        where T : GraphQL.Types.IGraphType { }
     public class ObjectGraphType : GraphQL.Types.ObjectGraphType<object?>
     {
         public ObjectGraphType() { }
@@ -3000,9 +2990,9 @@ namespace GraphQL.Types
         public int Count { get; }
         protected System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; set; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
-        protected GraphQL.Types.FieldType SchemaMetaFieldType { get; set; }
-        protected GraphQL.Types.FieldType TypeMetaFieldType { get; set; }
-        protected GraphQL.Types.FieldType TypeNameMetaFieldType { get; set; }
+        public GraphQL.Types.FieldType SchemaMetaFieldType { get; protected set; }
+        public GraphQL.Types.FieldType TypeMetaFieldType { get; protected set; }
+        public GraphQL.Types.FieldType TypeNameMetaFieldType { get; protected set; }
         public static System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, System.Type> BuiltInScalarMappings { get; }
         public System.Collections.Generic.IEnumerator<GraphQL.Types.IGraphType> GetEnumerator() { }
     }
