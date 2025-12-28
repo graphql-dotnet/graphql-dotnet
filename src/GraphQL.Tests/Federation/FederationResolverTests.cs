@@ -464,7 +464,7 @@ public class FederationResolverTests
         return ret.ShouldNotBeNull().ShouldBeAssignableTo<T>()!;
     }
 
-    private class MySchemaTypes : SchemaTypes
+    private class MySchemaTypes : SchemaTypesBase
     {
         public MySchemaTypes(IEnumerable<IGraphType> types)
         {

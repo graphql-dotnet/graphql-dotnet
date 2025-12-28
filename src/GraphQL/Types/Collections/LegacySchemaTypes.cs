@@ -13,7 +13,7 @@ namespace GraphQL.Types;
 /// NOTE: After creating an instance of this class, its contents cannot be changed.
 /// </summary>
 [Obsolete("LegacySchemaTypes is obsolete and will be removed in a future version. Please use NewSchemaTypes instead.")]
-public class LegacySchemaTypes : SchemaTypes
+public class LegacySchemaTypes : SchemaTypesBase
 {
     private const string INITIALIZATIION_TRACE_KEY = "__INITIALIZATIION_TRACE_KEY__";
 

@@ -167,16 +167,22 @@ The `ApplyMiddleware` method has been moved from the `SchemaTypes` class to the 
 
 ### 8. Schema initialization logic rewritten
 
-The schema initialization logic has been completely rewritten to improve type reference handling. The update `SchemaTypes` class provides stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
+The schema initialization logic has been completely rewritten to improve type reference handling. The updated `SchemaTypes` class provides stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
 
 Most users require no changes. Note that the order in which types are added to the schema has changed, which may affect introspection query results if you rely on a specific type ordering. Additionally, `GlobalSwitches.TrackGraphTypeInitialization` has been removed, but exception messages have been improved to provide better diagnostics.
 
 If you have a custom `SchemaTypes` implementation or need the legacy behavior, override `CreateSchemaTypes()` in your schema:
 
 ```csharp
-protected override SchemaTypes CreateSchemaTypes()
+protected override SchemaTypesBase CreateSchemaTypes()
 {
     var graphTypeMappingProviders = this.GetService<IEnumerable<IGraphTypeMappingProvider>>();
     return new LegacySchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
 }
 ```
+
+### 9. `ISchema.AllTypes` and `Schema.AllTypes` return type changed
+
+The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesBase` instead of `SchemaTypes`. `SchemaTypesBase` is now the base class, and a new `SchemaTypes` class now inherits from `SchemaTypesBase`.
+
+This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as before, so most code should continue to work without changes.

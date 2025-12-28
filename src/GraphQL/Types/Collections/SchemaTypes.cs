@@ -10,7 +10,7 @@ namespace GraphQL.Types;
 /// An abstract base class that represents a list of all the graph types utilized by a schema.
 /// Also provides lookup for all schema types.
 /// </summary>
-public partial class SchemaTypes : IEnumerable<IGraphType>
+public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
 {
     /// <summary>
     /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.
@@ -90,7 +90,7 @@ public partial class SchemaTypes : IEnumerable<IGraphType>
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(GraphQLClrOutputTypeReference<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ListGraphType<>))]
     [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(NonNullGraphType<>))]
-    static SchemaTypes()
+    static SchemaTypesBase()
     {
         // The above attributes preserve those classes when T is a reference type, but not
         // when T is a value type, which is necessary for GraphQL CLR type references.
@@ -144,7 +144,7 @@ public partial class SchemaTypes : IEnumerable<IGraphType>
     /// <summary>
     /// Initializes a new instance with an empty dictionary.
     /// </summary>
-    protected SchemaTypes() : this([])
+    protected SchemaTypesBase() : this([])
     {
     }
 
@@ -152,26 +152,9 @@ public partial class SchemaTypes : IEnumerable<IGraphType>
     /// Initializes a new instance with the specified dictionary.
     /// </summary>
     /// <param name="dictionary">The dictionary that relates type names to graph types.</param>
-    protected SchemaTypes(Dictionary<ROM, IGraphType> dictionary)
+    protected SchemaTypesBase(Dictionary<ROM, IGraphType> dictionary)
     {
         Dictionary = dictionary;
-    }
-
-    /// <summary>
-    /// Initializes a new instance by discovering and processing all types from the schema.
-    /// </summary>
-    /// <param name="schema">The schema instance being initialized.</param>
-    /// <param name="serviceProvider">DI container for resolving graph types.</param>
-    /// <param name="graphTypeMappings">Custom CLR-to-GraphQL type mappings.</param>
-    /// <param name="onBeforeInitialize">Pre-initialization hook called before each type is initialized.</param>
-    public SchemaTypes(
-        ISchema schema,
-        IServiceProvider serviceProvider,
-        IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings = null,
-        Action<IGraphType>? onBeforeInitialize = null) : this()
-    {
-        new NewSchemaTypes(this, schema, serviceProvider, graphTypeMappings, onBeforeInitialize)
-            .Initialize();
     }
 
     /// <summary>
