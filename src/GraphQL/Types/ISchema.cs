@@ -73,7 +73,7 @@ public interface ISchema : IMetadataReader, IMetadataWriter, IProvideDescription
     /// <summary>
     /// Returns a list of all the graph types utilized by this schema.
     /// </summary>
-    public SchemaTypes AllTypes { get; }
+    public SchemaTypesBase AllTypes { get; }
 
     /// <summary>
     /// A list of additional graph types manually added to the schema by a <see cref="RegisterType(Type)"/> call.
