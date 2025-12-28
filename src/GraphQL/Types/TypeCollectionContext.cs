@@ -3,7 +3,7 @@ namespace GraphQL.Types;
 /// <summary>
 /// Provides a mechanism to resolve graph type instances from their .NET types,
 /// and also to register new graph type instances with their name in the graph type lookup table.
-/// (See <see cref="SchemaTypes"/>.)
+/// (See <see cref="SchemaTypesBase"/>.)
 /// </summary>
 [Obsolete]
 internal sealed class TypeCollectionContext

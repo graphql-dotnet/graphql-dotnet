@@ -6,7 +6,7 @@ namespace GraphQL.Types;
 
 /// <summary>
 /// The DateTime scalar graph type represents a date and time in accordance with the ISO-8601 standard.
-/// By default <see cref="SchemaTypes"/> maps all <see cref="DateTime"/> .NET values to this scalar graph type.
+/// By default <see cref="SchemaTypesBase"/> maps all <see cref="DateTime"/> .NET values to this scalar graph type.
 /// </summary>
 public class DateTimeGraphType : ScalarGraphType
 {

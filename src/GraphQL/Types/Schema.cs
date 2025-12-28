@@ -390,7 +390,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         get
         {
-            foreach (var pair in SchemaTypes.BuiltInScalarMappings)
+            foreach (var pair in SchemaTypesBase.BuiltInScalarMappings)
                 yield return (pair.Key, pair.Value);
         }
     }
@@ -496,7 +496,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     }
 
     /// <summary>
-    /// Creates and returns a new instance of <see cref="SchemaTypes"/> for this schema.
+    /// Creates and returns a new instance of <see cref="SchemaTypesBase"/> for this schema.
     /// Does not apply middleware, apply schema visitors, or validate the schema.
     /// </summary>
     /// <remarks>

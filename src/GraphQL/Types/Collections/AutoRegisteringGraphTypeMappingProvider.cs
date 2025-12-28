@@ -45,7 +45,7 @@ public class AutoRegisteringGraphTypeMappingProvider : IGraphTypeMappingProvider
         if (isInputType && !_mapInputTypes && !IsForcedType(clrType) ||
             !isInputType && !_mapOutputTypes && !IsForcedType(clrType) ||
             clrType.IsEnum ||
-            SchemaTypes.BuiltInScalarMappings.ContainsKey(clrType))
+            SchemaTypesBase.BuiltInScalarMappings.ContainsKey(clrType))
             return null;
 
         if (isInputType)
