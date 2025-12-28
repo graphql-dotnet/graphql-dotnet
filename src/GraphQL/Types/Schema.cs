@@ -553,7 +553,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         var completed = new HashSet<IInputObjectGraphType>();
         var inProcess = new Stack<IInputObjectGraphType>();
-        foreach (var type in AllTypes)
+        foreach (var type in AllTypes.Dictionary.Values)
         {
             if (type is IInputObjectGraphType inputType)
                 ExamineType(inputType, completed, inProcess);
