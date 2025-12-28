@@ -185,14 +185,35 @@ namespace GraphQL.Types;
  * ================================================================================================
  */
 
-public partial class SchemaTypes
+/// <summary>
+/// Represents a list of all the graph types utilized by a schema.
+/// Also provides lookup for all schema types.
+/// </summary>
+public sealed partial class SchemaTypes : SchemaTypesBase
 {
     /// <summary>
-    /// An implementation for <see cref="SchemaTypes"/> that handles type discovery, registration, validation,
+    /// Initializes a new instance by discovering and processing all types from the schema.
+    /// </summary>
+    /// <param name="schema">The schema instance being initialized.</param>
+    /// <param name="serviceProvider">DI container for resolving graph types.</param>
+    /// <param name="graphTypeMappings">Custom CLR-to-GraphQL type mappings.</param>
+    /// <param name="onBeforeInitialize">Pre-initialization hook called before each type is initialized.</param>
+    public SchemaTypes(
+        ISchema schema,
+        IServiceProvider serviceProvider,
+        IEnumerable<IGraphTypeMappingProvider>? graphTypeMappings = null,
+        Action<IGraphType>? onBeforeInitialize = null) : base()
+    {
+        new SchemaTypesInitializer(this, schema, serviceProvider, graphTypeMappings, onBeforeInitialize)
+            .Initialize();
+    }
+
+    /// <summary>
+    /// An implementation that handles type discovery, registration, validation,
     /// and initialization for a schema. This implementation follows the comprehensive specifications for type
     /// discovery, registration, validation, and initialization.
     /// </summary>
-    internal readonly ref partial struct NewSchemaTypes
+    private readonly ref partial struct SchemaTypesInitializer
     {
         private readonly Dictionary<ROM, IGraphType> _dictionary;
         private readonly Dictionary<Type, IGraphType> _typeDictionary;
@@ -214,14 +235,14 @@ public partial class SchemaTypes
         };
 
         /// <summary>
-        /// Initializes a new instance of <see cref="NewSchemaTypes"/>.
+        /// Initializes a new instance of <see cref="SchemaTypesInitializer"/>.
         /// </summary>
         /// <param name="schemaTypes">The existing SchemaTypes instance.</param>
         /// <param name="schema">The schema instance being initialized.</param>
         /// <param name="serviceProvider">DI container for resolving graph types.</param>
         /// <param name="graphTypeMappings">Custom CLR-to-GraphQL type mappings.</param>
         /// <param name="onBeforeInitialize">Pre-initialization hook called before each type is initialized.</param>
-        public NewSchemaTypes(
+        public SchemaTypesInitializer(
             SchemaTypes schemaTypes,
             ISchema schema,
             IServiceProvider serviceProvider,

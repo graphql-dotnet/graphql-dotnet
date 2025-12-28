@@ -310,7 +310,7 @@ public class CustomData
 
 public class CustomTypesSchema : Schema
 {
-    protected override SchemaTypes CreateSchemaTypes()
+    protected override SchemaTypesBase CreateSchemaTypes()
         => new CustomSchemaTypes(this, this);
 }
 

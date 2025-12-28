@@ -51,7 +51,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
         public SchemaDirectives Directives => _schema.Directives;
 
         /// <inheritdoc/>
-        public SchemaTypes? AllTypes => _schema._allTypes;
+        public SchemaTypesBase? AllTypes => _schema._allTypes;
 
         public string AllTypesMessage => _schema._allTypes == null ? "AllTypes property too early initialization was suppressed to prevent unforeseen consequences. You may click Raw View in debugger window to evaluate all properties." : string.Empty;
 
@@ -76,7 +76,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
     private bool _disposed;
     private IServiceProvider _services;
-    private SchemaTypes? _allTypes;
+    private SchemaTypesBase? _allTypes;
     private ExceptionDispatchInfo? _initializationException;
     private readonly object _allTypesInitializationLock = new();
     private bool _creatingSchemaTypes;
@@ -255,7 +255,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     public SchemaDirectives Directives { get; }
 
     /// <inheritdoc/>
-    public SchemaTypes AllTypes
+    public SchemaTypesBase AllTypes
     {
         get
         {
@@ -502,7 +502,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     /// <remarks>
     /// This executes within a lock in <see cref="Initialize"/>.
     /// </remarks>
-    protected virtual SchemaTypes CreateSchemaTypes()
+    protected virtual SchemaTypesBase CreateSchemaTypes()
     {
         var graphTypeMappingProviders = (IEnumerable<IGraphTypeMappingProvider>?)_services.GetService(typeof(IEnumerable<IGraphTypeMappingProvider>));
         return new SchemaTypes(this, _services, graphTypeMappingProviders, OnBeforeInitializeType);
@@ -553,7 +553,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
     {
         var completed = new HashSet<IInputObjectGraphType>();
         var inProcess = new Stack<IInputObjectGraphType>();
-        foreach (var type in AllTypes.Dictionary.Values)
+        foreach (var type in AllTypes)
         {
             if (type is IInputObjectGraphType inputType)
                 ExamineType(inputType, completed, inProcess);

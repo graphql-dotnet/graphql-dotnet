@@ -3,15 +3,15 @@ using GraphQLParser;
 
 namespace GraphQL.Types;
 
-public partial class SchemaTypes
+public sealed partial class SchemaTypes
 {
-    internal readonly ref partial struct NewSchemaTypes
+    private readonly ref partial struct SchemaTypesInitializer
     {
         /// <summary>
         /// A visitor that replaces all <see cref="GraphQLTypeReference"/> instances
         /// with actual types from the schema's type dictionary.
         /// </summary>
-        internal readonly ref struct TypeReferenceReplacementVisitor
+        private readonly ref struct TypeReferenceReplacementVisitor
         {
             private readonly Dictionary<ROM, IGraphType> _typeDictionary;
             private readonly ReadOnlyDictionary<string, ScalarGraphType> _builtInTypes;
