@@ -5,7 +5,7 @@ using GraphQL.Types;
 namespace GraphQL;
 
 /// <summary>
-/// Extension methods for <see cref="SchemaTypes"/>.
+/// Extension methods for <see cref="SchemaTypesBase"/>.
 /// </summary>
 public static class SchemaTypesExtensions
 {
@@ -17,7 +17,7 @@ public static class SchemaTypesExtensions
     /// </summary>
     /// <param name="schemaTypes">The schema types collection to apply middleware to.</param>
     /// <param name="fieldMiddlewareBuilder">The middleware builder containing the middleware to apply.</param>
-    public static void ApplyMiddleware(this SchemaTypes schemaTypes, IFieldMiddlewareBuilder fieldMiddlewareBuilder)
+    public static void ApplyMiddleware(this SchemaTypesBase schemaTypes, IFieldMiddlewareBuilder fieldMiddlewareBuilder)
     {
         var transform = (fieldMiddlewareBuilder ?? throw new ArgumentNullException(nameof(fieldMiddlewareBuilder))).Build();
 
@@ -36,7 +36,7 @@ public static class SchemaTypesExtensions
     /// </summary>
     /// <param name="schemaTypes">The schema types collection to apply middleware to.</param>
     /// <param name="transform">The middleware transform delegate to apply.</param>
-    public static void ApplyMiddleware(this SchemaTypes schemaTypes, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
+    public static void ApplyMiddleware(this SchemaTypesBase schemaTypes, Func<FieldMiddlewareDelegate, FieldMiddlewareDelegate> transform)
     {
         if (schemaTypes == null)
             throw new ArgumentNullException(nameof(schemaTypes));

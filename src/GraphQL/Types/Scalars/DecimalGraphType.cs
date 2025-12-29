@@ -6,7 +6,7 @@ namespace GraphQL.Types;
 
 /// <summary>
 /// The Decimal scalar graph type represents a decimal value.
-/// By default <see cref="SchemaTypes"/> maps all <see cref="decimal"/> .NET values to this scalar graph type.
+/// By default <see cref="SchemaTypesBase"/> maps all <see cref="decimal"/> .NET values to this scalar graph type.
 /// </summary>
 public class DecimalGraphType : ScalarGraphType
 {

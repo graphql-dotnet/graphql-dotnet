@@ -879,8 +879,8 @@ namespace GraphQL
     }
     public static class SchemaTypesExtensions
     {
-        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypes schemaTypes, GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
-        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypes schemaTypes, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, GraphQL.Instrumentation.IFieldMiddlewareBuilder fieldMiddlewareBuilder) { }
+        public static void ApplyMiddleware(this GraphQL.Types.SchemaTypesBase schemaTypes, System.Func<GraphQL.Instrumentation.FieldMiddlewareDelegate, GraphQL.Instrumentation.FieldMiddlewareDelegate> transform) { }
     }
     public static class StringExtensions
     {
@@ -2676,7 +2676,7 @@ namespace GraphQL.Types
     {
         System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
-        GraphQL.Types.SchemaTypes AllTypes { get; }
+        GraphQL.Types.SchemaTypesBase AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
@@ -2772,7 +2772,7 @@ namespace GraphQL.Types
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
     }
-    public class LegacySchemaTypes : GraphQL.Types.SchemaTypes
+    public class LegacySchemaTypes : GraphQL.Types.SchemaTypesBase
     {
         protected LegacySchemaTypes() { }
         public LegacySchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider) { }
@@ -2928,7 +2928,7 @@ namespace GraphQL.Types
         public Schema(System.IServiceProvider services, bool runConfigurations = true) { }
         public System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType> AdditionalTypeInstances { get; }
         public System.Collections.Generic.IEnumerable<System.Type> AdditionalTypes { get; }
-        public GraphQL.Types.SchemaTypes AllTypes { get; }
+        public GraphQL.Types.SchemaTypesBase AllTypes { get; }
         [System.Runtime.CompilerServices.TupleElementNames(new string[] {
                 "clrType",
                 "graphType"})]
@@ -2953,7 +2953,7 @@ namespace GraphQL.Types
         public GraphQL.Types.FieldType TypeMetaFieldType { get; }
         public GraphQL.Types.FieldType TypeNameMetaFieldType { get; }
         protected virtual void CoerceInputTypeDefaultValues() { }
-        protected virtual GraphQL.Types.SchemaTypes CreateSchemaTypes() { }
+        protected virtual GraphQL.Types.SchemaTypesBase CreateSchemaTypes() { }
         public void Dispose() { }
         protected virtual void Dispose(bool disposing) { }
         public void Initialize() { }
@@ -2981,12 +2981,12 @@ namespace GraphQL.Types
         public void Register(GraphQL.Types.Directive directive) { }
         public void Register(params GraphQL.Types.Directive[] directives) { }
     }
-    public abstract class SchemaTypes : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
+    public abstract class SchemaTypesBase : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<string, GraphQL.Types.ScalarGraphType> BuiltInScalarsByName;
-        protected SchemaTypes() { }
-        protected SchemaTypes(System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> dictionary) { }
+        protected SchemaTypesBase() { }
+        protected SchemaTypesBase(System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> dictionary) { }
         public int Count { get; }
         protected System.Collections.Generic.Dictionary<GraphQLParser.ROM, GraphQL.Types.IGraphType> Dictionary { get; set; }
         public GraphQL.Types.IGraphType? this[GraphQLParser.ROM typeName] { get; }
