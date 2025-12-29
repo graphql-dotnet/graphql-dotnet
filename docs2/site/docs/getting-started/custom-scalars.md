@@ -708,16 +708,18 @@ with your registered replacement built-in type. For example, consider this code:
 ```csharp
 Field<StringGraphType>("sample")
   .Argument<BooleanGraphType>("argNewBehavior") // will be replaced with MyBooleanGraphType
-  .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }) // will retain default behavior
+  .Arguments(new QueryArgument(new BooleanGraphType()) { Name = "argOldBehavior" }) // will throw an exception during initialization
   .Resolve(...);
 ```
 
 This is by design. However, you can call the `ReplaceScalar` extension method after the schema is
-built, which will walk through all the graph types configured on the schema and replace any remaining
+built, which will walk through all the graph types configured on the schema and replace all
 references of the "Boolean" scalar graph type with references to your replacement scalar graph type.
 The scalar to be replaced is matched based on the name of the scalar.
 
 ```csharp
+// use BooleanGraphType to build the schema
 var schema = Schema.For(...);
+// replace all instances with a new instance
 schema.ReplaceScalar(new MyBooleanGraphType());
 ```

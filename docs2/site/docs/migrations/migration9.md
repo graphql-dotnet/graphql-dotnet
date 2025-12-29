@@ -165,11 +165,21 @@ The `ResolveFieldContextAccessor` property has been added to the `ISchema` inter
 
 The `ApplyMiddleware` method has been moved from the `SchemaTypes` class to the `SchemaTypesExtensions` static class.
 
-### 8. `SchemaTypes` is now `SchemaTypesBase`, an abstract base class
+### 8. Schema initialization logic rewritten
 
-The `SchemaTypes` class has been refactored into an abstract base class `SchemaTypesBase` with a new `LegacySchemaTypes` derived class that contains the concrete implementation. This change enables future extensibility while maintaining backward compatibility.
+The schema initialization logic has been completely rewritten to improve type reference handling. The updated `SchemaTypes` class provides stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
 
-Typically no changes are required unless you override `Schema.CreateSchemaTypes()` and/or use your own `SchemaTypes` implementation. In those cases, you should update your code to use or derive from `LegacySchemaTypes` instead of `SchemaTypes`.
+Most users require no changes. Note that the order in which types are added to the schema has changed, which may affect introspection query results if you rely on a specific type ordering. Additionally, `GlobalSwitches.TrackGraphTypeInitialization` has been removed, but exception messages have been improved to provide better diagnostics.
+
+If you have a custom `SchemaTypes` implementation or need the legacy behavior, override `CreateSchemaTypes()` in your schema:
+
+```csharp
+protected override SchemaTypesBase CreateSchemaTypes()
+{
+    var graphTypeMappingProviders = this.GetService<IEnumerable<IGraphTypeMappingProvider>>();
+    return new LegacySchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
+}
+```
 
 ### 9. `ISchema.AllTypes` and `Schema.AllTypes` return type changed
 

@@ -10,7 +10,7 @@ namespace GraphQL.Types;
 /// An abstract base class that represents a list of all the graph types utilized by a schema.
 /// Also provides lookup for all schema types.
 /// </summary>
-public abstract class SchemaTypesBase : IEnumerable<IGraphType>
+public abstract class SchemaTypesBase : IReadOnlyCollection<IGraphType>
 {
     /// <summary>
     /// Returns a dictionary of default CLR type to graph type mappings for a set of built-in (primitive) types.

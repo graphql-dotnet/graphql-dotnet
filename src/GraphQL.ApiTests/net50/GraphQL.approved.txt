@@ -298,6 +298,8 @@ namespace GraphQL
         public static bool EnableReflectionCaching { get; set; }
         public static System.Collections.Generic.ICollection<GraphQL.GraphQLAttribute> GlobalAttributes { get; }
         public static bool InferFieldNullabilityFromNRTAnnotations { get; set; }
+        [System.Obsolete("This switch is only applicable to LegacySchemaTypes, which is not used by default" +
+            ".")]
         public static bool TrackGraphTypeInitialization { get; set; }
         public static bool UseDeclaringTypeNames { get; set; }
     }
@@ -2765,6 +2767,8 @@ namespace GraphQL.Types
         public bool Contains(System.Type type) { }
         public System.Collections.Generic.IEnumerator<System.Type> GetEnumerator() { }
     }
+    [System.Obsolete("LegacySchemaTypes is obsolete and will be removed in a future version. Please use" +
+        " NewSchemaTypes instead.")]
     public class LegacySchemaTypes : GraphQL.Types.SchemaTypesBase
     {
         protected LegacySchemaTypes() { }
@@ -2974,7 +2978,11 @@ namespace GraphQL.Types
         public void Register(GraphQL.Types.Directive directive) { }
         public void Register(params GraphQL.Types.Directive[] directives) { }
     }
-    public abstract class SchemaTypesBase : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
+    public sealed class SchemaTypes : GraphQL.Types.SchemaTypesBase
+    {
+        public SchemaTypes(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider, System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphTypeMappingProvider>? graphTypeMappings = null, System.Action<GraphQL.Types.IGraphType>? onBeforeInitialize = null) { }
+    }
+    public abstract class SchemaTypesBase : System.Collections.Generic.IEnumerable<GraphQL.Types.IGraphType>, System.Collections.Generic.IReadOnlyCollection<GraphQL.Types.IGraphType>, System.Collections.IEnumerable
     {
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<System.Type, GraphQL.Types.ScalarGraphType> BuiltInScalars;
         protected static readonly System.Collections.ObjectModel.ReadOnlyDictionary<string, GraphQL.Types.ScalarGraphType> BuiltInScalarsByName;

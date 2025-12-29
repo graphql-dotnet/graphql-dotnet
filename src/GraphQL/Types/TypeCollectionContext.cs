@@ -5,6 +5,7 @@ namespace GraphQL.Types;
 /// and also to register new graph type instances with their name in the graph type lookup table.
 /// (See <see cref="SchemaTypesBase"/>.)
 /// </summary>
+[Obsolete]
 internal sealed class TypeCollectionContext
 {
     /// <summary>
@@ -62,6 +63,7 @@ internal sealed class TypeCollectionContext
     }
 }
 
+[Obsolete]
 internal readonly struct TypeCollectionContextInitializationTrace : IDisposable
 {
     private readonly TypeCollectionContext? _context;
