@@ -484,7 +484,7 @@ services
 
 - Creates a new DI scope for each subscription event
 
-- Ensures context.RequestServices is valid during resolver execution
+- Ensures `context.RequestServices` is valid during resolver execution
 
 - Enables safe resolution of scoped services
 
