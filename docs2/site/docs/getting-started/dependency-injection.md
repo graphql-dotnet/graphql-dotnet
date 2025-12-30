@@ -412,15 +412,14 @@ public class StarWarsQuery : ObjectGraphType
 
 1. Add `Defer<T>` to be injected by the dependency injection container. This is a factory which upon calling `Defer.Value` will resolve the requested service using any currently registered scope provider (e.g. `AspNetCoreHttpScopeProvider`)
 2. Use the `Defer<T>` factory class to resolve the requested dependency using any currently registered scope provider. In our case it will attempt to use the `IHttpContextAccessor.HttpContext.RequestServices` which is the ASP.NET Core Scoped `IServiceProvider` in order to resolve the dependency.
-# Scoped Services in GraphQL Subscriptions
 
-This document explains how **dependency injection scopes** behave in GraphQL.NET **subscriptions**, why resolving scoped services may fail by default, and how to correctly configure GraphQL.NET to support scoped services in subscription resolvers.
+## Scoped Services in GraphQL Subscriptions
 
----
+Dependency injection scopes behave differently in GraphQL.NET **subscriptions** than in queries and mutations, which can cause scoped services to fail to resolve by default; this section shows how to configure GraphQL.NET to support scoped services in subscription resolvers.
 
 ## Overview
 
-GraphQL.NET integrates with ASP.NET Core dependency injection.  
+GraphQL.NET integrates with ASP.NET Core dependency injection.
 For **queries** and **mutations**, each execution runs within a valid request scope, allowing scoped services (such as `DbContext`) to be resolved safely.
 
 **Subscriptions**, however, are executed differently and require special configuration when scoped services are involved.
@@ -480,7 +479,9 @@ services
     .AddGraphQL()
     .AddScopedSubscriptionExecutionStrategy();
 ```
+
 ### What This Does
+
 - Creates a new DI scope for each subscription event
 
 - Ensures context.RequestServices is valid during resolver execution
@@ -488,6 +489,7 @@ services
 - Enables safe resolution of scoped services
 
 - Aligns subscription behavior with queries and mutations
+
 ### Subscription Resolver
 
 ```csharp
@@ -502,10 +504,10 @@ Field<StringGraphType>(
 ```
 ### Behavior Comparison
 
-| Execution Strategy | Result |
-|-------------------|--------|
-| Default strategy  | ❌ Scoped services may fail |
-| Scoped strategy   | ✅ Scoped services resolve correctly |
+| Execution Strategy | Result
+|-------------------|--------
+| Default strategy  | ❌ Scoped services may fail
+| Scoped strategy   | ✅ Scoped services resolve correctly
 
 ## When to Use Scoped Subscription Execution
 
