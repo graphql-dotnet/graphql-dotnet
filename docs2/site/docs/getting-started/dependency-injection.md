@@ -424,8 +424,6 @@ For **queries** and **mutations**, each execution runs within a valid request sc
 
 **Subscriptions**, however, are executed differently and require special configuration when scoped services are involved.
 
----
-
 ## Subscription Execution Lifecycle
 
 A GraphQL subscription has two distinct execution phases:
@@ -440,8 +438,6 @@ A GraphQL subscription has two distinct execution phases:
 
 Because event execution may occur long after the initial request has completed, the original dependency injection scope may already be disposed.
 
----
-
 ## Why `RequestServices` May Be Disposed
 
 By default, GraphQL.NET does **not** create a new dependency injection scope for each subscription event.
@@ -454,8 +450,6 @@ As a result:
 
 This behavior commonly occurs when subscription resolvers depend on scoped services such as repositories or database contexts.
 
----
-
 ## Related Issue
 
 This behavior was reported and discussed in:
@@ -463,8 +457,6 @@ This behavior was reported and discussed in:
 - https://github.com/graphql-dotnet/graphql-dotnet/issues/3812
 
 The root cause was identified as missing DI scope creation during subscription event execution.
-
----
 
 ## Solution: Scoped Subscription Execution Strategy
 
