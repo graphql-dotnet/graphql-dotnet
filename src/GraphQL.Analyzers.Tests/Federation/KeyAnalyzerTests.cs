@@ -123,7 +123,6 @@ public class KeyAnalyzerTests
     [InlineData("[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]")]
     [InlineData("new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
     [InlineData("new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
-
     public async Task ValidKey_SingleKey_NoDiagnostics(string keyExpression)
     {
         string source =
