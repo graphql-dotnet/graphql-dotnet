@@ -256,9 +256,11 @@ public class KeyAnalyzerTests
     [InlineData(35, "new[] { $\"id {{|#0:nameof(User.AnotherField)|}}\" }", "AnotherField")]
     // mixed interpolation cases
     [InlineData(36, "$\"{{|#0:ConstFieldName|}} {{|#1:nameof(User.AnotherField)|}}\"", "nonExistentField", "AnotherField")]
-    [InlineData(36, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField|} {{|#2:nameof(User.AnotherField)|}}\"", "nonExistentField", "whateverField", "AnotherField")]
-    [InlineData(37, "[$\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\"]", "nonExistentField", "AnotherField")]
-    [InlineData(38, "new[] { $\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\" }", "nonExistentField", "AnotherField")]
+    [InlineData(37, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField|} {{|#2:nameof(User.AnotherField)|}}\"", "nonExistentField", "whateverField", "AnotherField")]
+    [InlineData(38, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField1|} {|#2:whateverField2|} {{|#3:nameof(User.AnotherField)|}}\"", "nonExistentField", "whateverField1", "whateverField2", "AnotherField")]
+    [InlineData(39, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField1|} {|#2:whateverField2|} {{|#3:nameof(User.AnotherField)|}} {|#4:whateverField3|}\"", "nonExistentField", "whateverField1", "whateverField2", "AnotherField", "whateverField3")]
+    [InlineData(40, "[$\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\"]", "nonExistentField", "AnotherField")]
+    [InlineData(41, "new[] { $\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\" }", "nonExistentField", "AnotherField")]
     public async Task InvalidKey_SingleFieldDoesNotExist_ReportsError(int idx, string keyFields, params string[] missingFields)
     {
         _ = idx;

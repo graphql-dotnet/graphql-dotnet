@@ -156,8 +156,8 @@ public sealed class FederationKey
                     case InterpolationSyntax interpolation when TryGetFieldsString(interpolation.Expression, semanticModel, out var interpolatedValue):
                         parts.Add(interpolatedValue);
                         break;
-                    case InterpolationSyntax interpolation:
-                        return false; // Unable to resolve interpolation
+                    default:
+                        return false;
                 }
             }
 
@@ -166,29 +166,38 @@ public sealed class FederationKey
         }
 
         // Handle string array argument (joined with spaces)
-        if (fieldsArg is ImplicitArrayCreationExpressionSyntax or ArrayCreationExpressionSyntax or CollectionExpressionSyntax)
+        var arrayElements = fieldsArg switch
         {
-            var arrayElements = GetArrayElements(fieldsArg);
-            if (arrayElements == null || arrayElements.Length == 0)
-            {
-                return false;
-            }
+            ImplicitArrayCreationExpressionSyntax implicitArray =>
+                implicitArray.Initializer.Expressions.ToArray(),
+            ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation =>
+                arrayCreation.Initializer.Expressions.ToArray(),
+            CollectionExpressionSyntax collectionExpression =>
+                collectionExpression.Elements
+                    .OfType<ExpressionElementSyntax>()
+                    .Select(e => e.Expression)
+                    .ToArray(),
+            _ => null
+        };
 
-            var stringValues = new List<string>(arrayElements.Length);
+        if (arrayElements == null || arrayElements.Length == 0)
+        {
+            return false;
+        }
+        var stringValues = new List<string>(arrayElements.Length);
 
-            foreach (var element in arrayElements)
+        foreach (var element in arrayElements)
+        {
+            if (TryGetFieldsString(element, semanticModel, out var elementString))
             {
-                if (TryGetFieldsString(element, semanticModel, out var elementString))
-                {
-                    stringValues.Add(elementString);
-                }
+                stringValues.Add(elementString);
             }
+        }
 
-            if (stringValues.Count == arrayElements.Length)
-            {
-                fieldsString = string.Join(" ", stringValues);
-                return true;
-            }
+        if (stringValues.Count == arrayElements.Length)
+        {
+            fieldsString = string.Join(" ", stringValues);
+            return true;
         }
 
         return false;
@@ -242,7 +251,7 @@ public sealed class FederationKey
         return GetFieldLocation(fieldsArg, fieldName) ?? Location;
     }
 
-    public Location? GetFieldLocation(ExpressionSyntax fieldsArg, string fieldName)
+    private Location? GetFieldLocation(ExpressionSyntax fieldsArg, string fieldName)
     {
         switch (fieldsArg)
         {
@@ -258,7 +267,7 @@ public sealed class FederationKey
             // Handle interpolated strings
             case InterpolatedStringExpressionSyntax interpolatedString when TryHandleInterpolatedString(interpolatedString, out var location):
                 return location;
-            // Handle collection expression syntax: ["id", "name"] or [ConstFieldName]
+            // Handle collection expression syntax: ["id", "name"]
             case CollectionExpressionSyntax collectionExpression:
             {
                 var expressions = collectionExpression.Elements.OfType<ExpressionElementSyntax>().Select(e => e.Expression);
@@ -267,7 +276,7 @@ public sealed class FederationKey
 
                 break;
             }
-            // Handle implicit array creation: new[] { "id", "name" } or new[] { "id", ConstFieldName }
+            // Handle implicit array creation: new[] { "id", "name" }
             case ImplicitArrayCreationExpressionSyntax implicitArray:
             {
                 if (TryHandleCollection(implicitArray.Initializer.Expressions, out var location))
@@ -275,7 +284,7 @@ public sealed class FederationKey
 
                 break;
             }
-            // Handle explicit array creation: new string[] { "id", "name" } or new string[] { "id", ConstFieldName }
+            // Handle explicit array creation: new string[] { "id", "name" }
             case ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation:
             {
                 if (TryHandleCollection(arrayCreation.Initializer.Expressions, out var location))
@@ -315,8 +324,7 @@ public sealed class FederationKey
                 // Calculate position within the string literal (accounting for opening quote)
                 var startPosition = token.SpanStart + 1 + fieldIndex; // +1 for opening quote
                 var span = new Microsoft.CodeAnalysis.Text.TextSpan(startPosition, fieldName.Length);
-                var syntaxTree = Syntax.SyntaxTree;
-                location = Location.Create(syntaxTree, span);
+                location = Location.Create(Syntax.SyntaxTree, span);
                 return true;
             }
 
@@ -352,16 +360,18 @@ public sealed class FederationKey
                     case InterpolatedStringTextSyntax textSyntax when string.Equals(textSyntax.TextToken.ValueText, fieldName, StringComparison.OrdinalIgnoreCase):
                         location = textSyntax.GetLocation();
                         return true;
-                    // Check for trimmed text match. Required when a literal between string interpolations: $"{nameof(A) B {C}}"
-                    case InterpolatedStringTextSyntax textSyntax when string.Equals(textSyntax.TextToken.ValueText.Trim(), fieldName, StringComparison.OrdinalIgnoreCase):
-                        var index = textSyntax.TextToken.ValueText.IndexOf(fieldName, StringComparison.OrdinalIgnoreCase);
-
-                        // Calculate position within the string literal (accounting for whitespaces)
-                        var startPosition = textSyntax.TextToken.SpanStart + index; // +1 for opening quote
-                        var span = new Microsoft.CodeAnalysis.Text.TextSpan(startPosition, fieldName.Length);
-                        var syntaxTree = Syntax.SyntaxTree;
-                        location = Location.Create(syntaxTree, span);
-                        return true;
+                    // Check for trimmed text match. Required when a literal located between string interpolations: $"{nameof(A)} B {C}}"
+                    case InterpolatedStringTextSyntax textSyntax:
+                        var fieldIndex = FindFieldInString(textSyntax.TextToken.ValueText, fieldName);
+                        if (fieldIndex >= 0)
+                        {
+                            // Calculate position within the string
+                            var startPosition = textSyntax.TextToken.SpanStart + fieldIndex;
+                            var span = new Microsoft.CodeAnalysis.Text.TextSpan(startPosition, fieldName.Length);
+                            location = Location.Create(Syntax.SyntaxTree, span);
+                            return true;
+                        }
+                        break;
                     case InterpolationSyntax interpolation:
                         location = GetFieldLocation(interpolation.Expression, fieldName);
                         if (location != null)
@@ -396,7 +406,6 @@ public sealed class FederationKey
             return 0;
 
         // Split by spaces to find individual field names
-        // TODO: make allocationless
         var fields = literalValue.Split([' '], StringSplitOptions.RemoveEmptyEntries);
         int currentPosition = 0;
 
@@ -422,7 +431,7 @@ public sealed class FederationKey
             return namedArg.Expression;
 
         // Check for positional arguments based on method signature
-        if (ModelExtensions.GetSymbolInfo(semanticModel, invocation).Symbol is not IMethodSymbol methodSymbol)
+        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
             return null;
 
         var paramIndex = -1;
@@ -437,25 +446,6 @@ public sealed class FederationKey
 
         if (paramIndex >= 0 && paramIndex < invocation.ArgumentList.Arguments.Count)
             return invocation.ArgumentList.Arguments[paramIndex].Expression;
-
-        return null;
-    }
-
-    private static ExpressionSyntax[]? GetArrayElements(ExpressionSyntax expression)
-    {
-        if (expression is ImplicitArrayCreationExpressionSyntax implicitArray)
-            return implicitArray.Initializer.Expressions.ToArray();
-
-        if (expression is ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation)
-            return arrayCreation.Initializer.Expressions.ToArray();
-
-        if (expression is CollectionExpressionSyntax collectionExpression)
-        {
-            return collectionExpression.Elements
-                .OfType<ExpressionElementSyntax>()
-                .Select(e => e.Expression)
-                .ToArray();
-        }
 
         return null;
     }
