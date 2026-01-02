@@ -135,7 +135,7 @@ public sealed class GraphQLGraphType
         var baseTypeSyntax = Syntax.BaseList?.Types.FirstOrDefault();
         Location? sourceTypeLocation = null;
 
-        if (baseTypeSyntax?.Type is GenericNameSyntax genericName && genericName.TypeArgumentList.Arguments.Count > 0)
+        if (baseTypeSyntax?.Type is GenericNameSyntax { TypeArgumentList.Arguments.Count: > 0 } genericName)
         {
             // Get the location of the first type argument (the source type)
             sourceTypeLocation = genericName.TypeArgumentList.Arguments[0].GetLocation();
@@ -160,7 +160,7 @@ public sealed class GraphQLGraphType
         return null;
     }
 
-    private IReadOnlyList<GraphQLFieldInvocation> GetFields()
+    private List<GraphQLFieldInvocation> GetFields()
     {
         var fields = new List<GraphQLFieldInvocation>();
 
@@ -209,7 +209,7 @@ public sealed class GraphQLGraphType
         return GetField(name) != null;
     }
 
-    private IReadOnlyList<FederationKey>? GetFederationKeys()
+    private List<FederationKey>? GetFederationKeys()
     {
         List<FederationKey>? keys = null;
 

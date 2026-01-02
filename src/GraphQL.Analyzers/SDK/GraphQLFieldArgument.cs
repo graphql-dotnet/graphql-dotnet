@@ -266,32 +266,6 @@ public sealed class GraphQLFieldArgument
 
     private ArgumentSyntax? GetArgument(string argumentName)
     {
-        if (SemanticModel.GetSymbolInfo(Syntax).Symbol is not IMethodSymbol methodSymbol)
-        {
-            return null;
-        }
-
-        // Check named arguments
-        foreach (var arg in Syntax.ArgumentList.Arguments)
-        {
-            if (arg.NameColon?.Name.Identifier.Text == argumentName)
-            {
-                return arg;
-            }
-        }
-
-        // Check positional arguments
-        var paramIndex = Array.FindIndex(methodSymbol.Parameters.ToArray(), p => p.Name == argumentName);
-        if (paramIndex >= 0 && paramIndex < Syntax.ArgumentList.Arguments.Count)
-        {
-            var arg = Syntax.ArgumentList.Arguments[paramIndex];
-            // Make sure it's not a named argument for a different parameter
-            if (arg.NameColon == null)
-            {
-                return arg;
-            }
-        }
-
-        return null;
+        return Syntax.GetMethodArgument(argumentName, SemanticModel);
     }
 }
