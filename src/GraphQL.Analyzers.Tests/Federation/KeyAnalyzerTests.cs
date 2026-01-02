@@ -261,7 +261,7 @@ public class KeyAnalyzerTests
     [InlineData(39, "$\"{{|#0:ConstFieldName|}} {|#1:whateverField1|} {|#2:whateverField2|} {{|#3:nameof(User.AnotherField)|}} {|#4:whateverField3|}\"", "nonExistentField", "whateverField1", "whateverField2", "AnotherField", "whateverField3")]
     [InlineData(40, "[$\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\"]", "nonExistentField", "AnotherField")]
     [InlineData(41, "new[] { $\"{{|#0:ConstFieldName|}}\", $\"{{|#1:nameof(User.AnotherField)|}}\" }", "nonExistentField", "AnotherField")]
-    public async Task InvalidKey_SingleFieldDoesNotExist_ReportsError(int idx, string keyFields, params string[] missingFields)
+    public async Task InvalidKey_FieldDoesNotExist_ReportsError(int idx, string keyFields, params string[] missingFields)
     {
         _ = idx;
         string source =
@@ -279,8 +279,8 @@ public class KeyAnalyzerTests
                 {
                     this.Key({{keyFields}});
 
-                Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
-                Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
+                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
+                    Field(x => x.Name, type: typeof(NonNullGraphType<StringGraphType>));
                 }
             }
 
@@ -304,41 +304,6 @@ public class KeyAnalyzerTests
             .ToArray();
 
         await VerifyCS.VerifyAnalyzerAsync(source, expectedDiagnostics);
-    }
-
-    [Fact]
-    public async Task InvalidKey_MultipleFieldsDoNotExist_ReportsMultipleErrors()
-    {
-        const string source =
-            """
-            using GraphQL.Federation;
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class UserGraphType : ObjectGraphType<User>
-            {
-                public UserGraphType()
-                {
-                    this.Key("{|#0:nonExistent1|} {|#1:nonExistent2|}");
-
-                    Field(x => x.Id, type: typeof(NonNullGraphType<IdGraphType>));
-                }
-            }
-
-            public class User
-            {
-                public int Id { get; set; }
-            }
-            """;
-
-        var expected1 = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldDoesNotExist)
-            .WithLocation(0)
-            .WithArguments("nonExistent1", "UserGraphType");
-        var expected2 = VerifyCS.Diagnostic(KeyAnalyzer.KeyFieldDoesNotExist)
-            .WithLocation(1)
-            .WithArguments("nonExistent2", "UserGraphType");
-        await VerifyCS.VerifyAnalyzerAsync(source, expected1, expected2);
     }
 
     [Fact]
