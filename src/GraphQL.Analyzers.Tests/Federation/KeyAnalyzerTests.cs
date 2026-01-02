@@ -97,34 +97,36 @@ public class KeyAnalyzerTests
 
     [Theory]
     // literals
-    [InlineData("\"id\"")]
-    [InlineData("\"id name\"")]
-    [InlineData("[\"id\", \"name\"]")]
-    [InlineData("new[] { \"id\", \"name\" }")]
-    [InlineData("new string[] { \"id\", \"name\" }")]
+    [InlineData(10, "\"id\"")]
+    [InlineData(11, "\"id name\"")]
+    [InlineData(12, "[\"id\", \"name\"]")]
+    [InlineData(13, "new[] { \"id\", \"name\" }")]
+    [InlineData(14, "new string[] { \"id\", \"name\" }")]
     // const
-    [InlineData("ConstFieldName")]
-    [InlineData("Constants.ConstFieldName")]
-    [InlineData("[ConstFieldName, \"name\"]")]
-    [InlineData("new[] { ConstFieldName, \"name\" }")]
-    [InlineData("new string[] { ConstFieldName, \"name\" }")]
+    [InlineData(15, "ConstFieldName")]
+    [InlineData(16, "Constants.ConstFieldName")]
+    [InlineData(17, "[ConstFieldName, \"name\"]")]
+    [InlineData(18, "new[] { ConstFieldName, \"name\" }")]
+    [InlineData(19, "new string[] { ConstFieldName, \"name\" }")]
     // nameof
-    [InlineData("nameof(User.Id)")]
-    [InlineData("new[] { nameof(User.Id), \"name\" }")]
-    [InlineData("new string[] { nameof(User.Id), \"name\" }")]
+    [InlineData(20, "nameof(User.Id)")]
+    [InlineData(21, "new[] { nameof(User.Id), \"name\" }")]
+    [InlineData(22, "new string[] { nameof(User.Id), \"name\" }")]
     // interpolation
-    [InlineData("$\"{nameof(User.Id)}\"")]
-    [InlineData("$\"{nameof(User.Id)} name\"")]
-    [InlineData("$\"{ConstFieldName} name\"")]
-    [InlineData("$\"{ConstFieldName} name {nameof(User.Organization)}\"")]
-    [InlineData("[$\"{ConstFieldName} organization\", \"name\"]")]
-    [InlineData("new[] { $\"{ConstFieldName} organization\", \"name\" }")]
-    [InlineData("new string[] { $\"{ConstFieldName} organization\", \"name\" }")]
-    [InlineData("[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]")]
-    [InlineData("new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
-    [InlineData("new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
-    public async Task ValidKey_SingleKey_NoDiagnostics(string keyExpression)
+    [InlineData(23, "$\"{nameof(User.Id)}\"")]
+    [InlineData(24, "$\"{nameof(User.Id)} name\"")]
+    [InlineData(25, "$\"{ConstFieldName} name\"")]
+    [InlineData(26, "$\"{ConstFieldName} name {nameof(User.Organization)}\"")]
+    [InlineData(27, "[$\"{ConstFieldName} organization\", \"name\"]")]
+    [InlineData(28, "new[] { $\"{ConstFieldName} organization\", \"name\" }")]
+    [InlineData(29, "new string[] { $\"{ConstFieldName} organization\", \"name\" }")]
+    [InlineData(30, "[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]")]
+    [InlineData(31, "new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
+    [InlineData(32, "new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }")]
+    public async Task ValidKey_SingleKey_NoDiagnostics(int idx, string keyExpression)
     {
+        _ = idx;
+
         string source =
             $$"""
             using GraphQL.Federation;
