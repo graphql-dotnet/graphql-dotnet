@@ -42,22 +42,22 @@ public sealed class GraphQLFieldInvocation
     public GraphQLObjectProperty<string>? Name => _name.Value;
 
     /// <summary>
-    /// Gets the graph type of the field with its location and type information, if it can be determined.
+    /// Gets the graph type of the field if it can be determined.
     /// </summary>
     public GraphQLFieldGraphType? GraphType => _graphType.Value;
 
     /// <summary>
-    /// Gets the description of the field with its location, if specified.
+    /// Gets the description of the field if specified.
     /// </summary>
     public GraphQLObjectProperty<string>? Description => _description.Value;
 
     /// <summary>
-    /// Gets the deprecation reason of the field with its location, if specified.
+    /// Gets the deprecation reason of the field if specified.
     /// </summary>
     public GraphQLObjectProperty<string>? DeprecationReason => _deprecationReason.Value;
 
     /// <summary>
-    /// Gets the resolver expression (lambda or delegate) with its location, if specified.
+    /// Gets the resolver expression (lambda or delegate) if specified.
     /// </summary>
     public GraphQLObjectProperty<ExpressionSyntax>? ResolverExpression => _resolverExpression.Value;
 
@@ -224,7 +224,7 @@ public sealed class GraphQLFieldInvocation
         return null;
     }
 
-    private IReadOnlyList<GraphQLFieldArgument> GetArguments()
+    private List<GraphQLFieldArgument> GetArguments()
     {
         var result = new List<GraphQLFieldArgument>();
 
@@ -265,33 +265,7 @@ public sealed class GraphQLFieldInvocation
 
     private ArgumentSyntax? GetArgument(string argumentName)
     {
-        if (SemanticModel.GetSymbolInfo(Syntax).Symbol is not IMethodSymbol methodSymbol)
-        {
-            return null;
-        }
-
-        // Check named arguments
-        foreach (var arg in Syntax.ArgumentList.Arguments)
-        {
-            if (arg.NameColon?.Name.Identifier.Text == argumentName)
-            {
-                return arg;
-            }
-        }
-
-        // Check positional arguments
-        var paramIndex = Array.FindIndex(methodSymbol.Parameters.ToArray(), p => p.Name == argumentName);
-        if (paramIndex >= 0 && paramIndex < Syntax.ArgumentList.Arguments.Count)
-        {
-            var arg = Syntax.ArgumentList.Arguments[paramIndex];
-            // Make sure it's not a named argument for a different parameter
-            if (arg.NameColon == null)
-            {
-                return arg;
-            }
-        }
-
-        return null;
+        return Syntax.GetMethodArgument(argumentName, SemanticModel);
     }
 
     private InvocationExpressionSyntax? FindChainedMethod(string methodName)
