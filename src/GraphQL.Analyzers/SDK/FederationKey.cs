@@ -421,35 +421,6 @@ public sealed class FederationKey
         return -1;
     }
 
-    private static ExpressionSyntax? GetArgumentValue(InvocationExpressionSyntax invocation, SemanticModel semanticModel, string argumentName)
-    {
-        // Check for named arguments
-        var namedArg = invocation.ArgumentList.Arguments
-            .FirstOrDefault(a => a.NameColon?.Name.Identifier.Text == argumentName);
-
-        if (namedArg != null)
-            return namedArg.Expression;
-
-        // Check for positional arguments based on method signature
-        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
-            return null;
-
-        var paramIndex = -1;
-        for (int i = 0; i < methodSymbol.Parameters.Length; i++)
-        {
-            if (methodSymbol.Parameters[i].Name == argumentName)
-            {
-                paramIndex = i;
-                break;
-            }
-        }
-
-        if (paramIndex >= 0 && paramIndex < invocation.ArgumentList.Arguments.Count)
-            return invocation.ArgumentList.Arguments[paramIndex].Expression;
-
-        return null;
-    }
-
     /// <summary>
     /// Gets the field names referenced in this key.
     /// For simple keys like "id" or "id name", returns the field names directly.
@@ -467,11 +438,8 @@ public sealed class FederationKey
         }
     }
 
-    /// <summary>
-    /// Checks if this key includes the specified field name at the top level.
-    /// </summary>
-    public bool IncludesField(string fieldName)
+    private static ExpressionSyntax? GetArgumentValue(InvocationExpressionSyntax invocation, SemanticModel semanticModel, string argumentName)
     {
-        return GetFieldNames().Any(name => string.Equals(name, fieldName, StringComparison.Ordinal));
+        return invocation.GetMethodArgument(argumentName, semanticModel)?.Expression;
     }
 }
