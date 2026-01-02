@@ -26,6 +26,7 @@ public static class Constants
         public const string DeprecationReason = "deprecationReason";
         public const string Description = "description";
         public const string Expression = "expression";
+        public const string Fields = "fields";
         public const string Name = "name";
         public const string Nullable = "nullable";
         public const string Resolve = "resolve";
@@ -85,6 +86,11 @@ public static class Constants
         public const string InputObjectGraphType = "GraphQL.Types.InputObjectGraphType`1";
         public const string NotAGraphTypeAttribute = "NotAGraphTypeAttribute";
         public const string RequireParameterlessConstructorAttribute = "RequireParameterlessConstructorAttribute";
+    }
+
+    public static class Directives
+    {
+        public const string Key = "Key";
     }
 }
 
