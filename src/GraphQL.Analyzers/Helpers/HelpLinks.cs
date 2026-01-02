@@ -22,4 +22,7 @@ public static class HelpLinks
     public const string PARSER_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql018";
     public const string VALIDATOR_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql019";
     public const string VALIDATE_ARGUMENTS_METHOD_MUST_BE_VALID = $"{DOCS_URL}/gql020";
+
+    public const string FED_DOCS_URL = "https://graphql-dotnet.github.io/docs/analyzers/federation";
+    public const string KEY_FIELD_DOES_NOT_EXIST = $"{FED_DOCS_URL}/gqlfed001";
 }

@@ -2,6 +2,7 @@ using GraphQL.Analyzers.Helpers;
 using GraphQLParser;
 using GraphQLParser.AST;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Location = Microsoft.CodeAnalysis.Location;
 
@@ -16,6 +17,7 @@ public sealed class FederationKey
     private readonly Lazy<string?> _fieldsString;
     private readonly Lazy<bool> _resolvable;
     private readonly Lazy<Location> _location;
+    private readonly Lazy<ExpressionSyntax?> _fieldsArgument;
 
     private FederationKey(
         GraphQLGraphType graphType,
@@ -26,6 +28,7 @@ public sealed class FederationKey
         Syntax = invocation;
         SemanticModel = semanticModel;
 
+        _fieldsArgument = new Lazy<ExpressionSyntax?>(() => GetArgumentValue(Syntax, SemanticModel, "fields"));
         _fieldsString = new Lazy<string?>(GetFieldsString);
         _resolvable = new Lazy<bool>(GetResolvable);
         _location = new Lazy<Location>(invocation.GetLocation);
@@ -91,15 +94,15 @@ public sealed class FederationKey
 
     private string? GetFieldsString()
     {
-        var fieldsArg = GetArgumentValue(Syntax, SemanticModel, "fields");
+        var fieldsArg = _fieldsArgument.Value;
         if (fieldsArg == null)
             return null;
 
-        TryGetFieldsString(fieldsArg, out var fieldsString);
+        TryGetFieldsString(fieldsArg, SemanticModel, out var fieldsString);
         return fieldsString;
     }
 
-    private static bool TryGetFieldsString(ExpressionSyntax fieldsArg, out string? fieldsString)
+    private static bool TryGetFieldsString(ExpressionSyntax fieldsArg, SemanticModel semanticModel, [NotNullWhen(true)] out string? fieldsString)
     {
         fieldsString = null;
 
@@ -110,22 +113,78 @@ public sealed class FederationKey
             return true;
         }
 
+        // Handle const field/property references
+        if (fieldsArg is IdentifierNameSyntax or MemberAccessExpressionSyntax)
+        {
+            var symbol = semanticModel.GetSymbolInfo(fieldsArg).Symbol;
+            if (symbol is IFieldSymbol { IsConst: true, ConstantValue: string constValue })
+            {
+                fieldsString = constValue;
+                return true;
+            }
+        }
+
+        // Handle nameof expressions
+        if (fieldsArg is InvocationExpressionSyntax { Expression: IdentifierNameSyntax { Identifier.Text: "nameof" } } nameofInvocation)
+        {
+            var nameofValue = nameofInvocation.ArgumentList.Arguments[0].Expression
+                .DescendantNodesAndSelf()
+                .OfType<IdentifierNameSyntax>()
+                .LastOrDefault()
+                ?.Identifier
+                .ValueText;
+
+            if (nameofValue != null)
+            {
+                fieldsString = nameofValue;
+                return true;
+            }
+        }
+
+        // Handle interpolated strings
+        if (fieldsArg is InterpolatedStringExpressionSyntax interpolatedString)
+        {
+            var parts = new List<string>();
+            foreach (var content in interpolatedString.Contents)
+            {
+                switch (content)
+                {
+                    case InterpolatedStringTextSyntax textSyntax:
+                        parts.Add(textSyntax.TextToken.ValueText);
+                        break;
+                    // Try to extract value from interpolation expression
+                    case InterpolationSyntax interpolation when TryGetFieldsString(interpolation.Expression, semanticModel, out var interpolatedValue):
+                        parts.Add(interpolatedValue);
+                        break;
+                    case InterpolationSyntax interpolation:
+                        return false; // Unable to resolve interpolation
+                }
+            }
+
+            fieldsString = string.Concat(parts);
+            return true;
+        }
+
         // Handle string array argument (joined with spaces)
-        if (fieldsArg is ImplicitArrayCreationExpressionSyntax or ArrayCreationExpressionSyntax)
+        if (fieldsArg is ImplicitArrayCreationExpressionSyntax or ArrayCreationExpressionSyntax or CollectionExpressionSyntax)
         {
             var arrayElements = GetArrayElements(fieldsArg);
-            if (arrayElements is not { Count: > 0 })
+            if (arrayElements == null || arrayElements.Length == 0)
             {
                 return false;
             }
 
-            var stringValues = arrayElements.Value
-                .OfType<LiteralExpressionSyntax>()
-                .Select(e => e.Token.Value as string)
-                .Where(s => s != null)
-                .ToList();
+            var stringValues = new List<string>(arrayElements.Length);
 
-            if (stringValues.Count == arrayElements.Value.Count)
+            foreach (var element in arrayElements)
+            {
+                if (TryGetFieldsString(element, semanticModel, out var elementString))
+                {
+                    stringValues.Add(elementString);
+                }
+            }
+
+            if (stringValues.Count == arrayElements.Length)
             {
                 fieldsString = string.Join(" ", stringValues);
                 return true;
@@ -165,6 +224,194 @@ public sealed class FederationKey
         }
     }
 
+    /// <summary>
+    /// Gets the source location for a specific field name within the key expression.
+    /// Returns the location of the entire key expression if the specific field location cannot be determined.
+    /// </summary>
+    /// <param name="fieldName">The name of the field to locate.</param>
+    /// <returns>The location of the field name in the source code.</returns>
+    public Location GetFieldLocation(string fieldName)
+    {
+        var fieldsArg = _fieldsArgument.Value;
+        if (fieldsArg == null)
+        {
+            return Location;
+        }
+
+        // Fall back to the entire key expression
+        return GetFieldLocation(fieldsArg, fieldName) ?? Location;
+    }
+
+    public Location? GetFieldLocation(ExpressionSyntax fieldsArg, string fieldName)
+    {
+        switch (fieldsArg)
+        {
+            // Handle const field/property references
+            case IdentifierNameSyntax or MemberAccessExpressionSyntax when TryHandleConstant(fieldsArg, out var location):
+                return location;
+            // Handle string literal: "id" or "id name"
+            case LiteralExpressionSyntax { Token.Value: string } literalExpression when TryHandleLiteral(literalExpression, out var location):
+                return location;
+            // Handle nameof expressions
+            case InvocationExpressionSyntax { Expression: IdentifierNameSyntax { Identifier.Text: "nameof" } } nameofInvocation when TryHandleNameof(nameofInvocation, out var location):
+                return location;
+            // Handle interpolated strings
+            case InterpolatedStringExpressionSyntax interpolatedString when TryHandleInterpolatedString(interpolatedString, out var location):
+                return location;
+            // Handle collection expression syntax: ["id", "name"] or [ConstFieldName]
+            case CollectionExpressionSyntax collectionExpression:
+            {
+                var expressions = collectionExpression.Elements.OfType<ExpressionElementSyntax>().Select(e => e.Expression);
+                if (TryHandleCollection(expressions, out var location))
+                    return location;
+
+                break;
+            }
+            // Handle implicit array creation: new[] { "id", "name" } or new[] { "id", ConstFieldName }
+            case ImplicitArrayCreationExpressionSyntax implicitArray:
+            {
+                if (TryHandleCollection(implicitArray.Initializer.Expressions, out var location))
+                    return location;
+
+                break;
+            }
+            // Handle explicit array creation: new string[] { "id", "name" } or new string[] { "id", ConstFieldName }
+            case ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation:
+            {
+                if (TryHandleCollection(arrayCreation.Initializer.Expressions, out var location))
+                    return location;
+
+                break;
+            }
+        }
+
+        return null;
+
+        bool TryHandleConstant(ExpressionSyntax expression, [NotNullWhen(true)] out Location? location)
+        {
+            var symbol = SemanticModel.GetSymbolInfo(expression).Symbol;
+            if (symbol is IFieldSymbol { IsConst: true, ConstantValue: string constValue })
+            {
+                if (string.Equals(constValue, fieldName, StringComparison.OrdinalIgnoreCase))
+                {
+                    location = expression.GetLocation();
+                    return true;
+                }
+            }
+
+            location = null;
+            return false;
+        }
+
+        bool TryHandleLiteral(LiteralExpressionSyntax expression, [NotNullWhen(true)] out Location? location)
+        {
+            var token = expression.Token;
+            var literalValue = token.ValueText;
+
+            // Find the field name within the string literal
+            var fieldIndex = FindFieldInString(literalValue, fieldName);
+            if (fieldIndex >= 0)
+            {
+                // Calculate position within the string literal (accounting for opening quote)
+                var startPosition = token.SpanStart + 1 + fieldIndex; // +1 for opening quote
+                var span = new Microsoft.CodeAnalysis.Text.TextSpan(startPosition, fieldName.Length);
+                var syntaxTree = Syntax.SyntaxTree;
+                location = Location.Create(syntaxTree, span);
+                return true;
+            }
+
+            location = null;
+            return false;
+        }
+
+        bool TryHandleNameof(InvocationExpressionSyntax expression, [NotNullWhen(true)] out Location? location)
+        {
+            var nameofIdentifier = expression.ArgumentList.Arguments[0].Expression
+                .DescendantNodesAndSelf()
+                .OfType<IdentifierNameSyntax>()
+                .LastOrDefault()
+                ?.Identifier;
+
+            if (string.Equals(nameofIdentifier?.ToString(), fieldName, StringComparison.Ordinal))
+            {
+                location = expression.GetLocation();
+                return true;
+            }
+
+            location = null;
+            return false;
+        }
+
+        bool TryHandleInterpolatedString(InterpolatedStringExpressionSyntax expression, [NotNullWhen(true)] out Location? location)
+        {
+            foreach (var content in expression.Contents)
+            {
+                switch (content)
+                {
+                    // Check for direct text match
+                    case InterpolatedStringTextSyntax textSyntax when string.Equals(textSyntax.TextToken.ValueText, fieldName, StringComparison.OrdinalIgnoreCase):
+                        location = textSyntax.GetLocation();
+                        return true;
+                    // Check for trimmed text match. Required when a literal between string interpolations: $"{nameof(A) B {C}}"
+                    case InterpolatedStringTextSyntax textSyntax when string.Equals(textSyntax.TextToken.ValueText.Trim(), fieldName, StringComparison.OrdinalIgnoreCase):
+                        var index = textSyntax.TextToken.ValueText.IndexOf(fieldName, StringComparison.OrdinalIgnoreCase);
+
+                        // Calculate position within the string literal (accounting for whitespaces)
+                        var startPosition = textSyntax.TextToken.SpanStart + index; // +1 for opening quote
+                        var span = new Microsoft.CodeAnalysis.Text.TextSpan(startPosition, fieldName.Length);
+                        var syntaxTree = Syntax.SyntaxTree;
+                        location = Location.Create(syntaxTree, span);
+                        return true;
+                    case InterpolationSyntax interpolation:
+                        location = GetFieldLocation(interpolation.Expression, fieldName);
+                        if (location != null)
+                            return true;
+
+                        break;
+                }
+            }
+
+            location = null;
+            return false;
+        }
+
+        bool TryHandleCollection(IEnumerable<ExpressionSyntax> elements, [NotNullWhen(true)] out Location? location)
+        {
+            foreach (var element in elements)
+            {
+                location = GetFieldLocation(element, fieldName);
+                if (location != null)
+                    return true;
+            }
+
+            location = null;
+            return false;
+        }
+    }
+
+    private static int FindFieldInString(string literalValue, string fieldName)
+    {
+        // fast track
+        if (string.Equals(literalValue, fieldName, StringComparison.OrdinalIgnoreCase))
+            return 0;
+
+        // Split by spaces to find individual field names
+        // TODO: make allocationless
+        var fields = literalValue.Split([' '], StringSplitOptions.RemoveEmptyEntries);
+        int currentPosition = 0;
+
+        foreach (var field in fields)
+        {
+            var fieldPosition = literalValue.IndexOf(field, currentPosition, StringComparison.OrdinalIgnoreCase);
+            if (fieldPosition >= 0 && string.Equals(field, fieldName, StringComparison.OrdinalIgnoreCase))
+                return fieldPosition;
+
+            currentPosition = fieldPosition + field.Length;
+        }
+
+        return -1;
+    }
+
     private static ExpressionSyntax? GetArgumentValue(InvocationExpressionSyntax invocation, SemanticModel semanticModel, string argumentName)
     {
         // Check for named arguments
@@ -175,7 +422,7 @@ public sealed class FederationKey
             return namedArg.Expression;
 
         // Check for positional arguments based on method signature
-        if (semanticModel.GetSymbolInfo(invocation).Symbol is not IMethodSymbol methodSymbol)
+        if (ModelExtensions.GetSymbolInfo(semanticModel, invocation).Symbol is not IMethodSymbol methodSymbol)
             return null;
 
         var paramIndex = -1;
@@ -189,23 +436,25 @@ public sealed class FederationKey
         }
 
         if (paramIndex >= 0 && paramIndex < invocation.ArgumentList.Arguments.Count)
-        {
             return invocation.ArgumentList.Arguments[paramIndex].Expression;
-        }
 
         return null;
     }
 
-    private static SeparatedSyntaxList<ExpressionSyntax>? GetArrayElements(ExpressionSyntax expression)
+    private static ExpressionSyntax[]? GetArrayElements(ExpressionSyntax expression)
     {
         if (expression is ImplicitArrayCreationExpressionSyntax implicitArray)
-        {
-            return implicitArray.Initializer.Expressions;
-        }
+            return implicitArray.Initializer.Expressions.ToArray();
 
         if (expression is ArrayCreationExpressionSyntax { Initializer: not null } arrayCreation)
+            return arrayCreation.Initializer.Expressions.ToArray();
+
+        if (expression is CollectionExpressionSyntax collectionExpression)
         {
-            return arrayCreation.Initializer.Expressions;
+            return collectionExpression.Elements
+                .OfType<ExpressionElementSyntax>()
+                .Select(e => e.Expression)
+                .ToArray();
         }
 
         return null;
@@ -224,9 +473,7 @@ public sealed class FederationKey
         foreach (var selection in Fields.Selections)
         {
             if (selection is GraphQLField field)
-            {
                 yield return field.Name.StringValue;
-            }
         }
     }
 

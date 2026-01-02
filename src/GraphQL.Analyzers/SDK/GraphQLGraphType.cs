@@ -195,7 +195,10 @@ public sealed class GraphQLGraphType
     public GraphQLFieldInvocation? GetField(string name)
     {
         return Fields.FirstOrDefault(f =>
-            f.Name != null && string.Equals(f.Name.Value, name, StringComparison.Ordinal));
+        {
+            var fieldName = f.GetName();
+            return fieldName != null && string.Equals(fieldName.Value, name, StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     /// <summary>

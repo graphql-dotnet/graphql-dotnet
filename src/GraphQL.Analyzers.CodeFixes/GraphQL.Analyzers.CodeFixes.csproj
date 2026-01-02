@@ -10,7 +10,8 @@
 
   <ItemGroup>
     <!-- https://github.com/graphql-dotnet/graphql-dotnet/issues/3829 -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.11.0" />
+    <!-- TODO: Add multitageting https://andrewlock.net/supporting-multiple-sdk-versions-in-analyzers-and-source-generators/ -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>

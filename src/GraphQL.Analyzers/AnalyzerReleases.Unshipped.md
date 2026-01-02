@@ -5,3 +5,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
+GQLFED001 | Federation | Error | KeyAnalyzer, [Documentation](https://graphql-dotnet.github.io/docs/analyzers/federation/gqlfed001)
