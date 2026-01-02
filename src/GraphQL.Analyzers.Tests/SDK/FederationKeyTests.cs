@@ -133,7 +133,7 @@ public class FederationKeyTests
     [InlineData(30, "[$\"{ConstFieldName} {nameof(User.Organization)}\", \"name\"]", "Id", "Organization", "name")]
     [InlineData(31, "new[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
     [InlineData(32, "new string[] { $\"{ConstFieldName} {nameof(User.Organization)}\", \"name\" }", "Id", "Organization", "name")]
-    public async Task FederationKey_ParsesCorrectly(int idx, string keyExpression, params string[] expectedFields)
+    public async Task FederationKey_PlainFields_ParsesCorrectly(int idx, string keyExpression, params string[] expectedFields)
     {
         _ = idx;
 
