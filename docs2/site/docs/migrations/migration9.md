@@ -186,3 +186,11 @@ protected override SchemaTypesBase CreateSchemaTypes()
 The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesBase` instead of `SchemaTypes`. `SchemaTypesBase` is now the base class, and a new `SchemaTypes` class now inherits from `SchemaTypesBase`.
 
 This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as `SchemaTypes` did before, so most code should continue to work without changes.
+
+### 10. `SchemaExporter` now honors `Schema.Comparer` for sorting
+
+The `SchemaExporter` class (used by `schema.ToAST()` and `schema.Print()`) now respects the `Schema.Comparer` property when exporting the schema to an AST. This means that if you have set a custom comparer on your schema (such as `AlphabeticalSchemaComparer`), the exported schema will be sorted according to that comparer.
+
+Previously, the schema elements (types, fields, arguments, enum values, directives) were exported in their natural order regardless of the `Schema.Comparer` setting. Now they will be sorted if a comparer is configured.
+
+This change also affects the default Federation SDL request, which uses `schema.Print()` internally. If you have set a custom comparer on your federated schema, the SDL response will now be sorted according to that comparer.

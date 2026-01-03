@@ -1,0 +1,30 @@
+schema {
+  query: Type1
+  mutation: Type3
+}
+
+directive @zdir1 on FIELD | OBJECT
+
+directive @zdir2 on INLINE_FRAGMENT | OBJECT
+
+directive @zdir3(arg3: [ID], arg1: Float, arg2: Int!) on FRAGMENT_SPREAD | FIELD | INLINE_FRAGMENT | OBJECT
+
+type Type1 @zdir3(arg3: null, arg1: null, arg2: 1) @zdir1 @zdir2 {
+  f1(arg1: Float, arg2: Int!, arg3: [ID]): String
+  f2: Float
+  f3: ID
+}
+
+"Type2 description"
+input Type2 {
+  "f1 description"
+  f1: String
+  "f2 description"
+  f2: [[Float!]!]!
+  "f3 description"
+  f3: ID!
+}
+
+type Type3 {
+  field1: String
+}
