@@ -186,3 +186,9 @@ protected override SchemaTypesBase CreateSchemaTypes()
 The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesBase` instead of `SchemaTypes`. `SchemaTypesBase` is now the base class, and a new `SchemaTypes` class now inherits from `SchemaTypesBase`.
 
 This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as `SchemaTypes` did before, so most code should continue to work without changes.
+
+### 10. `IConfigureSchema` interface now includes `SortOrder` property
+
+The `IConfigureSchema` interface now includes a `SortOrder` property, similar to the existing `IConfigureExecution` interface. This property determines the order in which schema configurations are executed, with lower values executing first. The default sort order for all built-in implementations is `100`.
+
+Typically no changes are required to user code unless you have a custom implementation of `IConfigureSchema`. If you do have a custom implementation, you will need to add the `SortOrder` property to your class. For most cases, returning `100` (the default value) is appropriate.
