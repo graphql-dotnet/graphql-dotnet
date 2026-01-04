@@ -40,6 +40,24 @@ schema.Features.DeprecationOfInputValues = false;
 
 Note that these properties must be set before schema initialization.
 
+### 2. Automatic Nullable Value Type Detection in Field Arguments
+
+The `Argument<T>` method on field builders now supports automatic nullable value type detection. When the `nullable` parameter is not specified (defaults to `null`), nullable value types like `int?`, `DateTime?`, etc. will automatically be treated as nullable fields in the GraphQL schema.
+
+```csharp
+// Before v9 - explicit nullable parameter required
+Field<StringGraphType>("myField")
+    .Argument<int?>("nullableArg", nullable: true)  // Had to explicitly set nullable: true
+    .Argument<int>("requiredArg", nullable: false); // Explicitly non-null
+
+// v9 - automatic detection when nullable parameter is omitted
+Field<StringGraphType>("myField")
+    .Argument<int?>("nullableArg")     // Automatically nullable (nullable value type)
+    .Argument<int>("requiredArg");     // Automatically non-null (non-nullable value type)
+```
+
+This feature makes it easier to work with nullable value types without having to explicitly specify the `nullable` parameter. Note that reference types like `string` still default to non-null and require explicitly setting `nullable: true` to make them optional. You can always explicitly set `nullable: true` or `nullable: false` to override the automatic behavior if needed.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
@@ -187,7 +205,11 @@ The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesB
 
 This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as `SchemaTypes` did before, so most code should continue to work without changes.
 
-### 10. `SchemaExporter` now honors `Schema.Comparer` for sorting
+### 10. `FieldBuilder.Argument<T>` nullable parameter changed to `bool?`
+
+The `nullable` parameter in the `Argument<T>` method has changed from `bool` (default `false`) to `bool?` (default `null`) to support automatic nullable value type detection. This change is generally source-compatible and should not require changes to user code. See the New Features section above for more details.
+
+### 11. `SchemaExporter` now honors `Schema.Comparer` for sorting
 
 The `SchemaExporter` class (used by `schema.ToAST()` and `schema.Print()`) now respects the `Schema.Comparer` property when exporting the schema to an AST. This means that if you have set a custom comparer on your schema (such as `AlphabeticalSchemaComparer`), the exported schema will be sorted according to that comparer.
 

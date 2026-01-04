@@ -5,3 +5,4 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
+GQL021 | Usage | Warning | NullableReferenceTypeArgumentAnalyzer

@@ -127,6 +127,9 @@ public static class GlobalSwitches
     /// <summary>
     /// Infer the field's graph type nullability from the Null Reference Type annotations of
     /// the field or property represented by the expression argument. <see langword="true"/> by default.
+    /// <br/><br/>
+    /// Note: When set to <see langword="false"/>, consider disabling analyzer rule GQL021 which warns
+    /// about nullable reference type arguments that don't explicitly specify the nullable parameter.
     /// </summary>
     public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = true;
 }
