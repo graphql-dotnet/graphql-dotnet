@@ -133,7 +133,7 @@ public class Schema : MetadataProvider, ISchema, IServiceProvider, IDisposable
 
         // OrderBy here performs a stable sort; that is, if the sort order of two elements are equal,
         // the order of the elements are preserved.
-        foreach (var configuration in (configurations ?? Array.Empty<IConfigureSchema>()).OrderBy(x => x.SortOrder))
+        foreach (var configuration in configurations?.OrderBy(x => x.SortOrder) ?? Enumerable.Empty<IConfigureSchema>())
         {
             configuration.Configure(this, services);
         }
