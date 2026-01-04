@@ -208,3 +208,11 @@ This change allows for better extensibility and provides a clearer separation be
 ### 10. `FieldBuilder.Argument<T>` nullable parameter changed to `bool?`
 
 The `nullable` parameter in the `Argument<T>` method has changed from `bool` (default `false`) to `bool?` (default `null`) to support automatic nullable value type detection. This change is generally source-compatible and should not require changes to user code. See the New Features section above for more details.
+
+### 11. `SchemaExporter` now honors `Schema.Comparer` for sorting
+
+The `SchemaExporter` class (used by `schema.ToAST()` and `schema.Print()`) now respects the `Schema.Comparer` property when exporting the schema to an AST. This means that if you have set a custom comparer on your schema (such as `AlphabeticalSchemaComparer`), the exported schema will be sorted according to that comparer.
+
+Previously, the schema elements (types, fields, arguments, enum values, directives) were exported in their natural order regardless of the `Schema.Comparer` setting. Now they will be sorted if a comparer is configured.
+
+This change also affects the default Federation SDL request, which uses `schema.Print()` internally. If you have set a custom comparer on your federated schema, the SDL response will now be sorted according to that comparer.
