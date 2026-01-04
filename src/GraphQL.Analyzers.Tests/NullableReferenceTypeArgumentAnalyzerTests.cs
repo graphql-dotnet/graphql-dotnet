@@ -13,11 +13,18 @@ public class NullableReferenceTypeArgumentAnalyzerTests
         await VerifyCS.VerifyAnalyzerAsync(source);
     }
 
-    [Fact]
-    public async Task NullableReferenceType_NoNullableParameter_ReportsDiagnostic()
+    [Theory]
+    [InlineData("\"arg\"", "\"arg\", nullable: true")]
+    [InlineData("\"arg\", null", "\"arg\", true")]
+    [InlineData("\"arg\", default", "\"arg\", true")]
+    [InlineData("\"arg\", nullable: null", "\"arg\", nullable: true")]
+    [InlineData("\"arg\", null, \"description\"", "\"arg\", true, \"description\"")]
+    [InlineData("\"arg\", description: \"description\", nullable: null", "\"arg\", description: \"description\", nullable: true")]
+    [InlineData("\"arg\", null, arg => { }", "\"arg\", true, arg => { }")]
+    public async Task NullableReferenceType_InvalidNullableParameter_ReportsDiagnostic(string arguments, string expectedArguments)
     {
-        const string source =
-            """
+        string source =
+            $$"""
             #nullable enable
             using GraphQL.Types;
 
@@ -28,13 +35,13 @@ public class NullableReferenceTypeArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg");
+                        .Argument<{|#0:string?|}>({{arguments}});
                 }
             }
             """;
 
-        const string fix =
-            """
+        string fix =
+            $$"""
             #nullable enable
             using GraphQL.Types;
 
@@ -45,7 +52,7 @@ public class NullableReferenceTypeArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", nullable: true);
+                        .Argument<string?>({{expectedArguments}});
                 }
             }
             """;
@@ -54,11 +61,13 @@ public class NullableReferenceTypeArgumentAnalyzerTests
         await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
     }
 
-    [Fact]
-    public async Task NullableReferenceType_NullableParameterNull_ReportsDiagnostic()
+    [Theory]
+    [InlineData("nullable: true")]
+    [InlineData("nullable: false")]
+    public async Task NullableReferenceType_ValidNullableParameter_NoDiagnostic(string nullableArg)
     {
-        const string source =
-            """
+        string source =
+            $$"""
             #nullable enable
             using GraphQL.Types;
 
@@ -69,235 +78,7 @@ public class NullableReferenceTypeArgumentAnalyzerTests
                 public MyGraphType()
                 {
                     Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg", null);
-                }
-            }
-            """;
-
-        const string fix =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", true);
-                }
-            }
-            """;
-
-        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments("string?");
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_NullableParameterDefault_ReportsDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg", default);
-                }
-            }
-            """;
-
-        const string fix =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", true);
-                }
-            }
-            """;
-
-        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments("string?");
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_NullableParameterNullNamed_ReportsDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg", nullable: null);
-                }
-            }
-            """;
-
-        const string fix =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", nullable: true);
-                }
-            }
-            """;
-
-        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments("string?");
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_WithDescription_ReportsDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg", null, "description");
-                }
-            }
-            """;
-
-        const string fix =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", true, "description");
-                }
-            }
-            """;
-
-        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments("string?");
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_WithConfigure_ReportsDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<{|#0:string?|}>("arg", null, arg => { });
-                }
-            }
-            """;
-
-        const string fix =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", true, arg => { });
-                }
-            }
-            """;
-
-        var expected = VerifyCS.Diagnostic().WithLocation(0).WithArguments("string?");
-        await VerifyCS.VerifyCodeFixAsync(source, expected, fix);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_NullableParameterTrue_NoDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", nullable: true);
-                }
-            }
-            """;
-
-        await VerifyCS.VerifyAnalyzerAsync(source);
-    }
-
-    [Fact]
-    public async Task NullableReferenceType_NullableParameterFalse_NoDiagnostic()
-    {
-        const string source =
-            """
-            #nullable enable
-            using GraphQL.Types;
-
-            namespace Sample.Server;
-
-            public class MyGraphType : ObjectGraphType
-            {
-                public MyGraphType()
-                {
-                    Field<StringGraphType>("Test")
-                        .Argument<string?>("arg", nullable: false);
+                        .Argument<string?>("arg", {{nullableArg}});
                 }
             }
             """;

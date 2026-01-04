@@ -42,12 +42,12 @@ public class NullableReferenceTypeArgumentAnalyzer : DiagnosticAnalyzer
         if (memberAccess.Name.Identifier.Text != Constants.MethodNames.Argument)
             return;
 
-        // Get the method symbol
-        if (context.SemanticModel.GetSymbolInfo(invocationExpr, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
+        // Check if this is a GraphQL method
+        if (!memberAccess.IsGraphQLSymbol(context.SemanticModel))
             return;
 
-        // Check if this is a GraphQL method
-        if (!methodSymbol.ContainingType.ToDisplayString().StartsWith("GraphQL."))
+        // Get the method symbol
+        if (context.SemanticModel.GetSymbolInfo(invocationExpr, context.CancellationToken).Symbol is not IMethodSymbol methodSymbol)
             return;
 
         // Check if this is a generic method with one type argument
@@ -60,13 +60,8 @@ public class NullableReferenceTypeArgumentAnalyzer : DiagnosticAnalyzer
         if (!IsNullableReferenceType(typeArgument))
             return;
 
-        // Find the nullable parameter
-        var nullableParam = methodSymbol.Parameters.FirstOrDefault(p => p.Name == Constants.ArgumentNames.Nullable);
-        if (nullableParam == null)
-            return;
-
         // Check if nullable parameter is explicitly provided
-        var nullableArg = GetArgumentForParameter(invocationExpr.ArgumentList, nullableParam, methodSymbol);
+        var nullableArg = invocationExpr.GetMethodArgument(Constants.ArgumentNames.Nullable, context.SemanticModel);
 
         if (nullableArg == null)
         {
@@ -99,31 +94,6 @@ public class NullableReferenceTypeArgumentAnalyzer : DiagnosticAnalyzer
         // Check if it's a reference type with nullable annotation
         return typeSymbol.IsReferenceType &&
                typeSymbol.NullableAnnotation == NullableAnnotation.Annotated;
-    }
-
-    private static ArgumentSyntax? GetArgumentForParameter(
-        ArgumentListSyntax argumentList,
-        IParameterSymbol parameter,
-        IMethodSymbol methodSymbol)
-    {
-        // First check named arguments
-        foreach (var arg in argumentList.Arguments)
-        {
-            if (arg.NameColon != null && arg.NameColon.Name.Identifier.Text == parameter.Name)
-                return arg;
-        }
-
-        // Check positional arguments
-        var paramIndex = Array.IndexOf(methodSymbol.Parameters.ToArray(), parameter);
-        if (paramIndex >= 0 && paramIndex < argumentList.Arguments.Count)
-        {
-            var arg = argumentList.Arguments[paramIndex];
-            // Only return if it's a positional argument (no name colon)
-            if (arg.NameColon == null)
-                return arg;
-        }
-
-        return null;
     }
 
     private static bool IsNullOrDefaultLiteral(ExpressionSyntax expression)

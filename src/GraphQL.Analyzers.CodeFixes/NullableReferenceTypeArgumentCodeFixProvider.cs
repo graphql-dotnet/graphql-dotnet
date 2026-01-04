@@ -63,7 +63,7 @@ public class NullableReferenceTypeArgumentCodeFixProvider : CodeFixProvider
             return document;
 
         var argumentList = invocationExpr.ArgumentList;
-        var existingNullableArg = FindNullableArgument(argumentList, nullableParam, methodSymbol);
+        var existingNullableArg = invocationExpr.GetMethodArgument(Constants.ArgumentNames.Nullable, semanticModel!);
 
         var trueExpression = SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression);
 
@@ -87,30 +87,5 @@ public class NullableReferenceTypeArgumentCodeFixProvider : CodeFixProvider
         }
 
         return docEditor.GetChangedDocument();
-    }
-
-    private static ArgumentSyntax? FindNullableArgument(
-        ArgumentListSyntax argumentList,
-        IParameterSymbol parameter,
-        IMethodSymbol methodSymbol)
-    {
-        // First check named arguments
-        foreach (var arg in argumentList.Arguments)
-        {
-            if (arg.NameColon != null && arg.NameColon.Name.Identifier.Text == parameter.Name)
-                return arg;
-        }
-
-        // Check positional arguments
-        var paramIndex = Array.IndexOf(methodSymbol.Parameters.ToArray(), parameter);
-        if (paramIndex >= 0 && paramIndex < argumentList.Arguments.Count)
-        {
-            var arg = argumentList.Arguments[paramIndex];
-            // Only return if it's a positional argument (no name colon)
-            if (arg.NameColon == null)
-                return arg;
-        }
-
-        return null;
     }
 }
