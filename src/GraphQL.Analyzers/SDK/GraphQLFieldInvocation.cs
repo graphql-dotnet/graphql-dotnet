@@ -10,10 +10,10 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldInvocation
 {
-    private readonly Lazy<GraphQLObjectProperty<string>?> _name;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _name;
     private readonly Lazy<GraphQLFieldGraphType?> _graphType;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _description;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _deprecationReason;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _description;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _deprecationReason;
     private readonly Lazy<GraphQLObjectProperty<ExpressionSyntax>?> _resolverExpression;
     private readonly Lazy<GraphQLFieldExpression?> _fieldExpression;
     private readonly Lazy<IReadOnlyList<GraphQLFieldArgument>> _arguments;
@@ -25,10 +25,10 @@ public sealed class GraphQLFieldInvocation
         Syntax = invocation;
         SemanticModel = semanticModel;
 
-        _name = new Lazy<GraphQLObjectProperty<string>?>(GetFieldName);
+        _name = new Lazy<GraphQLObjectProperty<string?>?>(GetFieldName);
         _graphType = new Lazy<GraphQLFieldGraphType?>(GetGraphType);
-        _description = new Lazy<GraphQLObjectProperty<string>?>(GetDescription);
-        _deprecationReason = new Lazy<GraphQLObjectProperty<string>?>(GetDeprecationReason);
+        _description = new Lazy<GraphQLObjectProperty<string?>?>(GetDescription);
+        _deprecationReason = new Lazy<GraphQLObjectProperty<string?>?>(GetDeprecationReason);
         _resolverExpression = new Lazy<GraphQLObjectProperty<ExpressionSyntax>?>(GetResolverExpression);
         _fieldExpression = new Lazy<GraphQLFieldExpression?>(GetFieldExpression);
         _arguments = new Lazy<IReadOnlyList<GraphQLFieldArgument>>(GetArguments);
@@ -39,7 +39,7 @@ public sealed class GraphQLFieldInvocation
     /// <summary>
     /// Gets the name of the field from explicit 'name' argument, if specified.
     /// </summary>
-    public GraphQLObjectProperty<string>? Name => _name.Value;
+    public GraphQLObjectProperty<string?>? Name => _name.Value;
 
     /// <summary>
     /// Gets the graph type of the field if it can be determined.
@@ -49,12 +49,12 @@ public sealed class GraphQLFieldInvocation
     /// <summary>
     /// Gets the description of the field if specified.
     /// </summary>
-    public GraphQLObjectProperty<string>? Description => _description.Value;
+    public GraphQLObjectProperty<string?>? Description => _description.Value;
 
     /// <summary>
     /// Gets the deprecation reason of the field if specified.
     /// </summary>
-    public GraphQLObjectProperty<string>? DeprecationReason => _deprecationReason.Value;
+    public GraphQLObjectProperty<string?>? DeprecationReason => _deprecationReason.Value;
 
     /// <summary>
     /// Gets the resolver expression (lambda or delegate) if specified.
@@ -108,12 +108,12 @@ public sealed class GraphQLFieldInvocation
     /// <summary>
     /// Gets the name of the field, checking the explicit 'name' argument first, then the field expression.
     /// </summary>
-    public GraphQLObjectProperty<string>? GetName()
+    public GraphQLObjectProperty<string?>? GetName()
     {
         return Name ?? FieldExpression?.Name;
     }
 
-    private GraphQLObjectProperty<string>? GetFieldName()
+    private GraphQLObjectProperty<string?>? GetFieldName()
     {
         // Try to get from explicit 'name' argument: Field<StringGraphType>("fieldName")
         var nameArg = GetArgument("name");
@@ -122,13 +122,13 @@ public sealed class GraphQLFieldInvocation
             switch (nameArg.Expression)
             {
                 case LiteralExpressionSyntax literal:
-                    return new GraphQLObjectProperty<string>(literal.Token.ValueText, literal.GetLocation());
+                    return new GraphQLObjectProperty<string?>(literal.Token.ValueText, literal.GetLocation());
                 case IdentifierNameSyntax or MemberAccessExpressionSyntax:
                 {
                     var symbol = SemanticModel.GetSymbolInfo(nameArg.Expression).Symbol;
                     if (symbol is IFieldSymbol { IsConst: true, ConstantValue: string constName })
                     {
-                        return new GraphQLObjectProperty<string>(constName, nameArg.Expression.GetLocation());
+                        return new GraphQLObjectProperty<string?>(constName, nameArg.Expression.GetLocation());
                     }
 
                     break;
@@ -166,13 +166,13 @@ public sealed class GraphQLFieldInvocation
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDescription()
+    private GraphQLObjectProperty<string?>? GetDescription()
     {
         var descriptionCall = FindChainedMethod("Description");
         var arg = descriptionCall?.ArgumentList.Arguments.FirstOrDefault();
         if (arg?.Expression is LiteralExpressionSyntax literal)
         {
-            return new GraphQLObjectProperty<string>(
+            return new GraphQLObjectProperty<string?>(
                 literal.Token.ValueText,
                 arg.Expression.GetLocation());
         }
@@ -180,13 +180,13 @@ public sealed class GraphQLFieldInvocation
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDeprecationReason()
+    private GraphQLObjectProperty<string?>? GetDeprecationReason()
     {
         var deprecationCall = FindChainedMethod("DeprecationReason");
         var arg = deprecationCall?.ArgumentList.Arguments.FirstOrDefault();
         if (arg?.Expression is LiteralExpressionSyntax literal)
         {
-            return new GraphQLObjectProperty<string>(
+            return new GraphQLObjectProperty<string?>(
                 literal.Token.ValueText,
                 arg.Expression.GetLocation());
         }

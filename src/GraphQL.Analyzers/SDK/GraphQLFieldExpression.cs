@@ -9,20 +9,20 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldExpression
 {
-    private readonly Lazy<GraphQLObjectProperty<string>?> _name;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _description;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _deprecationReason;
-    private readonly Lazy<GraphQLObjectProperty<object>?> _defaultValue;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _name;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _description;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _deprecationReason;
+    private readonly Lazy<GraphQLObjectProperty<object?>?> _defaultValue;
 
     private GraphQLFieldExpression(ExpressionSyntax expression, SemanticModel semanticModel)
     {
         Syntax = expression;
         SemanticModel = semanticModel;
 
-        _name = new Lazy<GraphQLObjectProperty<string>?>(GetName);
-        _description = new Lazy<GraphQLObjectProperty<string>?>(GetDescription);
-        _deprecationReason = new Lazy<GraphQLObjectProperty<string>?>(GetDeprecationReason);
-        _defaultValue = new Lazy<GraphQLObjectProperty<object>?>(GetDefaultValue);
+        _name = new Lazy<GraphQLObjectProperty<string?>?>(GetName);
+        _description = new Lazy<GraphQLObjectProperty<string?>?>(GetDescription);
+        _deprecationReason = new Lazy<GraphQLObjectProperty<string?>?>(GetDeprecationReason);
+        _defaultValue = new Lazy<GraphQLObjectProperty<object?>?>(GetDefaultValue);
     }
 
     /// <summary>
@@ -34,25 +34,25 @@ public sealed class GraphQLFieldExpression
     /// Gets the name inferred from the expression (e.g., property name from x => x.PropertyName).
     /// Returns null when the expression is not valid.
     /// </summary>
-    public GraphQLObjectProperty<string>? Name => _name.Value;
+    public GraphQLObjectProperty<string?>? Name => _name.Value;
 
     /// <summary>
     /// Gets the description from attributes on the member referenced by the expression.
     /// Returns null when the expression is not valid.
     /// </summary>
-    public GraphQLObjectProperty<string>? Description => _description.Value;
+    public GraphQLObjectProperty<string?>? Description => _description.Value;
 
     /// <summary>
     /// Gets the deprecation reason from attributes on the member referenced by the expression.
     /// Returns null when the expression is not valid.
     /// </summary>
-    public GraphQLObjectProperty<string>? DeprecationReason => _deprecationReason.Value;
+    public GraphQLObjectProperty<string?>? DeprecationReason => _deprecationReason.Value;
 
     /// <summary>
     /// Gets the default value from attributes on the member referenced by the expression.
     /// Returns null when the expression is not valid.
     /// </summary>
-    public GraphQLObjectProperty<object>? DefaultValue => _defaultValue.Value;
+    public GraphQLObjectProperty<object?>? DefaultValue => _defaultValue.Value;
 
     /// <summary>
     /// Gets the underlying expression syntax.
@@ -84,19 +84,19 @@ public sealed class GraphQLFieldExpression
         return new GraphQLFieldExpression(expression, semanticModel);
     }
 
-    private GraphQLObjectProperty<string>? GetName()
+    private GraphQLObjectProperty<string?>? GetName()
     {
         var memberAccess = GetMemberAccess();
         if (memberAccess != null)
         {
             var propertyName = memberAccess.Name.Identifier.Text;
-            return new GraphQLObjectProperty<string>(propertyName, memberAccess.Name.GetLocation());
+            return new GraphQLObjectProperty<string?>(propertyName, memberAccess.Name.GetLocation());
         }
 
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDescription()
+    private GraphQLObjectProperty<string?>? GetDescription()
     {
         var member = GetMemberSymbol();
         if (member == null)
@@ -115,7 +115,7 @@ public sealed class GraphQLFieldExpression
                     var location = attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation();
                     if (location != null)
                     {
-                        return new GraphQLObjectProperty<string>(description, location);
+                        return new GraphQLObjectProperty<string?>(description, location);
                     }
                 }
             }
@@ -124,7 +124,7 @@ public sealed class GraphQLFieldExpression
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDeprecationReason()
+    private GraphQLObjectProperty<string?>? GetDeprecationReason()
     {
         var member = GetMemberSymbol();
         if (member == null)
@@ -143,7 +143,7 @@ public sealed class GraphQLFieldExpression
                     var location = attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation();
                     if (location != null)
                     {
-                        return new GraphQLObjectProperty<string>(reason, location);
+                        return new GraphQLObjectProperty<string?>(reason, location);
                     }
                 }
             }
@@ -152,7 +152,7 @@ public sealed class GraphQLFieldExpression
         return null;
     }
 
-    private GraphQLObjectProperty<object>? GetDefaultValue()
+    private GraphQLObjectProperty<object?>? GetDefaultValue()
     {
         var member = GetMemberSymbol();
         if (member == null)
@@ -171,7 +171,7 @@ public sealed class GraphQLFieldExpression
                     var location = attribute.ApplicationSyntaxReference?.GetSyntax().GetLocation();
                     if (location != null)
                     {
-                        return new GraphQLObjectProperty<object>(value, location);
+                        return new GraphQLObjectProperty<object?>(value, location);
                     }
                 }
             }

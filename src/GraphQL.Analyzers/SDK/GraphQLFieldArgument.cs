@@ -11,10 +11,10 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldArgument
 {
-    private readonly Lazy<GraphQLObjectProperty<string>?> _nameArgument;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _nameArgument;
     private readonly Lazy<GraphQLObjectProperty<ITypeSymbol>?> _graphTypeGeneric;
     private readonly Lazy<GraphQLObjectProperty<bool>?> _nullable;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _descriptionArgument;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _descriptionArgument;
     private readonly Lazy<GraphQLFieldArgumentConfigureAction?> _configureAction;
     private readonly Lazy<Location> _location;
     private readonly Lazy<GraphQLFieldInvocation?> _parentField;
@@ -24,10 +24,10 @@ public sealed class GraphQLFieldArgument
         Syntax = invocation;
         SemanticModel = semanticModel;
 
-        _nameArgument = new Lazy<GraphQLObjectProperty<string>?>(GetNameArgument);
+        _nameArgument = new Lazy<GraphQLObjectProperty<string?>?>(GetNameArgument);
         _graphTypeGeneric = new Lazy<GraphQLObjectProperty<ITypeSymbol>?>(GetGraphTypeFromGeneric);
         _nullable = new Lazy<GraphQLObjectProperty<bool>?>(GetNullable);
-        _descriptionArgument = new Lazy<GraphQLObjectProperty<string>?>(GetDescriptionArgument);
+        _descriptionArgument = new Lazy<GraphQLObjectProperty<string?>?>(GetDescriptionArgument);
         _configureAction = new Lazy<GraphQLFieldArgumentConfigureAction?>(GetConfigureAction);
         _location = new Lazy<Location>(() => GetLocation(invocation, semanticModel));
         _parentField = new Lazy<GraphQLFieldInvocation?>(() => parentField ?? FindParentField());
@@ -36,7 +36,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the 'name' argument from the Argument() method call.
     /// </summary>
-    public GraphQLObjectProperty<string>? Name => _nameArgument.Value;
+    public GraphQLObjectProperty<string?>? Name => _nameArgument.Value;
 
     /// <summary>
     /// Gets the graph type from the generic type argument.
@@ -51,7 +51,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the 'description' argument from the Argument() method call.
     /// </summary>
-    public GraphQLObjectProperty<string>? Description => _descriptionArgument.Value;
+    public GraphQLObjectProperty<string?>? Description => _descriptionArgument.Value;
 
     /// <summary>
     /// Gets the 'configure' argument from the Argument() method call.
@@ -81,7 +81,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the name of the argument, checking the 'configure' action first, then the 'name' argument.
     /// </summary>
-    public GraphQLObjectProperty<string>? GetName()
+    public GraphQLObjectProperty<string?>? GetName()
     {
         return ConfigureAction?.Name ?? Name;
     }
@@ -97,7 +97,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the description of the argument, checking the 'configure' action first, then the 'description' argument.
     /// </summary>
-    public GraphQLObjectProperty<string>? GetDescription()
+    public GraphQLObjectProperty<string?>? GetDescription()
     {
         return ConfigureAction?.Description ?? Description;
     }
@@ -105,7 +105,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the default value of the argument from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<object>? GetDefaultValue()
+    public GraphQLObjectProperty<object?>? GetDefaultValue()
     {
         return ConfigureAction?.DefaultValue;
     }
@@ -113,7 +113,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the deprecation reason of the argument from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<string>? GetDeprecationReason()
+    public GraphQLObjectProperty<string?>? GetDeprecationReason()
     {
         return ConfigureAction?.DeprecationReason;
     }
@@ -163,7 +163,7 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetNameArgument()
+    private GraphQLObjectProperty<string?>? GetNameArgument()
     {
         // Try to get from explicit 'name' argument: .Argument<IntGraphType>("argName") or .Argument<int>("argName", nullable: true)
         var nameArg = GetArgument("name");
@@ -174,7 +174,7 @@ public sealed class GraphQLFieldArgument
                 // .Argument<IntGraphType>("argName")
                 case LiteralExpressionSyntax literal:
                 {
-                    return new GraphQLObjectProperty<string>(literal.Token.ValueText, literal.GetLocation());
+                    return new GraphQLObjectProperty<string?>(literal.Token.ValueText, literal.GetLocation());
                 }
                 // .Argument<IntGraphType>(ConstArgName)
                 case IdentifierNameSyntax or MemberAccessExpressionSyntax:
@@ -182,7 +182,7 @@ public sealed class GraphQLFieldArgument
                     var symbol = SemanticModel.GetSymbolInfo(nameArg.Expression).Symbol;
                     if (symbol is IFieldSymbol { IsConst: true, ConstantValue: string constName })
                     {
-                        return new GraphQLObjectProperty<string>(constName, nameArg.Expression.GetLocation());
+                        return new GraphQLObjectProperty<string?>(constName, nameArg.Expression.GetLocation());
                     }
 
                     break;
@@ -227,13 +227,13 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDescriptionArgument()
+    private GraphQLObjectProperty<string?>? GetDescriptionArgument()
     {
         // Try to get from explicit 'description' argument: .Argument<IntGraphType>("limit", "Description") or .Argument<int>("limit", nullable: true, description: "desc")
         var descArg = GetArgument("description");
         if (descArg?.Expression is LiteralExpressionSyntax literal)
         {
-            return new GraphQLObjectProperty<string>(
+            return new GraphQLObjectProperty<string?>(
                 literal.Token.ValueText,
                 descArg.Expression.GetLocation());
         }

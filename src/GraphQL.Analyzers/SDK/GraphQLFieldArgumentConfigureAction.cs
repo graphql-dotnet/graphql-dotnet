@@ -10,28 +10,28 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldArgumentConfigureAction
 {
-    private readonly Lazy<GraphQLObjectProperty<string>?> _name;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _name;
     private readonly Lazy<GraphQLObjectProperty<ITypeSymbol>?> _graphType;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _description;
-    private readonly Lazy<GraphQLObjectProperty<object>?> _defaultValue;
-    private readonly Lazy<GraphQLObjectProperty<string>?> _deprecationReason;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _description;
+    private readonly Lazy<GraphQLObjectProperty<object?>?> _defaultValue;
+    private readonly Lazy<GraphQLObjectProperty<string?>?> _deprecationReason;
 
     private GraphQLFieldArgumentConfigureAction(ExpressionSyntax lambdaExpression, SemanticModel semanticModel)
     {
         Syntax = lambdaExpression;
         SemanticModel = semanticModel;
 
-        _name = new Lazy<GraphQLObjectProperty<string>?>(GetName);
+        _name = new Lazy<GraphQLObjectProperty<string?>?>(GetName);
         _graphType = new Lazy<GraphQLObjectProperty<ITypeSymbol>?>(GetGraphType);
-        _description = new Lazy<GraphQLObjectProperty<string>?>(GetDescription);
-        _defaultValue = new Lazy<GraphQLObjectProperty<object>?>(GetDefaultValue);
-        _deprecationReason = new Lazy<GraphQLObjectProperty<string>?>(GetDeprecationReason);
+        _description = new Lazy<GraphQLObjectProperty<string?>?>(GetDescription);
+        _defaultValue = new Lazy<GraphQLObjectProperty<object?>?>(GetDefaultValue);
+        _deprecationReason = new Lazy<GraphQLObjectProperty<string?>?>(GetDeprecationReason);
     }
 
     /// <summary>
     /// Gets the name property from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<string>? Name => _name.Value;
+    public GraphQLObjectProperty<string?>? Name => _name.Value;
 
     /// <summary>
     /// Gets the graph type property from the configure action.
@@ -41,17 +41,17 @@ public sealed class GraphQLFieldArgumentConfigureAction
     /// <summary>
     /// Gets the description property from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<string>? Description => _description.Value;
+    public GraphQLObjectProperty<string?>? Description => _description.Value;
 
     /// <summary>
     /// Gets the default value property from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<object>? DefaultValue => _defaultValue.Value;
+    public GraphQLObjectProperty<object?>? DefaultValue => _defaultValue.Value;
 
     /// <summary>
     /// Gets the deprecation reason property from the configure action.
     /// </summary>
-    public GraphQLObjectProperty<string>? DeprecationReason => _deprecationReason.Value;
+    public GraphQLObjectProperty<string?>? DeprecationReason => _deprecationReason.Value;
 
     /// <summary>
     /// Gets the underlying lambda expression syntax.
@@ -81,9 +81,9 @@ public sealed class GraphQLFieldArgumentConfigureAction
         return new GraphQLFieldArgumentConfigureAction(lambdaExpression, semanticModel);
     }
 
-    private GraphQLObjectProperty<string>? GetName()
+    private GraphQLObjectProperty<string?>? GetName()
     {
-        return FindPropertyAssignment<string>("Name");
+        return FindPropertyAssignment<string?>("Name");
     }
 
     private GraphQLObjectProperty<ITypeSymbol>? GetGraphType()
@@ -98,14 +98,14 @@ public sealed class GraphQLFieldArgumentConfigureAction
         return FindPropertyAssignment<ITypeSymbol>("ResolvedType");
     }
 
-    private GraphQLObjectProperty<string>? GetDescription()
+    private GraphQLObjectProperty<string?>? GetDescription()
     {
-        return FindPropertyAssignment<string>("Description");
+        return FindPropertyAssignment<string?>("Description");
     }
 
-    private GraphQLObjectProperty<object>? GetDefaultValue()
+    private GraphQLObjectProperty<object?>? GetDefaultValue()
     {
-        var defaultValueAssignment = FindPropertyAssignment<object>("DefaultValue");
+        var defaultValueAssignment = FindPropertyAssignment<object?>("DefaultValue");
         if (defaultValueAssignment == null)
         {
             return null;
@@ -130,7 +130,7 @@ public sealed class GraphQLFieldArgumentConfigureAction
                 var constantValue = valueOperation.ConstantValue;
                 if (constantValue.HasValue)
                 {
-                    return new GraphQLObjectProperty<object>(
+                    return new GraphQLObjectProperty<object?>(
                         constantValue.Value,
                         assignment.Value.Syntax.GetLocation());
                 }
@@ -140,9 +140,9 @@ public sealed class GraphQLFieldArgumentConfigureAction
         return null;
     }
 
-    private GraphQLObjectProperty<string>? GetDeprecationReason()
+    private GraphQLObjectProperty<string?>? GetDeprecationReason()
     {
-        return FindPropertyAssignment<string>("DeprecationReason");
+        return FindPropertyAssignment<string?>("DeprecationReason");
     }
 
     /// <summary>
