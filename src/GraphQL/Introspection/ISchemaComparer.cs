@@ -39,6 +39,13 @@ public interface ISchemaComparer
     /// If this returns <see langword="null"/> then the original directive ordering is preserved.
     /// </summary>
     public IComparer<Directive>? DirectiveComparer { get; }
+
+    /// <summary>
+    /// Returns a comparer for directive arguments.
+    /// If this returns <see langword="null"/> then the original argument ordering is preserved.
+    /// </summary>
+    /// <param name="directive">The directive to which the arguments belong.</param>
+    public IComparer<QueryArgument>? DirectiveArgumentComparer(Directive directive);
 }
 
 /// <summary>
@@ -54,6 +61,9 @@ public class DefaultSchemaComparer : ISchemaComparer
 
     /// <inheritdoc/>
     public virtual IComparer<QueryArgument>? ArgumentComparer(IFieldType field) => null;
+
+    /// <inheritdoc/>
+    public virtual IComparer<QueryArgument>? DirectiveArgumentComparer(Directive directive) => null;
 
     /// <inheritdoc/>
     public virtual IComparer<EnumValueDefinition>? EnumValueComparer(EnumerationGraphType parent) => null;
@@ -106,6 +116,9 @@ public class AlphabeticalSchemaComparer : ISchemaComparer
 
     /// <inheritdoc/>
     public virtual IComparer<QueryArgument> ArgumentComparer(IFieldType field) => _instance3;
+
+    /// <inheritdoc/>
+    public virtual IComparer<QueryArgument> DirectiveArgumentComparer(Directive directive) => _instance3;
 
     /// <inheritdoc/>
     public virtual IComparer<EnumValueDefinition> EnumValueComparer(EnumerationGraphType parent) => _instance4;
