@@ -216,3 +216,11 @@ The `SchemaExporter` class (used by `schema.ToAST()` and `schema.Print()`) now r
 Previously, the schema elements (types, fields, arguments, enum values, directives) were exported in their natural order regardless of the `Schema.Comparer` setting. Now they will be sorted if a comparer is configured.
 
 This change also affects the default Federation SDL request, which uses `schema.Print()` internally. If you have set a custom comparer on your federated schema, the SDL response will now be sorted according to that comparer.
+
+### 12. `ISchemaComparer.DirectiveArgumentComparer` method added
+
+The `ISchemaComparer` interface has been extended with a new `DirectiveArgumentComparer(Directive)` method for sorting directive arguments during schema export and introspection. This is similar to the existing `ArgumentComparer(IFieldType)` method for field arguments.
+
+If you have a custom implementation of `ISchemaComparer`, you will need to implement this new method. Most users who use the built-in `DefaultSchemaComparer` or `AlphabeticalSchemaComparer` will not be affected.
+
+Note that `AlphabeticalSchemaComparer` will now sort directive arguments alphabetically for introspection queries and when using `ToAST()` or `Print()`.

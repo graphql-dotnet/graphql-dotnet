@@ -36,7 +36,30 @@ public class __Directive : ObjectGraphType<Directive>
             .ResolveNoAccessor(context => context.Source!.Locations);
 
         Field<NonNullGraphType<ListGraphType<NonNullGraphType<__InputValue>>>>("args")
-            .ResolveNoAccessor(context => context.Source!.Arguments?.List ?? Enumerable.Empty<QueryArgument>());
+            .Resolve(context =>
+            {
+                var source = context.Source!;
+                if (source.Arguments?.Count > 0)
+                {
+                    var comparer = context.Schema.Comparer.DirectiveArgumentComparer(source);
+                    if (comparer == null)
+                        return source.Arguments.List!;
+
+                    var arguments = context.ArrayPool.Rent<QueryArgument>(source.Arguments.Count);
+
+                    int index = 0;
+                    foreach (var argument in source.Arguments.List!)
+                    {
+                        arguments[index++] = argument;
+                    }
+
+                    Array.Sort(arguments, 0, index, comparer);
+
+                    return arguments.Constrained(index);
+                }
+
+                return Array.Empty<QueryArgument>();
+            });
 
         if (allowRepeatable)
             Field<NonNullGraphType<BooleanGraphType>>("isRepeatable").ResolveNoAccessor(context => context.Source!.Repeatable);
