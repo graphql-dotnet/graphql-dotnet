@@ -25,5 +25,5 @@ internal sealed class ValidateServicesSchemaConfigurator : IConfigureSchema
     }
 
     /// <inheritdoc/>
-    public float SortOrder => 100;
+    public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_OPTIONS;
 }

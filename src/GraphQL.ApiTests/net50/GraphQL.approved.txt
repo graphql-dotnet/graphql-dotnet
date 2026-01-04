@@ -324,6 +324,8 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
+        public const float SORT_ORDER_CONFIGURATION = 200F;
+        public const float SORT_ORDER_OPTIONS = 100F;
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Please ensure that the CLR types used by your schema are not trimmed by the compi" +
             "ler.")]
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }

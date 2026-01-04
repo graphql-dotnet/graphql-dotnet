@@ -24,8 +24,16 @@ namespace GraphQL;
 public static class GraphQLBuilderExtensions // TODO: split
 {
     // see matching list in IConfigureExecution.SortOrder xml comments
-    internal const float SORT_ORDER_OPTIONS = 100;
-    internal const float SORT_ORDER_CONFIGURATION = 200;
+
+    /// <summary>
+    /// Returns the default sort order value for options-related registrations. See <see cref="IConfigureExecution.SortOrder"/>.
+    /// </summary>
+    public const float SORT_ORDER_OPTIONS = 100;
+
+    /// <summary>
+    /// Returns the default sort order value for configuration-related registrations. See <see cref="IConfigureExecution.SortOrder"/>.
+    /// </summary>
+    public const float SORT_ORDER_CONFIGURATION = 200;
 
     #region - Additional overloads for Register, TryRegister and Configure -
     /// <inheritdoc cref="Register{TService}(IServiceRegister, Func{IServiceProvider, TService}, ServiceLifetime, bool)"/>
