@@ -1170,6 +1170,7 @@ namespace GraphQL.DI
     }
     public interface IConfigureSchema
     {
+        float SortOrder { get; }
         void Configure(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider);
     }
     public interface IGraphQLBuilder
