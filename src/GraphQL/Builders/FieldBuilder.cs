@@ -240,16 +240,17 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <typeparam name="TArgumentClrType">The clr type of the argument.</typeparam>
     /// <param name="name">The name of the argument.</param>
-    /// <param name="nullable">Indicates if the argument is optional or not.</param>
+    /// <param name="nullable">Indicates if the argument is optional or not. When <see langword="null"/>, nullable value types will be nullable fields.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable = false, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool? nullable = null, Action<QueryArgument>? configure = null)
     {
         Type type;
 
         try
         {
-            type = typeof(TArgumentClrType).GetGraphTypeFromType(nullable, TypeMappingMode.InputType);
+            var isNullable = nullable ?? (Nullable.GetUnderlyingType(typeof(TArgumentClrType)) != null);
+            type = typeof(TArgumentClrType).GetGraphTypeFromType(isNullable, TypeMappingMode.InputType);
         }
         catch (ArgumentOutOfRangeException exp)
         {
@@ -264,11 +265,11 @@ public class FieldBuilder<[NotAGraphType] TSourceType, [NotAGraphType] TReturnTy
     /// </summary>
     /// <typeparam name="TArgumentClrType">The clr type of the argument.</typeparam>
     /// <param name="name">The name of the argument.</param>
-    /// <param name="nullable">Indicates if the argument is optional or not.</param>
+    /// <param name="nullable">Indicates if the argument is optional or not. When <see langword="null"/>, nullable value types will be nullable fields.</param>
     /// <param name="description">The description of the argument.</param>
     /// <param name="configure">A delegate to further configure the argument.</param>
     [AllowedOn<IObjectGraphType, IInterfaceGraphType>]
-    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool nullable, string? description, Action<QueryArgument>? configure = null)
+    public virtual FieldBuilder<TSourceType, TReturnType> Argument<[NotAGraphType] TArgumentClrType>(string name, bool? nullable, string? description, Action<QueryArgument>? configure = null)
         => Argument<TArgumentClrType>(name, nullable, b =>
         {
             b.Description = description;
