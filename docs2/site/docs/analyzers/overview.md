@@ -60,3 +60,4 @@ For more information about analyzers configuration see
 | [GQL018](../gql018) | `Parser` method must be valid                                                                     |
 | [GQL019](../gql019) | `Validator` method must be valid                                                                  |
 | [GQL020](../gql020) | `ValidateArguments` method must be valid                                                          |
+| [GQL021](../gql021) | Nullable reference type argument should specify nullable parameter                                |
