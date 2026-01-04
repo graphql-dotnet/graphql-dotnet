@@ -223,4 +223,11 @@ The `ISchemaComparer` interface has been extended with a new `DirectiveArgumentC
 
 If you have a custom implementation of `ISchemaComparer`, you will need to implement this new method. Most users who use the built-in `DefaultSchemaComparer` or `AlphabeticalSchemaComparer` will not be affected.
 
-Note that `AlphabeticalSchemaComparer` will now sort directive arguments alphabetically for introspection queries and when using `ToAST()` or `Print()`.
+Note that `AlphabeticalSchemaComparer` will now sort directive arguments alphabetically for introspection queries and when using `ToAST()` or `Print()`. To revert this behavior and keep directive arguments in their natural order while maintaining alphabetical sorting for other schema elements, derive from `AlphabeticalSchemaComparer` and override `DirectiveArgumentComparer`, returning `null`:
+
+```csharp
+public class CustomSchemaComparer : AlphabeticalSchemaComparer
+{
+    public override IComparer<QueryArgument>? DirectiveArgumentComparer(Directive directive) => null;
+}
+```
