@@ -1,0 +1,123 @@
+"""
+One of the films in the Star Wars Trilogy.
+"""
+enum Episode {
+  """Released in 1977."""
+  NEWHOPE
+  """Released in 1980."""
+  EMPIRE
+  """Released in 1983."""
+  JEDI
+}
+
+"""
+A character in the Star Wars universe.
+"""
+interface Character {
+  """The id of the character."""
+  id: ID!
+  """The name of the character."""
+  name: String
+  """The friends of the character."""
+  friends: [Character]
+  """A list of a character's friends."""
+  friendsConnection(first: Int, after: String, last: Int, before: String): CharacterConnection
+  """Which movie they appear in."""
+  appearsIn: [Episode]
+}
+
+"""
+A humanoid creature in the Star Wars universe.
+"""
+type Human implements Character {
+  """The id of the human."""
+  id: ID!
+  """The name of the human."""
+  name: String
+  """The friends of the human."""
+  friends: [Character]
+  """A list of a character's friends."""
+  friendsConnection(first: Int, after: String, last: Int, before: String): CharacterConnection
+  """Which movie they appear in."""
+  appearsIn: [Episode]
+  """The home planet of the human."""
+  homePlanet: String
+}
+
+"""
+A mechanical creature in the Star Wars universe.
+"""
+type Droid implements Character {
+  """The id of the droid."""
+  id: ID!
+  """The name of the droid."""
+  name: String
+  """The friends of the droid."""
+  friends: [Character]
+  """A list of a character's friends."""
+  friendsConnection(first: Int, after: String, last: Int, before: String): CharacterConnection
+  """Which movie they appear in."""
+  appearsIn: [Episode]
+  """The primary function of the droid."""
+  primaryFunction: String
+}
+
+"""
+Input type for creating a human.
+"""
+input HumanInput {
+  """The name of the human."""
+  name: String!
+  """The home planet of the human."""
+  homePlanet: String
+}
+
+"""
+Connection type for Character pagination.
+"""
+type CharacterConnection {
+  """Total count of characters."""
+  totalCount: Int
+  """List of character edges."""
+  edges: [CharacterEdge]
+  """Pagination information."""
+  pageInfo: PageInfo!
+}
+
+"""
+Edge type for Character pagination.
+"""
+type CharacterEdge {
+  """The character node."""
+  node: Character
+  """Cursor for this edge."""
+  cursor: String!
+}
+
+"""
+Pagination information.
+"""
+type PageInfo {
+  """Cursor to the last item."""
+  endCursor: String
+  """Whether there are more items."""
+  hasNextPage: Boolean!
+  """Whether there are previous items."""
+  hasPreviousPage: Boolean!
+  """Cursor to the first item."""
+  startCursor: String
+}
+
+type Query {
+  """Returns the hero of the Star Wars trilogy."""
+  hero: Character
+  """Returns a human by id."""
+  human(id: String!): Human
+  """Returns a droid by id."""
+  droid(id: String!): Droid
+}
+
+type Mutation {
+  """Creates a new human."""
+  createHuman(human: HumanInput!): Human
+}

@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31919.166
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphQL", "src\GraphQL\GraphQL.csproj", "{1DD5E10B-2361-467A-82AC-36EFB8C61A1D}"
 EndProject
@@ -193,6 +193,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.DataLoader.Sample.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Federation.Tests", "samples\GraphQL.Federation.Tests\GraphQL.Federation.Tests.csproj", "{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.StarWars.SchemaFirst", "src\GraphQL.StarWars.SchemaFirst\GraphQL.StarWars.SchemaFirst.csproj", "{86CAF1BB-6348-CDB3-D8C5-6191105434F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness.SchemaFirst", "samples\GraphQL.Harness.SchemaFirst\GraphQL.Harness.SchemaFirst.csproj", "{2A8CDEA4-B079-B155-A657-A77D825C26A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphQL.Harness.SchemaFirst.Tests", "samples\GraphQL.Harness.SchemaFirst.Tests\GraphQL.Harness.SchemaFirst.Tests.csproj", "{9A149224-470F-B86A-3618-8317E218AFE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -323,6 +329,18 @@ Global
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86CAF1BB-6348-CDB3-D8C5-6191105434F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86CAF1BB-6348-CDB3-D8C5-6191105434F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86CAF1BB-6348-CDB3-D8C5-6191105434F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86CAF1BB-6348-CDB3-D8C5-6191105434F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A8CDEA4-B079-B155-A657-A77D825C26A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A8CDEA4-B079-B155-A657-A77D825C26A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A8CDEA4-B079-B155-A657-A77D825C26A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A8CDEA4-B079-B155-A657-A77D825C26A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A149224-470F-B86A-3618-8317E218AFE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A149224-470F-B86A-3618-8317E218AFE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A149224-470F-B86A-3618-8317E218AFE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A149224-470F-B86A-3618-8317E218AFE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -360,6 +378,9 @@ Global
 		{9555B98B-4088-459A-A42F-187F7A33A4DA} = {90080504-5840-4624-B240-82A6F9E723B5}
 		{A1EA5D62-6C67-40FA-8978-5239B94B0892} = {90080504-5840-4624-B240-82A6F9E723B5}
 		{00CF432E-6E58-D2DF-02F6-7C2C8E88C307} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
+		{86CAF1BB-6348-CDB3-D8C5-6191105434F0} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{2A8CDEA4-B079-B155-A657-A77D825C26A2} = {90080504-5840-4624-B240-82A6F9E723B5}
+		{9A149224-470F-B86A-3618-8317E218AFE5} = {BC80C071-B8B6-42D2-9CF8-6169C6169B74}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61AAA7F9-9D46-4050-A3A5-F4358BBD95B8}

@@ -1,0 +1,13 @@
+{
+  "profiles": {
+    "GraphiQL": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "ui/graphiql",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:62249/"
+    }
+  }
+}
