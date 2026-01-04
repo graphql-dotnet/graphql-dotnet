@@ -23,4 +23,7 @@ internal sealed class ValidateServicesSchemaConfigurator : IConfigureSchema
         else
             throw new InvalidOperationException("Could not create a service validator. Ensure that the dependency injection framework supports IServiceProviderIsService.");
     }
+
+    /// <inheritdoc/>
+    public float SortOrder => GraphQLBuilderExtensions.SORT_ORDER_OPTIONS;
 }

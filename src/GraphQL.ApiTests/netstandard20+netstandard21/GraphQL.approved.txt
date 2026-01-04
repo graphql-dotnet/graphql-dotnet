@@ -321,6 +321,8 @@ namespace GraphQL
     }
     public static class GraphQLBuilderExtensions
     {
+        public const float SORT_ORDER_CONFIGURATION = 200F;
+        public const float SORT_ORDER_OPTIONS = 100F;
         public static GraphQL.DI.IGraphQLBuilder AddAutoClrMappings(this GraphQL.DI.IGraphQLBuilder builder, bool mapInputTypes = true, bool mapOutputTypes = true) { }
         public static GraphQL.DI.IGraphQLBuilder AddAutoSchema<TQueryClrType>(this GraphQL.DI.IGraphQLBuilder builder, System.Action<GraphQL.IConfigureAutoSchema>? configure = null) { }
         public static GraphQL.DI.IGraphQLBuilder AddClrTypeMappings(this GraphQL.DI.IGraphQLBuilder builder) { }
@@ -1128,6 +1130,7 @@ namespace GraphQL.DI
     }
     public interface IConfigureSchema
     {
+        float SortOrder { get; }
         void Configure(GraphQL.Types.ISchema schema, System.IServiceProvider serviceProvider);
     }
     public interface IGraphQLBuilder
