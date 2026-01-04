@@ -1866,6 +1866,7 @@ namespace GraphQL.Introspection
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.Directive> DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType> TypeComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument> DirectiveArgumentComparer(GraphQL.Types.Directive directive) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition> EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType> FieldComparer(GraphQL.Types.IGraphType parent) { }
     }
@@ -1875,6 +1876,7 @@ namespace GraphQL.Introspection
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.Directive>? DirectiveComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field) { }
+        public virtual System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? DirectiveArgumentComparer(GraphQL.Types.Directive directive) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent) { }
         public virtual System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent) { }
     }
@@ -1900,6 +1902,7 @@ namespace GraphQL.Introspection
         System.Collections.Generic.IComparer<GraphQL.Types.Directive>? DirectiveComparer { get; }
         System.Collections.Generic.IComparer<GraphQL.Types.IGraphType>? TypeComparer { get; }
         System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? ArgumentComparer(GraphQL.Types.IFieldType field);
+        System.Collections.Generic.IComparer<GraphQL.Types.QueryArgument>? DirectiveArgumentComparer(GraphQL.Types.Directive directive);
         System.Collections.Generic.IComparer<GraphQL.Types.EnumValueDefinition>? EnumValueComparer(GraphQL.Types.EnumerationGraphType parent);
         System.Collections.Generic.IComparer<GraphQL.Types.IFieldType>? FieldComparer(GraphQL.Types.IGraphType parent);
     }

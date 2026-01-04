@@ -338,7 +338,7 @@ public class SchemaExporter
     {
         var ret = new GraphQLFieldDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
         {
-            Arguments = ExportArgumentsDefinition(fieldType, fieldType.Arguments),
+            Arguments = ExportArgumentsDefinition(fieldType),
         };
         return ApplyDescription(ApplyDirectives(ret, fieldType), fieldType);
     }
@@ -446,13 +446,15 @@ public class SchemaExporter
             new GraphQLDirectiveLocations(directive.Locations))
         {
             Repeatable = directive.Repeatable,
-            Arguments = ExportArgumentsDefinition(null, directive.Arguments),
+            Arguments = ExportDirectiveArgumentsDefinition(directive),
         };
         return ApplyDescription(def, directive);
     }
 
-    private GraphQLArgumentsDefinition? ExportArgumentsDefinition(IFieldType? field, QueryArguments? arguments)
+    private GraphQLArgumentsDefinition? ExportArgumentsDefinition(IFieldType field)
     {
+        var arguments = field.Arguments;
+
         if (arguments == null || arguments.Count == 0)
             return null;
 
@@ -463,6 +465,25 @@ public class SchemaExporter
             if (argumentComparer != null)
                 argList = argList.OrderBy(a => a, argumentComparer);
         }
+
+        var args = new List<GraphQLInputValueDefinition>(arguments.Count);
+        foreach (var arg in argList)
+        {
+            args.Add(ExportArgumentDefinition(arg));
+        }
+        return new GraphQLArgumentsDefinition(args);
+    }
+
+    private GraphQLArgumentsDefinition? ExportDirectiveArgumentsDefinition(Directive directive)
+    {
+        var arguments = directive.Arguments;
+        if (arguments == null || arguments.Count == 0)
+            return null;
+
+        IEnumerable<QueryArgument> argList = arguments.List!;
+        var argumentComparer = Schema.Comparer.DirectiveArgumentComparer(directive);
+        if (argumentComparer != null)
+            argList = argList.OrderBy(a => a, argumentComparer);
 
         var args = new List<GraphQLInputValueDefinition>(arguments.Count);
         foreach (var arg in argList)
