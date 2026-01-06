@@ -103,7 +103,8 @@ public class GraphQLFieldArgumentTests
     [Theory]
     [InlineData(".Argument<IntGraphType>(\"limit\")", "limit")]
     [InlineData(".Argument<IntGraphType>(name: \"limit\")", "limit")]
-    public async Task NameArgument_ExplicitStringLiteral_ReturnsNameWithLocation(string argumentCall, string expectedName)
+    [InlineData(".Argument<StringGraphType>(name: null)", null)]
+    public async Task NameArgument_ExplicitStringLiteral_ReturnsName(string argumentCall, string? expectedName)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -128,11 +129,11 @@ public class GraphQLFieldArgumentTests
         argument.Name.ShouldNotBeNull();
         argument.Name.Value.ShouldBe(expectedName);
         argument.Name.Location.ShouldNotBeNull();
-        await VerifyLocationAsync(context, argument.Name.Location, $"\"{expectedName}\"");
+        await VerifyLocationAsync(context, argument.Name.Location, expectedName == null ? "null" : $"\"{expectedName}\"");
     }
 
     [Fact]
-    public async Task NameArgument_ConstFieldReference_ReturnsNameWithLocation()
+    public async Task NameArgument_ConstFieldReference_ReturnsName()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -162,7 +163,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task GraphTypeGeneric_GenericTypeArgument_ReturnsTypeWithLocation()
+    public async Task GraphTypeGeneric_GenericTypeArgument_ReturnsType()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -191,7 +192,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task DescriptionArgument_ExplicitArgument_ReturnsDescriptionWithLocation()
+    public async Task DescriptionArgument_ExplicitArgument_ReturnsDescription()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -219,7 +220,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task ConfigureAction_Description_ReturnsDescriptionWithLocation()
+    public async Task ConfigureAction_Description_ReturnsDescription()
     {
         var context = await TestContext.CreateAsync(
             """
@@ -253,7 +254,7 @@ public class GraphQLFieldArgumentTests
     [InlineData("\"default\"", "default")]
     [InlineData("null", null)]
     [InlineData("DefaultLimitConst", 100)]
-    public async Task ConfigureAction_DefaultValue_ReturnsValueWithLocation(string defaultValueExpr, object? expectedDefaultValue)
+    public async Task ConfigureAction_DefaultValue_ReturnsValue(string defaultValueExpr, object? expectedDefaultValue)
     {
         var context = await TestContext.CreateAsync(
             $$"""
@@ -630,7 +631,7 @@ public class GraphQLFieldArgumentTests
     }
 
     [Fact]
-    public async Task ConfigureAction_DeprecationReason_ReturnsReasonWithLocation()
+    public async Task ConfigureAction_DeprecationReason_ReturnsReason()
     {
         var context = await TestContext.CreateAsync(
             """
