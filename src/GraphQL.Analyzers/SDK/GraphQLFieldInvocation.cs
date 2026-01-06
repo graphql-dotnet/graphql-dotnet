@@ -122,7 +122,7 @@ public sealed class GraphQLFieldInvocation
             switch (nameArg.Expression)
             {
                 case LiteralExpressionSyntax literal:
-                    return new GraphQLObjectProperty<string?>(literal.Token.ValueText, literal.GetLocation());
+                    return new GraphQLObjectProperty<string?>(literal.Token.Value, literal.GetLocation());
                 case IdentifierNameSyntax or MemberAccessExpressionSyntax:
                 {
                     var symbol = SemanticModel.GetSymbolInfo(nameArg.Expression).Symbol;
@@ -173,7 +173,7 @@ public sealed class GraphQLFieldInvocation
         if (arg?.Expression is LiteralExpressionSyntax literal)
         {
             return new GraphQLObjectProperty<string?>(
-                literal.Token.ValueText,
+                literal.Token.Value,
                 arg.Expression.GetLocation());
         }
 
@@ -187,7 +187,7 @@ public sealed class GraphQLFieldInvocation
         if (arg?.Expression is LiteralExpressionSyntax literal)
         {
             return new GraphQLObjectProperty<string?>(
-                literal.Token.ValueText,
+                literal.Token.Value,
                 arg.Expression.GetLocation());
         }
 

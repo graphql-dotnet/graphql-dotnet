@@ -11,9 +11,11 @@ namespace GraphQL.Analyzers.SDK;
 /// </summary>
 public sealed class GraphQLFieldArgument
 {
+    private const string METHOD_NAME = "Argument";
+
     private readonly Lazy<GraphQLObjectProperty<string?>?> _nameArgument;
     private readonly Lazy<GraphQLObjectProperty<ITypeSymbol>?> _graphTypeGeneric;
-    private readonly Lazy<GraphQLObjectProperty<bool>?> _nullable;
+    private readonly Lazy<GraphQLObjectProperty<bool?>?> _nullable;
     private readonly Lazy<GraphQLObjectProperty<string?>?> _descriptionArgument;
     private readonly Lazy<GraphQLFieldArgumentConfigureAction?> _configureAction;
     private readonly Lazy<Location> _location;
@@ -26,7 +28,7 @@ public sealed class GraphQLFieldArgument
 
         _nameArgument = new Lazy<GraphQLObjectProperty<string?>?>(GetNameArgument);
         _graphTypeGeneric = new Lazy<GraphQLObjectProperty<ITypeSymbol>?>(GetGraphTypeFromGeneric);
-        _nullable = new Lazy<GraphQLObjectProperty<bool>?>(GetNullable);
+        _nullable = new Lazy<GraphQLObjectProperty<bool?>?>(GetNullable);
         _descriptionArgument = new Lazy<GraphQLObjectProperty<string?>?>(GetDescriptionArgument);
         _configureAction = new Lazy<GraphQLFieldArgumentConfigureAction?>(GetConfigureAction);
         _location = new Lazy<Location>(() => GetLocation(invocation, semanticModel));
@@ -46,7 +48,7 @@ public sealed class GraphQLFieldArgument
     /// <summary>
     /// Gets the 'nullable' argument from the Argument() method call.
     /// </summary>
-    public GraphQLObjectProperty<bool>? Nullable => _nullable.Value;
+    public GraphQLObjectProperty<bool?>? Nullable => _nullable.Value;
 
     /// <summary>
     /// Gets the 'description' argument from the Argument() method call.
@@ -123,7 +125,7 @@ public sealed class GraphQLFieldArgument
     /// </summary>
     public static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel)
     {
-        if (!semanticModel.IsGraphQLMethodInvocation(invocation, "Argument"))
+        if (!semanticModel.IsGraphQLMethodInvocation(invocation, METHOD_NAME))
         {
             return null;
         }
@@ -136,7 +138,7 @@ public sealed class GraphQLFieldArgument
     /// </summary>
     internal static GraphQLFieldArgument? TryCreate(InvocationExpressionSyntax invocation, SemanticModel semanticModel, GraphQLFieldInvocation parentField)
     {
-        if (!semanticModel.IsGraphQLMethodInvocation(invocation, "Argument"))
+        if (!semanticModel.IsGraphQLMethodInvocation(invocation, METHOD_NAME))
         {
             return null;
         }
@@ -165,7 +167,7 @@ public sealed class GraphQLFieldArgument
 
     private GraphQLObjectProperty<string?>? GetNameArgument()
     {
-        // Try to get from explicit 'name' argument: .Argument<IntGraphType>("argName") or .Argument<int>("argName", nullable: true)
+        // Try to get from explicit 'name' argument: .Argument<IntGraphType>("argName")
         var nameArg = GetArgument("name");
         if (nameArg != null)
         {
@@ -174,7 +176,7 @@ public sealed class GraphQLFieldArgument
                 // .Argument<IntGraphType>("argName")
                 case LiteralExpressionSyntax literal:
                 {
-                    return new GraphQLObjectProperty<string?>(literal.Token.ValueText, literal.GetLocation());
+                    return new GraphQLObjectProperty<string?>(literal.Token.Value, literal.GetLocation());
                 }
                 // .Argument<IntGraphType>(ConstArgName)
                 case IdentifierNameSyntax or MemberAccessExpressionSyntax:
@@ -212,16 +214,13 @@ public sealed class GraphQLFieldArgument
         return null;
     }
 
-    private GraphQLObjectProperty<bool>? GetNullable()
+    private GraphQLObjectProperty<bool?>? GetNullable()
     {
         // Try to get from explicit 'nullable' argument: .Argument<int>("argName", nullable: true)
         var nullableArg = GetArgument("nullable");
         if (nullableArg?.Expression is LiteralExpressionSyntax literal)
         {
-            if (literal.Token.Value is bool boolValue)
-            {
-                return new GraphQLObjectProperty<bool>(boolValue, literal.GetLocation());
-            }
+            return new GraphQLObjectProperty<bool?>(literal.Token.Value, literal.GetLocation());
         }
 
         return null;
@@ -234,7 +233,7 @@ public sealed class GraphQLFieldArgument
         if (descArg?.Expression is LiteralExpressionSyntax literal)
         {
             return new GraphQLObjectProperty<string?>(
-                literal.Token.ValueText,
+                literal.Token.Value,
                 descArg.Expression.GetLocation());
         }
 

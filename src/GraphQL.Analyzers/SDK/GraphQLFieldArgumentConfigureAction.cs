@@ -174,17 +174,9 @@ public sealed class GraphQLFieldArgumentConfigureAction
             var constantValue = valueOperation.ConstantValue;
             if (constantValue is { HasValue: true })
             {
-                switch (constantValue.Value)
-                {
-                    case null:
-                        return new GraphQLObjectProperty<TType>(
-                            default,
-                            assignment.Value.Syntax.GetLocation());
-                    case TType value:
-                        return new GraphQLObjectProperty<TType>(
-                            value,
-                            assignment.Value.Syntax.GetLocation());
-                }
+                return new GraphQLObjectProperty<TType>(
+                    constantValue.Value,
+                    assignment.Value.Syntax.GetLocation());
             }
         }
 

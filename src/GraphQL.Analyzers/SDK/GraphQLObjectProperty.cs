@@ -25,6 +25,12 @@ public sealed class GraphQLObjectProperty<T>
         Location = location;
     }
 
+    internal GraphQLObjectProperty(object? value, Location location)
+    {
+        Value = value == null ? default : (T)value;
+        Location = location;
+    }
+
     /// <summary>
     /// Implicitly converts the property to its underlying value.
     /// </summary>
