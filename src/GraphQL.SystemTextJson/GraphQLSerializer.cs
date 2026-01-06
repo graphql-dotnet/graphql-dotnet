@@ -1,6 +1,8 @@
 using System.Text.Json;
 using GraphQL.Execution;
+#if !NET8_0_OR_GREATER
 using GraphQL.Instrumentation;
+#endif
 using GraphQL.Transport;
 
 namespace GraphQL.SystemTextJson;
@@ -175,10 +177,12 @@ public class GraphQLSerializer : IGraphQLTextSerializer
             SerializerOptions.Converters.Add(new ExecutionErrorJsonConverter(errorInfoProvider ?? new ErrorInfoProvider()));
         }
 
+#if !NET8_0_OR_GREATER
         if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(ApolloTrace))))
         {
             SerializerOptions.Converters.Add(new ApolloTraceJsonConverter());
         }
+#endif
 
         if (!SerializerOptions.Converters.Any(c => c.CanConvert(typeof(System.Numerics.BigInteger))))
         {

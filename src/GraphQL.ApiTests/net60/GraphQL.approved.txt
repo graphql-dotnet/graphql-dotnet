@@ -1811,30 +1811,44 @@ namespace GraphQL.Instrumentation
     public class ApolloTrace
     {
         public ApolloTrace(System.DateTime start, double durationMs) { }
+        [System.Text.Json.Serialization.JsonPropertyName("duration")]
         public long Duration { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("endTime")]
         public System.DateTime EndTime { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("execution")]
         public GraphQL.Instrumentation.ApolloTrace.ExecutionTrace Execution { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("parsing")]
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Parsing { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("startTime")]
         public System.DateTime StartTime { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("validation")]
         public GraphQL.Instrumentation.ApolloTrace.OperationTrace Validation { get; }
+        [System.Text.Json.Serialization.JsonPropertyName("version")]
         public int Version { get; }
         public class ExecutionTrace
         {
             public ExecutionTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("resolvers")]
             public System.Collections.Generic.List<GraphQL.Instrumentation.ApolloTrace.ResolverTrace> Resolvers { get; }
         }
         public class OperationTrace
         {
             public OperationTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("duration")]
             public long Duration { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("startOffset")]
             public long StartOffset { get; set; }
         }
         public class ResolverTrace : GraphQL.Instrumentation.ApolloTrace.OperationTrace
         {
             public ResolverTrace() { }
+            [System.Text.Json.Serialization.JsonPropertyName("fieldName")]
             public string? FieldName { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("parentType")]
             public string? ParentType { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("path")]
             public System.Collections.Generic.List<object>? Path { get; set; }
+            [System.Text.Json.Serialization.JsonPropertyName("returnType")]
             public string? ReturnType { get; set; }
         }
     }
