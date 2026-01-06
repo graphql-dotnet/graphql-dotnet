@@ -948,7 +948,8 @@ namespace GraphQL
         public static void RegisterListConverter<TListType, TElementType>(System.Func<System.Collections.Generic.IEnumerable<TElementType>, TListType>? conversion)
             where TListType : System.Collections.Generic.IEnumerable<TElementType> { }
         public static void RegisterListConverterFactory(System.Type listType, GraphQL.Conversion.IListConverterFactory? converter) { }
-        public static void RegisterListConverterFactory(System.Type listType, System.Type implementationType) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode(@"For generic list types, the constructed implementation type (e.g. List<T>) must be rooted for trimming. If the closed generic type is only referenced via reflection, the trimmer may remove its required constructors or other members, which can cause runtime failures.")]
+        public static void RegisterListConverterFactory(System.Type listType, [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type implementationType) { }
     }
     public struct VariableName
     {
@@ -1142,6 +1143,7 @@ namespace GraphQL.Conversion
     }
     public abstract class ListConverterFactoryBase : GraphQL.Conversion.IListConverterFactory
     {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
         protected ListConverterFactoryBase() { }
         public virtual GraphQL.Conversion.IListConverter Create([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public abstract System.Func<object?[], object> Create<T>();
