@@ -1,3 +1,6 @@
+#if NET8_0_OR_GREATER
+using System.Diagnostics;
+#endif
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Execution;
@@ -76,7 +79,43 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
             var items = arrayExecutionNode.Items;
             if (items == null)
             {
-                JsonSerializer.Serialize(writer, arrayExecutionNode.SerializedResult, options);
+                var serializedResult = arrayExecutionNode.SerializedResult;
+                if (serializedResult == null)
+                {
+                    writer.WriteNullValue();
+                }
+                else if (serializedResult.GetType() == typeof(byte[]))
+                {
+                    // For array execution nodes, if the serialized result is a byte array, write it as an array of numbers
+                    writer.WriteStartArray();
+                    foreach (var b in (byte[])serializedResult)
+                    {
+                        writer.WriteNumberValue(b);
+                    }
+                    writer.WriteEndArray();
+                }
+                else
+                {
+#if !NET8_0_OR_GREATER
+                    // Specify object? to eliminate boxing when iterating over IEnumerable
+                    JsonSerializer.Serialize<object?>(writer, serializedResult, options);
+#else
+                    if (options.TryGetTypeInfo(serializedResult.GetType(), out var typeInfo))
+                    {
+                        JsonSerializer.Serialize(writer, serializedResult, typeInfo);
+                    }
+                    else
+                    {
+                        // Arrays of primitive types may not have type info available, so fall back to manual serialization
+                        writer.WriteStartArray();
+                        foreach (var item in serializedResult)
+                        {
+                            JsonSerializer.Serialize(writer, item, options);
+                        }
+                        writer.WriteEndArray();
+                    }
+#endif
+                }
             }
             else
             {
