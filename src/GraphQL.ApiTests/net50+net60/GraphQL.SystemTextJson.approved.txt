@@ -1,0 +1,156 @@
+namespace GraphQL.SystemTextJson
+{
+    public class ApolloTraceJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Instrumentation.ApolloTrace>
+    {
+        public ApolloTraceJsonConverter() { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override GraphQL.Instrumentation.ApolloTrace Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Instrumentation.ApolloTrace value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class ExecutionErrorJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionError>
+    {
+        public ExecutionErrorJsonConverter(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public override bool CanConvert(System.Type typeToConvert) { }
+        public override GraphQL.ExecutionError Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionError error, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class ExecutionResultJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.ExecutionResult>
+    {
+        public ExecutionResultJsonConverter() { }
+        public override bool CanConvert(System.Type typeToConvert) { }
+        public override GraphQL.ExecutionResult Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class GraphQLRequestJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transport.GraphQLRequest>
+    {
+        public GraphQLRequestJsonConverter() { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override GraphQL.Transport.GraphQLRequest Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Transport.GraphQLRequest value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class GraphQLRequestListJsonConverter : System.Text.Json.Serialization.JsonConverter<System.Collections.Generic.IEnumerable<GraphQL.Transport.GraphQLRequest>>
+    {
+        public GraphQLRequestListJsonConverter() { }
+        public override bool CanConvert(System.Type typeToConvert) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override System.Collections.Generic.IEnumerable<GraphQL.Transport.GraphQLRequest> Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Collections.Generic.IEnumerable<GraphQL.Transport.GraphQLRequest> value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public class GraphQLSerializer : GraphQL.IGraphQLSerializer, GraphQL.IGraphQLTextSerializer
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer() { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(bool indent) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public bool IsNativelyAsync { get; }
+        protected System.Text.Json.JsonSerializerOptions SerializerOptions { get; }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public T? Deserialize<T>(string? json) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public System.Threading.Tasks.ValueTask<T?> ReadAsync<T>(System.IO.Stream stream, System.Threading.CancellationToken cancellationToken = default) { }
+        public T? ReadNode<T>(object? value) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public string Serialize<T>(T? value) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public System.Threading.Tasks.Task WriteAsync<T>(System.IO.Stream stream, T? value, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+    public class InputsJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Inputs>
+    {
+        public InputsJsonConverter() { }
+        public override GraphQL.Inputs Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Inputs value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public sealed class JsonConverterBigInteger : System.Text.Json.Serialization.JsonConverter<System.Numerics.BigInteger>
+    {
+        public JsonConverterBigInteger() { }
+        public override System.Numerics.BigInteger Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, System.Numerics.BigInteger value, System.Text.Json.JsonSerializerOptions options) { }
+        public static bool TryGetBigInteger(ref System.Text.Json.Utf8JsonReader reader, out System.Numerics.BigInteger bi) { }
+    }
+    public class OperationMessageJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transport.OperationMessage>
+    {
+        public OperationMessageJsonConverter() { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override GraphQL.Transport.OperationMessage Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.Transport.OperationMessage value, System.Text.Json.JsonSerializerOptions options) { }
+    }
+    public static class SchemaExtensions
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
+    }
+}
+namespace GraphQL
+{
+    public static class SystemTextJsonGraphQLBuilderExtensions
+    {
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
+    }
+}

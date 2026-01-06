@@ -10,6 +10,8 @@ namespace GraphQL.SystemTextJson;
 public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
 {
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override void Write(Utf8JsonWriter writer, ExecutionResult value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
@@ -23,6 +25,8 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
         writer.WriteEndObject();
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
+    [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
     private static void WriteData(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
     {
         if (result.Executed)
@@ -39,6 +43,8 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
         }
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
+    [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
     private static void WriteExecutionNode(Utf8JsonWriter writer, ExecutionNode node, JsonSerializerOptions options)
     {
         if (node is ValueExecutionNode valueExecutionNode)
@@ -92,6 +98,8 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
         }
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
+    [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
     private static void WriteErrors(Utf8JsonWriter writer, ExecutionErrors? errors, JsonSerializerOptions options)
     {
         if (errors == null || errors.Count == 0)
@@ -104,6 +112,8 @@ public class ExecutionResultJsonConverter : JsonConverter<ExecutionResult>
         JsonSerializer.Serialize(writer, errors, options);
     }
 
+    [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
+    [RequiresDynamicCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(Utf8JsonWriter, TValue, JsonSerializerOptions)")]
     private static void WriteExtensions(Utf8JsonWriter writer, ExecutionResult result, JsonSerializerOptions options)
     {
         if (result.Extensions?.Count > 0)

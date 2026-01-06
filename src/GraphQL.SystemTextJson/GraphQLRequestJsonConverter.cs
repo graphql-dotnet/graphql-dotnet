@@ -39,6 +39,8 @@ public class GraphQLRequestJsonConverter : JsonConverter<GraphQLRequest>
     private const string DOCUMENT_ID_KEY = "documentId";
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override void Write(Utf8JsonWriter writer, GraphQLRequest value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
@@ -71,6 +73,8 @@ public class GraphQLRequestJsonConverter : JsonConverter<GraphQLRequest>
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override GraphQLRequest Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)

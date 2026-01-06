@@ -29,6 +29,8 @@ public class GraphQLRequestListJsonConverter : JsonConverter<IEnumerable<GraphQL
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override void Write(Utf8JsonWriter writer, IEnumerable<GraphQLRequest> value, JsonSerializerOptions options)
     {
         writer.WriteStartArray();
@@ -40,6 +42,8 @@ public class GraphQLRequestListJsonConverter : JsonConverter<IEnumerable<GraphQL
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override IEnumerable<GraphQLRequest> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.StartObject)
