@@ -61,16 +61,29 @@ public class GraphQLAotSerializer : GraphQLSerializer
 
     private static JsonSerializerOptions CreateOptions(IErrorInfoProvider? errorInfoProvider, JsonSerializerContext? context)
     {
+        // Ensure the serializer has an error info provider available for the GraphQL-specific converters.
         errorInfoProvider ??= new ErrorInfoProvider();
-        var options = new JsonSerializerOptions(GraphQLJsonSerializerContext.Default.Options)
+
+        // No caller context: use only GraphQL's source-generated options and resolvers.
+        if (context == null)
         {
-            TypeInfoResolver = JsonTypeInfoResolver.Combine(GraphQLJsonSerializerContext.Default, new GraphQLCustomJsonSerializerContext(errorInfoProvider))
-        };
-        if (context != null)
-        {
-            options.TypeInfoResolver = JsonTypeInfoResolver.Combine(context, options.TypeInfoResolver!);
+            return new JsonSerializerOptions(GraphQLJsonSerializerContext.Default.Options)
+            {
+                TypeInfoResolver = JsonTypeInfoResolver.Combine(
+                    GraphQLJsonSerializerContext.Default,
+                    new GraphQLCustomJsonSerializerContext(errorInfoProvider))
+            };
         }
-        return options;
+
+        // Caller supplies a context: prefer its options and put it first in the resolver chain,
+        // while using GraphQL's resolvers as a fallback for types not covered by the caller's context.
+        return new JsonSerializerOptions(context.Options)
+        {
+            TypeInfoResolver = JsonTypeInfoResolver.Combine(
+                context,
+                GraphQLJsonSerializerContext.Default,
+                new GraphQLCustomJsonSerializerContext(errorInfoProvider))
+        };
     }
 }
 #endif
