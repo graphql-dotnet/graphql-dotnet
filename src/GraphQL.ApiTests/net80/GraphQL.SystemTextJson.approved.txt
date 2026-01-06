@@ -68,28 +68,28 @@ namespace GraphQL.SystemTextJson
     public class GraphQLSerializer : GraphQL.IGraphQLSerializer, GraphQL.IGraphQLTextSerializer
     {
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer() { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(bool indent) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(System.Action<System.Text.Json.JsonSerializerOptions> configureSerializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(System.Text.Json.JsonSerializerOptions serializerOptions, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public GraphQLSerializer(bool indent, GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
         public bool IsNativelyAsync { get; }
         protected System.Text.Json.JsonSerializerOptions SerializerOptions { get; }
@@ -156,9 +156,9 @@ namespace GraphQL
 {
     public static class SystemTextJsonGraphQLBuilderExtensions
     {
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
     }
 }

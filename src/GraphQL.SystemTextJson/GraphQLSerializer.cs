@@ -20,7 +20,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
     /// no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer()
         : this(indent: false)
@@ -32,7 +32,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
     /// <param name="indent">Indicates if child objects should be indented</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(bool indent)
         : this(GetDefaultSerializerOptions(indent))
@@ -44,7 +44,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="indent">Indicates if child objects should be indented</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(bool indent, IErrorInfoProvider errorInfoProvider)
         : this(GetDefaultSerializerOptions(indent), errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)))
@@ -56,7 +56,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// specified <see cref="IErrorInfoProvider"/>.
     /// </summary>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(IErrorInfoProvider errorInfoProvider)
         : this(false, errorInfoProvider)
@@ -68,7 +68,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// Configuration defaults to no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
     /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(Action<JsonSerializerOptions> configureSerializerOptions)
     {
@@ -96,7 +96,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// make are unobserved.
     /// </summary>
     /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(JsonSerializerOptions serializerOptions)
     {
@@ -126,7 +126,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
     {
@@ -147,7 +147,7 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
-    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
     [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(Action<JsonSerializerOptions> configureSerializerOptions, IErrorInfoProvider errorInfoProvider)
     {
