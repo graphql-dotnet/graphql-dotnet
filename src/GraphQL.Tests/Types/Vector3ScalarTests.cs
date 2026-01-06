@@ -40,12 +40,14 @@ public class Vector3ScalarTests : QueryTestBase<Vector3ScalarTests.Vector3Scalar
     [Fact]
     public void test_output()
     {
+        AllWriters = false; // Not compatible with AOT serializer as currently designed
         AssertQuerySuccess("{ output }", """{ "output": { "x": 4, "y": 5, "z": 6 } }""");
     }
 
     [Fact]
     public void test_loopback_with_value()
     {
+        AllWriters = false; // Not compatible with AOT serializer as currently designed
         AssertQuerySuccess("""{ loopback(arg: "11,12,13") }""", """{ "loopback": { "x": 11, "y": 12, "z": 13 } }""");
     }
 

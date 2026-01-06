@@ -13,7 +13,7 @@ IServiceCollection serviceCollection = new ServiceCollection();
 //   - AddAutoClrMappings
 //   - AddAutoSchema
 serviceCollection.AddGraphQL(b => b
-    .AddSystemTextJson()
+    .AddSystemTextJsonAot()
     //.AddSchema<StarWarsSchema>()
     //.AddGraphTypes(typeof(StarWarsSchema).Assembly)
     .AddSelfActivatingSchema<StarWarsSchema>()

@@ -36,6 +36,17 @@ namespace GraphQL.SystemTextJson
             "publishing as Native AOT")]
         public override void Write(System.Text.Json.Utf8JsonWriter writer, GraphQL.ExecutionResult value, System.Text.Json.JsonSerializerOptions options) { }
     }
+    public class GraphQLAotSerializer : GraphQL.SystemTextJson.GraphQLSerializer
+    {
+        public GraphQLAotSerializer() { }
+        public GraphQLAotSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider) { }
+        public GraphQLAotSerializer(System.Text.Json.Serialization.JsonSerializerContext context) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with \'RequiresUnreferencedCodeAttribute\' require dynamic" +
+            " access otherwise can break functionality when trimming application code")]
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with \'RequiresDynamicCodeAttribute\' when " +
+            "publishing as Native AOT")]
+        public GraphQLAotSerializer(GraphQL.Execution.IErrorInfoProvider errorInfoProvider, System.Text.Json.Serialization.JsonSerializerContext context) { }
+    }
     public class GraphQLRequestJsonConverter : System.Text.Json.Serialization.JsonConverter<GraphQL.Transport.GraphQLRequest>
     {
         public GraphQLRequestJsonConverter() { }
@@ -163,5 +174,7 @@ namespace GraphQL
         [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJsonAot(this GraphQL.DI.IGraphQLBuilder builder) { }
+        public static GraphQL.DI.IGraphQLBuilder AddSystemTextJsonAot(this GraphQL.DI.IGraphQLBuilder builder, System.Text.Json.Serialization.JsonSerializerContext context) { }
     }
 }

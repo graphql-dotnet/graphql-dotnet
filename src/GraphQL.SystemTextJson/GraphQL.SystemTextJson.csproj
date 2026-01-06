@@ -5,6 +5,8 @@
     <RootNamespace>GraphQL.SystemTextJson</RootNamespace>
     <Description>System.Text.Json serializer for GraphQL.NET</Description>
     <PackageTags>GraphQL;json</PackageTags>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>obj\Generated</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

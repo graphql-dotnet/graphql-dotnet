@@ -38,6 +38,10 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
                 _serializer = CreateNSJ();
             else if (type == "GraphQL.SystemTextJson.GraphQLSerializer")
                 _serializer = CreateSTJ();
+#if NET8_0_OR_GREATER
+            else if (type == "GraphQL.Tests.MyStjAotSerializer")
+                _serializer = CreateSTJAOT();
+#endif
             else
                 throw new NotSupportedException("Unknown serializer: " + type);
         }
@@ -51,7 +55,16 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
     public static readonly List<IGraphQLTextSerializer> AllWriters =
     [
         new Wrapper(CreateNSJ()),
-        new Wrapper(CreateSTJ())
+        new Wrapper(CreateSTJ()),
+#if NET8_0_OR_GREATER
+        new Wrapper(CreateSTJAOT()),
+#endif
+    ];
+
+    public static readonly List<IGraphQLTextSerializer> AllNonAotWriters =
+    [
+        new Wrapper(CreateNSJ()),
+        new Wrapper(CreateSTJ()),
     ];
 
     private static IGraphQLTextSerializer CreateNSJ() => new NewtonsoftJson.GraphQLSerializer(settings =>
@@ -67,6 +80,13 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping // less strict about what is encoded into \uXXXX
     });
 
+#if NET8_0_OR_GREATER
+    private static IGraphQLTextSerializer CreateSTJAOT()
+    {
+        return new MyStjAotSerializer();
+    }
+#endif
+
     public IEnumerator<object[]> GetEnumerator()
     {
         foreach (var writer in AllWriters)
@@ -77,3 +97,28 @@ public class GraphQLSerializersTestData : IEnumerable<object[]>
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
+
+public class GraphQLSerializersNoAotTestData : IEnumerable<object[]>
+{
+    public IEnumerator<object[]> GetEnumerator()
+    {
+        foreach (var writer in GraphQLSerializersTestData.AllNonAotWriters)
+        {
+            yield return new object[] { writer };
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+}
+
+#if NET8_0_OR_GREATER
+internal class MyStjAotSerializer : GraphQL.SystemTextJson.GraphQLAotSerializer
+{
+    public MyStjAotSerializer()
+    {
+        SerializerOptions.WriteIndented = true;
+        SerializerOptions.PropertyNameCaseInsensitive = true;
+        SerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping; // less strict about what is encoded into \uXXXX
+    }
+}
+#endif
