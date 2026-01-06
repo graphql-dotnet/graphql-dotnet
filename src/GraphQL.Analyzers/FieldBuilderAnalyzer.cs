@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using GraphQL.Analyzers.Helpers;
-using GraphQL.Analyzers.SDK;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,6 +19,11 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         isEnabledByDefault: true,
         helpLinkUri: HelpLinks.CAN_NOT_INFER_FIELD_NAME_FROM_EXPRESSION);
 
+    private static readonly HashSet<string> _supportedNames =
+    [
+        Constants.MethodNames.Field
+    ];
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
         ImmutableArray.Create(CantInferFieldNameFromExpression);
 
@@ -28,28 +32,86 @@ public class FieldBuilderAnalyzer : DiagnosticAnalyzer
         context.EnableConcurrentExecution();
         context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
-        context.RegisterSyntaxNodeAction(AnalyzeInvocationExpression, SyntaxKind.InvocationExpression);
+        context.RegisterSyntaxNodeAction(AnalyzeGenericNameSyntax, SyntaxKind.GenericName);
+        context.RegisterSyntaxNodeAction(AnalyzeInvocationExpressionSyntax, SyntaxKind.InvocationExpression);
     }
 
-    private static void AnalyzeInvocationExpression(SyntaxNodeAnalysisContext context)
+    // Field<T>()
+    private void AnalyzeGenericNameSyntax(SyntaxNodeAnalysisContext context)
     {
-        var invocation = (InvocationExpressionSyntax)context.Node;
-        var fieldInvocation = GraphQLFieldInvocation.TryCreate(invocation, context.SemanticModel);
+        var genericNameSyntax = (GenericNameSyntax)context.Node;
 
-        var fieldExpression = fieldInvocation?.FieldExpression;
-        if (fieldExpression == null)
+        AnalyzeExpressionSyntax(context, genericNameSyntax);
+    }
+
+    // Field(Type)
+    private void AnalyzeInvocationExpressionSyntax(SyntaxNodeAnalysisContext context)
+    {
+        var invocationExpressionSyntax = (InvocationExpressionSyntax)context.Node;
+
+        if (invocationExpressionSyntax.Expression is not IdentifierNameSyntax identifierSyntax)
         {
             return;
         }
 
-        if (!fieldExpression.IsValid)
-        {
-            var diagnostic = Diagnostic.Create(
-                CantInferFieldNameFromExpression,
-                fieldExpression.Syntax.GetLocation(),
-                fieldExpression.Syntax.ToString());
+        AnalyzeExpressionSyntax(context, identifierSyntax);
+    }
 
-            context.ReportDiagnostic(diagnostic);
+    private static void AnalyzeExpressionSyntax(SyntaxNodeAnalysisContext context, SimpleNameSyntax genericNameSyntax)
+    {
+        string name = genericNameSyntax.Identifier.Text;
+        if (!_supportedNames.Contains(name))
+        {
+            return;
         }
+
+        if (!genericNameSyntax.IsGraphQLSymbol(context.SemanticModel))
+        {
+            return;
+        }
+
+        var methodSymbol = genericNameSyntax.GetMethodSymbol(context);
+        if (methodSymbol == null)
+        {
+            return;
+        }
+
+        AnalyzeExpressionBasedFieldBuilder(context, genericNameSyntax, methodSymbol, name);
+    }
+
+    private static void AnalyzeExpressionBasedFieldBuilder(
+        SyntaxNodeAnalysisContext context,
+        SimpleNameSyntax genericNameSyntax,
+        IMethodSymbol methodSymbol,
+        string name)
+    {
+        if (name != Constants.MethodNames.Field || methodSymbol.ReturnType.Name != Constants.Types.FieldBuilder)
+        {
+            return;
+        }
+
+        var fieldInvocation = genericNameSyntax.FindMethodInvocationExpression()!;
+
+        var expressionArg = GetArgument(Constants.ArgumentNames.Expression);
+        if (expressionArg == null)
+        {
+            return;
+        }
+
+        if (expressionArg.Expression is SimpleLambdaExpressionSyntax { Body: not MemberAccessExpressionSyntax })
+        {
+            var nameArg = GetArgument(Constants.ArgumentNames.Name);
+            if (nameArg == null)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        CantInferFieldNameFromExpression,
+                        expressionArg.GetLocation(),
+                        expressionArg.Expression.ToString()));
+            }
+        }
+
+        ArgumentSyntax? GetArgument(string argName) =>
+            fieldInvocation.GetMethodArgument(argName, context.SemanticModel);
     }
 }
