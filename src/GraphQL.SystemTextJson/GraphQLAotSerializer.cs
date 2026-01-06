@@ -36,7 +36,7 @@ public class GraphQLAotSerializer : GraphQLSerializer
     /// Initializes a new instance of the <see cref="GraphQLAotSerializer"/> class with the specified
     /// <see cref="JsonSerializerContext"/> and the default <see cref="ErrorInfoProvider"/>.
     /// Types not included in the provided context but required during serialization will be
-    /// handled by the default serialization context.
+    /// handled by the internally provided serialization context.
     /// </summary>
     /// <param name="context">The JSON serializer context that provides metadata for serialization.</param>
     public GraphQLAotSerializer(JsonSerializerContext context)
@@ -47,8 +47,8 @@ public class GraphQLAotSerializer : GraphQLSerializer
     /// <summary>
     /// Initializes a new instance of the <see cref="GraphQLAotSerializer"/> class with the specified
     /// <see cref="IErrorInfoProvider"/> and <see cref="JsonSerializerContext"/>. Types not included
-    /// in the provided context but required during serialization will be handled by the default
-    /// serialization context.
+    /// in the provided context but required during serialization will be handled by the internally
+    /// provided serialization context.
     /// </summary>
     /// <param name="context">The JSON serializer context that provides metadata for serialization.</param>
     /// <param name="errorInfoProvider">The error information provider.</param>

@@ -22,6 +22,7 @@ namespace GraphQL.SystemTextJson;
 [JsonSerializable(typeof(ExecutionError[]))]
 [JsonSerializable(typeof(ApolloTrace))]
 // Common intrinsic types used in GraphQL.NET
+// Note that other scalar graph types like DateTimeGraphType serializes data to a string, so no special handling is needed here
 [JsonSerializable(typeof(JsonElement?))]
 [JsonSerializable(typeof(JsonElement))]
 [JsonSerializable(typeof(BigInteger))]
@@ -54,6 +55,8 @@ internal partial class GraphQLJsonSerializerContext : JsonSerializerContext
 {
 }
 
+// this class handles types that cannot properly be handled by source generation
+// but are already supported by custom converters
 internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJsonTypeInfoResolver
 {
     public GraphQLCustomJsonSerializerContext(IErrorInfoProvider errorInfoProvider) : base(CreateOptions(errorInfoProvider))
@@ -126,7 +129,7 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
             JsonConverter? converter = options.Converters[i];
             if (converter?.CanConvert(type) == true)
             {
-                // Not designed to be compatible with JsonConverterFactory
+                // Note: this code is not designed to be compatible with JsonConverterFactory
                 return JsonMetadataServices.CreateValueInfo<TJsonMetadataType>(options, converter);
             }
         }

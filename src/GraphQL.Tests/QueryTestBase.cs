@@ -170,7 +170,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
 
         var renderResult = renderErrors ? runResult : new ExecutionResult { Data = runResult.Data, Executed = runResult.Executed };
 
-        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : [new SystemTextJson.GraphQLSerializer()];
+        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : GraphQLSerializersTestData.AllNonAotWriters;
 
         foreach (var writer in writers)
         {
@@ -216,7 +216,7 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
             options.RequestServices = ServiceProvider;
         }).GetAwaiter().GetResult();
 
-        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : [new SystemTextJson.GraphQLSerializer()];
+        var writers = AllWriters ? GraphQLSerializersTestData.AllWriters : GraphQLSerializersTestData.AllNonAotWriters;
 
         foreach (var writer in writers)
         {
