@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net8.0;net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
     <RootNamespace>GraphQL.SystemTextJson</RootNamespace>
     <Description>System.Text.Json serializer for GraphQL.NET</Description>
     <PackageTags>GraphQL;json</PackageTags>

@@ -14,6 +14,8 @@ public class OperationMessageJsonConverter : JsonConverter<OperationMessage>
     private const string PAYLOAD_KEY = "payload";
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override void Write(Utf8JsonWriter writer, OperationMessage value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
@@ -36,6 +38,8 @@ public class OperationMessageJsonConverter : JsonConverter<OperationMessage>
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override OperationMessage Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
