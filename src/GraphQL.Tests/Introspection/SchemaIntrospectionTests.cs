@@ -34,6 +34,27 @@ public class SchemaIntrospectionTests
 
     [Theory]
     [ClassData(typeof(GraphQLSerializersTestData))]
+    public async Task validate_core_schema_legacy(IGraphQLTextSerializer serializer)
+    {
+        var documentExecuter = new DocumentExecuter();
+        var executionResult = await documentExecuter.ExecuteAsync(_ =>
+        {
+            _.Schema = new Schema
+            {
+                Query = new TestQuery()
+            };
+            _.Schema.Features.RepeatableDirectives = false;
+            _.Schema.Features.DeprecationOfInputValues = false;
+            _.Query = "IntrospectionQuery".ReadGraphQLRequest();
+        });
+
+        string json = serializer.Serialize(executionResult);
+
+        ShouldBe(json, "LegacyIntrospectionResult".ReadJsonResult());
+    }
+
+    [Theory]
+    [ClassData(typeof(GraphQLSerializersTestData))]
     public async Task validate_core_schema(IGraphQLTextSerializer serializer)
     {
         var documentExecuter = new DocumentExecuter();

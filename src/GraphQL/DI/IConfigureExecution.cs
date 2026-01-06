@@ -12,7 +12,7 @@ public interface IConfigureExecution
     /// <remarks>
     /// <see cref="ExecutionOptions.RequestServices"/> can be used to resolve other services from the dependency injection framework.
     /// </remarks>
-    Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next);
+    public Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next);
 
     /// <summary>
     /// Determines the order of the registered <see cref="IConfigureExecution"/> instances;
@@ -27,7 +27,7 @@ public interface IConfigureExecution
     /// <item>200: Execution configurations -- 'Use' calls such as <see cref="GraphQLBuilderExtensions.UseApolloTracing(IGraphQLBuilder, bool)">UseApolloTracing</see>, and <see cref="GraphQLBuilderExtensions.ConfigureExecution(IGraphQLBuilder, Func{ExecutionOptions, ExecutionDelegate, Task{ExecutionResult}})">ConfigureExecution</see> calls</item>
     /// </list>
     /// </summary>
-    float SortOrder { get; }
+    public float SortOrder { get; }
 }
 
 /// <summary>

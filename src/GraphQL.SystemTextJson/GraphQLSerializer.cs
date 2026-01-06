@@ -20,6 +20,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// Initializes a new instance of the <see cref="GraphQLSerializer"/> class with default settings:
     /// no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer()
         : this(indent: false)
     {
@@ -30,6 +32,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
     /// <param name="indent">Indicates if child objects should be indented</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(bool indent)
         : this(GetDefaultSerializerOptions(indent))
     {
@@ -40,6 +44,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="indent">Indicates if child objects should be indented</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(bool indent, IErrorInfoProvider errorInfoProvider)
         : this(GetDefaultSerializerOptions(indent), errorInfoProvider ?? throw new ArgumentNullException(nameof(errorInfoProvider)))
     {
@@ -50,6 +56,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// specified <see cref="IErrorInfoProvider"/>.
     /// </summary>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(IErrorInfoProvider errorInfoProvider)
         : this(false, errorInfoProvider)
     {
@@ -60,6 +68,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// Configuration defaults to no indenting and a default instance of the <see cref="ErrorInfoProvider"/> class.
     /// </summary>
     /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(Action<JsonSerializerOptions> configureSerializerOptions)
     {
         if (configureSerializerOptions == null)
@@ -86,6 +96,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// make are unobserved.
     /// </summary>
     /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(JsonSerializerOptions serializerOptions)
     {
 #if NET5_0_OR_GREATER
@@ -114,6 +126,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="serializerOptions">Specifies the JSON serializer settings</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(JsonSerializerOptions serializerOptions, IErrorInfoProvider errorInfoProvider)
     {
 #if NET5_0_OR_GREATER
@@ -133,6 +147,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// </summary>
     /// <param name="configureSerializerOptions">Specifies a callback used to configure the JSON serializer</param>
     /// <param name="errorInfoProvider">Specifies the <see cref="IErrorInfoProvider"/> instance to use to serialize GraphQL errors</param>
+    [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public GraphQLSerializer(Action<JsonSerializerOptions> configureSerializerOptions, IErrorInfoProvider errorInfoProvider)
     {
         if (configureSerializerOptions == null)
@@ -194,20 +210,28 @@ public class GraphQLSerializer : IGraphQLTextSerializer
         => new() { WriteIndented = indent };
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public Task WriteAsync<T>(Stream stream, T? value, CancellationToken cancellationToken = default)
         => JsonSerializer.SerializeAsync(stream, value, SerializerOptions, cancellationToken);
 
 #pragma warning disable CS8619 // Nullability of reference types doesn't match target type
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public ValueTask<T?> ReadAsync<T>(Stream stream, CancellationToken cancellationToken = default)
         => JsonSerializer.DeserializeAsync<T>(stream, SerializerOptions, cancellationToken);
 #pragma warning restore CS8619 // Nullability of reference types doesn't match target type
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public string Serialize<T>(T? value)
         => JsonSerializer.Serialize(value, SerializerOptions);
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public T? Deserialize<T>(string? json)
         => json == null ? default : JsonSerializer.Deserialize<T>(json, SerializerOptions);
 
@@ -227,6 +251,8 @@ public class GraphQLSerializer : IGraphQLTextSerializer
     /// <summary>
     /// Converts the <see cref="JsonElement"/> representing a single JSON value into a <typeparamref name="T"/>.
     /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     private T? ReadNode<T>(JsonElement jsonElement)
 #if NET6_0_OR_GREATER
         => JsonSerializer.Deserialize<T>(jsonElement, SerializerOptions);

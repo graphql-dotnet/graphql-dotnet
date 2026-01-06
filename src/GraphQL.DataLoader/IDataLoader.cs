@@ -9,7 +9,7 @@ public interface IDataLoader
     /// Dispatch any pending operations
     /// </summary>
     /// <param name="cancellationToken">Optional <seealso cref="CancellationToken"/> to pass to the fetch delegate</param>
-    Task DispatchAsync(CancellationToken cancellationToken = default);
+    public Task DispatchAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -24,7 +24,7 @@ public interface IDataLoader<T>
     /// <returns>
     /// An object representing a pending operation.
     /// </returns>
-    IDataLoaderResult<T> LoadAsync();
+    public IDataLoaderResult<T> LoadAsync();
 }
 
 /// <summary>
@@ -41,5 +41,5 @@ public interface IDataLoader<TKey, T>
     /// <returns>
     /// An object representing a pending operation
     /// </returns>
-    IDataLoaderResult<T> LoadAsync(TKey key);
+    public IDataLoaderResult<T> LoadAsync(TKey key);
 }

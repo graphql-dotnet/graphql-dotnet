@@ -1410,6 +1410,8 @@ public class GraphQLBuilderExtensionTests
     private class TestConfigureSchema : IConfigureSchema
     {
         public void Configure(ISchema schema, IServiceProvider serviceProvider) => throw new NotImplementedException();
+
+        public float SortOrder => throw new NotImplementedException();
     }
 
     private class TestConfigureExecution : IConfigureExecution

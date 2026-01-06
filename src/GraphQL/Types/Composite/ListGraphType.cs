@@ -15,24 +15,14 @@ public class ListGraphType : GraphType, IProvideResolvedType
     }
 
     /// <summary>
-    /// Returns the .NET type of the inner (wrapped) graph type.
-    /// </summary>
-    public virtual Type? Type => null;
-
-    private IGraphType? _resolvedType;
-
-    /// <summary>
     /// Gets or sets the instance of the inner (wrapped) graph type.
     /// </summary>
     public IGraphType? ResolvedType
     {
-        get => _resolvedType;
+        get;
         set
         {
-            if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
-                throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
-
-            _resolvedType = value;
+            field = value;
             _cachedString = null;
         }
     }
@@ -41,21 +31,27 @@ public class ListGraphType : GraphType, IProvideResolvedType
 
     /// <inheritdoc/>
     public override string ToString() => _cachedString ??= $"[{ResolvedType}]";
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (ListGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => ToString().GetHashCode();
 }
 
 /// <inheritdoc cref="ListGraphType"/>
 public sealed class ListGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : ListGraphType
     where T : IGraphType
 {
-    /// <summary>
-    /// Initializes a new instance for the specified inner graph type.
-    /// </summary>
-    [Obsolete("This constructor is for internal use only; use ListGraphType(IGraphType type) instead.")]
-    public ListGraphType()
-        : base(null!)
-    {
-    }
-
-    /// <inheritdoc/>
-    public override Type Type => typeof(T);
+    private ListGraphType() : base(null!) { }
 }

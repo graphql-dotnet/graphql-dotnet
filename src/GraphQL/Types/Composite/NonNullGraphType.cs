@@ -15,18 +15,11 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
     }
 
     /// <summary>
-    /// Returns the .NET type of the inner (wrapped) graph type.
-    /// </summary>
-    public virtual Type? Type => null;
-
-    private IGraphType? _resolvedType;
-
-    /// <summary>
     /// Gets or sets the instance of the inner (wrapped) graph type.
     /// </summary>
     public IGraphType? ResolvedType
     {
-        get => _resolvedType;
+        get;
         set
         {
             if (value is NonNullGraphType) //TODO: null check here or in ctor
@@ -35,10 +28,7 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
                 throw new ArgumentOutOfRangeException("ResolvedType", "Cannot nest NonNull inside NonNull.");
             }
 
-            if (value != null && Type != null && !Type.IsAssignableFrom(value.GetType()))
-                throw new ArgumentOutOfRangeException("ResolvedType", $"Type '{Type.Name}' should be assignable from ResolvedType '{value.GetType().Name}'.");
-
-            _resolvedType = value;
+            field = value;
             _cachedString = null;
         }
     }
@@ -47,25 +37,27 @@ public class NonNullGraphType : GraphType, IProvideResolvedType
 
     /// <inheritdoc/>
     public override string ToString() => _cachedString ??= $"{ResolvedType}!";
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+            return true;
+
+        if (obj is null || obj.GetType() != GetType())
+            return false;
+
+        var other = (NonNullGraphType)obj;
+        return Equals(ResolvedType, other.ResolvedType);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode() => ToString().GetHashCode();
 }
 
 /// <inheritdoc cref="NonNullGraphType"/>
 public sealed class NonNullGraphType<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] T> : NonNullGraphType
     where T : IGraphType
 {
-    /// <summary>
-    /// Initializes a new instance for the specified inner graph type.
-    /// </summary>
-    [Obsolete("This constructor is for internal use only; use NonNullGraphType(IGraphType type) instead.")]
-    public NonNullGraphType()
-        : base(null!)
-    {
-        if (typeof(NonNullGraphType).IsAssignableFrom(typeof(T)))
-        {
-            throw new ArgumentOutOfRangeException("type", "Cannot nest NonNull inside NonNull.");
-        }
-    }
-
-    /// <inheritdoc/>
-    public override Type Type => typeof(T);
+    private NonNullGraphType() : base(null!) { }
 }

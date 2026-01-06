@@ -40,7 +40,18 @@ public static class GlobalSwitches
     /// <br/>
     /// By default disabled.
     /// </summary>
-    public static bool EnableReadDescriptionFromXmlDocumentation { get; set; } = false;
+    public static bool EnableReadDescriptionFromXmlDocumentation
+    {
+        get;
+        set
+        {
+            // When no code calls the setter, the setter is trimmed during AOT compilation,
+            // causing the entire XML documentation feature to be trimmed out.
+            field = value;
+            if (value)
+                XmlDocumentationExtensions.Enable();
+        }
+    } = false;
 
     /// <summary>
     /// Gets or sets current validation delegate. By default this delegate validates all names according
@@ -70,6 +81,7 @@ public static class GlobalSwitches
     /// <br/>
     /// By default disabled.
     /// </summary>
+    [Obsolete("This switch is only applicable to LegacySchemaTypes, which is not used by default.")]
     public static bool TrackGraphTypeInitialization { get; set; } = false;
 
     /// <summary>
@@ -115,6 +127,9 @@ public static class GlobalSwitches
     /// <summary>
     /// Infer the field's graph type nullability from the Null Reference Type annotations of
     /// the field or property represented by the expression argument. <see langword="true"/> by default.
+    /// <br/><br/>
+    /// Note: When set to <see langword="false"/>, consider disabling analyzer rule GQL021 which warns
+    /// about nullable reference type arguments that don't explicitly specify the nullable parameter.
     /// </summary>
     public static bool InferFieldNullabilityFromNRTAnnotations { get; set; } = true;
 }

@@ -14,7 +14,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Check github.ref starts with 'refs/tags/'
         if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         run: |
@@ -39,7 +39,7 @@ jobs:
         working-directory: docs2
         run: npm run build
       - name: Upload documentation as workflow artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Documentation
           path: docs2/public/**
@@ -47,7 +47,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
           source-url: https://api.nuget.org/v3/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
@@ -61,7 +61,7 @@ jobs:
         working-directory: .
         run: dotnet pack --no-restore --no-build -c Release -p:Version=$version -o src/out
       - name: Upload Nuget packages as workflow artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Nuget packages
           path: |

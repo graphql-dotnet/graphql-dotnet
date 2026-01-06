@@ -20,6 +20,8 @@ public class ExecutionErrorJsonConverter : JsonConverter<ExecutionError>
     }
 
     /// <inheritdoc/>
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
     public override void Write(Utf8JsonWriter writer, ExecutionError error, JsonSerializerOptions options)
     {
         var info = _errorInfoProvider.GetInfo(error);

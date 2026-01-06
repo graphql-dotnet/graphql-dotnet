@@ -31,16 +31,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             3.1.x
-            5.0.x
             6.0.x
-            7.0.x
             8.0.x
+            10.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -94,11 +93,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup .NET SDKs
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

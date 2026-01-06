@@ -2,8 +2,6 @@ schema @link(url: "https://specs.apollo.dev/link/v1.0", import: ["@link"]) @link
   query: Query
 }
 
-scalar _Any
-
 type Query {
   _noop: String
   _service: _Service!
@@ -32,5 +30,7 @@ type SchemaFirstFederatedTestDto @key(fields: "id") {
 type _Service {
   sdl: String
 }
+
+scalar _Any
 
 union _Entity = SchemaFirstExternalResolvableTestDto | SchemaFirstFederatedTestDto

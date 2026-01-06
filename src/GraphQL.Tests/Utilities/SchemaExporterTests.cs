@@ -335,4 +335,56 @@ public class SchemaExporterTests
             }
         }
     }
+
+    [Fact]
+    public void Export_Should_Honor_Schema_Comparer()
+    {
+        var sdl = """
+            type Type3 {
+              field1: String
+            }
+
+            scalar Type4
+
+            schema {
+              mutation: Type3
+              query: Type1
+            }
+
+            type Type1 @zdir3(arg3: null, arg1: null, arg2: 1) @zdir1 @zdir2 {
+              f1(arg3: [ID], arg1: Float, arg2: Int!): String
+              f3: ID
+              f2: Float
+            }
+
+            # Type2 comment
+            "Type2 description"
+            input Type2 {
+              "f1 description"
+              f1: String
+              "f3 description"
+              f3: ID!
+              "f2 description"
+              f2: [[Float!]!]!
+            }
+
+            directive @zdir3(arg3: [ID], arg1: Float, arg2: Int!)
+              on FRAGMENT_SPREAD | FIELD | INLINE_FRAGMENT | OBJECT
+
+            directive @zdir1 on FIELD | OBJECT
+
+            directive @zdir2 on INLINE_FRAGMENT | OBJECT
+            """;
+
+        var schema = Schema.For(sdl);
+
+        // Set the schema comparer to alphabetical
+        schema.Comparer = new GraphQL.Introspection.AlphabeticalSchemaComparer();
+        schema.Initialize();
+
+        // Export and print the schema
+        var exported = schema.Print();
+
+        exported.ShouldMatchApproved(o => o.NoDiff());
+    }
 }

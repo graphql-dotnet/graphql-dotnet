@@ -22,6 +22,7 @@ public static class DiagnosticIds
     public const string PARSER_METHOD_MUST_BE_VALID = "GQL018";
     public const string VALIDATOR_METHOD_MUST_BE_VALID = "GQL019";
     public const string VALIDATE_ARGUMENTS_METHOD_MUST_BE_VALID = "GQL020";
+    public const string NULLABLE_REFERENCE_TYPE_ARGUMENT_SHOULD_SPECIFY_NULLABLE = "GQL021";
 
     public const string KEY_FIELD_DOES_NOT_EXIST = "GQLFED001";
 }

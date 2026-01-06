@@ -9,5 +9,5 @@ public interface IProvideResolvedType
     /// Returns the graph type of this argument or field.
     /// In case of <see cref="ListGraphType"/> or <see cref="NonNullGraphType"/>, returns an instance of the inner (wrapped) graph type.
     /// </summary>
-    IGraphType? ResolvedType { get; set; }
+    public IGraphType? ResolvedType { get; set; }
 }

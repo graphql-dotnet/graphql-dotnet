@@ -33,14 +33,12 @@ public class QueryTestBase<TSchema, TDocumentBuilder>
     }
 #pragma warning restore xUnit1013 // public method should be marked as test
 
-    private IServiceProvider _serviceProvider;
-
     // 1. get is not used by any test
     // 2. set is needed for some tests like MultithreadedTests/ComplexityTestBase that create an instance of test class manually
     public IServiceProvider ServiceProvider
     {
-        private get => _serviceProvider ??= CreateServiceProvider();
-        set => _serviceProvider = value;
+        private get => field ??= CreateServiceProvider();
+        set;
     }
 
     private IServiceProvider CreateServiceProvider()

@@ -34,7 +34,7 @@ public class BomTests
                 if (stream.Read(buffer, 0, 3) == 3 && buffer[0] == 0xEF && buffer[1] == 0xBB && buffer[2] == 0xBF) // EFBBBF
                 {
                     var data = new byte[stream.Length - 3];
-                    stream.Read(data, 0, data.Length);
+                    stream.ReadExactly(data);
                     stream.Close();
                     using var stream2 = new FileStream(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
                     stream2.Write(data);

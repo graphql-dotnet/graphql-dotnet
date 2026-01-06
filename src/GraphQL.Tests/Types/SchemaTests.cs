@@ -1,6 +1,7 @@
 using GraphQL.StarWars.Types;
 using GraphQL.Types;
 using GraphQL.Types.Relay;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GraphQL.Tests.Types;
 
@@ -125,10 +126,10 @@ public class SchemaTests
     }
 
     [Fact]
-    public void handles_stackoverflow_exception_for_cycle_field_type()
+    public void handles_cycle_field_type_2()
     {
         var schema = new ACyclingDerivingSchema(new FuncServiceProvider(t => t == typeof(AbstractGraphType) ? new ConcreteGraphType() : null));
-        Should.Throw<InvalidOperationException>(() => schema.AllTypes["abcd"]);
+        schema.Initialize();
     }
 
     private void ContainsTypeNames(ISchema schema, params string[] typeNames)
@@ -240,6 +241,50 @@ public class SchemaTests
         Should.Throw<InvalidOperationException>(() => schema.Initialize())
             .Message.ShouldBe("Cannot access AllTypes while schema types are being created. AllTypes is not available during OnBeforeInitializeType execution.");
     }
+
+    [Fact]
+    public void does_not_double_initialize_types()
+    {
+        var services = new ServiceCollection();
+        services.AddGraphQL(b => b
+            .AddSchema<AutoMapSchema>()
+            .AddAutoClrMappings(false, false)
+            .AddSystemTextJson()
+            .AddResolveFieldContextAccessor()
+        );
+        services.AddTransient(typeof(AutoRegisteringObjectGraphType<>), typeof(MyAuto<>));
+        var provider = services.BuildServiceProvider();
+        var schema = provider.GetRequiredService<ISchema>();
+        schema.Initialize();
+        var parent = schema.Query;
+        var field1 = parent.Fields.Find("field1").ShouldNotBeNull();
+        var field2 = parent.Fields.Find("field2").ShouldNotBeNull();
+        var objType = schema.AllTypes["Obj"];
+        field1.ResolvedType.ShouldBeSameAs(objType);
+        field2.ResolvedType.ShouldBeSameAs(objType);
+    }
+
+    private class MyAuto<T> : AutoRegisteringObjectGraphType<T>;
+    private class AutoMapSchema : Schema
+    {
+        public AutoMapSchema(IServiceProvider provider) : base(provider)
+        {
+            var query = new ObjectGraphType
+            {
+                Name = "Query",
+            };
+            query.Field<ObjType>("field1", true).Resolve(_ => new ObjType());
+            query.Field<ObjType>("field2", true).Resolve(_ => new ObjType());
+            Query = query;
+        }
+
+        [MapAutoClrType]
+        [Name("Obj")]
+        public class ObjType
+        {
+            public static string Hello => "world";
+        }
+    }
 }
 
 public class SchemaWithOnBeforeInitializeTypeAccessingAllTypes : Schema
@@ -265,11 +310,11 @@ public class CustomData
 
 public class CustomTypesSchema : Schema
 {
-    protected override SchemaTypes CreateSchemaTypes()
+    protected override SchemaTypesBase CreateSchemaTypes()
         => new CustomSchemaTypes(this, this);
 }
 
-public class CustomSchemaTypes : SchemaTypes
+public class CustomSchemaTypes : LegacySchemaTypes
 {
     public CustomSchemaTypes(ISchema schema, IServiceProvider serviceProvider)
         : base(schema, serviceProvider)

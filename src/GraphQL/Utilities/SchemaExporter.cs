@@ -53,20 +53,28 @@ public class SchemaExporter
         if (schemaDefinition is GraphQLSchemaDefinition schemaDef && !IsDefaultSchemaConfiguration(schemaDef))
         {
             definitions.Add(schemaDef);
-        };
+        }
 
         // export directives
-        foreach (var directive in Schema.Directives)
+        var directives = Schema.Directives.Where(d => !IsBuiltInDirective(d.Name));
+        var directiveComparer = Schema.Comparer.DirectiveComparer;
+        if (directiveComparer != null)
+            directives = directives.OrderBy(d => d, directiveComparer);
+
+        foreach (var directive in directives)
         {
-            if (!IsBuiltInDirective(directive.Name))
-                definitions.Add(ExportDirectiveDefinition(directive));
+            definitions.Add(ExportDirectiveDefinition(directive));
         }
 
         // export types
-        foreach (var type in Schema.AllTypes)
+        var types = Schema.AllTypes.Where(t => !IsIntrospectionType(t.Name) && !IsBuiltInScalar(t.Name));
+        var typeComparer = Schema.Comparer.TypeComparer;
+        if (typeComparer != null)
+            types = types.OrderBy(t => t, typeComparer);
+
+        foreach (var type in types)
         {
-            if (!IsIntrospectionType(type.Name) && !IsBuiltInScalar(type.Name))
-                definitions.Add(ApplyExtend(ExportTypeDefinition(type), type));
+            definitions.Add(ApplyExtend(ExportTypeDefinition(type), type));
         }
 
         return new GraphQLDocument(definitions);
@@ -151,8 +159,13 @@ public class SchemaExporter
         GraphQLInputFieldsDefinition? fields = null;
         if (graphType.Fields.Count > 0)
         {
+            IEnumerable<FieldType> fieldList = graphType.Fields.List!;
+            var fieldComparer = Schema.Comparer.FieldComparer(graphType);
+            if (fieldComparer != null)
+                fieldList = fieldList.OrderBy(f => f, fieldComparer);
+
             var list = new List<GraphQLInputValueDefinition>(graphType.Fields.Count);
-            foreach (var field in graphType.Fields)
+            foreach (var field in fieldList)
             {
                 list.Add(ExportInputFieldDefinition(field));
             }
@@ -188,8 +201,13 @@ public class SchemaExporter
         GraphQLFieldsDefinition? fields = null;
         if (graphType.Fields.Count > 0)
         {
+            IEnumerable<FieldType> fieldList = graphType.Fields.List!;
+            var fieldComparer = Schema.Comparer.FieldComparer(graphType);
+            if (fieldComparer != null)
+                fieldList = fieldList.OrderBy(f => f, fieldComparer);
+
             var list = new List<GraphQLFieldDefinition>(graphType.Fields.Count);
-            foreach (var field in graphType.Fields)
+            foreach (var field in fieldList)
             {
                 list.Add(ExportFieldDefinition(field));
             }
@@ -231,8 +249,13 @@ public class SchemaExporter
         GraphQLFieldsDefinition? fields = null;
         if (graphType.Fields.Count > 0)
         {
+            IEnumerable<FieldType> fieldList = graphType.Fields.List!;
+            var fieldComparer = Schema.Comparer.FieldComparer(graphType);
+            if (fieldComparer != null)
+                fieldList = fieldList.OrderBy(f => f, fieldComparer);
+
             var list = new List<GraphQLFieldDefinition>(graphType.Fields.Count);
-            foreach (var field in graphType.Fields)
+            foreach (var field in fieldList)
             {
                 list.Add(ExportFieldDefinition(field));
             }
@@ -315,7 +338,7 @@ public class SchemaExporter
     {
         var ret = new GraphQLFieldDefinition(new(fieldType.Name), ExportTypeReference(fieldType.ResolvedType!))
         {
-            Arguments = ExportArgumentsDefinition(fieldType.Arguments),
+            Arguments = ExportArgumentsDefinition(fieldType),
         };
         return ApplyDescription(ApplyDirectives(ret, fieldType), fieldType);
     }
@@ -359,8 +382,13 @@ public class SchemaExporter
         GraphQLEnumValuesDefinition? valuesDef = null;
         if (enumType.Values.Count > 0)
         {
+            IEnumerable<EnumValueDefinition> valueList = enumType.Values;
+            var enumValueComparer = Schema.Comparer.EnumValueComparer(enumType);
+            if (enumValueComparer != null)
+                valueList = valueList.OrderBy(v => v, enumValueComparer);
+
             var values = new List<GraphQLEnumValueDefinition>(enumType.Values.Count);
-            foreach (var value in enumType.Values)
+            foreach (var value in valueList)
             {
                 var name = new GraphQLName(value.Name);
                 var def = new GraphQLEnumValueDefinition(
@@ -418,18 +446,47 @@ public class SchemaExporter
             new GraphQLDirectiveLocations(directive.Locations))
         {
             Repeatable = directive.Repeatable,
-            Arguments = ExportArgumentsDefinition(directive.Arguments),
+            Arguments = ExportDirectiveArgumentsDefinition(directive),
         };
         return ApplyDescription(def, directive);
     }
 
-    private GraphQLArgumentsDefinition? ExportArgumentsDefinition(QueryArguments? arguments)
+    private GraphQLArgumentsDefinition? ExportArgumentsDefinition(IFieldType field)
     {
+        var arguments = field.Arguments;
+
         if (arguments == null || arguments.Count == 0)
             return null;
 
+        IEnumerable<QueryArgument> argList = arguments.List!;
+        if (field != null)
+        {
+            var argumentComparer = Schema.Comparer.ArgumentComparer(field);
+            if (argumentComparer != null)
+                argList = argList.OrderBy(a => a, argumentComparer);
+        }
+
         var args = new List<GraphQLInputValueDefinition>(arguments.Count);
-        foreach (var arg in arguments)
+        foreach (var arg in argList)
+        {
+            args.Add(ExportArgumentDefinition(arg));
+        }
+        return new GraphQLArgumentsDefinition(args);
+    }
+
+    private GraphQLArgumentsDefinition? ExportDirectiveArgumentsDefinition(Directive directive)
+    {
+        var arguments = directive.Arguments;
+        if (arguments == null || arguments.Count == 0)
+            return null;
+
+        IEnumerable<QueryArgument> argList = arguments.List!;
+        var argumentComparer = Schema.Comparer.DirectiveArgumentComparer(directive);
+        if (argumentComparer != null)
+            argList = argList.OrderBy(a => a, argumentComparer);
+
+        var args = new List<GraphQLInputValueDefinition>(arguments.Count);
+        foreach (var arg in argList)
         {
             args.Add(ExportArgumentDefinition(arg));
         }

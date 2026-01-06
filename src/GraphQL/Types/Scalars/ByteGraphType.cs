@@ -6,7 +6,7 @@ namespace GraphQL.Types;
 
 /// <summary>
 /// The Byte scalar graph type represents an unsigned 8-bit integer value.
-/// By default <see cref="SchemaTypes"/> maps all <see cref="byte"/> .NET values to this scalar graph type.
+/// By default <see cref="SchemaTypesBase"/> maps all <see cref="byte"/> .NET values to this scalar graph type.
 /// </summary>
 public class ByteGraphType : ScalarGraphType
 {

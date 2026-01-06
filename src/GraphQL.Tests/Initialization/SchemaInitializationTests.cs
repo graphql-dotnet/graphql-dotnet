@@ -61,15 +61,6 @@ public class SchemaInitializationTests : SchemaInitializationTestBase
         ShouldThrow<SchemaWithArgumentsOnInputField, InvalidOperationException>("The field 'id' of an Input Object type 'MyInput' must not have any arguments specified.");
     }
 
-    [Fact]
-    public void SchemaWithNotFullSpecifiedResolvedType_Should_Throw()
-    {
-        var ex = ShouldThrowMultiple<SchemaWithNotFullSpecifiedResolvedType>();
-        ex.InnerExceptions.Count.ShouldBe(2);
-        ex.InnerExceptions[0].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'in' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
-        ex.InnerExceptions[1].ShouldBeOfType<InvalidOperationException>().Message.ShouldBe("The field 'not' of an Input Object type 'InputString' must have non-null 'ResolvedType' property for all types in the chain.");
-    }
-
     // https://github.com/graphql-dotnet/graphql-dotnet/pull/2707/files#r757949833
     [Fact]
     public void SchemaWithInvalidDefault_Should_Throw()
@@ -286,37 +277,6 @@ public class SchemaWithArgumentsOnInputField : Schema
             ResolvedType = new StringGraphType(),
             Arguments = new QueryArguments(new QueryArgument<MyInputGraphType> { Name = "arg" })
         });
-    }
-}
-
-// https://github.com/graphql-dotnet/graphql-dotnet/issues/2675
-public class SchemaWithNotFullSpecifiedResolvedType : Schema
-{
-    public SchemaWithNotFullSpecifiedResolvedType()
-    {
-        var stringFilterInputType = new InputObjectGraphType { Name = "InputString" };
-
-        stringFilterInputType.AddField(new FieldType
-        {
-            Name = "eq",
-            ResolvedType = new StringGraphType()
-        });
-        stringFilterInputType.AddField(new FieldType
-        {
-            Name = "in",
-            ResolvedType = new ListGraphType<StringGraphType>()
-        });
-        stringFilterInputType.AddField(new FieldType
-        {
-            Name = "not",
-            ResolvedType = new NonNullGraphType<StringGraphType>()
-        });
-
-        var query = new ObjectGraphType();
-        query.Field("test", new StringGraphType())
-            .Arguments(new QueryArgument(stringFilterInputType) { Name = "a" })
-            .Resolve(_ => "ok");
-        Query = query;
     }
 }
 

@@ -22,6 +22,42 @@ For the smoothest migration experience, we strongly recommend:
 
 ## New Features
 
+### 1. GraphQL Specification September 2025 Features Enabled by Default
+
+Two features from the GraphQL specification dated September 2025 are now enabled by default:
+
+- **Repeatable Directives**: The `isRepeatable` field is now exposed for directives via introspection by default. This allows clients to determine whether a directive can be applied multiple times to the same location.
+- **Deprecation of Input Values**: Input values (arguments on fields and input fields on input types) can now be deprecated by default, similar to how output fields and enum values can be deprecated.
+
+These features were previously opt-in via `Schema.Features` but are now part of the official GraphQL specification and enabled by default.
+
+If you need to disable these features for backward compatibility, you can set them to `false`:
+
+```csharp
+schema.Features.RepeatableDirectives = false;
+schema.Features.DeprecationOfInputValues = false;
+```
+
+Note that these properties must be set before schema initialization.
+
+### 2. Automatic Nullable Value Type Detection in Field Arguments
+
+The `Argument<T>` method on field builders now supports automatic nullable value type detection. When the `nullable` parameter is not specified (defaults to `null`), nullable value types like `int?`, `DateTime?`, etc. will automatically be treated as nullable fields in the GraphQL schema.
+
+```csharp
+// Before v9 - explicit nullable parameter required
+Field<StringGraphType>("myField")
+    .Argument<int?>("nullableArg", nullable: true)  // Had to explicitly set nullable: true
+    .Argument<int>("requiredArg", nullable: false); // Explicitly non-null
+
+// v9 - automatic detection when nullable parameter is omitted
+Field<StringGraphType>("myField")
+    .Argument<int?>("nullableArg")     // Automatically nullable (nullable value type)
+    .Argument<int>("requiredArg");     // Automatically non-null (non-nullable value type)
+```
+
+This feature makes it easier to work with nullable value types without having to explicitly specify the `nullable` parameter. Note that reference types like `string` still default to non-null and require explicitly setting `nullable: true` to make them optional. You can always explicitly set `nullable: true` or `nullable: false` to override the automatic behavior if needed.
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
@@ -117,7 +153,7 @@ To address both concerns:
   - `IValidationResult.ArgumentValues` and `IValidationResult.DirectiveValues`
   - `ValidationResult.ArgumentValues` and `ValidationResult.DirectiveValues`
 
-### 2. New methods added to `IAbstractGraphType`
+### 3. New methods added to `IAbstractGraphType`
 
 The `IAbstractGraphType` interface has been extended with new methods that were previously only available on `InterfaceGraphType` and `UnionGraphType`. Since both interface and union graph types require the same methods for the same purpose, these methods have been moved to the common interface:
 
@@ -127,11 +163,11 @@ The `IAbstractGraphType` interface has been extended with new methods that were 
 
 If you have custom implementations of `IAbstractGraphType`, you will need to implement these new methods and property. Most users who inherit from `InterfaceGraphType` or `UnionGraphType` will not be affected as these base classes already provide the implementations.
 
-### 3. `ParseLinkVisitor.Run` method removed
+### 4. `ParseLinkVisitor.Run` method removed
 
 The `ParseLinkVisitor.Run` method has been removed. However, no changes should be required in your code since an equivalent extension method `Run` already exists for all `ISchemaNodeVisitor` instances, including `ParseLinkVisitor`.
 
-### 4. Async suffix removal for type-first field names
+### 5. Async suffix removal for type-first field names
 
 In type-first GraphQL schemas, field names ending with "Async" are now automatically removed for methods returning `ValueTask<T>` and `IAsyncEnumerable<T>`, consistent with the existing behavior for `Task<T>`.
 
@@ -139,6 +175,65 @@ For example, previously only `Task<string> GetDataAsync()` would become field `"
 
 If you have type-first schemas with `ValueTask<T>` or `IAsyncEnumerable<T>` methods ending in "Async", update your GraphQL queries to use the new field names without the "Async" suffix, or use the `[Name]` attribute to explicitly specify the desired field name.
 
-### 5. `ISchema.ResolveFieldContextAccessor` property added
+### 6. `ISchema.ResolveFieldContextAccessor` property added
 
 The `ResolveFieldContextAccessor` property has been added to the `ISchema` interface. This property was previously only available on the `Schema` class. If you have custom implementations of `ISchema`, you will need to implement this property. Most users who inherit from `Schema` will not be affected as the base class already provides the implementation.
+
+### 7. `SchemaTypes.ApplyMiddleware` moved to `SchemaTypesExtensions`
+
+The `ApplyMiddleware` method has been moved from the `SchemaTypes` class to the `SchemaTypesExtensions` static class.
+
+### 8. Schema initialization logic rewritten
+
+The schema initialization logic has been completely rewritten to improve type reference handling. The updated `SchemaTypes` class provides stricter duplicate type prevention and improved exception messages. The previous implementation is available as `LegacySchemaTypes` for backwards compatibility.
+
+Most users require no changes. Note that the order in which types are added to the schema has changed, which may affect introspection query results if you rely on a specific type ordering. Additionally, `GlobalSwitches.TrackGraphTypeInitialization` has been removed, but exception messages have been improved to provide better diagnostics.
+
+If you have a custom `SchemaTypes` implementation or need the legacy behavior, override `CreateSchemaTypes()` in your schema:
+
+```csharp
+protected override SchemaTypesBase CreateSchemaTypes()
+{
+    var graphTypeMappingProviders = this.GetService<IEnumerable<IGraphTypeMappingProvider>>();
+    return new LegacySchemaTypes(this, this, graphTypeMappingProviders, OnBeforeInitializeType);
+}
+```
+
+### 9. `ISchema.AllTypes` and `Schema.AllTypes` return type changed
+
+The `AllTypes` property on both `ISchema` and `Schema` now returns `SchemaTypesBase` instead of `SchemaTypes`. `SchemaTypesBase` is now the base class, and a new `SchemaTypes` class now inherits from `SchemaTypesBase`.
+
+This change allows for better extensibility and provides a clearer separation between the base functionality and the concrete implementation. The `SchemaTypesBase` class exposes the same public API as `SchemaTypes` did before, so most code should continue to work without changes.
+
+### 10. `FieldBuilder.Argument<T>` nullable parameter changed to `bool?`
+
+The `nullable` parameter in the `Argument<T>` method has changed from `bool` (default `false`) to `bool?` (default `null`) to support automatic nullable value type detection. This change is generally source-compatible and should not require changes to user code. See the New Features section above for more details.
+
+### 11. `SchemaExporter` now honors `Schema.Comparer` for sorting
+
+The `SchemaExporter` class (used by `schema.ToAST()` and `schema.Print()`) now respects the `Schema.Comparer` property when exporting the schema to an AST. This means that if you have set a custom comparer on your schema (such as `AlphabeticalSchemaComparer`), the exported schema will be sorted according to that comparer.
+
+Previously, the schema elements (types, fields, arguments, enum values, directives) were exported in their natural order regardless of the `Schema.Comparer` setting. Now they will be sorted if a comparer is configured.
+
+This change also affects the default Federation SDL request, which uses `schema.Print()` internally. If you have set a custom comparer on your federated schema, the SDL response will now be sorted according to that comparer.
+
+### 12. `ISchemaComparer.DirectiveArgumentComparer` method added
+
+The `ISchemaComparer` interface has been extended with a new `DirectiveArgumentComparer(Directive)` method for sorting directive arguments during schema export and introspection. This is similar to the existing `ArgumentComparer(IFieldType)` method for field arguments.
+
+If you have a custom implementation of `ISchemaComparer`, you will need to implement this new method. Most users who use the built-in `DefaultSchemaComparer` or `AlphabeticalSchemaComparer` will not be affected.
+
+Note that `AlphabeticalSchemaComparer` will now sort directive arguments alphabetically for introspection queries and when using `ToAST()` or `Print()`. To revert this behavior and keep directive arguments in their natural order while maintaining alphabetical sorting for other schema elements, derive from `AlphabeticalSchemaComparer` and override `DirectiveArgumentComparer`, returning `null`:
+
+```csharp
+public class CustomSchemaComparer : AlphabeticalSchemaComparer
+{
+    public override IComparer<QueryArgument>? DirectiveArgumentComparer(Directive directive) => null;
+}
+```
+
+### 13. `IConfigureSchema` interface now includes `SortOrder` property
+
+The `IConfigureSchema` interface now includes a `SortOrder` property, similar to the existing `IConfigureExecution` interface. This property determines the order in which schema configurations are executed, with lower values executing first. The default sort order for all built-in implementations is `100` (`GraphQLBuilderExtensions.SORT_ORDER_OPTIONS`).
+
+Typically no changes are required to user code unless you have a custom implementation of `IConfigureSchema`. If you do have a custom implementation, you will need to add the `SortOrder` property to your class. For most cases, returning `100` (the default value) is appropriate.

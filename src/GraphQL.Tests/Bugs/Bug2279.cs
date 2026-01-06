@@ -10,7 +10,7 @@ public class Bug2279DuplicateType : QueryTestBase<Bug2279Schema>
     {
         var s = new Bug2279Schema();
         var e = Should.Throw<InvalidOperationException>(() => s.Initialize());
-        e.Message.ShouldBe("Unable to register GraphType 'Bug2279GraphType<Int32>' with the name 'Bug2279GraphType_1'. The name 'Bug2279GraphType_1' is already registered to 'Bug2279GraphType<String>'. Check your schema configuration.");
+        e.Message.ShouldBe("The GraphQL type for field 'Bug2279Query.int' could not be derived implicitly. Unable to register GraphType 'Bug2279GraphType<Int32>' with the name 'Bug2279GraphType_1'. The name 'Bug2279GraphType_1' is already registered to 'Bug2279GraphType<String>'. Check your schema configuration.");
     }
 }
 

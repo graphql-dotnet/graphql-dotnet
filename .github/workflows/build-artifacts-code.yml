@@ -22,7 +22,7 @@ jobs:
   pack:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v6
         with:
@@ -34,7 +34,7 @@ jobs:
         working-directory: docs2
         run: npm run build
       - name: Publish docs artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Documentation
           path: docs2/public/**
@@ -42,7 +42,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '10.0.x'
           source-url: https://nuget.pkg.github.com/graphql-dotnet/index.json
         env:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
@@ -56,7 +56,7 @@ jobs:
         working-directory: .
         run: dotnet pack --no-restore --no-build -c Release -p:VersionSuffix=$GITHUB_RUN_NUMBER -o src/out
       - name: Upload artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: Nuget packages
           path: |

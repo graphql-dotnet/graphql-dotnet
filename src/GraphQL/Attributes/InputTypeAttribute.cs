@@ -8,8 +8,6 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter)]
 public class InputTypeAttribute : GraphQLAttribute
 {
-    private Type _inputType = null!;
-
     /// <inheritdoc cref="InputTypeAttribute"/>
     public InputTypeAttribute(Type graphType)
     {
@@ -19,7 +17,7 @@ public class InputTypeAttribute : GraphQLAttribute
     /// <inheritdoc cref="InputTypeAttribute"/>
     public Type InputType
     {
-        get => _inputType;
+        get;
         set
         {
             if (value == null)
@@ -28,23 +26,23 @@ public class InputTypeAttribute : GraphQLAttribute
             if (!value.IsInputType())
                 throw new ArgumentException(nameof(InputType), $"'{value}' should be an input type");
 
-            _inputType = value;
+            field = value;
         }
-    }
+    } = null!;
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
     {
         if (isInputType)
         {
-            fieldType.Type = _inputType;
+            fieldType.Type = InputType;
         }
     }
 
     /// <inheritdoc/>
     public override void Modify(QueryArgument queryArgument)
     {
-        queryArgument.Type = _inputType;
+        queryArgument.Type = InputType;
     }
 }
 

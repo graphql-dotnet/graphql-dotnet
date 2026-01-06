@@ -9,7 +9,7 @@ namespace GraphQL.Instrumentation;
 public static class FieldMiddlewareBuilderExtensions
 {
     /// <summary>
-    /// Adds middleware to the list of delegates that will be applied to all field resolvers when invoking <see cref="SchemaTypes.ApplyMiddleware(IFieldMiddlewareBuilder)"/>.
+    /// Adds middleware to the list of delegates that will be applied to all field resolvers when invoking <see cref="SchemaTypesExtensions.ApplyMiddleware(SchemaTypesBase, IFieldMiddlewareBuilder)"/>.
     /// </summary>
     /// <param name="builder">Interface for connecting middlewares to a schema.</param>
     /// <param name="middleware">Middleware instance.</param>

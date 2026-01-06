@@ -14,80 +14,80 @@ public interface ISchemaNodeVisitor
     /// <summary>
     /// Visits <see cref="Schema"/>.
     /// </summary>
-    void VisitSchema(ISchema schema);
+    public void VisitSchema(ISchema schema);
 
     /// <summary>
     /// Visits <see cref="Schema"/> after all other definitions have been visited.
     /// </summary>
-    void PostVisitSchema(ISchema schema);
+    public void PostVisitSchema(ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema <see cref="Directive"/>.
     /// </summary>
-    void VisitDirective(Directive directive, ISchema schema);
+    public void VisitDirective(Directive directive, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema <see cref="ScalarGraphType"/>.
     /// </summary>
-    void VisitScalar(ScalarGraphType type, ISchema schema);
+    public void VisitScalar(ScalarGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema object graph type.
     /// </summary>
-    void VisitObject(IObjectGraphType type, ISchema schema);
+    public void VisitObject(IObjectGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema input object graph type.
     /// </summary>
-    void VisitInputObject(IInputObjectGraphType type, ISchema schema);
+    public void VisitInputObject(IInputObjectGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits field of registered within the schema object graph type.
     /// </summary>
-    void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
+    public void VisitObjectFieldDefinition(FieldType field, IObjectGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits field of registered within the schema interface graph type.
     /// </summary>
-    void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
+    public void VisitInterfaceFieldDefinition(FieldType field, IInterfaceGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits field of registered within the schema input object graph type.
     /// </summary>
-    void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
+    public void VisitInputObjectFieldDefinition(FieldType field, IInputObjectGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits field argument of registered within the schema object graph type.
     /// </summary>
-    void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
+    public void VisitObjectFieldArgumentDefinition(QueryArgument argument, FieldType field, IObjectGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits field argument of registered within the schema interface graph type.
     /// </summary>
-    void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
+    public void VisitInterfaceFieldArgumentDefinition(QueryArgument argument, FieldType field, IInterfaceGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits directive argument.
     /// </summary>
-    void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema);
+    public void VisitDirectiveArgumentDefinition(QueryArgument argument, Directive directive, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema <see cref="IInterfaceGraphType"/>.
     /// </summary>
-    void VisitInterface(IInterfaceGraphType type, ISchema schema);
+    public void VisitInterface(IInterfaceGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema <see cref="UnionGraphType"/>.
     /// </summary>
-    void VisitUnion(UnionGraphType type, ISchema schema);
+    public void VisitUnion(UnionGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits registered within the schema <see cref="EnumerationGraphType"/>.
     /// </summary>
-    void VisitEnum(EnumerationGraphType type, ISchema schema);
+    public void VisitEnum(EnumerationGraphType type, ISchema schema);
 
     /// <summary>
     /// Visits value of registered within the schema <see cref="EnumerationGraphType"/>.
     /// </summary>
-    void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema);
+    public void VisitEnumValue(EnumValueDefinition value, EnumerationGraphType type, ISchema schema);
 }

@@ -8,8 +8,6 @@ namespace GraphQL;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Method | AttributeTargets.Field)]
 public class OutputTypeAttribute : GraphQLAttribute
 {
-    private Type _outputType = null!;
-
     /// <inheritdoc cref="OutputTypeAttribute"/>
     public OutputTypeAttribute(Type graphType)
     {
@@ -19,7 +17,7 @@ public class OutputTypeAttribute : GraphQLAttribute
     /// <inheritdoc cref="OutputTypeAttribute"/>
     public Type OutputType
     {
-        get => _outputType;
+        get;
         set
         {
             if (value == null)
@@ -28,16 +26,16 @@ public class OutputTypeAttribute : GraphQLAttribute
             if (!value.IsOutputType())
                 throw new ArgumentException(nameof(OutputType), $"'{value}' should be an output type");
 
-            _outputType = value;
+            field = value;
         }
-    }
+    } = null!;
 
     /// <inheritdoc/>
     public override void Modify(FieldType fieldType, bool isInputType)
     {
         if (!isInputType)
         {
-            fieldType.Type = _outputType;
+            fieldType.Type = OutputType;
         }
     }
 }

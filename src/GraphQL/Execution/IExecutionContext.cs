@@ -14,103 +14,103 @@ public interface IExecutionContext : IProvideUserContext
     /// <summary>
     /// Execution strategy for the currently executing document.
     /// </summary>
-    IExecutionStrategy ExecutionStrategy { get; }
+    public IExecutionStrategy ExecutionStrategy { get; }
 
     /// <summary>
     /// Propagates notification that the GraphQL request should be canceled.
     /// </summary>
-    CancellationToken CancellationToken { get; }
+    public CancellationToken CancellationToken { get; }
 
     /// <summary>
     /// The parsed GraphQL request.
     /// </summary>
-    GraphQLDocument Document { get; }
+    public GraphQLDocument Document { get; }
 
     /// <summary>
     /// A list of errors generated during GraphQL request processing.
     /// </summary>
-    ExecutionErrors Errors { get; }
+    public ExecutionErrors Errors { get; }
 
     /// <summary>
     /// A list of <see cref="IDocumentExecutionListener"/>s, enabling code to be executed at various points during the processing of the GraphQL query.
     /// </summary>
-    List<IDocumentExecutionListener> Listeners { get; }
+    public List<IDocumentExecutionListener> Listeners { get; }
 
     /// <summary>
     /// If set, limits the maximum number of nodes (in other words GraphQL fields) executed in parallel.
     /// </summary>
-    int? MaxParallelExecutionCount { get; }
+    public int? MaxParallelExecutionCount { get; }
 
     /// <summary>
     /// Provides performance metrics logging capabilities.
     /// </summary>
-    Metrics Metrics { get; }
+    public Metrics Metrics { get; }
 
     /// <summary>
     /// The GraphQL operation that is being executed.
     /// </summary>
-    GraphQLOperationDefinition Operation { get; }
+    public GraphQLOperationDefinition Operation { get; }
 
     /// <summary>
     /// Object to pass to the <see cref="IResolveFieldContext.Source"/> property of first-level resolvers.
     /// </summary>
-    object? RootValue { get; }
+    public object? RootValue { get; }
 
     /// <summary>
     /// Schema of the graph to use.
     /// </summary>
-    ISchema Schema { get; }
+    public ISchema Schema { get; }
 
     /// <summary>
     /// When <see langword="false"/>, <see cref="DocumentExecuter"/> and <see cref="ExecutionStrategy"/> capture unhandled
     /// exceptions and store them within <see cref="Errors">Errors</see>.
     /// </summary>
-    bool ThrowOnUnhandledException { get; }
+    public bool ThrowOnUnhandledException { get; }
 
     /// <summary>
     /// A delegate that can override, hide, modify, or log unhandled exceptions before they are stored.
     /// within <see cref="Errors"/> as an <see cref="ExecutionError"/>.
     /// </summary>
-    Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
+    public Func<UnhandledExceptionContext, Task> UnhandledExceptionDelegate { get; }
 
     /// <summary>
     /// Input variables to the GraphQL request.
     /// </summary>
-    Variables Variables { get; }
+    public Variables Variables { get; }
 
     /// <inheritdoc cref="IValidationResult.ArgumentValues"/>
-    IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
+    public IDictionary<GraphQLField, IDictionary<string, ArgumentValue>>? ArgumentValues { get; }
 
     /// <inheritdoc cref="IValidationResult.DirectiveValues"/>
-    IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
+    public IDictionary<ASTNode, IDictionary<string, DirectiveInfo>>? DirectiveValues { get; }
 
     /// <summary>
     /// A dictionary of extra information supplied with the GraphQL request.
     /// This is reserved for implementors to extend the protocol however they see fit, and
     /// hence there are no additional restrictions on its contents.
     /// </summary>
-    IReadOnlyDictionary<string, object?> InputExtensions { get; }
+    public IReadOnlyDictionary<string, object?> InputExtensions { get; }
 
     /// <summary>
     /// The response map may also contain an entry with key extensions. This entry is
     /// reserved for implementors to extend the protocol however they see fit, and
     /// hence there are no additional restrictions on its contents.
     /// </summary>
-    Dictionary<string, object?> OutputExtensions { get; }
+    public Dictionary<string, object?> OutputExtensions { get; }
 
     /// <summary>
     /// The service provider for the executing request. Typically this is a scoped service provider
     /// from your dependency injection framework.
     /// </summary>
-    IServiceProvider? RequestServices { get; }
+    public IServiceProvider? RequestServices { get; }
 
     /// <summary>
     /// Gets security information for the executing request.
     /// </summary>
-    ClaimsPrincipal? User { get; }
+    public ClaimsPrincipal? User { get; }
 
     /// <summary>
     /// Returns the <see cref="ExecutionOptions"/> used to configure the current execution.
     /// </summary>
-    ExecutionOptions ExecutionOptions { get; }
+    public ExecutionOptions ExecutionOptions { get; }
 }
