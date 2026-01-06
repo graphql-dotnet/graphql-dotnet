@@ -13,6 +13,7 @@ public static class SystemTextJsonGraphQLBuilderExtensions
     /// injection framework and configures them with the specified configuration delegate.
     /// </summary>
     [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions>? action = null)
     {
         builder.Services.Configure(action);
@@ -21,6 +22,7 @@ public static class SystemTextJsonGraphQLBuilderExtensions
 
     /// <inheritdoc cref="AddSystemTextJson(IGraphQLBuilder, Action{JsonSerializerOptions})"/>
     [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions, IServiceProvider>? action)
     {
         builder.Services.Configure(action);

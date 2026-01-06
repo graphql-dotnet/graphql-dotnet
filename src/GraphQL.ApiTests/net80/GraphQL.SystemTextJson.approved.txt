@@ -148,6 +148,7 @@ namespace GraphQL.SystemTextJson
     }
     public static class SchemaExtensions
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static System.Threading.Tasks.Task<string> ExecuteAsync(this GraphQL.Types.ISchema schema, System.Action<GraphQL.ExecutionOptions> configure) { }
     }
@@ -156,8 +157,10 @@ namespace GraphQL
 {
     public static class SystemTextJsonGraphQLBuilderExtensions
     {
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions>? action = null) { }
+        [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Requires runtime code generation for serialization.")]
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
         public static GraphQL.DI.IGraphQLBuilder AddSystemTextJson(this GraphQL.DI.IGraphQLBuilder builder, System.Action<System.Text.Json.JsonSerializerOptions, System.IServiceProvider>? action) { }
     }

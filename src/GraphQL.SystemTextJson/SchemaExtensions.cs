@@ -20,6 +20,7 @@ public static class SchemaExtensions
     /// Part of the public API and should not be removed even if it has no references.
     /// </remarks>
     [RequiresUnreferencedCode("This method requires dynamic access to code that is not referenced statically.")]
+    [RequiresDynamicCode("Requires runtime code generation for serialization.")]
     public static Task<string> ExecuteAsync(this ISchema schema, Action<ExecutionOptions> configure)
         => schema.ExecuteAsync(new GraphQLSerializer(indent: true), configure);
 }
