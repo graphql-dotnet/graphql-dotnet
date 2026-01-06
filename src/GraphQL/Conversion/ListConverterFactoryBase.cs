@@ -12,6 +12,7 @@ public abstract class ListConverterFactoryBase : IListConverterFactory
     /// <summary>
     /// Initializes a new instance of the <see cref="ListConverterFactoryBase"/> class.
     /// </summary>
+    [RequiresUnreferencedCode("Uses reflection to access generic method information which may be trimmed.")]
     protected ListConverterFactoryBase()
     {
         Expression<Func<object>> expression = () => Create<string>();
