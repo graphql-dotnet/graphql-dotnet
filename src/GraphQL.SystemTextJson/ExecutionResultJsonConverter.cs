@@ -1,6 +1,3 @@
-#if NET8_0_OR_GREATER
-using System.Diagnostics;
-#endif
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GraphQL.Execution;
