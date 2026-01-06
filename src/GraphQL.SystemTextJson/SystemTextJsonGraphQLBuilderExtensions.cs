@@ -12,7 +12,7 @@ public static class SystemTextJsonGraphQLBuilderExtensions
     /// <see cref="IGraphQLSerializer"/> and <see cref="IGraphQLTextSerializer"/> within the dependency
     /// injection framework and configures them with the specified configuration delegate.
     /// </summary>
-    [RequiresUnreferencedCode("Use GraphQLAotSerializer for NativeAOT scenarios.")]
+    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
     public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions>? action = null)
     {
         builder.Services.Configure(action);
@@ -20,7 +20,7 @@ public static class SystemTextJsonGraphQLBuilderExtensions
     }
 
     /// <inheritdoc cref="AddSystemTextJson(IGraphQLBuilder, Action{JsonSerializerOptions})"/>
-    [RequiresUnreferencedCode("Use GraphQLAotSerializer for NativeAOT scenarios.")]
+    [RequiresUnreferencedCode("Uses reflection and is not compatible with trimming or NativeAOT.")]
     public static IGraphQLBuilder AddSystemTextJson(this IGraphQLBuilder builder, Action<JsonSerializerOptions, IServiceProvider>? action)
     {
         builder.Services.Configure(action);
