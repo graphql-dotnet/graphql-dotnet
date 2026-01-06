@@ -166,7 +166,16 @@ mutation and subscription types' constructors may be trimmed; register them in y
 Also, `Field(x => x.MyField)` for enumeration values will require manually adding a mapping reference via
 `RegisterTypeMapping<MyEnum, EnumerationGraphType<MyEnum>>()`. Please see the `GraphQL.AotCompilationSample` for a simple
 demonstration of AOT compilation. Schema-first and type-first schemas have additional limtations and configuration requirements.
-AOT compilation has not been tested with frameworks other than .NET 7+ on Windows and Linux (e.g. Xamarin).
+AOT compilation has not been tested with frameworks other than .NET 8+ on Windows and Linux (e.g. Xamarin).
+
+To serialize with System.Text.Json's source generator for Native AOT deployments (.NET 8+), use the `GraphQLAotSerializer`
+from the `GraphQL.SystemTextJson` package:
+
+```csharp
+services.AddGraphQL(b => b
+    .AddSystemTextJsonAot()
+);
+```
 
 ## Training
 

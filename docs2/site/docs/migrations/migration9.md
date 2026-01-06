@@ -58,6 +58,47 @@ Field<StringGraphType>("myField")
 
 This feature makes it easier to work with nullable value types without having to explicitly specify the `nullable` parameter. Note that reference types like `string` still default to non-null and require explicitly setting `nullable: true` to make them optional. You can always explicitly set `nullable: true` or `nullable: false` to override the automatic behavior if needed.
 
+### 3. GraphQLAotSerializer for Native AOT Support
+
+A new `GraphQLAotSerializer` class has been added to the `GraphQL.SystemTextJson` package (available for .NET 8.0 and greater). This serializer provides AOT (Ahead-of-Time) compilation support via `JsonSerializerContext`, enabling GraphQL.NET to work with Native AOT deployments.
+
+The serializer uses source-generated JSON serialization metadata to avoid runtime reflection, which is required for Native AOT scenarios. The recommended approach is to use the `.AddSystemTextJsonAot()` extension method when configuring GraphQL:
+
+```csharp
+// Recommended: Use the extension method with default context
+services.AddGraphQL(b => b
+    .AddSystemTextJsonAot()
+);
+
+// Or with a custom JsonSerializerContext for your domain types
+services.AddGraphQL(b => b
+    .AddSystemTextJsonAot(MyAppJsonContext.Default)
+);
+```
+
+You can also instantiate the serializer directly if needed:
+
+```csharp
+var serializer = new GraphQLAotSerializer();
+```
+
+When providing a custom `JsonSerializerContext`, types not included in your context but required during serialization will be handled by the internally provided serialization context. This allows you to define serialization metadata for your custom types while still benefiting from GraphQL.NET's built-in serialization support. You can also use the custom context to modify default serialization options such as indentation.
+
+Note that when using custom scalars that return non-intrinsic types (such as the [`Vector3`](../getting-started/custom-scalars.md#vector3-sample-with-string-parsing-and-serialization) example), or when adding custom types to output extensions, you must provide a `JsonSerializerContext` that includes those types:
+
+```csharp
+// Define a context for your custom types with custom options
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Vector3))]
+[JsonSerializable(typeof(MyCustomExtensionData))]
+public partial class MyAppJsonContext : JsonSerializerContext { }
+
+// Use it with AddSystemTextJsonAot
+services.AddGraphQL(b => b
+    .AddSystemTextJsonAot(MyAppJsonContext.Default)
+);
+```
+
 ## Breaking Changes
 
 ### 1. Removal of Obsolete Members
