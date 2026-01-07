@@ -13,7 +13,11 @@ public class Inputs : ReadOnlyDictionary<string, object?>
     /// <summary>
     /// Returns an empty set of inputs.
     /// </summary>
-    public static readonly Inputs Empty = new(
+    public static
+#if NET8_0_OR_GREATER
+        new
+#endif
+        readonly Inputs Empty = new(
 #if NET5_0_OR_GREATER
         System.Collections.Immutable.ImmutableDictionary<string, object?>.Empty
 #else
