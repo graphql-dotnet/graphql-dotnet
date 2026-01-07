@@ -417,7 +417,7 @@ public class StarWarsQuery : ObjectGraphType
 
 Dependency injection scopes behave differently in GraphQL.NET **subscriptions** than in queries and mutations, which can cause scoped services to fail to resolve by default; this section shows how to configure GraphQL.NET to support scoped services in subscription resolvers.
 
-## Overview
+### Overview
 
 GraphQL.NET integrates with ASP.NET Core dependency injection.
 For **queries** and **mutations**, each execution runs within a valid request scope, allowing scoped services (such as `DbContext`) to be resolved safely.
