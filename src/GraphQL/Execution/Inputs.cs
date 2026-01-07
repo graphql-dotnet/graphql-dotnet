@@ -18,7 +18,9 @@ public class Inputs : ReadOnlyDictionary<string, object?>
         new
 #endif
         readonly Inputs Empty = new(
-#if NET5_0_OR_GREATER
+#if NET8_0_OR_GREATER
+        ReadOnlyDictionary<string, object?>.Empty
+#elif NET5_0_OR_GREATER
         System.Collections.Immutable.ImmutableDictionary<string, object?>.Empty
 #else
         new Dictionary<string, object?>()
