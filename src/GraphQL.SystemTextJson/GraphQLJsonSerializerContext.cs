@@ -119,6 +119,9 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
         // support ExecutionErrors
         if (type == typeof(ExecutionErrors))
             return CreateExecutionErrorsInfo(options);
+        // support ExecutionError[]
+        if (type == typeof(ExecutionError[]))
+            return CreateExecutionErrorArrayInfo(options);
 
         return null;
     }
@@ -138,7 +141,7 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
         return null;
     }
 
-    private static JsonTypeInfo CreateExecutionErrorsInfo(JsonSerializerOptions options)
+    private JsonTypeInfo CreateExecutionErrorsInfo(JsonSerializerOptions options)
     {
         var executionErrorTypeInfo = options.GetTypeInfo(typeof(ExecutionError));
         var info = new JsonCollectionInfoValues<ExecutionErrors>
@@ -161,6 +164,34 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
         };
         var jsonTypeInfo = JsonMetadataServices.CreateIEnumerableInfo<ExecutionErrors, ExecutionError>(options, info);
         jsonTypeInfo.NumberHandling = null;
+        jsonTypeInfo.OriginatingResolver = this;
+        return jsonTypeInfo;
+    }
+
+    private JsonTypeInfo CreateExecutionErrorArrayInfo(JsonSerializerOptions options)
+    {
+        var executionErrorTypeInfo = options.GetTypeInfo(typeof(ExecutionError));
+        var info = new JsonCollectionInfoValues<ExecutionError[]>
+        {
+            ObjectCreator = null,
+            SerializeHandler = (writer, value) =>
+            {
+                if (value == null)
+                {
+                    writer.WriteNullValue();
+                    return;
+                }
+                writer.WriteStartArray();
+                foreach (var error in value)
+                {
+                    JsonSerializer.Serialize(writer, error, executionErrorTypeInfo);
+                }
+                writer.WriteEndArray();
+            }
+        };
+        var jsonTypeInfo = JsonMetadataServices.CreateArrayInfo<ExecutionError>(options, info);
+        jsonTypeInfo.NumberHandling = null;
+        jsonTypeInfo.OriginatingResolver = this;
         return jsonTypeInfo;
     }
 }
