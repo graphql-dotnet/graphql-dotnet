@@ -282,7 +282,7 @@ public static class TypeExtensions
         => typeof(NonNullGraphType<>).MakeGenericType(type);
 
     [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
-        Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
+        Justification = "The supplied type is expected to be a reference type. ListGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
     private static Type MakeListType(Type type)
         => typeof(ListGraphType<>).MakeGenericType(type);
 

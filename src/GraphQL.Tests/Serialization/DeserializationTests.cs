@@ -13,7 +13,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void FromJson(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
@@ -23,7 +23,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void FromJson_Null(IGraphQLTextSerializer serializer)
     {
         const string test = "{\"query\":\"hello\",\"variables\":null}";
@@ -33,7 +33,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void FromJson_Missing(IGraphQLTextSerializer serializer)
     {
         const string test = "{\"query\":\"hello\"}";
@@ -43,7 +43,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void FromJson_IsCaseInsensitive_Element(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
@@ -54,7 +54,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void FromJson_IsCaseInsensitive_Inputs(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"Query\":\"hello\",\"Variables\":{ExampleJson}}}";
@@ -65,7 +65,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public async Task FromJsonStream(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
@@ -80,7 +80,7 @@ public class DeserializationTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void ElementToInputs(IGraphQLTextSerializer serializer)
     {
         string test = $"{{\"query\":\"hello\",\"variables\":{ExampleJson}}}";
