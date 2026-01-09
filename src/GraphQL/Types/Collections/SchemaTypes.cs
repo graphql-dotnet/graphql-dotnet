@@ -813,7 +813,8 @@ public sealed partial class SchemaTypes : SchemaTypesBase
             return type;
         }
 
-        [SuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
+        [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
+        [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
         private static Type MakeGenericTypeNoWarn(Type genericTypeDefinition, Type[] innerTypes)
         {
             return genericTypeDefinition.MakeGenericType(innerTypes);
@@ -879,10 +880,16 @@ public sealed partial class SchemaTypes : SchemaTypesBase
 
             // Auto-generate EnumerationGraphType<T> for enum types
             if (clrType.IsEnum)
-                return typeof(EnumerationGraphType<>).MakeGenericType(clrType);
+                return CreateEnumerationGraphTypeNoWarn(clrType);
 
             // No mapping found
             throw new InvalidOperationException($"Could not find type mapping from CLR type '{clrType.FullName}' to GraphType. Did you forget to register the type mapping with the '{nameof(ISchema)}.{nameof(ISchema.RegisterTypeMapping)}'?");
+        }
+
+        [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+        private Type CreateEnumerationGraphTypeNoWarn(Type enumType)
+        {
+            return typeof(EnumerationGraphType<>).MakeGenericType(enumType);
         }
 
         /// <summary>

@@ -939,6 +939,9 @@ namespace GraphQL
         public static object? ConvertTo(object? value, System.Type targetType) { }
         public static T? ConvertTo<T>(object? value) { }
         public static System.Func<object, object>? GetConversion(System.Type valueType, System.Type targetType) { }
+        [System.Diagnostics.CodeAnalysis.UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy \'DynamicallyAccessedMembersAttr" +
+            "ibute\' in call to target method. The parameter of method does not have matching " +
+            "annotations.", Justification="False positive; type will always equal listType, which is properly marked")]
         public static GraphQL.Conversion.IListConverter GetListConverter([System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.None | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicMethods)] System.Type listType) { }
         public static GraphQL.Conversion.IListConverterFactory GetListConverterFactory(System.Type listType) { }
         public static void Register(System.Type valueType, System.Type targetType, System.Func<object, object>? conversion) { }
@@ -2555,13 +2558,11 @@ namespace GraphQL.Types
         public override object? ParseLiteral(GraphQLParser.AST.GraphQLValue value) { }
         public override object? ParseValue(object? value) { }
     }
-    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.InputObjectGraphType { }
-    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
-    public sealed class GraphQLTypeReference : GraphQL.Types.InterfaceGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
+    public sealed class GraphQLClrInputTypeReference<T> : GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IInputObjectGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public sealed class GraphQLClrOutputTypeReference<T> : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata { }
+    public sealed class GraphQLTypeReference : GraphQL.Types.IAbstractGraphType, GraphQL.Types.IComplexGraphType, GraphQL.Types.IGraphType, GraphQL.Types.IImplementInterfaces, GraphQL.Types.IInterfaceGraphType, GraphQL.Types.IMetadataReader, GraphQL.Types.IMetadataWriter, GraphQL.Types.INamedType, GraphQL.Types.IObjectGraphType, GraphQL.Types.IProvideDeprecationReason, GraphQL.Types.IProvideDescription, GraphQL.Types.IProvideMetadata
     {
         public GraphQLTypeReference(string typeName) { }
-        public System.Func<object, bool>? IsTypeOf { get; set; }
-        public bool SkipTypeCheck { get; set; }
         public string TypeName { get; }
         public override bool Equals(object? obj) { }
         public override int GetHashCode() { }

@@ -24,7 +24,7 @@ public static class ValueConverter
     /// <summary>
     /// Register built-in conversions. This list is expected to grow over time.
     /// </summary>
-    [SuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code")]
     static ValueConverter()
     {
         Register<string, sbyte>(value => sbyte.Parse(value, NumberFormatInfo.InvariantInfo));
@@ -404,7 +404,7 @@ public static class ValueConverter
     /// Returns a converter which will convert items from a given <c>object[]</c> list
     /// into a list instance of the specified type. The list converter is cached for the specified type.
     /// </summary>
-    [SuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+    [UnconditionalSuppressMessage("Trimming", "IL2067:Target parameter argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "False positive; type will always equal listType, which is properly marked")]
     public static IListConverter GetListConverter(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]

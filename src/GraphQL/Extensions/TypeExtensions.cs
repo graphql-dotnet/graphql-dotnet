@@ -276,12 +276,12 @@ public static class TypeExtensions
         static bool IsNullableType(Type type) => !type.IsValueType || type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
     }
 
-    [SuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
     private static Type MakeNonNullType(Type type)
         => typeof(NonNullGraphType<>).MakeGenericType(type);
 
-    [SuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.",
         Justification = "The supplied type is expected to be a reference type. NonNullGraphType<T> constrains T to IGraphType, and all supported implementations are classes, so MakeGenericType(type) should be valid.")]
     private static Type MakeListType(Type type)
         => typeof(ListGraphType<>).MakeGenericType(type);
