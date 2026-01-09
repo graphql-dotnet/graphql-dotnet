@@ -18,8 +18,6 @@ namespace GraphQL.SystemTextJson;
     DefaultIgnoreCondition = JsonIgnoreCondition.Never
 )]
 // Simple GraphQL.NET types
-[JsonSerializable(typeof(ExecutionErrors))]
-[JsonSerializable(typeof(ExecutionError[]))]
 [JsonSerializable(typeof(ApolloTrace))]
 // Common intrinsic types used in GraphQL.NET
 // Note that other scalar graph types like DateTimeGraphType serializes data to a string, so no special handling is needed here
@@ -118,11 +116,17 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
         // supported types by OperationMessageJsonConverter
         if (type == typeof(OperationMessage))
             return CreateTypeInfo<OperationMessage>(type, options);
+        // support ExecutionErrors
+        if (type == typeof(ExecutionErrors))
+            return CreateExecutionErrorsInfo(options);
+        // support ExecutionError[]
+        if (type == typeof(ExecutionError[]))
+            return CreateExecutionErrorArrayInfo(options);
 
         return null;
     }
 
-    private JsonTypeInfo? CreateTypeInfo<TJsonMetadataType>(Type type, JsonSerializerOptions options)
+    private static JsonTypeInfo? CreateTypeInfo<TJsonMetadataType>(Type type, JsonSerializerOptions options)
     {
         for (int i = 0; i < options.Converters.Count; i++)
         {
@@ -135,6 +139,60 @@ internal class GraphQLCustomJsonSerializerContext : JsonSerializerContext, IJson
         }
 
         return null;
+    }
+
+    private JsonTypeInfo CreateExecutionErrorsInfo(JsonSerializerOptions options)
+    {
+        var executionErrorTypeInfo = options.GetTypeInfo(typeof(ExecutionError));
+        var info = new JsonCollectionInfoValues<ExecutionErrors>
+        {
+            ObjectCreator = () => new ExecutionErrors(),
+            SerializeHandler = (writer, value) =>
+            {
+                if (value == null)
+                {
+                    writer.WriteNullValue();
+                    return;
+                }
+                writer.WriteStartArray();
+                foreach (var error in value)
+                {
+                    JsonSerializer.Serialize(writer, error, executionErrorTypeInfo);
+                }
+                writer.WriteEndArray();
+            }
+        };
+        var jsonTypeInfo = JsonMetadataServices.CreateIEnumerableInfo<ExecutionErrors, ExecutionError>(options, info);
+        jsonTypeInfo.NumberHandling = null;
+        jsonTypeInfo.OriginatingResolver = this;
+        return jsonTypeInfo;
+    }
+
+    private JsonTypeInfo CreateExecutionErrorArrayInfo(JsonSerializerOptions options)
+    {
+        var executionErrorTypeInfo = options.GetTypeInfo(typeof(ExecutionError));
+        var info = new JsonCollectionInfoValues<ExecutionError[]>
+        {
+            ObjectCreator = null,
+            SerializeHandler = (writer, value) =>
+            {
+                if (value == null)
+                {
+                    writer.WriteNullValue();
+                    return;
+                }
+                writer.WriteStartArray();
+                foreach (var error in value)
+                {
+                    JsonSerializer.Serialize(writer, error, executionErrorTypeInfo);
+                }
+                writer.WriteEndArray();
+            }
+        };
+        var jsonTypeInfo = JsonMetadataServices.CreateArrayInfo<ExecutionError>(options, info);
+        jsonTypeInfo.NumberHandling = null;
+        jsonTypeInfo.OriginatingResolver = this;
+        return jsonTypeInfo;
     }
 }
 #endif
