@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using GraphQLParser;
-using GraphQLParser.AST;
 
 namespace GraphQL.Types;
 
