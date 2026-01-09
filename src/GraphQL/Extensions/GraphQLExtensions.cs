@@ -164,6 +164,10 @@ public static class GraphQLExtensions
     public static bool IsValidInterfaceFor(this IInterfaceGraphType implementedType, IComplexGraphType type, bool throwError = true)
     {
         // note: interfaces are only valid for object types
+        if (implementedType is GraphQLTypeReference)
+        {
+            return true; // cannot verify before the schema is built; schema validation will verify later
+        }
 
         // loop through all fields defined in the interface
         foreach (var implementedField in implementedType.Fields)

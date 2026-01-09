@@ -61,8 +61,16 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// </summary>
     public static CustomListConverterFactory DefaultInstance { get; } = new();
 
-    [SuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.", Justification = "<Pending>")]
     public IListConverter Create(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
+        Type listType)
+    {
+        return CreateImpl(listType);
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2055:Either the type on which the MakeGenericType is called can't be statically determined, or the type parameters to be used for generic arguments can't be statically determined.")]
+    [UnconditionalSuppressMessage("Trimming", "IL3050: Avoid calling members annotated with 'RequiresDynamicCodeAttribute' when publishing as Native AOT")]
+    private IListConverter CreateImpl(
         [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods)]
         Type listType)
     {
@@ -131,7 +139,7 @@ internal sealed class CustomListConverterFactory : IListConverterFactory
     /// <summary>
     /// Finds an 'Add' method that can be used to add items to the list.
     /// </summary>
-    [SuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2070:'this' argument does not satisfy 'DynamicallyAccessedMembersAttribute' in call to target method. The parameter of method does not have matching annotations.")]
     private static MethodInfo? GetAddMethod(Type listType, Type elementType)
     {
         var addMethod = listType.GetMethod("Add", [elementType]);
