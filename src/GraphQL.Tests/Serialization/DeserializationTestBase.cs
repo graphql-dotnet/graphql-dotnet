@@ -28,6 +28,30 @@ public class DeserializationTestBase
     };
     protected readonly string ExampleJson = "{\"array\":[null,\"test\",123,1.2],\"obj\":{\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4},\"itemNull\":null,\"itemString\":\"test\",\"itemNum\":123,\"itemFloat\":12.4,\"itemBigInt\":1234567890123456789012345678901234567890}";
 
+    protected readonly Dictionary<string, object?> ExampleDataSimple = new()
+    {
+        { "array", new object?[]
+            {
+                null,
+                "test",
+                123,
+                1.2
+            }
+        },
+        { "obj", new Dictionary<string, object?>
+        {
+            { "itemNull", null },
+            { "itemString", "test" },
+            { "itemNum", 123 },
+            { "itemFloat", 12.4 },
+        }
+        },
+        { "itemNull", null },
+        { "itemString", "test" },
+        { "itemNum", 123 },
+        { "itemFloat", 12.4 },
+        { "itemBigInt", BigInteger.Parse("1234567890123456789012345678901234567890") },
+    };
     public class TestData
     {
         public object?[] array { get; set; }

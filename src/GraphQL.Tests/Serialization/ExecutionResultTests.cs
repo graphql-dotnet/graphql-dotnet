@@ -26,7 +26,7 @@ public class ExecutionResultTests
             ],
             Extensions = new Dictionary<string, object?>
             {
-                { "someExtension", new { someProperty = "someValue", someOtherProperty = 1 } }
+                { "someExtension", new Dictionary<string, object?> { { "someProperty", "someValue" }, { "someOtherProperty", 1 } } }
             }
         };
 

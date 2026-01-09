@@ -53,7 +53,7 @@ public class GraphQLRequestTests : DeserializationTestBase
     }
 
     [Theory]
-    [ClassData(typeof(GraphQLSerializersTestData))]
+    [ClassData(typeof(GraphQLSerializersNoAotTestData))]
     public void Writes_GraphQLRequest_Correctly_SampleData(IGraphQLTextSerializer serializer)
     {
         var request = new GraphQLRequest
